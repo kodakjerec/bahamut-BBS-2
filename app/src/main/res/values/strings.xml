@@ -31,16 +31,14 @@
     <string name="abc_shareactionprovider_share_with">Share with</string>
     <string name="abc_shareactionprovider_share_with_application" translatable="false">Share with %s</string>
     <string name="abc_toolbar_collapse_description">Collapse</string>
-    <string name="account" translatable="false">帳號</string>
-    <string name="account_digits" translatable="false">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
-    <string name="add" translatable="false">新增</string>
+    <string name="account" translatable="false">帳號</string><string name="add" translatable="false">新增</string>
     <string name="app_name" translatable="false">Baha!BBS</string>
     <string name="arrow_down" translatable="false">▼</string>
     <string name="arrow_right" translatable="false">&gt;</string>
     <string name="arrow_up" translatable="false">▲</string>
     <string name="article_top_bottom_function_notificaiton" translatable="false">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
     <string name="author" translatable="false">作者</string>
-    <string name="author_" translatable="false">作者 :</string>
+    <string name="author_" translatable="false">作者：</string>
     <string name="block_list_setting" translatable="false">黑名單設定</string>
     <string name="bookmark" translatable="false">書籤</string>
     <string name="cancel" translatable="false">取消</string>
@@ -60,14 +58,14 @@
     <string name="folder_boards" translatable="false">佈告討論區</string>
     <string name="folder_class" translatable="false">分組討論區</string>
     <string name="folder_favorite" translatable="false">我的最愛</string>
-    <string name="gy_" translatable="false">GY :</string>
+    <string name="gy_" translatable="false">GY：</string>
     <string name="gy_minimum" translatable="false">GY值下限：</string>
-    <string name="input_board_name" translatable="false">請輸入看板名稱:</string>
+    <string name="input_board_name" translatable="false">請輸入看板名稱：</string>
     <string name="input_content_here" translatable="false">請在此輸入內文</string>
     <string name="input_receiver_here" translatable="false">請在此輸入收件人ID</string>
     <string name="input_title_here" translatable="false">請在此輸入標題</string>
     <string name="is_post_article" translatable="false">是否確定要張貼此文章?</string>
-    <string name="is_post_article_reply" translatable="false">回應至:</string>
+    <string name="is_post_article_reply" translatable="false">回應至：</string>
     <string name="keep_wifi_on_sleep" translatable="false">防止Wifi因為待機而中斷</string>
     <string name="keyword" translatable="false">關鍵字</string>
     <string name="last_page" translatable="false">最後頁</string>
@@ -96,9 +94,7 @@
     <string name="number_9" translatable="false">9</string>
     <string name="open_bookmark" translatable="false">開啟書籤</string>
     <string name="open_url" translatable="false">開啟連結</string>
-    <string name="password" translatable="false">密碼</string>
-    <string name="password_digits" translatable="false">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
-    <string name="please_input_article_number" translatable="false">請輸入文章編號</string>
+    <string name="password" translatable="false">密碼</string><string name="please_input_article_number" translatable="false">請輸入文章編號</string>
     <string name="please_input_id" translatable="false">請輸入ID</string>
     <string name="post" translatable="false">發表</string>
     <string name="post_to_board" translatable="false">版上</string>
@@ -116,8 +112,8 @@
     <string name="search_menu_title" translatable="false">Search</string>
     <string name="select" translatable="false">選擇</string>
     <string name="select_article" translatable="false">選擇文章</string>
-    <string name="select_sign" translatable="false">選擇簽名檔:</string>
-    <string name="select_sign_msg" translatable="false">要使用的簽名檔(0=不加):</string>
+    <string name="select_sign" translatable="false">選擇簽名檔：</string>
+    <string name="select_sign_msg" translatable="false">要使用的簽名檔(0=不加)：</string>
     <string name="send" translatable="false">送出</string>
     <string name="setting" translatable="false">設定</string>
     <string name="start_msg_1" translatable="false">Baha!BBS是一個巴哈姆特電玩資訊站BBS討論區的手機客戶端軟體，使用時需要透過網路傳送資料，使用時請確認您的網路連線處於可連線之狀態。\10</string>

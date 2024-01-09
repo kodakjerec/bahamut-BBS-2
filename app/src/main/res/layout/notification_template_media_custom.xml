@@ -27,5 +27,9 @@
     </LinearLayout>
     <LinearLayout android:layout_gravity="center_vertical|center_horizontal|center|end" android:orientation="horizontal" android:id="@+id/media_actions" android:layout_width="wrap_content" android:layout_height="match_parent"/>
     <include android:layout_width="48dp" android:layout_height="match_parent" android:layout_marginEnd="6dp" layout="@layout/notification_media_cancel_action"/>
-    <ImageView android:id="@+id/end_padder" android:layout_width="6dp" android:layout_height="match_parent"/>
+
+    <ImageView
+        android:id="@+id/end_padder"
+        android:layout_width="6dp"
+        android:layout_height="match_parent" />
 </LinearLayout>

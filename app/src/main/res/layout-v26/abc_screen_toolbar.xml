@@ -17,12 +17,12 @@
         android:keyboardNavigationCluster="true"
         android:touchscreenBlocksFocus="true">
 
-        <android.support.v7.widget.Toolbar xmlns:ns1="http://schemas.android.com/apk/res-auto"
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res-auto"
             android:id="@+id/action_bar"
             style="?attr/toolbarStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            ns1:navigationContentDescription="@string/abc_action_bar_up_description" />
+            android:navigationContentDescription="@string/abc_action_bar_up_description" />
 
         <android.support.v7.widget.ActionBarContextView
             android:id="@+id/action_context_bar"

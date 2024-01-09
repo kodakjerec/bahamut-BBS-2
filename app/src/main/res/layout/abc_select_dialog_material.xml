@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <view class="androidx.appcompat.app.AlertController$RecycleListView" xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:ns1="http://schemas.android.com/apk/res-auto"
-    xmlns:ns2="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res-auto"
     android:id="@+id/select_dialog_listview"
     style="@style/Widget.AppCompat.ListView"
     android:layout_width="match_parent"
@@ -12,5 +11,5 @@
     android:fadingEdge="none"
     android:overScrollMode="ifContentScrolls"
     android:scrollbars="vertical"
-    ns1:paddingBottomNoButtons="@dimen/abc_dialog_list_padding_bottom_no_buttons"
-    ns2:paddingTopNoTitle="@dimen/abc_dialog_list_padding_top_no_title" />
+    android:paddingBottomNoButtons="@dimen/abc_dialog_list_padding_bottom_no_buttons"
+    android:paddingTopNoTitle="@dimen/abc_dialog_list_padding_top_no_title" />
