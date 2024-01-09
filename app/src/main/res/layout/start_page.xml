@@ -1,70 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:background="@color/item_background_color">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                style="@style/TouchBlock"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical">
-
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                    style="@style/TextViewLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/notices"
-                    android:textColor="@android:color/white" />
-
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                    style="@style/TextViewNormal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/start_msg_1" />
-
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                    style="@style/TextViewLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/start_msg_2"
-                    android:textColor="@android:color/white" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+    <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" style="@style/TouchBlock">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@android:color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/notices" style="@style/TextViewLarge"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/start_msg_1" style="@style/TextViewNormal"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@android:color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/start_msg_2" style="@style/TextViewLarge"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-
-    <LinearLayout
-        android:id="@+id/Start_Toolbar"
-        style="@style/Toolbar">
-
-        <Button
-            android:id="@+id/Start_ExitButton"
-            style="@style/ToolbarItem"
-            android:text="@string/exit" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            style="@style/ToolbarItem"
-            android:text="@string/zero_word" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/Start_ConnectButton"
-            style="@style/ToolbarItem"
-            android:text="@string/connect" />
+    <LinearLayout android:id="@+id/Start_Toolbar" style="@style/Toolbar">
+        <Button android:id="@+id/Start_ExitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:text="@string/zero_word" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:id="@+id/Start_ConnectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,67 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/BoardExtendOptionalPage_HistoryItemView_ContentView"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <View
-        android:id="@+id/BoardExtendOptionalPage_HistoryItemView_DividerTop"
-        style="@style/ItemViewDividerHorizontal"
-        android:visibility="gone" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:id="@+id/BoardExtendOptionalPage_HistoryItemView_BackgroundView"
-            style="@style/TouchBlock"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:background="@color/list_page_item_content_background"
-            android:orientation="horizontal">
-
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                android:id="@+id/BoardExtendOptionalPage_HistoryItemView_Status"
-                style="@style/TextViewNormal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/title_"
-                android:textColor="#fff0f080" />
-
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                android:id="@+id/BoardExtendOptionalPage_HistoryItemView_Title"
-                style="@style/TextViewNormal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:ellipsize="end"
-                android:singleLine="true"
-                android:text="@string/uninput"
-                android:textColor="#ffffffff" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/BoardExtendOptionalPage_HistoryItemView_ContentView" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <View android:id="@+id/BoardExtendOptionalPage_HistoryItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <LinearLayout android:orientation="horizontal" android:id="@+id/BoardExtendOptionalPage_HistoryItemView_BackgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#fff0f080" android:id="@+id/BoardExtendOptionalPage_HistoryItemView_Status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_" style="@style/TextViewNormal"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:ellipsize="end" android:id="@+id/BoardExtendOptionalPage_HistoryItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/uninput" android:singleLine="true" android:layout_weight="1" style="@style/TextViewNormal"/>
         </LinearLayout>
-
-        <View style="@style/ItemViewDividerVertical" />
-
-        <com.kota.TelnetUI.TextView.TelnetTextViewSmall
-            android:id="@+id/BoardExtendOptionalPage_HistoryItemView_ArrowView"
-            style="@style/TextViewSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@color/list_page_item_arrow_background"
-            android:gravity="center"
-            android:paddingStart="6dp"
-            android:paddingRight="6dp"
-            android:text="@string/arrow_right"
-            android:textColor="@color/list_page_item_arrow_color"
-            android:textStyle="bold" />
+        <View style="@style/ItemViewDividerVertical"/>
+        <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/BoardExtendOptionalPage_HistoryItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
     </LinearLayout>
-
-    <View
-        android:id="@+id/BoardExtendOptionalPage_HistoryItemView_DividerBottom"
-        style="@style/ItemViewDividerHorizontal" />
+    <View android:id="@+id/BoardExtendOptionalPage_HistoryItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

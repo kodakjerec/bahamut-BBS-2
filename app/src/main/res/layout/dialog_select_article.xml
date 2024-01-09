@@ -1,171 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:background="#ffffffff"
-    android:orientation="vertical"
-    android:padding="3dp">
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#ff000000"
-        android:orientation="vertical"
-        android:padding="1dp">
-
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-            style="@style/TextViewLarge"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="#ff202020"
-            android:padding="6dp"
-            android:text="@string/select_article"
-            android:textColor="#ffffffff" />
-
-        <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/Bahamut_Dialog_Select_Content_Label"
-                    style="@style/TextViewLarge"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:background="@null"
-                    android:gravity="center"
-                    android:hint="@string/please_input_article_number"
-                    android:textColor="#ffffffff" />
-
-                <View style="@style/DialogSelectArticleHorizontalDivider" />
-
-                <LinearLayout
-                    android:id="@+id/Bahamut_Dialog_Select_Block_P"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_7_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_7" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_8_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_8" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_9_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_9" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="#ffffffff" android:padding="3dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_article" style="@style/TextViewLarge"/>
+        <ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                <TextView android:textColor="#ffffffff" android:gravity="center" android:id="@+id/Bahamut_Dialog_Select_Content_Label" android:background="@null" android:layout_width="match_parent" android:layout_height="60dp" android:hint="@string/please_input_article_number" style="@style/TextViewLarge"/>
+                <View style="@style/DialogSelectArticleHorizontalDivider"/>
+                <LinearLayout android:orientation="vertical" android:id="@+id/Bahamut_Dialog_Select_Block_P" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_7_p" android:text="@string/number_7" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_8_p" android:text="@string/number_8" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_9_p" android:text="@string/number_9" style="@style/SelectArticleItem_p"/>
                     </LinearLayout>
-
-                    <View style="@style/DialogSelectArticleHorizontalDivider" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_4_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_4" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_5_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_5" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_6_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_6" />
+                    <View style="@style/DialogSelectArticleHorizontalDivider"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_4_p" android:text="@string/number_4" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_5_p" android:text="@string/number_5" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_6_p" android:text="@string/number_6" style="@style/SelectArticleItem_p"/>
                     </LinearLayout>
-
-                    <View style="@style/DialogSelectArticleHorizontalDivider" />
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_1_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_1" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_2_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_2" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_3_p"
-                            style="@style/SelectArticleItem_p"
-                            android:text="@string/number_3" />
+                    <View style="@style/DialogSelectArticleHorizontalDivider"/>
+                    <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_1_p" android:text="@string/number_1" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_2_p" android:text="@string/number_2" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_3_p" android:text="@string/number_3" style="@style/SelectArticleItem_p"/>
                     </LinearLayout>
-
-                    <View style="@style/DialogSelectArticleHorizontalDivider" />
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_0_p"
-                            style="@style/SelectArticleItem_p"
-                            android:layout_width="match_parent"
-                            android:layout_weight="1"
-                            android:text="@string/number_0" />
-
-                        <View style="@style/DialogSelectArticleVerticalDivider" />
-
-                        <Button
-                            android:id="@+id/Bahamut_Dialog_Select_Button_BackSpace_p"
-                            style="@style/SelectArticleItem_p"
-                            android:layout_width="match_parent"
-                            android:layout_weight="2"
-                            android:text="@string/del" />
+                    <View style="@style/DialogSelectArticleHorizontalDivider"/>
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_0_p" android:layout_width="match_parent" android:text="@string/number_0" android:layout_weight="1" style="@style/SelectArticleItem_p"/>
+                        <View style="@style/DialogSelectArticleVerticalDivider"/>
+                        <Button android:id="@+id/Bahamut_Dialog_Select_Button_BackSpace_p" android:layout_width="match_parent" android:text="@string/del" android:layout_weight="2" style="@style/SelectArticleItem_p"/>
                     </LinearLayout>
-
-                    <View style="@style/DialogSelectArticleHorizontalDivider" />
+                    <View style="@style/DialogSelectArticleHorizontalDivider"/>
                 </LinearLayout>
-
                 <LinearLayout style="@style/Toolbar">
-
-                    <Button
-                        android:id="@+id/Bahamut_Dialog_Select_Button_Cancel"
-                        style="@style/DialogToolbarItem"
-                        android:text="@string/cancel" />
-
-                    <View style="@style/ToolbarDivider" />
-
-                    <Button
-                        android:id="@+id/Bahamut_Dialog_Select_Button_Search"
-                        style="@style/DialogToolbarItem"
-                        android:text="@string/search" />
+                    <Button android:id="@+id/Bahamut_Dialog_Select_Button_Cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+                    <View style="@style/ToolbarDivider"/>
+                    <Button android:id="@+id/Bahamut_Dialog_Select_Button_Search" android:text="@string/search" style="@style/DialogToolbarItem"/>
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
