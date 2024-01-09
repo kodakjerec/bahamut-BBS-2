@@ -1,21 +1,113 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <LinearLayout android:orientation="vertical" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
-            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#fff0f080" android:id="@+id/MailBoxPage_ItemView_Status" android:layout_width="30dp" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:ellipsize="end" android:id="@+id/MailBoxPage_ItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewNormal"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            style="@style/TouchBlock"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/list_page_item_content_background"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    android:id="@+id/MailBoxPage_ItemView_Status"
+                    style="@style/TextViewNormal"
+                    android:layout_width="30dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="#fff0f080" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    android:id="@+id/MailBoxPage_ItemView_Title"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="#ffffffff" />
             </LinearLayout>
-            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffc08080" android:id="@+id/MailBoxPage_ItemView_Number" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffff7f27" android:id="@+id/MailBoxPage_ItemView_Mark" android:paddingLeft="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/word_m" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ff00ffff" android:id="@+id/MailBoxPage_ItemView_Reply" android:paddingLeft="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/word_r" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ff80c080" android:id="@+id/MailBoxPage_ItemView_Date" android:paddingLeft="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffb0b0f0" android:gravity="right" android:id="@+id/MailBoxPage_ItemView_Author" android:paddingLeft="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/MailBoxPage_ItemView_Number"
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffc08080" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/MailBoxPage_ItemView_Mark"
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="@string/word_m"
+                    android:textColor="#ffff7f27" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/MailBoxPage_ItemView_Reply"
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:text="@string/word_r"
+                    android:textColor="#ff00ffff" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/MailBoxPage_ItemView_Date"
+                    style="@style/TextViewSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="12dp"
+                    android:textColor="#ff80c080" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/MailBoxPage_ItemView_Author"
+                    style="@style/TextViewSmall"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:paddingStart="12dp"
+                    android:singleLine="true"
+                    android:textColor="#ffb0b0f0" />
             </LinearLayout>
         </LinearLayout>
-        <View style="@style/ItemViewDividerVertical"/>
-        <TextView android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/MailBoxPage_ItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+
+        <View style="@style/ItemViewDividerVertical" />
+
+        <TextView
+            android:id="@+id/MailBoxPage_ItemView_ArrowView"
+            style="@style/TextViewSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@color/list_page_item_arrow_background"
+            android:gravity="center"
+            android:paddingStart="6dp"
+            android:paddingRight="6dp"
+            android:text="@string/arrow_right"
+            android:textColor="@color/list_page_item_arrow_color"
+            android:textStyle="bold" />
     </LinearLayout>
-    <View android:id="@+id/MailBoxPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+
+    <View
+        android:id="@+id/MailBoxPage_ItemView_DividerBottom"
+        style="@style/ItemViewDividerHorizontal" />
 </LinearLayout>

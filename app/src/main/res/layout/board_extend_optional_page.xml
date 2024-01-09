@@ -1,15 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <com.kota.TelnetUI.TelnetHeaderItemView android:id="@+id/BoardExtendOptionalPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="#ffffffff" android:gravity="center" android:id="@+id/BoardExtendOptionalPage_ListEmptyView" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/list_empty" style="@style/TextViewUltraLarge"/>
-        <ListView android:id="@+id/BoardExtendOptionalPage_ListView" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@null" android:dividerHeight="0dp"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.kota.TelnetUI.TelnetHeaderItemView
+        android:id="@+id/BoardExtendOptionalPage_HeaderView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+            android:id="@+id/BoardExtendOptionalPage_ListEmptyView"
+            style="@style/TextViewUltraLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/list_empty"
+            android:textColor="#ffffffff"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/BoardExtendOptionalPage_ListView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
     </FrameLayout>
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_BookmarkButton" android:background="@color/tab_item_background_color_selected" android:text="@string/title" style="@style/TabItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_HistoryButton" android:background="@color/tab_item_background_color_unselected" android:text="@string/record" style="@style/TabItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_WaterBallButton" android:background="@color/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/TabItem"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/BoardExtendOptionalPage_BookmarkButton"
+            style="@style/TabItem"
+            android:background="@color/tab_item_background_color_selected"
+            android:text="@string/title"
+            android:textColor="@color/tab_item_text_color_selected" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BoardExtendOptionalPage_HistoryButton"
+            style="@style/TabItem"
+            android:background="@color/tab_item_background_color_unselected"
+            android:text="@string/record"
+            android:textColor="@color/tab_item_text_color_unselected" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BoardExtendOptionalPage_WaterBallButton"
+            style="@style/TabItem"
+            android:background="@color/tab_item_background_color_unselected"
+            android:enabled="false"
+            android:text="@string/zero_word"
+            android:textColor="@color/tab_item_text_color_unselected" />
     </LinearLayout>
 </LinearLayout>

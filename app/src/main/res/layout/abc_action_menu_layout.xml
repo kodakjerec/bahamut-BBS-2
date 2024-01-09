@@ -1,2 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.ActionMenuView xmlns:android="http://schemas.android.com/apk/res/android" android:gravity="center_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" xmlns:ns1="http://schemas.android.com/apk/res-auto" ns1:divider="?attr/actionBarDivider" xmlns:ns2="http://schemas.android.com/apk/res-auto" ns2:dividerPadding="12dp"/>
+<androidx.appcompat.widget.ActionMenuView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ns1="http://schemas.android.com/apk/res-auto"
+    xmlns:ns2="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    ns1:divider="?attr/actionBarDivider"
+    ns2:dividerPadding="12dp" />

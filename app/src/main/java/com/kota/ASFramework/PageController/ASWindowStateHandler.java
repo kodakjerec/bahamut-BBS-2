@@ -1,12 +1,13 @@
 package com.kota.ASFramework.PageController;
 
-import android.app.Activity;
 import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.view.Window;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 public class ASWindowStateHandler {
-    public static Activity activity = null;
+    public static AppCompatActivity activity = null;
     public static int contentViewHeight = -1;
     public static int contentViewWidth = -1;
     public static double screenHeightInch = 0.0d;
@@ -17,7 +18,7 @@ public class ASWindowStateHandler {
     public static int statusBarHeight = 0;
     public static int titleBarHeight = 0;
 
-    public static void construct(Activity aActivity) {
+    public static void construct(AppCompatActivity aActivity) {
         activity = aActivity;
         Rect rectgle = new Rect();
         Window window = activity.getWindow();

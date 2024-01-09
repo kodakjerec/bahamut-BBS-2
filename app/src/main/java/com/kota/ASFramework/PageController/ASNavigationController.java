@@ -1,20 +1,21 @@
 package com.kota.ASFramework.PageController;
 
-import android.app.Activity;
 import android.os.Bundle;
-import androidx.core.view.ViewCompat;
-
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+
 import com.kota.ASFramework.Thread.ASRunner;
+
 import java.util.Iterator;
 import java.util.Vector;
 
-public class ASNavigationController extends Activity {
+public class ASNavigationController extends AppCompatActivity {
     private static ASNavigationController _current_controller = null;
     /* access modifiers changed from: private */
     public Vector<ASViewController> _add_list = new Vector<>();

@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/time_line_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/Block">
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffffffff" android:gravity="right" android:id="@+id/ArticleTimeItemView_Time" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Block"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/time_line_background_color">
+
+    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        android:id="@+id/ArticleTimeItemView_Time"
+        style="@style/TextViewSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:textColor="#ffffffff" />
 </LinearLayout>

@@ -1,4 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
-    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Hello World!" xmlns:ns1="http://schemas.android.com/apk/res-auto" ns1:layout_constraintBottom_toBottomOf="0" xmlns:ns2="http://schemas.android.com/apk/res-auto" ns2:layout_constraintLeft_toLeftOf="0" xmlns:ns3="http://schemas.android.com/apk/res-auto" ns3:layout_constraintRight_toRightOf="0" xmlns:ns4="http://schemas.android.com/apk/res-auto" ns4:layout_constraintTop_toTopOf="0"/>
-</android.support.constraint.ConstraintLayout>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ns2="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!"
+        ns2:layout_constraintBottom_toBottomOf="parent"
+        ns2:layout_constraintLeft_toLeftOf="parent"
+        ns2:layout_constraintRight_toRightOf="parent"
+        ns2:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

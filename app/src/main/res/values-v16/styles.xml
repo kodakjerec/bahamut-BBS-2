@@ -2,6 +2,6 @@
 <resources>
     <style name="TextAppearance.AppCompat.Tooltip">
         <item name="android:textSize">14sp</item>
-        <item name="android:fontFamily">sans-serif</item>
+        <item name="fontFamily">sans-serif</item>
     </style>
 </resources>

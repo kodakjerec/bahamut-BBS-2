@@ -1,36 +1,182 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-        <LinearLayout android:orientation="vertical" android:id="@+id/SendMail_TitleBlock" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:gravity="center_vertical" android:id="@+id/SendMail_TitleLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_" style="@style/TextViewNormal"/>
-                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#00000000" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_TitleFieldBackground" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:singleLine="true" style="@style/TextViewNormal"/>
-                    <EditText android:textColor="#ffffffff" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_TitleField" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:hint="@string/input_title_here" android:singleLine="true" style="@style/TextViewNormal"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/SendMail_TitleBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                style="@style/TouchBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/item_background_color"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    android:id="@+id/SendMail_TitleLabel"
+                    style="@style/TextViewNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/title_"
+                    android:textColor="#ffffffff" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/SendMail_TitleFieldBackground"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:minHeight="54dp"
+                        android:singleLine="true"
+                        android:textColor="#00000000" />
+
+                    <EditText
+                        android:id="@+id/SendMail_TitleField"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:hint="@string/input_title_here"
+                        android:inputType="text"
+                        android:minHeight="54dp"
+                        android:singleLine="true"
+                        android:textColor="#ffffffff" />
                 </FrameLayout>
             </LinearLayout>
-            <View style="@style/HorizontalDivider"/>
-            <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@+id/SendMail_ReceiverBlock" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:gravity="center_vertical" android:id="@+id/SendMail_ReceiverLabel" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/receiver_" style="@style/TextViewNormal"/>
-                <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#00000000" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_ReceiverFieldBackground" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:singleLine="true" style="@style/TextViewNormal"/>
-                    <EditText android:textColor="#ffffffff" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_ReceiverField" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:hint="@string/input_receiver_here" android:singleLine="true" style="@style/TextViewNormal"/>
+
+            <View style="@style/HorizontalDivider" />
+
+            <LinearLayout
+                android:id="@+id/SendMail_ReceiverBlock"
+                style="@style/TouchBlock"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/item_background_color"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    android:id="@+id/SendMail_ReceiverLabel"
+                    style="@style/TextViewNormal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:text="@string/receiver_"
+                    android:textColor="#ffffffff" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/SendMail_ReceiverFieldBackground"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:minHeight="54dp"
+                        android:singleLine="true"
+                        android:textColor="#00000000" />
+
+                    <EditText
+                        android:id="@+id/SendMail_ReceiverField"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#00000000"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:hint="@string/input_receiver_here"
+                        android:inputType="text"
+                        android:minHeight="54dp"
+                        android:singleLine="true"
+                        android:textColor="#ffffffff" />
                 </FrameLayout>
             </LinearLayout>
-            <View style="@style/HorizontalDivider"/>
+
+            <View style="@style/HorizontalDivider" />
         </LinearLayout>
-        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:baselineAligned="false" android:layout_weight="1">
-            <EditText android:textColor="@android:color/white" android:gravity="top|left|center_vertical|center_horizontal|center" android:id="@+id/SendMailDialog_EditField" android:background="@color/item_background_color" android:padding="10dp" android:layout_width="0dp" android:layout_height="match_parent" android:hint="@string/input_content_here" android:layout_weight="1" style="@style/TextViewNormal"/>
-            <LinearLayout android:orientation="vertical" android:id="@+id/SendMail_SymbolList" android:background="@color/item_background_color" android:visibility="gone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/SendMailDialog_EditField"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/item_background_color"
+                android:gravity="center|start|center_horizontal|top|center_vertical"
+                android:hint="@string/input_content_here"
+                android:inputType="text"
+                android:padding="10dp"
+                android:textColor="@android:color/white" />
+
+            <LinearLayout
+                android:id="@+id/SendMail_SymbolList"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
+                android:background="@color/item_background_color"
+                android:orientation="vertical"
+                android:visibility="gone" />
         </LinearLayout>
-        <LinearLayout android:id="@+id/Sendtoolbar" style="@style/Toolbar">
-            <Button android:id="@+id/SendMailDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/SendMailDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/SendMailDialog_Change" android:text="@string/change_mode_short" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/SendMailDialog_Post" android:text="@string/send" style="@style/ToolbarItem"/>
+
+        <LinearLayout
+            android:id="@+id/Sendtoolbar"
+            style="@style/Toolbar">
+
+            <Button
+                android:id="@+id/SendMailDialog_Cancel"
+                style="@style/ToolbarItem"
+                android:text="@string/symbol" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/SendMailDialog_Symbol"
+                style="@style/ToolbarItem"
+                android:text="@string/face" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/SendMailDialog_Change"
+                style="@style/ToolbarItem"
+                android:text="@string/change_mode_short" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/SendMailDialog_Post"
+                style="@style/ToolbarItem"
+                android:text="@string/send" />
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

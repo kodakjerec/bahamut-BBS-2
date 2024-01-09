@@ -1,6 +1,5 @@
 package com.kota.Bahamut.Pages;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +12,9 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
@@ -28,7 +30,6 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -36,6 +37,7 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -351,7 +353,7 @@ public class ArticlePage extends TelnetPage {
 
     /* access modifiers changed from: package-private */
     public void showNotification() {
-        Activity activity = getNavigationController();
+        AppCompatActivity activity = getNavigationController();
         if (activity != null) {
             SharedPreferences perf = activity.getSharedPreferences("notification", 0);
             if (!perf.getBoolean("show_top_bottom_function", false)) {

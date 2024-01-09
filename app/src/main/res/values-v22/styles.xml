@@ -5,11 +5,11 @@
     <style name="Base.Theme.AppCompat.Light">
     </style>
     <style name="Base.V22.Theme.AppCompat">
-        <item name="actionModeShareDrawable">?android:attr/actionModeShareDrawable</item>
-        <item name="editTextBackground">?android:attr/editTextBackground</item>
+        <item name="actionModeShareDrawable">?attr/actionModeShareDrawable</item>
+        <item name="editTextBackground">?attr/editTextBackground</item>
     </style>
     <style name="Base.V22.Theme.AppCompat.Light">
-        <item name="actionModeShareDrawable">?android:attr/actionModeShareDrawable</item>
-        <item name="editTextBackground">?android:attr/editTextBackground</item>
+        <item name="actionModeShareDrawable">?attr/actionModeShareDrawable</item>
+        <item name="editTextBackground">?attr/editTextBackground</item>
     </style>
 </resources>

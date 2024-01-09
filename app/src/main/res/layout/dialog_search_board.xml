@@ -1,17 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="#ffffffff" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/search_board" style="@style/TextViewLarge"/>
-        <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/input_board_name" style="@style/TextViewNormal"/>
-            <View style="@style/BlockDividerHorizontal"/>
-            <EditText android:id="@+id/Bahamut_Dialog_Search_Board_Keyword" android:text="" style="@style/EditTextSingleLineLight"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="260dp"
+    android:layout_height="wrap_content"
+    android:background="#ffffffff"
+    android:padding="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ff000000"
+        android:orientation="vertical"
+        android:padding="1dp">
+
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/TextViewLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ff202020"
+            android:padding="6dp"
+            android:text="@string/search_board"
+            android:textColor="#ffffffff" />
+
+        <LinearLayout
+            style="@style/TouchBlock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/item_background_color"
+            android:orientation="vertical">
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                style="@style/TextViewNormal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/input_board_name"
+                android:textColor="#ffffffff" />
+
+            <View style="@style/BlockDividerHorizontal" />
+
+            <EditText
+                android:id="@+id/Bahamut_Dialog_Search_Board_Keyword"
+                style="@style/EditTextSingleLineLight"
+                android:text="" />
         </LinearLayout>
-        <View style="@style/BlockDividerHorizontal"/>
+
+        <View style="@style/BlockDividerHorizontal" />
+
         <LinearLayout style="@style/Toolbar">
-            <Button android:id="@+id/Bahamut_Dialog_Search_Board_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/Bahamut_Dialog_Search_Board_Search_Button" android:text="@string/search" style="@style/DialogToolbarItem"/>
+
+            <Button
+                android:id="@+id/Bahamut_Dialog_Search_Board_Cancel_Button"
+                style="@style/DialogToolbarItem"
+                android:text="@string/cancel" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Bahamut_Dialog_Search_Board_Search_Button"
+                style="@style/DialogToolbarItem"
+                android:text="@string/search" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

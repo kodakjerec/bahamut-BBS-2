@@ -1,22 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
-        <Button android:id="@+id/search_by_keyword" android:text="@string/search_article" style="@style/ExtToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/search_by_number" android:text="@string/select_article" style="@style/ExtToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/open_bookmark" android:text="@string/open_bookmark" style="@style/ExtToolbarItem"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ext_toolbar"
+        style="@style/ExtToolbar">
+
+        <Button
+            android:id="@+id/search_by_keyword"
+            style="@style/ExtToolbarItem"
+            android:text="@string/search_article" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/search_by_number"
+            style="@style/ExtToolbarItem"
+            android:text="@string/select_article" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/open_bookmark"
+            style="@style/ExtToolbarItem"
+            android:text="@string/open_bookmark" />
     </LinearLayout>
-    <com.kota.TelnetUI.TelnetHeaderItemView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-    <FrameLayout android:id="@+id/BoardPage_ListViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="#ffffffff" android:gravity="center" android:id="@+id/BoardPage_ListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
-        <com.kota.ASFramework.UI.ASListView android:id="@+id/BoardPage_ListView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
+
+    <com.kota.TelnetUI.TelnetHeaderItemView
+        android:id="@+id/BoardPage_HeaderView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <FrameLayout
+        android:id="@+id/BoardPage_ListViewBlock"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+            android:id="@+id/BoardPage_ListEmptyView"
+            style="@style/TextViewUltraLarge"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/loading_"
+            android:textColor="#ffffffff"
+            android:visibility="invisible" />
+
+        <com.kota.ASFramework.UI.ASListView
+            android:id="@+id/BoardPage_ListView"
+            style="@style/List"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="-1dp"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
     </FrameLayout>
-    <LinearLayout android:id="@+id/toolbar" style="@style/Toolbar">
-        <Button android:id="@+id/BoardPage_PostButton" android:text="@string/post" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/BoardPage_FirstPageButton" android:text="@string/first_page" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/BoardPage_LastestPageButton" android:text="@string/last_page" style="@style/ToolbarItem"/>
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/Toolbar">
+
+        <Button
+            android:id="@+id/BoardPage_PostButton"
+            style="@style/ToolbarItem"
+            android:text="@string/post" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BoardPage_FirstPageButton"
+            style="@style/ToolbarItem"
+            android:text="@string/first_page" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BoardPage_LastestPageButton"
+            style="@style/ToolbarItem"
+            android:text="@string/last_page" />
     </LinearLayout>
 </LinearLayout>

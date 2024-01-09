@@ -2,9 +2,10 @@ package com.kota.TelnetUI.TextView;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
-public class TelnetTextView extends TextView {
+import androidx.appcompat.widget.AppCompatTextView;
+
+public class TelnetTextView extends AppCompatTextView {
     public static final int TEXT_VIEW_SIZE_LARGE = 1;
     public static final int TEXT_VIEW_SIZE_NORMAL = 0;
     public static final int TEXT_VIEW_SIZE_SMALL = -1;
