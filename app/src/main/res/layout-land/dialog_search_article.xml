@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="#ffffffff" android:padding="3dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/search_article" style="@style/TextViewLarge"/>
+        <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
+                <LinearLayout android:orientation="horizontal" android:id="@+id/SearchArticleDialog_HeaderBlock" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@+id/SearchArticleDialog_KeywordBlock" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="0.8">
+                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:paddingTop="6dp" android:paddingRight="6dp" android:paddingBottom="6dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/keyword" style="@style/TextViewNormal"/>
+                        <EditText android:id="@+id/Bahamut_Dialog_Search_Keyword" style="@style/EditTextSingleLineLight"/>
+                    </LinearLayout>
+                    <View android:layout_width="6dp" android:layout_height="0px"/>
+                    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@+id/SearchArticleDialog_AuthorBlock" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_weight="1">
+                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:paddingTop="6dp" android:paddingRight="6dp" android:paddingBottom="6dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/author" style="@style/TextViewNormal"/>
+                        <EditText android:id="@+id/Bahamut_Dialog_Search_Author" style="@style/EditTextSingleLineLight"/>
+                    </LinearLayout>
+                </LinearLayout>
+                <View style="@style/BlockDividerHorizontal"/>
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@+id/SearchArticleDialog_MarkBlock" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="57dp">
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:paddingRight="20dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mark_only" style="@style/TextViewNormal"/>
+                    <RadioGroup android:orientation="horizontal" android:id="@+id/Bahamut_Dialog_Search_Mark" android:layout_width="match_parent" android:layout_height="wrap_content" android:checkedButton="@+id/Bahamut_Dialog_Search_Mark_NO">
+                        <RadioButton android:textSize="21sp" android:id="@+id/Bahamut_Dialog_Search_Mark_YES" android:layout_width="100dp" android:layout_height="wrap_content" android:text="@string/mark_y" android:layout_weight="1"/>
+                        <RadioButton android:textSize="21sp" android:id="@+id/Bahamut_Dialog_Search_Mark_NO" android:layout_width="100dp" android:layout_height="wrap_content" android:text="@string/mark_n" android:layout_weight="1"/>
+                    </RadioGroup>
+                </LinearLayout>
+                <View style="@style/BlockDividerHorizontal"/>
+                <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:id="@+id/SearchArticleDialog_GyBlock" android:paddingRight="20dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/gy_minimum" style="@style/TextViewNormal"/>
+                    <EditText android:id="@+id/gy_number_field" android:layout_width="80dp" android:maxLength="2" android:inputType="numberSigned" style="@style/EditTextSingleLineLight"/>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        <LinearLayout style="@style/Toolbar">
+            <Button android:id="@+id/Bahamut_Dialog_Search_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/Bahamut_Dialog_Search_Search_Button" android:text="@string/search" style="@style/DialogToolbarItem"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>
