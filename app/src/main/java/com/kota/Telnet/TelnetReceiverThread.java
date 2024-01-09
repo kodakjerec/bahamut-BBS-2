@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class TelnetReceiverThread extends Thread {
     public static final int UNSET = -1;
-    private TelnetCommand _command = new TelnetCommand();
+    private final TelnetCommand _command = new TelnetCommand();
     private TelnetConnector _connector = null;
     private TelnetModel _model = null;
     private boolean _receiving = true;

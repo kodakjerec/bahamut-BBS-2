@@ -4,7 +4,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import java.util.Stack;
 
 public class BoardPageBlock extends TelnetListPageBlock {
-    private static Stack<BoardPageBlock> _pool = new Stack<>();
+    private static final Stack<BoardPageBlock> _pool = new Stack<>();
     public String BoardManager = null;
     public String BoardName = null;
     public String BoardTitle = null;

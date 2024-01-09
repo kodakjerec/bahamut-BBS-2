@@ -34,7 +34,7 @@ public class ArticleTemp {
         aStream.writeUTF(this.content);
     }
 
-    public void importFromStream(ObjectInputStream aStream) throws StreamCorruptedException, IOException {
+    public void importFromStream(ObjectInputStream aStream) throws IOException {
         aStream.readInt();
         this.header = aStream.readUTF();
         this.title = aStream.readUTF();

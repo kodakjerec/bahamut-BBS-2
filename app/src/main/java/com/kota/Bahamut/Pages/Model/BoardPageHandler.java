@@ -126,7 +126,7 @@ public class BoardPageHandler {
                 item.Number = article_number;
                 item.Date = date;
                 item.Author = author;
-                item.isRead = (info == 43 || info == 77) ? false : true;
+                item.isRead = info != 43 && info != 77;
                 item.isDeleted = info == 100;
                 item.isMarked = info == 109 || info == 77;
                 item.GY = gy;

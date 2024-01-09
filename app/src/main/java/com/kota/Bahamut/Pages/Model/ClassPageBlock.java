@@ -4,7 +4,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import java.util.Stack;
 
 public class ClassPageBlock extends TelnetListPageBlock {
-    private static Stack<ClassPageBlock> _pool = new Stack<>();
+    private static final Stack<ClassPageBlock> _pool = new Stack<>();
     public int mode = 0;
 
     private ClassPageBlock() {

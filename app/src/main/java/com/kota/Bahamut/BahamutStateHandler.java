@@ -33,7 +33,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     private static final int STEP_WORKING = 1;
     public static final int UNKNOWN = -1;
     private static BahamutStateHandler _instance = null;
-    private Article_Handler _article_handler = new Article_Handler();
+    private final Article_Handler _article_handler = new Article_Handler();
     public String _article_number;
     private TelnetCursor _cursor = null;
     private boolean _reading_article = false;
@@ -73,7 +73,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         System.out.println("Current Page:" + getCurrentPage());
         String telnet_screen = "\n";
         for (int i = 0; i < 24; i++) {
-            telnet_screen = telnet_screen + String.format("%1$02d.%2$s\n", new Object[]{Integer.valueOf(i + 1), TelnetClient.getModel().getRow(i).getRawString()});
+            telnet_screen = telnet_screen + String.format("%1$02d.%2$s\n", Integer.valueOf(i + 1), TelnetClient.getModel().getRow(i).getRawString());
         }
         System.out.println("content:" + telnet_screen);
         System.out.println("cursor:" + TelnetClient.getModel().getCursor().toString());

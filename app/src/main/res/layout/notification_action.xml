@@ -23,7 +23,7 @@
         android:layout_gravity="left|center_vertical|center_horizontal|center|start"
         android:clickable="false"
         android:ellipsize="end"
-        android:paddingStart="4dp"
+        android:paddingLeft="4dp"
         android:singleLine="true"
         android:textColor="#ccc" />
 </LinearLayout>

@@ -6,11 +6,11 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 public class ASPageView extends FrameLayout {
-    private static int _count = 0;
+    private static final int _count = 0;
     private ASViewController _owner_controller = null;
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 

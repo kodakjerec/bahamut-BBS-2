@@ -151,9 +151,6 @@ public class BahamutController extends ASNavigationController implements TelnetC
     }
 
     public boolean isAnimationEnable() {
-        if (!getSharedPreferences(UserSettings.PERF_NAME, 0).getBoolean(UserSettings.PROPERTIES_ANIMATION_DISABLE, false)) {
-            return true;
-        }
-        return false;
+        return !getSharedPreferences(UserSettings.PERF_NAME, 0).getBoolean(UserSettings.PROPERTIES_ANIMATION_DISABLE, false);
     }
 }

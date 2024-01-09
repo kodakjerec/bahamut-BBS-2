@@ -10,7 +10,7 @@ import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.R;
 
 public class ClassPageItemView extends LinearLayout {
-    private static int _count = 0;
+    private static final int _count = 0;
     private TextView _board_manager_label = null;
     private TextView _board_name_label = null;
     private TextView _board_title_label = null;
@@ -27,7 +27,7 @@ public class ClassPageItemView extends LinearLayout {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 

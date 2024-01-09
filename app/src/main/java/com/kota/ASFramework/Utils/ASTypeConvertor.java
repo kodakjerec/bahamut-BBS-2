@@ -43,12 +43,8 @@ public class ASTypeConvertor {
         }
         byte[] size_data = getData(string_data.length);
         byte[] data = new byte[(string_data.length + 4)];
-        for (int i = 0; i < 4; i++) {
-            data[i] = size_data[i];
-        }
-        for (int i2 = 0; i2 < string_data.length; i2++) {
-            data[i2 + 4] = string_data[i2];
-        }
+        System.arraycopy(size_data, 0, data, 0, 4);
+        System.arraycopy(string_data, 0, data, 4, string_data.length);
         return data;
     }
 }

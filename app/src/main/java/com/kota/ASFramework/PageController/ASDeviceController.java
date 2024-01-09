@@ -63,9 +63,6 @@ public class ASDeviceController {
         NetworkInfo.State wimax = getNetworkState(6);
         NetworkInfo.State bluetooth = getNetworkState(7);
         NetworkInfo.State default_ethernet = getNetworkState(9);
-        if (mobile == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTED || wimax == NetworkInfo.State.CONNECTED || bluetooth == NetworkInfo.State.CONNECTED || default_ethernet == NetworkInfo.State.CONNECTED) {
-            return true;
-        }
-        return false;
+        return mobile == NetworkInfo.State.CONNECTED || wifi == NetworkInfo.State.CONNECTED || wimax == NetworkInfo.State.CONNECTED || bluetooth == NetworkInfo.State.CONNECTED || default_ethernet == NetworkInfo.State.CONNECTED;
     }
 }

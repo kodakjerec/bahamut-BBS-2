@@ -2,7 +2,7 @@ package com.kota.Bahamut.ListPage;
 
 public abstract class TelnetListPageBlock {
     public static final int BLOCK_SIZE = 20;
-    private TelnetListPageItem[] _items = new TelnetListPageItem[20];
+    private final TelnetListPageItem[] _items = new TelnetListPageItem[20];
     public int maximumItemNumber = 0;
     public int minimumItemNumber = 0;
     public TelnetListPageItem selectedItem = null;

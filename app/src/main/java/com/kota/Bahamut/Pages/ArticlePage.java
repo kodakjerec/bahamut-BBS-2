@@ -124,11 +124,7 @@ public class ArticlePage extends TelnetPage {
                     item_view.setAuthor(item.getAuthor(), item.getNickname());
                     item_view.setQuote(item.getQuoteLevel());
                     item_view.setContent(item.getContent());
-                    if (itemIndex < getCount() - 2) {
-                        item_view.setDividerhidden(false);
-                    } else {
-                        item_view.setDividerhidden(true);
-                    }
+                    item_view.setDividerhidden(itemIndex >= getCount() - 2);
                     if (ArticlePage.this._settings.isBlockListEnable() && ArticlePage.this._settings.isBlockListContains(item.getAuthor())) {
                         item_view.setVisible(false);
                         break;
@@ -190,10 +186,7 @@ public class ArticlePage extends TelnetPage {
 
         public boolean isEnabled(int itemIndex) {
             int type = getItemViewType(itemIndex);
-            if (type == 0 || type == 1) {
-                return true;
-            }
-            return false;
+            return type == 0 || type == 1;
         }
     };
     AdapterView.OnItemLongClickListener _list_long_click_listener = new AdapterView.OnItemLongClickListener() {
@@ -281,13 +274,13 @@ public class ArticlePage extends TelnetPage {
     UserSettings _settings;
     private TelnetView _telnet_view = null;
     Runnable _top_action = null;
-    private View.OnClickListener mChangeModeListener = new View.OnClickListener() {
+    private final View.OnClickListener mChangeModeListener = new View.OnClickListener() {
         public void onClick(View v) {
             ArticlePage.this.changeViewMode();
             ArticlePage.this.refreshExternalToolbar();
         }
     };
-    private View.OnClickListener mDoGyListener = new View.OnClickListener() {
+    private final View.OnClickListener mDoGyListener = new View.OnClickListener() {
         public void onClick(View v) {
             ArticlePage.this.onGYButtonClicked();
         }
@@ -298,7 +291,7 @@ public class ArticlePage extends TelnetPage {
             ArticlePage.this.onMenuClicked();
         }
     };
-    private View.OnClickListener mShowLinkListener = new View.OnClickListener() {
+    private final View.OnClickListener mShowLinkListener = new View.OnClickListener() {
         public void onClick(View v) {
             ArticlePage.this.onOpenLinkClicked();
         }
@@ -430,7 +423,6 @@ public class ArticlePage extends TelnetPage {
                             ArticlePage.this.onOpenLinkClicked();
                             return;
                         default:
-                            return;
                     }
                 }
 
@@ -514,13 +506,10 @@ public class ArticlePage extends TelnetPage {
             final int item_number = this._article.Number;
             ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
                 public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    switch (index) {
-                        case 1:
-                            ArticlePage.this._board_page.pushCommand(new BahamutCommandDeleteArticle(item_number));
-                            ArticlePage.this.onBackPressed();
-                            return;
-                        default:
-                            return;
+                    if (index == 1) {
+                        ArticlePage.this._board_page.pushCommand(new BahamutCommandDeleteArticle(item_number));
+                        ArticlePage.this.onBackPressed();
+                        return;
                     }
                 }
             }).scheduleDismissOnPageDisappear(this).show();

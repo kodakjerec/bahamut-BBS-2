@@ -20,14 +20,14 @@ import java.util.Iterator;
 import java.util.Vector;
 
 public class TelnetView extends View {
-    private float DEFAULT_TEXT_SIZE = 20.0f;
+    private final float DEFAULT_TEXT_SIZE = 20.0f;
     private double _bitmap_block_height = 0.0d;
     private double _bitmap_block_width = 0.0d;
-    private Bitmap.Config _bitmap_config = Bitmap.Config.RGB_565;
+    private final Bitmap.Config _bitmap_config = Bitmap.Config.RGB_565;
     private int _bitmap_space_column = 0;
     private int _bitmap_space_row = 0;
-    private int _bitmap_space_x = 8;
-    private int _bitmap_space_y = 4;
+    private final int _bitmap_space_x = 8;
+    private final int _bitmap_space_y = 4;
     private Bitmap[][] _bitmaps = null;
     /* access modifiers changed from: private */
     public boolean _blink = false;
@@ -38,22 +38,22 @@ public class TelnetView extends View {
     private double _block_width = 6.0d;
     Rect _clip = new Rect();
     private int _column = 80;
-    private BitmapSpace _current_space = new BitmapSpace();
+    private final BitmapSpace _current_space = new BitmapSpace();
     private int _draw_height = 0;
-    private boolean _draw_separator_line = false;
+    private final boolean _draw_separator_line = false;
     private int _draw_width = 0;
-    private TelnetViewDrawer _drawer = new TelnetViewDrawer();
+    private final TelnetViewDrawer _drawer = new TelnetViewDrawer();
     private double _en_text_size = 12.0d;
     private TelnetFrame _frame = null;
     /* access modifiers changed from: private */
     public Handler _handler = null;
     private double _horizontal_unit = 1.5d;
     Matrix _matrix = new Matrix();
-    private int _origin_x = 0;
-    private int _origin_y = 0;
+    private final int _origin_x = 0;
+    private final int _origin_y = 0;
     Paint _paint = new Paint();
     private double _radius = 0.0d;
-    private double _ratio = 2.5d;
+    private final double _ratio = 2.5d;
     private int _row = 24;
     private float _scale_x = 1.0f;
     private float _scale_y = 1.0f;
@@ -186,7 +186,7 @@ public class TelnetView extends View {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         if (this._blink_thread != null) {
             stopBlink();
         }

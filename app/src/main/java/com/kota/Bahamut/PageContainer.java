@@ -18,7 +18,7 @@ public class PageContainer {
     private BoardPage _board_page = null;
     private BoardSearchPage _board_search_page = null;
     private BoardLinkPage _board_title_linked_page = null;
-    private Stack<ClassPage> _class_page = new Stack<>();
+    private final Stack<ClassPage> _class_page = new Stack<>();
     private LoginPage _login_page = null;
     private MailBoxPage _mail_page = null;
     private MainPage _main_page = null;

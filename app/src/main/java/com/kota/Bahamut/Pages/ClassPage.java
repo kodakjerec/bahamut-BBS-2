@@ -106,7 +106,6 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                 TelnetClient.getClient().sendKeyboardInputToServerInBackground(99);
                 return;
             default:
-                return;
         }
     }
 
@@ -130,7 +129,6 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                 onSearchButtonClicked();
                 return;
             default:
-                return;
         }
     }
 
@@ -141,7 +139,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
                 public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
                     if (index == 1) {
-                        TelnetClient.getClient().sendStringToServerInBackground(String.valueOf(item_index) + "\nd");
+                        TelnetClient.getClient().sendStringToServerInBackground(item_index + "\nd");
                         ClassPage.this.loadLastBlock();
                     }
                 }
@@ -154,7 +152,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
             ASAlertDialog.createDialog().setMessage("確定要將此看板加入我的最愛?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
                 public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
                     if (index == 1) {
-                        TelnetClient.getClient().sendStringToServerInBackground(String.valueOf(item_index2) + "\na");
+                        TelnetClient.getClient().sendStringToServerInBackground(item_index2 + "\na");
                     }
                 }
             }).show();

@@ -17,7 +17,7 @@ public class ASListDialog extends ASDialog {
     private LinearLayout _content_view = null;
     private float _dialog_width = 280.0f;
     private LinearLayout _item_block = null;
-    private Vector<ASListDialogItem> _item_list = new Vector<>();
+    private final Vector<ASListDialogItem> _item_list = new Vector<>();
     private int _item_text_size = 1;
     private ASListDialogItemClickListener _listener = null;
     private ScrollView _scroll_view = null;

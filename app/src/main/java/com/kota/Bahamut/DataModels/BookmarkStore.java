@@ -17,11 +17,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class BookmarkStore {
-    private Map<String, BookmarkList> _bookmarks = new HashMap();
+    private final Map<String, BookmarkList> _bookmarks = new HashMap();
     private Context _context = null;
     private byte[] _ext_data = new byte[0];
     private String _file_path = "";
-    private BookmarkList _global_bookmarks = new BookmarkList("");
+    private final BookmarkList _global_bookmarks = new BookmarkList("");
     private String _owner = "";
     private int _version = 1;
 
@@ -139,7 +139,7 @@ public class BookmarkStore {
         }
     }
 
-    public void importFromStream(ObjectInputStream aStream) throws StreamCorruptedException, IOException {
+    public void importFromStream(ObjectInputStream aStream) throws IOException {
         cleanBookmark();
         this._version = aStream.readInt();
         this._owner = aStream.readUTF();

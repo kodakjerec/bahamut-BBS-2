@@ -25,7 +25,7 @@ public class Bookmark {
     public Bookmark() {
     }
 
-    public Bookmark(ObjectInputStream aInputStream) throws StreamCorruptedException, IOException {
+    public Bookmark(ObjectInputStream aInputStream) throws IOException {
         importFromStream(aInputStream);
     }
 
@@ -65,7 +65,7 @@ public class Bookmark {
         this._gy = obj.getString("gy");
     }
 
-    public void importFromStream(ObjectInputStream aStream) throws StreamCorruptedException, IOException {
+    public void importFromStream(ObjectInputStream aStream) throws IOException {
         aStream.readInt();
         this.index = 0;
         this.optional = aStream.readUTF();

@@ -139,7 +139,6 @@ public class MainPage extends TelnetPage {
                             TelnetClient.getClient().sendStringToServerInBackground("C");
                             return;
                         default:
-                            return;
                     }
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(new ASDialogOnBackPressedDelegate() {
@@ -169,7 +168,6 @@ public class MainPage extends TelnetPage {
                             TelnetClient.getClient().sendStringToServerInBackground("G");
                             return;
                         default:
-                            return;
                     }
                 }
             }).scheduleDismissOnPageDisappear(this);

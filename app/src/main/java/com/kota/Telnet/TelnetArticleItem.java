@@ -16,7 +16,7 @@ public class TelnetArticleItem {
     private TelnetFrame _frame = null;
     private String _nickname = "";
     private int _quote_level = 0;
-    private Vector<TelnetRow> _rows = new Vector<>();
+    private final Vector<TelnetRow> _rows = new Vector<>();
     private int _type = 0;
 
     public String getAuthor() {
@@ -104,12 +104,11 @@ public class TelnetArticleItem {
     }
 
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("QuoteLevel:" + this._quote_level + "\n");
-        buffer.append("Author:" + this._author + "\n");
-        buffer.append("Nickname:" + this._nickname + "\n");
-        buffer.append("Content:" + this._content + "\n");
-        return buffer.toString();
+        String buffer = "QuoteLevel:" + this._quote_level + "\n" +
+                "Author:" + this._author + "\n" +
+                "Nickname:" + this._nickname + "\n" +
+                "Content:" + this._content + "\n";
+        return buffer;
     }
 
     public void buildFrame() {

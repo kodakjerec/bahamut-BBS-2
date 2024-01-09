@@ -23,10 +23,10 @@ public class ASNavigationController extends AppCompatActivity {
     /* access modifiers changed from: private */
     public Vector<ASViewController> _controllers = new Vector<>();
     private ASDeviceController _device_controller = null;
-    private DisplayMetrics _display_metrics = new DisplayMetrics();
+    private final DisplayMetrics _display_metrics = new DisplayMetrics();
     private boolean _in_background = false;
     private boolean _is_animating = false;
-    private Vector<PageCommand> _page_commands = new Vector<>();
+    private final Vector<PageCommand> _page_commands = new Vector<>();
     /* access modifiers changed from: private */
     public Vector<ASViewController> _remove_list = new Vector<>();
     /* access modifiers changed from: private */
@@ -75,18 +75,12 @@ public class ASNavigationController extends AppCompatActivity {
 
     private boolean onMenuPressed() {
         ASViewController page = getTopController();
-        if (page == null || !page.onMenuButtonClicked()) {
-            return false;
-        }
-        return true;
+        return page != null && page.onMenuButtonClicked();
     }
 
     private boolean onSearchPressed() {
         ASViewController page = getTopController();
-        if (page == null || !page.onSearchButtonClicked()) {
-            return false;
-        }
-        return true;
+        return page != null && page.onSearchButtonClicked();
     }
 
     public void onBackPressed() {

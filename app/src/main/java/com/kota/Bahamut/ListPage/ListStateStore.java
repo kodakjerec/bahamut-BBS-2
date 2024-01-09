@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class ListStateStore {
     private static ListStateStore _instance = null;
-    private Map<String, ListState> _states = new HashMap();
+    private final Map<String, ListState> _states = new HashMap();
 
     private ListStateStore() {
     }

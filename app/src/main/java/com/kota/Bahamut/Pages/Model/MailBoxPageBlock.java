@@ -4,7 +4,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import java.util.Stack;
 
 public class MailBoxPageBlock extends TelnetListPageBlock {
-    private static Stack<MailBoxPageBlock> _pool = new Stack<>();
+    private static final Stack<MailBoxPageBlock> _pool = new Stack<>();
 
     private MailBoxPageBlock() {
     }

@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Vector;
 
 public class ASAlertDialog extends ASDialog implements View.OnClickListener {
-    private static Map<String, ASAlertDialog> _alerts = new HashMap();
+    private static final Map<String, ASAlertDialog> _alerts = new HashMap();
     private String _alert_id = null;
-    private Vector<Button> _item_list = new Vector<>();
+    private final Vector<Button> _item_list = new Vector<>();
     private ASAlertDialogListener _listener = null;
     private TextView _message_label = null;
     private TextView _title_label = null;

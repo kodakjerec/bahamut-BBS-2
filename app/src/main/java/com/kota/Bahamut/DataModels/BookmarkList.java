@@ -8,8 +8,8 @@ import java.util.List;
 
 public class BookmarkList {
     private String _board = "";
-    private List<Bookmark> _bookmarks = new ArrayList();
-    private List<Bookmark> _history_bookmarks = new ArrayList();
+    private final List<Bookmark> _bookmarks = new ArrayList();
+    private final List<Bookmark> _history_bookmarks = new ArrayList();
     public int limit = 20;
 
     public BookmarkList(String aBoardName) {

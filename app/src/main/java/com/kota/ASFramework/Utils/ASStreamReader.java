@@ -5,10 +5,7 @@ import java.io.InputStream;
 
 public class ASStreamReader {
     public static boolean readBoolean(InputStream aInputStream) throws IOException {
-        if (aInputStream.read() == 0) {
-            return false;
-        }
-        return true;
+        return aInputStream.read() != 0;
     }
 
     public static byte readByte(InputStream aInputStream) throws IOException {

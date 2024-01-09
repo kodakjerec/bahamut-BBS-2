@@ -4,8 +4,8 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import java.util.Stack;
 
 public class MailBoxPageItem extends TelnetListPageItem {
-    private static int _count = 0;
-    private static Stack<MailBoxPageItem> _pool = new Stack<>();
+    private static final int _count = 0;
+    private static final Stack<MailBoxPageItem> _pool = new Stack<>();
     public String Author = null;
     public String Date = null;
     public int Size = 0;
@@ -54,7 +54,7 @@ public class MailBoxPageItem extends TelnetListPageItem {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 

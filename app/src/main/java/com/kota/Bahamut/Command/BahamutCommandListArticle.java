@@ -14,7 +14,7 @@ public class BahamutCommandListArticle extends TelnetCommand {
 
     public void execute(TelnetListPage aListPage) {
         if (this._article_index > 0) {
-            TelnetClient.getClient().sendDataToServer((String.valueOf(this._article_index) + "\nS").getBytes());
+            TelnetClient.getClient().sendDataToServer((this._article_index + "\nS").getBytes());
         }
     }
 

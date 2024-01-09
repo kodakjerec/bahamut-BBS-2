@@ -44,7 +44,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     UserSettings _settings;
     private Button _symbol_button = null;
     private View _title_block = null;
-    private boolean _title_block_hidden = false;
+    private final boolean _title_block_hidden = false;
     private EditText _title_field = null;
     private TextView _title_field_background = null;
     public boolean recover = false;
@@ -414,7 +414,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         if (this._edit_format == null) {
             return null;
         }
-        return String.format(this._edit_format, new Object[]{this._title_field.getText().toString(), this._content_field.getText().toString()});
+        return String.format(this._edit_format, this._title_field.getText().toString(), this._content_field.getText().toString());
     }
 
     public boolean isKeepOnOffline() {

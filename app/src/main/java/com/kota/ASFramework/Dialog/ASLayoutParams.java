@@ -8,17 +8,17 @@ import androidx.core.view.ViewCompat;
 
 public class ASLayoutParams {
     private static ASLayoutParams _instance = null;
-    private float _default_touch_block_height = 60.0f;
-    private float _default_touch_block_width = 60.0f;
-    private float _dialog_width_large = 320.0f;
-    private float _dialog_width_normal = 270.0f;
-    private float _padding_large = 20.0f;
-    private float _padding_normal = 10.0f;
-    private float _padding_small = 5.0f;
-    private float _text_size_large = 24.0f;
-    private float _text_size_normal = 20.0f;
-    private float _text_size_small = 16.0f;
-    private float _text_size_ultra_large = 28.0f;
+    private final float _default_touch_block_height = 60.0f;
+    private final float _default_touch_block_width = 60.0f;
+    private final float _dialog_width_large = 320.0f;
+    private final float _dialog_width_normal = 270.0f;
+    private final float _padding_large = 20.0f;
+    private final float _padding_normal = 10.0f;
+    private final float _padding_small = 5.0f;
+    private final float _text_size_large = 24.0f;
+    private final float _text_size_normal = 20.0f;
+    private final float _text_size_small = 16.0f;
+    private final float _text_size_ultra_large = 28.0f;
 
     private ASLayoutParams() {
         initial();

@@ -9,5 +9,4 @@
     android:clickable="true"
     android:contentDescription="@string/abc_action_mode_done"
     android:focusable="true"
-    android:paddingStart="8dp"
     ns1:srcCompat="?attr/actionModeCloseDrawable" />

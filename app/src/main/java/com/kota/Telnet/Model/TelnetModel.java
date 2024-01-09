@@ -7,9 +7,9 @@ import com.kota.Telnet.TelnetCursor;
 import java.nio.ByteBuffer;
 
 public class TelnetModel {
-    private static int _count = 0;
+    private static final int _count = 0;
     protected TelnetAnsi _ansi;
-    private ByteBuffer _ansi_buffer;
+    private final ByteBuffer _ansi_buffer;
     private TelnetCursor _cursor;
     private TelnetFrame _frame;
     private int _pushed_data_size;
@@ -17,7 +17,7 @@ public class TelnetModel {
     private TelnetCursor _saved_cursor;
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 
@@ -398,7 +398,6 @@ public class TelnetModel {
                 return;
             default:
                 onReceivedUnknownAnsiControl();
-                return;
         }
     }
 
@@ -542,7 +541,6 @@ public class TelnetModel {
             default:
                 this._ansi.resetToDefaultState();
                 System.out.println("Unsupported SGR code : " + state);
-                return;
         }
     }
 
@@ -663,7 +661,6 @@ public class TelnetModel {
                 return;
             default:
                 cleanFrameToEnd();
-                return;
         }
     }
 
@@ -685,7 +682,6 @@ public class TelnetModel {
                 return;
             default:
                 cleanRowToEnd();
-                return;
         }
     }
 
@@ -714,7 +710,7 @@ public class TelnetModel {
     public String getAnsiBufferString() {
         String str = "";
         for (int i = 0; i < this._ansi_buffer.limit(); i++) {
-            str = str + String.valueOf((char) (this._ansi_buffer.get(i) & 255));
+            str = str + (char) (this._ansi_buffer.get(i) & 255);
         }
         return str;
     }

@@ -14,8 +14,8 @@ public class TelnetTextView extends AppCompatTextView {
     private static final float text_size_normal = 20.0f;
     private static final float text_size_small = 16.0f;
     private static final float text_size_ultra_large = 28.0f;
-    private float text_scale = 1.0f;
-    private float text_scale_weight = 0.0f;
+    private final float text_scale = 1.0f;
+    private final float text_scale_weight = 0.0f;
 
     public TelnetTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);

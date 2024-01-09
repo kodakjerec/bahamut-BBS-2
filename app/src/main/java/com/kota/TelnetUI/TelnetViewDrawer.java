@@ -120,7 +120,7 @@ public class TelnetViewDrawer {
                 this.canvas.drawRect((float) block.Left, (float) (block.Bottom - ((int) (((float) block.Height) - (this.verticalUnit * 2.0f)))), (float) block.Right, (float) block.Bottom, this.paint);
                 return;
             case 9607:
-                this.canvas.drawRect((float) block.Left, (float) (block.Bottom - ((int) (((float) block.Height) - (this.verticalUnit * 1.0f)))), (float) block.Right, (float) block.Bottom, this.paint);
+                this.canvas.drawRect((float) block.Left, (float) (block.Bottom - ((int) (((float) block.Height) - (this.verticalUnit)))), (float) block.Right, (float) block.Bottom, this.paint);
                 return;
             case 9608:
                 this.canvas.drawRect((float) block.Left, (float) block.Top, (float) block.Right, (float) block.Bottom, this.paint);
@@ -144,7 +144,7 @@ public class TelnetViewDrawer {
                 this.canvas.drawRect((float) block.Left, (float) block.Top, (float) (block.Left + ((int) (this.horizontalUnit * 2.0f))), (float) block.Bottom, this.paint);
                 return;
             case 9615:
-                this.canvas.drawRect((float) block.Left, (float) block.Top, (float) (block.Left + ((int) (this.horizontalUnit * 1.0f))), (float) block.Bottom, this.paint);
+                this.canvas.drawRect((float) block.Left, (float) block.Top, (float) (block.Left + ((int) (this.horizontalUnit))), (float) block.Bottom, this.paint);
                 return;
             case 9621:
                 this.canvas.drawRect((float) (block.Right - this.line_width), (float) block.Top, (float) block.Right, (float) block.Bottom, this.paint);
@@ -200,7 +200,6 @@ public class TelnetViewDrawer {
                 return;
             default:
                 this.canvas.drawText(new char[]{c}, 0, 1, (float) block.Left, (float) (block.Bottom - this.textBottomOffset), this.paint);
-                return;
         }
     }
 }

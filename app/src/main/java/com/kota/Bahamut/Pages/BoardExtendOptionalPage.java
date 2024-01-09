@@ -35,7 +35,7 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
     private Button _bookmark_button = null;
     protected TelnetHeaderItemView _header_view = null;
     private Button _history_button = null;
-    private List<Bookmark> _list = new ArrayList();
+    private final List<Bookmark> _list = new ArrayList();
     private View _list_empty_view = null;
     private ListView _list_view = null;
     private BoardExtendOptionalPageListener _listener = null;

@@ -1,7 +1,7 @@
 package com.kota.Telnet;
 
 public class NumberCharSequence implements CharSequence {
-    private char[] _data = new char[5];
+    private final char[] _data = new char[5];
     private String _string = null;
 
     public NumberCharSequence() {

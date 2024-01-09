@@ -4,8 +4,8 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import java.util.Stack;
 
 public class ClassPageItem extends TelnetListPageItem {
-    private static int _count = 0;
-    private static Stack<ClassPageItem> _pool = new Stack<>();
+    private static final int _count = 0;
+    private static final Stack<ClassPageItem> _pool = new Stack<>();
     public String Manager = null;
     public int Mode = 0;
     public String Name = null;
@@ -50,7 +50,7 @@ public class ClassPageItem extends TelnetListPageItem {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 }

@@ -182,7 +182,7 @@ public abstract class ASViewController {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         onPageDidUnload();
         super.finalize();
     }
@@ -269,10 +269,7 @@ public abstract class ASViewController {
     }
 
     public boolean isTopPage() {
-        if (getNavigationController() != null && getNavigationController().getTopController() == this) {
-            return true;
-        }
-        return false;
+        return getNavigationController() != null && getNavigationController().getTopController() == this;
     }
 
     public AssetManager getAssets() {

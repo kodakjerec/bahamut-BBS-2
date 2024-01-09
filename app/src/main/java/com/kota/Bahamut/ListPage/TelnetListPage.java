@@ -30,7 +30,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     public static final int LIST_TYPE_SEARCH = 2;
     private AutoLoadThread _auto_load_thread = null;
     @SuppressLint({"UseSparseArrays"})
-    private Map<Integer, TelnetListPageBlock> _block_list = new HashMap();
+    private final Map<Integer, TelnetListPageBlock> _block_list = new HashMap();
     private int _current_block = 0;
     private TelnetCommand _executing_command = null;
     private boolean _initialed = false;
@@ -45,12 +45,12 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     private String _list_name = null;
     /* access modifiers changed from: private */
     public ListView _list_view = null;
-    private Stack<TelnetCommand> _load_command_stack = new Stack<>();
+    private final Stack<TelnetCommand> _load_command_stack = new Stack<>();
     /* access modifiers changed from: private */
     public boolean _manual_load_page = false;
-    private Vector<TelnetCommand> _operation_command_stack = new Vector<>();
-    private boolean[] _page_preload_command = new boolean[1];
-    private boolean[] _page_refresh_command = new boolean[2];
+    private final Vector<TelnetCommand> _operation_command_stack = new Vector<>();
+    private final boolean[] _page_preload_command = new boolean[1];
+    private final boolean[] _page_refresh_command = new boolean[2];
     private int _selected_index = 0;
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
@@ -95,11 +95,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
                         send_command = span_offset > 60000;
                     } else if (total_offset > 180000) {
                         send_command = span_offset > 30000;
-                    } else if (total_offset <= 10000 || total_offset <= span_offset) {
-                        send_command = false;
-                    } else {
-                        send_command = true;
-                    }
+                    } else send_command = total_offset > 10000 && total_offset > span_offset;
                     if ((send_command || TelnetListPage.this._manual_load_page) && this.run) {
                         TelnetListPage.this.loadLastBlock(false);
                         long unused = TelnetListPage.this._last_send_time = current_time;

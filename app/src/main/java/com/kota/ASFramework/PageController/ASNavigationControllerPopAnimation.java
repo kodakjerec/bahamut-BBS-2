@@ -15,7 +15,7 @@ public class ASNavigationControllerPopAnimation {
     public ASViewController _target_controller = null;
     /* access modifiers changed from: private */
     public boolean _target_finished = false;
-    private int animation_duration = 250;
+    private final int animation_duration = 250;
 
     public ASNavigationControllerPopAnimation(ASViewController aSourceController, ASViewController aTargetController) {
         this._source_controller = aSourceController;

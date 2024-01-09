@@ -63,7 +63,6 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
                 return;
             default:
                 setDone(true);
-                return;
         }
     }
 

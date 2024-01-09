@@ -134,12 +134,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     private void onDeleteArticle(final int itemIndex) {
         ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此信件?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
             public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                switch (index) {
-                    case 1:
-                        MailBoxPage.this.pushCommand(new BahamutCommandDeleteArticle(itemIndex));
-                        return;
-                    default:
-                        return;
+                if (index == 1) {
+                    MailBoxPage.this.pushCommand(new BahamutCommandDeleteArticle(itemIndex));
+                    return;
                 }
             }
         }).scheduleDismissOnPageDisappear(this).show();
@@ -172,7 +169,6 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
                 showSelectArticleDialog();
                 return;
             default:
-                return;
         }
     }
 
@@ -189,12 +185,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     public void goodArticle(final int articleIndex) {
         ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener(new ASAlertDialogListener() {
             public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                switch (index) {
-                    case 1:
-                        MailBoxPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
-                        return;
-                    default:
-                        return;
+                if (index == 1) {
+                    MailBoxPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
+                    return;
                 }
             }
         }).scheduleDismissOnPageDisappear(this).show();

@@ -41,7 +41,7 @@ public class MailBoxPageHandler {
                 item.Number = article_index;
                 item.Date = date;
                 item.Author = author;
-                item.isRead = (info == 43 || info == 77) ? false : true;
+                item.isRead = info != 43 && info != 77;
                 item.isReply = info == 114 || info == 82;
                 item.isMarked = info == 109 || info == 82 || info == 77;
                 item.Title = title;

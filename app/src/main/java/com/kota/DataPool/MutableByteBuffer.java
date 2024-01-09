@@ -7,8 +7,8 @@ import java.util.Vector;
 
 public class MutableByteBuffer implements Iterable<ByteBuffer> {
     public static int BUFFER_SIZE = 128;
-    private static Stack<ByteBuffer> _buffer_pool = new Stack<>();
-    private static Stack<MutableByteBuffer> _pool = new Stack<>();
+    private static final Stack<ByteBuffer> _buffer_pool = new Stack<>();
+    private static final Stack<MutableByteBuffer> _pool = new Stack<>();
     private boolean _is_closed = false;
     private int _size = 0;
     /* access modifiers changed from: private */

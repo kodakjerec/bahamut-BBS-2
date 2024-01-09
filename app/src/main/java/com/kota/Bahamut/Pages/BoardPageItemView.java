@@ -12,7 +12,7 @@ import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
 
 public class BoardPageItemView extends LinearLayout {
-    private static int _count = 0;
+    private static final int _count = 0;
     private TextView _author_label = null;
     private ViewGroup _content_view = null;
     private TextView _date_label = null;
@@ -35,7 +35,7 @@ public class BoardPageItemView extends LinearLayout {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 
@@ -115,7 +115,7 @@ public class BoardPageItemView extends LinearLayout {
     public void setNumber(int number) {
         if (this._number_label != null) {
             if (number > 0) {
-                this._number_label.setText(String.format("%1$05d", new Object[]{Integer.valueOf(number)}));
+                this._number_label.setText(String.format("%1$05d", Integer.valueOf(number)));
                 return;
             }
             this._number_label.setText("讀取中");

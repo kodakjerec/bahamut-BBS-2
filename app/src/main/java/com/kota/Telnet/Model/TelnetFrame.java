@@ -8,11 +8,11 @@ import java.util.Vector;
 public class TelnetFrame {
     public static final int DEFAULT_COLUMN = 80;
     public static final int DEFAULT_ROW = 24;
-    private static int _count = 0;
+    private static final int _count = 0;
     public Vector<TelnetRow> rows = new Vector<>();
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 
@@ -134,16 +134,8 @@ public class TelnetFrame {
                 if (getPositionData(row, column) <= 127 || column >= 79) {
                     setPositionBitSpace(row, column, (byte) 0);
                 } else {
-                    if (getPositionTextColor(row, column) != getPositionTextColor(row, column + 1)) {
-                        text_color_diff = true;
-                    } else {
-                        text_color_diff = false;
-                    }
-                    if (getPositionBackgroundColor(row, column) != getPositionBackgroundColor(row, column + 1)) {
-                        background_color_diff = true;
-                    } else {
-                        background_color_diff = false;
-                    }
+                    text_color_diff = getPositionTextColor(row, column) != getPositionTextColor(row, column + 1);
+                    background_color_diff = getPositionBackgroundColor(row, column) != getPositionBackgroundColor(row, column + 1);
                     if (text_color_diff || background_color_diff) {
                         setPositionBitSpace(row, column, (byte) 3);
                         setPositionBitSpace(row, column + 1, (byte) 4);
@@ -163,9 +155,9 @@ public class TelnetFrame {
             StringBuffer s = new StringBuffer();
             TelnetRow row = this.rows.get(i);
             for (int j = 0; j < 80; j++) {
-                s.append(String.format("%1$02d ", new Object[]{Byte.valueOf(row.backgroundColor[j])}));
+                s.append(String.format("%1$02d ", Byte.valueOf(row.backgroundColor[j])));
             }
-            System.out.println(s.toString());
+            System.out.println(s);
         }
     }
 

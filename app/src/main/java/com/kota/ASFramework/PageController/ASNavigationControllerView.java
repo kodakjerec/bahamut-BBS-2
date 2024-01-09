@@ -8,7 +8,7 @@ import com.kota.ASFramework.Model.ASSize;
 
 public class ASNavigationControllerView extends ASPageView implements ASGestureViewDelegate {
     private ASPageView _background_view = null;
-    private ASSize _content_size = new ASSize(0, 0);
+    private final ASSize _content_size = new ASSize(0, 0);
     private ASPageView _content_view = null;
     private ASGestureView _gesture_view = null;
     private ASNavigationController _page_controller = null;

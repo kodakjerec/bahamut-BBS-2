@@ -11,7 +11,7 @@ import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.R;
 
 public class MailBoxPage_ItemView extends LinearLayout {
-    private static int _count = 0;
+    private static final int _count = 0;
     private TextView _author = null;
     private TextView _date = null;
     private View _divider_bottom = null;
@@ -32,7 +32,7 @@ public class MailBoxPage_ItemView extends LinearLayout {
     }
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 
@@ -96,7 +96,7 @@ public class MailBoxPage_ItemView extends LinearLayout {
     public void setIndex(int number) {
         if (this._number != null) {
             if (number > 0) {
-                this._number.setText(String.format("%1$05d", new Object[]{Integer.valueOf(number)}));
+                this._number.setText(String.format("%1$05d", Integer.valueOf(number)));
                 return;
             }
             this._number.setText("讀取中");

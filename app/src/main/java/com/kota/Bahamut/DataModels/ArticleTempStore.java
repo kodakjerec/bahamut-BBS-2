@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 public class ArticleTempStore {
     public static final int version = 1;
-    private Context _context;
+    private final Context _context;
     private String _file_path = null;
     public Vector<ArticleTemp> articles = new Vector<>();
 
@@ -123,7 +123,7 @@ public class ArticleTempStore {
         return obj;
     }
 
-    public void importFromStream(ObjectInputStream aStream) throws StreamCorruptedException, IOException {
+    public void importFromStream(ObjectInputStream aStream) throws IOException {
         aStream.readInt();
         int size = aStream.readInt();
         for (int i = 0; i < size; i++) {
