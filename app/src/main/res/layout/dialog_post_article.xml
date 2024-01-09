@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="#ffffffff" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/confirm" style="@style/TextViewLarge"/>
+        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
+            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/is_post_article" style="@style/TextViewNormal"/>
+                <LinearLayout android:orientation="vertical" android:id="@+id/reply_target_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/is_post_article_reply" style="@style/TextViewNormal"/>
+                    <RadioGroup android:orientation="vertical" android:id="@+id/post_target" android:layout_width="match_parent" android:layout_height="wrap_content">
+                        <RadioButton android:textSize="20sp" android:id="@+id/post_to_board" android:paddingLeft="10dp" android:layout_width="match_parent" android:layout_height="50dp" android:checked="true" android:text="@string/post_to_board"/>
+                        <RadioButton android:textSize="20sp" android:id="@+id/post_to_mail" android:paddingLeft="10dp" android:layout_width="match_parent" android:layout_height="50dp" android:text="@string/post_to_mail"/>
+                        <RadioButton android:textSize="20sp" android:id="@+id/post_to_both" android:paddingLeft="10dp" android:layout_width="match_parent" android:layout_height="50dp" android:text="@string/post_to_both"/>
+                    </RadioGroup>
+                </LinearLayout>
+                <LinearLayout android:orientation="vertical" android:id="@+id/sign_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewNormal"/>
+                    <Spinner android:id="@+id/sign_spinner" android:layout_width="match_parent" android:layout_height="50dp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+        <View style="@style/BlockDividerHorizontal"/>
+        <LinearLayout style="@style/Toolbar">
+            <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+    <View style="@style/ItemViewDividerHorizontal"/>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <EditText android:textColor="#ffffffff" android:gravity="center" android:id="@+id/BlockList_Input" android:background="@null" android:layout_width="0dp" android:layout_height="60dp" android:hint="@string/please_input_id" android:cursorVisible="false" android:singleLine="true" android:editable="false" android:layout_weight="1" android:inputType="text" style="@style/TextViewLarge"/>
+        <Button android:textSize="24sp" android:textColor="@color/button_text_color_1" android:gravity="center" android:id="@+id/BlockList_Add" android:background="@drawable/button_background_1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="100dp" android:text="@string/add" style="@style/TouchBlock"/>
+    </LinearLayout>
+    <View style="@style/ItemViewDividerHorizontal"/>
+    <View android:background="@color/divider_color" android:layout_width="match_parent" android:layout_height="5dp"/>
+    <ListView android:id="@+id/BlockList_List" android:layout_width="match_parent" android:layout_height="0dp" android:divider="@null" android:dividerHeight="0dp" android:layout_weight="1"/>
+</LinearLayout>

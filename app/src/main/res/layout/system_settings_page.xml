@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+    <ScrollView android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <RelativeLayout android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" style="@style/CheckBox"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:text="@string/switch_connect_recovery" android:layout_centerVertical="true" style="@style/TextViewLarge"/>
+            </RelativeLayout>
+            <View android:visibility="gone" style="@style/HorizontalDivider"/>
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/SystemSettings_BlockListEnable" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" style="@style/CheckBox"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:text="@string/switch_on_block_list" android:layout_centerVertical="true" style="@style/TextViewLarge"/>
+            </RelativeLayout>
+            <View style="@style/HorizontalDivider"/>
+            <LinearLayout android:id="@+id/SystemSettings_BlockListSetting" android:background="@drawable/list_selector_background" android:clickable="true" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <TextView android:textSize="24sp" android:textColor="@color/button_text_color" android:gravity="center_vertical" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/block_list_setting" android:layout_weight="1" style="@style/TouchBlock"/>
+                <View style="@style/ItemViewDividerVertical"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+            </LinearLayout>
+            <View style="@style/HorizontalDivider"/>
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/SystemSettings_AnimationEnable" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" style="@style/CheckBox"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:text="@string/enable_page_animation" android:layout_centerVertical="true" style="@style/TextViewLarge"/>
+            </RelativeLayout>
+            <View style="@style/HorizontalDivider"/>
+            <RelativeLayout android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/SystemSettings_KeepWifi" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" style="@style/CheckBox"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:text="@string/keep_wifi_on_sleep" android:layout_centerVertical="true" style="@style/TextViewLarge"/>
+            </RelativeLayout>
+            <RelativeLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+                <CheckBox android:id="@+id/SystemSettings_DisableArticleMove" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="5dp" style="@style/CheckBox"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:gravity="center_vertical" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginLeft="50dp" android:text="@string/disable_aricle_move" android:layout_centerVertical="true" style="@style/TextViewLarge"/>
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
