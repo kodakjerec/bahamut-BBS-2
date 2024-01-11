@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="reply_target_list">
+        <item>上一次簽名檔</item>
+        <item>不使用</item>
+        <item>簽名檔1</item>
+        <item>簽名檔2</item>
+        <item>簽名檔3</item>
+        <item>簽名檔4</item>
+        <item>簽名檔5</item>
+        <item>簽名檔6</item>
+        <item>簽名檔7</item>
+        <item>簽名檔8</item>
+        <item>簽名檔9</item>
+    </string-array>
+    <string-array name="sign_selection_list">
+        <item>版上</item>
+        <item>作者信箱</item>
+        <item>兩者皆是</item>
+    </string-array>
+</resources>
