@@ -19,7 +19,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageHandler;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
-import com.kota.bahamut_bbs_2.R;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;

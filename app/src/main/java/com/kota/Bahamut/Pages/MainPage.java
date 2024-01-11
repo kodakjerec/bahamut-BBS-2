@@ -8,7 +8,7 @@ import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASDialogOnBackPressedDelegate;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;

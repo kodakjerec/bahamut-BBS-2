@@ -7,7 +7,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import java.util.Vector;
 
 public class Dialog_SearchArticle extends ASDialog implements View.OnClickListener {

@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 
 public class Dialog_SearchBoard extends ASDialog implements View.OnClickListener {
     Button _cancel_button = null;

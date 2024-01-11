@@ -19,7 +19,7 @@ import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle_Listener;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 

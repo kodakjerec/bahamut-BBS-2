@@ -24,7 +24,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;

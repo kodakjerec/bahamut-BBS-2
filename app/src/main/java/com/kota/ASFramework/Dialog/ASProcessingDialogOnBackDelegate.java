@@ -1,15 +1,11 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.Dialog;
 
-
-// Referenced classes of package com.kumi.ASFramework.Dialog:
-//            ASProcessingDialog
-
-public interface ASProcessingDialogOnBackDelegate
-{
-
-    public abstract boolean onASProcessingDialogOnBackDetected(ASProcessingDialog asprocessingdialog);
+public interface ASProcessingDialogOnBackDelegate {
+  boolean onASProcessingDialogOnBackDetected(ASProcessingDialog paramASProcessingDialog);
 }
+
+
+/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\Dialog\ASProcessingDialogOnBackDelegate.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.1.3
+ */

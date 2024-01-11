@@ -6,7 +6,7 @@ import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.PageContainer;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 

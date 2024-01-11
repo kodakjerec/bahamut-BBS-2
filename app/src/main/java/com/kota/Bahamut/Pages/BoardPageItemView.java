@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 
 public class BoardPageItemView extends LinearLayout {
     private static final int _count = 0;

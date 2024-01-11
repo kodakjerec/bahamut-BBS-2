@@ -1,119 +1,72 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.PageController;
 
 import android.view.View;
 import android.view.animation.Animation;
-import com.kumi.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.Thread.ASRunner;
 
-public abstract class ASAnimationRunner
-{
+/* loaded from: classes.dex */
+public abstract class ASAnimationRunner {
+  Animation _animation;
 
-    Animation _animation;
+  abstract View getTargetView();
 
-    public ASAnimationRunner(Animation animation)
-    {
-        _animation = null;
-        _animation = animation;
-    }
+  abstract void onAnimationStartFail();
 
-    private void animate()
-    {
-        (new ASRunner() {
+  public ASAnimationRunner(Animation animation) {
+    this._animation = null;
+    this._animation = animation;
+  }
 
-            final ASAnimationRunner this$0;
+  public void start() {
+    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.1
+      @Override // com.kumi.ASFramework.Thread.ASRunner
+      public void run() {
+        int i = 0;
+        boolean success = false;
+        while (true) {
+          if (i >= 10) {
+            break;
+          }
+          View target_view = ASAnimationRunner.this.getTargetView();
+          if (target_view != null) {
+            ASAnimationRunner.this.animate();
+            success = true;
+            break;
+          }
+          i++;
+          try {
+            Thread.sleep(10L);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+          }
+        }
+        if (!success) {
+          ASAnimationRunner.this.fail();
+        }
+      }
+    }.runInNewThread();
+  }
 
-            public void run()
-            {
-                View view = getTargetView();
-                if (view != null)
-                {
-                    view.startAnimation(_animation);
-                }
-            }
+  /* JADX INFO: Access modifiers changed from: private */
+  public void fail() {
+    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.2
+      @Override // com.kumi.ASFramework.Thread.ASRunner
+      public void run() {
+        ASAnimationRunner.this.onAnimationStartFail();
+      }
+    }.runInMainThread();
+  }
 
-            
-            {
-                this$0 = ASAnimationRunner.this;
-                super();
-            }
-        }).runInMainThread();
-    }
-
-    private void fail()
-    {
-        (new ASRunner() {
-
-            final ASAnimationRunner this$0;
-
-            public void run()
-            {
-                onAnimationStartFail();
-            }
-
-            
-            {
-                this$0 = ASAnimationRunner.this;
-                super();
-            }
-        }).runInMainThread();
-    }
-
-    abstract View getTargetView();
-
-    abstract void onAnimationStartFail();
-
-    public void start()
-    {
-        (new ASRunner() {
-
-            final ASAnimationRunner this$0;
-
-            public void run()
-            {
-                int i = 0;
-                boolean flag1 = false;
-                do
-                {
-label0:
-                    {
-                        boolean flag = flag1;
-                        if (i < 10)
-                        {
-                            if (getTargetView() == null)
-                            {
-                                break label0;
-                            }
-                            animate();
-                            flag = true;
-                        }
-                        if (!flag)
-                        {
-                            fail();
-                        }
-                        return;
-                    }
-                    i++;
-                    try
-                    {
-                        Thread.sleep(10L);
-                    }
-                    catch (InterruptedException interruptedexception)
-                    {
-                        interruptedexception.printStackTrace();
-                    }
-                } while (true);
-            }
-
-            
-            {
-                this$0 = ASAnimationRunner.this;
-                super();
-            }
-        }).runInNewThread();
-    }
-
-
+  /* JADX INFO: Access modifiers changed from: private */
+  public void animate() {
+    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.3
+      @Override // com.kumi.ASFramework.Thread.ASRunner
+      public void run() {
+        View target_view = ASAnimationRunner.this.getTargetView();
+        if (target_view != null) {
+          target_view.startAnimation(ASAnimationRunner.this._animation);
+        }
+      }
+    }.runInMainThread();
+  }
 }

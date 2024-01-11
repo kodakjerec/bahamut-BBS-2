@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    namespace 'com.kota.bahamut_bbs_2'
+    namespace 'com.kota.Bahamut'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.kota.bahamut_bbs_2"
-        minSdk 30
+        applicationId "com.kota.Bahamut"
+        minSdk 28
         targetSdk 33
         versionCode 1
         versionName "1.0"
@@ -22,8 +22,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -35,6 +35,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    buildToolsVersion '30.0.3'
 }
 
 dependencies {

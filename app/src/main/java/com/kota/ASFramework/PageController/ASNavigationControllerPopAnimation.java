@@ -1,222 +1,176 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.PageController;
 
 import android.view.animation.Animation;
-import com.kumi.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.Thread.ASRunner;
 
-// Referenced classes of package com.kumi.ASFramework.PageController:
-//            ASViewController, ASPageAnimation, ASNavigationController, ASPageView
-
-public class ASNavigationControllerPopAnimation
-{
-
-    private boolean _finished;
-    private Animation _source_animation;
-    private ASViewController _source_controller;
-    private boolean _source_finished;
-    private Animation _target_animation;
-    private ASViewController _target_controller;
-    private boolean _target_finished;
-    private int animation_duration;
-
-    public ASNavigationControllerPopAnimation(ASViewController asviewcontroller, ASViewController asviewcontroller1)
-    {
-        animation_duration = 250;
-        _source_controller = null;
-        _target_controller = null;
-        _source_finished = false;
-        _target_finished = false;
-        _finished = false;
-        _source_animation = null;
-        _target_animation = null;
-        _source_controller = asviewcontroller;
-        _target_controller = asviewcontroller1;
-    }
-
-    private void animate()
-    {
-        if (_source_controller == null || _source_controller.getPageView() == null) goto _L2; else goto _L1
-_L1:
-        _source_animation = ASPageAnimation.getFadeOutTtRightAnimation();
-        _source_animation.setDuration(animation_duration);
-        _source_animation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
-        _source_animation.setAnimationListener(new Animation.AnimationListener() {
-
-            final ASNavigationControllerPopAnimation this$0;
-
-            public void onAnimationEnd(Animation animation)
-            {
-                synchronized (ASNavigationControllerPopAnimation.this)
-                {
-                    _source_controller.getPageView().onPageAnimationFinished();
-                    _source_finished = true;
-                    checkFinished();
-                }
-                return;
-                exception1;
-                animation;
-                JVM INSTR monitorexit ;
-                throw exception1;
-            }
-
-            public void onAnimationRepeat(Animation animation)
-            {
-            }
-
-            public void onAnimationStart(Animation animation)
-            {
-            }
-
-            
-            {
-                this$0 = ASNavigationControllerPopAnimation.this;
-                super();
-            }
-        });
-        _source_controller.getPageView().onPageAnimationStart();
-        _source_controller.getPageView().startAnimation(_source_animation);
-_L4:
-        if (_target_controller != null && _target_controller.getPageView() != null)
-        {
-            _target_animation = ASPageAnimation.getFadeInFromLeftAnimation();
-            _target_animation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
-            _target_animation.setDuration(animation_duration);
-            _target_animation.setAnimationListener(new Animation.AnimationListener() {
-
-                final ASNavigationControllerPopAnimation this$0;
-
-                public void onAnimationEnd(Animation animation)
-                {
-                    synchronized (ASNavigationControllerPopAnimation.this)
-                    {
-                        _target_controller.getPageView().onPageAnimationFinished();
-                        _target_finished = true;
-                        checkFinished();
-                    }
-                    return;
-                    exception1;
-                    animation;
-                    JVM INSTR monitorexit ;
-                    throw exception1;
-                }
-
-                public void onAnimationRepeat(Animation animation)
-                {
-                }
-
-                public void onAnimationStart(Animation animation)
-                {
-                }
-
-            
-            {
-                this$0 = ASNavigationControllerPopAnimation.this;
-                super();
-            }
-            });
-            _target_controller.getPageView().onPageAnimationStart();
-            _target_controller.getPageView().startAnimation(_target_animation);
-            return;
-        }
-        break; /* Loop/switch isn't completed */
-_L2:
-        this;
-        JVM INSTR monitorenter ;
-        _source_finished = true;
-        checkFinished();
-        this;
-        JVM INSTR monitorexit ;
-        if (true) goto _L4; else goto _L3
-        Exception exception;
-        exception;
-        this;
-        JVM INSTR monitorexit ;
-        throw exception;
-_L3:
-        this;
-        JVM INSTR monitorenter ;
-        _target_finished = true;
-        checkFinished();
-        this;
-        JVM INSTR monitorexit ;
-        return;
-        exception;
-        this;
-        JVM INSTR monitorexit ;
-        throw exception;
-    }
-
-    private void checkFinished()
-    {
-        if (_source_finished && _target_finished)
-        {
-            finish();
-        }
-    }
-
-    private void finish()
-    {
-        if (!_finished)
-        {
-            (new ASRunner() {
-
-                final ASNavigationControllerPopAnimation this$0;
-
-                public void run()
-                {
-                    onAnimationFinished();
-                }
-
-            
-            {
-                this$0 = ASNavigationControllerPopAnimation.this;
-                super();
-            }
-            }).runInMainThread();
-            _finished = true;
-        }
-    }
-
-    public void onAnimationFinished()
-    {
-    }
-
-    public void start(boolean flag)
-    {
-        if (!flag)
-        {
-            finish();
-            return;
-        } else
-        {
-            animate();
-            return;
-        }
-    }
-
-
-
-/*
-    static boolean access$102(ASNavigationControllerPopAnimation asnavigationcontrollerpopanimation, boolean flag)
-    {
-        asnavigationcontrollerpopanimation._source_finished = flag;
-        return flag;
-    }
-
-*/
-
-
-
-
-/*
-    static boolean access$402(ASNavigationControllerPopAnimation asnavigationcontrollerpopanimation, boolean flag)
-    {
-        asnavigationcontrollerpopanimation._target_finished = flag;
-        return flag;
-    }
-
-*/
+public class ASNavigationControllerPopAnimation {
+  private boolean _finished = false;
+  
+  private Animation _source_animation = null;
+  
+  private ASViewController _source_controller = null;
+  
+  private boolean _source_finished = false;
+  
+  private Animation _target_animation = null;
+  
+  private ASViewController _target_controller = null;
+  
+  private boolean _target_finished = false;
+  
+  private int animation_duration = 250;
+  
+  public ASNavigationControllerPopAnimation(ASViewController paramASViewController1, ASViewController paramASViewController2) {
+    this._source_controller = paramASViewController1;
+    this._target_controller = paramASViewController2;
+  }
+  
+  private void animate() {
+    // Byte code:
+    //   0: aload_0
+    //   1: getfield _source_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   4: ifnull -> 175
+    //   7: aload_0
+    //   8: getfield _source_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   11: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   14: ifnull -> 175
+    //   17: aload_0
+    //   18: invokestatic getFadeOutTtRightAnimation : ()Landroid/view/animation/Animation;
+    //   21: putfield _source_animation : Landroid/view/animation/Animation;
+    //   24: aload_0
+    //   25: getfield _source_animation : Landroid/view/animation/Animation;
+    //   28: aload_0
+    //   29: getfield animation_duration : I
+    //   32: i2l
+    //   33: invokevirtual setDuration : (J)V
+    //   36: aload_0
+    //   37: getfield _source_animation : Landroid/view/animation/Animation;
+    //   40: invokestatic getCurrentController : ()Lcom/kumi/ASFramework/PageController/ASNavigationController;
+    //   43: ldc 17432580
+    //   45: invokevirtual setInterpolator : (Landroid/content/Context;I)V
+    //   48: aload_0
+    //   49: getfield _source_animation : Landroid/view/animation/Animation;
+    //   52: new com/kumi/ASFramework/PageController/ASNavigationControllerPopAnimation$1
+    //   55: dup
+    //   56: aload_0
+    //   57: invokespecial <init> : (Lcom/kumi/ASFramework/PageController/ASNavigationControllerPopAnimation;)V
+    //   60: invokevirtual setAnimationListener : (Landroid/view/animation/Animation$AnimationListener;)V
+    //   63: aload_0
+    //   64: getfield _source_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   67: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   70: invokevirtual onPageAnimationStart : ()V
+    //   73: aload_0
+    //   74: getfield _source_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   77: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   80: aload_0
+    //   81: getfield _source_animation : Landroid/view/animation/Animation;
+    //   84: invokevirtual startAnimation : (Landroid/view/animation/Animation;)V
+    //   87: aload_0
+    //   88: getfield _target_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   91: ifnull -> 196
+    //   94: aload_0
+    //   95: getfield _target_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   98: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   101: ifnull -> 196
+    //   104: aload_0
+    //   105: invokestatic getFadeInFromLeftAnimation : ()Landroid/view/animation/Animation;
+    //   108: putfield _target_animation : Landroid/view/animation/Animation;
+    //   111: aload_0
+    //   112: getfield _target_animation : Landroid/view/animation/Animation;
+    //   115: invokestatic getCurrentController : ()Lcom/kumi/ASFramework/PageController/ASNavigationController;
+    //   118: ldc 17432580
+    //   120: invokevirtual setInterpolator : (Landroid/content/Context;I)V
+    //   123: aload_0
+    //   124: getfield _target_animation : Landroid/view/animation/Animation;
+    //   127: aload_0
+    //   128: getfield animation_duration : I
+    //   131: i2l
+    //   132: invokevirtual setDuration : (J)V
+    //   135: aload_0
+    //   136: getfield _target_animation : Landroid/view/animation/Animation;
+    //   139: new com/kumi/ASFramework/PageController/ASNavigationControllerPopAnimation$2
+    //   142: dup
+    //   143: aload_0
+    //   144: invokespecial <init> : (Lcom/kumi/ASFramework/PageController/ASNavigationControllerPopAnimation;)V
+    //   147: invokevirtual setAnimationListener : (Landroid/view/animation/Animation$AnimationListener;)V
+    //   150: aload_0
+    //   151: getfield _target_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   154: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   157: invokevirtual onPageAnimationStart : ()V
+    //   160: aload_0
+    //   161: getfield _target_controller : Lcom/kumi/ASFramework/PageController/ASViewController;
+    //   164: invokevirtual getPageView : ()Lcom/kumi/ASFramework/PageController/ASPageView;
+    //   167: aload_0
+    //   168: getfield _target_animation : Landroid/view/animation/Animation;
+    //   171: invokevirtual startAnimation : (Landroid/view/animation/Animation;)V
+    //   174: return
+    //   175: aload_0
+    //   176: monitorenter
+    //   177: aload_0
+    //   178: iconst_1
+    //   179: putfield _source_finished : Z
+    //   182: aload_0
+    //   183: invokespecial checkFinished : ()V
+    //   186: aload_0
+    //   187: monitorexit
+    //   188: goto -> 87
+    //   191: astore_1
+    //   192: aload_0
+    //   193: monitorexit
+    //   194: aload_1
+    //   195: athrow
+    //   196: aload_0
+    //   197: monitorenter
+    //   198: aload_0
+    //   199: iconst_1
+    //   200: putfield _target_finished : Z
+    //   203: aload_0
+    //   204: invokespecial checkFinished : ()V
+    //   207: aload_0
+    //   208: monitorexit
+    //   209: goto -> 174
+    //   212: astore_1
+    //   213: aload_0
+    //   214: monitorexit
+    //   215: aload_1
+    //   216: athrow
+    // Exception table:
+    //   from	to	target	type
+    //   177	188	191	finally
+    //   192	194	191	finally
+    //   198	209	212	finally
+    //   213	215	212	finally
+  }
+  
+  private void checkFinished() {
+    if (this._source_finished && this._target_finished)
+      finish(); 
+  }
+  
+  private void finish() {
+    if (!this._finished) {
+      (new ASRunner() {
+          public void run() {
+            ASNavigationControllerPopAnimation.this.onAnimationFinished();
+          }
+        }).runInMainThread();
+      this._finished = true;
+    } 
+  }
+  
+  public void onAnimationFinished() {}
+  
+  public void start(boolean paramBoolean) {
+    if (!paramBoolean) {
+      finish();
+      return;
+    } 
+    animate();
+  }
 }
+
+
+/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASNavigationControllerPopAnimation.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.1.3
+ */

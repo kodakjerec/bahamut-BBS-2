@@ -1,97 +1,69 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.Utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ASStreamWriter
-{
-
-    public ASStreamWriter()
-    {
-    }
-
-    public static void writeData(OutputStream outputstream, byte byte0)
-        throws IOException
-    {
-        outputstream.write(byte0);
-    }
-
-    public static void writeData(OutputStream outputstream, char c)
-        throws IOException
-    {
-        outputstream.write(c >> 8 & 0xff);
-        outputstream.write(c & 0xff);
-    }
-
-    public static void writeData(OutputStream outputstream, double d)
-        throws IOException
-    {
-        writeData(outputstream, Double.doubleToLongBits(d));
-    }
-
-    public static void writeData(OutputStream outputstream, float f)
-        throws IOException
-    {
-        writeData(outputstream, Float.floatToIntBits(f));
-    }
-
-    public static void writeData(OutputStream outputstream, int i)
-        throws IOException
-    {
-        outputstream.write(i >> 24 & 0xff);
-        outputstream.write(i >> 16 & 0xff);
-        outputstream.write(i >> 8 & 0xff);
-        outputstream.write(i & 0xff);
-    }
-
-    public static void writeData(OutputStream outputstream, long l)
-        throws IOException
-    {
-        outputstream.write((int)(l >> 56) & 0xff);
-        outputstream.write((int)(l >> 48) & 0xff);
-        outputstream.write((int)(l >> 40) & 0xff);
-        outputstream.write((int)(l >> 32) & 0xff);
-        outputstream.write((int)(l >> 24) & 0xff);
-        outputstream.write((int)(l >> 16) & 0xff);
-        outputstream.write((int)(l >> 8) & 0xff);
-        outputstream.write((int)l & 0xff);
-    }
-
-    public static void writeData(OutputStream outputstream, String s)
-        throws IOException
-    {
-        writeData(outputstream, s.getBytes("unicode"));
-    }
-
-    public static void writeData(OutputStream outputstream, short word0)
-        throws IOException
-    {
-        outputstream.write(word0 >> 8 & 0xff);
-        outputstream.write(word0 & 0xff);
-    }
-
-    public static void writeData(OutputStream outputstream, boolean flag)
-        throws IOException
-    {
-        if (flag)
-        {
-            outputstream.write(1);
-            return;
-        } else
-        {
-            outputstream.write(0);
-            return;
-        }
-    }
-
-    public static void writeData(OutputStream outputstream, byte abyte0[])
-        throws IOException
-    {
-        writeData(outputstream, abyte0.length);
-        outputstream.write(abyte0);
-    }
+public class ASStreamWriter {
+  public static void writeData(OutputStream paramOutputStream, byte paramByte) throws IOException {
+    paramOutputStream.write(paramByte);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, char paramChar) throws IOException {
+    paramOutputStream.write(paramChar >> 8 & 0xFF);
+    paramOutputStream.write(paramChar & 0xFF);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, double paramDouble) throws IOException {
+    writeData(paramOutputStream, Double.doubleToLongBits(paramDouble));
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, float paramFloat) throws IOException {
+    writeData(paramOutputStream, Float.floatToIntBits(paramFloat));
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, int paramInt) throws IOException {
+    paramOutputStream.write(paramInt >> 24 & 0xFF);
+    paramOutputStream.write(paramInt >> 16 & 0xFF);
+    paramOutputStream.write(paramInt >> 8 & 0xFF);
+    paramOutputStream.write(paramInt & 0xFF);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, long paramLong) throws IOException {
+    paramOutputStream.write((int)(paramLong >> 56L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 48L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 40L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 32L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 24L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 16L) & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 8L) & 0xFF);
+    paramOutputStream.write((int)paramLong & 0xFF);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, String paramString) throws IOException {
+    writeData(paramOutputStream, paramString.getBytes("unicode"));
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, short paramShort) throws IOException {
+    paramOutputStream.write(paramShort >> 8 & 0xFF);
+    paramOutputStream.write(paramShort & 0xFF);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, boolean paramBoolean) throws IOException {
+    if (paramBoolean) {
+      paramOutputStream.write(1);
+      return;
+    } 
+    paramOutputStream.write(0);
+  }
+  
+  public static void writeData(OutputStream paramOutputStream, byte[] paramArrayOfbyte) throws IOException {
+    writeData(paramOutputStream, paramArrayOfbyte.length);
+    paramOutputStream.write(paramArrayOfbyte);
+  }
 }
+
+
+/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\Utils\ASStreamWriter.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.1.3
+ */

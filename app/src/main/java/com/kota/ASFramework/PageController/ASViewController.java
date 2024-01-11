@@ -1,7 +1,3 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.PageController;
 
 import android.content.Context;
@@ -12,486 +8,355 @@ import android.view.View;
 import java.util.Iterator;
 import java.util.Vector;
 
-// Referenced classes of package com.kumi.ASFramework.PageController:
-//            ASPageView, ASNavigationController, ASViewControllerOperationListener, ASViewControllerAppearListener, 
-//            ASViewControllerDisappearListener
+/* loaded from: classes.dex */
+public abstract class ASViewController {
+  public static final int ALERT_LEFT_BUTTON = -1;
+  public static final int ALERT_MIDDLE_BUTTON = -3;
+  public static final int ALERT_RIGHT_BUTTON = -2;
+  private ASNavigationController _controller = null;
+  protected boolean _is_loaded = false;
+  private ASPageView _page_view = null;
+  private boolean _contains_in_container = false;
+  private boolean _marked_removed = false;
+  private boolean _marked_added = false;
+  private boolean _is_appeared = false;
+  private boolean _is_disappeared = true;
+  private boolean _is_request_refresh = false;
+  private Vector<ASViewControllerOperationListener> _operation_listeners = null;
+  private Vector<ASViewControllerAppearListener> _appear_listeners = null;
+  private Vector<ASViewControllerDisappearListener> _disappear_listeners = null;
 
-public abstract class ASViewController
-{
+  public abstract int getPageLayout();
 
-    public static final int ALERT_LEFT_BUTTON = -1;
-    public static final int ALERT_MIDDLE_BUTTON = -3;
-    public static final int ALERT_RIGHT_BUTTON = -2;
-    private Vector _appear_listeners;
-    private boolean _contains_in_container;
-    private ASNavigationController _controller;
-    private Vector _disappear_listeners;
-    private boolean _is_appeared;
-    private boolean _is_disappeared;
-    protected boolean _is_loaded;
-    private boolean _is_request_refresh;
-    private boolean _marked_added;
-    private boolean _marked_removed;
-    private Vector _operation_listeners;
-    private ASPageView _page_view;
-
-    public ASViewController()
-    {
-        _controller = null;
-        _is_loaded = false;
-        _page_view = null;
-        _contains_in_container = false;
-        _marked_removed = false;
-        _marked_added = false;
-        _is_appeared = false;
-        _is_disappeared = true;
-        _is_request_refresh = false;
-        _operation_listeners = null;
-        _appear_listeners = null;
-        _disappear_listeners = null;
+  public void setPageView(ASPageView aPageView) {
+    if (this._page_view != null) {
+      this._page_view.setOwnerController(null);
     }
-
-    public boolean backToMainToolbarAfterExtendToolbarClicked()
-    {
-        return true;
+    this._page_view = aPageView;
+    if (this._page_view != null) {
+      this._page_view.setOwnerController(this);
     }
+  }
 
-    protected void cleanMark()
-    {
-        _marked_removed = false;
-        _marked_added = false;
-    }
+  public ASPageView getPageView() {
+    return this._page_view;
+  }
 
-    public void clear()
-    {
-    }
+  public int getPageType() {
+    return 0;
+  }
 
-    public boolean containsInContainer()
-    {
-        return _contains_in_container;
-    }
+  public void onPageDidLoad() {
+  }
 
-    protected void finalize()
-        throws Throwable
-    {
-        onPageDidUnload();
-        super.finalize();
-    }
+  public void onPageWillAppear() {
+  }
 
-    public View findViewById(int i)
-    {
-        if (_page_view != null)
-        {
-            return _page_view.findViewById(i);
-        } else
-        {
-            return null;
+  public void onPageDidAppear() {
+  }
+
+  public void onPageRefresh() {
+  }
+
+  public void onPageFreeMemory() {
+  }
+
+  public void onPageWillDisappear() {
+  }
+
+  public void onPageDidDisappear() {
+  }
+
+  public void onPageDidRemoveFromNavigationController() {
+  }
+
+  public void onPageDidAddToNavigationController() {
+  }
+
+  public void onPageDidUnload() {
+  }
+
+  public void notifyPageDidRemoveFromNavigationController() {
+    if (this._operation_listeners != null) {
+      Vector<ASViewControllerOperationListener> listeners = new Vector<>(this._operation_listeners);
+      Iterator<ASViewControllerOperationListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerOperationListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerWillRemoveFromNavigationController(this);
         }
+      }
     }
+    onPageDidRemoveFromNavigationController();
+  }
 
-    public AssetManager getAssets()
-    {
-        return _controller.getAssets();
-    }
-
-    public Context getContext()
-    {
-        return _controller;
-    }
-
-    public ASNavigationController getNavigationController()
-    {
-        return _controller;
-    }
-
-    public abstract int getPageLayout();
-
-    public int getPageType()
-    {
-        return 0;
-    }
-
-    public ASPageView getPageView()
-    {
-        return _page_view;
-    }
-
-    public Resources getResource()
-    {
-        return _controller.getResources();
-    }
-
-    public Object getSystemService(String s)
-    {
-        if (_controller != null)
-        {
-            return _controller.getSystemService(s);
-        } else
-        {
-            return null;
+  public void notifyPageDidAddToNavigationController() {
+    if (this._operation_listeners != null) {
+      Vector<ASViewControllerOperationListener> listeners = new Vector<>(this._operation_listeners);
+      Iterator<ASViewControllerOperationListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerOperationListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerWillAddToNavigationController(this);
         }
+      }
     }
+    onPageDidAddToNavigationController();
+  }
 
-    protected boolean isMarkedAdded()
-    {
-        return _marked_added;
-    }
-
-    protected boolean isMarkedRemoved()
-    {
-        return _marked_removed;
-    }
-
-    public boolean isPageAppeared()
-    {
-        return _is_appeared;
-    }
-
-    public boolean isPageDisappeared()
-    {
-        return _is_disappeared;
-    }
-
-    public boolean isTopPage()
-    {
-        while (getNavigationController() == null || getNavigationController().getTopController() != this) 
-        {
-            return false;
+  public void notifyPageWillAppear() {
+    this._is_disappeared = false;
+    if (this._appear_listeners != null) {
+      Vector<ASViewControllerAppearListener> listeners = new Vector<>(this._appear_listeners);
+      Iterator<ASViewControllerAppearListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerAppearListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerWillAppear(this);
         }
-        return true;
+      }
     }
+    onPageWillAppear();
+  }
 
-    public void notifyPageDidAddToNavigationController()
-    {
-        if (_operation_listeners != null)
-        {
-            Iterator iterator = (new Vector(_operation_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerOperationListener asviewcontrolleroperationlistener = (ASViewControllerOperationListener)iterator.next();
-                if (asviewcontrolleroperationlistener != null)
-                {
-                    asviewcontrolleroperationlistener.onASViewControllerWillAddToNavigationController(this);
-                }
-            } while (true);
+  public void notifyPageDidAppear() {
+    this._is_appeared = true;
+    if (this._appear_listeners != null) {
+      Vector<ASViewControllerAppearListener> listeners = new Vector<>(this._appear_listeners);
+      Iterator<ASViewControllerAppearListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerAppearListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerDidAppear(this);
         }
-        onPageDidAddToNavigationController();
+      }
     }
+    onPageDidAppear();
+    if (this._is_request_refresh) {
+      onPageRefresh();
+      this._is_request_refresh = false;
+    }
+  }
 
-    public void notifyPageDidAppear()
-    {
-        _is_appeared = true;
-        if (_appear_listeners != null)
-        {
-            Iterator iterator = (new Vector(_appear_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerAppearListener asviewcontrollerappearlistener = (ASViewControllerAppearListener)iterator.next();
-                if (asviewcontrollerappearlistener != null)
-                {
-                    asviewcontrollerappearlistener.onASViewControllerDidAppear(this);
-                }
-            } while (true);
+  public void notifyPageWillDisappear() {
+    this._is_appeared = false;
+    if (this._disappear_listeners != null) {
+      Vector<ASViewControllerDisappearListener> listeners = new Vector<>(this._disappear_listeners);
+      Iterator<ASViewControllerDisappearListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerDisappearListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerWillDisappear(this);
         }
-        onPageDidAppear();
-        if (_is_request_refresh)
-        {
-            onPageRefresh();
-            _is_request_refresh = false;
+      }
+    }
+    onPageWillDisappear();
+  }
+
+  public void notifyPageDidDisappear() {
+    this._is_disappeared = true;
+    if (this._disappear_listeners != null) {
+      Vector<ASViewControllerDisappearListener> listeners = new Vector<>(this._disappear_listeners);
+      Iterator<ASViewControllerDisappearListener> it = listeners.iterator();
+      while (it.hasNext()) {
+        ASViewControllerDisappearListener listener = it.next();
+        if (listener != null) {
+          listener.onASViewControllerDidDisappear(this);
         }
+      }
     }
+    onPageDidDisappear();
+  }
 
-    public void notifyPageDidDisappear()
-    {
-        _is_disappeared = true;
-        if (_disappear_listeners != null)
-        {
-            Iterator iterator = (new Vector(_disappear_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerDisappearListener asviewcontrollerdisappearlistener = (ASViewControllerDisappearListener)iterator.next();
-                if (asviewcontrollerdisappearlistener != null)
-                {
-                    asviewcontrollerdisappearlistener.onASViewControllerDidDisappear(this);
-                }
-            } while (true);
-        }
-        onPageDidDisappear();
+  public void requestPageRefresh() {
+    if (this._is_appeared) {
+      onPageRefresh();
+    } else {
+      this._is_request_refresh = true;
     }
+  }
 
-    public void notifyPageDidRemoveFromNavigationController()
-    {
-        if (_operation_listeners != null)
-        {
-            Iterator iterator = (new Vector(_operation_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerOperationListener asviewcontrolleroperationlistener = (ASViewControllerOperationListener)iterator.next();
-                if (asviewcontrolleroperationlistener != null)
-                {
-                    asviewcontrolleroperationlistener.onASViewControllerWillRemoveFromNavigationController(this);
-                }
-            } while (true);
-        }
-        onPageDidRemoveFromNavigationController();
-    }
+  public boolean isPageAppeared() {
+    return this._is_appeared;
+  }
 
-    public void notifyPageWillAppear()
-    {
-        _is_disappeared = false;
-        if (_appear_listeners != null)
-        {
-            Iterator iterator = (new Vector(_appear_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerAppearListener asviewcontrollerappearlistener = (ASViewControllerAppearListener)iterator.next();
-                if (asviewcontrollerappearlistener != null)
-                {
-                    asviewcontrollerappearlistener.onASViewControllerWillAppear(this);
-                }
-            } while (true);
-        }
-        onPageWillAppear();
-    }
+  public boolean isPageDisappeared() {
+    return this._is_disappeared;
+  }
 
-    public void notifyPageWillDisappear()
-    {
-        _is_appeared = false;
-        if (_disappear_listeners != null)
-        {
-            Iterator iterator = (new Vector(_disappear_listeners)).iterator();
-            do
-            {
-                if (!iterator.hasNext())
-                {
-                    break;
-                }
-                ASViewControllerDisappearListener asviewcontrollerdisappearlistener = (ASViewControllerDisappearListener)iterator.next();
-                if (asviewcontrollerdisappearlistener != null)
-                {
-                    asviewcontrollerdisappearlistener.onASViewControllerWillDisappear(this);
-                }
-            } while (true);
-        }
-        onPageWillDisappear();
-    }
+  public boolean backToMainToolbarAfterExtendToolbarClicked() {
+    return true;
+  }
 
-    protected boolean onBackPressed()
-    {
-        getNavigationController().popViewController();
-        return true;
-    }
+  protected void finalize() throws Throwable {
+    onPageDidUnload();
+    super.finalize();
+  }
 
-    protected boolean onMenuButtonClicked()
-    {
-        return false;
-    }
+  public void clear() {
+  }
 
-    public void onPageDidAddToNavigationController()
-    {
-    }
+  public Context getContext() {
+    return this._controller;
+  }
 
-    public void onPageDidAppear()
-    {
-    }
+  public Resources getResource() {
+    return this._controller.getResources();
+  }
 
-    public void onPageDidDisappear()
-    {
-    }
+  public ASNavigationController getNavigationController() {
+    return this._controller;
+  }
 
-    public void onPageDidLoad()
-    {
+  public View findViewById(int viewID) {
+    if (this._page_view != null) {
+      return this._page_view.findViewById(viewID);
     }
+    return null;
+  }
 
-    public void onPageDidRemoveFromNavigationController()
-    {
+  public Object getSystemService(String name) {
+    if (this._controller != null) {
+      return this._controller.getSystemService(name);
     }
+    return null;
+  }
 
-    public void onPageDidUnload()
-    {
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
+  }
 
-    public void onPageFreeMemory()
-    {
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public boolean onBackPressed() {
+    getNavigationController().popViewController();
+    return true;
+  }
 
-    public void onPageRefresh()
-    {
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public boolean onSearchButtonClicked() {
+    return false;
+  }
 
-    public void onPageWillAppear()
-    {
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public boolean onMenuButtonClicked() {
+    return false;
+  }
 
-    public void onPageWillDisappear()
-    {
+  public void startActivity(Intent intent) {
+    if (this._controller != null) {
+      this._controller.startActivity(intent);
     }
+  }
 
-    public boolean onReceivedGestureDown()
-    {
-        return false;
-    }
+  public void setNavigationController(ASNavigationController controller) {
+    this._controller = controller;
+  }
 
-    public boolean onReceivedGestureLeft()
-    {
-        return false;
+  public void reloadLayout() {
+    if (this._controller != null) {
+      this._controller.reloadLayout();
     }
+  }
 
-    public boolean onReceivedGestureRight()
-    {
-        return false;
-    }
+  public boolean onReceivedGestureUp() {
+    return false;
+  }
 
-    public boolean onReceivedGestureUp()
-    {
-        return false;
-    }
+  public boolean onReceivedGestureDown() {
+    return false;
+  }
 
-    protected boolean onSearchButtonClicked()
-    {
-        return false;
-    }
+  public boolean onReceivedGestureLeft() {
+    return false;
+  }
 
-    protected void onSizeChanged(int i, int j, int k, int l)
-    {
-    }
+  public boolean onReceivedGestureRight() {
+    return false;
+  }
 
-    protected void prepareForAdd()
-    {
-        _marked_removed = false;
-        _marked_added = true;
-    }
+  public boolean isTopPage() {
+    return getNavigationController() != null && getNavigationController().getTopController() == this;
+  }
 
-    protected void prepareForRemove()
-    {
-        _marked_removed = true;
-    }
+  public AssetManager getAssets() {
+    return this._controller.getAssets();
+  }
 
-    public void registerAppearListener(ASViewControllerAppearListener asviewcontrollerappearlistener)
-    {
-        if (_appear_listeners == null)
-        {
-            _appear_listeners = new Vector();
-        }
-        _appear_listeners.add(asviewcontrollerappearlistener);
-    }
+  public boolean containsInContainer() {
+    return this._contains_in_container;
+  }
 
-    public void registerDisappearListener(ASViewControllerDisappearListener asviewcontrollerdisappearlistener)
-    {
-        if (_disappear_listeners == null)
-        {
-            _disappear_listeners = new Vector();
-        }
-        _disappear_listeners.add(asviewcontrollerdisappearlistener);
-    }
+  public void setContainsInContainer(boolean contains) {
+    this._contains_in_container = contains;
+  }
 
-    public void registerPageOperationListener(ASViewControllerOperationListener asviewcontrolleroperationlistener)
-    {
-        if (_operation_listeners == null)
-        {
-            _operation_listeners = new Vector();
-        }
-        _operation_listeners.add(asviewcontrolleroperationlistener);
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public boolean isMarkedRemoved() {
+    return this._marked_removed;
+  }
 
-    public void reloadLayout()
-    {
-        if (_controller != null)
-        {
-            _controller.reloadLayout();
-        }
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public boolean isMarkedAdded() {
+    return this._marked_added;
+  }
 
-    public void requestPageRefresh()
-    {
-        if (_is_appeared)
-        {
-            onPageRefresh();
-            return;
-        } else
-        {
-            _is_request_refresh = true;
-            return;
-        }
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public void prepareForRemove() {
+    this._marked_removed = true;
+  }
 
-    public void setContainsInContainer(boolean flag)
-    {
-        _contains_in_container = flag;
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public void prepareForAdd() {
+    this._marked_removed = false;
+    this._marked_added = true;
+  }
 
-    public void setNavigationController(ASNavigationController asnavigationcontroller)
-    {
-        _controller = asnavigationcontroller;
-    }
+  /* JADX INFO: Access modifiers changed from: protected */
+  public void cleanMark() {
+    this._marked_removed = false;
+    this._marked_added = false;
+  }
 
-    public void setPageView(ASPageView aspageview)
-    {
-        if (_page_view != null)
-        {
-            _page_view.setOwnerController(null);
-        }
-        _page_view = aspageview;
-        if (_page_view != null)
-        {
-            _page_view.setOwnerController(this);
-        }
-    }
+  public String toString() {
+    return "ASViewController[Type:" + getPageType() + "]";
+  }
 
-    public void startActivity(Intent intent)
-    {
-        if (_controller != null)
-        {
-            _controller.startActivity(intent);
-        }
+  public void registerPageOperationListener(ASViewControllerOperationListener aListener) {
+    if (this._operation_listeners == null) {
+      this._operation_listeners = new Vector<>();
     }
+    this._operation_listeners.add(aListener);
+  }
 
-    public String toString()
-    {
-        return (new StringBuilder()).append("ASViewController[Type:").append(getPageType()).append("]").toString();
+  public void unregisterPageOperationListener(ASViewControllerOperationListener aListener) {
+    if (this._operation_listeners != null) {
+      this._operation_listeners.remove(aListener);
     }
+  }
 
-    public void unregisterAppearListener(ASViewControllerAppearListener asviewcontrollerappearlistener)
-    {
-        if (_appear_listeners != null)
-        {
-            _appear_listeners.remove(asviewcontrollerappearlistener);
-        }
+  public void registerAppearListener(ASViewControllerAppearListener aListener) {
+    if (this._appear_listeners == null) {
+      this._appear_listeners = new Vector<>();
     }
+    this._appear_listeners.add(aListener);
+  }
 
-    public void unregisterDisappearListener(ASViewControllerDisappearListener asviewcontrollerdisappearlistener)
-    {
-        if (_disappear_listeners != null)
-        {
-            _disappear_listeners.remove(asviewcontrollerdisappearlistener);
-        }
+  public void unregisterAppearListener(ASViewControllerAppearListener aListener) {
+    if (this._appear_listeners != null) {
+      this._appear_listeners.remove(aListener);
     }
+  }
 
-    public void unregisterPageOperationListener(ASViewControllerOperationListener asviewcontrolleroperationlistener)
-    {
-        if (_operation_listeners != null)
-        {
-            _operation_listeners.remove(asviewcontrolleroperationlistener);
-        }
+  public void registerDisappearListener(ASViewControllerDisappearListener aListener) {
+    if (this._disappear_listeners == null) {
+      this._disappear_listeners = new Vector<>();
     }
+    this._disappear_listeners.add(aListener);
+  }
+
+  public void unregisterDisappearListener(ASViewControllerDisappearListener aListener) {
+    if (this._disappear_listeners != null) {
+      this._disappear_listeners.remove(aListener);
+    }
+  }
 }

@@ -8,7 +8,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.kota.bahamut_bbs_2.R;
+import com.kota.Bahamut.R;
 
 public class TelnetHeaderItemView extends LinearLayout {
     private TextView _detail_1 = null;

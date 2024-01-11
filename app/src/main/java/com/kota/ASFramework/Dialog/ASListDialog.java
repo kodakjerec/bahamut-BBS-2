@@ -1,301 +1,212 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.Dialog;
 
-import android.content.Context;
-import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import androidx.core.view.ViewCompat;
+
 import java.util.Vector;
 
-// Referenced classes of package com.kumi.ASFramework.Dialog:
-//            ASDialog, ASLayoutParams, ASListDialogItemClickListener
+/* loaded from: classes.dex */
+public class ASListDialog extends ASDialog {
+  public static final int SIZE_LARGE = 1;
+  public static final int SIZE_NORMAL = 0;
+  private LinearLayout _content_view = null;
+  private LinearLayout _item_block = null;
+  private ASListDialogItemClickListener _listener = null;
+  private Vector<ASListDialogItem> _item_list = new Vector<>();
+  private TextView _title_label = null;
+  private float _dialog_width = 280.0f;
+  private ScrollView _scroll_view = null;
+  private int _item_text_size = 1;
 
-public class ASListDialog extends ASDialog
-{
-    class ASListDialogItem
-    {
+  /* JADX INFO: Access modifiers changed from: package-private */
+  /* loaded from: classes.dex */
+  public class ASListDialogItem {
+    public Button button = null;
+    public String title = null;
 
-        public Button button;
-        final ASListDialog this$0;
-        public String title;
-
-        ASListDialogItem()
-        {
-            this$0 = ASListDialog.this;
-            super();
-            button = null;
-            title = null;
-        }
+    ASListDialogItem() {
     }
+  }
 
+  public ASListDialog setItemTextSize(int size) {
+    this._item_text_size = size;
+    return this;
+  }
 
-    public static final int SIZE_LARGE = 1;
-    public static final int SIZE_NORMAL = 0;
-    private LinearLayout _content_view;
-    private float _dialog_width;
-    private LinearLayout _item_block;
-    private Vector _item_list;
-    private int _item_text_size;
-    private ASListDialogItemClickListener _listener;
-    private ScrollView _scroll_view;
-    private TextView _title_label;
+  @Override // com.kumi.ASFramework.Dialog.ASDialog
+  public String getName() {
+    return "ListDialog";
+  }
 
-    public ASListDialog()
-    {
-        _content_view = null;
-        _item_block = null;
-        _listener = null;
-        _item_list = new Vector();
-        _title_label = null;
-        _dialog_width = 280F;
-        _scroll_view = null;
-        _item_text_size = 1;
-        requestWindowFeature(1);
-        setContentView(buildContentView());
-        getWindow().setBackgroundDrawable(null);
+  public ASListDialog() {
+    requestWindowFeature(1);
+    setContentView(buildContentView());
+    getWindow().setBackgroundDrawable(null);
+  }
+
+  private View buildContentView() {
+    int frame_padding = (int) TypedValue.applyDimension(1, 3.0f, getContext().getResources().getDisplayMetrics());
+    int padding = (int) TypedValue.applyDimension(1, 5.0f, getContext().getResources().getDisplayMetrics());
+    LinearLayout frame = new LinearLayout(getContext());
+    frame.setBackgroundColor(-1);
+    frame.setPadding(frame_padding, frame_padding, frame_padding, frame_padding);
+    LinearLayout content_view = new LinearLayout(getContext());
+    content_view.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
+    content_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
+    frame.addView(content_view);
+    content_view.setOrientation(1);
+    int dialog_width = (((int) TypedValue.applyDimension(1, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
+    this._scroll_view = new ScrollView(getContext());
+    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
+    content_view.addView(this._scroll_view);
+    this._content_view = new LinearLayout(getContext());
+    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    this._content_view.setOrientation(1);
+    this._content_view.setGravity(17);
+    this._scroll_view.addView(this._content_view);
+    this._title_label = new TextView(getContext());
+    this._title_label.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+    this._title_label.setPadding(padding, padding, padding, padding);
+    this._title_label.setTextColor(-1);
+    this._title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
+    this._title_label.setText("選項");
+    this._title_label.setBackgroundColor(-14671840);
+    this._title_label.setGravity(17);
+    this._content_view.addView(this._title_label);
+    this._item_block = new LinearLayout(getContext());
+    this._item_block.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    this._item_block.setOrientation(1);
+    this._item_block.setGravity(17);
+    this._content_view.addView(this._item_block);
+    return frame;
+  }
+
+  public static ASListDialog createDialog() {
+    return new ASListDialog();
+  }
+
+  public ASListDialog setListener(ASListDialogItemClickListener aListener) {
+    this._listener = aListener;
+    return this;
+  }
+
+  public ASListDialog setTitle(String aTitle) {
+    if (this._title_label != null) {
+      this._title_label.setText(aTitle);
     }
+    return this;
+  }
 
-    private View buildContentView()
-    {
-        int j = (int)TypedValue.applyDimension(1, 3F, getContext().getResources().getDisplayMetrics());
-        int i = (int)TypedValue.applyDimension(1, 5F, getContext().getResources().getDisplayMetrics());
-        LinearLayout linearlayout = new LinearLayout(getContext());
-        linearlayout.setBackgroundColor(-1);
-        linearlayout.setPadding(j, j, j, j);
-        LinearLayout linearlayout1 = new LinearLayout(getContext());
-        linearlayout1.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
-        linearlayout1.setBackgroundColor(0xff000000);
-        linearlayout.addView(linearlayout1);
-        linearlayout1.setOrientation(1);
-        j = ((int)TypedValue.applyDimension(1, _dialog_width, getContext().getResources().getDisplayMetrics()) / 2) * 2;
-        _scroll_view = new ScrollView(getContext());
-        _scroll_view.setLayoutParams(new LinearLayout.LayoutParams(j, -2));
-        linearlayout1.addView(_scroll_view);
-        _content_view = new LinearLayout(getContext());
-        _content_view.setLayoutParams(new android.widget.FrameLayout.LayoutParams(j, -2));
-        _content_view.setOrientation(1);
-        _content_view.setGravity(17);
-        _scroll_view.addView(_content_view);
-        _title_label = new TextView(getContext());
-        _title_label.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
-        _title_label.setPadding(i, i, i, i);
-        _title_label.setTextColor(-1);
-        _title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
-        _title_label.setText("\u9078\u9805");
-        _title_label.setBackgroundColor(0xff202020);
-        _title_label.setGravity(17);
-        _content_view.addView(_title_label);
-        _item_block = new LinearLayout(getContext());
-        _item_block.setLayoutParams(new android.widget.FrameLayout.LayoutParams(j, -2));
-        _item_block.setOrientation(1);
-        _item_block.setGravity(17);
-        _content_view.addView(_item_block);
-        return linearlayout;
+  public ASListDialog addItems(String[] aItemList) {
+    for (String item_title : aItemList) {
+      addItem(item_title);
     }
+    return this;
+  }
 
-    private Button createButton()
-    {
-        Button button;
-        button = new Button(getContext());
-        button.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
-        button.setMinimumHeight((int)TypedValue.applyDimension(1, 60F, getContext().getResources().getDisplayMetrics()));
-        button.setGravity(17);
-        if (_item_text_size != 0) goto _L2; else goto _L1
-_L1:
-        button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
-_L4:
-        button.setBackgroundDrawable(ASLayoutParams.getInstance().getListItemBackgroundDrawable());
-        button.setTextColor(ASLayoutParams.getInstance().getListItemTextColor());
-        button.setSingleLine(true);
-        return button;
-_L2:
-        if (_item_text_size == 1)
-        {
-            button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
-        } else
-        if (_item_text_size == 2)
-        {
-            button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
-        }
-        if (true) goto _L4; else goto _L3
-_L3:
+  public ASListDialog addItem(String aItemTitle) {
+    Button button = createButton();
+    button.setOnClickListener(new View.OnClickListener() { // from class: com.kumi.ASFramework.Dialog.ASListDialog.1
+      @Override // android.view.View.OnClickListener
+      public void onClick(View v) {
+        ASListDialog.this.onItemClicked((Button) v);
+      }
+    });
+    button.setOnLongClickListener(new View.OnLongClickListener() { // from class: com.kumi.ASFramework.Dialog.ASListDialog.2
+      @Override // android.view.View.OnLongClickListener
+      public boolean onLongClick(View v) {
+        return ASListDialog.this.onItemLongClicked((Button) v);
+      }
+    });
+    if (aItemTitle == null) {
+      button.setVisibility(8);
+    } else {
+      if (this._item_list.size() > 0) {
+        this._item_block.addView(createDivider());
+      }
+      button.setText(aItemTitle);
     }
+    this._item_block.addView(button);
+    ASListDialogItem item = new ASListDialogItem();
+    item.button = button;
+    item.title = aItemTitle;
+    this._item_list.add(item);
+    return this;
+  }
 
-    public static ASListDialog createDialog()
-    {
-        return new ASListDialog();
+  public View createDivider() {
+    View divider = new View(getContext());
+    int divider_height = (int) Math.ceil(TypedValue.applyDimension(1, 1.0f, getContext().getResources().getDisplayMetrics()));
+    divider.setLayoutParams(new LinearLayout.LayoutParams(-1, divider_height));
+    divider.setBackgroundColor(-2130706433);
+    return divider;
+  }
+
+  private Button createButton() {
+    Button button = new Button(getContext());
+    button.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+    button.setMinimumHeight((int) TypedValue.applyDimension(1, 60.0f, getContext().getResources().getDisplayMetrics()));
+    button.setGravity(17);
+    if (this._item_text_size == 0) {
+      button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
+    } else if (this._item_text_size == 1) {
+      button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
+    } else if (this._item_text_size == 2) {
+      button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
     }
+    button.setBackgroundDrawable(ASLayoutParams.getInstance().getListItemBackgroundDrawable());
+    button.setTextColor(ASLayoutParams.getInstance().getListItemTextColor());
+    button.setSingleLine(true);
+    return button;
+  }
 
-    private int indexOfButton(Button button)
-    {
-        byte byte0 = -1;
-        int i = 0;
-        do
-        {
-label0:
-            {
-                int j = byte0;
-                if (i < _item_list.size())
-                {
-                    if (((ASListDialogItem)_item_list.get(i)).button != button)
-                    {
-                        break label0;
-                    }
-                    j = i;
-                }
-                return j;
-            }
-            i++;
-        } while (true);
+  private int indexOfButton(Button aButton) {
+    for (int i = 0; i < this._item_list.size(); i++) {
+      ASListDialogItem item = this._item_list.get(i);
+      if (item.button == aButton) {
+        int index = i;
+        return index;
+      }
     }
+    return -1;
+  }
 
-    private void onItemClicked(Button button)
-    {
-        if (_listener != null)
-        {
-            int i = indexOfButton(button);
-            if (i != -1)
-            {
-                _listener.onListDialogItemClicked(this, i, ((ASListDialogItem)_item_list.get(i)).title);
-            }
-            dismiss();
-        }
+  /* JADX INFO: Access modifiers changed from: private */
+  public void onItemClicked(Button button) {
+    if (this._listener != null) {
+      int index = indexOfButton(button);
+      if (index != -1) {
+        this._listener.onListDialogItemClicked(this, index, this._item_list.get(index).title);
+      }
+      dismiss();
     }
+  }
 
-    private boolean onItemLongClicked(Button button)
-    {
-        boolean flag1 = false;
-        boolean flag = flag1;
-        if (_listener != null)
-        {
-            int i = indexOfButton(button);
-            flag = flag1;
-            if (i != -1)
-            {
-                flag = _listener.onListDialogItemLongClicked(this, i, ((ASListDialogItem)_item_list.get(i)).title);
-            }
-        }
-        if (flag)
-        {
-            dismiss();
-        }
-        return flag;
+  /* JADX INFO: Access modifiers changed from: private */
+  public boolean onItemLongClicked(Button button) {
+    int index;
+    boolean result = false;
+    if (this._listener != null && (index = indexOfButton(button)) != -1) {
+      result = this._listener.onListDialogItemLongClicked(this, index, this._item_list.get(index).title);
     }
-
-    public ASListDialog addItem(String s)
-    {
-        Button button = createButton();
-        button.setOnClickListener(new View.OnClickListener() {
-
-            final ASListDialog this$0;
-
-            public void onClick(View view)
-            {
-                onItemClicked((Button)view);
-            }
-
-            
-            {
-                this$0 = ASListDialog.this;
-                super();
-            }
-        });
-        button.setOnLongClickListener(new View.OnLongClickListener() {
-
-            final ASListDialog this$0;
-
-            public boolean onLongClick(View view)
-            {
-                return onItemLongClicked((Button)view);
-            }
-
-            
-            {
-                this$0 = ASListDialog.this;
-                super();
-            }
-        });
-        ASListDialogItem aslistdialogitem;
-        if (s == null)
-        {
-            button.setVisibility(8);
-        } else
-        {
-            if (_item_list.size() > 0)
-            {
-                _item_block.addView(createDivider());
-            }
-            button.setText(s);
-        }
-        _item_block.addView(button);
-        aslistdialogitem = new ASListDialogItem();
-        aslistdialogitem.button = button;
-        aslistdialogitem.title = s;
-        _item_list.add(aslistdialogitem);
-        return this;
+    if (result) {
+      dismiss();
     }
+    return result;
+  }
 
-    public ASListDialog addItems(String as[])
-    {
-        int j = as.length;
-        for (int i = 0; i < j; i++)
-        {
-            addItem(as[i]);
-        }
-
-        return this;
-    }
-
-    public View createDivider()
-    {
-        View view = new View(getContext());
-        view.setLayoutParams(new LinearLayout.LayoutParams(-1, (int)Math.ceil(TypedValue.applyDimension(1, 1.0F, getContext().getResources().getDisplayMetrics()))));
-        view.setBackgroundColor(0x80ffffff);
-        return view;
-    }
-
-    public String getName()
-    {
-        return "ListDialog";
-    }
-
-    public ASListDialog setDialogWidth(float f)
-    {
-        _dialog_width = f;
-        int i = ((int)TypedValue.applyDimension(1, _dialog_width, getContext().getResources().getDisplayMetrics()) / 2) * 2;
-        _scroll_view.setLayoutParams(new LinearLayout.LayoutParams(i, -2));
-        _content_view.setLayoutParams(new android.widget.FrameLayout.LayoutParams(i, -2));
-        return this;
-    }
-
-    public ASListDialog setItemTextSize(int i)
-    {
-        _item_text_size = i;
-        return this;
-    }
-
-    public ASListDialog setListener(ASListDialogItemClickListener aslistdialogitemclicklistener)
-    {
-        _listener = aslistdialogitemclicklistener;
-        return this;
-    }
-
-    public ASListDialog setTitle(String s)
-    {
-        if (_title_label != null)
-        {
-            _title_label.setText(s);
-        }
-        return this;
-    }
-
-
+  public ASListDialog setDialogWidth(float width) {
+    this._dialog_width = width;
+    int dialog_width = (((int) TypedValue.applyDimension(1, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
+    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
+    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    return this;
+  }
 }

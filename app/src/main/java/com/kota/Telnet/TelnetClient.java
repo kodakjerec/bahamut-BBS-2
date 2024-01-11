@@ -1,6 +1,6 @@
 package com.kota.Telnet;
 
-import com.kota.Bahamut.SelfFramework.Thread.ASRunner;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.Telnet.Reference.TelnetKeyboard;

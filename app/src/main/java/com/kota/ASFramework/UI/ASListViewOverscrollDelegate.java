@@ -1,17 +1,13 @@
-// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
-// Jad home page: http://www.geocities.com/kpdus/jad.html
-// Decompiler options: braces fieldsfirst space lnc 
-
 package com.kota.ASFramework.UI;
 
-
-// Referenced classes of package com.kumi.ASFramework.UI:
-//            ASListView
-
-public interface ASListViewOverscrollDelegate
-{
-
-    public abstract void onASListViewDelectedOverscrollBottom(ASListView aslistview);
-
-    public abstract void onASListViewDelectedOverscrollTop(ASListView aslistview);
+public interface ASListViewOverscrollDelegate {
+  void onASListViewDelectedOverscrollBottom(ASListView paramASListView);
+  
+  void onASListViewDelectedOverscrollTop(ASListView paramASListView);
 }
+
+
+/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\UI\ASListViewOverscrollDelegate.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.1.3
+ */

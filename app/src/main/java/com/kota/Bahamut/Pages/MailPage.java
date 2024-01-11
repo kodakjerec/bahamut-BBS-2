@@ -15,7 +15,7 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.bahamut_bbs_2.R;;
+import com.kota.Bahamut.R;;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;

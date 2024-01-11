@@ -1,5 +1,7 @@
 package com.kota.TelnetUI;
 
+import com.kota.ASFramework.PageController.ASViewController;
+
 public abstract class TelnetPage extends ASViewController {
     public void onPageDidUnload() {
         clear();
