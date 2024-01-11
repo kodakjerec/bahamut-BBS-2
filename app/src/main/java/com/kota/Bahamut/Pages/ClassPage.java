@@ -6,7 +6,6 @@ import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.ListView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
@@ -20,7 +19,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageHandler;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -118,17 +117,13 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     }
 
     public void onClick(View aView) {
-        switch (aView.getId()) {
-            case R.id.ClassPage_FirstPageButton /*2131230843*/:
-                moveToFirstPosition();
-                return;
-            case R.id.ClassPage_LastestPageButton /*2131230852*/:
-                moveToLastPosition();
-                return;
-            case R.id.ClassPage_SearchButton /*2131230856*/:
-                onSearchButtonClicked();
-                return;
-            default:
+        int get_id = aView.getId();
+        if (get_id == R.id.ClassPage_FirstPageButton) {
+            moveToFirstPosition();
+        } else if (get_id == R.id.ClassPage_LastestPageButton) {
+            moveToLastPosition();
+        } else if (get_id == R.id.ClassPage_SearchButton){
+            onSearchButtonClicked();
         }
     }
 
@@ -136,12 +131,10 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     public boolean onListViewItemLongClicked(View itemView, int index) {
         if (getListName() != null && getListName().equals("Favorite")) {
             final int item_index = index + 1;
-            ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    if (index == 1) {
-                        TelnetClient.getClient().sendStringToServerInBackground(item_index + "\nd");
-                        ClassPage.this.loadLastBlock();
-                    }
+            ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消").addButton("確定").setListener((aDialog, index1) -> {
+                if (index1 == 1) {
+                    TelnetClient.getClient().sendStringToServerInBackground(item_index + "\nd");
+                    ClassPage.this.loadLastBlock();
                 }
             }).scheduleDismissOnPageDisappear(this).show();
             return true;
@@ -149,11 +142,9 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
             return false;
         } else {
             final int item_index2 = index + 1;
-            ASAlertDialog.createDialog().setMessage("確定要將此看板加入我的最愛?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    if (index == 1) {
-                        TelnetClient.getClient().sendStringToServerInBackground(item_index2 + "\na");
-                    }
+            ASAlertDialog.createDialog().setMessage("確定要將此看板加入我的最愛?").addButton("取消").addButton("確定").setListener((aDialog, index12) -> {
+                if (index12 == 1) {
+                    TelnetClient.getClient().sendStringToServerInBackground(item_index2 + "\na");
                 }
             }).show();
             return true;
@@ -172,7 +163,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         ASListDialog.createDialog().addItems(SearchBoard_Handler.getInstance().getBoards()).setListener(new ASListDialogItemClickListener() {
             public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                 String board = SearchBoard_Handler.getInstance().getBoard(index);
-                if (ClassPage.this.getListName() == "Favorite") {
+                if (ClassPage.this.getListName().equals("Favorite")) {
                     ClassPage.this.showAddBoardToFavoriteDialog(board);
                     return;
                 }
@@ -187,15 +178,13 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     }
 
     public void showAddBoardToFavoriteDialog(final String boardName) {
-        ASAlertDialog.createDialog().setMessage("是否將看板" + boardName + "加入我的最愛?").addButton("取消").addButton("加入").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    TelnetOutputBuilder.create().pushKey(256).pushString("B\n").pushKey(TelnetKeyboard.HOME).pushString("/" + boardName + "\na ").pushKey(256).pushString("F\ns" + boardName + "\n").sendToServerInBackground();
-                    return;
-                }
-                TelnetClient.getClient().sendStringToServerInBackground("s" + boardName);
-                SearchBoard_Handler.getInstance().clear();
+        ASAlertDialog.createDialog().setMessage("是否將看板" + boardName + "加入我的最愛?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
+            if (index == 1) {
+                TelnetOutputBuilder.create().pushKey(256).pushString("B\n").pushKey(TelnetKeyboard.HOME).pushString("/" + boardName + "\na ").pushKey(256).pushString("F\ns" + boardName + "\n").sendToServerInBackground();
+                return;
             }
+            TelnetClient.getClient().sendStringToServerInBackground("s" + boardName);
+            SearchBoard_Handler.getInstance().clear();
         }).scheduleDismissOnPageDisappear(this).show();
     }
 

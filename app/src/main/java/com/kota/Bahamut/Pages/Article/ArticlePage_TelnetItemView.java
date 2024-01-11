@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.widget.LinearLayout;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetArticleItemView;
 import com.kota.TelnetUI.DividerView;

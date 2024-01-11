@@ -1,106 +1,182 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Dialog;
 
 import android.content.res.ColorStateList;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
-import androidx.core.view.ViewCompat;
 
-public class ASLayoutParams {
+public class ASLayoutParams
+{
+
     private static ASLayoutParams _instance = null;
-    private final float _default_touch_block_height = 60.0f;
-    private final float _default_touch_block_width = 60.0f;
-    private final float _dialog_width_large = 320.0f;
-    private final float _dialog_width_normal = 270.0f;
-    private final float _padding_large = 20.0f;
-    private final float _padding_normal = 10.0f;
-    private final float _padding_small = 5.0f;
-    private final float _text_size_large = 24.0f;
-    private final float _text_size_normal = 20.0f;
-    private final float _text_size_small = 16.0f;
-    private final float _text_size_ultra_large = 28.0f;
+    private float _default_touch_block_height;
+    private float _default_touch_block_width;
+    private float _dialog_width_large;
+    private float _dialog_width_normal;
+    private float _padding_large;
+    private float _padding_normal;
+    private float _padding_small;
+    private float _text_size_large;
+    private float _text_size_normal;
+    private float _text_size_small;
+    private float _text_size_ultra_large;
 
-    private ASLayoutParams() {
+    private ASLayoutParams()
+    {
+        _text_size_small = 16F;
+        _text_size_normal = 20F;
+        _text_size_large = 24F;
+        _text_size_ultra_large = 28F;
+        _dialog_width_normal = 270F;
+        _dialog_width_large = 320F;
+        _default_touch_block_width = 60F;
+        _default_touch_block_height = 60F;
+        _padding_small = 5F;
+        _padding_normal = 10F;
+        _padding_large = 20F;
         initial();
     }
 
-    public static ASLayoutParams getInstance() {
-        if (_instance == null) {
+    public static ASLayoutParams getInstance()
+    {
+        if (_instance == null)
+        {
             _instance = new ASLayoutParams();
         }
         return _instance;
     }
 
-    private void initial() {
+    private void initial()
+    {
     }
 
-    public float getTextSizeSmall() {
-        return this._text_size_small;
+    public Drawable getAlertItemBackgroundDrawable()
+    {
+        StateListDrawable statelistdrawable = new StateListDrawable();
+        ColorDrawable colordrawable = new ColorDrawable(-14066);
+        statelistdrawable.addState(new int[] {
+            0x10100a7, 0x101009e
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff800000);
+        statelistdrawable.addState(new int[] {
+            0x101009e, 0x101009c
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff400000);
+        statelistdrawable.addState(new int[] {
+            0x101009e
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff200000);
+        statelistdrawable.addState(new int[0], colordrawable);
+        return statelistdrawable;
     }
 
-    public float getTextSizeNormal() {
-        return this._text_size_normal;
+    public ColorStateList getAlertItemTextColor()
+    {
+        return new ColorStateList(new int[][] {
+            new int[] {
+                0x10100a7, 0x101009e
+            }, new int[] {
+                0x101009e, 0x101009c
+            }, new int[] {
+                0x101009e
+            }, new int[0]
+        }, new int[] {
+            0xff000000, 0xff000000, -1, 0xff808080
+        });
     }
 
-    public float getTextSizeLarge() {
-        return this._text_size_large;
+    public float getDefaultTouchBlockHeight()
+    {
+        return _default_touch_block_height;
     }
 
-    public float getTextSizeUltraLarge() {
-        return this._text_size_ultra_large;
+    public float getDefaultTouchBlockWidth()
+    {
+        return _default_touch_block_width;
     }
 
-    public float getDialogWidthNormal() {
-        return this._dialog_width_normal;
+    public float getDialogWidthLarge()
+    {
+        return _dialog_width_large;
     }
 
-    public float getDialogWidthLarge() {
-        return this._dialog_width_large;
+    public float getDialogWidthNormal()
+    {
+        return _dialog_width_normal;
     }
 
-    public float getDefaultTouchBlockWidth() {
-        return this._default_touch_block_width;
+    public Drawable getListItemBackgroundDrawable()
+    {
+        StateListDrawable statelistdrawable = new StateListDrawable();
+        ColorDrawable colordrawable = new ColorDrawable(-14066);
+        statelistdrawable.addState(new int[] {
+            0x10100a7, 0x101009e
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff000000);
+        statelistdrawable.addState(new int[] {
+            0x101009e, 0x101009c
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff000000);
+        statelistdrawable.addState(new int[] {
+            0x101009e
+        }, colordrawable);
+        colordrawable = new ColorDrawable(0xff000000);
+        statelistdrawable.addState(new int[0], colordrawable);
+        return statelistdrawable;
     }
 
-    public float getDefaultTouchBlockHeight() {
-        return this._default_touch_block_height;
+    public ColorStateList getListItemTextColor()
+    {
+        return new ColorStateList(new int[][] {
+            new int[] {
+                0x10100a7, 0x101009e
+            }, new int[] {
+                0x101009e, 0x101009c
+            }, new int[] {
+                0x101009e
+            }, new int[0]
+        }, new int[] {
+            0xff000000, 0xff000000, -1, 0xff808080
+        });
     }
 
-    public float getPaddingSmall() {
-        return this._padding_small;
+    public float getPaddingLarge()
+    {
+        return _padding_large;
     }
 
-    public float getPaddingNormal() {
-        return this._padding_normal;
+    public float getPaddingNormal()
+    {
+        return _padding_normal;
     }
 
-    public float getPaddingLarge() {
-        return this._padding_large;
+    public float getPaddingSmall()
+    {
+        return _padding_small;
     }
 
-    public Drawable getAlertItemBackgroundDrawable() {
-        StateListDrawable alert_item_background = new StateListDrawable();
-        alert_item_background.addState(new int[]{16842919, 16842910}, new ColorDrawable(-14066));
-        alert_item_background.addState(new int[]{16842910, 16842908}, new ColorDrawable(-8388608));
-        alert_item_background.addState(new int[]{16842910}, new ColorDrawable(-12582912));
-        alert_item_background.addState(new int[0], new ColorDrawable(-14680064));
-        return alert_item_background;
+    public float getTextSizeLarge()
+    {
+        return _text_size_large;
     }
 
-    public ColorStateList getAlertItemTextColor() {
-        return new ColorStateList(new int[][]{new int[]{16842919, 16842910}, new int[]{16842910, 16842908}, new int[]{16842910}, new int[0]}, new int[]{ViewCompat.MEASURED_STATE_MASK, ViewCompat.MEASURED_STATE_MASK, -1, -8355712});
+    public float getTextSizeNormal()
+    {
+        return _text_size_normal;
     }
 
-    public Drawable getListItemBackgroundDrawable() {
-        StateListDrawable alert_item_background = new StateListDrawable();
-        alert_item_background.addState(new int[]{16842919, 16842910}, new ColorDrawable(-14066));
-        alert_item_background.addState(new int[]{16842910, 16842908}, new ColorDrawable(ViewCompat.MEASURED_STATE_MASK));
-        alert_item_background.addState(new int[]{16842910}, new ColorDrawable(ViewCompat.MEASURED_STATE_MASK));
-        alert_item_background.addState(new int[0], new ColorDrawable(ViewCompat.MEASURED_STATE_MASK));
-        return alert_item_background;
+    public float getTextSizeSmall()
+    {
+        return _text_size_small;
     }
 
-    public ColorStateList getListItemTextColor() {
-        return new ColorStateList(new int[][]{new int[]{16842919, 16842910}, new int[]{16842910, 16842908}, new int[]{16842910}, new int[0]}, new int[]{ViewCompat.MEASURED_STATE_MASK, ViewCompat.MEASURED_STATE_MASK, -1, -8355712});
+    public float getTextSizeUltraLarge()
+    {
+        return _text_size_ultra_large;
     }
+
 }

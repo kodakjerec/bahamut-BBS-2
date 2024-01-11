@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 
 public class ClassPageItemView extends LinearLayout {
     private static final int _count = 0;

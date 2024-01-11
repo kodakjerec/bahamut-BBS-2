@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Command;
 
+import static com.kota.Bahamut.BahamutStateHandler.*;
+
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;

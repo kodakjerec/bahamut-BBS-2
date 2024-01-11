@@ -1,5 +1,5 @@
 package com.kota.Telnet.Reference;
 
 public interface TelnetDefs {
-    String CHARSET = "UTF-16LE";
+    public static final String CHARSET = "UTF-16LE";
 }

@@ -1,91 +1,130 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Dialog;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
-import com.kota.ASFramework.PageController.ASNavigationController;
-import com.kota.ASFramework.PageController.ASViewController;
-import com.kota.ASFramework.PageController.ASViewControllerDisappearListener;
+import com.kumi.ASFramework.PageController.ASNavigationController;
+import com.kumi.ASFramework.PageController.ASViewController;
+import com.kumi.ASFramework.PageController.ASViewControllerDisappearListener;
 
-public class ASDialog extends Dialog implements ASViewControllerDisappearListener {
-    private ASViewController _controller = null;
-    private ASDialogOnBackPressedDelegate _on_back_delegate = null;
-    private boolean _showing = false;
+// Referenced classes of package com.kumi.ASFramework.Dialog:
+//            ASDialogOnBackPressedDelegate
 
-    public ASDialog(int theme) {
-        super(ASNavigationController.getCurrentController(), theme);
-    }
+public class ASDialog extends Dialog
+    implements ASViewControllerDisappearListener
+{
 
-    protected ASDialog(boolean cancelable, DialogInterface.OnCancelListener cancelListener) {
-        super(ASNavigationController.getCurrentController(), cancelable, cancelListener);
-    }
+    private ASViewController _controller;
+    private ASDialogOnBackPressedDelegate _on_back_delegate;
+    private boolean _showing;
 
-    public ASDialog() {
+    public ASDialog()
+    {
         super(ASNavigationController.getCurrentController());
+        _on_back_delegate = null;
+        _showing = false;
+        _controller = null;
     }
 
-    public void dismiss() {
-        if (this._controller != null) {
-            this._controller.unregisterDisappearListener(this);
-            this._controller = null;
+    public ASDialog(int i)
+    {
+        super(ASNavigationController.getCurrentController(), i);
+        _on_back_delegate = null;
+        _showing = false;
+        _controller = null;
+    }
+
+    protected ASDialog(boolean flag, OnCancelListener oncancellistener)
+    {
+        super(ASNavigationController.getCurrentController(), flag, oncancellistener);
+        _on_back_delegate = null;
+        _showing = false;
+        _controller = null;
+    }
+
+    public void dismiss()
+    {
+        if (_controller != null)
+        {
+            _controller.unregisterDisappearListener(this);
+            _controller = null;
         }
-        this._showing = false;
+        _showing = false;
         super.dismiss();
     }
 
-    public void show() {
-        super.show();
-        this._showing = true;
-    }
-
-    public boolean isShowing() {
-        return this._showing;
-    }
-
-    public int getCurrentOrientation() {
-        ASNavigationController current_controller = ASNavigationController.getCurrentController();
-        if (current_controller != null) {
-            return current_controller.getCurrentOrientation();
+    public int getCurrentOrientation()
+    {
+        int i = 1;
+        ASNavigationController asnavigationcontroller = ASNavigationController.getCurrentController();
+        if (asnavigationcontroller != null)
+        {
+            i = asnavigationcontroller.getCurrentOrientation();
         }
-        return 1;
+        return i;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return "ASDialog";
     }
 
-    public ASDialog setIsCancelable(boolean cancelable) {
-        setCancelable(cancelable);
-        return this;
+    public boolean isShowing()
+    {
+        return _showing;
     }
 
-    public void onBackPressed() {
-        if (this._on_back_delegate == null || !this._on_back_delegate.onASDialogBackPressed(this)) {
-            super.onBackPressed();
-        }
+    public void onASViewControllerDidDisappear(ASViewController asviewcontroller)
+    {
     }
 
-    public ASDialog setOnBackDelegate(ASDialogOnBackPressedDelegate aDelegate) {
-        this._on_back_delegate = aDelegate;
-        return this;
-    }
-
-    public ASDialog scheduleDismissOnPageDisappear(ASViewController aController) {
-        if (this._controller != null) {
-            this._controller.unregisterDisappearListener(this);
-        }
-        this._controller = aController;
-        if (this._controller != null) {
-            this._controller.registerDisappearListener(this);
-        }
-        return this;
-    }
-
-    public void onASViewControllerWillDisappear(ASViewController aController) {
-        if (isShowing()) {
+    public void onASViewControllerWillDisappear(ASViewController asviewcontroller)
+    {
+        if (isShowing())
+        {
             dismiss();
         }
     }
 
-    public void onASViewControllerDidDisappear(ASViewController aController) {
+    public void onBackPressed()
+    {
+        if (_on_back_delegate == null || !_on_back_delegate.onASDialogBackPressed(this))
+        {
+            super.onBackPressed();
+        }
+    }
+
+    public ASDialog scheduleDismissOnPageDisappear(ASViewController asviewcontroller)
+    {
+        if (_controller != null)
+        {
+            _controller.unregisterDisappearListener(this);
+        }
+        _controller = asviewcontroller;
+        if (_controller != null)
+        {
+            _controller.registerDisappearListener(this);
+        }
+        return this;
+    }
+
+    public ASDialog setIsCancelable(boolean flag)
+    {
+        setCancelable(flag);
+        return this;
+    }
+
+    public ASDialog setOnBackDelegate(ASDialogOnBackPressedDelegate asdialogonbackpresseddelegate)
+    {
+        _on_back_delegate = asdialogonbackpresseddelegate;
+        return this;
+    }
+
+    public void show()
+    {
+        super.show();
+        _showing = true;
     }
 }

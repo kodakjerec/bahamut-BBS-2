@@ -1,45 +1,81 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.PageController;
 
 import android.view.View;
 import android.view.ViewGroup;
-import com.kota.ASFramework.Thread.ASRunner;
+import com.kumi.ASFramework.Thread.ASRunner;
 
-public class ASViewRemover {
-    /* access modifiers changed from: private */
-    public ViewGroup _parent_view = null;
-    /* access modifiers changed from: private */
-    public View _target_view = null;
+public class ASViewRemover
+{
 
-    public static void remove(ViewGroup parentView, View targetView) {
-        new ASViewRemover(parentView, targetView).start();
+    private ViewGroup _parent_view;
+    private View _target_view;
+
+    public ASViewRemover(ViewGroup viewgroup, View view)
+    {
+        _parent_view = null;
+        _target_view = null;
+        _parent_view = viewgroup;
+        _target_view = view;
     }
 
-    public ASViewRemover(ViewGroup parentView, View targetView) {
-        this._parent_view = parentView;
-        this._target_view = targetView;
-    }
+    private void remove()
+    {
+        (new ASRunner() {
 
-    public void start() {
-        new ASRunner() {
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                ASViewRemover.this.remove();
-            }
-        }.runInNewThread();
-    }
+            final ASViewRemover this$0;
 
-    /* access modifiers changed from: private */
-    public void remove() {
-        new ASRunner() {
-            public void run() {
-                if (ASViewRemover.this._parent_view != null && ASViewRemover.this._target_view != null) {
-                    ASViewRemover.this._parent_view.removeView(ASViewRemover.this._target_view);
+            public void run()
+            {
+                if (_parent_view != null && _target_view != null)
+                {
+                    _parent_view.removeView(_target_view);
                 }
             }
-        }.runInMainThread();
+
+            
+            {
+                this$0 = ASViewRemover.this;
+                super();
+            }
+        }).runInMainThread();
     }
+
+    public static void remove(ViewGroup viewgroup, View view)
+    {
+        (new ASViewRemover(viewgroup, view)).start();
+    }
+
+    public void start()
+    {
+        (new ASRunner() {
+
+            final ASViewRemover this$0;
+
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(1000L);
+                }
+                catch (InterruptedException interruptedexception)
+                {
+                    interruptedexception.printStackTrace();
+                }
+                remove();
+            }
+
+            
+            {
+                this$0 = ASViewRemover.this;
+                super();
+            }
+        }).runInNewThread();
+    }
+
+
+
 }

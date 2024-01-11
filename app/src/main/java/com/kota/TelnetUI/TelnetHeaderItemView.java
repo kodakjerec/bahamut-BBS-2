@@ -7,7 +7,8 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.kota.Bahamut.R;
+
+import com.kota.bahamut_bbs_2.R;
 
 public class TelnetHeaderItemView extends LinearLayout {
     private TextView _detail_1 = null;
@@ -27,7 +28,7 @@ public class TelnetHeaderItemView extends LinearLayout {
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.header_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.header_item_view, this);
         this._title = (TextView) findViewById(R.id.title);
         this._detail_1 = (TextView) findViewById(R.id.detail_1);
         this._detail_2 = (TextView) findViewById(R.id.detail_2);
@@ -37,13 +38,13 @@ public class TelnetHeaderItemView extends LinearLayout {
 
     public void setMenuButton(View.OnClickListener aListener) {
         if (aListener == null) {
-            this.mMenuDivider.setVisibility(8);
-            this.mMenuButton.setVisibility(8);
+            this.mMenuDivider.setVisibility(View.GONE);
+            this.mMenuButton.setVisibility(View.GONE);
             this.mMenuButton.setOnClickListener((View.OnClickListener) null);
             return;
         }
-        this.mMenuDivider.setVisibility(0);
-        this.mMenuButton.setVisibility(0);
+        this.mMenuDivider.setVisibility(View.VISIBLE);
+        this.mMenuButton.setVisibility(View.VISIBLE);
         this.mMenuButton.setOnClickListener(aListener);
     }
 

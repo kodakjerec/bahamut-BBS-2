@@ -10,7 +10,7 @@ import java.io.OutputStream;
 import java.util.Properties;
 
 public class PropertiesOperator {
-    private final Properties _property = new Properties();
+    private Properties _property = new Properties();
     private String _save_path = "";
 
     public PropertiesOperator(String aSavePath) {

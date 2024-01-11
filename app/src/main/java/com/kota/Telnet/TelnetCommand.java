@@ -29,11 +29,17 @@ public class TelnetCommand {
     }
 
     public boolean isEqualTo(TelnetCommand aCommand) {
-        return aCommand.header == this.header && aCommand.action == this.action && aCommand.option == this.option;
+        if (aCommand.header == this.header && aCommand.action == this.action && aCommand.option == this.option) {
+            return true;
+        }
+        return false;
     }
 
     public boolean isEqualTo(int aHeader, int aAction, int aOption) {
-        return aHeader == this.header && aAction == this.action && aOption == this.option;
+        if (aHeader == this.header && aAction == this.action && aOption == this.option) {
+            return true;
+        }
+        return false;
     }
 
     public String getCommandNameString(int aCommand) {

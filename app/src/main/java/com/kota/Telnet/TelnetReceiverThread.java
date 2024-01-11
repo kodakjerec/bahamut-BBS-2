@@ -5,7 +5,7 @@ import java.io.IOException;
 
 public class TelnetReceiverThread extends Thread {
     public static final int UNSET = -1;
-    private final TelnetCommand _command = new TelnetCommand();
+    private TelnetCommand _command = new TelnetCommand();
     private TelnetConnector _connector = null;
     private TelnetModel _model = null;
     private boolean _receiving = true;
@@ -24,6 +24,7 @@ public class TelnetReceiverThread extends Thread {
     /* JADX WARNING: Removed duplicated region for block: B:0:0x0000 A[LOOP:0: B:0:0x0000->B:3:0x0008, LOOP_START, MTH_ENTER_BLOCK] */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public void run() {
+
         /*
             r1 = this;
         L_0x0000:

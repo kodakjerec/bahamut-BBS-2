@@ -1,31 +1,48 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Model;
 
-public class ASSize {
-    public int height = 0;
-    public int width = 0;
 
-    public ASSize() {
+public class ASSize
+{
+
+    public int height;
+    public int width;
+
+    public ASSize()
+    {
+        width = 0;
+        height = 0;
     }
 
-    public ASSize(int aWidth, int aHeight) {
-        this.width = aWidth;
-        this.height = aHeight;
+    public ASSize(int i, int j)
+    {
+        width = 0;
+        height = 0;
+        width = i;
+        height = j;
     }
 
-    public void set(ASSize aSize) {
-        set(aSize.width, aSize.height);
+    public boolean isZero()
+    {
+        return width == 0 && height == 0;
     }
 
-    public void set(int aWidth, int aHeight) {
-        this.width = aWidth;
-        this.height = aHeight;
+    public void set(int i, int j)
+    {
+        width = i;
+        height = j;
     }
 
-    public String toString() {
-        return "(" + this.width + "," + this.height + ")";
+    public void set(ASSize assize)
+    {
+        set(assize.width, assize.height);
     }
 
-    public boolean isZero() {
-        return this.width == 0 && this.height == 0;
+    public String toString()
+    {
+        return (new StringBuilder()).append("(").append(width).append(",").append(height).append(")").toString();
     }
 }

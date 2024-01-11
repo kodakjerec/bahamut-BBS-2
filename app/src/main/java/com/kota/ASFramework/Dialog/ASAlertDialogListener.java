@@ -1,5 +1,15 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Dialog;
 
-public interface ASAlertDialogListener {
-    void onAlertDialogDismissWithButtonIndex(ASAlertDialog aSAlertDialog, int i);
+
+// Referenced classes of package com.kumi.ASFramework.Dialog:
+//            ASAlertDialog
+
+public interface ASAlertDialogListener
+{
+
+    public abstract void onAlertDialogDismissWithButtonIndex(ASAlertDialog asalertdialog, int i);
 }

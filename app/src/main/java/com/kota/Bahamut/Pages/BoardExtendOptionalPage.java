@@ -19,7 +19,7 @@ import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.ArrayList;

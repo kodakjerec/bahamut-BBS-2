@@ -1,3 +1,7 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.UI;
 
 import android.content.Context;
@@ -8,103 +12,144 @@ import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.LinearLayout;
 
-public class ASScrollView extends LinearLayout implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener {
-    private int _content_size_height = 0;
-    private int _content_size_width = 0;
-    private View _content_view = null;
-    private ScaleGestureDetector _scale_detector = null;
-    private GestureDetector _scroll_detector = null;
+public class ASScrollView extends LinearLayout
+    implements GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener
+{
 
-    public ASScrollView(Context context) {
+    private int _content_size_height;
+    private int _content_size_width;
+    private View _content_view;
+    private ScaleGestureDetector _scale_detector;
+    private GestureDetector _scroll_detector;
+
+    public ASScrollView(Context context)
+    {
         super(context);
+        _scroll_detector = null;
+        _scale_detector = null;
+        _content_view = null;
+        _content_size_width = 0;
+        _content_size_height = 0;
         initial(context);
     }
 
-    public ASScrollView(Context context, AttributeSet attrs) {
-        super(context, attrs);
+    public ASScrollView(Context context, AttributeSet attributeset)
+    {
+        super(context, attributeset);
+        _scroll_detector = null;
+        _scale_detector = null;
+        _content_view = null;
+        _content_size_width = 0;
+        _content_size_height = 0;
         initial(context);
     }
 
-    private void initial(Context context) {
-        this._scroll_detector = new GestureDetector(context, this);
-        this._scale_detector = new ScaleGestureDetector(context, this);
+    private void initial(Context context)
+    {
+        _scroll_detector = new GestureDetector(context, this);
+        _scale_detector = new ScaleGestureDetector(context, this);
     }
 
-    public void setContentSize(int width, int height) {
-        this._content_size_width = width;
-        this._content_size_height = height;
-    }
-
-    public void reload() {
-        if (getChildCount() > 0) {
-            this._content_view = getChildAt(0);
-        }
-    }
-
-    public boolean onTouchEvent(MotionEvent event) {
-        if (event.getPointerCount() == 2) {
-            return this._scale_detector.onTouchEvent(event);
-        }
-        return this._scroll_detector.onTouchEvent(event);
-    }
-
-    public boolean onDown(MotionEvent e) {
+    public boolean onDown(MotionEvent motionevent)
+    {
         return true;
     }
 
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+    public boolean onFling(MotionEvent motionevent, MotionEvent motionevent1, float f, float f1)
+    {
         return false;
     }
 
-    public void onLongPress(MotionEvent e) {
+    public void onLongPress(MotionEvent motionevent)
+    {
     }
 
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        if (this._content_view == null) {
+    public boolean onScale(ScaleGestureDetector scalegesturedetector)
+    {
+        return true;
+    }
+
+    public boolean onScaleBegin(ScaleGestureDetector scalegesturedetector)
+    {
+        return true;
+    }
+
+    public void onScaleEnd(ScaleGestureDetector scalegesturedetector)
+    {
+    }
+
+    public boolean onScroll(MotionEvent motionevent, MotionEvent motionevent1, float f, float f1)
+    {
+        if (_content_view == null)
+        {
             reload();
         }
-        if (this._content_view == null) {
-            return false;
+        if (_content_view != null)
+        {
+            _content_size_width = _content_view.getWidth();
+            _content_size_height = _content_view.getHeight();
+            int i = getScrollX();
+            int l = getScrollY();
+            int j = (int)((float)i + f);
+            int k = _content_size_width - getWidth();
+            i = j;
+            if (j > k)
+            {
+                i = k;
+            }
+            j = i;
+            if (i < 0)
+            {
+                j = 0;
+            }
+            k = (int)((float)l + f1);
+            l = _content_size_height - getHeight();
+            i = k;
+            if (k > l)
+            {
+                i = l;
+            }
+            k = i;
+            if (i < 0)
+            {
+                k = 0;
+            }
+            scrollTo(j, k);
         }
-        this._content_size_width = this._content_view.getWidth();
-        this._content_size_height = this._content_view.getHeight();
-        int scroll_x = getScrollX();
-        int scroll_y = getScrollY();
-        int scroll_x2 = (int) (((float) scroll_x) + distanceX);
-        int scroll_limit_x = this._content_size_width - getWidth();
-        if (scroll_x2 > scroll_limit_x) {
-            scroll_x2 = scroll_limit_x;
-        }
-        if (scroll_x2 < 0) {
-            scroll_x2 = 0;
-        }
-        int scroll_y2 = (int) (((float) scroll_y) + distanceY);
-        int scroll_limit_y = this._content_size_height - getHeight();
-        if (scroll_y2 > scroll_limit_y) {
-            scroll_y2 = scroll_limit_y;
-        }
-        if (scroll_y2 < 0) {
-            scroll_y2 = 0;
-        }
-        scrollTo(scroll_x2, scroll_y2);
         return false;
     }
 
-    public void onShowPress(MotionEvent e) {
+    public void onShowPress(MotionEvent motionevent)
+    {
     }
 
-    public boolean onSingleTapUp(MotionEvent e) {
+    public boolean onSingleTapUp(MotionEvent motionevent)
+    {
         return false;
     }
 
-    public boolean onScale(ScaleGestureDetector detector) {
-        return true;
+    public boolean onTouchEvent(MotionEvent motionevent)
+    {
+        if (motionevent.getPointerCount() == 2)
+        {
+            return _scale_detector.onTouchEvent(motionevent);
+        } else
+        {
+            return _scroll_detector.onTouchEvent(motionevent);
+        }
     }
 
-    public boolean onScaleBegin(ScaleGestureDetector detector) {
-        return true;
+    public void reload()
+    {
+        if (getChildCount() > 0)
+        {
+            _content_view = getChildAt(0);
+        }
     }
 
-    public void onScaleEnd(ScaleGestureDetector detector) {
+    public void setContentSize(int i, int j)
+    {
+        _content_size_width = i;
+        _content_size_height = j;
     }
 }

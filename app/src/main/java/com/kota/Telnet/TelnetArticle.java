@@ -23,12 +23,12 @@ public class TelnetArticle {
     public String Title = "";
     public int Type = 0;
     private String _block_list = null;
-    private final Vector<TelnetArticleItem> _extend_items = new Vector<>();
+    private Vector<TelnetArticleItem> _extend_items = new Vector<>();
     private TelnetFrame _frame = null;
-    private final Vector<TelnetArticleItemInfo> _infos = new Vector<>();
-    private final Vector<TelnetArticleItem> _items = new Vector<>();
-    private final Vector<TelnetArticleItem> _main_items = new Vector<>();
-    private final Vector<TelnetArticlePush> _pushs = new Vector<>();
+    private Vector<TelnetArticleItemInfo> _infos = new Vector<>();
+    private Vector<TelnetArticleItem> _items = new Vector<>();
+    private Vector<TelnetArticleItem> _main_items = new Vector<>();
+    private Vector<TelnetArticlePush> _pushs = new Vector<>();
 
     public void setFrameData(Vector<TelnetRow> rows) {
         this._frame = new TelnetFrame(rows.size());
@@ -165,7 +165,7 @@ public class TelnetArticle {
         } else {
             maximum_quote = quote_level_list[1].intValue();
         }
-        content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", this.Author, this.Nickname));
+        content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", new Object[]{this.Author, this.Nickname}));
         content_builder.append("\n");
         Iterator<TelnetArticleItemInfo> it2 = this._infos.iterator();
         while (it2.hasNext()) {
@@ -174,7 +174,7 @@ public class TelnetArticle {
                 for (int i = 0; i < info.quoteLevel; i++) {
                     content_builder.append("> ");
                 }
-                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
+                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", new Object[]{info.author, info.nickname}));
             }
         }
         Iterator<TelnetArticleItem> it3 = this._main_items.iterator();
@@ -211,7 +211,10 @@ public class TelnetArticle {
 
     @SuppressLint({"DefaultLocale"})
     public boolean isBlocked(String name) {
-        return this._block_list != null && name != null && this._block_list.contains("," + name.trim().toLowerCase() + ",");
+        if (this._block_list == null || name == null || !this._block_list.contains("," + name.trim().toLowerCase() + ",")) {
+            return false;
+        }
+        return true;
     }
 
     public String getFullText() {

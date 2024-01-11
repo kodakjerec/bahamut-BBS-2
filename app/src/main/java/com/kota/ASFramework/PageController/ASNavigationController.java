@@ -1,668 +1,925 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.PageController;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.Animation;
-import android.widget.FrameLayout;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
-
-import com.kota.ASFramework.Thread.ASRunner;
-
+import com.kumi.ASFramework.Thread.ASRunner;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Vector;
 
-public class ASNavigationController extends AppCompatActivity {
-    private static ASNavigationController _current_controller = null;
-    /* access modifiers changed from: private */
-    public Vector<ASViewController> _add_list = new Vector<>();
-    private boolean _animation_enable = true;
-    /* access modifiers changed from: private */
-    public Vector<ASViewController> _controllers = new Vector<>();
-    private ASDeviceController _device_controller = null;
-    private final DisplayMetrics _display_metrics = new DisplayMetrics();
-    private boolean _in_background = false;
-    private boolean _is_animating = false;
-    private final Vector<PageCommand> _page_commands = new Vector<>();
-    /* access modifiers changed from: private */
-    public Vector<ASViewController> _remove_list = new Vector<>();
-    /* access modifiers changed from: private */
-    public ASNavigationControllerView _root_view = null;
-    /* access modifiers changed from: private */
-    public Vector<ASViewController> _temp_controllers = new Vector<>();
+// Referenced classes of package com.kumi.ASFramework.PageController:
+//            ASViewController, ASAnimation, ASPageView, ASNavigationControllerView, 
+//            ASDeviceController, ASNavigationControllerPopAnimation, ASNavigationControllerPushAnimation
 
-    private abstract class PageCommand {
+public class ASNavigationController extends Activity
+{
+    private abstract class PageCommand
+    {
+
         public boolean animated;
+        final ASNavigationController this$0;
 
         public abstract void run();
 
-        private PageCommand() {
-            this.animated = true;
+        private PageCommand()
+        {
+            this$0 = ASNavigationController.this;
+            super();
+            animated = true;
         }
+
     }
 
-    /* access modifiers changed from: protected */
-    public void onControllerWillLoad() {
+
+    private static ASNavigationController _current_controller = null;
+    private Vector _add_list;
+    private boolean _animation_enable;
+    private Vector _controllers;
+    private ASDeviceController _device_controller;
+    private DisplayMetrics _display_metrics;
+    private boolean _in_background;
+    private boolean _is_animating;
+    private Vector _page_commands;
+    private Vector _remove_list;
+    private ASNavigationControllerView _root_view;
+    private Vector _temp_controllers;
+
+    public ASNavigationController()
+    {
+        _device_controller = null;
+        _display_metrics = new DisplayMetrics();
+        _root_view = null;
+        _controllers = new Vector();
+        _temp_controllers = new Vector();
+        _remove_list = new Vector();
+        _add_list = new Vector();
+        _animation_enable = true;
+        _in_background = false;
+        _page_commands = new Vector();
+        _is_animating = false;
     }
 
-    /* access modifiers changed from: protected */
-    public void onControllerDidLoad() {
+    private void animatePopViewController(final ASViewController final_asviewcontroller, final ASViewController final_asviewcontroller1, boolean flag)
+    {
+        if (final_asviewcontroller != null)
+        {
+            final_asviewcontroller.notifyPageWillDisappear();
+            if (flag)
+            {
+                removePageView(final_asviewcontroller, ASAnimation.getFadeOutToRightAnimation());
+            } else
+            {
+                removePageView(final_asviewcontroller);
+            }
+        }
+        if (final_asviewcontroller1 != null)
+        {
+            buildPageView(final_asviewcontroller1);
+            final_asviewcontroller1.onPageDidLoad();
+            final_asviewcontroller1.onPageRefresh();
+            final_asviewcontroller1.notifyPageWillAppear();
+        }
+        (new ASNavigationControllerPopAnimation(final_asviewcontroller, final_asviewcontroller1) {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aAddPage;
+            final ASViewController val$aRemovePage;
+
+            public void onAnimationFinished()
+            {
+                if (aRemovePage != null)
+                {
+                    aRemovePage.onPageDidDisappear();
+                }
+                Object obj = new Vector();
+                for (int i = 0; i < _root_view.getContentView().getChildCount(); i++)
+                {
+                    View view = _root_view.getContentView().getChildAt(i);
+                    if (view != aAddPage.getPageView())
+                    {
+                        ((Vector) (obj)).add(view);
+                    }
+                }
+
+                View view1;
+                for (obj = ((Vector) (obj)).iterator(); ((Iterator) (obj)).hasNext(); _root_view.getContentView().removeView(view1))
+                {
+                    view1 = (View)((Iterator) (obj)).next();
+                }
+
+                cleanPageView(aRemovePage);
+                obj = _controllers.iterator();
+                do
+                {
+                    if (!((Iterator) (obj)).hasNext())
+                    {
+                        break;
+                    }
+                    ASViewController asviewcontroller = (ASViewController)((Iterator) (obj)).next();
+                    if (asviewcontroller != aAddPage && asviewcontroller.getPageView() != null)
+                    {
+                        cleanPageView(asviewcontroller);
+                    }
+                } while (true);
+                if (aAddPage != null)
+                {
+                    aAddPage.notifyPageDidAppear();
+                }
+                onPageCommandExecuteFinished();
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aRemovePage = asviewcontroller2;
+                aAddPage = asviewcontroller3;
+                super(final_asviewcontroller, final_asviewcontroller1);
+            }
+        }).start(flag);
     }
 
-    /* access modifiers changed from: protected */
-    public void onControllerWillFinish() {
+    private void animatedPushViewController(final ASViewController final_asviewcontroller, final ASViewController final_asviewcontroller1, boolean flag)
+    {
+        if (final_asviewcontroller1 != null)
+        {
+            buildPageView(final_asviewcontroller1);
+            final_asviewcontroller1.onPageDidLoad();
+            final_asviewcontroller1.onPageRefresh();
+        }
+        if (final_asviewcontroller != null)
+        {
+            final_asviewcontroller.notifyPageWillDisappear();
+        }
+        if (final_asviewcontroller1 != null)
+        {
+            final_asviewcontroller1.notifyPageWillAppear();
+        }
+        (new ASNavigationControllerPushAnimation(final_asviewcontroller, final_asviewcontroller1) {
+
+            final ASNavigationController this$0;
+            final ASViewController val$sourceController;
+            final ASViewController val$targetController;
+
+            public void onAnimationFinished()
+            {
+                if (sourceController != null)
+                {
+                    sourceController.onPageDidDisappear();
+                }
+                if (targetController != null)
+                {
+                    Object obj = new Vector();
+                    for (int i = 0; i < _root_view.getContentView().getChildCount(); i++)
+                    {
+                        View view = _root_view.getContentView().getChildAt(i);
+                        if (view != targetController.getPageView())
+                        {
+                            ((Vector) (obj)).add(view);
+                        }
+                    }
+
+                    View view1;
+                    for (obj = ((Vector) (obj)).iterator(); ((Iterator) (obj)).hasNext(); _root_view.getContentView().removeView(view1))
+                    {
+                        view1 = (View)((Iterator) (obj)).next();
+                    }
+
+                }
+                Iterator iterator = _controllers.iterator();
+                do
+                {
+                    if (!iterator.hasNext())
+                    {
+                        break;
+                    }
+                    ASViewController asviewcontroller = (ASViewController)iterator.next();
+                    if (asviewcontroller != targetController && asviewcontroller.getPageView() != null)
+                    {
+                        cleanPageView(asviewcontroller);
+                    }
+                } while (true);
+                if (targetController != null)
+                {
+                    targetController.notifyPageDidAppear();
+                }
+                onPageCommandExecuteFinished();
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                sourceController = asviewcontroller2;
+                targetController = asviewcontroller3;
+                super(final_asviewcontroller, final_asviewcontroller1);
+            }
+        }).start(flag);
     }
 
-    private static void setNavigationController(ASNavigationController aController) {
-        _current_controller = aController;
+    private void buildPageView(ASViewController asviewcontroller)
+    {
+        ASPageView aspageview = new ASPageView(this);
+        aspageview.setLayoutParams(new android.widget.FrameLayout.LayoutParams(-1, -1));
+        aspageview.setBackgroundColor(0xff000000);
+        aspageview.setAnimationCacheEnabled(false);
+        getLayoutInflater().inflate(asviewcontroller.getPageLayout(), aspageview);
+        asviewcontroller.setPageView(aspageview);
+        _root_view.getContentView().addView(aspageview);
     }
 
-    public static ASNavigationController getCurrentController() {
+    private void cleanPageView(ASViewController asviewcontroller)
+    {
+        asviewcontroller.setPageView(null);
+    }
+
+    public static ASNavigationController getCurrentController()
+    {
         return _current_controller;
     }
 
-    public void setNavigationTitle(String title) {
-        super.setTitle(title);
-    }
-
-    /* access modifiers changed from: protected */
-    public String getControllerName() {
-        return "";
-    }
-
-    private boolean onMenuPressed() {
-        ASViewController page = getTopController();
-        return page != null && page.onMenuButtonClicked();
-    }
-
-    private boolean onSearchPressed() {
-        ASViewController page = getTopController();
-        return page != null && page.onSearchButtonClicked();
-    }
-
-    public void onBackPressed() {
-        boolean handle_back_button = false;
-        ASViewController page = getTopController();
-        if (page != null && page.onBackPressed()) {
-            handle_back_button = true;
-        }
-        if (!handle_back_button) {
-            finish();
-        }
-    }
-
-    public boolean onBackLongPressed() {
-        return false;
-    }
-
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setNavigationController(this);
-        getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics);
-        ASRunner.construct();
-        this._device_controller = new ASDeviceController(this);
-        onControllerWillLoad();
-        this._root_view = new ASNavigationControllerView(this);
-        this._root_view.setPageController(this);
-        setContentView(this._root_view);
-        onControllerDidLoad();
-    }
-
-    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
-        if (keyCode == 4) {
-            return onBackLongPressed();
-        }
-        return super.onKeyLongPress(keyCode, event);
-    }
-
-    public boolean onKeyUp(int keyCode, KeyEvent event) {
-        switch (keyCode) {
-            case 82:
-                return onMenuPressed();
-            case 84:
-                return onSearchPressed();
-            default:
-                return super.onKeyUp(keyCode, event);
-        }
-    }
-
-    public ASViewController getTopController() {
-        ASViewController controller = null;
-        synchronized (this._controllers) {
-            if (this._controllers.size() > 0) {
-                controller = this._controllers.lastElement();
+    private boolean onMenuPressed()
+    {
+        boolean flag1 = false;
+        ASViewController asviewcontroller = getTopController();
+        boolean flag = flag1;
+        if (asviewcontroller != null)
+        {
+            flag = flag1;
+            if (asviewcontroller.onMenuButtonClicked())
+            {
+                flag = true;
             }
         }
-        return controller;
+        return flag;
     }
 
-    private void buildPageView(ASViewController controller) {
-        ASPageView page_view = new ASPageView(this);
-        page_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
-        page_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
-        page_view.setAnimationCacheEnabled(false);
-        getLayoutInflater().inflate(controller.getPageLayout(), page_view);
-        controller.setPageView(page_view);
-        this._root_view.getContentView().addView(page_view);
+    private void onPageCommandExecuteFinished()
+    {
+        this;
+        JVM INSTR monitorenter ;
+        _is_animating = false;
+        this;
+        JVM INSTR monitorexit ;
+        _temp_controllers.clear();
+        executePageCommand();
+        return;
+        Exception exception;
+        exception;
+        this;
+        JVM INSTR monitorexit ;
+        throw exception;
     }
 
-    /* access modifiers changed from: private */
-    public void cleanPageView(ASViewController controller) {
-        controller.setPageView((ASPageView) null);
+    private boolean onSearchPressed()
+    {
+        boolean flag1 = false;
+        ASViewController asviewcontroller = getTopController();
+        boolean flag = flag1;
+        if (asviewcontroller != null)
+        {
+            flag = flag1;
+            if (asviewcontroller.onSearchButtonClicked())
+            {
+                flag = true;
+            }
+        }
+        return flag;
     }
 
-    public void addPageView(final ASViewController aPage) {
-        final View page_view = aPage.getPageView();
-        this._root_view.post(new Runnable() {
-            public void run() {
+    private static void setNavigationController(ASNavigationController asnavigationcontroller)
+    {
+        _current_controller = asnavigationcontroller;
+    }
+
+    public void addPageView(final ASViewController aPage)
+    {
+        final ASPageView page_view = aPage.getPageView();
+        _root_view.post(new Runnable() {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aPage;
+            final View val$page_view;
+
+            public void run()
+            {
                 aPage.onPageDidDisappear();
-                ASNavigationController.this._root_view.removeView(page_view);
+                _root_view.removeView(page_view);
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aPage = asviewcontroller;
+                page_view = view;
+                super();
             }
         });
     }
 
-    public void removePageView(final ASViewController aPage) {
-        final View page_view = aPage.getPageView();
-        this._root_view.post(new Runnable() {
-            public void run() {
-                aPage.onPageDidDisappear();
-                ASNavigationController.this._root_view.removeView(page_view);
-            }
-        });
+    public boolean containsViewController(ASViewController asviewcontroller)
+    {
+        return _controllers.contains(asviewcontroller);
     }
 
-    public void removePageView(final ASViewController aPage, Animation aAnimation) {
-        aAnimation.setAnimationListener(new Animation.AnimationListener() {
-            public void onAnimationStart(Animation animation) {
-            }
+    public void exchangeViewControllers(final boolean animated)
+    {
+        (new ASRunner() {
 
-            public void onAnimationRepeat(Animation animation) {
-            }
+            final ASNavigationController this$0;
+            final boolean val$animated;
 
-            public void onAnimationEnd(Animation animation) {
-                ASNavigationController.this.removePageView(aPage);
-            }
-        });
-        aPage.getPageView().startAnimation(aAnimation);
-    }
-
-    /* access modifiers changed from: private */
-    public void animatePopViewController(ASViewController aRemovePage, ASViewController aAddPage, boolean animated) {
-        if (aRemovePage != null) {
-            aRemovePage.notifyPageWillDisappear();
-            if (animated) {
-                removePageView(aRemovePage, ASAnimation.getFadeOutToRightAnimation());
-            } else {
-                removePageView(aRemovePage);
-            }
-        }
-        if (aAddPage != null) {
-            buildPageView(aAddPage);
-            aAddPage.onPageDidLoad();
-            aAddPage.onPageRefresh();
-            aAddPage.notifyPageWillAppear();
-        }
-        final ASViewController aSViewController = aRemovePage;
-        final ASViewController aSViewController2 = aAddPage;
-        new ASNavigationControllerPopAnimation(aRemovePage, aAddPage) {
-            public void onAnimationFinished() {
-                if (aSViewController != null) {
-                    aSViewController.onPageDidDisappear();
+            public void run()
+            {
+                ASViewController asviewcontroller;
+                ASViewController asviewcontroller1;
+                boolean flag;
+                if (_controllers.size() > 0)
+                {
+                    asviewcontroller = (ASViewController)_controllers.lastElement();
+                } else
+                {
+                    asviewcontroller = null;
                 }
-                Vector<View> remove_list = new Vector<>();
-                for (int i = 0; i < ASNavigationController.this._root_view.getContentView().getChildCount(); i++) {
-                    View page_view = ASNavigationController.this._root_view.getContentView().getChildAt(i);
-                    if (page_view != aSViewController2.getPageView()) {
-                        remove_list.add(page_view);
+                if (_temp_controllers.size() > 0)
+                {
+                    asviewcontroller1 = (ASViewController)_temp_controllers.lastElement();
+                } else
+                {
+                    asviewcontroller1 = null;
+                }
+                flag = _controllers.contains(asviewcontroller1);
+                for (Iterator iterator = _controllers.iterator(); iterator.hasNext(); ((ASViewController)iterator.next()).prepareForRemove()) { }
+                for (Iterator iterator1 = _temp_controllers.iterator(); iterator1.hasNext(); ((ASViewController)iterator1.next()).prepareForAdd()) { }
+                ASViewController asviewcontroller2;
+                for (Iterator iterator2 = _controllers.iterator(); iterator2.hasNext(); asviewcontroller2.cleanMark())
+                {
+                    asviewcontroller2 = (ASViewController)iterator2.next();
+                    if (asviewcontroller2.isMarkedRemoved())
+                    {
+                        _remove_list.add(asviewcontroller2);
                     }
                 }
-                Iterator<View> it = remove_list.iterator();
-                while (it.hasNext()) {
-                    ASNavigationController.this._root_view.getContentView().removeView(it.next());
-                }
-                ASNavigationController.this.cleanPageView(aSViewController);
-                Iterator it2 = ASNavigationController.this._controllers.iterator();
-                while (it2.hasNext()) {
-                    ASViewController controller = (ASViewController) it2.next();
-                    if (!(controller == aSViewController2 || controller.getPageView() == null)) {
-                        ASNavigationController.this.cleanPageView(controller);
-                    }
-                }
-                if (aSViewController2 != null) {
-                    aSViewController2.notifyPageDidAppear();
-                }
-                ASNavigationController.this.onPageCommandExecuteFinished();
-            }
-        }.start(animated);
-    }
 
-    /* access modifiers changed from: private */
-    public void animatedPushViewController(ASViewController sourceController, ASViewController targetController, boolean animated) {
-        if (targetController != null) {
-            buildPageView(targetController);
-            targetController.onPageDidLoad();
-            targetController.onPageRefresh();
-        }
-        if (sourceController != null) {
-            sourceController.notifyPageWillDisappear();
-        }
-        if (targetController != null) {
-            targetController.notifyPageWillAppear();
-        }
-        final ASViewController aSViewController = sourceController;
-        final ASViewController aSViewController2 = targetController;
-        new ASNavigationControllerPushAnimation(sourceController, targetController) {
-            public void onAnimationFinished() {
-                if (aSViewController != null) {
-                    aSViewController.onPageDidDisappear();
-                }
-                if (aSViewController2 != null) {
-                    Vector<View> remove_list = new Vector<>();
-                    for (int i = 0; i < ASNavigationController.this._root_view.getContentView().getChildCount(); i++) {
-                        View page_view = ASNavigationController.this._root_view.getContentView().getChildAt(i);
-                        if (page_view != aSViewController2.getPageView()) {
-                            remove_list.add(page_view);
-                        }
-                    }
-                    Iterator<View> it = remove_list.iterator();
-                    while (it.hasNext()) {
-                        ASNavigationController.this._root_view.getContentView().removeView(it.next());
+                ASViewController asviewcontroller3;
+                for (Iterator iterator3 = _temp_controllers.iterator(); iterator3.hasNext(); asviewcontroller3.cleanMark())
+                {
+                    asviewcontroller3 = (ASViewController)iterator3.next();
+                    if (asviewcontroller3.isMarkedAdded())
+                    {
+                        asviewcontroller3.setNavigationController(ASNavigationController.this);
+                        _add_list.add(asviewcontroller3);
                     }
                 }
-                Iterator it2 = ASNavigationController.this._controllers.iterator();
-                while (it2.hasNext()) {
-                    ASViewController controller = (ASViewController) it2.next();
-                    if (!(controller == aSViewController2 || controller.getPageView() == null)) {
-                        ASNavigationController.this.cleanPageView(controller);
-                    }
-                }
-                if (aSViewController2 != null) {
-                    aSViewController2.notifyPageDidAppear();
-                }
-                ASNavigationController.this.onPageCommandExecuteFinished();
-            }
-        }.start(animated);
-    }
 
-    public void pushViewController(ASViewController aController) {
-        pushViewController(aController, this._animation_enable);
-    }
-
-    public void pushViewController(final ASViewController aController, boolean animated) {
-        PageCommand command = new PageCommand() {
-            public void run() {
-                if (aController == null) {
+                _controllers.removeAllElements();
+                _controllers.addAll(_temp_controllers);
+                for (Iterator iterator4 = _add_list.iterator(); iterator4.hasNext(); ((ASViewController)iterator4.next()).notifyPageDidAddToNavigationController()) { }
+                for (Iterator iterator5 = _remove_list.iterator(); iterator5.hasNext(); ((ASViewController)iterator5.next()).notifyPageDidRemoveFromNavigationController()) { }
+                _add_list.clear();
+                _remove_list.clear();
+                if (asviewcontroller != asviewcontroller1)
+                {
+                    if (flag)
+                    {
+                        animatePopViewController(asviewcontroller, asviewcontroller1, animated);
+                        return;
+                    } else
+                    {
+                        animatedPushViewController(asviewcontroller, asviewcontroller1, animated);
+                        return;
+                    }
+                } else
+                {
+                    onPageCommandExecuteFinished();
                     return;
                 }
-                if (ASNavigationController.this._temp_controllers.size() <= 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
-                    ASNavigationController.this._temp_controllers.add(aController);
-                }
             }
-        };
-        command.animated = animated;
-        pushPageCommand(command);
-    }
 
-    public void popViewController() {
-        popViewController(this._animation_enable);
-    }
-
-    public void popViewController(boolean animated) {
-        PageCommand command = new PageCommand() {
-            public void run() {
-                if (ASNavigationController.this._temp_controllers.size() > 0) {
-                    ASNavigationController.this._temp_controllers.remove(ASNavigationController.this._temp_controllers.size() - 1);
-                }
+            
+            {
+                this$0 = ASNavigationController.this;
+                animated = flag;
+                super();
             }
-        };
-        command.animated = animated;
-        pushPageCommand(command);
+        }).runInMainThread();
     }
 
-    public void popToViewController(ASViewController aController) {
-        popToViewController(aController, this._animation_enable);
-    }
-
-    public void popToViewController(final ASViewController aController, boolean animated) {
-        PageCommand command = new PageCommand() {
-            public void run() {
-                if (aController == null) {
-                    return;
-                }
-                if (ASNavigationController.this._temp_controllers.size() <= 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
-                    while (ASNavigationController.this._temp_controllers.size() > 0 && ASNavigationController.this._temp_controllers.lastElement() != aController) {
-                        ASNavigationController.this._temp_controllers.remove(ASNavigationController.this._temp_controllers.size() - 1);
-                    }
-                }
-            }
-        };
-        command.animated = animated;
-        pushPageCommand(command);
-    }
-
-    public void setViewControllers(Vector<ASViewController> aControllerList) {
-        setViewControllers(aControllerList, this._animation_enable);
-    }
-
-    public void setViewControllers(final Vector<ASViewController> aControllerList, boolean animated) {
-        PageCommand command = new PageCommand() {
-            public void run() {
-                if (aControllerList != null) {
-                    ASNavigationController.this._temp_controllers.removeAllElements();
-                    ASNavigationController.this._temp_controllers.addAll(aControllerList);
-                }
-            }
-        };
-        command.animated = animated;
-        pushPageCommand(command);
-    }
-
-    public void exchangeViewControllers(final boolean animated) {
-        new ASRunner() {
-            public void run() {
-                ASViewController source_controller;
-                ASViewController target_controller;
-                if (ASNavigationController.this._controllers.size() > 0) {
-                    source_controller = (ASViewController) ASNavigationController.this._controllers.lastElement();
-                } else {
-                    source_controller = null;
-                }
-                if (ASNavigationController.this._temp_controllers.size() > 0) {
-                    target_controller = (ASViewController) ASNavigationController.this._temp_controllers.lastElement();
-                } else {
-                    target_controller = null;
-                }
-                boolean pop = ASNavigationController.this._controllers.contains(target_controller);
-                Iterator it = ASNavigationController.this._controllers.iterator();
-                while (it.hasNext()) {
-                    ((ASViewController) it.next()).prepareForRemove();
-                }
-                Iterator it2 = ASNavigationController.this._temp_controllers.iterator();
-                while (it2.hasNext()) {
-                    ((ASViewController) it2.next()).prepareForAdd();
-                }
-                Iterator it3 = ASNavigationController.this._controllers.iterator();
-                while (it3.hasNext()) {
-                    ASViewController controller = (ASViewController) it3.next();
-                    if (controller.isMarkedRemoved()) {
-                        ASNavigationController.this._remove_list.add(controller);
-                    }
-                    controller.cleanMark();
-                }
-                Iterator it4 = ASNavigationController.this._temp_controllers.iterator();
-                while (it4.hasNext()) {
-                    ASViewController controller2 = (ASViewController) it4.next();
-                    if (controller2.isMarkedAdded()) {
-                        controller2.setNavigationController(ASNavigationController.this);
-                        ASNavigationController.this._add_list.add(controller2);
-                    }
-                    controller2.cleanMark();
-                }
-                ASNavigationController.this._controllers.removeAllElements();
-                ASNavigationController.this._controllers.addAll(ASNavigationController.this._temp_controllers);
-                Iterator it5 = ASNavigationController.this._add_list.iterator();
-                while (it5.hasNext()) {
-                    ((ASViewController) it5.next()).notifyPageDidAddToNavigationController();
-                }
-                Iterator it6 = ASNavigationController.this._remove_list.iterator();
-                while (it6.hasNext()) {
-                    ((ASViewController) it6.next()).notifyPageDidRemoveFromNavigationController();
-                }
-                ASNavigationController.this._add_list.clear();
-                ASNavigationController.this._remove_list.clear();
-                if (source_controller == target_controller) {
-                    ASNavigationController.this.onPageCommandExecuteFinished();
-                } else if (pop) {
-                    ASNavigationController.this.animatePopViewController(source_controller, target_controller, animated);
-                } else {
-                    ASNavigationController.this.animatedPushViewController(source_controller, target_controller, animated);
-                }
-            }
-        }.runInMainThread();
-    }
-
-    public Vector<ASViewController> getViewControllers() {
-        return new Vector<>(this._controllers);
-    }
-
-    public boolean containsViewController(ASViewController aController) {
-        return this._controllers.contains(aController);
-    }
-
-    /* access modifiers changed from: protected */
-    public void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
-        ASViewController page = getTopController();
-        if (page != null) {
-            page.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
+    public void executePageCommand()
+    {
+        this;
+        JVM INSTR monitorenter ;
+        if (!_is_animating)
+        {
+            break MISSING_BLOCK_LABEL_12;
         }
-    }
-
-    public void reloadLayout() {
-        if (this._root_view != null) {
-            this._root_view.requestLayout();
+        this;
+        JVM INSTR monitorexit ;
+        return;
+        this;
+        JVM INSTR monitorexit ;
+        Vector vector = _page_commands;
+        vector;
+        JVM INSTR monitorenter ;
+        if (_page_commands.size() <= 0)
+        {
+            break MISSING_BLOCK_LABEL_98;
         }
-    }
-
-    public boolean onReceivedGestureUp() {
-        ASViewController page = getTopController();
-        if (page != null) {
-            return page.onReceivedGestureUp();
+        this;
+        JVM INSTR monitorenter ;
+        _is_animating = true;
+        this;
+        JVM INSTR monitorexit ;
+        _temp_controllers.addAll(_controllers);
+        Exception exception;
+        Exception exception1;
+        for (boolean flag = ((PageCommand)_page_commands.firstElement()).animated; _page_commands.size() > 0 && ((PageCommand)_page_commands.firstElement()).animated == flag; ((PageCommand)_page_commands.remove(0)).run())
+        {
+            break MISSING_BLOCK_LABEL_116;
         }
-        return false;
+
+        exchangeViewControllers(flag);
+        vector;
+        JVM INSTR monitorexit ;
+        return;
+        exception1;
+        vector;
+        JVM INSTR monitorexit ;
+        throw exception1;
+        exception;
+        this;
+        JVM INSTR monitorexit ;
+        throw exception;
+        exception1;
+        this;
+        JVM INSTR monitorexit ;
+        throw exception1;
     }
 
-    public boolean onReceivedGestureDown() {
-        ASViewController page = getTopController();
-        if (page != null) {
-            return page.onReceivedGestureDown();
-        }
-        return false;
-    }
-
-    public boolean onReceivedGestureLeft() {
-        ASViewController page = getTopController();
-        if (page != null) {
-            return page.onReceivedGestureLeft();
-        }
-        return false;
-    }
-
-    public boolean onReceivedGestureRight() {
-        ASViewController page = getTopController();
-        if (page != null) {
-            return page.onReceivedGestureRight();
-        }
-        return false;
-    }
-
-    public int getCurrentOrientation() {
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
-        if (rotation == 1 || rotation == 3) {
-            return 2;
-        }
-        return 1;
-    }
-
-    public int getScreenWidth() {
-        return this._display_metrics.widthPixels;
-    }
-
-    public int getScreenHeight() {
-        return this._display_metrics.heightPixels;
-    }
-
-    public ASDeviceController getDeviceController() {
-        return this._device_controller;
-    }
-
-    public void finish() {
+    public void finish()
+    {
         onControllerWillFinish();
         getDeviceController().unlockWifi();
         super.finish();
     }
 
-    public boolean isAnimationEnable() {
-        return this._animation_enable;
+    protected String getControllerName()
+    {
+        return "";
     }
 
-    public void setAnimationEnable(boolean enable) {
-        this._animation_enable = enable;
-    }
-
-    /* access modifiers changed from: protected */
-    public void onPause() {
-        super.onPause();
-        this._in_background = true;
-    }
-
-    /* access modifiers changed from: protected */
-    public void onResume() {
-        super.onResume();
-        this._in_background = false;
-    }
-
-    public boolean isInBackground() {
-        return this._in_background;
-    }
-
-    public void printControllers() {
-        printControllers(this._controllers);
-    }
-
-    public void printControllers(Vector<ASViewController> controllers) {
-        Iterator<ASViewController> it = controllers.iterator();
-        while (it.hasNext()) {
-            System.out.print(it.next().getPageType() + " ");
+    public int getCurrentOrientation()
+    {
+        byte byte0 = 1;
+        int i = getWindowManager().getDefaultDisplay().getRotation();
+        if (i == 1 || i == 3)
+        {
+            byte0 = 2;
         }
-        System.out.print("\n");
+        return byte0;
     }
 
-    public void onLowMemory() {
+    public ASDeviceController getDeviceController()
+    {
+        return _device_controller;
+    }
+
+    public int getScreenHeight()
+    {
+        return _display_metrics.heightPixels;
+    }
+
+    public int getScreenWidth()
+    {
+        return _display_metrics.widthPixels;
+    }
+
+    public ASViewController getTopController()
+    {
+        ASViewController asviewcontroller = null;
+        synchronized (_controllers)
+        {
+            if (_controllers.size() > 0)
+            {
+                asviewcontroller = (ASViewController)_controllers.lastElement();
+            }
+        }
+        return asviewcontroller;
+        exception;
+        vector;
+        JVM INSTR monitorexit ;
+        throw exception;
+    }
+
+    public Vector getViewControllers()
+    {
+        return new Vector(_controllers);
+    }
+
+    public boolean isAnimationEnable()
+    {
+        return _animation_enable;
+    }
+
+    public boolean isInBackground()
+    {
+        return _in_background;
+    }
+
+    public boolean onBackLongPressed()
+    {
+        return false;
+    }
+
+    public void onBackPressed()
+    {
+        boolean flag1 = false;
+        ASViewController asviewcontroller = getTopController();
+        boolean flag = flag1;
+        if (asviewcontroller != null)
+        {
+            flag = flag1;
+            if (asviewcontroller.onBackPressed())
+            {
+                flag = true;
+            }
+        }
+        if (!flag)
+        {
+            finish();
+        }
+    }
+
+    protected void onControllerDidLoad()
+    {
+    }
+
+    protected void onControllerWillFinish()
+    {
+    }
+
+    protected void onControllerWillLoad()
+    {
+    }
+
+    public void onCreate(Bundle bundle)
+    {
+        super.onCreate(bundle);
+        setNavigationController(this);
+        getWindowManager().getDefaultDisplay().getMetrics(_display_metrics);
+        ASRunner.construct();
+        _device_controller = new ASDeviceController(this);
+        onControllerWillLoad();
+        _root_view = new ASNavigationControllerView(this);
+        _root_view.setPageController(this);
+        setContentView(_root_view);
+        onControllerDidLoad();
+    }
+
+    public boolean onKeyLongPress(int i, KeyEvent keyevent)
+    {
+        if (i == 4)
+        {
+            return onBackLongPressed();
+        } else
+        {
+            return super.onKeyLongPress(i, keyevent);
+        }
+    }
+
+    public boolean onKeyUp(int i, KeyEvent keyevent)
+    {
+        switch (i)
+        {
+        case 83: // 'S'
+        default:
+            return super.onKeyUp(i, keyevent);
+
+        case 84: // 'T'
+            return onSearchPressed();
+
+        case 82: // 'R'
+            return onMenuPressed();
+        }
+    }
+
+    public void onLowMemory()
+    {
         System.out.println("on low memory");
         super.onLowMemory();
     }
 
-    public void pushPageCommand(PageCommand aCommand) {
-        synchronized (this._page_commands) {
-            this._page_commands.add(aCommand);
-        }
-        executePageCommand();
+    protected void onPause()
+    {
+        super.onPause();
+        _in_background = true;
     }
 
-    /* JADX WARNING: Code restructure failed: missing block: B:10:0x0011, code lost:
-        if (r4._page_commands.size() <= 0) goto L_0x0040;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:11:0x0013, code lost:
-        monitor-enter(r4);
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:14:?, code lost:
-        r4._is_animating = true;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:15:0x0017, code lost:
-        monitor-exit(r4);
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:17:?, code lost:
-        r4._temp_controllers.addAll(r4._controllers);
-        r0 = r4._page_commands.firstElement().animated;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:19:0x002f, code lost:
-        if (r4._page_commands.size() <= 0) goto L_0x003d;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:21:0x003b, code lost:
-        if (r4._page_commands.firstElement().animated == r0) goto L_0x004b;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:22:0x003d, code lost:
-        exchangeViewControllers(r0);
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:23:0x0040, code lost:
-        monitor-exit(r2);
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:37:0x004b, code lost:
-        r4._page_commands.remove(0).run();
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:46:?, code lost:
+    public boolean onReceivedGestureDown()
+    {
+        ASViewController asviewcontroller = getTopController();
+        if (asviewcontroller != null)
+        {
+            return asviewcontroller.onReceivedGestureDown();
+        } else
+        {
+            return false;
+        }
+    }
+
+    public boolean onReceivedGestureLeft()
+    {
+        ASViewController asviewcontroller = getTopController();
+        if (asviewcontroller != null)
+        {
+            return asviewcontroller.onReceivedGestureLeft();
+        } else
+        {
+            return false;
+        }
+    }
+
+    public boolean onReceivedGestureRight()
+    {
+        ASViewController asviewcontroller = getTopController();
+        if (asviewcontroller != null)
+        {
+            return asviewcontroller.onReceivedGestureRight();
+        } else
+        {
+            return false;
+        }
+    }
+
+    public boolean onReceivedGestureUp()
+    {
+        ASViewController asviewcontroller = getTopController();
+        if (asviewcontroller != null)
+        {
+            return asviewcontroller.onReceivedGestureUp();
+        } else
+        {
+            return false;
+        }
+    }
+
+    protected void onResume()
+    {
+        super.onResume();
+        _in_background = false;
+    }
+
+    protected void onSizeChanged(int i, int j, int k, int l)
+    {
+        ASViewController asviewcontroller = getTopController();
+        if (asviewcontroller != null)
+        {
+            asviewcontroller.onSizeChanged(i, j, k, l);
+        }
+    }
+
+    public void popToViewController(ASViewController asviewcontroller)
+    {
+        popToViewController(asviewcontroller, _animation_enable);
+    }
+
+    public void popToViewController(final ASViewController aController, boolean flag)
+    {
+        aController = new PageCommand() {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aController;
+
+            public void run()
+            {
+                if (aController != null && (_temp_controllers.size() <= 0 || aController != _temp_controllers.lastElement()))
+                {
+                    for (; _temp_controllers.size() > 0 && _temp_controllers.lastElement() != aController; _temp_controllers.remove(_temp_controllers.size() - 1)) { }
+                }
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aController = asviewcontroller;
+                super();
+            }
+        };
+        aController.animated = flag;
+        pushPageCommand(aController);
+    }
+
+    public void popViewController()
+    {
+        popViewController(_animation_enable);
+    }
+
+    public void popViewController(boolean flag)
+    {
+        PageCommand pagecommand = new PageCommand() {
+
+            final ASNavigationController this$0;
+
+            public void run()
+            {
+                if (_temp_controllers.size() > 0)
+                {
+                    _temp_controllers.remove(_temp_controllers.size() - 1);
+                }
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                super();
+            }
+        };
+        pagecommand.animated = flag;
+        pushPageCommand(pagecommand);
+    }
+
+    public void printControllers()
+    {
+        printControllers(_controllers);
+    }
+
+    public void printControllers(Vector vector)
+    {
+        ASViewController asviewcontroller;
+        for (vector = vector.iterator(); vector.hasNext(); System.out.print((new StringBuilder()).append(asviewcontroller.getPageType()).append(" ").toString()))
+        {
+            asviewcontroller = (ASViewController)vector.next();
+        }
+
+        System.out.print("\n");
+    }
+
+    public void pushPageCommand(PageCommand pagecommand)
+    {
+        synchronized (_page_commands)
+        {
+            _page_commands.add(pagecommand);
+        }
+        executePageCommand();
         return;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:6:0x0008, code lost:
-        r2 = r4._page_commands;
-     */
-    /* JADX WARNING: Code restructure failed: missing block: B:7:0x000a, code lost:
-        monitor-enter(r2);
-     */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public void executePageCommand() {
-        /*
-            r4 = this;
-            monitor-enter(r4)
-            boolean r1 = r4._is_animating     // Catch:{ all -> 0x0045 }
-            if (r1 == 0) goto L_0x0007
-            monitor-exit(r4)     // Catch:{ all -> 0x0045 }
-        L_0x0006:
-            return
-        L_0x0007:
-            monitor-exit(r4)     // Catch:{ all -> 0x0045 }
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r2 = r4._page_commands
-            monitor-enter(r2)
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r1 = r4._page_commands     // Catch:{ all -> 0x0042 }
-            int r1 = r1.size()     // Catch:{ all -> 0x0042 }
-            if (r1 <= 0) goto L_0x0040
-            monitor-enter(r4)     // Catch:{ all -> 0x0042 }
-            r1 = 1
-            r4._is_animating = r1     // Catch:{ all -> 0x0048 }
-            monitor-exit(r4)     // Catch:{ all -> 0x0048 }
-            java.util.Vector<com.kota.ASFramework.PageController.ASViewController> r1 = r4._temp_controllers     // Catch:{ all -> 0x0042 }
-            java.util.Vector<com.kota.ASFramework.PageController.ASViewController> r3 = r4._controllers     // Catch:{ all -> 0x0042 }
-            r1.addAll(r3)     // Catch:{ all -> 0x0042 }
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r1 = r4._page_commands     // Catch:{ all -> 0x0042 }
-            java.lang.Object r1 = r1.firstElement()     // Catch:{ all -> 0x0042 }
-            com.kota.ASFramework.PageController.ASNavigationController$PageCommand r1 = (com.kota.ASFramework.PageController.ASNavigationController.PageCommand) r1     // Catch:{ all -> 0x0042 }
-            boolean r0 = r1.animated     // Catch:{ all -> 0x0042 }
-        L_0x0029:
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r1 = r4._page_commands     // Catch:{ all -> 0x0042 }
-            int r1 = r1.size()     // Catch:{ all -> 0x0042 }
-            if (r1 <= 0) goto L_0x003d
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r1 = r4._page_commands     // Catch:{ all -> 0x0042 }
-            java.lang.Object r1 = r1.firstElement()     // Catch:{ all -> 0x0042 }
-            com.kota.ASFramework.PageController.ASNavigationController$PageCommand r1 = (com.kota.ASFramework.PageController.ASNavigationController.PageCommand) r1     // Catch:{ all -> 0x0042 }
-            boolean r1 = r1.animated     // Catch:{ all -> 0x0042 }
-            if (r1 == r0) goto L_0x004b
-        L_0x003d:
-            r4.exchangeViewControllers(r0)     // Catch:{ all -> 0x0042 }
-        L_0x0040:
-            monitor-exit(r2)     // Catch:{ all -> 0x0042 }
-            goto L_0x0006
-        L_0x0042:
-            r1 = move-exception
-            monitor-exit(r2)     // Catch:{ all -> 0x0042 }
-            throw r1
-        L_0x0045:
-            r1 = move-exception
-            monitor-exit(r4)     // Catch:{ all -> 0x0045 }
-            throw r1
-        L_0x0048:
-            r1 = move-exception
-            monitor-exit(r4)     // Catch:{ all -> 0x0048 }
-            throw r1     // Catch:{ all -> 0x0042 }
-        L_0x004b:
-            java.util.Vector<com.kota.ASFramework.PageController.ASNavigationController$PageCommand> r1 = r4._page_commands     // Catch:{ all -> 0x0042 }
-            r3 = 0
-            java.lang.Object r1 = r1.remove(r3)     // Catch:{ all -> 0x0042 }
-            com.kota.ASFramework.PageController.ASNavigationController$PageCommand r1 = (com.kota.ASFramework.PageController.ASNavigationController.PageCommand) r1     // Catch:{ all -> 0x0042 }
-            r1.run()     // Catch:{ all -> 0x0042 }
-            goto L_0x0029
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.kota.ASFramework.PageController.ASNavigationController.executePageCommand():void");
+        pagecommand;
+        vector;
+        JVM INSTR monitorexit ;
+        throw pagecommand;
     }
 
-    /* access modifiers changed from: private */
-    public void onPageCommandExecuteFinished() {
-        synchronized (this) {
-            this._is_animating = false;
-        }
-        this._temp_controllers.clear();
-        executePageCommand();
+    public void pushViewController(ASViewController asviewcontroller)
+    {
+        pushViewController(asviewcontroller, _animation_enable);
     }
+
+    public void pushViewController(final ASViewController aController, boolean flag)
+    {
+        aController = new PageCommand() {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aController;
+
+            public void run()
+            {
+                if (aController != null && (_temp_controllers.size() <= 0 || aController != _temp_controllers.lastElement()))
+                {
+                    _temp_controllers.add(aController);
+                }
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aController = asviewcontroller;
+                super();
+            }
+        };
+        aController.animated = flag;
+        pushPageCommand(aController);
+    }
+
+    public void reloadLayout()
+    {
+        if (_root_view != null)
+        {
+            _root_view.requestLayout();
+        }
+    }
+
+    public void removePageView(final ASViewController aPage)
+    {
+        final ASPageView page_view = aPage.getPageView();
+        _root_view.post(new Runnable() {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aPage;
+            final View val$page_view;
+
+            public void run()
+            {
+                aPage.onPageDidDisappear();
+                _root_view.removeView(page_view);
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aPage = asviewcontroller;
+                page_view = view;
+                super();
+            }
+        });
+    }
+
+    public void removePageView(final ASViewController aPage, Animation animation)
+    {
+        animation.setAnimationListener(new Animation.AnimationListener() {
+
+            final ASNavigationController this$0;
+            final ASViewController val$aPage;
+
+            public void onAnimationEnd(Animation animation1)
+            {
+                removePageView(aPage);
+            }
+
+            public void onAnimationRepeat(Animation animation1)
+            {
+            }
+
+            public void onAnimationStart(Animation animation1)
+            {
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aPage = asviewcontroller;
+                super();
+            }
+        });
+        aPage.getPageView().startAnimation(animation);
+    }
+
+    public void setAnimationEnable(boolean flag)
+    {
+        _animation_enable = flag;
+    }
+
+    public void setNavigationTitle(String s)
+    {
+        super.setTitle(s);
+    }
+
+    public void setViewControllers(Vector vector)
+    {
+        setViewControllers(vector, _animation_enable);
+    }
+
+    public void setViewControllers(final Vector aControllerList, boolean flag)
+    {
+        aControllerList = new PageCommand() {
+
+            final ASNavigationController this$0;
+            final Vector val$aControllerList;
+
+            public void run()
+            {
+                if (aControllerList != null)
+                {
+                    _temp_controllers.removeAllElements();
+                    _temp_controllers.addAll(aControllerList);
+                }
+            }
+
+            
+            {
+                this$0 = ASNavigationController.this;
+                aControllerList = vector;
+                super();
+            }
+        };
+        aControllerList.animated = flag;
+        pushPageCommand(aControllerList);
+    }
+
+
+
+
+
+
+
+
+
+
 }

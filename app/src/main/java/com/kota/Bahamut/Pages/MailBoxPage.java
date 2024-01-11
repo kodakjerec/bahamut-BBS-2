@@ -24,7 +24,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;
@@ -143,33 +143,32 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     public boolean onLongClick(View aView) {
-        switch (aView.getId()) {
-            case R.id.Mail_PageDownButton /*2131230887*/:
-                return true;
-            case R.id.Mail_PageUpButton /*2131230888*/:
-                return true;
-            default:
-                return false;
+        int get_id = aView.getId();
+        if (get_id == R.id.Mail_PageDownButton) {
+            return true;
+        } else if (get_id == R.id.Mail_PageUpButton) {
+            return true;
         }
+        return false;
     }
 
     public void onClick(View aView) {
-        switch (aView.getId()) {
-            case R.id.Mail_BackButton /*2131230881*/:
-                onPostButtonClicked();
-                return;
-            case R.id.Mail_PageDownButton /*2131230887*/:
-                setManualLoadPage();
-                moveToLastPosition();
-                return;
-            case R.id.Mail_PageUpButton /*2131230888*/:
-                moveToFirstPosition();
-                return;
-            case R.id.Mail_SearchButton /*2131230889*/:
-                showSelectArticleDialog();
-                return;
-            default:
+        int get_id = aView.getId();
+        if (get_id == R.id.Mail_BackButton) {
+            onPostButtonClicked();
+            return;
+        } else if (get_id == R.id.Mail_PageDownButton) {
+            setManualLoadPage();
+            moveToLastPosition();
+            return;
+        }else if (get_id == R.id.Mail_PageUpButton) {
+            moveToFirstPosition();
+            return;
+        }else if (get_id == R.id.Mail_SearchButton) {
+            showSelectArticleDialog();
+            return;
         }
+        return;
     }
 
     public boolean onReceivedGestureRight() {

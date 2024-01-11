@@ -8,7 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.Vector;

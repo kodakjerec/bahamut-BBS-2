@@ -28,8 +28,8 @@ public class UserSettings {
     private Vector<String> _block_list = null;
     private String _block_list_string_lower_cased = null;
     Context _context;
-    private final String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
-    private final String[] _symbols = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
+    private String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
+    private String[] _symbols = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
     public Typeface _typeface = null;
     private boolean _updated = false;
 
@@ -132,7 +132,10 @@ public class UserSettings {
     }
 
     public boolean isAnimationEnable() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false);
+        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false)) {
+            return true;
+        }
+        return false;
     }
 
     public void setAnimationEnable(boolean enable) {
@@ -296,7 +299,10 @@ public class UserSettings {
     }
 
     public boolean isKeepWifi() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_DISABLE, false);
+        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_DISABLE, false)) {
+            return true;
+        }
+        return false;
     }
 
     public void setKeepWifi(boolean keep) {
@@ -336,6 +342,9 @@ public class UserSettings {
     }
 
     public boolean isLastConnectionIsOfflineByUser() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, false);
+        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, false)) {
+            return true;
+        }
+        return false;
     }
 }

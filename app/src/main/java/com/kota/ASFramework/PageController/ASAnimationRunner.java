@@ -1,68 +1,119 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.PageController;
 
 import android.view.View;
 import android.view.animation.Animation;
-import com.kota.ASFramework.Thread.ASRunner;
+import com.kumi.ASFramework.Thread.ASRunner;
 
-public abstract class ASAnimationRunner {
-    Animation _animation = null;
+public abstract class ASAnimationRunner
+{
 
-    /* access modifiers changed from: package-private */
-    public abstract View getTargetView();
+    Animation _animation;
 
-    /* access modifiers changed from: package-private */
-    public abstract void onAnimationStartFail();
-
-    public ASAnimationRunner(Animation animation) {
-        this._animation = animation;
+    public ASAnimationRunner(Animation animation)
+    {
+        _animation = null;
+        _animation = animation;
     }
 
-    public void start() {
-        new ASRunner() {
-            public void run() {
+    private void animate()
+    {
+        (new ASRunner() {
+
+            final ASAnimationRunner this$0;
+
+            public void run()
+            {
+                View view = getTargetView();
+                if (view != null)
+                {
+                    view.startAnimation(_animation);
+                }
+            }
+
+            
+            {
+                this$0 = ASAnimationRunner.this;
+                super();
+            }
+        }).runInMainThread();
+    }
+
+    private void fail()
+    {
+        (new ASRunner() {
+
+            final ASAnimationRunner this$0;
+
+            public void run()
+            {
+                onAnimationStartFail();
+            }
+
+            
+            {
+                this$0 = ASAnimationRunner.this;
+                super();
+            }
+        }).runInMainThread();
+    }
+
+    abstract View getTargetView();
+
+    abstract void onAnimationStartFail();
+
+    public void start()
+    {
+        (new ASRunner() {
+
+            final ASAnimationRunner this$0;
+
+            public void run()
+            {
                 int i = 0;
-                boolean success = false;
-                while (true) {
-                    if (i >= 10) {
-                        break;
-                    } else if (ASAnimationRunner.this.getTargetView() != null) {
-                        ASAnimationRunner.this.animate();
-                        success = true;
-                        break;
-                    } else {
-                        i++;
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
+                boolean flag1 = false;
+                do
+                {
+label0:
+                    {
+                        boolean flag = flag1;
+                        if (i < 10)
+                        {
+                            if (getTargetView() == null)
+                            {
+                                break label0;
+                            }
+                            animate();
+                            flag = true;
                         }
+                        if (!flag)
+                        {
+                            fail();
+                        }
+                        return;
                     }
-                }
-                if (!success) {
-                    ASAnimationRunner.this.fail();
-                }
+                    i++;
+                    try
+                    {
+                        Thread.sleep(10L);
+                    }
+                    catch (InterruptedException interruptedexception)
+                    {
+                        interruptedexception.printStackTrace();
+                    }
+                } while (true);
             }
-        }.runInNewThread();
+
+            
+            {
+                this$0 = ASAnimationRunner.this;
+                super();
+            }
+        }).runInNewThread();
     }
 
-    /* access modifiers changed from: private */
-    public void fail() {
-        new ASRunner() {
-            public void run() {
-                ASAnimationRunner.this.onAnimationStartFail();
-            }
-        }.runInMainThread();
-    }
 
-    /* access modifiers changed from: private */
-    public void animate() {
-        new ASRunner() {
-            public void run() {
-                View target_view = ASAnimationRunner.this.getTargetView();
-                if (target_view != null) {
-                    target_view.startAnimation(ASAnimationRunner.this._animation);
-                }
-            }
-        }.runInMainThread();
-    }
 }

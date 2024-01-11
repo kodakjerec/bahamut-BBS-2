@@ -2,10 +2,10 @@ package com.kota.Telnet;
 
 public class TelnetAnsi {
     public static byte DEFAULT_BACKGROUND_COLOR = 0;
-    private static final boolean DEFAULT_TEXT_BLINK = false;
-    private static final boolean DEFAULT_TEXT_BRIGHT = false;
+    private static boolean DEFAULT_TEXT_BLINK = false;
+    private static boolean DEFAULT_TEXT_BRIGHT = false;
     public static byte DEFAULT_TEXT_COLOR = 7;
-    private static final boolean DEFAULT_TEXT_ITALIC = false;
+    private static boolean DEFAULT_TEXT_ITALIC = false;
     public byte backgroundColor = 0;
     public boolean textBlink = false;
     public boolean textBright = false;

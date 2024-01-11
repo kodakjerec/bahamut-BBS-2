@@ -13,13 +13,12 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
@@ -30,7 +29,7 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;
@@ -346,11 +345,11 @@ public class ArticlePage extends TelnetPage {
 
     /* access modifiers changed from: package-private */
     public void showNotification() {
-        AppCompatActivity activity = getNavigationController();
+        ASNavigationController activity = getNavigationController();
         if (activity != null) {
             SharedPreferences perf = activity.getSharedPreferences("notification", 0);
             if (!perf.getBoolean("show_top_bottom_function", false)) {
-                Toast.makeText(activity, R.string.article_top_bottom_function_notificaiton, 1).show();
+                Toast.makeText(activity, R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
                 perf.edit().putBoolean("show_top_bottom_function", true).commit();
             }
         }
@@ -453,7 +452,7 @@ public class ArticlePage extends TelnetPage {
 
     private void reloadTelnetLayout() {
         int screen_width;
-        int telnet_view_width = (((int) TypedValue.applyDimension(2, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
+        int telnet_view_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
         if (getNavigationController().getCurrentOrientation() == 2) {
             screen_width = getNavigationController().getScreenHeight();
         } else {
@@ -545,19 +544,19 @@ public class ArticlePage extends TelnetPage {
         ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_ContentTelnetViewBlock);
         if (this._settings.getArticleViewMode() == 0) {
             if (text_content_view != null) {
-                text_content_view.setVisibility(0);
+                text_content_view.setVisibility(View.VISIBLE);
             }
             if (telnet_content_view != null) {
-                telnet_content_view.setVisibility(8);
+                telnet_content_view.setVisibility(View.GONE);
                 return;
             }
             return;
         }
         if (text_content_view != null) {
-            text_content_view.setVisibility(8);
+            text_content_view.setVisibility(View.GONE);
         }
         if (telnet_content_view != null) {
-            telnet_content_view.setVisibility(0);
+            telnet_content_view.setVisibility(View.VISIBLE);
             telnet_content_view.invalidate();
         }
     }
@@ -594,7 +593,7 @@ public class ArticlePage extends TelnetPage {
         System.out.println("article_mode:" + article_mode);
         View toolbar_view = findViewById(R.id.ext_toolbar);
         if (toolbar_view != null) {
-            toolbar_view.setVisibility(enable ? 0 : 8);
+            toolbar_view.setVisibility(enable ? View.VISIBLE : View.GONE);
         }
     }
 
@@ -605,7 +604,7 @@ public class ArticlePage extends TelnetPage {
             if (urls.length == 0) {
                 Context context = getContext();
                 if (context != null) {
-                    Toast.makeText(context, "此文章內容未包含連結", 0).show();
+                    Toast.makeText(context, "此文章內容未包含連結", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 return;

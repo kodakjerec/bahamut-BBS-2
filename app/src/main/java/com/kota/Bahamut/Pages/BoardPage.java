@@ -36,7 +36,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageHandler;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;

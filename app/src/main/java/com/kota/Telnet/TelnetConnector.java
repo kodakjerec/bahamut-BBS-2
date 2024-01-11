@@ -3,7 +3,7 @@ package com.kota.Telnet;
 import java.io.IOException;
 
 public class TelnetConnector implements TelnetChannelListener {
-    private final TelnetChannel[] _channel = new TelnetChannel[2];
+    private TelnetChannel[] _channel = new TelnetChannel[2];
     /* access modifiers changed from: private */
     public HolderThread _holder_thread = null;
     private boolean _is_connecting = false;
@@ -59,7 +59,7 @@ public class TelnetConnector implements TelnetChannelListener {
     }
 
     /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
+    public void finalize() throws Throwable {
         if (isConnecting()) {
             close();
         }

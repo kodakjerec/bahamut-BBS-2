@@ -1,30 +1,52 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Utils;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ASStreamReader {
-    public static boolean readBoolean(InputStream aInputStream) throws IOException {
-        return aInputStream.read() != 0;
+public class ASStreamReader
+{
+
+    public ASStreamReader()
+    {
     }
 
-    public static byte readByte(InputStream aInputStream) throws IOException {
-        return (byte) aInputStream.read();
+    public static boolean readBoolean(InputStream inputstream)
+        throws IOException
+    {
+        return inputstream.read() != 0;
     }
 
-    public static short readShort(InputStream aInputStream) throws IOException {
-        return (short) (aInputStream.read() << (aInputStream.read() + 8));
+    public static byte readByte(InputStream inputstream)
+        throws IOException
+    {
+        return (byte)inputstream.read();
     }
 
-    public static char readChar(InputStream aInputStream) throws IOException {
-        return (char) (aInputStream.read() << (aInputStream.read() + 8));
+    public static char readChar(InputStream inputstream)
+        throws IOException
+    {
+        return (char)(inputstream.read() << inputstream.read() + 8);
     }
 
-    public static int readInt(InputStream aInputStream) throws IOException {
-        return ((aInputStream.read() << (aInputStream.read() + 24)) << (aInputStream.read() + 16)) << (aInputStream.read() + 8);
+    public static double readDouble(InputStream inputstream)
+        throws IOException
+    {
+        return 0.0D;
     }
 
-    public static double readDouble(InputStream aInputStream) throws IOException {
-        return 0.0d;
+    public static int readInt(InputStream inputstream)
+        throws IOException
+    {
+        return inputstream.read() << inputstream.read() + 24 << inputstream.read() + 16 << inputstream.read() + 8;
+    }
+
+    public static short readShort(InputStream inputstream)
+        throws IOException
+    {
+        return (short)(inputstream.read() << inputstream.read() + 8);
     }
 }

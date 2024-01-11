@@ -6,7 +6,7 @@ public class TelnetData {
     public static final byte DOUBLE_BIT_SPACE_2_2 = 4;
     public static final byte SINGLE_BIT_SPACE_2_1 = 1;
     public static final byte SINGLE_BIT_SPACE_2_2 = 2;
-    private static final int _count = 0;
+    private static int _count = 0;
     public byte backgroundColor = 0;
     public byte bitSpace = 0;
     public boolean blink = false;
@@ -15,7 +15,7 @@ public class TelnetData {
     public byte textColor = 0;
 
     /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
+    public void finalize() throws Throwable {
         super.finalize();
     }
 

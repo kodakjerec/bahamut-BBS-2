@@ -1,6 +1,6 @@
 package com.kota.Telnet;
 
-import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.SelfFramework.Thread.ASRunner;
 import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -63,10 +63,13 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
+
     public void sendStringToServer(String str) {
         if (ASRunner.isMainThread()) {
+            // Running on the main thread
             sendStringToServerInBackground(str, 0);
         } else {
+            // Not running on the main thread
             sendStringToServer(str, 0);
         }
     }

@@ -5,7 +5,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.TelnetArticleItemView;
 
 public class ArticlePage_TimeTimeView extends RelativeLayout implements TelnetArticleItemView {

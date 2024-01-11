@@ -6,7 +6,7 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 

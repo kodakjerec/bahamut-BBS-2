@@ -1,36 +1,54 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.PageController;
 
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
-public class ASAnimation {
-    private static final int animation_duration = 250;
+// Referenced classes of package com.kumi.ASFramework.PageController:
+//            ASNavigationController
 
-    public static Animation getFadeOutToLeftAnimation() {
-        Animation animation = new TranslateAnimation(1, 0.0f, 2, -1.0f, 2, 0.0f, 2, 0.0f);
-        animation.setDuration((long) animation_duration);
-        animation.setInterpolator(ASNavigationController.getCurrentController(), 17432580);
-        return animation;
+public class ASAnimation
+{
+
+    private static int animation_duration = 250;
+
+    public ASAnimation()
+    {
     }
 
-    public static Animation getFadeOutToRightAnimation() {
-        Animation animation = new TranslateAnimation(1, 0.0f, 2, 1.0f, 2, 0.0f, 2, 0.0f);
-        animation.setDuration((long) animation_duration);
-        animation.setInterpolator(ASNavigationController.getCurrentController(), 17432580);
-        return animation;
+    public static Animation getFadeInFromLeftAnimation()
+    {
+        TranslateAnimation translateanimation = new TranslateAnimation(1, -1F, 2, 0.0F, 2, 0.0F, 2, 0.0F);
+        translateanimation.setDuration(animation_duration);
+        translateanimation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
+        return translateanimation;
     }
 
-    public static Animation getFadeInFromLeftAnimation() {
-        Animation animation = new TranslateAnimation(1, -1.0f, 2, 0.0f, 2, 0.0f, 2, 0.0f);
-        animation.setDuration((long) animation_duration);
-        animation.setInterpolator(ASNavigationController.getCurrentController(), 17432580);
-        return animation;
+    public static Animation getFadeInFromRightAnimation()
+    {
+        TranslateAnimation translateanimation = new TranslateAnimation(1, 1.0F, 2, 0.0F, 2, 0.0F, 2, 0.0F);
+        translateanimation.setDuration(animation_duration);
+        translateanimation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
+        return translateanimation;
     }
 
-    public static Animation getFadeInFromRightAnimation() {
-        Animation animation = new TranslateAnimation(1, 1.0f, 2, 0.0f, 2, 0.0f, 2, 0.0f);
-        animation.setDuration((long) animation_duration);
-        animation.setInterpolator(ASNavigationController.getCurrentController(), 17432580);
-        return animation;
+    public static Animation getFadeOutToLeftAnimation()
+    {
+        TranslateAnimation translateanimation = new TranslateAnimation(1, 0.0F, 2, -1F, 2, 0.0F, 2, 0.0F);
+        translateanimation.setDuration(animation_duration);
+        translateanimation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
+        return translateanimation;
     }
+
+    public static Animation getFadeOutToRightAnimation()
+    {
+        TranslateAnimation translateanimation = new TranslateAnimation(1, 0.0F, 2, 1.0F, 2, 0.0F, 2, 0.0F);
+        translateanimation.setDuration(animation_duration);
+        translateanimation.setInterpolator(ASNavigationController.getCurrentController(), 0x10a0004);
+        return translateanimation;
+    }
+
 }

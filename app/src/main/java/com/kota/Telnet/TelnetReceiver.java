@@ -29,6 +29,9 @@ public class TelnetReceiver {
     }
 
     public boolean isReceiving() {
-        return this._receiver_thread != null;
+        if (this._receiver_thread != null) {
+            return true;
+        }
+        return false;
     }
 }

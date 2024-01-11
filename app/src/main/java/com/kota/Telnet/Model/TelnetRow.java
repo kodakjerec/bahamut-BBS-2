@@ -3,7 +3,7 @@ package com.kota.Telnet.Model;
 import com.kota.TextEncoder.B2UEncoder;
 
 public class TelnetRow {
-    private static final int _count = 0;
+    private static int _count = 0;
     private TelnetRow _append_row = null;
     private String _cached_string = null;
     private int _empty_space = 0;
@@ -17,7 +17,7 @@ public class TelnetRow {
     public byte[] textColor = new byte[80];
 
     /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
+    public void finalize() throws Throwable {
         super.finalize();
     }
 

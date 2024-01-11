@@ -8,10 +8,10 @@ import java.util.Iterator;
 
 public class TelnetChannel {
     public static int BUFFER_SIZE = 2048;
-    private final ByteBuffer _input_buffer = ByteBuffer.allocate(BUFFER_SIZE);
+    private ByteBuffer _input_buffer = ByteBuffer.allocate(BUFFER_SIZE);
     private TelnetChannelListener _listener = null;
     private boolean _lock = false;
-    private final MutableByteBuffer _output_buffer = MutableByteBuffer.createMutableByteBuffer();
+    private MutableByteBuffer _output_buffer = MutableByteBuffer.createMutableByteBuffer();
     private int _read_data_size = 0;
     private TelnetSocketChannel _socket_channel = null;
 
@@ -130,7 +130,7 @@ public class TelnetChannel {
             System.out.println("send data:\n" + B2UEncoder.getInstance().encodeToString(data));
             String hex_data = "";
             for (int i2 = 0; i2 < data.length; i2++) {
-                hex_data = hex_data + String.format(" %1$02x", Byte.valueOf(data[i2]));
+                hex_data = hex_data + String.format(" %1$02x", new Object[]{Byte.valueOf(data[i2])});
             }
             System.out.println("send hex data:\n" + hex_data.substring(1));
         } catch (Exception e) {

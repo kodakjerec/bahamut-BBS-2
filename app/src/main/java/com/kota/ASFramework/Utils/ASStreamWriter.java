@@ -1,63 +1,97 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Utils;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
-public class ASStreamWriter {
-    public static void writeData(OutputStream aOutputStream, boolean aBooleanValue) throws IOException {
-        if (aBooleanValue) {
-            aOutputStream.write(1);
-        } else {
-            aOutputStream.write(0);
+public class ASStreamWriter
+{
+
+    public ASStreamWriter()
+    {
+    }
+
+    public static void writeData(OutputStream outputstream, byte byte0)
+        throws IOException
+    {
+        outputstream.write(byte0);
+    }
+
+    public static void writeData(OutputStream outputstream, char c)
+        throws IOException
+    {
+        outputstream.write(c >> 8 & 0xff);
+        outputstream.write(c & 0xff);
+    }
+
+    public static void writeData(OutputStream outputstream, double d)
+        throws IOException
+    {
+        writeData(outputstream, Double.doubleToLongBits(d));
+    }
+
+    public static void writeData(OutputStream outputstream, float f)
+        throws IOException
+    {
+        writeData(outputstream, Float.floatToIntBits(f));
+    }
+
+    public static void writeData(OutputStream outputstream, int i)
+        throws IOException
+    {
+        outputstream.write(i >> 24 & 0xff);
+        outputstream.write(i >> 16 & 0xff);
+        outputstream.write(i >> 8 & 0xff);
+        outputstream.write(i & 0xff);
+    }
+
+    public static void writeData(OutputStream outputstream, long l)
+        throws IOException
+    {
+        outputstream.write((int)(l >> 56) & 0xff);
+        outputstream.write((int)(l >> 48) & 0xff);
+        outputstream.write((int)(l >> 40) & 0xff);
+        outputstream.write((int)(l >> 32) & 0xff);
+        outputstream.write((int)(l >> 24) & 0xff);
+        outputstream.write((int)(l >> 16) & 0xff);
+        outputstream.write((int)(l >> 8) & 0xff);
+        outputstream.write((int)l & 0xff);
+    }
+
+    public static void writeData(OutputStream outputstream, String s)
+        throws IOException
+    {
+        writeData(outputstream, s.getBytes("unicode"));
+    }
+
+    public static void writeData(OutputStream outputstream, short word0)
+        throws IOException
+    {
+        outputstream.write(word0 >> 8 & 0xff);
+        outputstream.write(word0 & 0xff);
+    }
+
+    public static void writeData(OutputStream outputstream, boolean flag)
+        throws IOException
+    {
+        if (flag)
+        {
+            outputstream.write(1);
+            return;
+        } else
+        {
+            outputstream.write(0);
+            return;
         }
     }
 
-    public static void writeData(OutputStream aOutputStream, byte aByteValue) throws IOException {
-        aOutputStream.write(aByteValue);
-    }
-
-    public static void writeData(OutputStream aOutputStream, short aShortValue) throws IOException {
-        aOutputStream.write((aShortValue >> 8) & 255);
-        aOutputStream.write(aShortValue & 255);
-    }
-
-    public static void writeData(OutputStream aOutputStream, char aCharValue) throws IOException {
-        aOutputStream.write((aCharValue >> 8) & 255);
-        aOutputStream.write(aCharValue & 255);
-    }
-
-    public static void writeData(OutputStream aOutputStream, int aIntValue) throws IOException {
-        aOutputStream.write((aIntValue >> 24) & 255);
-        aOutputStream.write((aIntValue >> 16) & 255);
-        aOutputStream.write((aIntValue >> 8) & 255);
-        aOutputStream.write(aIntValue & 255);
-    }
-
-    public static void writeData(OutputStream aOutputStream, long aLongValue) throws IOException {
-        aOutputStream.write(((int) (aLongValue >> 56)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 48)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 40)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 32)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 24)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 16)) & 255);
-        aOutputStream.write(((int) (aLongValue >> 8)) & 255);
-        aOutputStream.write(((int) aLongValue) & 255);
-    }
-
-    public static void writeData(OutputStream aOutputStream, float aFloatValue) throws IOException {
-        writeData(aOutputStream, Float.floatToIntBits(aFloatValue));
-    }
-
-    public static void writeData(OutputStream aOutputStream, double aDoubleValue) throws IOException {
-        writeData(aOutputStream, Double.doubleToLongBits(aDoubleValue));
-    }
-
-    public static void writeData(OutputStream aOutputStream, byte[] aBinaryData) throws IOException {
-        writeData(aOutputStream, aBinaryData.length);
-        aOutputStream.write(aBinaryData);
-    }
-
-    public static void writeData(OutputStream aOutputStream, String aStringValue) throws IOException {
-        writeData(aOutputStream, aStringValue.getBytes("unicode"));
+    public static void writeData(OutputStream outputstream, byte abyte0[])
+        throws IOException
+    {
+        writeData(outputstream, abyte0.length);
+        outputstream.write(abyte0);
     }
 }

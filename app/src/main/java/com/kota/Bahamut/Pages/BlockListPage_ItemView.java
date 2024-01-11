@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 
 public class BlockListPage_ItemView extends LinearLayout implements View.OnClickListener {
     private Button _delete_button = null;

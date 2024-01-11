@@ -7,7 +7,7 @@ import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.Bahamut.R;
+import com.kota.bahamut_bbs_2.R;;
 
 public class Dialog_PostArticle extends ASDialog implements View.OnClickListener {
     public static final int NEW = 0;

@@ -5,7 +5,7 @@ import java.util.Vector;
 
 public class SearchBoard_Handler {
     private static SearchBoard_Handler _instance = null;
-    private final Vector<String> _boards = new Vector<>();
+    private Vector<String> _boards = new Vector<>();
 
     private SearchBoard_Handler() {
     }

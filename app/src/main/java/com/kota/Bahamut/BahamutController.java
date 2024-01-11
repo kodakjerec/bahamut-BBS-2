@@ -1,13 +1,12 @@
 package com.kota.Bahamut;
 
+import android.content.Context;
 import android.content.Intent;
-import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
-import com.kota.ASFramework.Dialog.ASProcessingDialog;
+
+import androidx.annotation.NonNull;
+import androidx.navigation.NavController;
+
 import com.kota.ASFramework.PageController.ASNavigationController;
-import com.kota.ASFramework.PageController.ASViewController;
-import com.kota.ASFramework.Thread.ASRunner;
-import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
@@ -24,6 +23,8 @@ import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 import com.kota.TextEncoder.U2BEncoder;
+import com.kota.bahamut_bbs_2.R;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -31,6 +32,10 @@ import java.util.TimeZone;
 import java.util.Vector;
 
 public class BahamutController extends ASNavigationController implements TelnetClientListener {
+    public BahamutController(@NonNull Context context) {
+        super(context);
+    }
+
     /* access modifiers changed from: protected */
     public void onControllerWillLoad() {
         requestWindowFeature(1);

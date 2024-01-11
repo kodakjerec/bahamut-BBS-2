@@ -7,7 +7,7 @@ import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.TextEncoder.U2BEncoder;
 
 public class TelnetOutputBuilder {
-    private final MutableByteBuffer _buffer = MutableByteBuffer.createMutableByteBuffer();
+    private MutableByteBuffer _buffer = MutableByteBuffer.createMutableByteBuffer();
 
     public static TelnetOutputBuilder create() {
         return new TelnetOutputBuilder();

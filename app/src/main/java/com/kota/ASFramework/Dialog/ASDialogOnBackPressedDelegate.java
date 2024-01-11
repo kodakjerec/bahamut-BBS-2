@@ -1,5 +1,15 @@
+// Decompiled by Jad v1.5.8e. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.geocities.com/kpdus/jad.html
+// Decompiler options: braces fieldsfirst space lnc 
+
 package com.kota.ASFramework.Dialog;
 
-public interface ASDialogOnBackPressedDelegate {
-    boolean onASDialogBackPressed(ASDialog aSDialog);
+
+// Referenced classes of package com.kumi.ASFramework.Dialog:
+//            ASDialog
+
+public interface ASDialogOnBackPressedDelegate
+{
+
+    public abstract boolean onASDialogBackPressed(ASDialog asdialog);
 }
