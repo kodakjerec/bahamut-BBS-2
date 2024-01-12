@@ -1,15 +1,16 @@
 package com.kota.Bahamut.Pages;
 
-import android.view.View;
-import android.widget.Button;
+import com.kota.TelnetUI.TelnetPage;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialogOnBackDelegate;
-import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
-import com.kota.TelnetUI.TelnetPage;
+
+import android.view.View;
+import android.widget.Button;
 
 public class StartPage extends TelnetPage {
     View.OnClickListener _connect_listener = new View.OnClickListener() {
@@ -63,22 +64,23 @@ public class StartPage extends TelnetPage {
         ASProcessingDialog.hideProcessingDialog();
     }
 
-    /* access modifiers changed from: private */
+    /** 按下離開 */
     public void onExitButtonClicked() {
         getNavigationController().finish();
     }
 
-    /* access modifiers changed from: protected */
+    /** 手機: 上一步 */
     public boolean onBackPressed() {
         onExitButtonClicked();
         return true;
     }
 
-    /* access modifiers changed from: private */
+    /** 按下連線按鈕 */
     public void onConnectButtonClicked() {
         connect();
     }
 
+    /** 連線 */
     public void connect() {
         if (getNavigationController().getDeviceController().isNetworkAvailable()) {
             ASProcessingDialog.showProcessingDialog("連線中", new ASProcessingDialogOnBackDelegate() {
@@ -87,11 +89,9 @@ public class StartPage extends TelnetPage {
                     return false;
                 }
             });
-            new ASRunner() {
-                public void run() {
+            ASRunner.runInNewThread(()->{
                     TelnetClient.getClient().connect("bbs.gamer.com.tw", 23);
-                }
-            }.runInNewThread();
+            });
             return;
         }
         ASToast.showShortToast("您未連接網路");

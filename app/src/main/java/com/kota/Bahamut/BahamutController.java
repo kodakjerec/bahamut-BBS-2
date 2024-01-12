@@ -1,18 +1,21 @@
 package com.kota.Bahamut;
 
-import android.content.Context;
-import android.content.Intent;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.TimeZone;
+import java.util.Vector;
 
-import androidx.annotation.NonNull;
-import androidx.navigation.NavController;
-
+import com.kota.TelnetUI.TelnetPage;
+import com.kota.TextEncoder.B2UEncoder;
+import com.kota.TextEncoder.U2BEncoder;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
-import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
@@ -22,23 +25,16 @@ import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.Pages.StartPage;
+import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
 import com.kota.Telnet.UserSettings;
-import com.kota.TelnetUI.TelnetPage;
-import com.kota.TextEncoder.B2UEncoder;
-import com.kota.TextEncoder.U2BEncoder;
-import com.kota.Bahamut.R;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.TimeZone;
-import java.util.Vector;
+import android.content.Intent;
 
 public class BahamutController extends ASNavigationController implements TelnetClientListener {
-    /* access modifiers changed from: protected */
+    /** 登入點 */
     public void onControllerWillLoad() {
         requestWindowFeature(1);
         try {
@@ -70,6 +66,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         return "Baha!BBS";
     }
 
+    /** 離開 */
     public boolean onBackLongPressed() {
         boolean result = true;
         if (TelnetClient.getConnector().isConnecting()) {
@@ -90,30 +87,30 @@ public class BahamutController extends ASNavigationController implements TelnetC
         return result;
     }
 
-    /* access modifiers changed from: private */
+    /** 開始連線 */
+    public void onTelnetClientConnectionStart(TelnetClient aClient) {
+        ASRunner.runInNewThread(()->{
+            BahamutController.this.showConnectionStartMessage();
+        });
+    }
     public void showConnectionStartMessage() {
         SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd kk:hh:ss");
         date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         System.out.println("Baha!BBS connection start:" + date_format.format(new Date()));
     }
 
-    public void onTelnetClientConnectionStart(TelnetClient aClient) {
-        new ASRunner() {
-            public void run() {
-                BahamutController.this.showConnectionStartMessage();
-            }
-        }.runInMainThread();
-    }
-
+    /** 連線成功 */
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
         startService(new Intent(this, BahaBBSBackgroundService.class));
     }
 
+    /** 連線失敗 */
     public void onTelnetClientConnectionFail(TelnetClient aClient) {
         ASProcessingDialog.hideProcessingDialog();
         ASToast.showShortToast("連線失敗，請檢查網路連線或稍後再試");
     }
 
+    /** 關閉連線 */
     public void onTelnetClientConnectionClosed(TelnetClient aClient) {
         stopService(new Intent(this, BahaBBSBackgroundService.class));
         new ASRunner() {

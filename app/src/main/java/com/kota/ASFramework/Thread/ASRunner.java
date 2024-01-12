@@ -37,16 +37,10 @@ public abstract class ASRunner {
     return this;
   }
 
-  public ASRunner runInNewThread() {
-    Thread thread = new Thread() { // from class: com.kumi.ASFramework.Thread.ASRunner.2
-      @Override // java.lang.Thread, java.lang.Runnable
-      public void run() {
-        _main_thread.run();
-      }
-    };
+  public static void runInNewThread(Runnable runnable) {
+    Thread thread = new Thread(new ASRunner(runnable));
     thread.start();
-    return this;
-  }
+}
 
   public long getTimeout() {
     return this._timeout;
