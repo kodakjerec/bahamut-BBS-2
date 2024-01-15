@@ -56,7 +56,7 @@ public class ASLayoutParams {
   }
   
   public ColorStateList getAlertItemTextColor() {
-    return new ColorStateList(new int[][] { { 16842919, 16842910 }, {}, { 16842910, 16842908 }, {}, { 16842910 }, {}, {} }, new int[] { -16777216, -16777216, -1, -8355712 });
+    return new ColorStateList(new int[][] { { 16842919, 16842910 }, { 16842910, 16842908 }, { 16842910 }, {} }, new int[] { -16777216, -16777216, -1, -8355712 });
   }
   
   public float getDefaultTouchBlockHeight() {

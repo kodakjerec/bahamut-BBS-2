@@ -41,7 +41,7 @@ public abstract class ASAnimationRunner {
         if (!success) {
           ASAnimationRunner.this.fail();
         }
-    })
+    });
   }
 
   /* JADX INFO: Access modifiers changed from: private */
