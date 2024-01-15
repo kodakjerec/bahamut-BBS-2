@@ -37,13 +37,15 @@ public abstract class ASRunner {
     return this;
   }
 
-  public ASRunner runInNewThread(Runnable runner) {
-    (new Thread() {
+  public static void runInNewThread(Runnable runnable) {
+    Thread thread = new Thread() {
+      @Override
       public void run() {
-        runner.run();
+        runnable.run();
+        ;
       }
-    }).start();
-    return this;
+    };
+    thread.start();
 }
 
   public long getTimeout() {

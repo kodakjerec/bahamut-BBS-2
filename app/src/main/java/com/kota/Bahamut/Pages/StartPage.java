@@ -89,11 +89,9 @@ public class StartPage extends TelnetPage {
                     return false;
                 }
             });
-            (new Thread(){
-                public void run() {
+            ASRunner.runInNewThread(()->{
                     TelnetClient.getClient().connect("bbs.gamer.com.tw", 23);
-                }
-            }).start();
+            });
             return;
         }
         ASToast.showShortToast("您未連接網路");
