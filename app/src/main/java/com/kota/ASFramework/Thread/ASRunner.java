@@ -37,9 +37,13 @@ public abstract class ASRunner {
     return this;
   }
 
-  public static void runInNewThread(Runnable runnable) {
-    Thread thread = new Thread(new ASRunner(runnable));
-    thread.start();
+  public ASRunner runInNewThread(Runnable runner) {
+    (new Thread() {
+      public void run() {
+        runner.run();
+      }
+    }).start();
+    return this;
 }
 
   public long getTimeout() {

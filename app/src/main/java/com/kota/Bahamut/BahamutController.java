@@ -89,9 +89,11 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     /** 開始連線 */
     public void onTelnetClientConnectionStart(TelnetClient aClient) {
-        ASRunner.runInNewThread(()->{
-            BahamutController.this.showConnectionStartMessage();
-        });
+        (new Thread(){
+            public void run() {
+                BahamutController.this.showConnectionStartMessage();
+            }
+        }).start();
     }
     public void showConnectionStartMessage() {
         SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd kk:hh:ss");

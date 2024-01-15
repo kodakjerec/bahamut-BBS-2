@@ -24,18 +24,9 @@ public class TelnetReceiverThread extends Thread {
     /* JADX WARNING: Removed duplicated region for block: B:0:0x0000 A[LOOP:0: B:0:0x0000->B:3:0x0008, LOOP_START, MTH_ENTER_BLOCK] */
     /* Code decompiled incorrectly, please refer to instructions dump. */
     public void run() {
+        do {
 
-        /*
-            r1 = this;
-        L_0x0000:
-            boolean r0 = r1._receiving
-            if (r0 == 0) goto L_0x000a
-            boolean r0 = r1.receiveData()
-            if (r0 != 0) goto L_0x0000
-        L_0x000a:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: com.kota.Telnet.TelnetReceiverThread.run():void");
+        } while (this._receiving && receiveData());
     }
 
     private byte readData() throws TelnetConnectionClosedException, IOException {
