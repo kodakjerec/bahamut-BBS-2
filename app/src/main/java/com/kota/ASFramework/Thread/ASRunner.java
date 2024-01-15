@@ -42,7 +42,6 @@ public abstract class ASRunner {
       @Override
       public void run() {
         runnable.run();
-        ;
       }
     };
     thread.start();

@@ -22,17 +22,14 @@ public class ASViewRemover {
   }
 
   public void start() {
-    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASViewRemover.1
-      @Override // com.kumi.ASFramework.Thread.ASRunner
-      public void run() {
+    ASRunner.runInNewThread(()->{
         try {
           Thread.sleep(1000L);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
         ASViewRemover.this.remove();
-      }
-    }.runInNewThread();
+    });
   }
 
   /* JADX INFO: Access modifiers changed from: private */

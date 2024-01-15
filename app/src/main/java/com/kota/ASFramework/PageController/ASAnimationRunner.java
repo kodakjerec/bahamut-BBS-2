@@ -18,9 +18,7 @@ public abstract class ASAnimationRunner {
   }
 
   public void start() {
-    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.1
-      @Override // com.kumi.ASFramework.Thread.ASRunner
-      public void run() {
+    ASRunner.runInNewThread(()->{
         int i = 0;
         boolean success = false;
         while (true) {
@@ -43,8 +41,7 @@ public abstract class ASAnimationRunner {
         if (!success) {
           ASAnimationRunner.this.fail();
         }
-      }
-    }.runInNewThread();
+    })
   }
 
   /* JADX INFO: Access modifiers changed from: private */
