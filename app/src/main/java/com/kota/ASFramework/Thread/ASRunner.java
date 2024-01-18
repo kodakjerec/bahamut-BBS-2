@@ -1,5 +1,6 @@
 package com.kota.ASFramework.Thread;
 
+import android.annotation.SuppressLint;
 import android.os.Handler;
 import android.os.Message;
 
@@ -11,6 +12,7 @@ public abstract class ASRunner {
 
   public abstract void run();
 
+  @SuppressLint("HandlerLeak")
   public static void construct() {
     _main_thread = Thread.currentThread();
     _main_handler = new Handler() { // from class: com.kumi.ASFramework.Thread.ASRunner.1
@@ -38,12 +40,7 @@ public abstract class ASRunner {
   }
 
   public static void runInNewThread(Runnable runnable) {
-    Thread thread = new Thread() {
-      @Override
-      public void run() {
-        runnable.run();
-      }
-    };
+    Thread thread = new Thread(runnable);
     thread.start();
 }
 

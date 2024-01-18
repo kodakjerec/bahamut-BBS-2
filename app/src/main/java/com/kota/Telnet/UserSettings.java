@@ -6,7 +6,6 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import java.io.File;
-import java.util.Iterator;
 import java.util.Vector;
 
 public class UserSettings {
@@ -28,8 +27,8 @@ public class UserSettings {
     private Vector<String> _block_list = null;
     private String _block_list_string_lower_cased = null;
     Context _context;
-    private String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
-    private String[] _symbols = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
+    private final String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
+    private final String[] _symbols = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
     public Typeface _typeface = null;
     private boolean _updated = false;
 
@@ -82,7 +81,7 @@ public class UserSettings {
                 editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, animation_disable);
                 editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extra_toolbar);
                 editor.putInt("upgrade", 1);
-                editor.commit();
+                editor.apply();
             }
         }
     }
@@ -94,7 +93,7 @@ public class UserSettings {
     public void setExternalToolbarEnable(boolean isEnable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, isEnable);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isExternalToolbarEnable() {
@@ -104,7 +103,7 @@ public class UserSettings {
     public void setUsername(String username) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putString(PROPERTIES_USERNAME, username);
-        editor.commit();
+        editor.apply();
     }
 
     public String getUsername() {
@@ -114,7 +113,7 @@ public class UserSettings {
     public void setPassword(String password) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putString(PROPERTIES_PASSWORD, password);
-        editor.commit();
+        editor.apply();
     }
 
     public String getPassword() {
@@ -128,14 +127,11 @@ public class UserSettings {
     public void setSaveLogonUser(boolean save) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_SAVE_LOGON_USER, save);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isAnimationEnable() {
-        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false)) {
-            return true;
-        }
-        return false;
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false);
     }
 
     public void setAnimationEnable(boolean enable) {
@@ -145,7 +141,7 @@ public class UserSettings {
             z = true;
         }
         editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, z);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isArticleMoveDisable() {
@@ -155,7 +151,7 @@ public class UserSettings {
     public void setArticleMoveDisable(boolean isDisable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable);
-        editor.commit();
+        editor.apply();
     }
 
     public int getArticleViewMode() {
@@ -169,7 +165,7 @@ public class UserSettings {
     public void setArticleViewState(int state) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state);
-        editor.commit();
+        editor.apply();
     }
 
     public String[] getArticleHeaders() {
@@ -207,7 +203,7 @@ public class UserSettings {
         String block_string = getBlockListString();
         if (this._block_list == null) {
             this._block_list = new Vector<>();
-            if (block_string != null && block_string.length() > 0) {
+            if (block_string.length() > 0) {
                 for (String block_name : block_string.split(" *, *")) {
                     if (block_name.length() > 0) {
                         this._block_list.add(block_name);
@@ -219,25 +215,23 @@ public class UserSettings {
     }
 
     public void updateBlockList(Vector<String> aList) {
-        String list_string = ",";
+        StringBuilder list_string = new StringBuilder(",");
         if (aList == null || aList.size() == 0) {
-            list_string = "";
+            list_string = new StringBuilder();
         } else {
-            Iterator<String> it = aList.iterator();
-            while (it.hasNext()) {
-                list_string = list_string + it.next().trim() + ",";
+            for (String s : aList) {
+                list_string.append(s.trim()).append(",");
             }
         }
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
-        editor.putString(PROPERTIES_BLOCK_LIST, list_string);
-        editor.commit();
+        editor.putString(PROPERTIES_BLOCK_LIST, list_string.toString());
+        editor.apply();
         this._block_list = null;
         this._block_list_string_lower_cased = null;
     }
 
     public void addBlockName(String aBlockName) {
-        Vector<String> new_list = new Vector<>();
-        new_list.addAll(getBlockList());
+        Vector<String> new_list = new Vector<>(getBlockList());
         int ref = aBlockName.hashCode();
         boolean find = false;
         int i = 0;
@@ -259,8 +253,7 @@ public class UserSettings {
     }
 
     public void removeBlockName(String aBlockName) {
-        Vector<String> new_list = new Vector<>();
-        new_list.addAll(getBlockList());
+        Vector<String> new_list = new Vector<>(getBlockList());
         for (int i = new_list.size(); i > 0; i--) {
             if (new_list.get(i - 1).equals(aBlockName)) {
                 new_list.remove(i - 1);
@@ -271,9 +264,7 @@ public class UserSettings {
 
     @SuppressLint({"DefaultLocale"})
     public boolean isBlockListContains(String aName) {
-        if (getBlockListString() == null) {
-            return false;
-        }
+        getBlockListString();
         if (this._block_list_string_lower_cased == null) {
             this._block_list_string_lower_cased = getBlockListString().toLowerCase();
         }
@@ -287,7 +278,7 @@ public class UserSettings {
     public void setBlockListEnable(boolean enable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, enable);
-        editor.commit();
+        editor.apply();
     }
 
     @SuppressLint({"DefaultLocale"})
@@ -299,10 +290,7 @@ public class UserSettings {
     }
 
     public boolean isKeepWifi() {
-        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_DISABLE, false)) {
-            return true;
-        }
-        return false;
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_DISABLE, false);
     }
 
     public void setKeepWifi(boolean keep) {
@@ -312,7 +300,7 @@ public class UserSettings {
             z = true;
         }
         editor.putBoolean(PROPERTIES_KEEP_WIFI_DISABLE, z);
-        editor.commit();
+        editor.apply();
     }
 
     public void reloadWifiSetting() {
@@ -338,13 +326,10 @@ public class UserSettings {
             z = true;
         }
         editor.putBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, z);
-        editor.commit();
+        editor.apply();
     }
 
     public boolean isLastConnectionIsOfflineByUser() {
-        if (!this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, false)) {
-            return true;
-        }
-        return false;
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, false);
     }
 }

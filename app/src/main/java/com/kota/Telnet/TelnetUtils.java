@@ -7,7 +7,7 @@ public class TelnetUtils {
         int hash = 0;
         int multiplier = 1;
         for (int i = aData.length - 1; i >= 0; i--) {
-            hash += (aData[i] & TelnetCommand.IAC) * multiplier;
+            hash += (aData[i] & 0xFF) * multiplier;
             multiplier = (multiplier << 5) - multiplier;
         }
         return hash;

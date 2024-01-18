@@ -19,7 +19,7 @@ public class ASListDialog extends ASDialog {
   private LinearLayout _content_view = null;
   private LinearLayout _item_block = null;
   private ASListDialogItemClickListener _listener = null;
-  private Vector<ASListDialogItem> _item_list = new Vector<>();
+  private final Vector<ASListDialogItem> _item_list = new Vector<>();
   private TextView _title_label = null;
   private float _dialog_width = 280.0f;
   private ScrollView _scroll_view = null;
@@ -27,7 +27,7 @@ public class ASListDialog extends ASDialog {
 
   /* JADX INFO: Access modifiers changed from: package-private */
   /* loaded from: classes.dex */
-  public class ASListDialogItem {
+  public static class ASListDialogItem {
     public Button button = null;
     public String title = null;
 
@@ -52,23 +52,23 @@ public class ASListDialog extends ASDialog {
   }
 
   private View buildContentView() {
-    int frame_padding = (int) TypedValue.applyDimension(1, 3.0f, getContext().getResources().getDisplayMetrics());
-    int padding = (int) TypedValue.applyDimension(1, 5.0f, getContext().getResources().getDisplayMetrics());
+    int frame_padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0f, getContext().getResources().getDisplayMetrics());
+    int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5.0f, getContext().getResources().getDisplayMetrics());
     LinearLayout frame = new LinearLayout(getContext());
     frame.setBackgroundColor(-1);
     frame.setPadding(frame_padding, frame_padding, frame_padding, frame_padding);
     LinearLayout content_view = new LinearLayout(getContext());
     content_view.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
-    content_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
+    content_view.setBackgroundColor(View.MEASURED_STATE_MASK);
     frame.addView(content_view);
-    content_view.setOrientation(1);
-    int dialog_width = (((int) TypedValue.applyDimension(1, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
+    content_view.setOrientation(LinearLayout.VERTICAL);
+    int dialog_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
     this._scroll_view = new ScrollView(getContext());
     this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
     content_view.addView(this._scroll_view);
     this._content_view = new LinearLayout(getContext());
     this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
-    this._content_view.setOrientation(1);
+    this._content_view.setOrientation(LinearLayout.VERTICAL);
     this._content_view.setGravity(17);
     this._scroll_view.addView(this._content_view);
     this._title_label = new TextView(getContext());
@@ -82,7 +82,7 @@ public class ASListDialog extends ASDialog {
     this._content_view.addView(this._title_label);
     this._item_block = new LinearLayout(getContext());
     this._item_block.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
-    this._item_block.setOrientation(1);
+    this._item_block.setOrientation(LinearLayout.VERTICAL);
     this._item_block.setGravity(17);
     this._content_view.addView(this._item_block);
     return frame;
@@ -113,20 +113,14 @@ public class ASListDialog extends ASDialog {
 
   public ASListDialog addItem(String aItemTitle) {
     Button button = createButton();
-    button.setOnClickListener(new View.OnClickListener() { // from class: com.kumi.ASFramework.Dialog.ASListDialog.1
-      @Override // android.view.View.OnClickListener
-      public void onClick(View v) {
-        ASListDialog.this.onItemClicked((Button) v);
-      }
-    });
-    button.setOnLongClickListener(new View.OnLongClickListener() { // from class: com.kumi.ASFramework.Dialog.ASListDialog.2
-      @Override // android.view.View.OnLongClickListener
-      public boolean onLongClick(View v) {
-        return ASListDialog.this.onItemLongClicked((Button) v);
-      }
-    });
+    // from class: com.kumi.ASFramework.Dialog.ASListDialog.1
+// android.view.View.OnClickListener
+    button.setOnClickListener(v -> ASListDialog.this.onItemClicked((Button) v));
+    // from class: com.kumi.ASFramework.Dialog.ASListDialog.2
+// android.view.View.OnLongClickListener
+    button.setOnLongClickListener(v -> ASListDialog.this.onItemLongClicked((Button) v));
     if (aItemTitle == null) {
-      button.setVisibility(8);
+      button.setVisibility(View.GONE);
     } else {
       if (this._item_list.size() > 0) {
         this._item_block.addView(createDivider());
@@ -143,7 +137,7 @@ public class ASListDialog extends ASDialog {
 
   public View createDivider() {
     View divider = new View(getContext());
-    int divider_height = (int) Math.ceil(TypedValue.applyDimension(1, 1.0f, getContext().getResources().getDisplayMetrics()));
+    int divider_height = (int) Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0f, getContext().getResources().getDisplayMetrics()));
     divider.setLayoutParams(new LinearLayout.LayoutParams(-1, divider_height));
     divider.setBackgroundColor(-2130706433);
     return divider;
@@ -152,7 +146,7 @@ public class ASListDialog extends ASDialog {
   private Button createButton() {
     Button button = new Button(getContext());
     button.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
-    button.setMinimumHeight((int) TypedValue.applyDimension(1, 60.0f, getContext().getResources().getDisplayMetrics()));
+    button.setMinimumHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60.0f, getContext().getResources().getDisplayMetrics()));
     button.setGravity(17);
     if (this._item_text_size == 0) {
       button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
@@ -161,7 +155,7 @@ public class ASListDialog extends ASDialog {
     } else if (this._item_text_size == 2) {
       button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
     }
-    button.setBackgroundDrawable(ASLayoutParams.getInstance().getListItemBackgroundDrawable());
+    button.setBackground(ASLayoutParams.getInstance().getListItemBackgroundDrawable());
     button.setTextColor(ASLayoutParams.getInstance().getListItemTextColor());
     button.setSingleLine(true);
     return button;
@@ -204,7 +198,7 @@ public class ASListDialog extends ASDialog {
 
   public ASListDialog setDialogWidth(float width) {
     this._dialog_width = width;
-    int dialog_width = (((int) TypedValue.applyDimension(1, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
+    int dialog_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
     this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
     this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
     return this;

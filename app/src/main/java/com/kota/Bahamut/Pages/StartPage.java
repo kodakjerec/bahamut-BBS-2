@@ -2,7 +2,6 @@ package com.kota.Bahamut.Pages;
 
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
-import com.kota.ASFramework.Dialog.ASProcessingDialogOnBackDelegate;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.PageContainer;
@@ -10,19 +9,10 @@ import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
 
 import android.view.View;
-import android.widget.Button;
 
 public class StartPage extends TelnetPage {
-    View.OnClickListener _connect_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            StartPage.this.onConnectButtonClicked();
-        }
-    };
-    View.OnClickListener _exit_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            StartPage.this.onExitButtonClicked();
-        }
-    };
+    View.OnClickListener _connect_listener = v -> StartPage.this.onConnectButtonClicked();
+    View.OnClickListener _exit_listener = v -> StartPage.this.onExitButtonClicked();
 
     public int getPageLayout() {
         return R.layout.start_page;
@@ -34,8 +24,8 @@ public class StartPage extends TelnetPage {
 
     public void onPageDidLoad() {
         getNavigationController().setNavigationTitle("勇者入口");
-        ((Button) findViewById(R.id.Start_ExitButton)).setOnClickListener(this._exit_listener);
-        ((Button) findViewById(R.id.Start_ConnectButton)).setOnClickListener(this._connect_listener);
+        findViewById(R.id.Start_ExitButton).setOnClickListener(this._exit_listener);
+        findViewById(R.id.Start_ConnectButton).setOnClickListener(this._connect_listener);
     }
 
     public void onPageWillAppear() {
@@ -83,15 +73,11 @@ public class StartPage extends TelnetPage {
     /** 連線 */
     public void connect() {
         if (getNavigationController().getDeviceController().isNetworkAvailable()) {
-            ASProcessingDialog.showProcessingDialog("連線中", new ASProcessingDialogOnBackDelegate() {
-                public boolean onASProcessingDialogOnBackDetected(ASProcessingDialog aDialog) {
-                    TelnetClient.getClient().close();
-                    return false;
-                }
+            ASProcessingDialog.showProcessingDialog("連線中", aDialog -> {
+                TelnetClient.getClient().close();
+                return false;
             });
-            ASRunner.runInNewThread(()->{
-                    TelnetClient.getClient().connect("bbs.gamer.com.tw", 23);
-            });
+            ASRunner.runInNewThread(()-> TelnetClient.getClient().connect("bbs.gamer.com.tw", 23));
             return;
         }
         ASToast.showShortToast("您未連接網路");

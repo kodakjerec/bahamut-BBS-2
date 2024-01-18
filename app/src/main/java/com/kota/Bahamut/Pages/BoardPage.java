@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -36,11 +35,13 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageHandler;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
+
+import java.util.Objects;
 import java.util.Vector;
 
 public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Listener, Dialog_SelectArticle_Listener, PostArticlePage_Listener, BoardExtendOptionalPageListener, ASListViewExtentOptionalDelegate {
@@ -50,42 +51,16 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     private int _last_list_action = 0;
     private boolean _refresh_header_view = false;
     UserSettings _settings;
-    private final View.OnClickListener mFirstPageClicked = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.moveToFirstPosition();
-        }
+    private final View.OnClickListener mFirstPageClicked = v -> BoardPage.this.moveToFirstPosition();
+    private final View.OnClickListener mLastPageClicked = v -> {
+        BoardPage.this.setManualLoadPage();
+        BoardPage.this.moveToLastPosition();
     };
-    private final View.OnClickListener mLastPageClicked = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.setManualLoadPage();
-            BoardPage.this.moveToLastPosition();
-        }
-    };
-    private final View.OnClickListener mMenuButtonListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.onMenuClicked();
-        }
-    };
-    private final View.OnClickListener mOpenBookmarkListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.onBookmarkButtonClicked();
-        }
-    };
-    private final View.OnClickListener mPostListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.onPostButtonClicked();
-        }
-    };
-    private final View.OnClickListener mSearchByKeywordListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.onSearchButtonClicked();
-        }
-    };
-    private final View.OnClickListener mSearchByNumberListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            BoardPage.this.showSelectArticleDialog();
-        }
-    };
+    private final View.OnClickListener mMenuButtonListener = v -> BoardPage.this.onMenuClicked();
+    private final View.OnClickListener mOpenBookmarkListener = v -> BoardPage.this.onBookmarkButtonClicked();
+    private final View.OnClickListener mPostListener = v -> BoardPage.this.onPostButtonClicked();
+    private final View.OnClickListener mSearchByKeywordListener = v -> BoardPage.this.onSearchButtonClicked();
+    private final View.OnClickListener mSearchByNumberListener = v -> BoardPage.this.showSelectArticleDialog();
 
     public int getPageType() {
         return 10;
@@ -102,9 +77,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         list_view.extendOptionalDelegate = this;
         list_view.setEmptyView(findViewById(R.id.BoardPage_ListEmptyView));
         setListView(list_view);
-        ((Button) findViewById(R.id.BoardPage_PostButton)).setOnClickListener(this.mPostListener);
-        ((Button) findViewById(R.id.BoardPage_FirstPageButton)).setOnClickListener(this.mFirstPageClicked);
-        ((Button) findViewById(R.id.BoardPage_LastestPageButton)).setOnClickListener(this.mLastPageClicked);
+        findViewById(R.id.BoardPage_PostButton).setOnClickListener(this.mPostListener);
+        findViewById(R.id.BoardPage_FirstPageButton).setOnClickListener(this.mFirstPageClicked);
+        findViewById(R.id.BoardPage_LastestPageButton).setOnClickListener(this.mLastPageClicked);
         Button select_by_keyword_button = (Button) findViewById(R.id.search_by_keyword);
         if (select_by_keyword_button != null) {
             select_by_keyword_button.setOnClickListener(this.mSearchByKeywordListener);
@@ -203,13 +178,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void onBlockButtonClicked(final String aBlockName) {
-        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    BoardPage.this._settings.addBlockName(aBlockName);
-                    BoardPage.this._settings.notifyDataUpdated();
-                    BoardPage.this.reloadListView();
-                }
+        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
+            if (index == 1) {
+                BoardPage.this._settings.addBlockName(aBlockName);
+                BoardPage.this._settings.notifyDataUpdated();
+                BoardPage.this.reloadListView();
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -235,7 +208,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void onSearchDialogSearchButtonClickedWithValues(Vector<String> values) {
-        searchArticle(values.get(0), values.get(1), values.get(2) == "YES" ? "y" : "n", values.get(3));
+        searchArticle(values.get(0), values.get(1), Objects.equals(values.get(2), "YES") ? "y" : "n", values.get(3));
     }
 
     private void searchArticle(String keyword, String author, String mark, String gy) {
@@ -334,12 +307,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     /* access modifiers changed from: protected */
     public void onDeleteArticle(int itemNumber) {
         final int item_number = itemNumber;
-        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    BoardPage.this.pushCommand(new BahamutCommandDeleteArticle(item_number));
-                    return;
-                }
+        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener((aDialog, index) -> {
+            if (index == 1) {
+                BoardPage.this.pushCommand(new BahamutCommandDeleteArticle(item_number));
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -367,12 +337,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void goodArticle(final int articleIndex) {
-        ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    BoardPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
-                    return;
-                }
+        ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener((aDialog, index) -> {
+            if (index == 1) {
+                BoardPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -486,7 +453,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         boolean enable = this._settings.isExternalToolbarEnable();
         View toolbar_view = findViewById(R.id.ext_toolbar);
         if (toolbar_view != null) {
-            toolbar_view.setVisibility(enable ? 0 : 8);
+            toolbar_view.setVisibility(enable ? View.VISIBLE : View.GONE);
         }
     }
 

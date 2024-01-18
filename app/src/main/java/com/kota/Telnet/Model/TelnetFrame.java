@@ -1,24 +1,19 @@
 package com.kota.Telnet.Model;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Telnet.Reference.TelnetAnsiCode;
-import com.kota.Telnet.TelnetCommand;
-import java.util.Iterator;
+
 import java.util.Vector;
 
 public class TelnetFrame {
-    public static final int DEFAULT_COLUMN = 80;
-    public static final int DEFAULT_ROW = 24;
-    private static int _count = 0;
+    // public static final int DEFAULT_COLUMN = 80;
+    // public static final int DEFAULT_ROW = 24;
     public Vector<TelnetRow> rows = new Vector<>();
 
     /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
-    }
-
-    public TelnetFrame() {
-        initialData(24);
-        clear();
     }
 
     public TelnetFrame(int row) {
@@ -66,7 +61,7 @@ public class TelnetFrame {
     }
 
     public int getPositionData(int row, int column) {
-        return getRow(row).data[column] & TelnetCommand.IAC;
+        return getRow(row).data[column] & 0xFF;
     }
 
     public int getPositionTextColor(int row, int column) {
@@ -108,6 +103,7 @@ public class TelnetFrame {
         return this.rows.size();
     }
 
+    @NonNull
     public TelnetFrame clone() {
         return new TelnetFrame(this);
     }
@@ -121,29 +117,18 @@ public class TelnetFrame {
         return true;
     }
 
-    public TelnetRow removeRow(int index) {
-        return this.rows.remove(index);
+    public void removeRow(int index) {
+        this.rows.remove(index);
     }
 
     public void reloadSpace() {
-        boolean text_color_diff;
-        boolean background_color_diff;
         for (int row = 0; row < getRowSize(); row++) {
             int column = 0;
             while (column < 80) {
-                if (getPositionData(row, column) <= 127 || column >= 79) {
-                    setPositionBitSpace(row, column, (byte) 0);
-                } else {
-                    if (getPositionTextColor(row, column) != getPositionTextColor(row, column + 1)) {
-                        text_color_diff = true;
-                    } else {
-                        text_color_diff = false;
-                    }
-                    if (getPositionBackgroundColor(row, column) != getPositionBackgroundColor(row, column + 1)) {
-                        background_color_diff = true;
-                    } else {
-                        background_color_diff = false;
-                    }
+                int data = getPositionData(row, column);
+                if (data > 127 && column < 79) {
+                    boolean text_color_diff = getPositionTextColor(row, column) != getPositionTextColor(row, column + 1);
+                    boolean background_color_diff = getPositionBackgroundColor(row, column) != getPositionBackgroundColor(row, column + 1);
                     if (text_color_diff || background_color_diff) {
                         setPositionBitSpace(row, column, (byte) 3);
                         setPositionBitSpace(row, column + 1, (byte) 4);
@@ -152,27 +137,17 @@ public class TelnetFrame {
                         setPositionBitSpace(row, column + 1, (byte) 2);
                     }
                     column++;
+                } else {
+                    setPositionBitSpace(row, column, (byte) 0);
                 }
                 column++;
             }
         }
     }
 
-    public void printBackgroundColor() {
-        for (int i = 0; i < this.rows.size(); i++) {
-            StringBuffer s = new StringBuffer();
-            TelnetRow row = this.rows.get(i);
-            for (int j = 0; j < 80; j++) {
-                s.append(String.format("%1$02d ", new Object[]{Byte.valueOf(row.backgroundColor[j])}));
-            }
-            System.out.println(s.toString());
-        }
-    }
-
     public void cleanCachedData() {
-        Iterator<TelnetRow> it = this.rows.iterator();
-        while (it.hasNext()) {
-            it.next().cleanCachedData();
+        for (TelnetRow row : this.rows) {
+            row.cleanCachedData();
         }
     }
 }

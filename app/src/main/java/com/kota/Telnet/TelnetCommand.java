@@ -1,5 +1,7 @@
 package com.kota.Telnet;
 
+import androidx.annotation.NonNull;
+
 public class TelnetCommand {
     public static final byte AUTH = 37;
     public static final byte DO = -3;
@@ -29,17 +31,11 @@ public class TelnetCommand {
     }
 
     public boolean isEqualTo(TelnetCommand aCommand) {
-        if (aCommand.header == this.header && aCommand.action == this.action && aCommand.option == this.option) {
-            return true;
-        }
-        return false;
+        return aCommand.header == this.header && aCommand.action == this.action && aCommand.option == this.option;
     }
 
     public boolean isEqualTo(int aHeader, int aAction, int aOption) {
-        if (aHeader == this.header && aAction == this.action && aOption == this.option) {
-            return true;
-        }
-        return false;
+        return aHeader == this.header && aAction == this.action && aOption == this.option;
     }
 
     public String getCommandNameString(int aCommand) {
@@ -77,6 +73,7 @@ public class TelnetCommand {
         }
     }
 
+    @NonNull
     public String toString() {
         return getCommandNameString(this.header) + "," + getCommandNameString(this.action) + "," + getCommandNameString(this.option);
     }

@@ -1,5 +1,6 @@
 package com.kota.Bahamut;
 
+import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
@@ -413,7 +414,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     public void showPage(TelnetPage aPage) {
-        final TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+        // aPage 進入判斷的頁面
+        // top_page 最上層的頁面
+        ASNavigationController asNavigationController = ASNavigationController.getCurrentController();
+        final TelnetPage top_page = (TelnetPage) asNavigationController.getTopController();
         if (aPage == top_page) {
             new ASRunner() {
                 public void run() {
@@ -421,10 +425,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 }
             }.runInMainThread();
         } else if (!top_page.isPopupPage() && aPage != null) {
-            if (ASNavigationController.getCurrentController().containsViewController(aPage)) {
-                ASNavigationController.getCurrentController().popToViewController(aPage);
+            if (asNavigationController.containsViewController(aPage)) {
+                asNavigationController.popToViewController(aPage);
             } else {
-                ASNavigationController.getCurrentController().pushViewController(aPage);
+                asNavigationController.pushViewController(aPage);
             }
         }
     }

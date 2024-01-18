@@ -2,48 +2,41 @@ package com.kota.ASFramework.PageController;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
 import android.os.PowerManager;
 
 public class ASDeviceController {
-  private static final String WAKELOCK_KEY = "ASFramework_WakeLock";
+  private static final String wakeLockKey = "myapp:wakeLockKey";
   
-  private static final String WIFILOCK_KEY = "ASFramework_WifiLock";
+  private static final String wifiLockKey = "myapp:wifiLockKey";
   
-  private Context _context = null;
+  private final Context _context;
   
   private boolean _wifi_locked = true;
   
-  private PowerManager.WakeLock mWakeLock = null;
+  private final PowerManager.WakeLock mWakeLock;
   
-  private WifiManager.WifiLock mWifiLock = null;
+  private final WifiManager.WifiLock mWifiLock;
   
   public ASDeviceController(Context paramContext) {
     this._context = paramContext;
-    this.mWakeLock = ((PowerManager)this._context.getSystemService("power")).newWakeLock(1, "ASFramework_WakeLock");
+    this.mWakeLock = ((PowerManager)paramContext.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockKey);
     this.mWakeLock.setReferenceCounted(true);
-    this.mWifiLock = ((WifiManager)paramContext.getSystemService("wifi")).createWifiLock("ASFramework_WifiLock");
+    this.mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, wifiLockKey);
     this.mWifiLock.setReferenceCounted(true);
-  }
-  
-  public NetworkInfo.State getNetworkState(int paramInt) {
-    NetworkInfo.State state = NetworkInfo.State.DISCONNECTED;
-    NetworkInfo networkInfo = ((ConnectivityManager)this._context.getSystemService("connectivity")).getNetworkInfo(paramInt);
-    if (networkInfo != null)
-      state = networkInfo.getState(); 
-    return state;
   }
   
   public boolean isNetworkAvailable() {
     boolean bool = false;
-    NetworkInfo.State state4 = getNetworkState(0);
-    NetworkInfo.State state1 = getNetworkState(1);
-    NetworkInfo.State state5 = getNetworkState(6);
-    NetworkInfo.State state2 = getNetworkState(7);
-    NetworkInfo.State state3 = getNetworkState(9);
-    if (state4 == NetworkInfo.State.CONNECTED || state1 == NetworkInfo.State.CONNECTED || state5 == NetworkInfo.State.CONNECTED || state2 == NetworkInfo.State.CONNECTED || state3 == NetworkInfo.State.CONNECTED)
-      bool = true; 
+    ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
+    Network activeNetwork = connectivityManager.getActiveNetwork();
+    NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+    if (capabilities != null) {
+      // any type of internet
+      bool = true;
+    }
     return bool;
   }
   
@@ -51,7 +44,7 @@ public class ASDeviceController {
     System.out.println("Lock Wifi");
     if (!this._wifi_locked) {
       this._wifi_locked = true;
-      this.mWakeLock.acquire();
+      this.mWakeLock.acquire(10*60*1000L /*10 minutes*/);
       this.mWifiLock.acquire();
     } 
   }
@@ -60,12 +53,14 @@ public class ASDeviceController {
     if (this._wifi_locked) {
       System.out.println("Unlock Wifi");
       try {
-        this.mWifiLock.release();
+        if (this.mWifiLock.isHeld())
+          this.mWifiLock.release();
       } catch (Exception exception) {
         exception.printStackTrace();
       } 
       try {
-        this.mWakeLock.release();
+        if (this.mWakeLock.isHeld())
+          this.mWakeLock.release();
       } catch (Exception exception) {
         exception.printStackTrace();
       } 

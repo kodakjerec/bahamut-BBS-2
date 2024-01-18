@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
 public class ASPageView extends FrameLayout {
-  private static int _count = 0;
+  private static final int _count = 0;
   
   private ASViewController _owner_controller = null;
   
@@ -28,6 +28,7 @@ public class ASPageView extends FrameLayout {
   private void init() {}
   
   public void draw(Canvas paramCanvas) {
+    super.draw(paramCanvas);
     int i = paramCanvas.getSaveCount();
     dispatchDraw(paramCanvas);
     paramCanvas.restoreToCount(i);

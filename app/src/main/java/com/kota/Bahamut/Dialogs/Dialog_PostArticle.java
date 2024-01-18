@@ -34,13 +34,13 @@ public class Dialog_PostArticle extends ASDialog implements View.OnClickListener
         View reply_target_view = findViewById(R.id.reply_target_view);
         View findViewById = findViewById(R.id.sign_view);
         if (this._target == 0) {
-            reply_target_view.setVisibility(8);
+            reply_target_view.setVisibility(View.GONE);
         } else {
-            reply_target_view.setVisibility(0);
+            reply_target_view.setVisibility(View.VISIBLE);
         }
         this._sign_spinner = (Spinner) findViewById(R.id.sign_spinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.reply_target_list, 17367048);
-        adapter.setDropDownViewResource(17367049);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(), R.array.reply_target_list, R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this._sign_spinner.setAdapter(adapter);
         this._send_button.setOnClickListener(this);
         this._cancel_button.setOnClickListener(this);

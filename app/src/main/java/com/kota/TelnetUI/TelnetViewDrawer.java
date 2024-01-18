@@ -28,7 +28,7 @@ public class TelnetViewDrawer {
     public int textColor = 0;
     public float verticalUnit = 0.0f;
 
-    private class TelnetViewBlock {
+    private static class TelnetViewBlock {
         public int Bottom;
         public int Height;
         public int Left;
@@ -80,7 +80,7 @@ public class TelnetViewDrawer {
 
     private void drawTextAtPosition(Context aContext, TelnetViewBlock block, char c) {
         if (this.line_width == 0) {
-            this.line_width = (int) Math.ceil((double) TypedValue.applyDimension(1, 1.0f, aContext.getResources().getDisplayMetrics()));
+            this.line_width = (int) Math.ceil((double) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0f, aContext.getResources().getDisplayMetrics()));
         }
         this.paint.setColor(this.textColor);
         switch (c) {
@@ -95,6 +95,7 @@ public class TelnetViewDrawer {
                 this.canvas.drawLine((float) block.Left, (float) block.Bottom, (float) block.Right, (float) block.Top, this.paint);
                 return;
             case 9586:
+            case 65340:
                 this.canvas.drawLine((float) block.Left, (float) block.Top, (float) block.Right, (float) block.Bottom, this.paint);
                 return;
             case 9587:
@@ -189,9 +190,6 @@ public class TelnetViewDrawer {
                 path4.lineTo((float) block.Left, (float) block.Top);
                 this.canvas.drawPath(path4, this.paint);
                 return;
-            case 65340:
-                this.canvas.drawLine((float) block.Left, (float) block.Top, (float) block.Right, (float) block.Bottom, this.paint);
-                return;
             case 65343:
                 this.canvas.drawRect((float) block.Left, (float) (block.Bottom - this.line_width), (float) block.Right, (float) block.Bottom, this.paint);
                 return;
@@ -200,7 +198,6 @@ public class TelnetViewDrawer {
                 return;
             default:
                 this.canvas.drawText(new char[]{c}, 0, 1, (float) block.Left, (float) (block.Bottom - this.textBottomOffset), this.paint);
-                return;
         }
     }
 }

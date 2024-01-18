@@ -1,27 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <View style="@style/HorizontalDivider"/>
-    <FrameLayout android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="match_parent"/>
-    <com.kota.TelnetUI.TelnetView android:id="@+id/Main_TelnetView" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_centerHorizontal="true"/>
-    <LinearLayout android:id="@+id/toolbar" android:layout_alignParentBottom="true" style="@style/Toolbar">
-        <Button android:id="@+id/Main_LogoutButton" android:text="@string/logout" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Main_MailButton" android:text="@string/mailbox" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Main_SystemSettingsButton" android:text="@string/setting" style="@style/ToolbarItem"/>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <View style="@style/HorizontalDivider" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/item_background_color" />
+
+    <com.kota.TelnetUI.TelnetView
+        android:id="@+id/Main_TelnetView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true" />
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/Toolbar"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/Main_LogoutButton"
+            style="@style/ToolbarItem"
+            android:text="@string/logout" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/Main_MailButton"
+            style="@style/ToolbarItem"
+            android:text="@string/mailbox" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/Main_SystemSettingsButton"
+            style="@style/ToolbarItem"
+            android:text="@string/setting" />
     </LinearLayout>
-    <LinearLayout android:orientation="vertical" android:id="@+id/Main_ItemBlock" android:background="#e0000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_above="@+id/toolbar">
-        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="72dp" android:layout_weight="1">
-            <View style="@style/HorizontalDivider"/>
-            <Button android:textColor="@color/button_text_color" android:id="@+id/Main_BoardsButton" android:background="@android:drawable/list_selector_background" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/folder_boards" style="@style/MainItem"/>
+
+    <LinearLayout
+        android:id="@+id/Main_ItemBlock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/toolbar"
+        android:background="#e0000000"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <View style="@style/HorizontalDivider" />
+
+            <Button
+                android:id="@+id/Main_BoardsButton"
+                style="@style/MainItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/folder_boards"
+                android:textColor="@color/button_text_color"
+                android:textSize="30sp"/>
         </LinearLayout>
-        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="72dp" android:layout_weight="1">
-            <View style="@style/HorizontalDivider"/>
-            <Button android:textColor="@color/button_text_color" android:id="@+id/Main_ClassButton" android:background="@android:drawable/list_selector_background" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/folder_class" style="@style/MainItem"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <View style="@style/HorizontalDivider" />
+
+            <Button
+                android:id="@+id/Main_ClassButton"
+                style="@style/MainItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/folder_class"
+                android:textColor="@color/button_text_color"
+                android:textSize="30sp"/>
         </LinearLayout>
-        <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="72dp" android:layout_weight="1">
-            <View style="@style/HorizontalDivider"/>
-            <Button android:textColor="@color/button_text_color" android:id="@+id/Main_FavoriteButton" android:background="@android:drawable/list_selector_background" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/folder_favorite" style="@style/MainItem"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <View style="@style/HorizontalDivider" />
+
+            <Button
+                android:id="@+id/Main_FavoriteButton"
+                style="@style/MainItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/folder_favorite"
+                android:textColor="@color/button_text_color"
+                android:textSize="30sp"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

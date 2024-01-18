@@ -4,51 +4,48 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.Vector;
 
 public class BlockListPage extends TelnetPage {
-    View.OnClickListener _add_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            EditText input_field = (EditText) BlockListPage.this.findViewById(R.id.BlockList_Input);
-            if (input_field != null) {
-                String block_name = input_field.getText().toString().trim();
-                input_field.setText("");
-                BlockListPage.this._settings.addBlockName(block_name);
-                BlockListPage.this._settings.notifyDataUpdated();
-                BlockListPage.this.reload();
-            }
+    View.OnClickListener _add_listener = v -> {
+        EditText input_field = (EditText) BlockListPage.this.findViewById(R.id.BlockList_Input);
+        if (input_field != null) {
+            String block_name = input_field.getText().toString().trim();
+            input_field.setText("");
+            BlockListPage.this._settings.addBlockName(block_name);
+            BlockListPage.this._settings.notifyDataUpdated();
+            BlockListPage.this.reload();
         }
     };
     /* access modifiers changed from: private */
     public Vector<String> _block_list = null;
-    BlockListPage_ItemView_Listener _block_listener = new BlockListPage_ItemView_Listener() {
-        public void onBlockListPage_ItemView_Clicked(BlockListPage_ItemView aItemView) {
-            int deleted_index = aItemView.index;
-            Vector<String> new_list = new Vector<>();
-            new_list.addAll(BlockListPage.this._block_list);
-            new_list.remove(deleted_index);
-            BlockListPage.this._settings.updateBlockList(new_list);
-            BlockListPage.this.reload();
-        }
+    BlockListPage_ItemView_Listener _block_listener = aItemView -> {
+        int deleted_index = aItemView.index;
+        Vector<String> new_list = new Vector<>(BlockListPage.this._block_list);
+        new_list.remove(deleted_index);
+        BlockListPage.this._settings.updateBlockList(new_list);
+        BlockListPage.this.reload();
     };
     BaseAdapter _list_adapter = new BaseAdapter() {
         public int getCount() {
-            return BlockListPage.this._block_list.size();
+            if (BlockListPage.this._block_list!=null)
+                return BlockListPage.this._block_list.size();
+            else
+                return 0;
         }
 
         public String getItem(int index) {
-            return (String) BlockListPage.this._block_list.get(index);
+            return BlockListPage.this._block_list.get(index);
         }
 
         public long getItemId(int position) {
-            return (long) position;
+            return position;
         }
 
         public int getItemViewType(int position) {
@@ -108,7 +105,7 @@ public class BlockListPage extends TelnetPage {
         this._settings = new UserSettings(getContext());
         this._block_list = this._settings.getBlockList();
         ((ListView) findViewById(R.id.BlockList_List)).setAdapter(this._list_adapter);
-        ((Button) findViewById(R.id.BlockList_Add)).setOnClickListener(this._add_listener);
+        findViewById(R.id.BlockList_Add).setOnClickListener(this._add_listener);
     }
 
     public void onPageWillDisappear() {

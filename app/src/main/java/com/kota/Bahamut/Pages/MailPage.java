@@ -15,7 +15,7 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;
@@ -53,7 +53,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     public void onPageDidLoad() {
         this._telnet_view_block = (ASScrollView) findViewById(R.id.Mail_ContentTelnetViewBlock);
         this._telnet_view = (TelnetView) findViewById(R.id.Mail_ContentTelnetView);
-        int screen_width = (((int) TypedValue.applyDimension(1, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
+        int screen_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
         ViewGroup.LayoutParams telnet_layout = this._telnet_view.getLayoutParams();
         telnet_layout.width = screen_width;
         telnet_layout.height = -2;
@@ -65,7 +65,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         this._back_button.setOnClickListener(this);
         this._page_up_button.setOnClickListener(this);
         this._page_down_button.setOnClickListener(this);
-        ((Button) findViewById(R.id.Mail_ChangeModeButton)).setOnClickListener(this);
+        findViewById(R.id.Mail_ChangeModeButton).setOnClickListener(this);
         resetAdapter();
     }
 
@@ -118,7 +118,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public long getItemId(int itemIndex) {
-        return (long) itemIndex;
+        return itemIndex;
     }
 
     public int getItemViewType(int itemIndex) {
@@ -158,21 +158,19 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 item_view.setContent(item.getContent());
                 if (itemIndex >= getCount() - 2) {
                     item_view.setDividerhidden(true);
-                    break;
                 } else {
                     item_view.setDividerhidden(false);
-                    break;
                 }
+                break;
             case 1:
                 ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemView;
                 item_view2.setFrame(getItem(itemIndex).getFrame());
                 if (itemIndex >= getCount() - 2) {
                     item_view2.setDividerhidden(true);
-                    break;
                 } else {
                     item_view2.setDividerhidden(false);
-                    break;
                 }
+                break;
             case 2:
                 ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
                 String author = this._article.Author;
@@ -275,12 +273,12 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
             this._view_mode = ArticleViewMode.MODE_TEXT;
         }
         if (this._view_mode == ArticleViewMode.MODE_TEXT) {
-            this._list.setVisibility(0);
-            this._telnet_view_block.setVisibility(8);
+            this._list.setVisibility(View.VISIBLE);
+            this._telnet_view_block.setVisibility(View.GONE);
             return;
         }
-        this._list.setVisibility(8);
-        this._telnet_view_block.setVisibility(0);
+        this._list.setVisibility(View.GONE);
+        this._telnet_view_block.setVisibility(View.VISIBLE);
         this._telnet_view_block.invalidate();
     }
 

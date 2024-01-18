@@ -8,7 +8,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
+import java.util.Objects;
 
 public class MailBoxPage_ItemView extends LinearLayout {
     private static final int _count = 0;
@@ -51,44 +52,32 @@ public class MailBoxPage_ItemView extends LinearLayout {
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.mail_box_page_item_view, this);
-        this._status = (TextView) findViewById(R.id.MailBoxPage_ItemView_Status);
-        this._title = (TextView) findViewById(R.id.MailBoxPage_ItemView_Title);
-        this._number = (TextView) findViewById(R.id.MailBoxPage_ItemView_Number);
-        this._date = (TextView) findViewById(R.id.MailBoxPage_ItemView_Date);
-        this._mark = (TextView) findViewById(R.id.MailBoxPage_ItemView_Mark);
-        this._author = (TextView) findViewById(R.id.MailBoxPage_ItemView_Author);
-        this._reply = (TextView) findViewById(R.id.MailBoxPage_ItemView_Reply);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.mail_box_page_item_view, this);
+        this._status = findViewById(R.id.MailBoxPage_ItemView_Status);
+        this._title = findViewById(R.id.MailBoxPage_ItemView_Title);
+        this._number = findViewById(R.id.MailBoxPage_ItemView_Number);
+        this._date = findViewById(R.id.MailBoxPage_ItemView_Date);
+        this._mark = findViewById(R.id.MailBoxPage_ItemView_Mark);
+        this._author = findViewById(R.id.MailBoxPage_ItemView_Author);
+        this._reply = findViewById(R.id.MailBoxPage_ItemView_Reply);
         this._divider_bottom = findViewById(R.id.MailBoxPage_ItemView_DividerBottom);
     }
 
     public void setTitle(String title) {
         if (this._title != null) {
-            if (title != null) {
-                this._title.setText(title);
-            } else {
-                this._title.setText("讀取中...");
-            }
+            this._title.setText(Objects.requireNonNullElse(title, "讀取中..."));
         }
     }
 
     public void setAuthor(String author) {
         if (this._author != null) {
-            if (author != null) {
-                this._author.setText(author);
-            } else {
-                this._author.setText("讀取中");
-            }
+            this._author.setText(Objects.requireNonNullElse(author, "讀取中"));
         }
     }
 
     public void setDate(String date) {
         if (this._date != null) {
-            if (date != null) {
-                this._date.setText(date);
-            } else {
-                this._date.setText("讀取中");
-            }
+            this._date.setText(Objects.requireNonNullElse(date, "讀取中"));
         }
     }
 
@@ -96,7 +85,7 @@ public class MailBoxPage_ItemView extends LinearLayout {
     public void setIndex(int number) {
         if (this._number != null) {
             if (number > 0) {
-                this._number.setText(String.format("%1$05d", Integer.valueOf(number)));
+                this._number.setText(String.format("%1$05d", number));
                 return;
             }
             this._number.setText("讀取中");
@@ -105,17 +94,17 @@ public class MailBoxPage_ItemView extends LinearLayout {
 
     public void setReply(boolean isReply) {
         if (isReply) {
-            this._reply.setVisibility(0);
+            this._reply.setVisibility(View.VISIBLE);
         } else {
-            this._reply.setVisibility(4);
+            this._reply.setVisibility(View.INVISIBLE);
         }
     }
 
     public void setMark(boolean isMarked) {
         if (isMarked) {
-            this._mark.setVisibility(0);
+            this._mark.setVisibility(View.VISIBLE);
         } else {
-            this._mark.setVisibility(4);
+            this._mark.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -130,9 +119,9 @@ public class MailBoxPage_ItemView extends LinearLayout {
     }
 
     public void clear() {
-        setTitle((String) null);
-        setDate((String) null);
-        setAuthor((String) null);
+        setTitle(null);
+        setDate(null);
+        setAuthor(null);
         setIndex(0);
         setRead(true);
         setReply(false);
@@ -144,11 +133,11 @@ public class MailBoxPage_ItemView extends LinearLayout {
             return;
         }
         if (visible) {
-            if (this._divider_bottom.getVisibility() != 0) {
-                this._divider_bottom.setVisibility(0);
+            if (this._divider_bottom.getVisibility() != View.VISIBLE) {
+                this._divider_bottom.setVisibility(View.VISIBLE);
             }
-        } else if (this._divider_bottom.getVisibility() != 8) {
-            this._divider_bottom.setVisibility(8);
+        } else if (this._divider_bottom.getVisibility() != View.GONE) {
+            this._divider_bottom.setVisibility(View.GONE);
         }
     }
 }

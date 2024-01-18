@@ -1,16 +1,17 @@
 package com.kota.Telnet.Reference;
 
 import android.annotation.SuppressLint;
+import android.view.View;
 
 import androidx.core.internal.view.SupportMenu;
 import androidx.core.view.InputDeviceCompat;
 import androidx.core.view.ViewCompat;
 
 public class TelnetAnsiCode {
-    public static final int[] BACKGROUND_COLOR_NORMAL = {ViewCompat.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
+    public static final int[] BACKGROUND_COLOR_NORMAL = {View.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
     @SuppressLint("RestrictedApi")
     public static final int[] COLOR_BRIGHT = {-8355712, SupportMenu.CATEGORY_MASK, -16711936, InputDeviceCompat.SOURCE_ANY, -16776961, -65281, -16711681, -1};
-    public static final int[] TEXT_COLOR_NORMAL = {ViewCompat.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
+    public static final int[] TEXT_COLOR_NORMAL = {View.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
 
     public static class Code {
         public static final int CHA = 6;

@@ -83,7 +83,7 @@ public class ASProcessingDialog extends ASDialog {
     content_view.setOrientation(1);
     content_view.setGravity(1);
     content_view.setMinimumWidth((int) TypedValue.applyDimension(1, 100.0f, getContext().getResources().getDisplayMetrics()));
-    content_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
+    content_view.setBackgroundColor(View.MEASURED_STATE_MASK);
     frame_view.addView(content_view);
     this._progress_bar = new ProgressBar(getContext());
     this._progress_bar.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));

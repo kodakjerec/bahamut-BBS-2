@@ -6,12 +6,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.Vector;
@@ -122,7 +121,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         this._symbol_button.setOnClickListener(this);
         this._hide_title_button = (Button) findViewById(R.id.SendMailDialog_Cancel);
         this._hide_title_button.setOnClickListener(this);
-        ((Button) findViewById(R.id.SendMailDialog_Change)).setOnClickListener(this);
+        findViewById(R.id.SendMailDialog_Change).setOnClickListener(this);
         this._title_block = findViewById(R.id.SendMail_TitleBlock);
         refresh();
     }
@@ -156,7 +155,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
                 String receiver = this._receiver_field.getText().toString().replace("\n", "");
                 String title = this._title_field.getText().toString().replace("\n", "");
                 String content = this._content_field.getText().toString();
-                String err_msg = "";
+                StringBuilder err_msg = new StringBuilder();
                 Vector<String> empty = new Vector<>();
                 if (receiver.length() == 0) {
                     empty.add("收件人");
@@ -169,29 +168,27 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
                 }
                 if (empty.size() > 0) {
                     for (int i = 0; i < empty.size(); i++) {
-                        err_msg = err_msg + empty.get(i);
+                        err_msg.append(empty.get(i));
                         if (i == empty.size() - 2) {
-                            err_msg = err_msg + "與";
+                            err_msg.append("與");
                         } else if (i < empty.size() - 2) {
-                            err_msg = err_msg + "、";
+                            err_msg.append("、");
                         }
                     }
-                    err_msg = err_msg + "不可為空";
+                    err_msg.append("不可為空");
                 }
                 if (err_msg.length() > 0) {
-                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_msg).addButton("確定").show();
+                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_msg.toString()).addButton("確定").show();
                     return;
                 }
                 final String send_receiver = receiver;
                 final String send_title = title;
                 final String send_content = content;
-                ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要送出此信件?").setListener(new ASAlertDialogListener() {
-                    public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                        if (index == 1) {
-                            SendMailPage.this._listener.onSendMailDialogSendButtonClicked(SendMailPage.this, send_receiver, send_title, send_content);
-                            SendMailPage.this.getNavigationController().popViewController();
-                            SendMailPage.this.clear();
-                        }
+                ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要送出此信件?").setListener((aDialog, index) -> {
+                    if (index == 1) {
+                        SendMailPage.this._listener.onSendMailDialogSendButtonClicked(SendMailPage.this, send_receiver, send_title, send_content);
+                        SendMailPage.this.getNavigationController().popViewController();
+                        SendMailPage.this.clear();
                     }
                 }).show();
             }

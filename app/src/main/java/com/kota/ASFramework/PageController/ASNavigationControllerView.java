@@ -3,20 +3,15 @@ package com.kota.ASFramework.PageController;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import com.kota.ASFramework.Model.ASSize;
 
 public class ASNavigationControllerView extends ASPageView implements ASGestureViewDelegate {
   private ASPageView _background_view = null;
   
-  private ASSize _content_size = new ASSize(0, 0);
+  private final ASSize _content_size = new ASSize(0, 0);
   
   private ASPageView _content_view = null;
-  
-  private ASGestureView _gesture_view = null;
-  
+
   private ASNavigationController _page_controller = null;
   
   public ASNavigationControllerView(Context paramContext) {
@@ -36,15 +31,15 @@ public class ASNavigationControllerView extends ASPageView implements ASGestureV
   
   private void initial(Context paramContext) {
     this._background_view = new ASPageView(paramContext);
-    this._background_view.setLayoutParams((ViewGroup.LayoutParams)new LayoutParams(-1, -1));
-    addView((View)this._background_view);
+    this._background_view.setLayoutParams(new LayoutParams(-1, -1));
+    addView(this._background_view);
     this._content_view = new ASPageView(paramContext);
-    this._content_view.setLayoutParams((ViewGroup.LayoutParams)new LayoutParams(-1, -1));
-    addView((View)this._content_view);
-    this._gesture_view = new ASGestureView(paramContext);
-    this._gesture_view.setLayoutParams((ViewGroup.LayoutParams)new LayoutParams(-1, -1));
-    this._gesture_view.setDelegate(this);
-    addView((View)this._gesture_view);
+    this._content_view.setLayoutParams(new LayoutParams(-1, -1));
+    addView(this._content_view);
+    ASGestureView _gesture_view = new ASGestureView(paramContext);
+    _gesture_view.setLayoutParams(new LayoutParams(-1, -1));
+    _gesture_view.setDelegate(this);
+    addView(_gesture_view);
   }
   
   public ASPageView getBackgroundView() {
@@ -64,19 +59,19 @@ public class ASNavigationControllerView extends ASPageView implements ASGestureV
   }
   
   public boolean onASGestureReceivedGestureDown() {
-    return (this._page_controller != null) ? this._page_controller.onReceivedGestureDown() : false;
+    return this._page_controller != null && this._page_controller.onReceivedGestureDown();
   }
   
   public boolean onASGestureReceivedGestureLeft() {
-    return (this._page_controller != null) ? this._page_controller.onReceivedGestureLeft() : false;
+    return this._page_controller != null && this._page_controller.onReceivedGestureLeft();
   }
   
   public boolean onASGestureReceivedGestureRight() {
-    return (this._page_controller != null) ? this._page_controller.onReceivedGestureRight() : false;
+    return this._page_controller != null && this._page_controller.onReceivedGestureRight();
   }
   
   public boolean onASGestureReceivedGestureUp() {
-    return (this._page_controller != null) ? this._page_controller.onReceivedGestureUp() : false;
+    return this._page_controller != null && this._page_controller.onReceivedGestureUp();
   }
   
   protected void onSizeChanged(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {

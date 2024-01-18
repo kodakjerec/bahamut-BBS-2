@@ -7,7 +7,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.kota.Bahamut.DataModels.Bookmark;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 
 public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
     private View _divider_bottom = null;
@@ -33,8 +33,8 @@ public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.board_extend_optional_page_history_item_view, this);
-        this._title_label = (TextView) findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_Title);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.board_extend_optional_page_history_item_view, this);
+        this._title_label = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_Title);
         this._divider_top = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_DividerTop);
         this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_DividerBottom);
     }
@@ -44,11 +44,11 @@ public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
             return;
         }
         if (visible) {
-            if (this._divider_top.getVisibility() != 0) {
-                this._divider_top.setVisibility(0);
+            if (this._divider_top.getVisibility() != View.VISIBLE) {
+                this._divider_top.setVisibility(View.VISIBLE);
             }
-        } else if (this._divider_top.getVisibility() != 8) {
-            this._divider_top.setVisibility(8);
+        } else if (this._divider_top.getVisibility() != View.GONE) {
+            this._divider_top.setVisibility(View.GONE);
         }
     }
 
@@ -57,17 +57,17 @@ public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
             return;
         }
         if (visible) {
-            if (this._divider_bottom.getVisibility() != 0) {
-                this._divider_bottom.setVisibility(0);
+            if (this._divider_bottom.getVisibility() != View.VISIBLE) {
+                this._divider_bottom.setVisibility(View.VISIBLE);
             }
-        } else if (this._divider_bottom.getVisibility() != 8) {
-            this._divider_bottom.setVisibility(8);
+        } else if (this._divider_bottom.getVisibility() != View.GONE) {
+            this._divider_bottom.setVisibility(View.GONE);
         }
     }
 
     public void setTitle(String title) {
         if (this._title_label != null) {
-            if (title == null || title.length() <= 0) {
+            if (title == null || title.length() == 0) {
                 this._title_label.setText("未輸入");
             } else {
                 this._title_label.setText(title);
@@ -76,6 +76,6 @@ public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
     }
 
     public void clear() {
-        setTitle((String) null);
+        setTitle(null);
     }
 }

@@ -3,7 +3,6 @@ package com.kota.Bahamut.Pages;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.Button;
 import android.widget.ListView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
@@ -44,9 +43,9 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         ListView list_view = (ListView) findViewById(R.id.ClassPage_ListView);
         list_view.setEmptyView(findViewById(R.id.ClassPage_ListEmptyView));
         setListView(list_view);
-        ((Button) findViewById(R.id.ClassPage_SearchButton)).setOnClickListener(this);
-        ((Button) findViewById(R.id.ClassPage_FirstPageButton)).setOnClickListener(this);
-        ((Button) findViewById(R.id.ClassPage_LastestPageButton)).setOnClickListener(this);
+        findViewById(R.id.ClassPage_SearchButton).setOnClickListener(this);
+        findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
+        findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
     }
 
     public void onPageDidDisappear() {
@@ -202,6 +201,8 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
 
     public void loadItemAtIndex(int index) {
         ClassPageItem item = (ClassPageItem) getItem(index);
+        if (item == null) return;
+
         if (item.isDirectory) {
             PageContainer.getInstance().pushClassPage(item.Name, item.Title);
             getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
@@ -213,6 +214,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         super.loadItemAtIndex(index);
     }
 
+    // 填入看板
     public View getView(int index, View itemView, ViewGroup parentView) {
         int item_index = index + 1;
         int item_block = ItemUtils.getBlock(item_index);

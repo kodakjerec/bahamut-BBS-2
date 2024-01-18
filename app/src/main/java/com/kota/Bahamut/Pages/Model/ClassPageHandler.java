@@ -42,9 +42,23 @@ public class ClassPageHandler {
                 board_name_end = j + 9;
                 j++;
             }
+            int board_manager_start = 65;
+            // 看板英文名稱
             String board_name = row.getSpaceString(9, board_name_end).trim();
-            String board_title = row.getSpaceString(board_name_end + 1, 64).trim();
-            String board_manager = row.getSpaceString(65, 79).trim();
+            // 看板中文名稱
+            // 先取得除英文名稱外全字串, 扣除版主群後, 剩下的就是看板中文名稱
+            String board_title = row.getSpaceString(board_name_end + 1,row.data.length-1).trim();
+            for (int bb = board_title.length()-1; bb>=0;bb--) {
+                if (board_title.charAt(bb)==32) {
+                    board_manager_start = bb;
+                    break;
+                }
+            }
+            // 版主群
+            String board_manager = board_title.substring(board_manager_start+1, board_title.length());
+
+            // 得到看板中文名稱
+            board_title = board_title.replace(board_manager, "");
             ClassPageItem item = ClassPageItem.create();
             if (board_name.endsWith("/")) {
                 item.isDirectory = true;

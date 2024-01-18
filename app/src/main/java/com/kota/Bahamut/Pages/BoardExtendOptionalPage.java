@@ -10,7 +10,6 @@ import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.Bookmark;
@@ -19,7 +18,7 @@ import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.ArrayList;
@@ -35,10 +34,8 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
     private Button _bookmark_button = null;
     protected TelnetHeaderItemView _header_view = null;
     private Button _history_button = null;
-    private final List<Bookmark> _list = new ArrayList();
-    private View _list_empty_view = null;
-    private ListView _list_view = null;
-    private BoardExtendOptionalPageListener _listener = null;
+    private final List<Bookmark> _list = new ArrayList<>();
+    private final BoardExtendOptionalPageListener _listener;
     private int _mode = 0;
     private Button _selected_button = null;
     private Button[] _tab_buttons = null;
@@ -62,12 +59,12 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
         super.onPageDidLoad();
         this._header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_HeaderView);
         this._header_view.setData("我的書籤", this._board_name, "");
-        this._list_empty_view = findViewById(R.id.BoardExtendOptionalPage_ListEmptyView);
-        this._list_view = (ListView) findViewById(R.id.BoardExtendOptionalPage_ListView);
-        this._list_view.setAdapter(this);
-        this._list_view.setOnItemClickListener(this);
-        this._list_view.setOnItemLongClickListener(this);
-        this._list_view.setEmptyView(this._list_empty_view);
+        View _list_empty_view = findViewById(R.id.BoardExtendOptionalPage_ListEmptyView);
+        ListView _list_view = (ListView) findViewById(R.id.BoardExtendOptionalPage_ListView);
+        _list_view.setAdapter(this);
+        _list_view.setOnItemClickListener(this);
+        _list_view.setOnItemLongClickListener(this);
+        _list_view.setEmptyView(_list_empty_view);
         this._bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_BookmarkButton);
         this._history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_HistoryButton);
         this._water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_WaterBallButton);
@@ -88,7 +85,7 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
     }
 
     public long getItemId(int position) {
-        return (long) position;
+        return position;
     }
 
     public int getItemViewType(int position) {
@@ -156,14 +153,12 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
             return false;
         }
         final int bookmark_index = index;
-        ASAlertDialog.createDialog().setTitle("刪除書籤").setMessage("是否確定要刪除此書籤\"" + getItem(index).getTitle() + "\"?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    BookmarkStore store = new BookmarkStore(BoardExtendOptionalPage.this.getContext());
-                    store.getBookmarkList(BoardExtendOptionalPage.this._board_name).removeBookmark(bookmark_index);
-                    store.store();
-                    BoardExtendOptionalPage.this.notifyDataSetChanged();
-                }
+        ASAlertDialog.createDialog().setTitle("刪除書籤").setMessage("是否確定要刪除此書籤\"" + getItem(index).getTitle() + "\"?").addButton("取消").addButton("刪除").setListener((aDialog, index1) -> {
+            if (index1 == 1) {
+                BookmarkStore store = new BookmarkStore(BoardExtendOptionalPage.this.getContext());
+                store.getBookmarkList(BoardExtendOptionalPage.this._board_name).removeBookmark(bookmark_index);
+                store.store();
+                BoardExtendOptionalPage.this.notifyDataSetChanged();
             }
         }).scheduleDismissOnPageDisappear(this).show();
         return true;
@@ -186,7 +181,7 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
         controllers.remove(controllers.size() - 1);
         controllers.add(page);
         getNavigationController().setViewControllers(controllers, true);
-        if (this._listener != null && bookmark != null) {
+        if (this._listener != null) {
             this._listener.onBoardExtendOptionalPageDidSelectBookmark(bookmark);
         }
     }
@@ -206,10 +201,10 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
             this._selected_button = (Button) aView;
             for (Button tab_button : this._tab_buttons) {
                 if (tab_button == this._selected_button) {
-                    tab_button.setTextColor(getResource().getColorStateList(R.color.tab_item_text_color_selected));
+                    tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_selected));
                     tab_button.setBackgroundResource(R.color.tab_item_background_color_selected);
                 } else {
-                    tab_button.setTextColor(getResource().getColorStateList(R.color.tab_item_text_color_unselected));
+                    tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_unselected));
                     tab_button.setBackgroundResource(R.color.tab_item_background_color_unselected);
                 }
             }

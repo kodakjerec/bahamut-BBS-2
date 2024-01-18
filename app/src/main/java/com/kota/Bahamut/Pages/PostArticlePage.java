@@ -10,7 +10,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.DataModels.ArticleTemp;
@@ -18,10 +17,11 @@ import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
-import com.kota.Bahamut.Dialogs.Dialog_PostArticle_Listener;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
+
+import java.util.Objects;
 
 public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener {
     /* access modifiers changed from: private */
@@ -44,7 +44,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     UserSettings _settings;
     private Button _symbol_button = null;
     private View _title_block = null;
-    private final boolean _title_block_hidden = false;
     private EditText _title_field = null;
     private TextView _title_field_background = null;
     public boolean recover = false;
@@ -140,10 +139,10 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         this._symbol_button.setOnClickListener(this);
         this._hide_title_button = (Button) findViewById(R.id.ArticlePostDialog_Cancel);
         this._hide_title_button.setOnClickListener(this);
-        ((Button) findViewById(R.id.ArticlePostDialog_File)).setOnClickListener(this);
+        findViewById(R.id.ArticlePostDialog_File).setOnClickListener(this);
         this._header_selector = (Spinner) findViewById(R.id.Post_HeaderSelector);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, this._settings.getArticleHeaders());
-        adapter.setDropDownViewResource(17367049);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this._header_selector.setAdapter(adapter);
         this._header_selector.setOnItemSelectedListener(this);
         this._title_block = findViewById(R.id.Post_TitleBlock);
@@ -223,38 +222,32 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         final String send_content = content;
         if (this._article_number != null && this._operation_mode == OperationMode.Reply) {
             Dialog_PostArticle dialog = new Dialog_PostArticle(1);
-            dialog.setListener(new Dialog_PostArticle_Listener() {
-                public void onPostArticleDoneWithTarger(String aTarget, String aSign) {
-                    if (PostArticlePage.this._listener != null) {
-                        PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign);
-                    }
-                    PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                    PostArticlePage.this.clear();
+            dialog.setListener((aTarget, aSign) -> {
+                if (PostArticlePage.this._listener != null) {
+                    PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign);
                 }
+                PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
+                PostArticlePage.this.clear();
             });
             dialog.show();
         } else if (this._article_number != null) {
-            ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?").setListener(new ASAlertDialogListener() {
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    if (index == 1) {
-                        if (PostArticlePage.this._listener != null) {
-                            PostArticlePage.this._listener.onPostDialogEditButtonClicked(PostArticlePage.this, PostArticlePage.this._article_number, send_title, PostArticlePage.this.getEditContent());
-                        }
-                        PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                        PostArticlePage.this.clear();
+            ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?").setListener((aDialog, index) -> {
+                if (index == 1) {
+                    if (PostArticlePage.this._listener != null) {
+                        PostArticlePage.this._listener.onPostDialogEditButtonClicked(PostArticlePage.this, PostArticlePage.this._article_number, send_title, PostArticlePage.this.getEditContent());
                     }
+                    PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
+                    PostArticlePage.this.clear();
                 }
             }).show();
         } else {
             Dialog_PostArticle dialog2 = new Dialog_PostArticle(0);
-            dialog2.setListener(new Dialog_PostArticle_Listener() {
-                public void onPostArticleDoneWithTarger(String aTarget, String aSign) {
-                    if (PostArticlePage.this._listener != null) {
-                        PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, (String) null, (String) null, aSign);
-                    }
-                    PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                    PostArticlePage.this.clear();
+            dialog2.setListener((aTarget, aSign) -> {
+                if (PostArticlePage.this._listener != null) {
+                    PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, null, null, aSign);
                 }
+                PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
+                PostArticlePage.this.clear();
             });
             dialog2.show();
         }
@@ -268,11 +261,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     }
 
     public void refresh() {
-        if (this._title_block_hidden) {
-            this._title_block.setVisibility(View.GONE);
-        } else {
-            this._title_block.setVisibility(View.VISIBLE);
-        }
+        this._title_block.setVisibility(View.VISIBLE);
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
@@ -303,9 +292,9 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             }
 
             public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                if (aTitle == "讀取暫存檔") {
+                if (Objects.equals(aTitle, "讀取暫存檔")) {
                     PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
-                } else if (aTitle == "存入暫存檔") {
+                } else if (Objects.equals(aTitle, "存入暫存檔")) {
                     PostArticlePage.this.ontSaveArticleToTempButtonClicked();
                 }
             }
@@ -321,17 +310,11 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
             public void onListDialogItemClicked(ASListDialog aDialog, final int index, String aTitle) {
                 if (index == 0) {
-                    ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?").setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                        public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int button_index) {
-                            PostArticlePage.this.loadTempArticle(10);
-                        }
-                    }).show();
+                    ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?").setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?").addButton("取消").addButton("確定").setListener((aDialog12, button_index) -> PostArticlePage.this.loadTempArticle(10)).show();
                 } else {
-                    ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以暫存檔." + index + "的內容取代您現在編輯的內容?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                        public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int button_index) {
-                            if (button_index == 1) {
-                                PostArticlePage.this.loadTempArticle(index - 1);
-                            }
+                    ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以暫存檔." + index + "的內容取代您現在編輯的內容?").addButton("取消").addButton("確定").setListener((aDialog1, button_index) -> {
+                        if (button_index == 1) {
+                            PostArticlePage.this.loadTempArticle(index - 1);
                         }
                     }).show();
                 }
@@ -355,11 +338,9 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             }
 
             public void onListDialogItemClicked(ASListDialog aDialog, final int index, String aTitle) {
-                ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                    public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int button_index) {
-                        if (button_index == 1) {
-                            PostArticlePage.this.saveTempArticle(index);
-                        }
+                ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?").addButton("取消").addButton("確定").setListener((aDialog1, button_index) -> {
+                    if (button_index == 1) {
+                        PostArticlePage.this.saveTempArticle(index);
                     }
                 }).show();
             }
@@ -427,16 +408,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
     /* access modifiers changed from: protected */
     public boolean onBackPressed() {
-        if (this._title_field.getText().toString().length() <= 0 && this._content_field.getText().toString().length() <= 0) {
+        if (this._title_field.getText().toString().length() == 0 && this._content_field.getText().toString().length() == 0) {
             return super.onBackPressed();
         }
-        ASAlertDialog.createDialog().setTitle("文章").setMessage("是否要放棄此編輯內容?").addButton("取消").addButton("放棄").addButton("存檔").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    PostArticlePage.this.getNavigationController().popViewController();
-                } else if (index == 2) {
-                    PostArticlePage.this.ontSaveArticleToTempAndLeaveButtonClicked();
-                }
+        ASAlertDialog.createDialog().setTitle("文章").setMessage("是否要放棄此編輯內容?").addButton("取消").addButton("放棄").addButton("存檔").setListener((aDialog, index) -> {
+            if (index == 1) {
+                PostArticlePage.this.getNavigationController().popViewController();
+            } else if (index == 2) {
+                PostArticlePage.this.ontSaveArticleToTempAndLeaveButtonClicked();
             }
         }).show();
         return true;
@@ -450,14 +429,12 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             }
 
             public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?").addButton("取消").addButton("確定").setListener(new ASAlertDialogListener() {
-                    public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                        if (index == 0) {
-                            PostArticlePage.this.onBackPressed();
-                        } else if (index == 1) {
-                            PostArticlePage.this.saveTempArticle(index);
-                            PostArticlePage.this.getNavigationController().popViewController();
-                        }
+                ASAlertDialog.createDialog().setTitle("讀取暫存檔").setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?").addButton("取消").addButton("確定").setListener((aDialog1, index1) -> {
+                    if (index1 == 0) {
+                        PostArticlePage.this.onBackPressed();
+                    } else if (index1 == 1) {
+                        PostArticlePage.this.saveTempArticle(index1);
+                        PostArticlePage.this.getNavigationController().popViewController();
                     }
                 }).show();
             }

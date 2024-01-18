@@ -8,8 +8,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
-import androidx.core.view.ViewCompat;
-
 import com.kota.ASFramework.Thread.ASRunner;
 import java.util.Iterator;
 import java.util.Vector;
@@ -18,20 +16,19 @@ import java.util.Vector;
 public class ASNavigationController extends Activity {
   private static ASNavigationController _current_controller = null;
   private ASDeviceController _device_controller = null;
-  private DisplayMetrics _display_metrics = new DisplayMetrics();
+  private final DisplayMetrics _display_metrics = new DisplayMetrics();
   private ASNavigationControllerView _root_view = null;
-  private Vector<ASViewController> _controllers = new Vector<>();
-  private Vector<ASViewController> _temp_controllers = new Vector<>();
-  private Vector<ASViewController> _remove_list = new Vector<>();
-  private Vector<ASViewController> _add_list = new Vector<>();
+  private final Vector<ASViewController> _controllers = new Vector<>();
+  private final Vector<ASViewController> _temp_controllers = new Vector<>();
+  private final Vector<ASViewController> _remove_list = new Vector<>();
+  private final Vector<ASViewController> _add_list = new Vector<>();
   private boolean _animation_enable = true;
   private boolean _in_background = false;
-  private Vector<PageCommand> _page_commands = new Vector<>();
+  private final Vector<PageCommand> _page_commands = new Vector<>();
   private boolean _is_animating = false;
 
-  /* JADX INFO: Access modifiers changed from: private */
   /* loaded from: classes.dex */
-  public abstract class PageCommand {
+  public abstract static class PageCommand {
     public boolean animated;
 
     public abstract void run();
@@ -68,18 +65,12 @@ public class ASNavigationController extends Activity {
 
   private boolean onMenuPressed() {
     ASViewController page = getTopController();
-    if (page == null || !page.onMenuButtonClicked()) {
-      return false;
-    }
-    return true;
+    return page != null && page.onMenuButtonClicked();
   }
 
   private boolean onSearchPressed() {
     ASViewController page = getTopController();
-    if (page == null || !page.onSearchButtonClicked()) {
-      return false;
-    }
-    return true;
+    return page != null && page.onSearchButtonClicked();
   }
 
   @Override // android.app.Activity
@@ -115,26 +106,21 @@ public class ASNavigationController extends Activity {
   @Override // android.app.Activity, android.view.KeyEvent.Callback
   public boolean onKeyLongPress(int keyCode, KeyEvent event) {
     if (keyCode == 4) {
-      boolean result = onBackLongPressed();
-      return result;
+      return onBackLongPressed();
     }
-    boolean result2 = super.onKeyLongPress(keyCode, event);
-    return result2;
+    return super.onKeyLongPress(keyCode, event);
   }
 
   @Override // android.app.Activity, android.view.KeyEvent.Callback
   public boolean onKeyUp(int keyCode, KeyEvent event) {
     switch (keyCode) {
       case 82:
-        boolean result = onMenuPressed();
-        return result;
+        return onMenuPressed();
       case 83:
       default:
-        boolean result2 = super.onKeyUp(keyCode, event);
-        return result2;
+        return super.onKeyUp(keyCode, event);
       case 84:
-        boolean result3 = onSearchPressed();
-        return result3;
+        return onSearchPressed();
     }
   }
 
@@ -151,37 +137,22 @@ public class ASNavigationController extends Activity {
   private void buildPageView(ASViewController controller) {
     ASPageView page_view = new ASPageView(this);
     page_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
-    page_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
-    page_view.setAnimationCacheEnabled(false);
+    page_view.setBackgroundColor(View.MEASURED_STATE_MASK);
+    page_view.setLayerType(View.LAYER_TYPE_NONE, null);
     getLayoutInflater().inflate(controller.getPageLayout(), page_view);
     controller.setPageView(page_view);
-    this._root_view.getContentView().addView(page_view);
+    this._root_view.addView(page_view);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
   public void cleanPageView(ASViewController controller) {
     controller.setPageView(null);
   }
 
-  public void addPageView(final ASViewController aPage) {
-    final View page_view = aPage.getPageView();
-    this._root_view.post(new Runnable() { // from class: com.kumi.ASFramework.PageController.ASNavigationController.1
-      @Override // java.lang.Runnable
-      public void run() {
-        aPage.onPageDidDisappear();
-        ASNavigationController.this._root_view.removeView(page_view);
-      }
-    });
-  }
-
   public void removePageView(final ASViewController aPage) {
     final View page_view = aPage.getPageView();
-    this._root_view.post(new Runnable() { // from class: com.kumi.ASFramework.PageController.ASNavigationController.2
-      @Override // java.lang.Runnable
-      public void run() {
-        aPage.onPageDidDisappear();
-        ASNavigationController.this._root_view.removeView(page_view);
-      }
+    this._root_view.post(() -> {
+      aPage.onPageDidDisappear();
+      ASNavigationController.this._root_view.removeView(page_view);
     });
   }
 
@@ -204,7 +175,6 @@ public class ASNavigationController extends Activity {
     page_view.startAnimation(aAnimation);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
   public void animatePopViewController(final ASViewController aRemovePage, final ASViewController aAddPage, boolean animated) {
     if (aRemovePage != null) {
       aRemovePage.notifyPageWillDisappear();
@@ -229,19 +199,17 @@ public class ASNavigationController extends Activity {
         Vector<View> remove_list = new Vector<>();
         for (int i = 0; i < ASNavigationController.this._root_view.getContentView().getChildCount(); i++) {
           View page_view = ASNavigationController.this._root_view.getContentView().getChildAt(i);
+          assert aAddPage != null;
           if (page_view != aAddPage.getPageView()) {
             remove_list.add(page_view);
           }
         }
-        Iterator<View> it = remove_list.iterator();
-        while (it.hasNext()) {
-          View view = it.next();
+        for (View view : remove_list) {
           ASNavigationController.this._root_view.getContentView().removeView(view);
         }
+        assert aRemovePage != null;
         ASNavigationController.this.cleanPageView(aRemovePage);
-        Iterator it2 = ASNavigationController.this._controllers.iterator();
-        while (it2.hasNext()) {
-          ASViewController controller = (ASViewController) it2.next();
+        for (ASViewController controller : ASNavigationController.this._controllers) {
           if (controller != aAddPage && controller.getPageView() != null) {
             ASNavigationController.this.cleanPageView(controller);
           }
@@ -254,7 +222,6 @@ public class ASNavigationController extends Activity {
     }.start(animated);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
   public void animatedPushViewController(final ASViewController sourceController, final ASViewController targetController, boolean animated) {
     if (targetController != null) {
       buildPageView(targetController);
@@ -281,15 +248,11 @@ public class ASNavigationController extends Activity {
               remove_list.add(page_view);
             }
           }
-          Iterator<View> it = remove_list.iterator();
-          while (it.hasNext()) {
-            View view = it.next();
+          for (View view : remove_list) {
             ASNavigationController.this._root_view.getContentView().removeView(view);
           }
         }
-        Iterator it2 = ASNavigationController.this._controllers.iterator();
-        while (it2.hasNext()) {
-          ASViewController controller = (ASViewController) it2.next();
+        for (ASViewController controller : ASNavigationController.this._controllers) {
           if (controller != targetController && controller.getPageView() != null) {
             ASNavigationController.this.cleanPageView(controller);
           }
@@ -312,7 +275,7 @@ public class ASNavigationController extends Activity {
       @Override // com.kumi.ASFramework.PageController.ASNavigationController.PageCommand
       public void run() {
         if (aController != null) {
-          if (ASNavigationController.this._temp_controllers.size() <= 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
+          if (ASNavigationController.this._temp_controllers.size() == 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
             ASNavigationController.this._temp_controllers.add(aController);
           }
         }
@@ -349,7 +312,7 @@ public class ASNavigationController extends Activity {
       @Override // com.kumi.ASFramework.PageController.ASNavigationController.PageCommand
       public void run() {
         if (aController != null) {
-          if (ASNavigationController.this._temp_controllers.size() <= 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
+          if (ASNavigationController.this._temp_controllers.size() == 0 || aController != ASNavigationController.this._temp_controllers.lastElement()) {
             while (ASNavigationController.this._temp_controllers.size() > 0 && ASNavigationController.this._temp_controllers.lastElement() != aController) {
               ASNavigationController.this._temp_controllers.remove(ASNavigationController.this._temp_controllers.size() - 1);
             }
@@ -384,30 +347,26 @@ public class ASNavigationController extends Activity {
     new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASNavigationController.10
       @Override // com.kumi.ASFramework.Thread.ASRunner
       public void run() {
-        ASViewController source_controller = ASNavigationController.this._controllers.size() > 0 ? (ASViewController) ASNavigationController.this._controllers.lastElement() : null;
-        ASViewController target_controller = ASNavigationController.this._temp_controllers.size() > 0 ? (ASViewController) ASNavigationController.this._temp_controllers.lastElement() : null;
+        ASViewController source_controller = ASNavigationController.this._controllers.size() > 0 ? ASNavigationController.this._controllers.lastElement() : null;
+        ASViewController target_controller = ASNavigationController.this._temp_controllers.size() > 0 ? ASNavigationController.this._temp_controllers.lastElement() : null;
         boolean pop = ASNavigationController.this._controllers.contains(target_controller);
-        Iterator it = ASNavigationController.this._controllers.iterator();
-        while (it.hasNext()) {
-          ASViewController controller = (ASViewController) it.next();
+        // 準備移除
+        for (ASViewController controller : ASNavigationController.this._controllers) {
           controller.prepareForRemove();
         }
-        Iterator it2 = ASNavigationController.this._temp_controllers.iterator();
-        while (it2.hasNext()) {
-          ASViewController controller2 = (ASViewController) it2.next();
+        // 準備新增
+        for (ASViewController controller2 : ASNavigationController.this._temp_controllers) {
           controller2.prepareForAdd();
         }
-        Iterator it3 = ASNavigationController.this._controllers.iterator();
-        while (it3.hasNext()) {
-          ASViewController controller3 = (ASViewController) it3.next();
+        // 要移除的加進移除柱列
+        for (ASViewController controller3 : ASNavigationController.this._controllers) {
           if (controller3.isMarkedRemoved()) {
             ASNavigationController.this._remove_list.add(controller3);
           }
           controller3.cleanMark();
         }
-        Iterator it4 = ASNavigationController.this._temp_controllers.iterator();
-        while (it4.hasNext()) {
-          ASViewController controller4 = (ASViewController) it4.next();
+        // 要新增的加進新增柱列
+        for (ASViewController controller4 : ASNavigationController.this._temp_controllers) {
           if (controller4.isMarkedAdded()) {
             controller4.setNavigationController(ASNavigationController.this);
             ASNavigationController.this._add_list.add(controller4);
@@ -416,14 +375,12 @@ public class ASNavigationController extends Activity {
         }
         ASNavigationController.this._controllers.removeAllElements();
         ASNavigationController.this._controllers.addAll(ASNavigationController.this._temp_controllers);
-        Iterator it5 = ASNavigationController.this._add_list.iterator();
-        while (it5.hasNext()) {
-          ASViewController controller5 = (ASViewController) it5.next();
+        // 通知新增畫面準備新增
+        for (ASViewController controller5 : ASNavigationController.this._add_list) {
           controller5.notifyPageDidAddToNavigationController();
         }
-        Iterator it6 = ASNavigationController.this._remove_list.iterator();
-        while (it6.hasNext()) {
-          ASViewController controller6 = (ASViewController) it6.next();
+        // 通知移除畫面準備移除
+        for (ASViewController controller6 : ASNavigationController.this._remove_list) {
           controller6.notifyPageDidRemoveFromNavigationController();
         }
         ASNavigationController.this._add_list.clear();
@@ -447,7 +404,6 @@ public class ASNavigationController extends Activity {
     return this._controllers.contains(aController);
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
   public void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
     ASViewController page = getTopController();
     if (page != null) {
@@ -528,7 +484,6 @@ public class ASNavigationController extends Activity {
     this._animation_enable = enable;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
   @Override // android.app.Activity
   public void onPause() {
     super.onPause();
@@ -550,9 +505,7 @@ public class ASNavigationController extends Activity {
   }
 
   public void printControllers(Vector<ASViewController> controllers) {
-    Iterator<ASViewController> it = controllers.iterator();
-    while (it.hasNext()) {
-      ASViewController controller = it.next();
+    for (ASViewController controller : controllers) {
       System.out.print(controller.getPageType() + " ");
     }
     System.out.print("\n");
@@ -573,7 +526,7 @@ public class ASNavigationController extends Activity {
 
   public void executePageCommand() {
     synchronized (this) {
-      if (!this._is_animating) {
+      if(!this._is_animating) {
         synchronized (this._page_commands) {
           if (this._page_commands.size() > 0) {
             synchronized (this) {
@@ -591,7 +544,6 @@ public class ASNavigationController extends Activity {
     }
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
   public void onPageCommandExecuteFinished() {
     synchronized (this) {
       this._is_animating = false;

@@ -7,8 +7,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
@@ -24,10 +24,12 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;
+
+import java.util.Objects;
 import java.util.Vector;
 
 public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_SearchArticle_Listener, Dialog_SelectArticle_Listener, SendMailPage_Listener, View.OnClickListener, View.OnLongClickListener {
@@ -60,7 +62,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
         this._page_down_button = (Button) findViewById(R.id.Mail_PageDownButton);
         this._page_down_button.setOnClickListener(this);
         this._page_down_button.setOnLongClickListener(this);
-        ((Button) findViewById(R.id.Mail_SearchButton)).setOnClickListener(this);
+        findViewById(R.id.Mail_SearchButton).setOnClickListener(this);
         this._header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_HeaderView);
     }
 
@@ -112,7 +114,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     public void onSearchDialogSearchButtonClickedWithValues(Vector<String> values) {
-        pushCommand(new BahamutCommandSearchArticle(values.get(0), values.get(1), values.get(2) == "YES" ? "y" : "n", values.get(3)));
+        pushCommand(new BahamutCommandSearchArticle(values.get(0), values.get(1), Objects.equals(values.get(2), "YES") ? "y" : "n", values.get(3)));
     }
 
     public void onSelectDialogDismissWIthIndex(String aIndexString) {
@@ -132,12 +134,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     private void onDeleteArticle(final int itemIndex) {
-        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此信件?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    MailBoxPage.this.pushCommand(new BahamutCommandDeleteArticle(itemIndex));
-                    return;
-                }
+        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此信件?").addButton("取消").addButton("刪除").setListener((aDialog, index) -> {
+            if (index == 1) {
+                MailBoxPage.this.pushCommand(new BahamutCommandDeleteArticle(itemIndex));
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -146,29 +145,23 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
         int get_id = aView.getId();
         if (get_id == R.id.Mail_PageDownButton) {
             return true;
-        } else if (get_id == R.id.Mail_PageUpButton) {
-            return true;
+        } else {
+            return get_id == R.id.Mail_PageUpButton;
         }
-        return false;
     }
 
     public void onClick(View aView) {
         int get_id = aView.getId();
         if (get_id == R.id.Mail_BackButton) {
             onPostButtonClicked();
-            return;
         } else if (get_id == R.id.Mail_PageDownButton) {
             setManualLoadPage();
             moveToLastPosition();
-            return;
         }else if (get_id == R.id.Mail_PageUpButton) {
             moveToFirstPosition();
-            return;
         }else if (get_id == R.id.Mail_SearchButton) {
             showSelectArticleDialog();
-            return;
         }
-        return;
     }
 
     public boolean onReceivedGestureRight() {
@@ -182,12 +175,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     public void goodArticle(final int articleIndex) {
-        ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    MailBoxPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
-                    return;
-                }
+        ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener((aDialog, index) -> {
+            if (index == 1) {
+                MailBoxPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }

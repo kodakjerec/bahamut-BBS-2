@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
@@ -29,7 +28,7 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;
@@ -38,30 +37,29 @@ import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public class ArticlePage extends TelnetPage {
     long _action_delay = 500;
     /* access modifiers changed from: private */
     public TelnetArticle _article = null;
-    View.OnClickListener _back_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            if (!TelnetClient.getConnector().isConnecting()) {
-                ArticlePage.this.showConnectionClosedToast();
-            } else if (ArticlePage.this._article != null) {
-                PostArticlePage page = new PostArticlePage();
-                String reply_title = ArticlePage.this._article.generateReplyTitle();
-                ArticlePage.this._article.setBlockList(ArticlePage.this._settings.getBlockListLowCasedString());
-                String reply_content = ArticlePage.this._article.generateReplyContent();
-                page.setBoardPage(ArticlePage.this._board_page);
-                page.setOperationMode(PostArticlePage.OperationMode.Reply);
-                page.setArticleNumber(String.valueOf(ArticlePage.this._article.Number));
-                page.setPostTitle(reply_title);
-                page.setPostContent(reply_content + "\n\n\n");
-                page.setListener(ArticlePage.this._board_page);
-                page.setHeaderHidden(true);
-                ArticlePage.this.getNavigationController().pushViewController(page);
-            }
+    View.OnClickListener _back_listener = v -> {
+        if (!TelnetClient.getConnector().isConnecting()) {
+            ArticlePage.this.showConnectionClosedToast();
+        } else if (ArticlePage.this._article != null) {
+            PostArticlePage page = new PostArticlePage();
+            String reply_title = ArticlePage.this._article.generateReplyTitle();
+            ArticlePage.this._article.setBlockList(ArticlePage.this._settings.getBlockListLowCasedString());
+            String reply_content = ArticlePage.this._article.generateReplyContent();
+            page.setBoardPage(ArticlePage.this._board_page);
+            page.setOperationMode(PostArticlePage.OperationMode.Reply);
+            page.setArticleNumber(String.valueOf(ArticlePage.this._article.Number));
+            page.setPostTitle(reply_title);
+            page.setPostContent(reply_content + "\n\n\n");
+            page.setListener(ArticlePage.this._board_page);
+            page.setHeaderHidden(true);
+            ArticlePage.this.getNavigationController().pushViewController(page);
         }
     };
     /* access modifiers changed from: private */
@@ -84,7 +82,7 @@ public class ArticlePage extends TelnetPage {
         }
 
         public long getItemId(int itemIndex) {
-            return (long) itemIndex;
+            return itemIndex;
         }
 
         public int getItemViewType(int itemIndex) {
@@ -94,7 +92,7 @@ public class ArticlePage extends TelnetPage {
             if (itemIndex == getCount() - 1) {
                 return 3;
             }
-            return getItem(itemIndex).getType();
+            return Objects.requireNonNull(getItem(itemIndex)).getType();
         }
 
         public View getView(int itemIndex, View itemView, ViewGroup parentView) {
@@ -120,27 +118,17 @@ public class ArticlePage extends TelnetPage {
                 case 0:
                     TelnetArticleItem item = getItem(itemIndex);
                     ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemView;
-                    item_view.setAuthor(item.getAuthor(), item.getNickname());
+                    item_view.setAuthor(Objects.requireNonNull(item).getAuthor(), item.getNickname());
                     item_view.setQuote(item.getQuoteLevel());
                     item_view.setContent(item.getContent());
                     item_view.setDividerhidden(itemIndex >= getCount() - 2);
-                    if (ArticlePage.this._settings.isBlockListEnable() && ArticlePage.this._settings.isBlockListContains(item.getAuthor())) {
-                        item_view.setVisible(false);
-                        break;
-                    } else {
-                        item_view.setVisible(true);
-                        break;
-                    }
+                    item_view.setVisible(!ArticlePage.this._settings.isBlockListEnable() || !ArticlePage.this._settings.isBlockListContains(item.getAuthor()));
+                    break;
                 case 1:
                     ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemView;
-                    item_view2.setFrame(getItem(itemIndex).getFrame());
-                    if (itemIndex >= getCount() - 2) {
-                        item_view2.setDividerhidden(true);
-                        break;
-                    } else {
-                        item_view2.setDividerhidden(false);
-                        break;
-                    }
+                    item_view2.setFrame(Objects.requireNonNull(getItem(itemIndex)).getFrame());
+                    item_view2.setDividerhidden(itemIndex >= getCount() - 2);
+                    break;
                 case 2:
                     ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
                     String author = null;
@@ -188,113 +176,84 @@ public class ArticlePage extends TelnetPage {
             return type == 0 || type == 1;
         }
     };
-    AdapterView.OnItemLongClickListener _list_long_click_listener = new AdapterView.OnItemLongClickListener() {
-        public boolean onItemLongClick(AdapterView<?> adapterView, View arg1, int itemIndex, long arg3) {
-            TelnetArticleItem item;
-            if (ArticlePage.this._article == null || (item = ArticlePage.this._article.getItem(itemIndex - 1)) == null) {
-                return false;
-            }
-            int type = item.getType();
-            if (type == 0) {
-                item.setType(1);
-                ArticlePage.this._list_adapter.notifyDataSetChanged();
-                return true;
-            } else if (type != 1) {
-                return false;
-            } else {
-                item.setType(0);
-                ArticlePage.this._list_adapter.notifyDataSetChanged();
-                return true;
-            }
-        }
-    };
-    View.OnLongClickListener _page_bottom_listener = new View.OnLongClickListener() {
-        public boolean onLongClick(View v) {
-            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
-                if (ArticlePage.this._bottom_action != null) {
-                    v.removeCallbacks(ArticlePage.this._bottom_action);
-                    ArticlePage.this._bottom_action = null;
-                }
-                ArticlePage.this._bottom_action = new Runnable() {
-                    public void run() {
-                        ArticlePage.this._bottom_action = null;
-                        ArticlePage.this.moveToBottomArticle();
-                    }
-                };
-                v.postDelayed(ArticlePage.this._bottom_action, ArticlePage.this._action_delay);
-            }
+    AdapterView.OnItemLongClickListener _list_long_click_listener = (adapterView, arg1, itemIndex, arg3) -> {
+        TelnetArticleItem item;
+        if (ArticlePage.this._article == null || (item = ArticlePage.this._article.getItem(itemIndex - 1)) == null) {
             return false;
         }
+        int type = item.getType();
+        if (type == 0) {
+            item.setType(1);
+            ArticlePage.this._list_adapter.notifyDataSetChanged();
+            return true;
+        } else if (type != 1) {
+            return false;
+        } else {
+            item.setType(0);
+            ArticlePage.this._list_adapter.notifyDataSetChanged();
+            return true;
+        }
     };
-    View.OnClickListener _page_down_listener = new View.OnClickListener() {
-        public void onClick(View v) {
+    View.OnLongClickListener _page_bottom_listener = v -> {
+        if (!ArticlePage.this._settings.isArticleMoveDisable()) {
             if (ArticlePage.this._bottom_action != null) {
                 v.removeCallbacks(ArticlePage.this._bottom_action);
+            }
+            ArticlePage.this._bottom_action = () -> {
                 ArticlePage.this._bottom_action = null;
-            }
-            if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
-                ArticlePage.this.showConnectionClosedToast();
-            } else {
-                ArticlePage.this._board_page.loadTheSameTitleDown();
-            }
+                ArticlePage.this.moveToBottomArticle();
+            };
+            v.postDelayed(ArticlePage.this._bottom_action, ArticlePage.this._action_delay);
+        }
+        return false;
+    };
+    View.OnClickListener _page_down_listener = v -> {
+        if (ArticlePage.this._bottom_action != null) {
+            v.removeCallbacks(ArticlePage.this._bottom_action);
+            ArticlePage.this._bottom_action = null;
+        }
+        if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
+            ArticlePage.this.showConnectionClosedToast();
+        } else {
+            ArticlePage.this._board_page.loadTheSameTitleDown();
         }
     };
-    View.OnLongClickListener _page_top_listener = new View.OnLongClickListener() {
-        public boolean onLongClick(View v) {
-            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
-                if (ArticlePage.this._top_action != null) {
-                    v.removeCallbacks(ArticlePage.this._top_action);
-                    ArticlePage.this._top_action = null;
-                }
-                ArticlePage.this._top_action = new Runnable() {
-                    public void run() {
-                        ArticlePage.this._top_action = null;
-                        ArticlePage.this.moveToTopArticle();
-                    }
-                };
-                v.postDelayed(ArticlePage.this._top_action, ArticlePage.this._action_delay);
-            }
-            return false;
-        }
-    };
-    View.OnClickListener _page_up_listener = new View.OnClickListener() {
-        public void onClick(View v) {
+    View.OnLongClickListener _page_top_listener = v -> {
+        if (!ArticlePage.this._settings.isArticleMoveDisable()) {
             if (ArticlePage.this._top_action != null) {
                 v.removeCallbacks(ArticlePage.this._top_action);
                 ArticlePage.this._top_action = null;
             }
-            if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
-                ArticlePage.this.showConnectionClosedToast();
-            } else {
-                ArticlePage.this._board_page.loadTheSameTitleUp();
-            }
+            ArticlePage.this._top_action = () -> {
+                ArticlePage.this._top_action = null;
+                ArticlePage.this.moveToTopArticle();
+            };
+            v.postDelayed(ArticlePage.this._top_action, ArticlePage.this._action_delay);
+        }
+        return false;
+    };
+    View.OnClickListener _page_up_listener = v -> {
+        if (ArticlePage.this._top_action != null) {
+            v.removeCallbacks(ArticlePage.this._top_action);
+            ArticlePage.this._top_action = null;
+        }
+        if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
+            ArticlePage.this.showConnectionClosedToast();
+        } else {
+            ArticlePage.this._board_page.loadTheSameTitleUp();
         }
     };
     UserSettings _settings;
     private TelnetView _telnet_view = null;
     Runnable _top_action = null;
-    private final View.OnClickListener mChangeModeListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            ArticlePage.this.changeViewMode();
-            ArticlePage.this.refreshExternalToolbar();
-        }
+    private final View.OnClickListener mChangeModeListener = v -> {
+        ArticlePage.this.changeViewMode();
+        ArticlePage.this.refreshExternalToolbar();
     };
-    private final View.OnClickListener mDoGyListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            ArticlePage.this.onGYButtonClicked();
-        }
-    };
+    private final View.OnClickListener mDoGyListener = v -> ArticlePage.this.onGYButtonClicked();
     /* access modifiers changed from: private */
-    public View.OnClickListener mMenuListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            ArticlePage.this.onMenuClicked();
-        }
-    };
-    private final View.OnClickListener mShowLinkListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            ArticlePage.this.onOpenLinkClicked();
-        }
-    };
+    public View.OnClickListener mMenuListener = v -> ArticlePage.this.onMenuClicked();
+    private final View.OnClickListener mShowLinkListener = v -> ArticlePage.this.onOpenLinkClicked();
 
     public int getPageType() {
         return 14;
@@ -319,7 +278,7 @@ public class ArticlePage extends TelnetPage {
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
         Button page_up_button = (Button) findViewById(R.id.Article_PageUpButton);
         Button page_down_button = (Button) findViewById(R.id.Article_PageDownButton);
-        ((Button) findViewById(R.id.Article_BackButton)).setOnClickListener(this._back_listener);
+        findViewById(R.id.Article_BackButton).setOnClickListener(this._back_listener);
         page_up_button.setOnClickListener(this._page_up_listener);
         page_up_button.setOnLongClickListener(this._page_top_listener);
         page_down_button.setOnClickListener(this._page_down_listener);
@@ -350,7 +309,7 @@ public class ArticlePage extends TelnetPage {
             SharedPreferences perf = activity.getSharedPreferences("notification", 0);
             if (!perf.getBoolean("show_top_bottom_function", false)) {
                 Toast.makeText(activity, R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
-                perf.edit().putBoolean("show_top_bottom_function", true).commit();
+                perf.edit().putBoolean("show_top_bottom_function", true).apply();
             }
         }
     }
@@ -503,13 +462,10 @@ public class ArticlePage extends TelnetPage {
     public void onDeleteButtonClicked() {
         if (this._article != null && this._board_page != null) {
             final int item_number = this._article.Number;
-            ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() {
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    if (index == 1) {
-                        ArticlePage.this._board_page.pushCommand(new BahamutCommandDeleteArticle(item_number));
-                        ArticlePage.this.onBackPressed();
-                        return;
-                    }
+            ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener((aDialog, index) -> {
+                if (index == 1) {
+                    ArticlePage.this._board_page.pushCommand(new BahamutCommandDeleteArticle(item_number));
+                    ArticlePage.this.onBackPressed();
                 }
             }).scheduleDismissOnPageDisappear(this).show();
         }
@@ -648,7 +604,7 @@ public class ArticlePage extends TelnetPage {
                 ASAlertDialog.createDialog().setMessage("無可加入黑名單的ID").show();
                 return;
             }
-            final String[] names = (String[]) buffer.toArray(new String[buffer.size()]);
+            final String[] names = buffer.toArray(new String[0]);
             ASListDialog.createDialog().addItems(names).setListener(new ASListDialogItemClickListener() {
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                     return false;
@@ -662,19 +618,17 @@ public class ArticlePage extends TelnetPage {
     }
 
     public void onBlockButtonClicked(final String aBlockName) {
-        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener(new ASAlertDialogListener() {
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                if (index == 1) {
-                    ArticlePage.this._settings.addBlockName(aBlockName);
-                    ArticlePage.this._settings.notifyDataUpdated();
-                    if (!ArticlePage.this._settings.isBlockListEnable()) {
-                        return;
-                    }
-                    if (aBlockName == ArticlePage.this._article.Author) {
-                        ArticlePage.this.onBackPressed();
-                    } else {
-                        ArticlePage.this._list_adapter.notifyDataSetChanged();
-                    }
+        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
+            if (index == 1) {
+                ArticlePage.this._settings.addBlockName(aBlockName);
+                ArticlePage.this._settings.notifyDataUpdated();
+                if (!ArticlePage.this._settings.isBlockListEnable()) {
+                    return;
+                }
+                if (aBlockName.equals(ArticlePage.this._article.Author)) {
+                    ArticlePage.this.onBackPressed();
+                } else {
+                    ArticlePage.this._list_adapter.notifyDataSetChanged();
                 }
             }
         }).scheduleDismissOnPageDisappear(this).show();

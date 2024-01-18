@@ -1,20 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/Mail_WindowView" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical" android:id="@+id/Mail_ContentView" android:layout_width="match_parent" android:layout_height="match_parent">
-        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-            <com.kota.ASFramework.UI.ASListView android:id="@+id/Mail_ContentList" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:listSelector="@null" android:divider="@color/divider_color" style="@style/List"/>
-            <com.kota.ASFramework.UI.ASScrollView android:id="@+id/Mail_ContentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
-                <com.kota.TelnetUI.TelnetView android:id="@+id/Mail_ContentTelnetView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/Mail_WindowView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/Mail_ContentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <com.kota.ASFramework.UI.ASListView
+                android:id="@+id/Mail_ContentList"
+                style="@style/List"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:divider="@color/divider_color"
+                android:listSelector="@null"
+                android:scrollbars="vertical" />
+
+            <com.kota.ASFramework.UI.ASScrollView
+                android:id="@+id/Mail_ContentTelnetViewBlock"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <com.kota.TelnetUI.TelnetView
+                    android:id="@+id/Mail_ContentTelnetView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
             </com.kota.ASFramework.UI.ASScrollView>
         </FrameLayout>
-        <LinearLayout android:id="@+id/toolbar" style="@style/Toolbar">
-            <Button android:id="@+id/Mail_BackButton" android:text="@string/reply_mail" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/Mail_ChangeModeButton" android:text="@string/change_mode_short" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/Mail_PageUpButton" android:text="@string/prev_article" style="@style/ToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/Mail_PageDownButton" android:text="@string/next_article" style="@style/ToolbarItem"/>
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/Toolbar">
+
+            <Button
+                android:id="@+id/Mail_BackButton"
+                style="@style/ToolbarItem"
+                android:text="@string/reply_mail" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Mail_ChangeModeButton"
+                style="@style/ToolbarItem"
+                android:text="@string/change_mode_short" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Mail_PageUpButton"
+                style="@style/ToolbarItem"
+                android:text="@string/prev_article" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Mail_PageDownButton"
+                style="@style/ToolbarItem"
+                android:text="@string/next_article" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

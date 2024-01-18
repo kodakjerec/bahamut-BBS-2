@@ -1,31 +1,53 @@
 package com.kota.Telnet.Model;
 
+import com.kota.Telnet.TelnetCommand;
 import com.kota.TextEncoder.B2UEncoder;
 
+/* loaded from: classes.dex */
 public class TelnetRow {
-    private static int _count = 0;
-    private TelnetRow _append_row = null;
-    private String _cached_string = null;
-    private int _empty_space = 0;
-    private int _quote_level = -1;
-    private int _quote_space = 0;
-    public byte[] backgroundColor = new byte[80];
-    public byte[] bitSpace = new byte[80];
-    public boolean[] blink = new boolean[80];
-    public byte[] data = new byte[80];
-    public boolean[] italic = new boolean[80];
-    public byte[] textColor = new byte[80];
+    private TelnetRow _append_row;
+    private String _cached_string;
+    private int _empty_space;
+    private int _quote_level;
+    private int _quote_space;
+    public byte[] backgroundColor;
+    public byte[] bitSpace;
+    public boolean[] blink;
+    public byte[] data;
+    public boolean[] italic;
+    public byte[] textColor;
 
-    /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         super.finalize();
     }
 
     public TelnetRow() {
+        this.data = new byte[80];
+        this.textColor = new byte[80];
+        this.backgroundColor = new byte[80];
+        this.blink = new boolean[80];
+        this.italic = new boolean[80];
+        this.bitSpace = new byte[80];
+        this._quote_level = -1;
+        this._quote_space = 0;
+        this._empty_space = 0;
+        this._cached_string = null;
+        this._append_row = null;
         clear();
     }
 
     public TelnetRow(TelnetRow aRow) {
+        this.data = new byte[80];
+        this.textColor = new byte[80];
+        this.backgroundColor = new byte[80];
+        this.blink = new boolean[80];
+        this.italic = new boolean[80];
+        this.bitSpace = new byte[80];
+        this._quote_level = -1;
+        this._quote_space = 0;
+        this._empty_space = 0;
+        this._cached_string = null;
+        this._append_row = null;
         clear();
         set(aRow);
     }
@@ -91,25 +113,20 @@ public class TelnetRow {
 
     private void reloadQuoteSpace() {
         this._quote_level = 0;
-        this._quote_space = 0;
         int space_count = 0;
         this._quote_space = 0;
         while (this._quote_space < this.data.length) {
-            if (this.data[this._quote_space] != 62) {
-                if (this.data[this._quote_space] != 32 || (space_count = space_count + 1) > 1) {
-                    break;
-                }
-            } else {
+            if (this.data[this._quote_space] == 62) {
                 this._quote_level++;
                 space_count = 0;
+            } else if (this.data[this._quote_space] != 32 || (space_count = space_count + 1) > 1) {
+                break;
             }
             this._quote_space++;
         }
         this._empty_space = 0;
-        int i = this.data.length - 1;
-        while (i >= 0 && this.data[i] == 0) {
+        for (int i = this.data.length - 1; i >= 0 && this.data[i] == 0; i--) {
             this._empty_space++;
-            i--;
         }
     }
 
@@ -140,7 +157,8 @@ public class TelnetRow {
                 from_position = position;
             }
             position++;
-            if ((this.data[i] & 255) > 127 && i < to) {
+            int d = this.data[i] & 0xFF;
+            if (d > 127 && i < to) {
                 i++;
             }
             i++;
@@ -150,10 +168,7 @@ public class TelnetRow {
         if (to_position > cached_string.length()) {
             to_position = cached_string.length();
         }
-        if (to_position < from_position) {
-            return "";
-        }
-        return cached_string.substring(from_position, to_position);
+        return to_position < from_position ? "" : cached_string.substring(from_position, to_position);
     }
 
     public boolean isEmpty() {
@@ -171,6 +186,7 @@ public class TelnetRow {
         System.out.println("self become:" + getRawString());
     }
 
+    @Override
     public TelnetRow clone() {
         return new TelnetRow(this);
     }

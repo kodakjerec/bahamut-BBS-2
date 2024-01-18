@@ -2,16 +2,13 @@ package com.kota.Bahamut.Pages;
 
 import android.os.Build;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.ASFramework.Dialog.ASDialogOnBackPressedDelegate;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCursor;
@@ -23,30 +20,24 @@ public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
     int _error_count = 0;
     ASProcessingDialog _login_process_dialog = null;
-    View.OnClickListener _logout_listener = new View.OnClickListener() {
-        public void onClick(View v) {
-            String err_message;
-            LoginPage.this._username = ((EditText) LoginPage.this.findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
-            LoginPage.this._password = ((EditText) LoginPage.this.findViewById(R.id.Login_PasswordEdit)).getText().toString().trim();
-            LoginPage.this._save_logon_user = ((CheckBox) LoginPage.this.findViewById(R.id.Login_LoginRememberCheckBox)).isChecked();
-            if (LoginPage.this._username.length() == 0 && LoginPage.this._password.length() == 0) {
-                err_message = "帳號、密碼不可為空，請重新輸入。";
-            } else if (LoginPage.this._username.length() == 0) {
-                err_message = "帳號不可為空，請重新輸入。";
-            } else if (LoginPage.this._password.length() == 0) {
-                err_message = "密碼不可為空，請重新輸入。";
-            } else {
-                err_message = null;
-            }
-            if (err_message != null) {
-                ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_message).addButton("確定").setListener(new ASAlertDialogListener() {
-                    public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                        aDialog.dismiss();
-                    }
-                }).scheduleDismissOnPageDisappear(LoginPage.this).show();
-            } else {
-                LoginPage.this.login();
-            }
+    View.OnClickListener _logout_listener = v -> {
+        String err_message;
+        LoginPage.this._username = ((EditText) LoginPage.this.findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
+        LoginPage.this._password = ((EditText) LoginPage.this.findViewById(R.id.Login_PasswordEdit)).getText().toString().trim();
+        LoginPage.this._save_logon_user = ((CheckBox) LoginPage.this.findViewById(R.id.Login_LoginRememberCheckBox)).isChecked();
+        if (LoginPage.this._username.length() == 0 && LoginPage.this._password.length() == 0) {
+            err_message = "帳號、密碼不可為空，請重新輸入。";
+        } else if (LoginPage.this._username.length() == 0) {
+            err_message = "帳號不可為空，請重新輸入。";
+        } else if (LoginPage.this._password.length() == 0) {
+            err_message = "密碼不可為空，請重新輸入。";
+        } else {
+            err_message = null;
+        }
+        if (err_message != null) {
+            ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_message).addButton("確定").setListener((aDialog, index) -> aDialog.dismiss()).scheduleDismissOnPageDisappear(LoginPage.this).show();
+        } else {
+            LoginPage.this.login();
         }
     };
     String _password = "";
@@ -67,9 +58,14 @@ public class LoginPage extends TelnetPage {
 
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
+        // 登入
         getNavigationController().setNavigationTitle("勇者登入");
-        ((Button) findViewById(R.id.Login_LoginButton)).setOnClickListener(this._logout_listener);
+        findViewById(R.id.Login_LoginButton).setOnClickListener(this._logout_listener);
+        // checkbox區塊點擊
+        CheckBox checkBox = (CheckBox) findViewById(R.id.Login_LoginRememberCheckBox);
+        findViewById(R.id.toolbar).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
         this._telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
+        // 讀取預設勇者設定
         loadLogonUser();
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
     }
@@ -107,8 +103,6 @@ public class LoginPage extends TelnetPage {
             sendPassword();
             return false;
         } else {
-            if (cursor.row == 22) {
-            }
             return true;
         }
     }
@@ -184,11 +178,7 @@ public class LoginPage extends TelnetPage {
     /* access modifiers changed from: private */
     public void login() {
         ASProcessingDialog.showProcessingDialog("登入中");
-        new Thread() {
-            public void run() {
-                TelnetClient.getClient().sendStringToServerInBackground(LoginPage.this._username);
-            }
-        }.start();
+        new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground(LoginPage.this._username)).start();
     }
 
     public void onCheckRemoveLogonUser() {
@@ -196,24 +186,20 @@ public class LoginPage extends TelnetPage {
             public void run() {
                 ASProcessingDialog.hideProcessingDialog();
                 if (LoginPage.this._remove_logon_user_dialog == null) {
-                    LoginPage.this._remove_logon_user_dialog = (ASAlertDialog) ASAlertDialog.createDialog().setTitle("提示").setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是").setListener(new ASAlertDialogListener() {
-                        public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                            if (index == 0) {
-                                TelnetClient.getClient().sendStringToServerInBackground("n");
-                            } else {
-                                TelnetClient.getClient().sendStringToServerInBackground("y");
-                            }
-                            LoginPage.this._remove_logon_user_dialog = null;
-                            ASProcessingDialog.showProcessingDialog("登入中");
-                        }
-                    }).setOnBackDelegate(new ASDialogOnBackPressedDelegate() {
-                        public boolean onASDialogBackPressed(ASDialog aDialog) {
+                    LoginPage.this._remove_logon_user_dialog = (ASAlertDialog) ASAlertDialog.createDialog().setTitle("提示").setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是").setListener((aDialog, index) -> {
+                        if (index == 0) {
                             TelnetClient.getClient().sendStringToServerInBackground("n");
-                            LoginPage.this._remove_logon_user_dialog.dismiss();
-                            LoginPage.this._remove_logon_user_dialog = null;
-                            ASProcessingDialog.showProcessingDialog("登入中");
-                            return true;
+                        } else {
+                            TelnetClient.getClient().sendStringToServerInBackground("y");
                         }
+                        LoginPage.this._remove_logon_user_dialog = null;
+                        ASProcessingDialog.showProcessingDialog("登入中");
+                    }).setOnBackDelegate(aDialog -> {
+                        TelnetClient.getClient().sendStringToServerInBackground("n");
+                        LoginPage.this._remove_logon_user_dialog.dismiss();
+                        LoginPage.this._remove_logon_user_dialog = null;
+                        ASProcessingDialog.showProcessingDialog("登入中");
+                        return true;
                     });
                     LoginPage.this._remove_logon_user_dialog.show();
                 }
@@ -269,18 +255,16 @@ public class LoginPage extends TelnetPage {
 
     public void onSaveArticle() {
         if (this._save_unfinished_article_dialog == null) {
-            this._save_unfinished_article_dialog = ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成").addButton("放棄").addButton("寫入暫存檔").setListener(new ASAlertDialogListener() {
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    switch (index) {
-                        case 0:
-                            TelnetClient.getClient().sendStringToServer("Q");
-                            break;
-                        case 1:
-                            TelnetClient.getClient().sendStringToServer("S");
-                            break;
-                    }
-                    LoginPage.this._save_unfinished_article_dialog = null;
+            this._save_unfinished_article_dialog = ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成").addButton("放棄").addButton("寫入暫存檔").setListener((aDialog, index) -> {
+                switch (index) {
+                    case 0:
+                        TelnetClient.getClient().sendStringToServer("Q");
+                        break;
+                    case 1:
+                        TelnetClient.getClient().sendStringToServer("S");
+                        break;
                 }
+                LoginPage.this._save_unfinished_article_dialog = null;
             }).scheduleDismissOnPageDisappear(this);
             this._save_unfinished_article_dialog.show();
         }
