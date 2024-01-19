@@ -1,7 +1,6 @@
 package com.kota.Telnet;
 
-import androidx.annotation.NonNull;
-
+/* loaded from: classes.dex */
 public class TelnetCommand {
     public static final byte AUTH = 37;
     public static final byte DO = -3;
@@ -17,14 +16,20 @@ public class TelnetCommand {
     public static final byte TERMINAL_TYPE = 24;
     public static final byte WILL = -5;
     public static final byte WONT = -4;
-    public byte action = 0;
-    public byte header = 0;
-    public byte option = 0;
+    public byte action;
+    public byte header;
+    public byte option;
 
     public TelnetCommand() {
+        this.header = (byte) 0;
+        this.action = (byte) 0;
+        this.option = (byte) 0;
     }
 
     public TelnetCommand(byte aHeader, byte aAction, byte aOption) {
+        this.header = (byte) 0;
+        this.action = (byte) 0;
+        this.option = (byte) 0;
         this.header = aHeader;
         this.action = aAction;
         this.option = aOption;
@@ -69,11 +74,11 @@ public class TelnetCommand {
             case 39:
                 return "NEW_ENV";
             default:
-                return "UNKNOW(" + aCommand + ")";
+                String name = "UNKNOW(" + aCommand + ")";
+                return name;
         }
     }
 
-    @NonNull
     public String toString() {
         return getCommandNameString(this.header) + "," + getCommandNameString(this.action) + "," + getCommandNameString(this.option);
     }

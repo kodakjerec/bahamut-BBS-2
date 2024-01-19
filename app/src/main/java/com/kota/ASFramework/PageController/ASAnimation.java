@@ -5,33 +5,33 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
 public class ASAnimation {
-  private static int animation_duration = 250;
+  private static final int animation_duration = 250;
   
   public static Animation getFadeInFromLeftAnimation() {
     TranslateAnimation translateAnimation = new TranslateAnimation(1, -1.0F, 2, 0.0F, 2, 0.0F, 2, 0.0F);
     translateAnimation.setDuration(animation_duration);
-    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), 17432580);
+    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), android.R.anim.accelerate_decelerate_interpolator);
     return (Animation)translateAnimation;
   }
   
   public static Animation getFadeInFromRightAnimation() {
     TranslateAnimation translateAnimation = new TranslateAnimation(1, 1.0F, 2, 0.0F, 2, 0.0F, 2, 0.0F);
     translateAnimation.setDuration(animation_duration);
-    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), 17432580);
+    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), android.R.anim.accelerate_decelerate_interpolator);
     return (Animation)translateAnimation;
   }
   
   public static Animation getFadeOutToLeftAnimation() {
     TranslateAnimation translateAnimation = new TranslateAnimation(1, 0.0F, 2, -1.0F, 2, 0.0F, 2, 0.0F);
     translateAnimation.setDuration(animation_duration);
-    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), 17432580);
+    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), android.R.anim.accelerate_decelerate_interpolator);
     return (Animation)translateAnimation;
   }
   
   public static Animation getFadeOutToRightAnimation() {
     TranslateAnimation translateAnimation = new TranslateAnimation(1, 0.0F, 2, 1.0F, 2, 0.0F, 2, 0.0F);
     translateAnimation.setDuration(animation_duration);
-    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), 17432580);
+    translateAnimation.setInterpolator((Context)ASNavigationController.getCurrentController(), android.R.anim.accelerate_decelerate_interpolator);
     return (Animation)translateAnimation;
   }
 }

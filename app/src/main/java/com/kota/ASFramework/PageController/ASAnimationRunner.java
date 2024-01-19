@@ -44,8 +44,7 @@ public abstract class ASAnimationRunner {
     });
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void fail() {
+  private void fail() {
     new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.2
       @Override // com.kumi.ASFramework.Thread.ASRunner
       public void run() {
@@ -54,8 +53,7 @@ public abstract class ASAnimationRunner {
     }.runInMainThread();
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void animate() {
+  private void animate() {
     new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.3
       @Override // com.kumi.ASFramework.Thread.ASRunner
       public void run() {

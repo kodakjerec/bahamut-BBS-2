@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 
 public class Dialog_SelectArticle extends ASDialog implements View.OnClickListener {
     Button _button_0_p = null;

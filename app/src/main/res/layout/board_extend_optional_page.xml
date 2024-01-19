@@ -6,10 +6,10 @@
         <ListView android:id="@+id/BoardExtendOptionalPage_ListView" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@null" android:dividerHeight="0dp"/>
     </FrameLayout>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_BookmarkButton" android:background="@color/tab_item_background_color_selected" android:text="@string/title" style="@style/TabItem"/>
+        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_BookmarkButton" android:background="@drawable/tab_item_background_color_selected" android:text="@string/title" style="@style/TabItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_HistoryButton" android:background="@color/tab_item_background_color_unselected" android:text="@string/record" style="@style/TabItem"/>
+        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_HistoryButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/record" style="@style/TabItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_WaterBallButton" android:background="@color/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/TabItem"/>
+        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_WaterBallButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/TabItem"/>
     </LinearLayout>
 </LinearLayout>

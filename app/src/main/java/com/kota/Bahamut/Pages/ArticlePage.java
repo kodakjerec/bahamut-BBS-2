@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,23 +12,26 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.Toast;
-
 import com.kota.ASFramework.Dialog.ASAlertDialog;
+import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
-import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
+import com.kota.Bahamut.Command.TelnetCommand;
+import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
+import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -35,45 +39,30 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
-
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
+/* loaded from: classes.dex */
 public class ArticlePage extends TelnetPage {
-    long _action_delay = 500;
-    /* access modifiers changed from: private */
-    public TelnetArticle _article = null;
-    View.OnClickListener _back_listener = v -> {
-        if (!TelnetClient.getConnector().isConnecting()) {
-            ArticlePage.this.showConnectionClosedToast();
-        } else if (ArticlePage.this._article != null) {
-            PostArticlePage page = new PostArticlePage();
-            String reply_title = ArticlePage.this._article.generateReplyTitle();
-            ArticlePage.this._article.setBlockList(ArticlePage.this._settings.getBlockListLowCasedString());
-            String reply_content = ArticlePage.this._article.generateReplyContent();
-            page.setBoardPage(ArticlePage.this._board_page);
-            page.setOperationMode(PostArticlePage.OperationMode.Reply);
-            page.setArticleNumber(String.valueOf(ArticlePage.this._article.Number));
-            page.setPostTitle(reply_title);
-            page.setPostContent(reply_content + "\n\n\n");
-            page.setListener(ArticlePage.this._board_page);
-            page.setHeaderHidden(true);
-            ArticlePage.this.getNavigationController().pushViewController(page);
-        }
-    };
-    /* access modifiers changed from: private */
-    public BoardPage _board_page = null;
-    Runnable _bottom_action = null;
+    UserSettings _settings;
+    private TelnetArticle _article = null;
+    private TelnetView _telnet_view = null;
+    private BoardPage _board_page = null;
     private boolean _full_screen = false;
-    BaseAdapter _list_adapter = new BaseAdapter() {
+    long _action_delay = 500;
+    Runnable _top_action = null;
+    Runnable _bottom_action = null;
+    BaseAdapter _list_adapter = new BaseAdapter() { // from class: com.kota.Bahamut.Pages.ArticlePage.2
+        @Override // android.widget.Adapter
         public int getCount() {
             if (ArticlePage.this._article != null) {
-                return ArticlePage.this._article.getItemSize() + 2;
+                int count = ArticlePage.this._article.getItemSize() + 2;
+                return count;
             }
             return 0;
         }
 
+        @Override // android.widget.Adapter
         public TelnetArticleItem getItem(int itemIndex) {
             if (ArticlePage.this._article == null) {
                 return null;
@@ -81,10 +70,12 @@ public class ArticlePage extends TelnetPage {
             return ArticlePage.this._article.getItem(itemIndex - 1);
         }
 
+        @Override // android.widget.Adapter
         public long getItemId(int itemIndex) {
             return itemIndex;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.Adapter
         public int getItemViewType(int itemIndex) {
             if (itemIndex == 0) {
                 return 2;
@@ -92,9 +83,11 @@ public class ArticlePage extends TelnetPage {
             if (itemIndex == getCount() - 1) {
                 return 3;
             }
-            return Objects.requireNonNull(getItem(itemIndex)).getType();
+            int type = getItem(itemIndex).getType();
+            return type;
         }
 
+        @Override // android.widget.Adapter
         public View getView(int itemIndex, View itemView, ViewGroup parentView) {
             int type = getItemViewType(itemIndex);
             if (itemView == null) {
@@ -118,17 +111,31 @@ public class ArticlePage extends TelnetPage {
                 case 0:
                     TelnetArticleItem item = getItem(itemIndex);
                     ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemView;
-                    item_view.setAuthor(Objects.requireNonNull(item).getAuthor(), item.getNickname());
+                    item_view.setAuthor(item.getAuthor(), item.getNickname());
                     item_view.setQuote(item.getQuoteLevel());
                     item_view.setContent(item.getContent());
-                    item_view.setDividerhidden(itemIndex >= getCount() - 2);
-                    item_view.setVisible(!ArticlePage.this._settings.isBlockListEnable() || !ArticlePage.this._settings.isBlockListContains(item.getAuthor()));
-                    break;
+                    if (itemIndex < getCount() - 2) {
+                        item_view.setDividerhidden(false);
+                    } else {
+                        item_view.setDividerhidden(true);
+                    }
+                    if (ArticlePage.this._settings.isBlockListEnable() && ArticlePage.this._settings.isBlockListContains(item.getAuthor())) {
+                        item_view.setVisible(false);
+                        break;
+                    } else {
+                        item_view.setVisible(true);
+                        break;
+                    }
                 case 1:
                     ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemView;
-                    item_view2.setFrame(Objects.requireNonNull(getItem(itemIndex)).getFrame());
-                    item_view2.setDividerhidden(itemIndex >= getCount() - 2);
-                    break;
+                    item_view2.setFrame(getItem(itemIndex).getFrame());
+                    if (itemIndex < getCount() - 2) {
+                        item_view2.setDividerhidden(false);
+                        break;
+                    } else {
+                        item_view2.setDividerhidden(true);
+                        break;
+                    }
                 case 2:
                     ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
                     String author = null;
@@ -155,118 +162,187 @@ public class ArticlePage extends TelnetPage {
             return itemView;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.Adapter
         public int getViewTypeCount() {
             return 4;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.Adapter
         public boolean hasStableIds() {
             return false;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.Adapter
         public boolean isEmpty() {
             return getCount() == 0;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
         public boolean areAllItemsEnabled() {
             return false;
         }
 
+        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
         public boolean isEnabled(int itemIndex) {
             int type = getItemViewType(itemIndex);
             return type == 0 || type == 1;
         }
     };
-    AdapterView.OnItemLongClickListener _list_long_click_listener = (adapterView, arg1, itemIndex, arg3) -> {
-        TelnetArticleItem item;
-        if (ArticlePage.this._article == null || (item = ArticlePage.this._article.getItem(itemIndex - 1)) == null) {
-            return false;
-        }
-        int type = item.getType();
-        if (type == 0) {
-            item.setType(1);
-            ArticlePage.this._list_adapter.notifyDataSetChanged();
-            return true;
-        } else if (type != 1) {
-            return false;
-        } else {
-            item.setType(0);
-            ArticlePage.this._list_adapter.notifyDataSetChanged();
-            return true;
-        }
-    };
-    View.OnLongClickListener _page_bottom_listener = v -> {
-        if (!ArticlePage.this._settings.isArticleMoveDisable()) {
-            if (ArticlePage.this._bottom_action != null) {
-                v.removeCallbacks(ArticlePage.this._bottom_action);
+    AdapterView.OnItemLongClickListener _list_long_click_listener = new AdapterView.OnItemLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.3
+        @Override // android.widget.AdapterView.OnItemLongClickListener
+        public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int itemIndex, long arg3) {
+            TelnetArticleItem item;
+            if (ArticlePage.this._article == null || (item = ArticlePage.this._article.getItem(itemIndex - 1)) == null) {
+                return false;
             }
-            ArticlePage.this._bottom_action = () -> {
-                ArticlePage.this._bottom_action = null;
-                ArticlePage.this.moveToBottomArticle();
-            };
-            v.postDelayed(ArticlePage.this._bottom_action, ArticlePage.this._action_delay);
-        }
-        return false;
-    };
-    View.OnClickListener _page_down_listener = v -> {
-        if (ArticlePage.this._bottom_action != null) {
-            v.removeCallbacks(ArticlePage.this._bottom_action);
-            ArticlePage.this._bottom_action = null;
-        }
-        if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
-            ArticlePage.this.showConnectionClosedToast();
-        } else {
-            ArticlePage.this._board_page.loadTheSameTitleDown();
+            int type = item.getType();
+            if (type == 0) {
+                item.setType(1);
+                ArticlePage.this._list_adapter.notifyDataSetChanged();
+                return true;
+            } else if (type == 1) {
+                item.setType(0);
+                ArticlePage.this._list_adapter.notifyDataSetChanged();
+                return true;
+            } else {
+                return false;
+            }
         }
     };
-    View.OnLongClickListener _page_top_listener = v -> {
-        if (!ArticlePage.this._settings.isArticleMoveDisable()) {
+    View.OnLongClickListener _page_top_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.4
+        @Override // android.view.View.OnLongClickListener
+        public boolean onLongClick(View v) {
+            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
+                if (ArticlePage.this._top_action != null) {
+                    v.removeCallbacks(ArticlePage.this._top_action);
+                    ArticlePage.this._top_action = null;
+                }
+                ArticlePage.this._top_action = new Runnable() { // from class: com.kota.Bahamut.Pages.ArticlePage.4.1
+                    @Override // java.lang.Runnable
+                    public void run() {
+                        ArticlePage.this._top_action = null;
+                        ArticlePage.this.moveToTopArticle();
+                    }
+                };
+                v.postDelayed(ArticlePage.this._top_action, ArticlePage.this._action_delay);
+            }
+            return false;
+        }
+    };
+    View.OnClickListener _page_up_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.5
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
             if (ArticlePage.this._top_action != null) {
                 v.removeCallbacks(ArticlePage.this._top_action);
                 ArticlePage.this._top_action = null;
             }
-            ArticlePage.this._top_action = () -> {
-                ArticlePage.this._top_action = null;
-                ArticlePage.this.moveToTopArticle();
-            };
-            v.postDelayed(ArticlePage.this._top_action, ArticlePage.this._action_delay);
+            if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
+                ArticlePage.this.showConnectionClosedToast();
+            } else {
+                ArticlePage.this._board_page.loadTheSameTitleUp();
+            }
         }
-        return false;
     };
-    View.OnClickListener _page_up_listener = v -> {
-        if (ArticlePage.this._top_action != null) {
-            v.removeCallbacks(ArticlePage.this._top_action);
-            ArticlePage.this._top_action = null;
+    View.OnLongClickListener _page_bottom_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.6
+        @Override // android.view.View.OnLongClickListener
+        public boolean onLongClick(View v) {
+            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
+                if (ArticlePage.this._bottom_action != null) {
+                    v.removeCallbacks(ArticlePage.this._bottom_action);
+                    ArticlePage.this._bottom_action = null;
+                }
+                ArticlePage.this._bottom_action = new Runnable() { // from class: com.kota.Bahamut.Pages.ArticlePage.6.1
+                    @Override // java.lang.Runnable
+                    public void run() {
+                        ArticlePage.this._bottom_action = null;
+                        ArticlePage.this.moveToBottomArticle();
+                    }
+                };
+                v.postDelayed(ArticlePage.this._bottom_action, ArticlePage.this._action_delay);
+            }
+            return false;
         }
-        if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
+    };
+    View.OnClickListener _page_down_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.7
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            if (ArticlePage.this._bottom_action != null) {
+                v.removeCallbacks(ArticlePage.this._bottom_action);
+                ArticlePage.this._bottom_action = null;
+            }
+            if (!TelnetClient.getConnector().isConnecting() || ArticlePage.this._board_page == null) {
+                ArticlePage.this.showConnectionClosedToast();
+            } else {
+                ArticlePage.this._board_page.loadTheSameTitleDown();
+            }
+        }
+    };
+    View.OnClickListener _back_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.8
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            if (TelnetClient.getConnector().isConnecting()) {
+                if (ArticlePage.this._article != null) {
+                    PostArticlePage page = new PostArticlePage();
+                    String reply_title = ArticlePage.this._article.generateReplyTitle();
+                    ArticlePage.this._article.setBlockList(ArticlePage.this._settings.getBlockListLowCasedString());
+                    String reply_content = ArticlePage.this._article.generateReplyContent();
+                    page.setBoardPage(ArticlePage.this._board_page);
+                    page.setOperationMode(PostArticlePage.OperationMode.Reply);
+                    page.setArticleNumber(String.valueOf(ArticlePage.this._article.Number));
+                    page.setPostTitle(reply_title);
+                    page.setPostContent(reply_content + "\n\n\n");
+                    page.setListener(ArticlePage.this._board_page);
+                    page.setHeaderHidden(true);
+                    ArticlePage.this.getNavigationController().pushViewController(page);
+                    return;
+                }
+                return;
+            }
             ArticlePage.this.showConnectionClosedToast();
-        } else {
-            ArticlePage.this._board_page.loadTheSameTitleUp();
         }
     };
-    UserSettings _settings;
-    private TelnetView _telnet_view = null;
-    Runnable _top_action = null;
-    private final View.OnClickListener mChangeModeListener = v -> {
-        ArticlePage.this.changeViewMode();
-        ArticlePage.this.refreshExternalToolbar();
+    private View.OnClickListener mMenuListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.10
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            ArticlePage.this.onMenuClicked();
+        }
     };
-    private final View.OnClickListener mDoGyListener = v -> ArticlePage.this.onGYButtonClicked();
-    /* access modifiers changed from: private */
-    public View.OnClickListener mMenuListener = v -> ArticlePage.this.onMenuClicked();
-    private final View.OnClickListener mShowLinkListener = v -> ArticlePage.this.onOpenLinkClicked();
+    private View.OnClickListener mDoGyListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.11
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            ArticlePage.this.onGYButtonClicked();
+        }
+    };
+    private View.OnClickListener mChangeModeListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.12
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            ArticlePage.this.changeViewMode();
+            ArticlePage.this.refreshExternalToolbar();
+        }
+    };
+    private View.OnClickListener mShowLinkListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.13
+        @Override // android.view.View.OnClickListener
+        public void onClick(View v) {
+            ArticlePage.this.onOpenLinkClicked();
+        }
+    };
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
         return 14;
     }
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageLayout() {
         return R.layout.article_page;
     }
 
+    @Override // com.kota.TelnetUI.TelnetPage
     public boolean isPopupPage() {
         return true;
     }
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
         this._telnet_view = (TelnetView) findViewById(R.id.Article_ContentTelnetView);
@@ -274,11 +350,12 @@ public class ArticlePage extends TelnetPage {
         View empty_view = findViewById(R.id.Article_ContentEmptyView);
         ASListView list_view = (ASListView) findViewById(R.id.Article_ContentList);
         list_view.setEmptyView(empty_view);
-        list_view.setAdapter(this._list_adapter);
+        list_view.setAdapter((ListAdapter) this._list_adapter);
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
+        Button back_button = (Button) findViewById(R.id.Article_BackButton);
         Button page_up_button = (Button) findViewById(R.id.Article_PageUpButton);
         Button page_down_button = (Button) findViewById(R.id.Article_PageDownButton);
-        findViewById(R.id.Article_BackButton).setOnClickListener(this._back_listener);
+        back_button.setOnClickListener(this._back_listener);
         page_up_button.setOnClickListener(this._page_up_listener);
         page_up_button.setOnLongClickListener(this._page_top_listener);
         page_down_button.setOnClickListener(this._page_down_listener);
@@ -302,60 +379,51 @@ public class ArticlePage extends TelnetPage {
         showNotification();
     }
 
-    /* access modifiers changed from: package-private */
-    public void showNotification() {
-        ASNavigationController activity = getNavigationController();
+    void showNotification() {
+        Activity activity = getNavigationController();
         if (activity != null) {
             SharedPreferences perf = activity.getSharedPreferences("notification", 0);
-            if (!perf.getBoolean("show_top_bottom_function", false)) {
-                Toast.makeText(activity, R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
-                perf.edit().putBoolean("show_top_bottom_function", true).apply();
+            boolean show_top_bottom_function = perf.getBoolean("show_top_bottom_function", false);
+            if (!show_top_bottom_function) {
+                Toast.makeText(activity, (int) R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
+                perf.edit().putBoolean("show_top_bottom_function", true).commit();
             }
         }
     }
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageWillAppear() {
         reloadViewMode();
     }
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidDisappear() {
         this._telnet_view = null;
         super.onPageDidDisappear();
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    @Override // com.kota.ASFramework.PageController.ASViewController
+    protected boolean onBackPressed() {
         getNavigationController().popViewController();
         PageContainer.getInstance().cleanArticlePage();
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onMenuButtonClicked() {
+    @Override // com.kota.ASFramework.PageController.ASViewController
+    protected boolean onMenuButtonClicked() {
         onMenuClicked();
         return true;
     }
 
-    /* access modifiers changed from: package-private */
-    public void onMenuClicked() {
-        String str;
-        String str2 = null;
+    void onMenuClicked() {
         if (this._article != null && this._article.Author != null) {
             String author = this._article.Author.toLowerCase();
             String logon_user = this._settings.getUsername().trim().toLowerCase();
             boolean is_board = this._board_page.getPageType() == 10;
-            String external_toolbar_enable_title = this._settings.isExternalToolbarEnable() ? "隱藏工具列" : "開啟工具列";
-            ASListDialog addItem = ASListDialog.createDialog().addItem("推薦").addItem("切換模式");
-            if (!is_board || !author.equals(logon_user)) {
-                str = null;
-            } else {
-                str = "編輯文章";
-            }
-            ASListDialog addItem2 = addItem.addItem(str);
-            if (author.equals(logon_user)) {
-                str2 = "刪除文章";
-            }
-            addItem2.addItem(str2).addItem(external_toolbar_enable_title).addItem("加入黑名單").addItem("開啟連結").setListener(new ASListDialogItemClickListener() {
+            boolean ext_toolbar_enable = this._settings.isExternalToolbarEnable();
+            String external_toolbar_enable_title = ext_toolbar_enable ? "隱藏工具列" : "開啟工具列";
+            ASListDialog.createDialog().addItem("推薦").addItem("切換模式").addItem((is_board && author.equals(logon_user)) ? "編輯文章" : null).addItem(author.equals(logon_user) ? "刪除文章" : null).addItem(external_toolbar_enable_title).addItem("加入黑名單").addItem("開啟連結").setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.1
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                     switch (index) {
                         case 0:
@@ -381,9 +449,11 @@ public class ArticlePage extends TelnetPage {
                             ArticlePage.this.onOpenLinkClicked();
                             return;
                         default:
+                            return;
                     }
                 }
 
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                     return false;
                 }
@@ -396,7 +466,8 @@ public class ArticlePage extends TelnetPage {
         if (this._article != null) {
             String board_name = this._board_page.getListName();
             BookmarkStore store = new BookmarkStore(getContext());
-            store.getBookmarkList(board_name).addHistoryBookmark(this._article.Title);
+            BookmarkList bookmark_list = store.getBookmarkList(board_name);
+            bookmark_list.addHistoryBookmark(this._article.Title);
             store.store();
             this._telnet_view.setFrame(this._article.getFrame());
             reloadTelnetLayout();
@@ -411,7 +482,8 @@ public class ArticlePage extends TelnetPage {
 
     private void reloadTelnetLayout() {
         int screen_width;
-        int telnet_view_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
+        int text_width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20.0f, getContext().getResources().getDisplayMetrics());
+        int telnet_view_width = (text_width / 2) * 80;
         if (getNavigationController().getCurrentOrientation() == 2) {
             screen_width = getNavigationController().getScreenHeight();
         } else {
@@ -429,31 +501,27 @@ public class ArticlePage extends TelnetPage {
         this._telnet_view.setLayoutParams(telnet_layout);
     }
 
-    /* access modifiers changed from: package-private */
-    public void moveToTopArticle() {
-        if (!TelnetClient.getConnector().isConnecting() || this._board_page == null) {
-            showConnectionClosedToast();
-        } else {
+    void moveToTopArticle() {
+        if (TelnetClient.getConnector().isConnecting() && this._board_page != null) {
             this._board_page.loadTheSameTitleTop();
-        }
-    }
-
-    /* access modifiers changed from: package-private */
-    public void moveToBottomArticle() {
-        if (!TelnetClient.getConnector().isConnecting() || this._board_page == null) {
-            showConnectionClosedToast();
         } else {
-            this._board_page.loadTheSameTitleBottom();
+            showConnectionClosedToast();
         }
     }
 
-    /* access modifiers changed from: private */
-    public void showConnectionClosedToast() {
+    void moveToBottomArticle() {
+        if (TelnetClient.getConnector().isConnecting() && this._board_page != null) {
+            this._board_page.loadTheSameTitleBottom();
+        } else {
+            showConnectionClosedToast();
+        }
+    }
+
+    private void showConnectionClosedToast() {
         ASToast.showShortToast("連線已中斷");
     }
 
-    /* access modifiers changed from: private */
-    public void onGYButtonClicked() {
+    private void onGYButtonClicked() {
         if (this._board_page != null) {
             this._board_page.goodLoadingArticle();
         }
@@ -462,10 +530,19 @@ public class ArticlePage extends TelnetPage {
     public void onDeleteButtonClicked() {
         if (this._article != null && this._board_page != null) {
             final int item_number = this._article.Number;
-            ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener((aDialog, index) -> {
-                if (index == 1) {
-                    ArticlePage.this._board_page.pushCommand(new BahamutCommandDeleteArticle(item_number));
-                    ArticlePage.this.onBackPressed();
+            ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.9
+                @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
+                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
+                    switch (index) {
+                        case 0:
+                        default:
+                            return;
+                        case 1:
+                            TelnetCommand command = new BahamutCommandDeleteArticle(item_number);
+                            ArticlePage.this._board_page.pushCommand(command);
+                            ArticlePage.this.onBackPressed();
+                            return;
+                    }
                 }
             }).scheduleDismissOnPageDisappear(this).show();
         }
@@ -517,14 +594,16 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
+    @Override // com.kota.ASFramework.PageController.ASViewController
     public boolean onReceivedGestureRight() {
-        if (this._settings.getArticleViewMode() != 0 && !this._full_screen) {
+        if (this._settings.getArticleViewMode() == 0 || this._full_screen) {
+            onBackPressed();
             return true;
         }
-        onBackPressed();
         return true;
     }
 
+    @Override // com.kota.TelnetUI.TelnetPage
     public boolean isKeepOnOffline() {
         return true;
     }
@@ -534,12 +613,12 @@ public class ArticlePage extends TelnetPage {
     }
 
     public void onExternalToolbarClicked() {
-        this._settings.setExternalToolbarEnable(!this._settings.isExternalToolbarEnable());
+        boolean enable = this._settings.isExternalToolbarEnable();
+        this._settings.setExternalToolbarEnable(!enable);
         refreshExternalToolbar();
     }
 
-    /* access modifiers changed from: private */
-    public void refreshExternalToolbar() {
+    private void refreshExternalToolbar() {
         boolean enable = this._settings.isExternalToolbarEnable();
         int article_mode = this._settings.getArticleViewMode();
         if (article_mode == 1) {
@@ -553,8 +632,7 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
-    /* access modifiers changed from: private */
-    public void onOpenLinkClicked() {
+    private void onOpenLinkClicked() {
         if (this._article != null) {
             final String[] urls = this._article.getUrls();
             if (urls.length == 0) {
@@ -569,19 +647,22 @@ public class ArticlePage extends TelnetPage {
             for (String url : urls) {
                 list_dialog.addItem(url);
             }
-            list_dialog.setListener(new ASListDialogItemClickListener() {
+            list_dialog.setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.14
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                     return false;
                 }
 
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                    String url = urls[index];
-                    if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("ftp://")) {
-                        url = url.matches("([a-zA-Z0-9\\-]+:[a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "ftp://" + url : url.matches("([a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "mailto:" + url : "http://" + url;
+                    String url2 = urls[index];
+                    if (!url2.startsWith("http://") && !url2.startsWith("https://") && !url2.startsWith("ftp://")) {
+                        url2 = url2.matches("([a-zA-Z0-9\\-]+:[a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "ftp://" + url2 : url2.matches("([a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "mailto:" + url2 : "http://" + url2;
                     }
-                    Context context = ArticlePage.this.getContext();
-                    if (context != null) {
-                        context.startActivity(new Intent("android.intent.action.VIEW", Uri.parse(url)));
+                    Context context2 = ArticlePage.this.getContext();
+                    if (context2 != null) {
+                        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url2));
+                        context2.startActivity(intent);
                     }
                 }
             });
@@ -595,7 +676,8 @@ public class ArticlePage extends TelnetPage {
             Set<String> buffer = new HashSet<>();
             int len = article.getItemSize();
             for (int i = 0; i < len; i++) {
-                String author = article.getItem(i).getAuthor();
+                TelnetArticleItem item = article.getItem(i);
+                String author = item.getAuthor();
                 if (author != null && !this._settings.isBlockListContains(author)) {
                     buffer.add(author);
                 }
@@ -604,12 +686,14 @@ public class ArticlePage extends TelnetPage {
                 ASAlertDialog.createDialog().setMessage("無可加入黑名單的ID").show();
                 return;
             }
-            final String[] names = buffer.toArray(new String[0]);
-            ASListDialog.createDialog().addItems(names).setListener(new ASListDialogItemClickListener() {
+            final String[] names = (String[]) buffer.toArray(new String[buffer.size()]);
+            ASListDialog.createDialog().addItems(names).setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.15
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                     return false;
                 }
 
+                @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                     ArticlePage.this.onBlockButtonClicked(names[index]);
                 }
@@ -618,17 +702,19 @@ public class ArticlePage extends TelnetPage {
     }
 
     public void onBlockButtonClicked(final String aBlockName) {
-        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
-            if (index == 1) {
-                ArticlePage.this._settings.addBlockName(aBlockName);
-                ArticlePage.this._settings.notifyDataUpdated();
-                if (!ArticlePage.this._settings.isBlockListEnable()) {
-                    return;
-                }
-                if (aBlockName.equals(ArticlePage.this._article.Author)) {
-                    ArticlePage.this.onBackPressed();
-                } else {
-                    ArticlePage.this._list_adapter.notifyDataSetChanged();
+        ASAlertDialog.createDialog().setTitle("加入黑名單").setMessage("是否要將\"" + aBlockName + "\"加入黑名單?").addButton("取消").addButton("加入").setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.16
+            @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
+            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
+                if (index == 1) {
+                    ArticlePage.this._settings.addBlockName(aBlockName);
+                    ArticlePage.this._settings.notifyDataUpdated();
+                    if (ArticlePage.this._settings.isBlockListEnable()) {
+                        if (aBlockName.equals(ArticlePage.this._article.Author)) {
+                            ArticlePage.this.onBackPressed();
+                        } else {
+                            ArticlePage.this._list_adapter.notifyDataSetChanged();
+                        }
+                    }
                 }
             }
         }).scheduleDismissOnPageDisappear(this).show();

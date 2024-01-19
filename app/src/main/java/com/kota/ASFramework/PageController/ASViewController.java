@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.view.View;
+
+import androidx.annotation.NonNull;
+
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -79,9 +82,7 @@ public abstract class ASViewController {
   public void notifyPageDidRemoveFromNavigationController() {
     if (this._operation_listeners != null) {
       Vector<ASViewControllerOperationListener> listeners = new Vector<>(this._operation_listeners);
-      Iterator<ASViewControllerOperationListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerOperationListener listener = it.next();
+      for (ASViewControllerOperationListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerWillRemoveFromNavigationController(this);
         }
@@ -93,9 +94,7 @@ public abstract class ASViewController {
   public void notifyPageDidAddToNavigationController() {
     if (this._operation_listeners != null) {
       Vector<ASViewControllerOperationListener> listeners = new Vector<>(this._operation_listeners);
-      Iterator<ASViewControllerOperationListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerOperationListener listener = it.next();
+      for (ASViewControllerOperationListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerWillAddToNavigationController(this);
         }
@@ -108,9 +107,7 @@ public abstract class ASViewController {
     this._is_disappeared = false;
     if (this._appear_listeners != null) {
       Vector<ASViewControllerAppearListener> listeners = new Vector<>(this._appear_listeners);
-      Iterator<ASViewControllerAppearListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerAppearListener listener = it.next();
+      for (ASViewControllerAppearListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerWillAppear(this);
         }
@@ -123,9 +120,7 @@ public abstract class ASViewController {
     this._is_appeared = true;
     if (this._appear_listeners != null) {
       Vector<ASViewControllerAppearListener> listeners = new Vector<>(this._appear_listeners);
-      Iterator<ASViewControllerAppearListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerAppearListener listener = it.next();
+      for (ASViewControllerAppearListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerDidAppear(this);
         }
@@ -142,9 +137,7 @@ public abstract class ASViewController {
     this._is_appeared = false;
     if (this._disappear_listeners != null) {
       Vector<ASViewControllerDisappearListener> listeners = new Vector<>(this._disappear_listeners);
-      Iterator<ASViewControllerDisappearListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerDisappearListener listener = it.next();
+      for (ASViewControllerDisappearListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerWillDisappear(this);
         }
@@ -157,9 +150,7 @@ public abstract class ASViewController {
     this._is_disappeared = true;
     if (this._disappear_listeners != null) {
       Vector<ASViewControllerDisappearListener> listeners = new Vector<>(this._disappear_listeners);
-      Iterator<ASViewControllerDisappearListener> it = listeners.iterator();
-      while (it.hasNext()) {
-        ASViewControllerDisappearListener listener = it.next();
+      for (ASViewControllerDisappearListener listener : listeners) {
         if (listener != null) {
           listener.onASViewControllerDidDisappear(this);
         }
@@ -222,23 +213,19 @@ public abstract class ASViewController {
     return null;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
+  protected void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public boolean onBackPressed() {
+  protected boolean onBackPressed() {
     getNavigationController().popViewController();
     return true;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public boolean onSearchButtonClicked() {
+  protected boolean onSearchButtonClicked() {
     return false;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public boolean onMenuButtonClicked() {
+  protected boolean onMenuButtonClicked() {
     return false;
   }
 
@@ -290,33 +277,29 @@ public abstract class ASViewController {
     this._contains_in_container = contains;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public boolean isMarkedRemoved() {
+  protected boolean isMarkedRemoved() {
     return this._marked_removed;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public boolean isMarkedAdded() {
+  protected boolean isMarkedAdded() {
     return this._marked_added;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public void prepareForRemove() {
+  protected void prepareForRemove() {
     this._marked_removed = true;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public void prepareForAdd() {
+  protected void prepareForAdd() {
     this._marked_removed = false;
     this._marked_added = true;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public void cleanMark() {
+  protected void cleanMark() {
     this._marked_removed = false;
     this._marked_added = false;
   }
 
+  @NonNull
   public String toString() {
     return "ASViewController[Type:" + getPageType() + "]";
   }

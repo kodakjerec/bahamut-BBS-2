@@ -12,17 +12,18 @@ import com.kota.Bahamut.Pages.StartPage;
 import java.util.Iterator;
 import java.util.Stack;
 
+/* loaded from: classes.dex */
 public class PageContainer {
     private static PageContainer _instance = null;
-    private ArticlePage _article_page = null;
-    private BoardPage _board_page = null;
-    private BoardSearchPage _board_search_page = null;
-    private BoardLinkPage _board_title_linked_page = null;
-    private final Stack<ClassPage> _class_page = new Stack<>();
-    private LoginPage _login_page = null;
-    private MailBoxPage _mail_page = null;
-    private MainPage _main_page = null;
     private StartPage _start_page = null;
+    private LoginPage _login_page = null;
+    private MainPage _main_page = null;
+    private Stack<ClassPage> _class_page = new Stack<>();
+    private BoardPage _board_page = null;
+    private BoardLinkPage _board_title_linked_page = null;
+    private BoardSearchPage _board_search_page = null;
+    private MailBoxPage _mail_page = null;
+    private ArticlePage _article_page = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -92,16 +93,17 @@ public class PageContainer {
 
     public ClassPage getClassPage() {
         if (this._class_page.size() > 0) {
-            return (ClassPage) this._class_page.lastElement();
+            return this._class_page.lastElement();
         }
         return null;
     }
 
     public void cleanClassPage() {
         if (this._class_page != null) {
-            Iterator it = this._class_page.iterator();
+            Iterator<ClassPage> it = this._class_page.iterator();
             while (it.hasNext()) {
-                ((ClassPage) it.next()).clear();
+                ClassPage page = it.next();
+                page.clear();
             }
             this._class_page.clear();
         }

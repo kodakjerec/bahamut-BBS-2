@@ -1,22 +1,25 @@
 package com.kota.Telnet.Model;
 
-import androidx.annotation.NonNull;
-
+/* loaded from: classes.dex */
 public class TelnetData {
     public static final byte BIT_SPACE_1 = 0;
     public static final byte DOUBLE_BIT_SPACE_2_1 = 3;
     public static final byte DOUBLE_BIT_SPACE_2_2 = 4;
     public static final byte SINGLE_BIT_SPACE_2_1 = 1;
     public static final byte SINGLE_BIT_SPACE_2_2 = 2;
-    public byte backgroundColor = 0;
-    public byte bitSpace = 0;
-    public boolean blink = false;
+    private static int _count = 0;
     public byte data = 0;
-    public boolean italic = false;
     public byte textColor = 0;
+    public byte backgroundColor = 0;
+    public boolean blink = false;
+    public boolean italic = false;
+    public byte bitSpace = 0;
 
     protected void finalize() throws Throwable {
         super.finalize();
+    }
+
+    public TelnetData() {
     }
 
     public TelnetData(TelnetData aData) {
@@ -31,15 +34,14 @@ public class TelnetData {
         this.italic = aData.italic;
     }
 
-    @NonNull
     public TelnetData clone() {
         return new TelnetData(this);
     }
 
     public void clear() {
-        this.data = 0;
-        this.textColor = 0;
-        this.backgroundColor = 0;
+        this.data = (byte) 0;
+        this.textColor = (byte) 0;
+        this.backgroundColor = (byte) 0;
         this.blink = false;
         this.italic = false;
     }

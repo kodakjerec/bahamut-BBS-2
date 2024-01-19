@@ -1,19 +1,23 @@
 package com.kota.Telnet.Model;
 
-import androidx.annotation.NonNull;
-
 import com.kota.Telnet.Reference.TelnetAnsiCode;
-
+import java.util.Iterator;
 import java.util.Vector;
 
+/* loaded from: classes.dex */
 public class TelnetFrame {
-    // public static final int DEFAULT_COLUMN = 80;
-    // public static final int DEFAULT_ROW = 24;
+    public static final int DEFAULT_COLUMN = 80;
+    public static final int DEFAULT_ROW = 24;
+    private static int _count = 0;
     public Vector<TelnetRow> rows = new Vector<>();
 
-    /* access modifiers changed from: protected */
     protected void finalize() throws Throwable {
         super.finalize();
+    }
+
+    public TelnetFrame() {
+        initialData(24);
+        clear();
     }
 
     public TelnetFrame(int row) {
@@ -61,15 +65,18 @@ public class TelnetFrame {
     }
 
     public int getPositionData(int row, int column) {
-        return getRow(row).data[column] & 0xFF;
+        int data = getRow(row).data[column];
+        return data & 255;
     }
 
     public int getPositionTextColor(int row, int column) {
-        return TelnetAnsiCode.getTextColor(getRow(row).textColor[column]);
+        byte color_index = getRow(row).textColor[column];
+        return TelnetAnsiCode.getTextColor(color_index);
     }
 
     public int getPositionBackgroundColor(int row, int column) {
-        return TelnetAnsiCode.getBackgroundColor(getRow(row).backgroundColor[column]);
+        byte color_index = getRow(row).backgroundColor[column];
+        return TelnetAnsiCode.getBackgroundColor(color_index);
     }
 
     public void cleanPositionData(int row, int column) {
@@ -95,15 +102,15 @@ public class TelnetFrame {
     }
 
     public void switchRow(int index, int andIndex) {
+        TelnetRow row = this.rows.get(index);
         this.rows.set(index, this.rows.get(andIndex));
-        this.rows.set(andIndex, this.rows.get(index));
+        this.rows.set(andIndex, row);
     }
 
     public int getRowSize() {
         return this.rows.size();
     }
 
-    @NonNull
     public TelnetFrame clone() {
         return new TelnetFrame(this);
     }
@@ -117,8 +124,9 @@ public class TelnetFrame {
         return true;
     }
 
-    public void removeRow(int index) {
-        this.rows.remove(index);
+    public TelnetRow removeRow(int index) {
+        TelnetRow row = this.rows.remove(index);
+        return row;
     }
 
     public void reloadSpace() {
@@ -145,8 +153,21 @@ public class TelnetFrame {
         }
     }
 
+    public void printBackgroundColor() {
+        for (int i = 0; i < this.rows.size(); i++) {
+            StringBuffer s = new StringBuffer();
+            TelnetRow row = this.rows.get(i);
+            for (int j = 0; j < 80; j++) {
+                s.append(String.format("%1$02d ", Byte.valueOf(row.backgroundColor[j])));
+            }
+            System.out.println(s.toString());
+        }
+    }
+
     public void cleanCachedData() {
-        for (TelnetRow row : this.rows) {
+        Iterator<TelnetRow> it = this.rows.iterator();
+        while (it.hasNext()) {
+            TelnetRow row = it.next();
             row.cleanCachedData();
         }
     }

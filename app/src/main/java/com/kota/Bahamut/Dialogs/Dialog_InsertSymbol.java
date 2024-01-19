@@ -10,7 +10,7 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.Bahamut.R;;
+import com.kota.Bahamut.R;
 
 public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemClickListener, ListAdapter {
     GridView _grid_view = null;

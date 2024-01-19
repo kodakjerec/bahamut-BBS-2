@@ -1,24 +1,25 @@
-package com.kota.Bahamut;
+package com.kumi.Bahamut;
 
+/* loaded from: classes.dex */
 public interface BahamutPage {
-    int BAHAMUT_ARTICLE = 14;
-    int BAHAMUT_BLOCK_LIST = 8;
-    int BAHAMUT_BOARD = 10;
-    int BAHAMUT_BOARD_LINK = 12;
-    int BAHAMUT_BOARD_SEARCH = 13;
-    int BAHAMUT_BOOKMARK = 11;
-    int BAHAMUT_CLASS = 6;
-    int BAHAMUT_LOGIN = 1;
-    int BAHAMUT_MAIL = 15;
-    int BAHAMUT_MAIL_BOX = 9;
-    int BAHAMUT_MAIN = 5;
-    int BAHAMUT_PASSED_SIGNATURE = 4;
-    int BAHAMUT_POST_ARTICLE = 16;
-    int BAHAMUT_SEND_MAIL = 17;
-    int BAHAMUT_SYSTEM_ANNOUNCEMENT = 2;
-    int BAHAMUT_SYSTEM_SETTINGS = 7;
-    int BAHAMUT_TOP_TEN = 3;
-    int MANUAL = 18;
-    int START = 0;
-    int UNKNOWN = -1;
+    public static final int BAHAMUT_ARTICLE = 14;
+    public static final int BAHAMUT_BLOCK_LIST = 8;
+    public static final int BAHAMUT_BOARD = 10;
+    public static final int BAHAMUT_BOARD_LINK = 12;
+    public static final int BAHAMUT_BOARD_SEARCH = 13;
+    public static final int BAHAMUT_BOOKMARK = 11;
+    public static final int BAHAMUT_CLASS = 6;
+    public static final int BAHAMUT_LOGIN = 1;
+    public static final int BAHAMUT_MAIL = 15;
+    public static final int BAHAMUT_MAIL_BOX = 9;
+    public static final int BAHAMUT_MAIN = 5;
+    public static final int BAHAMUT_PASSED_SIGNATURE = 4;
+    public static final int BAHAMUT_POST_ARTICLE = 16;
+    public static final int BAHAMUT_SEND_MAIL = 17;
+    public static final int BAHAMUT_SYSTEM_ANNOUNCEMENT = 2;
+    public static final int BAHAMUT_SYSTEM_SETTINGS = 7;
+    public static final int BAHAMUT_TOP_TEN = 3;
+    public static final int MANUAL = 18;
+    public static final int START = 0;
+    public static final int UNKNOWN = -1;
 }

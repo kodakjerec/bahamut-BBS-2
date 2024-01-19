@@ -43,7 +43,7 @@ public class ASWindowStateHandler {
     Window window = activity.getWindow();
     window.getDecorView().getWindowVisibleDisplayFrame(rect);
     statusBarHeight = rect.top;
-    int i = window.findViewById(16908290).getTop();
+    int i = window.findViewById(android.R.id.content).getTop();
     if (i > 0)
       titleBarHeight = i - statusBarHeight; 
     DisplayMetrics displayMetrics = new DisplayMetrics();

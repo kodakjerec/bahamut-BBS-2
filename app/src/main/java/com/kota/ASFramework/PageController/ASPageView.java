@@ -5,56 +5,59 @@ import android.graphics.Canvas;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
+/* loaded from: classes.dex */
 public class ASPageView extends FrameLayout {
-  private static final int _count = 0;
-  
-  private ASViewController _owner_controller = null;
-  
-  public ASPageView(Context paramContext) {
-    super(paramContext);
-    init();
-  }
-  
-  public ASPageView(Context paramContext, AttributeSet paramAttributeSet) {
-    super(paramContext, paramAttributeSet);
-    init();
-  }
-  
-  public ASPageView(Context paramContext, AttributeSet paramAttributeSet, int paramInt) {
-    super(paramContext, paramAttributeSet, paramInt);
-    init();
-  }
-  
-  private void init() {}
-  
-  public void draw(Canvas paramCanvas) {
-    super.draw(paramCanvas);
-    int i = paramCanvas.getSaveCount();
-    dispatchDraw(paramCanvas);
-    paramCanvas.restoreToCount(i);
-  }
-  
+  private static int _count = 0;
+  private ASViewController _owner_controller;
+
   protected void finalize() throws Throwable {
     super.finalize();
   }
-  
+
+  public ASPageView(Context context) {
+    super(context);
+    this._owner_controller = null;
+    init();
+  }
+
+  public ASPageView(Context context, AttributeSet attrs, int defStyle) {
+    super(context, attrs, defStyle);
+    this._owner_controller = null;
+    init();
+  }
+
+  public ASPageView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    this._owner_controller = null;
+    init();
+  }
+
+  private void init() {
+  }
+
+  public void setOwnerController(ASViewController aController) {
+    this._owner_controller = aController;
+  }
+
   public ASViewController getOwnerController() {
     return this._owner_controller;
   }
-  
-  protected void onDraw(Canvas paramCanvas) {}
-  
-  public void onPageAnimationFinished() {}
-  
-  public void onPageAnimationStart() {}
-  
-  public void setOwnerController(ASViewController paramASViewController) {
-    this._owner_controller = paramASViewController;
+
+  @Override // android.view.View
+  public void draw(Canvas canvas) {
+    super.draw(canvas);
+    int save_count = canvas.getSaveCount();
+    dispatchDraw(canvas);
+    canvas.restoreToCount(save_count);
+  }
+
+  @Override // android.view.View
+  protected void onDraw(Canvas aCanvas) {
+  }
+
+  public void onPageAnimationStart() {
+  }
+
+  public void onPageAnimationFinished() {
   }
 }
-
-
-/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASPageView.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */

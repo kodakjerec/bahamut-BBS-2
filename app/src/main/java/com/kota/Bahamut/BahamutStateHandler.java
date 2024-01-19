@@ -1,6 +1,5 @@
 package com.kota.Bahamut;
 
-import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
@@ -26,25 +25,24 @@ import com.kota.Telnet.TelnetUtils;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.Map;
 
+/* loaded from: classes.dex */
 public class BahamutStateHandler extends TelnetStateHandler {
     private static final int STEP_CONNECTING = 0;
     private static final int STEP_WORKING = 1;
     public static final int UNKNOWN = -1;
     private static BahamutStateHandler _instance = null;
-    private final Article_Handler _article_handler = new Article_Handler();
     public String _article_number;
-    private TelnetCursor _cursor = null;
-    private boolean _reading_article = false;
     private int _step = 0;
-    private String first_header = "";
-    private String last_header = "";
     private String row_string_00 = "";
     private String row_string_01 = "";
     private String row_string_02 = "";
     private String row_string_23 = "";
+    private String first_header = "";
+    private String last_header = "";
+    private TelnetCursor _cursor = null;
+    private Article_Handler _article_handler = new Article_Handler();
+    private boolean _reading_article = false;
 
     public void setArticleNumber(String aArticleNumber) {
         this._article_number = aArticleNumber;
@@ -90,20 +88,20 @@ public class BahamutStateHandler extends TelnetStateHandler {
             int end_point = -1;
             int i = 0;
             while (true) {
-                if (i < row.data.length) {
-                    byte background_color = row.backgroundColor[i];
-                    byte data = row.data[i];
-                    if (background_color != 6) {
-                        if (background_color != 5) {
-                            end_point = i;
-                            break;
-                        }
-                        msg_buffer.write(data);
-                    } else {
-                        name_buffer.write(data);
-                    }
-                    i++;
+                if (i >= row.data.length) {
+                    break;
                 }
+                byte background_color = row.backgroundColor[i];
+                byte data = row.data[i];
+                if (background_color == 6) {
+                    name_buffer.write(data);
+                } else if (background_color == 5) {
+                    msg_buffer.write(data);
+                } else {
+                    end_point = i;
+                    break;
+                }
+                i++;
             }
             if (name_buffer.size() > 0 && msg_buffer.size() > 0) {
                 String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
@@ -113,7 +111,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     String msg2 = msg.substring(1);
                     AppDatabase db = new AppDatabase(MyApplication.getInstance());
                     db.saveMessage(name2, msg2);
-                    List<Map<String, Object>> loadMessages = db.loadMessages();
+                    db.loadMessages();
                     return true;
                 }
             }
@@ -135,12 +133,15 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 ASToast.showShortToast(continue_message);
             }
             if (this.row_string_23.startsWith("★ 引言太多")) {
-                TelnetClient.getClient().sendDataToServer(TelnetOutputBuilder.create().pushKey(32).pushKey(24).pushString("a\n\n").build());
+                byte[] data = TelnetOutputBuilder.create().pushKey(32).pushKey(24).pushString("a\n\n").build();
+                TelnetClient.getClient().sendDataToServer(data);
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
                 if (top_page instanceof BoardPage) {
-                    PageContainer.getInstance().getBoardPage().recoverPost();
+                    BoardPage page = PageContainer.getInstance().getBoardPage();
+                    page.recoverPost();
                 } else if (top_page instanceof MailBoxPage) {
-                    PageContainer.getInstance().getMailBoxPage().recoverPost();
+                    MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
+                    page2.recoverPost();
                 }
                 return false;
             }
@@ -150,11 +151,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
             ASToast.showShortToast("此看板無文章");
             TelnetClient.getClient().sendStringToServer("N");
             return false;
-        } else if (!this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
-            return run_pass_2;
-        } else {
+        } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
             TelnetClient.getClient().sendKeyboardInputToServer(256);
             return false;
+        } else {
+            return run_pass_2;
         }
     }
 
@@ -177,20 +178,22 @@ public class BahamutStateHandler extends TelnetStateHandler {
             showPage(page);
         }
         if (this.last_header.equals("本次")) {
-            new ASRunner() {
+            new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.1
+                @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    MainPage page = PageContainer.getInstance().getMainPage();
-                    if (page.isTopPage()) {
-                        page.onProcessHotMessage();
+                    MainPage page2 = PageContainer.getInstance().getMainPage();
+                    if (page2.isTopPage()) {
+                        page2.onProcessHotMessage();
                     }
                 }
             }.runInMainThread();
         } else if (this.last_header.equals("G)")) {
-            new ASRunner() {
+            new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.2
+                @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    MainPage page = PageContainer.getInstance().getMainPage();
-                    if (page.isTopPage()) {
-                        page.onCheckGoodbye();
+                    MainPage page2 = PageContainer.getInstance().getMainPage();
+                    if (page2.isTopPage()) {
+                        page2.onCheckGoodbye();
                     }
                 }
             }.runInMainThread();
@@ -213,10 +216,13 @@ public class BahamutStateHandler extends TelnetStateHandler {
             TelnetClient.getClient().sendKeyboardInputToServer(67);
         } else if (this._cursor.row == 1) {
             SearchBoard_Handler.getInstance().read();
-            TelnetClient.getClient().sendDataToServer(TelnetOutputBuilder.create().pushData((byte) 25).pushString("\n\n").build());
-            new ASRunner() {
+            byte[] data = TelnetOutputBuilder.create().pushData((byte) 25).pushString("\n\n").build();
+            TelnetClient.getClient().sendDataToServer(data);
+            new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.3
+                @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    PageContainer.getInstance().getClassPage().onSearchBoardFinished();
+                    ClassPage page = PageContainer.getInstance().getClassPage();
+                    page.onSearchBoardFinished();
                 }
             }.runInMainThread();
         }
@@ -267,77 +273,78 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
     }
 
+    @Override // com.kota.Telnet.TelnetStateHandler
     public void handleState() {
         loadState();
         this._cursor = TelnetClient.getModel().getCursor();
-        if (!pass_1()) {
-            return;
-        }
-        if (getCurrentPage() == 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
-            TelnetClient.getClient().sendKeyboardInputToServer(256);
-        } else if (getCurrentPage() > 9 && this.row_string_23.startsWith("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
-            handleArticle();
-            onReadArticleFinished();
-            TelnetClient.getClient().sendKeyboardInputToServer(256);
-        } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("魚雁往返") && this.row_string_23.endsWith("標記")) {
-            handleArticle();
-            onReadArticleFinished();
-            TelnetClient.getClient().sendKeyboardInputToServer(256);
-        } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
-            handleArticle();
-            onReadArticlePage();
-            TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.PAGE_DOWN, 1);
-        } else if (this.first_header.equals("對戰") && getCurrentPage() < 5) {
-            handleLoginPage();
-        } else if (this.row_string_00.startsWith("【主功能表】")) {
-            handleMainPage();
-        } else if (this.row_string_00.startsWith("【郵件選單】")) {
-            handleMailBoxPage();
-        } else if (this.row_string_00.startsWith("【看板列表】")) {
-            if (this.row_string_01.startsWith("請輸入看板名稱")) {
-                handleSearchBoard();
-            } else if (this.row_string_02.startsWith("總數")) {
-                TelnetClient.getClient().sendKeyboardInputToServer(99);
-            } else {
-                handleClassPage();
-            }
-        } else if (this.row_string_00.startsWith("【主題串列】")) {
-            if (PageContainer.getInstance().getBoardPage().getLastListAction() == 1) {
-                handleBoardSearchPage();
-            } else {
-                handleBoardTitleLinkedPage();
-            }
-        } else if (this.row_string_00.startsWith("【板主：")) {
-            handleBoardPage();
-        } else if (this.row_string_23.startsWith("您要刪除上述記錄嗎")) {
-            TelnetClient.getClient().sendStringToServer("n");
-        } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
-            TelnetClient.getClient().sendKeyboardInputToServer(256);
-        } else if (this.last_header.equals("您想")) {
-            new ASRunner() {
-                public void run() {
-                    LoginPage page = PageContainer.getInstance().getLoginPage();
-                    if (page.isTopPage()) {
-                        page.onSaveArticle();
-                    }
+        if (pass_1()) {
+            if (getCurrentPage() == 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+                TelnetClient.getClient().sendKeyboardInputToServer(256);
+            } else if (getCurrentPage() > 9 && this.row_string_23.startsWith("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
+                handleArticle();
+                onReadArticleFinished();
+                TelnetClient.getClient().sendKeyboardInputToServer(256);
+            } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("魚雁往返") && this.row_string_23.endsWith("標記")) {
+                handleArticle();
+                onReadArticleFinished();
+                TelnetClient.getClient().sendKeyboardInputToServer(256);
+            } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+                handleArticle();
+                onReadArticlePage();
+                TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.PAGE_DOWN, 1);
+            } else if (this.first_header.equals("對戰") && getCurrentPage() < 5) {
+                handleLoginPage();
+            } else if (this.row_string_00.startsWith("【主功能表】")) {
+                handleMainPage();
+            } else if (this.row_string_00.startsWith("【郵件選單】")) {
+                handleMailBoxPage();
+            } else if (this.row_string_00.startsWith("【看板列表】")) {
+                if (this.row_string_01.startsWith("請輸入看板名稱")) {
+                    handleSearchBoard();
+                } else if (this.row_string_02.startsWith("總數")) {
+                    TelnetClient.getClient().sendKeyboardInputToServer(99);
+                } else {
+                    handleClassPage();
                 }
-            }.runInMainThread();
-        } else if (this.row_string_23.startsWith("★ 請閱讀最新公告")) {
-            TelnetClient.getClient().sendStringToServer("");
-        } else if (this._step == 0 && this.first_header.equals("--")) {
-            setCurrentPage(3);
-            if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
+            } else if (this.row_string_00.startsWith("【主題串列】")) {
+                if (PageContainer.getInstance().getBoardPage().getLastListAction() == 1) {
+                    handleBoardSearchPage();
+                } else {
+                    handleBoardTitleLinkedPage();
+                }
+            } else if (this.row_string_00.startsWith("【板主：")) {
+                handleBoardPage();
+            } else if (this.row_string_23.startsWith("您要刪除上述記錄嗎")) {
+                TelnetClient.getClient().sendStringToServer("n");
+            } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
+                TelnetClient.getClient().sendKeyboardInputToServer(256);
+            } else if (this.last_header.equals("您想")) {
+                new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
+                    @Override // com.kota.ASFramework.Thread.ASRunner
+                    public void run() {
+                        LoginPage page = PageContainer.getInstance().getLoginPage();
+                        if (page.isTopPage()) {
+                            page.onSaveArticle();
+                        }
+                    }
+                }.runInMainThread();
+            } else if (this.row_string_23.startsWith("★ 請閱讀最新公告")) {
                 TelnetClient.getClient().sendStringToServer("");
-            }
-        } else if (this._step == 0 && this.first_header.equals("□□")) {
-            setCurrentPage(2);
-            if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
-                TelnetClient.getClient().sendStringToServer("");
-            }
-        } else if (this.first_header.equals("【過")) {
-            setCurrentPage(4);
-            if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
-                TelnetClient.getClient().sendStringToServer("");
+            } else if (this._step == 0 && this.first_header.equals("--")) {
+                setCurrentPage(3);
+                if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
+                    TelnetClient.getClient().sendStringToServer("");
+                }
+            } else if (this._step == 0 && this.first_header.equals("□□")) {
+                setCurrentPage(2);
+                if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
+                    TelnetClient.getClient().sendStringToServer("");
+                }
+            } else if (this.first_header.equals("【過")) {
+                setCurrentPage(4);
+                if (this.last_header.equals("●請") || this.last_header.equals("請按")) {
+                    TelnetClient.getClient().sendStringToServer("");
+                }
             }
         }
     }
@@ -357,7 +364,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this._article_handler.build();
         TelnetArticle article = this._article_handler.getArticle();
         this._article_handler.newArticle();
-        BoardPage boardPage = PageContainer.getInstance().getBoardPage();
+        PageContainer.getInstance().getBoardPage();
         if (this._article_number != null) {
             article.Number = Integer.parseInt(this._article_number);
         }
@@ -370,7 +377,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     private void showArticle(final TelnetArticle aArticle) {
-        new ASRunner() {
+        new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.5
+            @Override // com.kota.ASFramework.Thread.ASRunner
             public void run() {
                 try {
                     PageContainer.getInstance().getArticlePage().setArticle(aArticle);
@@ -382,16 +390,18 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     private void showMail(final TelnetArticle aArticle) {
-        new ASRunner() {
+        new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.6
+            @Override // com.kota.ASFramework.Thread.ASRunner
             public void run() {
                 MailPage mail_page;
-                MailPage mail_page2 = null;
+                MailPage mail_page2;
                 try {
                     TelnetPage last_page = (TelnetPage) ASNavigationController.getCurrentController().getViewControllers().lastElement();
                     if (last_page == null || last_page.getPageType() != 15) {
                         mail_page = null;
                     } else {
-                        mail_page = (MailPage) last_page;
+                        MailPage mail_page3 = (MailPage) last_page;
+                        mail_page = mail_page3;
                     }
                     if (mail_page == null) {
                         try {
@@ -399,40 +409,39 @@ public class BahamutStateHandler extends TelnetStateHandler {
                             ASNavigationController.getCurrentController().pushViewController(mail_page2);
                         } catch (Exception e) {
                             e = e;
-                            MailPage mailPage = mail_page;
                             e.printStackTrace();
+                            return;
                         }
                     } else {
                         mail_page2 = mail_page;
                     }
                     mail_page2.setArticle(aArticle);
                 } catch (Exception e2) {
-                    e2.printStackTrace();
+                    Exception e = e2;
                 }
             }
         }.runInMainThread();
     }
 
     public void showPage(TelnetPage aPage) {
-        // aPage 進入判斷的頁面
-        // top_page 最上層的頁面
-        ASNavigationController asNavigationController = ASNavigationController.getCurrentController();
-        final TelnetPage top_page = (TelnetPage) asNavigationController.getTopController();
+        final TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
         if (aPage == top_page) {
-            new ASRunner() {
+            new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.7
+                @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
                     top_page.requestPageRefresh();
                 }
             }.runInMainThread();
         } else if (!top_page.isPopupPage() && aPage != null) {
-            if (asNavigationController.containsViewController(aPage)) {
-                asNavigationController.popToViewController(aPage);
+            if (ASNavigationController.getCurrentController().containsViewController(aPage)) {
+                ASNavigationController.getCurrentController().popToViewController(aPage);
             } else {
-                asNavigationController.pushViewController(aPage);
+                ASNavigationController.getCurrentController().pushViewController(aPage);
             }
         }
     }
 
+    @Override // com.kota.Telnet.TelnetStateHandler
     public void clear() {
         this._step = 0;
         setCurrentPage(-1);
@@ -442,19 +451,16 @@ public class BahamutStateHandler extends TelnetStateHandler {
         int start = 0;
         int end = aMessage.length() - 1;
         char[] words = aMessage.toCharArray();
-        while (true) {
-            if ((words[start] == 9733 || words[start] == ' ') && start < words.length) {
-                start++;
-            } else {
-                break;
-            }
+        while (start < words.length) {
+            start = (words[start] == 9733 || words[start] == ' ') ? start + 1 : 0;
         }
         while (words[end] != '[' && end >= 0) {
             end--;
         }
-        if (end > start) {
-            return aMessage.substring(start, end).trim();
+        if (end <= start) {
+            return "";
         }
-        return "";
+        String message = aMessage.substring(start, end).trim();
+        return message;
     }
 }

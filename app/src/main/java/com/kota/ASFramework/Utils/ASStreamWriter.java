@@ -9,8 +9,8 @@ public class ASStreamWriter {
   }
   
   public static void writeData(OutputStream paramOutputStream, char paramChar) throws IOException {
-    paramOutputStream.write(paramChar >> 8 & 0xFF);
-    paramOutputStream.write(paramChar & 0xFF);
+    paramOutputStream.write(paramChar >> 8 & 255);
+    paramOutputStream.write(paramChar & 255);
   }
   
   public static void writeData(OutputStream paramOutputStream, double paramDouble) throws IOException {
@@ -22,21 +22,21 @@ public class ASStreamWriter {
   }
   
   public static void writeData(OutputStream paramOutputStream, int paramInt) throws IOException {
-    paramOutputStream.write(paramInt >> 24 & 0xFF);
-    paramOutputStream.write(paramInt >> 16 & 0xFF);
-    paramOutputStream.write(paramInt >> 8 & 0xFF);
-    paramOutputStream.write(paramInt & 0xFF);
+    paramOutputStream.write(paramInt >> 24 & 255);
+    paramOutputStream.write(paramInt >> 16 & 255);
+    paramOutputStream.write(paramInt >> 8 & 255);
+    paramOutputStream.write(paramInt & 255);
   }
   
   public static void writeData(OutputStream paramOutputStream, long paramLong) throws IOException {
-    paramOutputStream.write((int)(paramLong >> 56L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 48L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 40L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 32L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 24L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 16L) & 0xFF);
-    paramOutputStream.write((int)(paramLong >> 8L) & 0xFF);
-    paramOutputStream.write((int)paramLong & 0xFF);
+    paramOutputStream.write((int)(paramLong >> 56L) & 255);
+    paramOutputStream.write((int)(paramLong >> 48L) & 255);
+    paramOutputStream.write((int)(paramLong >> 40L) & 255);
+    paramOutputStream.write((int)(paramLong >> 32L) & 255);
+    paramOutputStream.write((int)(paramLong >> 24L) & 255);
+    paramOutputStream.write((int)(paramLong >> 16L) & 255);
+    paramOutputStream.write((int)(paramLong >> 8L) & 255);
+    paramOutputStream.write((int)paramLong & 255);
   }
   
   public static void writeData(OutputStream paramOutputStream, String paramString) throws IOException {
@@ -44,8 +44,8 @@ public class ASStreamWriter {
   }
   
   public static void writeData(OutputStream paramOutputStream, short paramShort) throws IOException {
-    paramOutputStream.write(paramShort >> 8 & 0xFF);
-    paramOutputStream.write(paramShort & 0xFF);
+    paramOutputStream.write(paramShort >> 8 & 255);
+    paramOutputStream.write(paramShort & 255);
   }
   
   public static void writeData(OutputStream paramOutputStream, boolean paramBoolean) throws IOException {

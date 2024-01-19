@@ -15,12 +15,12 @@ public class ASGestureView extends FrameLayout implements GestureDetector.OnGest
   
   private boolean _event_locked = false;
   
-  private GestureDetector _gesture_detector = null;
+  private final GestureDetector _gesture_detector;
   
   public ASGestureView(Context paramContext) {
     super(paramContext);
     this._gesture_detector = new GestureDetector(paramContext, this);
-    filter = (int)TypedValue.applyDimension(1, 550.0F, paramContext.getResources().getDisplayMetrics());
+    filter = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 550.0F, paramContext.getResources().getDisplayMetrics());
   }
   
   public boolean onDown(MotionEvent paramMotionEvent) {
@@ -28,8 +28,7 @@ public class ASGestureView extends FrameLayout implements GestureDetector.OnGest
   }
   
   public boolean onFling(MotionEvent paramMotionEvent1, MotionEvent paramMotionEvent2, float paramFloat1, float paramFloat2) {
-    boolean bool2 = false;
-    boolean bool1 = bool2;
+    boolean bool1 = false;
     if (this._delegate != null) {
       float f2 = Math.abs(paramFloat1);
       float f1 = Math.abs(paramFloat2);
@@ -40,9 +39,7 @@ public class ASGestureView extends FrameLayout implements GestureDetector.OnGest
           bool1 = this._delegate.onASGestureReceivedGestureLeft();
         } 
       } else {
-        bool1 = bool2;
         if (f1 > filter) {
-          bool1 = bool2;
           if (f1 > range * f2)
             if (paramFloat2 > 0.0F) {
               bool1 = this._delegate.onASGestureReceivedGestureDown();

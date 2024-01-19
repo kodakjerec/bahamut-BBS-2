@@ -7,7 +7,7 @@
         <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
             android:name="com.kota.Bahamut.BahamutController"
             android:screenOrientation="fullSensor"
-            android:theme="@style/MyTheme"
+            android:theme="@style/Theme.AppCompat"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
             tools:ignore="Instantiatable">

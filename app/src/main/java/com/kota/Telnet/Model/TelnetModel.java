@@ -6,39 +6,29 @@ import com.kota.Telnet.TelnetCommand;
 import com.kota.Telnet.TelnetCursor;
 import java.nio.ByteBuffer;
 
+/* loaded from: classes.dex */
 public class TelnetModel {
-    protected TelnetAnsi _ansi;
-    private final ByteBuffer _ansi_buffer;
-    private TelnetCursor _cursor;
-    private TelnetFrame _frame;
-    private int _pushed_data_size;
+    private static int _count = 0;
     private int _row;
-    private TelnetCursor _saved_cursor;
+    protected TelnetAnsi _ansi = new TelnetAnsi();
+    private TelnetFrame _frame = null;
+    private TelnetCursor _cursor = new TelnetCursor();
+    private TelnetCursor _saved_cursor = new TelnetCursor();
+    private int _pushed_data_size = 0;
+    private ByteBuffer _ansi_buffer = ByteBuffer.allocate(1024);
 
     protected void finalize() throws Throwable {
         super.finalize();
     }
 
     public TelnetModel(int row) {
-        this._ansi = new TelnetAnsi();
-        this._frame = null;
         this._row = 0;
-        this._cursor = new TelnetCursor();
-        this._saved_cursor = new TelnetCursor();
-        this._pushed_data_size = 0;
-        this._ansi_buffer = ByteBuffer.allocate(1024);
         this._row = row;
         initialDataModel();
     }
 
     public TelnetModel() {
-        this._ansi = new TelnetAnsi();
-        this._frame = null;
         this._row = 0;
-        this._cursor = new TelnetCursor();
-        this._saved_cursor = new TelnetCursor();
-        this._pushed_data_size = 0;
-        this._ansi_buffer = ByteBuffer.allocate(1024);
         this._row = 24;
         initialDataModel();
     }
@@ -81,15 +71,18 @@ public class TelnetModel {
     }
 
     public int getData(int row, int column) {
-        return this._frame.getRow(row).data[column] & 0xFF;
+        int data = this._frame.getRow(row).data[column];
+        return data & 255;
     }
 
     public int getTextColor(int row, int column) {
-        return TelnetAnsiCode.getTextColor(this._frame.getRow(row).textColor[column]);
+        byte data = this._frame.getRow(row).textColor[column];
+        return TelnetAnsiCode.getTextColor(data);
     }
 
     public int getBackgroundColor(int row, int column) {
-        return TelnetAnsiCode.getBackgroundColor(this._frame.getRow(row).backgroundColor[column]);
+        byte data = this._frame.getRow(row).backgroundColor[column];
+        return TelnetAnsiCode.getBackgroundColor(data);
     }
 
     public TelnetCursor getCursor() {
@@ -118,16 +111,20 @@ public class TelnetModel {
     public void setCursorRow(int aRow) {
         if (aRow < 0) {
             this._cursor.row = 0;
+        } else if (aRow > this._row - 1) {
+            this._cursor.row = this._row - 1;
         } else {
-            this._cursor.row = Math.min(aRow, this._row - 1);
+            this._cursor.row = aRow;
         }
     }
 
     public void setCursorColumn(int aColumn) {
         if (aColumn < 0) {
             this._cursor.column = 0;
+        } else if (aColumn > 79) {
+            this._cursor.column = 79;
         } else {
-            this._cursor.column = Math.min(aColumn, 79);
+            this._cursor.column = aColumn;
         }
     }
 
@@ -338,7 +335,8 @@ public class TelnetModel {
 
     public void parseAnsiBuffer() {
         this._ansi_buffer.flip();
-        switch (this._ansi_buffer.get(this._ansi_buffer.limit() - 1) & 255) {
+        int cmd = this._ansi_buffer.get(this._ansi_buffer.limit() - 1) & 255;
+        switch (cmd) {
             case 65:
                 onReceivedAnsiControlCUU();
                 return;
@@ -392,6 +390,7 @@ public class TelnetModel {
                 return;
             default:
                 onReceivedUnknownAnsiControl();
+                return;
         }
     }
 
@@ -465,6 +464,8 @@ public class TelnetModel {
             case 64:
                 return;
             case 5:
+                this._ansi.textBlink = true;
+                return;
             case 6:
                 this._ansi.textBlink = true;
                 return;
@@ -476,63 +477,70 @@ public class TelnetModel {
             case 25:
                 this._ansi.textBlink = false;
                 return;
+            case 26:
+            case 50:
+            case 56:
+            case 57:
+            case 58:
+            case 59:
+            default:
+                this._ansi.resetToDefaultState();
+                System.out.println("Unsupported SGR code : " + state);
+                return;
             case 30:
-                this._ansi.textColor = 0;
+                this._ansi.textColor = (byte) 0;
                 return;
             case 31:
-                this._ansi.textColor = 1;
+                this._ansi.textColor = (byte) 1;
                 return;
             case 32:
-                this._ansi.textColor = 2;
+                this._ansi.textColor = (byte) 2;
                 return;
             case 33:
-                this._ansi.textColor = 3;
+                this._ansi.textColor = (byte) 3;
                 return;
             case 34:
-                this._ansi.textColor = 4;
+                this._ansi.textColor = (byte) 4;
                 return;
             case 35:
-                this._ansi.textColor = 5;
+                this._ansi.textColor = (byte) 5;
                 return;
             case 36:
-                this._ansi.textColor = 6;
+                this._ansi.textColor = (byte) 6;
                 return;
             case 37:
-                this._ansi.textColor = 7;
+                this._ansi.textColor = (byte) 7;
                 return;
             case 39:
                 this._ansi.textColor = TelnetAnsi.DEFAULT_TEXT_COLOR;
                 return;
             case 40:
-                this._ansi.backgroundColor = 0;
+                this._ansi.backgroundColor = (byte) 0;
                 return;
             case 41:
-                this._ansi.backgroundColor = 1;
+                this._ansi.backgroundColor = (byte) 1;
                 return;
             case 42:
-                this._ansi.backgroundColor = 2;
+                this._ansi.backgroundColor = (byte) 2;
                 return;
             case 43:
-                this._ansi.backgroundColor = 3;
+                this._ansi.backgroundColor = (byte) 3;
                 return;
             case 44:
-                this._ansi.backgroundColor = 4;
+                this._ansi.backgroundColor = (byte) 4;
                 return;
             case 45:
-                this._ansi.backgroundColor = 5;
+                this._ansi.backgroundColor = (byte) 5;
                 return;
             case 46:
-                this._ansi.backgroundColor = 6;
+                this._ansi.backgroundColor = (byte) 6;
                 return;
             case 47:
-                this._ansi.backgroundColor = 7;
+                this._ansi.backgroundColor = (byte) 7;
                 return;
             case 49:
                 this._ansi.backgroundColor = TelnetAnsi.DEFAULT_BACKGROUND_COLOR;
                 return;
-            default:
-                this._ansi.resetToDefaultState();
-                System.out.println("Unsupported SGR code : " + state);
         }
     }
 
@@ -653,6 +661,7 @@ public class TelnetModel {
                 return;
             default:
                 cleanFrameToEnd();
+                return;
         }
     }
 
@@ -674,6 +683,7 @@ public class TelnetModel {
                 return;
             default:
                 cleanRowToEnd();
+                return;
         }
     }
 
@@ -700,10 +710,11 @@ public class TelnetModel {
     }
 
     public String getAnsiBufferString() {
-        StringBuilder str = new StringBuilder();
+        String str = "";
         for (int i = 0; i < this._ansi_buffer.limit(); i++) {
-            str.append((char) (this._ansi_buffer.get(i) & 255));
+            int c = this._ansi_buffer.get(i) & 255;
+            str = str + String.valueOf((char) c);
         }
-        return str.toString();
+        return str;
     }
 }

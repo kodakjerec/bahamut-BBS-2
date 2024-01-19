@@ -20,30 +20,15 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/toolbar_item_background_color">
+            android:background="@drawable/toolbar_item_background_color">
 
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                style="@style/TextViewLarge"
+                style="@style/SystemSettings_item_text"
                 android:id="@+id/loginRememberLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginStart="50dp"
-                android:singleLine="true"
-                android:text="@string/save_data"
-                android:textColor="@android:color/white" />
+                android:text="@string/save_data" />
 
             <CheckBox
-                android:id="@+id/Login_LoginRememberCheckBox"
-                style="@style/CheckBox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="10dp"
-                android:gravity="center_vertical"
-                android:scaleX="1"
-                android:scaleY="1" />
+                android:id="@+id/Login_LoginRememberCheckBox" style="@style/Checkbox_bahamut" />
         </RelativeLayout>
 
         <View style="@style/ToolbarDivider" />
@@ -97,7 +82,7 @@
                     android:labelFor="@id/Login_UsernameLabel"
                     android:maxLength="12"
                     android:singleLine="true"
-                    android:textSize="30dp" />
+                    android:textSize="30sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -124,7 +109,7 @@
                     android:inputType="textPassword"
                     android:autofillHints="password"
                     android:singleLine="true"
-                    android:textSize="30dp"/>
+                    android:textSize="30sp"/>
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>

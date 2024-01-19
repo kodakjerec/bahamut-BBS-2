@@ -3,90 +3,118 @@ package com.kota.ASFramework.PageController;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.FrameLayout;
 import com.kota.ASFramework.Model.ASSize;
 
+/* loaded from: classes.dex */
 public class ASNavigationControllerView extends ASPageView implements ASGestureViewDelegate {
-  private ASPageView _background_view = null;
-  
-  private final ASSize _content_size = new ASSize(0, 0);
-  
-  private ASPageView _content_view = null;
+  private ASPageView _background_view;
+  private ASSize _content_size;
+  private ASPageView _content_view;
+  private ASGestureView _gesture_view;
+  private ASNavigationController _page_controller;
 
-  private ASNavigationController _page_controller = null;
-  
-  public ASNavigationControllerView(Context paramContext) {
-    super(paramContext);
-    initial(paramContext);
+  public ASNavigationControllerView(Context context) {
+    super(context);
+    this._background_view = null;
+    this._content_view = null;
+    this._gesture_view = null;
+    this._content_size = new ASSize(0, 0);
+    this._page_controller = null;
+    initial(context);
   }
-  
-  public ASNavigationControllerView(Context paramContext, AttributeSet paramAttributeSet) {
-    super(paramContext, paramAttributeSet);
-    initial(paramContext);
+
+  public ASNavigationControllerView(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    this._background_view = null;
+    this._content_view = null;
+    this._gesture_view = null;
+    this._content_size = new ASSize(0, 0);
+    this._page_controller = null;
+    initial(context);
   }
-  
-  public ASNavigationControllerView(Context paramContext, AttributeSet paramAttributeSet, int paramInt) {
-    super(paramContext, paramAttributeSet, paramInt);
-    initial(paramContext);
+
+  public ASNavigationControllerView(Context context, AttributeSet attrs, int defStyle) {
+    super(context, attrs, defStyle);
+    this._background_view = null;
+    this._content_view = null;
+    this._gesture_view = null;
+    this._content_size = new ASSize(0, 0);
+    this._page_controller = null;
+    initial(context);
   }
-  
-  private void initial(Context paramContext) {
-    this._background_view = new ASPageView(paramContext);
-    this._background_view.setLayoutParams(new LayoutParams(-1, -1));
+
+  private void initial(Context context) {
+    this._background_view = new ASPageView(context);
+    this._background_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
     addView(this._background_view);
-    this._content_view = new ASPageView(paramContext);
-    this._content_view.setLayoutParams(new LayoutParams(-1, -1));
+    this._content_view = new ASPageView(context);
+    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
     addView(this._content_view);
-    ASGestureView _gesture_view = new ASGestureView(paramContext);
-    _gesture_view.setLayoutParams(new LayoutParams(-1, -1));
-    _gesture_view.setDelegate(this);
-    addView(_gesture_view);
+    this._gesture_view = new ASGestureView(context);
+    this._gesture_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
+    this._gesture_view.setDelegate(this);
+    addView(this._gesture_view);
   }
-  
+
   public ASPageView getBackgroundView() {
     return this._background_view;
   }
-  
-  public ASSize getContentSize() {
-    return this._content_size;
-  }
-  
+
   public ASPageView getContentView() {
     return this._content_view;
   }
-  
-  public void onASGestureDispathTouchEvent(MotionEvent paramMotionEvent) {
-    this._content_view.dispatchTouchEvent(paramMotionEvent);
+
+  public ASSize getContentSize() {
+    return this._content_size;
   }
-  
-  public boolean onASGestureReceivedGestureDown() {
-    return this._page_controller != null && this._page_controller.onReceivedGestureDown();
+
+  public void setPageController(ASNavigationController aController) {
+    this._page_controller = aController;
   }
-  
-  public boolean onASGestureReceivedGestureLeft() {
-    return this._page_controller != null && this._page_controller.onReceivedGestureLeft();
+
+  @Override // android.view.View
+  protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+    super.onSizeChanged(w, h, oldw, oldh);
+    if (this._page_controller != null) {
+      this._page_controller.onSizeChanged(w, h, oldw, oldh);
+    }
   }
-  
-  public boolean onASGestureReceivedGestureRight() {
-    return this._page_controller != null && this._page_controller.onReceivedGestureRight();
+
+  @Override // com.kota.ASFramework.PageController.ASGestureViewDelegate
+  public void onASGestureDispathTouchEvent(MotionEvent event) {
+    this._content_view.dispatchTouchEvent(event);
   }
-  
+
+  @Override // com.kota.ASFramework.PageController.ASGestureViewDelegate
   public boolean onASGestureReceivedGestureUp() {
-    return this._page_controller != null && this._page_controller.onReceivedGestureUp();
+    if (this._page_controller != null) {
+      return this._page_controller.onReceivedGestureUp();
+    }
+    return false;
   }
-  
-  protected void onSizeChanged(int paramInt1, int paramInt2, int paramInt3, int paramInt4) {
-    super.onSizeChanged(paramInt1, paramInt2, paramInt3, paramInt4);
-    if (this._page_controller != null)
-      this._page_controller.onSizeChanged(paramInt1, paramInt2, paramInt3, paramInt4); 
+
+  @Override // com.kota.ASFramework.PageController.ASGestureViewDelegate
+  public boolean onASGestureReceivedGestureDown() {
+    if (this._page_controller != null) {
+      return this._page_controller.onReceivedGestureDown();
+    }
+    return false;
   }
-  
-  public void setPageController(ASNavigationController paramASNavigationController) {
-    this._page_controller = paramASNavigationController;
+
+  @Override // com.kota.ASFramework.PageController.ASGestureViewDelegate
+  public boolean onASGestureReceivedGestureLeft() {
+    if (this._page_controller != null) {
+      return this._page_controller.onReceivedGestureLeft();
+    }
+    return false;
+  }
+
+  @Override // com.kota.ASFramework.PageController.ASGestureViewDelegate
+  public boolean onASGestureReceivedGestureRight() {
+    if (this._page_controller != null) {
+      return this._page_controller.onReceivedGestureRight();
+    }
+    return false;
   }
 }
-
-
-/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASNavigationControllerView.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */

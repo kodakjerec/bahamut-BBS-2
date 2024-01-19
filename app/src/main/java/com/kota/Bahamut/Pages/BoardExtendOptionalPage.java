@@ -202,10 +202,10 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
             for (Button tab_button : this._tab_buttons) {
                 if (tab_button == this._selected_button) {
                     tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_selected));
-                    tab_button.setBackgroundResource(R.color.tab_item_background_color_selected);
+                    tab_button.setBackgroundResource(R.drawable.tab_item_background_color_selected);
                 } else {
                     tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_unselected));
-                    tab_button.setBackgroundResource(R.color.tab_item_background_color_unselected);
+                    tab_button.setBackgroundResource(R.drawable.tab_item_background_color_unselected);
                 }
             }
         }

@@ -6,8 +6,8 @@ import com.kota.ASFramework.Thread.ASRunner;
 
 /* loaded from: classes.dex */
 public class ASViewRemover {
-  private ViewGroup _parent_view;
-  private View _target_view;
+  private final ViewGroup _parent_view;
+  private final View _target_view;
 
   public static void remove(ViewGroup parentView, View targetView) {
     ASViewRemover remover = new ASViewRemover(parentView, targetView);
@@ -15,8 +15,6 @@ public class ASViewRemover {
   }
 
   public ASViewRemover(ViewGroup parentView, View targetView) {
-    this._parent_view = null;
-    this._target_view = null;
     this._parent_view = parentView;
     this._target_view = targetView;
   }
@@ -32,8 +30,7 @@ public class ASViewRemover {
     });
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void remove() {
+  private void remove() {
     new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASViewRemover.2
       @Override // com.kumi.ASFramework.Thread.ASRunner
       public void run() {

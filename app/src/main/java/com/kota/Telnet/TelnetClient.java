@@ -9,16 +9,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/* loaded from: classes.dex */
 public class TelnetClient implements TelnetConnectorListener {
     private static TelnetClient _instance = null;
-    /* access modifiers changed from: private */
-    public TelnetConnector _connector = null;
-    private TelnetClientListener _listener = null;
-    private TelnetModel _model = null;
-    private TelnetReceiver _receiver = null;
-    ExecutorService _send_executor = Executors.newSingleThreadExecutor();
-    private TelnetStateHandler _state_handler = null;
+    private TelnetConnector _connector;
+    private TelnetModel _model;
+    private TelnetReceiver _receiver;
+    private TelnetStateHandler _state_handler;
     private String _username;
+    private TelnetClientListener _listener = null;
+    ExecutorService _send_executor = Executors.newSingleThreadExecutor();
 
     public static void construct(TelnetStateHandler aStateHandler) {
         _instance = new TelnetClient(aStateHandler);
@@ -37,6 +37,10 @@ public class TelnetClient implements TelnetConnectorListener {
     }
 
     private TelnetClient(TelnetStateHandler aStateHandler) {
+        this._state_handler = null;
+        this._connector = null;
+        this._receiver = null;
+        this._model = null;
         this._state_handler = aStateHandler;
         this._model = new TelnetModel();
         this._connector = new TelnetConnector();
@@ -63,13 +67,10 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
-
     public void sendStringToServer(String str) {
         if (ASRunner.isMainThread()) {
-            // Running on the main thread
             sendStringToServerInBackground(str, 0);
         } else {
-            // Not running on the main thread
             sendStringToServer(str, 0);
         }
     }
@@ -78,7 +79,8 @@ public class TelnetClient implements TelnetConnectorListener {
         byte[] data = null;
         boolean encode_success = false;
         try {
-            data = U2BEncoder.getInstance().encodeToBytes((str + "\n").getBytes(TelnetDefs.CHARSET), 0);
+            byte[] data2 = (str + "\n").getBytes(TelnetDefs.CHARSET);
+            data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -96,7 +98,8 @@ public class TelnetClient implements TelnetConnectorListener {
         byte[] data = null;
         boolean encode_success = false;
         try {
-            data = U2BEncoder.getInstance().encodeToBytes((str + "\n").getBytes(TelnetDefs.CHARSET), 0);
+            byte[] data2 = (str + "\n").getBytes(TelnetDefs.CHARSET);
+            data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -134,8 +137,7 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void sendDataToServer(byte[] data, int channel) {
+    protected void sendDataToServer(byte[] data, int channel) {
         if (data != null && this._connector.isConnecting()) {
             this._connector.writeData(data, channel);
             this._connector.sendData(channel);
@@ -148,7 +150,8 @@ public class TelnetClient implements TelnetConnectorListener {
 
     public void sendDataToServerInBackground(final byte[] data, final int channel) {
         if (data != null && this._connector.isConnecting()) {
-            this._send_executor.submit(new Runnable() {
+            this._send_executor.submit(new Runnable() { // from class: com.kota.Telnet.TelnetClient.1
+                @Override // java.lang.Runnable
                 public void run() {
                     TelnetClient.this._connector.writeData(data, channel);
                     TelnetClient.this._connector.sendData(channel);
@@ -161,12 +164,14 @@ public class TelnetClient implements TelnetConnectorListener {
         this._listener = aListener;
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectStart(TelnetConnector aConnector) {
         if (this._listener != null) {
             this._listener.onTelnetClientConnectionStart(this);
         }
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorClosed(TelnetConnector aConnector) {
         clear();
         if (this._listener != null) {
@@ -174,6 +179,7 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectSuccess(TelnetConnector aConnector) {
         this._receiver.startReceiver();
         if (this._listener != null) {
@@ -181,6 +187,7 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectFail(TelnetConnector aConnector) {
         clear();
         if (this._listener != null) {
@@ -188,6 +195,7 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorReceiveDataStart(TelnetConnector aConnector) {
         if (this._state_handler != null) {
             this._model.cleanCahcedData();
@@ -195,6 +203,7 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
+    @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorReceiveDataFinished(TelnetConnector aConnector) {
         this._connector.cleanReadDataSize();
     }

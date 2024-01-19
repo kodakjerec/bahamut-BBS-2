@@ -5,6 +5,7 @@ import com.kota.TextEncoder.B2UEncoder;
 
 /* loaded from: classes.dex */
 public class TelnetRow {
+    private static int _count = 0;
     private TelnetRow _append_row;
     private String _cached_string;
     private int _empty_space;
@@ -113,6 +114,7 @@ public class TelnetRow {
 
     private void reloadQuoteSpace() {
         this._quote_level = 0;
+        this._quote_space = 0;
         int space_count = 0;
         this._quote_space = 0;
         while (this._quote_space < this.data.length) {
@@ -157,7 +159,7 @@ public class TelnetRow {
                 from_position = position;
             }
             position++;
-            int d = this.data[i] & 0xFF;
+            int d = this.data[i] & 255;
             if (d > 127 && i < to) {
                 i++;
             }
@@ -186,7 +188,6 @@ public class TelnetRow {
         System.out.println("self become:" + getRawString());
     }
 
-    @Override
     public TelnetRow clone() {
         return new TelnetRow(this);
     }

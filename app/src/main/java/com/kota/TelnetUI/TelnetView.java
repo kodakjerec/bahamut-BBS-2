@@ -1,5 +1,7 @@
 package com.kota.TelnetUI;
 
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -55,7 +57,7 @@ public class TelnetView extends View {
     private final int _origin_y;
     Paint _paint;
     private double _radius;
-    private final double _ratio;
+    private final double _ratio = 2.5d;
     private int _row;
     private float _scale_x;
     private float _scale_y;
@@ -151,7 +153,6 @@ public class TelnetView extends View {
         this._column = 80;
         this._draw_width = 0;
         this._draw_height = 0;
-        this._ratio = 2.5d;
         this._block_width = 6.0d;
         this._block_height = 15.0d;
         this._zh_text_size = 12.0d;
@@ -195,7 +196,6 @@ public class TelnetView extends View {
         this._column = 80;
         this._draw_width = 0;
         this._draw_height = 0;
-        this._ratio = 2.5d;
         this._block_width = 6.0d;
         this._block_height = 15.0d;
         this._zh_text_size = 12.0d;
@@ -239,7 +239,6 @@ public class TelnetView extends View {
         this._column = 80;
         this._draw_width = 0;
         this._draw_height = 0;
-        this._ratio = 2.5d;
         this._block_width = 6.0d;
         this._block_height = 15.0d;
         this._zh_text_size = 12.0d;
@@ -330,10 +329,6 @@ public class TelnetView extends View {
         this._typeface = typeface;
     }
 
-    private int match(int value, int root) {
-        return (value / root) * root;
-    }
-
     @Override // android.view.View
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width_measure_value;
@@ -342,7 +337,7 @@ public class TelnetView extends View {
         int view_width = View.MeasureSpec.getSize(widthMeasureSpec);
         int view_height = View.MeasureSpec.getSize(heightMeasureSpec);
         ViewGroup.LayoutParams layout = getLayoutParams();
-        int default_text_size = match((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.DEFAULT_TEXT_SIZE, getContext().getResources().getDisplayMetrics()), 4);
+        double default_text_size = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, this.DEFAULT_TEXT_SIZE, getContext().getResources().getDisplayMetrics());
         this._draw_width = 0;
         this._draw_height = 0;
         this._scale_x = 1.0f;
@@ -355,38 +350,41 @@ public class TelnetView extends View {
         }
         this._row = this._frame.getRowSize();
         this._column = 80;
-        if (layout.width == -2 && layout.height == -2) {
-            this._block_width = default_text_size / 2;
-            this._block_height = match((int) (this._block_width * this._ratio), 2);
+        // 螢幕寬度/每行字元數 = 得到雙字元寬度(預估)
+        // => /2 得到單字元寬度
+        // => *2 得到雙字元寬度(精準)
+        if (layout.width == WRAP_CONTENT && layout.height == WRAP_CONTENT) {
+            this._block_width = (int)(default_text_size / 2/2*2);
+            this._block_height = this._block_width * this._ratio;
             this._draw_width = (int) (this._block_width * this._column);
             this._draw_height = (int) (this._block_height * this._row);
             this._scale_x = 1.0f;
             this._scale_y = 1.0f;
             width_measure_value = View.MeasureSpec.makeMeasureSpec(this._draw_width, MeasureSpec.EXACTLY);
             height_measure_value = View.MeasureSpec.makeMeasureSpec(this._draw_height, MeasureSpec.EXACTLY);
-        } else if (layout.height == -2) {
-            this._block_width = match(view_width / this._column, 2);
-            this._block_height = match((int) (this._block_width * this._ratio), 2);
+        } else if (layout.height == WRAP_CONTENT) {
+            this._block_width = (int)(view_width / this._column/2*2);
+            this._block_height = this._block_width * this._ratio;
             this._draw_width = (int) (this._block_width * this._column);
             this._draw_height = (int) (this._block_height * this._row);
-            this._scale_x = view_width / this._draw_width;
+            this._scale_x = (float)view_width / this._draw_width;
             width_measure_value = View.MeasureSpec.makeMeasureSpec(view_width, MeasureSpec.EXACTLY);
             height_measure_value = View.MeasureSpec.makeMeasureSpec(this._draw_height, MeasureSpec.EXACTLY);
-        } else if (layout.width == -2) {
-            this._block_height = match(view_height / this._row, 2);
-            this._block_width = match((int) (this._block_height / this._ratio), 2);
+        } else if (layout.width == WRAP_CONTENT) {
+            this._block_width = (int)(this._block_height / this._ratio/2*2);
+            this._block_height = view_height / this._row;
             this._draw_width = (int) (this._block_width * this._column);
             this._draw_height = (int) (this._block_height * this._row);
-            this._scale_y = view_height / this._draw_height;
+            this._scale_y = (float)view_height / this._draw_height;
             width_measure_value = View.MeasureSpec.makeMeasureSpec(this._draw_width, MeasureSpec.EXACTLY);
             height_measure_value = View.MeasureSpec.makeMeasureSpec(view_height, MeasureSpec.EXACTLY);
         } else {
-            this._block_width = match(view_width / this._column, 2);
-            this._block_height = match((int) (this._block_width * this._ratio), 2);
+            this._block_width = view_width / this._column/2*2;
+            this._block_height = this._block_width * this._ratio;
             this._draw_width = (int) (this._block_width * this._column);
             this._draw_height = (int) (this._block_height * this._row);
-            this._scale_x = view_width / this._draw_width;
-            this._scale_y = view_height / this._draw_height;
+            this._scale_x = (float)view_width / this._draw_width;
+            this._scale_y = (float)view_height / this._draw_height;
             width_measure_value = View.MeasureSpec.makeMeasureSpec(view_width, MeasureSpec.EXACTLY);
             height_measure_value = View.MeasureSpec.makeMeasureSpec(view_height, MeasureSpec.EXACTLY);
         }
@@ -399,12 +397,12 @@ public class TelnetView extends View {
             int unit_dp = (int) Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0f, getContext().getResources().getDisplayMetrics()));
             this._vertical_unit = (this._block_height - unit_dp) / 8.0d;
             this._horizontal_unit = (this._block_width * 2.0d) / 7.0d;
-            this._radius = match((int) (this._block_height / 2.0d), 2);
+            this._radius = this._block_height / 2.0d;
             if (this._radius > this._block_width) {
                 this._radius = this._block_width;
             }
-            this._zh_text_size = match((int) (this._radius * 2.0d), 2);
-            this._en_text_size = match((int) (this._zh_text_size * 0.8999999761581421d), 2);
+            this._zh_text_size = this._radius * 2.0d;
+            this._en_text_size = this._zh_text_size * 0.8999999761581421d;
         }
         this._bitmap_block_width = this._block_width * this._bitmap_space_x;
         this._bitmap_block_height = this._block_height * this._bitmap_space_y;
@@ -453,11 +451,11 @@ public class TelnetView extends View {
     }
 
     private void reloadDrawer() {
-        this._drawer.blockWidth = (int) this._block_width;
-        this._drawer.blockHeight = (int) this._block_height;
-        this._drawer.horizontalUnit = (int) this._horizontal_unit;
-        this._drawer.verticalUnit = (int) this._vertical_unit;
-        this._drawer.radius = (int) this._radius;
+        this._drawer.blockWidth = this._block_width;
+        this._drawer.blockHeight = this._block_height;
+        this._drawer.horizontalUnit = this._horizontal_unit;
+        this._drawer.verticalUnit = this._vertical_unit;
+        this._drawer.radius = this._radius;
         this._drawer.originX = this._origin_x;
         this._drawer.originY = this._origin_y;
         this._drawer.paint.setAntiAlias(true);
