@@ -31,7 +31,6 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -56,8 +55,7 @@ public class ArticlePage extends TelnetPage {
         @Override // android.widget.Adapter
         public int getCount() {
             if (ArticlePage.this._article != null) {
-                int count = ArticlePage.this._article.getItemSize() + 2;
-                return count;
+                return ArticlePage.this._article.getItemSize() + 2;
             }
             return 0;
         }
@@ -83,8 +81,7 @@ public class ArticlePage extends TelnetPage {
             if (itemIndex == getCount() - 1) {
                 return 3;
             }
-            int type = getItem(itemIndex).getType();
-            return type;
+            return getItem(itemIndex).getType();
         }
 
         @Override // android.widget.Adapter
@@ -301,26 +298,26 @@ public class ArticlePage extends TelnetPage {
             ArticlePage.this.showConnectionClosedToast();
         }
     };
-    private View.OnClickListener mMenuListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.10
+    private final View.OnClickListener mMenuListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.10
         @Override // android.view.View.OnClickListener
         public void onClick(View v) {
             ArticlePage.this.onMenuClicked();
         }
     };
-    private View.OnClickListener mDoGyListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.11
+    private final View.OnClickListener mDoGyListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.11
         @Override // android.view.View.OnClickListener
         public void onClick(View v) {
             ArticlePage.this.onGYButtonClicked();
         }
     };
-    private View.OnClickListener mChangeModeListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.12
+    private final View.OnClickListener mChangeModeListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.12
         @Override // android.view.View.OnClickListener
         public void onClick(View v) {
             ArticlePage.this.changeViewMode();
             ArticlePage.this.refreshExternalToolbar();
         }
     };
-    private View.OnClickListener mShowLinkListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.13
+    private final View.OnClickListener mShowLinkListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.13
         @Override // android.view.View.OnClickListener
         public void onClick(View v) {
             ArticlePage.this.onOpenLinkClicked();
@@ -386,7 +383,7 @@ public class ArticlePage extends TelnetPage {
             boolean show_top_bottom_function = perf.getBoolean("show_top_bottom_function", false);
             if (!show_top_bottom_function) {
                 Toast.makeText(activity, (int) R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
-                perf.edit().putBoolean("show_top_bottom_function", true).commit();
+                perf.edit().putBoolean("show_top_bottom_function", true).apply();
             }
         }
     }
@@ -449,7 +446,6 @@ public class ArticlePage extends TelnetPage {
                             ArticlePage.this.onOpenLinkClicked();
                             return;
                         default:
-                            return;
                     }
                 }
 
@@ -541,7 +537,6 @@ public class ArticlePage extends TelnetPage {
                             TelnetCommand command = new BahamutCommandDeleteArticle(item_number);
                             ArticlePage.this._board_page.pushCommand(command);
                             ArticlePage.this.onBackPressed();
-                            return;
                     }
                 }
             }).scheduleDismissOnPageDisappear(this).show();

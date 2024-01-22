@@ -27,7 +27,7 @@ public class ArticlePage_TimeTimeView extends RelativeLayout implements TelnetAr
     }
 
     public void init() {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.article_page_time_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_time_item_view, this);
         this._time_label = (TextView) findViewById(R.id.ArticleTimeItemView_Time);
     }
 

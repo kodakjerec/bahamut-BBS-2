@@ -123,6 +123,7 @@ public class TelnetArticle {
         return "Re: " + this.Title;
     }
 
+    // 設定文章標題
     public String generatrEditFormat() {
         StringBuffer content_buffer = new StringBuffer();
         String time_string = this._frame.getRow(2).toString().substring(4);
@@ -141,6 +142,7 @@ public class TelnetArticle {
         return this._frame.getRow(1).toString().substring(4);
     }
 
+    // 設定文章內容
     public String generateEditContent() {
         StringBuffer content_buffer = new StringBuffer();
         for (int i = 5; i < this._frame.getRowSize(); i++) {

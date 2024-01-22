@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace 'com.kota.Bahamut'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.kota.Bahamut"
-        minSdk 29
-        targetSdk 33
+        minSdk 28
+        targetSdk 34
         versionCode 1
-        versionName "1.0"
+        versionName "1.7"
     }
 
     buildTypes {

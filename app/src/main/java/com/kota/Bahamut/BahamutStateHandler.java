@@ -12,6 +12,7 @@ import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
+import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Telnet.Logic.Article_Handler;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Model.TelnetRow;
@@ -452,7 +453,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
         int end = aMessage.length() - 1;
         char[] words = aMessage.toCharArray();
         while (start < words.length) {
-            start = (words[start] == 9733 || words[start] == ' ') ? start + 1 : 0;
+            if (words[start] == 9733 || words[start] == 32)
+                start++;
+            else
+                break;
         }
         while (words[end] != '[' && end >= 0) {
             end--;

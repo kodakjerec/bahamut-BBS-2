@@ -1,5 +1,6 @@
 package com.kota.ASFramework.Dialog;
 
+import android.annotation.SuppressLint;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
@@ -8,7 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import androidx.core.view.ViewCompat;
+import com.kota.Bahamut.R;
 
 import java.util.Vector;
 
@@ -51,11 +52,12 @@ public class ASListDialog extends ASDialog {
     getWindow().setBackgroundDrawable(null);
   }
 
+  @SuppressLint("ResourceAsColor")
   private View buildContentView() {
     int frame_padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0f, getContext().getResources().getDisplayMetrics());
     int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5.0f, getContext().getResources().getDisplayMetrics());
     LinearLayout frame = new LinearLayout(getContext());
-    frame.setBackgroundColor(-1);
+    frame.setBackgroundResource(R.color.dialog_border_color);
     frame.setPadding(frame_padding, frame_padding, frame_padding, frame_padding);
     LinearLayout content_view = new LinearLayout(getContext());
     content_view.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));

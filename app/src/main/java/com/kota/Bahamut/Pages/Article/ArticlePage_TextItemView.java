@@ -2,9 +2,9 @@ package com.kota.Bahamut.Pages.Article;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,22 +30,22 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.article_page_text_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
         this._author_label = (TextView) findViewById(R.id.ArticleTextItemView_Title);
         this._content_label = (TextView) findViewById(R.id.ArticleTextItemView_Content);
         this._divider_view = (DividerView) findViewById(R.id.ArticleTextItemView_DividerView);
         this._content_view = (ViewGroup) findViewById(R.id.ArticleTextItemView_ContentView);
-        setBackgroundDrawable((Drawable) null);
+        setBackgroundResource(android.R.color.transparent);
     }
 
     public void setAuthor(String author, String nickname) {
         if (this._author_label != null) {
-            StringBuffer author_buffer = new StringBuffer();
+            StringBuilder author_buffer = new StringBuilder();
             if (author != null) {
                 author_buffer.append(author);
             }
             if (nickname != null && nickname.length() > 0) {
-                author_buffer.append("(" + nickname + ")");
+                author_buffer.append("(").append(nickname).append(")");
             }
             author_buffer.append(" 說:");
             this._author_label.setText(author_buffer.toString());
@@ -79,17 +79,17 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
 
     public void setDividerhidden(boolean isHidden) {
         if (isHidden) {
-            this._divider_view.setVisibility(8);
+            this._divider_view.setVisibility(View.GONE);
         } else {
-            this._divider_view.setVisibility(0);
+            this._divider_view.setVisibility(View.VISIBLE);
         }
     }
 
     public void setVisible(boolean visible) {
         if (visible) {
-            this._content_view.setVisibility(0);
+            this._content_view.setVisibility(View.VISIBLE);
         } else {
-            this._content_view.setVisibility(8);
+            this._content_view.setVisibility(View.GONE);
         }
     }
 }

@@ -12,12 +12,12 @@ import com.kota.Bahamut.R;
 public class Dialog_PostArticle extends ASDialog implements View.OnClickListener {
     public static final int NEW = 0;
     public static final int REPLY = 1;
-    Button _cancel_button = null;
+    Button _cancel_button;
     Dialog_PostArticle_Listener _listener = null;
     RadioGroup _post_target_group;
-    Button _send_button = null;
-    Spinner _sign_spinner = null;
-    int _target = 0;
+    Button _send_button;
+    Spinner _sign_spinner;
+    int _target;
 
     public String getName() {
         return "BahamutBoardsPostArticle";
@@ -32,7 +32,7 @@ public class Dialog_PostArticle extends ASDialog implements View.OnClickListener
         this._send_button = (Button) findViewById(R.id.send);
         this._cancel_button = (Button) findViewById(R.id.cancel);
         View reply_target_view = findViewById(R.id.reply_target_view);
-        View findViewById = findViewById(R.id.sign_view);
+        findViewById(R.id.sign_view);
         if (this._target == 0) {
             reply_target_view.setVisibility(View.GONE);
         } else {

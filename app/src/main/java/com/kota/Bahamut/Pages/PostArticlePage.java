@@ -226,8 +226,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 if (PostArticlePage.this._listener != null) {
                     PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign);
                 }
-                PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                PostArticlePage.this.clear();
+                closeArticle();
             });
             dialog.show();
         } else if (this._article_number != null) {
@@ -236,9 +235,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                     if (PostArticlePage.this._listener != null) {
                         PostArticlePage.this._listener.onPostDialogEditButtonClicked(PostArticlePage.this, PostArticlePage.this._article_number, send_title, PostArticlePage.this.getEditContent());
                     }
-                    PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                    PostArticlePage.this.clear();
                 }
+                closeArticle();
             }).show();
         } else {
             Dialog_PostArticle dialog2 = new Dialog_PostArticle(0);
@@ -246,11 +244,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 if (PostArticlePage.this._listener != null) {
                     PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, null, null, aSign);
                 }
-                PostArticlePage.this.getNavigationController().popToViewController(PostArticlePage.this._board_page);
-                PostArticlePage.this.clear();
+                closeArticle();
             });
             dialog2.show();
         }
+    }
+    public void closeArticle() {
+        this.clear();
+        this.getNavigationController().popToViewController(this._board_page);
     }
 
     public void onItemSelected(AdapterView<?> adapterView, View aView, int index, long id) {

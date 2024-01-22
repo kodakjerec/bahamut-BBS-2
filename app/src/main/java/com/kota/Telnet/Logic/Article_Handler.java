@@ -56,6 +56,7 @@ public class Article_Handler {
         this._last_page = null;
     }
 
+    // 分析每行內容
     public void build() {
         this._article.clear();
         Vector<TelnetRow> rows = new Vector<>();
@@ -162,6 +163,7 @@ public class Article_Handler {
                             processing_item.setNickname(this._article.Nickname);
                         }
                     }
+                    // 其他狀況
                     if (processing_item != null) {
                         processing_item.addRow(row);
                     }

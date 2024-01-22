@@ -1,8 +1,8 @@
 package com.kota.Bahamut.Pages.Article;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Model.TelnetFrame;
@@ -20,10 +20,10 @@ public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetAr
     }
 
     private void init(Context context) {
-        ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.article_page_telnet_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_telnet_item_view, this);
         this._telnet_view = (TelnetView) findViewById(R.id.ArticlePage_TelnetItemView_TelnetView);
         this._divider_view = (DividerView) findViewById(R.id.ArticlePage_TelnetItemView_DividerView);
-        setBackgroundDrawable((Drawable) null);
+        setBackgroundResource(android.R.color.transparent);
     }
 
     public void setFrame(TelnetFrame aFrame) {
@@ -36,9 +36,9 @@ public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetAr
 
     public void setDividerhidden(boolean isHidden) {
         if (isHidden) {
-            this._divider_view.setVisibility(8);
+            this._divider_view.setVisibility(View.GONE);
         } else {
-            this._divider_view.setVisibility(0);
+            this._divider_view.setVisibility(View.VISIBLE);
         }
     }
 }

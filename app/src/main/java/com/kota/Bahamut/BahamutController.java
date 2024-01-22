@@ -67,7 +67,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.ASFramework.PageController.ASNavigationController
     protected String getControllerName() {
-        return "Baha!BBS";
+        return String.valueOf(R.string.app_name);
     }
 
     @Override // com.kota.ASFramework.PageController.ASNavigationController
@@ -98,7 +98,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd kk:hh:ss");
         date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         String time_string = date_format.format(new Date());
-        System.out.println("Baha!BBS connection start:" + time_string);
+        System.out.println("BahaBBS connection start:" + time_string);
     }
 
     @Override // com.kota.Telnet.TelnetClientListener
@@ -133,7 +133,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd kk:hh:ss");
                 date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
                 String time_string = date_format.format(new Date());
-                System.out.println("Baha!BBS connection close:" + time_string);
+                System.out.println("BahaBBS connection close:" + time_string);
                 BahamutController.this.handleNormalConnectionClosed();
                 ASToast.showShortToast("連線已中斷");
                 ASProcessingDialog.hideProcessingDialog();

@@ -59,11 +59,13 @@ public class ASListView extends ListView implements GestureDetector.OnGestureLis
     return super.onTouchEvent(event);
   }
 
+  // 用户轻触触摸屏
   @Override // android.view.GestureDetector.OnGestureListener
   public boolean onDown(MotionEvent arg0) {
     return true;
   }
 
+  // 用户按下触摸屏、快速移动后松开
   @Override // android.view.GestureDetector.OnGestureListener
   public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
     float distance_x = Math.abs(velocityX);
@@ -86,6 +88,7 @@ public class ASListView extends ListView implements GestureDetector.OnGestureLis
               cancel_event.setAction(3);
               super.onTouchEvent(cancel_event);
             }
+            return true;
           }
         }
       }
@@ -110,19 +113,23 @@ public class ASListView extends ListView implements GestureDetector.OnGestureLis
     return true;
   }
 
+  // 用户长按触摸屏
   @Override // android.view.GestureDetector.OnGestureListener
   public void onLongPress(MotionEvent e) {
   }
 
+  // 用户按下触摸屏 & 拖动
   @Override // android.view.GestureDetector.OnGestureListener
   public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
     return false;
   }
 
+  // 用户轻触触摸屏，尚未松开或拖动
   @Override // android.view.GestureDetector.OnGestureListener
   public void onShowPress(MotionEvent e) {
   }
 
+  // 用户轻击屏幕后抬起
   @Override // android.view.GestureDetector.OnGestureListener
   public boolean onSingleTapUp(MotionEvent e) {
     return false;

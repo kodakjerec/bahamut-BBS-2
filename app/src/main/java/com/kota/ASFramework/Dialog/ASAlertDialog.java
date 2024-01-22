@@ -1,21 +1,25 @@
 package com.kota.ASFramework.Dialog;
 
+import android.graphics.Typeface;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.kota.Bahamut.R;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 public class ASAlertDialog extends ASDialog implements View.OnClickListener {
-  private static Map<String, ASAlertDialog> _alerts = new HashMap<String, ASAlertDialog>();
+  private static final Map<String, ASAlertDialog> _alerts = new HashMap<>();
   
   private String _alert_id = null;
   
-  private Vector<Button> _item_list = new Vector<Button>();
+  private final Vector<Button> _item_list = new Vector<>();
   
   private ASAlertDialogListener _listener = null;
   
@@ -35,17 +39,17 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   }
   
   private View buildContentView() {
-    int n = (int)TypedValue.applyDimension(1, ASLayoutParams.getInstance().getDialogWidthNormal(), getContext().getResources().getDisplayMetrics());
-    int i = (int)TypedValue.applyDimension(1, 100.0F, getContext().getResources().getDisplayMetrics());
-    int k = (int)Math.ceil(TypedValue.applyDimension(1, 6.0F, getContext().getResources().getDisplayMetrics()));
-    int j = (int)Math.ceil(TypedValue.applyDimension(1, 3.0F, getContext().getResources().getDisplayMetrics()));
-    int m = (int)Math.ceil(TypedValue.applyDimension(1, 1.0F, getContext().getResources().getDisplayMetrics()));
+    int n = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ASLayoutParams.getInstance().getDialogWidthNormal(), getContext().getResources().getDisplayMetrics());
+    int i = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100.0F, getContext().getResources().getDisplayMetrics());
+    int k = (int)Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 6.0F, getContext().getResources().getDisplayMetrics()));
+    int j = (int)Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0F, getContext().getResources().getDisplayMetrics()));
+    int m = (int)Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0F, getContext().getResources().getDisplayMetrics()));
     LinearLayout linearLayout2 = new LinearLayout(getContext());
-    linearLayout2.setOrientation(1);
+    linearLayout2.setOrientation(LinearLayout.VERTICAL);
     linearLayout2.setPadding(j, j, j, j);
-    linearLayout2.setBackgroundColor(-1);
+    linearLayout2.setBackgroundResource(R.color.dialog_border_color);
     LinearLayout linearLayout1 = new LinearLayout(getContext());
-    linearLayout1.setOrientation(1);
+    linearLayout1.setOrientation(LinearLayout.VERTICAL);
     linearLayout1.setPadding(m, m, m, m);
     linearLayout1.setBackgroundColor(-16777216);
     linearLayout2.addView((View)linearLayout1);
@@ -54,8 +58,8 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
     this._title_label.setPadding(k, k, k, k);
     this._title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
     this._title_label.setTextColor(-1);
-    this._title_label.setTypeface(this._title_label.getTypeface(), 1);
-    this._title_label.setVisibility(8);
+    this._title_label.setTypeface(this._title_label.getTypeface(), Typeface.BOLD);
+    this._title_label.setVisibility(View.GONE);
     this._title_label.setBackgroundColor(-15724528);
     this._title_label.setSingleLine(true);
     linearLayout1.addView((View)this._title_label);
@@ -65,13 +69,13 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
     this._message_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
     this._message_label.setMinimumHeight(i);
     this._message_label.setTextColor(-1);
-    this._message_label.setVisibility(8);
+    this._message_label.setVisibility(View.GONE);
     this._message_label.setBackgroundColor(-16777216);
     linearLayout1.addView((View)this._message_label);
     this._toolbar = new LinearLayout(getContext());
     this._toolbar.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, -2));
     this._toolbar.setGravity(17);
-    this._toolbar.setOrientation(0);
+    this._toolbar.setOrientation(LinearLayout.HORIZONTAL);
     linearLayout1.addView((View)this._toolbar);
     return (View)linearLayout2;
   }
@@ -103,14 +107,14 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   private Button createButton() {
     Button button = new Button(getContext());
     button.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(-1, -2, 1.0F));
-    int j = (int)TypedValue.applyDimension(1, 3.0F, getContext().getResources().getDisplayMetrics());
-    int i = (int)TypedValue.applyDimension(1, 5.0F, getContext().getResources().getDisplayMetrics());
+    int j = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0F, getContext().getResources().getDisplayMetrics());
+    int i = (int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5.0F, getContext().getResources().getDisplayMetrics());
     button.setPadding(i, j, i, j);
     button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
-    button.setMinimumHeight((int)TypedValue.applyDimension(1, ASLayoutParams.getInstance().getDefaultTouchBlockHeight(), getContext().getResources().getDisplayMetrics()));
+    button.setMinimumHeight((int)TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, ASLayoutParams.getInstance().getDefaultTouchBlockHeight(), getContext().getResources().getDisplayMetrics()));
     button.setGravity(17);
     button.setOnClickListener(this);
-    button.setBackgroundDrawable(ASLayoutParams.getInstance().getAlertItemBackgroundDrawable());
+    button.setBackground(ASLayoutParams.getInstance().getAlertItemBackgroundDrawable());
     button.setSingleLine(false);
     button.setTextColor(ASLayoutParams.getInstance().getAlertItemTextColor());
     return button;
@@ -153,7 +157,7 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   
   public View createDivider() {
     View view = new View(getContext());
-    view.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams((int)Math.ceil(TypedValue.applyDimension(1, 1.0F, getContext().getResources().getDisplayMetrics())), -1));
+    view.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams((int)Math.ceil(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1.0F, getContext().getResources().getDisplayMetrics())), -1));
     view.setBackgroundColor(-16777216);
     return view;
   }
@@ -185,20 +189,20 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   
   public ASAlertDialog setMessage(String paramString) {
     if (paramString == null) {
-      this._message_label.setVisibility(8);
+      this._message_label.setVisibility(View.GONE);
       return this;
     } 
-    this._message_label.setVisibility(0);
+    this._message_label.setVisibility(View.VISIBLE);
     this._message_label.setText(paramString);
     return this;
   }
   
   public ASAlertDialog setTitle(String paramString) {
     if (paramString == null) {
-      this._title_label.setVisibility(8);
+      this._title_label.setVisibility(View.GONE);
       return this;
     } 
-    this._title_label.setVisibility(0);
+    this._title_label.setVisibility(View.VISIBLE);
     this._title_label.setText(paramString);
     return this;
   }
