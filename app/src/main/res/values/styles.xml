@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+<<<<<<< HEAD
     <style name="AlertDialog.AppCompat" parent="@style/Base.AlertDialog.AppCompat" />
     <style name="AlertDialog.AppCompat.Light" parent="@style/Base.AlertDialog.AppCompat.Light" />
     <style name="Animation.AppCompat.Dialog" parent="@style/Base.Animation.AppCompat.Dialog" />
@@ -931,6 +932,46 @@
         <item name="android:scaleType">center</item>
         <item name="android:minWidth">56.0dip</item>
     </style>
+=======
+    <style name="Titlebar">
+        <item name="android:background">@color/titlebar_background_color</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style name="Toolbar">
+        <item name="android:orientation">@null</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="ToolbarDivider">
+        <item name="android:background">@color/toolbar_divider</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+    <style name="ToolbarItem">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:background">@drawable/toolbar_item_background_color</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+    <style name="ToolbarItemDark">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/toolbar_item_background_color_dark</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+>>>>>>> dev_kodak
     <style name="Block">
         <item name="android:paddingLeft">6.0dip</item>
         <item name="android:paddingTop">6.0dip</item>
@@ -968,7 +1009,10 @@
     <style name="DialogToolbarItem" parent="@style/ToolbarItem">
         <item name="android:textSize">24.0sp</item>
         <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:background">@color/dialog_item_background_color</item>
+        <item name="android:background">@drawable/dialog_item_background_color</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
     <style name="Dialog_NoTitle_FullScreen">
         <item name="android:windowBackground">@android:color/black</item>
@@ -989,8 +1033,13 @@
         <item name="android:paddingRight">6.0dip</item>
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
+<<<<<<< HEAD
         <item name="android:minHeight">44.0dip</item>
         <item name="android:imeOptions">flagNoExtractUi</item>
+=======
+        <item name="android:minHeight">48dp</item>
+        <item name="android:imeOptions">actionUnspecified</item>
+>>>>>>> dev_kodak
     </style>
     <style name="ExtToolbar">
         <item name="android:orientation">horizontal</item>
@@ -1001,8 +1050,13 @@
         <item name="android:textSize">24.0sp</item>
         <item name="android:textColor">@color/button_text_color</item>
         <item name="android:gravity">center</item>
+<<<<<<< HEAD
         <item name="android:background">@color/ext_toolbar_item_background_color</item>
         <item name="android:layout_width">fill_parent</item>
+=======
+        <item name="android:background">@drawable/ext_toolbar_item_background_color</item>
+        <item name="android:layout_width">match_parent</item>
+>>>>>>> dev_kodak
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
         <item name="android:layout_weight">1.0</item>
@@ -1026,7 +1080,7 @@
         <item name="android:minWidth">1.0px</item>
     </style>
     <style name="List">
-        <item name="android:listSelector">@drawable/list_selector_background</item>
+        <item name="android:listSelector">@android:drawable/list_selector_background</item>
         <item name="android:divider">@color/divider_color</item>
         <item name="android:dividerHeight">1.0dip</item>
     </style>
@@ -1062,6 +1116,7 @@
         <item name="android:layout_width">fill_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+<<<<<<< HEAD
     <style name="MyTheme" parent="@android:style/Theme">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowContentOverlay">@null</item>
@@ -1509,8 +1564,100 @@
     <style name="Widget.AppCompat.Toolbar.Button.Navigation" parent="@style/Base.Widget.AppCompat.Toolbar.Button.Navigation" />
     <style name="Widget.Compat.NotificationActionContainer" parent="" />
     <style name="Widget.Compat.NotificationActionText" parent="" />
+=======
+    <style name="MyTheme" parent="@style/Theme.AppCompat">
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:textColorHint">@android:color/tab_indicator_text</item>
+    </style>
+    <style name="TextViewLarge">
+        <item name="android:textColor">@android:color/tab_indicator_text</item>
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="TextViewNormal">
+        <item name="android:textColor">@android:color/tab_indicator_text</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="TextViewSmall">
+        <item name="android:textColor">@android:color/tab_indicator_text</item>
+        <item name="android:textSize">16sp</item>
+    </style>
+    <style name="TextViewUltraLarge">
+        <item name="android:textColor">@android:color/tab_indicator_text</item>
+        <item name="android:textSize">28sp</item>
+    </style>
+    <style name="TouchBlock">
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+    </style>
+    <style name="VerticalDivider">
+        <item name="android:background">@color/divider_color</item>
+        <item name="android:layout_width">1dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:minWidth">1px</item>
+    </style>
+    <style name="SelectArticleItem_l">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/dialog_select_article_item_background_color</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">70dp</item>
+        <item name="android:minHeight">60dp</item>
+    </style>
+    <style name="SelectArticleItem_p">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/dialog_select_article_item_background_color</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minWidth">90dp</item>
+        <item name="android:minHeight">60dp</item>
+    </style>
+    <style name="TabItem">
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+>>>>>>> dev_kodak
     <style name="baseTouchPart">
         <item name="android:minWidth">60.0dip</item>
         <item name="android:minHeight">60.0dip</item>
+    </style>
+    <style name="system_settings_item">
+        <item name="android:background">@android:drawable/list_selector_background</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:layout_marginStart">5dp</item>
+    </style>
+
+    <style name="Checkbox_bahamut" parent="CheckBox">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_alignParentStart">true</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:scaleX">1</item>
+        <item name="android:scaleY">1</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
+    </style>
+
+    <style name="SystemSettings_item_text" parent="TextViewLarge">
+        <item name="android:textColor">#ffffffff</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginLeft">50dp</item>
+        <item name="android:layout_centerVertical">true</item>
     </style>
 </resources>

@@ -1,3 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <TextView n1:textAppearance="?android:textAppearanceLarge" n1:gravity="center" n1:id="@android:id/text1" n1:layout_width="54.0dip" n1:layout_height="54.0dip"
   xmlns:n1="http://schemas.android.com/apk/res/android" />
+=======
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" android:textAppearance="?android:attr/textAppearanceLarge" android:gravity="center" android:id="@android:id/text1" android:layout_width="54dp" android:layout_height="54dp" android:textColor="@color/button_text_color"/>
+>>>>>>> dev_kodak

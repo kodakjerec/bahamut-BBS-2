@@ -6,11 +6,20 @@
         <com.kumi.TelnetUI.TextView.TelnetTextViewUltraLarge n1:textColor="#ffffffff" n1:gravity="center" n1:id="@id/BoardExtendOptionalPage_ListEmptyView" n1:visibility="gone" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:text="@string/list_empty" style="@style/TextViewUltraLarge" />
         <ListView n1:id="@id/BoardExtendOptionalPage_ListView" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:divider="@null" n1:dividerHeight="0.0dip" />
     </FrameLayout>
+<<<<<<< HEAD
     <LinearLayout n1:layout_width="fill_parent" n1:layout_height="wrap_content">
         <Button n1:textColor="@color/tab_item_text_color_selected" n1:id="@id/BoardExtendOptionalPage_BookmarkButton" n1:background="@color/tab_item_background_color_selected" n1:text="@string/title" style="@style/TabItem" />
         <View style="@style/ToolbarDivider" />
         <Button n1:textColor="@color/tab_item_text_color_unselected" n1:id="@id/BoardExtendOptionalPage_HistoryButton" n1:background="@color/tab_item_background_color_unselected" n1:text="@string/record" style="@style/TabItem" />
         <View style="@style/ToolbarDivider" />
         <Button n1:enabled="false" n1:textColor="@color/tab_item_text_color_unselected" n1:id="@id/BoardExtendOptionalPage_WaterBallButton" n1:background="@color/tab_item_background_color_unselected" n1:text="@string/zero_word" style="@style/TabItem" />
+=======
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_BookmarkButton" android:background="@drawable/tab_item_background_color_selected" android:text="@string/title" style="@style/TabItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_HistoryButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/record" style="@style/TabItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_WaterBallButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/TabItem"/>
+>>>>>>> dev_kodak
     </LinearLayout>
 </LinearLayout>

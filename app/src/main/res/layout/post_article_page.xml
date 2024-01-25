@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <RelativeLayout n1:layout_width="fill_parent" n1:layout_height="fill_parent"
   xmlns:n1="http://schemas.android.com/apk/res/android">
     <LinearLayout n1:orientation="horizontal" n1:id="@id/Post_TitleBlock" n1:background="@color/item_background_color" n1:layout_width="fill_parent" n1:layout_height="54.0dip" n1:layout_alignParentTop="true" style="@style/TouchBlock">
@@ -6,6 +7,20 @@
         <FrameLayout n1:layout_width="fill_parent" n1:layout_height="wrap_content">
             <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="#00000000" n1:ellipsize="end" n1:gravity="center_vertical" n1:id="@id/ArticlePostDialog_TitleFieldBackground" n1:background="#00000000" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:minHeight="54.0dip" n1:singleLine="true" style="@style/TextViewNormal" />
             <EditText n1:textColor="#ffffffff" n1:ellipsize="end" n1:gravity="center_vertical" n1:id="@id/ArticlePostDialog_TitleField" n1:background="#00000000" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:minHeight="54.0dip" n1:hint="@string/input_title_here" n1:singleLine="true" style="@style/TextViewNormal" />
+=======
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="horizontal" android:id="@+id/Post_TitleBlock" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="54dp" android:layout_alignParentTop="true" style="@style/TouchBlock">
+
+        <Spinner
+            android:id="@+id/Post_HeaderSelector"
+            android:layout_width="65dp"
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:textSize="19sp" />
+        <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#00000000" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/ArticlePostDialog_TitleFieldBackground" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:singleLine="true" style="@style/TextViewNormal"/>
+            <EditText android:textColor="#ffffffff" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/ArticlePostDialog_TitleField" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:hint="@string/input_title_here" android:singleLine="true" style="@style/TextViewNormal"/>
+>>>>>>> dev_kodak
         </FrameLayout>
     </LinearLayout>
     <TextView n1:id="@id/Post_MiddleDivider" n1:layout_below="@id/Post_TitleBlock" style="@style/HorizontalDivider" />

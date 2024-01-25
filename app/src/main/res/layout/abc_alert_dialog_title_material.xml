@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <LinearLayout n1:orientation="vertical" n1:id="@id/topPanel" n1:layout_width="fill_parent" n1:layout_height="wrap_content"
   xmlns:n1="http://schemas.android.com/apk/res/android">
     <LinearLayout n1:gravity="start|center" n1:orientation="horizontal" n1:id="@id/title_template" n1:paddingLeft="?dialogPreferredPadding" n1:paddingTop="@dimen/abc_dialog_padding_top_material" n1:paddingRight="?dialogPreferredPadding" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
@@ -7,3 +8,12 @@
     </LinearLayout>
     <android.support.v4.widget.Space n1:id="@id/titleDividerNoCustom" n1:visibility="gone" n1:layout_width="fill_parent" n1:layout_height="@dimen/abc_dialog_title_divider_material" />
 </LinearLayout>
+=======
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/topPanel" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:gravity="left|center_vertical|center_horizontal|center|start" android:orientation="horizontal" android:id="@+id/title_template" android:paddingLeft="?attr/dialogPreferredPadding" android:paddingTop="@dimen/abc_dialog_padding_top_material" android:paddingRight="?attr/dialogPreferredPadding" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <ImageView android:id="@android:id/icon" android:layout_width="32dp" android:layout_height="32dp" android:layout_marginRight="8dp" android:src="@null" android:scaleType="fitCenter"/>
+        <TextView android:ellipsize="end" android:id="@+id/alertTitle" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" style="?android:attr/windowTitleStyle"/>
+    </LinearLayout>
+    <Space android:id="@+id/titleDividerNoCustom" android:visibility="gone" android:layout_width="match_parent" android:layout_height="@dimen/abc_dialog_title_divider_material"/>
+</LinearLayout>
+>>>>>>> dev_kodak

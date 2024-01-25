@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <adaptive-icon>
     <background n1:drawable="@drawable/ic_launcher_background"
       xmlns:n1="http://schemas.android.com/apk/res/android" />
     <foreground n2:drawable="@drawable/ic_launcher_foreground"
       xmlns:n2="http://schemas.android.com/apk/res/android" />
+=======
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+>>>>>>> dev_kodak
 </adaptive-icon>

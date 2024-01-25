@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <selector n1:dither="true" n1:variablePadding="true" n1:constantSize="true"
   xmlns:n1="http://schemas.android.com/apk/res/android">
     <item n1:state_enabled="false" n1:color="@color/button_label_color_disable" />
@@ -6,3 +7,11 @@
     <item n1:state_focused="true" n1:color="@color/button_label_color_focused" />
     <item n1:color="@color/button_label_color_normal" />
 </selector>
+=======
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:dither="true" android:variablePadding="true" android:constantSize="true">
+    <item android:state_enabled="false" android:color="@color/button_label_color_disable"/>
+    <item android:state_pressed="true" android:color="@color/button_label_color_pressed"/>
+    <item android:state_focused="true" android:color="@color/button_label_color_focused"/>
+    <item android:color="@android:color/white"/>
+</selector>
+>>>>>>> dev_kodak

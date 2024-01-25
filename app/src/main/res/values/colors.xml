@@ -118,6 +118,7 @@
     <color name="tab_unselected_text_color_focused">#ff000000</color>
     <color name="tab_unselected_text_color_normal">#ff608060</color>
     <color name="tab_unselected_text_color_pressed">#ffffffff</color>
+    <color name="dialog_border_color">#808080</color>
     <color name="time_line_background_color">#ff000060</color>
     <color name="titlebar_background_color">#ff000060</color>
     <color name="toolbar_background_color_disabled">#ff002020</color>

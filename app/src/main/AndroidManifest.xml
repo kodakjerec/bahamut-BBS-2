@@ -1,23 +1,28 @@
-<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.kumi.Bahamut">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<?xml version="1.0" encoding="utf-8" standalone="no"?><manifest xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-    <permission android:name="android.permission.READ_PHONE_STATE"/>
-    <permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <application android:allowBackup="true" android:icon="@drawable/app_icon" android:label="@string/app_name" android:name="com.kumi.Bahamut.MyApplication">
-        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize" android:label="@string/app_name" android:name="com.kumi.Bahamut.BahamutController" android:screenOrientation="portrait" android:theme="@style/MyTheme" android:windowSoftInputMode="adjustResize">
+    <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:name="com.kota.Bahamut.MyApplication">
+        <activity android:configChanges="keyboard|keyboardHidden|orientation|screenSize"
+            android:name="com.kota.Bahamut.BahamutController"
+            android:screenOrientation="unspecified"
+            android:theme="@style/MyTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:exported="true"
+            tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>`</activity>
-        <receiver android:label="NetworkConnection" android:name="com.kumi.ASFramework.Network.ASNetworkStateChangeReceiver">
+            </intent-filter>
+        </activity>
+        <receiver android:label="NetworkConnection" android:name="com.kota.ASFramework.Network.ASNetworkStateChangeReceiver"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"
+                    tools:ignore="BatteryLife" />
             </intent-filter>
         </receiver>
-        <service android:enabled="true" android:exported="true" android:name="com.kumi.Bahamut.Service.BahaBBSBackgroundService"/>
-        <meta-data android:name="android.support.VERSION" android:value="26.1.0"/>
-        <meta-data android:name="android.arch.lifecycle.VERSION" android:value="27.0.0-SNAPSHOT"/>
+        <service android:enabled="true" android:exported="false" android:name="com.kota.Bahamut.Service.BahaBBSBackgroundService" />
     </application>
 </manifest>

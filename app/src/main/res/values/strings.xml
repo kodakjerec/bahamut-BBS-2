@@ -1,40 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="abc_action_bar_home_description">Navigate home</string>
-    <string name="abc_action_bar_home_description_format">%1$s, %2$s</string>
-    <string name="abc_action_bar_home_subtitle_description_format">%1$s, %2$s, %3$s</string>
-    <string name="abc_action_bar_up_description">Navigate up</string>
-    <string name="abc_action_menu_overflow_description">More options</string>
-    <string name="abc_action_mode_done">Done</string>
-    <string name="abc_activity_chooser_view_see_all">See all</string>
-    <string name="abc_activitychooserview_choose_application">Choose an app</string>
-    <string name="abc_capital_off">OFF</string>
-    <string name="abc_capital_on">ON</string>
-    <string name="abc_font_family_body_1_material">sans-serif</string>
-    <string name="abc_font_family_body_2_material">sans-serif-medium</string>
-    <string name="abc_font_family_button_material">sans-serif-medium</string>
-    <string name="abc_font_family_caption_material">sans-serif</string>
-    <string name="abc_font_family_display_1_material">sans-serif</string>
-    <string name="abc_font_family_display_2_material">sans-serif</string>
-    <string name="abc_font_family_display_3_material">sans-serif</string>
-    <string name="abc_font_family_display_4_material">sans-serif-light</string>
-    <string name="abc_font_family_headline_material">sans-serif</string>
-    <string name="abc_font_family_menu_material">sans-serif</string>
-    <string name="abc_font_family_subhead_material">sans-serif</string>
-    <string name="abc_font_family_title_material">sans-serif-medium</string>
-    <string name="abc_search_hint">Search…</string>
-    <string name="abc_searchview_description_clear">Clear query</string>
-    <string name="abc_searchview_description_query">Search query</string>
-    <string name="abc_searchview_description_search">Search</string>
-    <string name="abc_searchview_description_submit">Submit query</string>
-    <string name="abc_searchview_description_voice">Voice search</string>
-    <string name="abc_shareactionprovider_share_with">Share with</string>
-    <string name="abc_shareactionprovider_share_with_application">Share with %s</string>
-    <string name="abc_toolbar_collapse_description">Collapse</string>
+    <string name="app_name">BahaBBS</string>
+    <string name="hello_world">Hello world!!</string>
     <string name="account">帳號</string>
     <string name="account_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="add">新增</string>
-    <string name="app_name">Baha!BBS</string>
     <string name="arrow_down">▼</string>
     <string name="arrow_right">></string>
     <string name="arrow_up">▲</string>
@@ -98,6 +67,8 @@
     <string name="open_bookmark">開啟書籤</string>
     <string name="open_url">開啟連結</string>
     <string name="password">密碼</string>
+    <string name="Username_hint">最長12位</string>
+    <string name="password_hint">最長8位</string>
     <string name="password_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="please_input_article_number">請輸入文章編號</string>
     <string name="please_input_id">請輸入ID</string>
@@ -121,8 +92,12 @@
     <string name="select_sign_msg">要使用的簽名檔(0=不加):</string>
     <string name="send">送出</string>
     <string name="setting">設定</string>
+<<<<<<< HEAD
     <string name="start_msg_1">"Baha!BBS是一個巴哈姆特電玩資訊站BBS討論區的手機客戶端軟體，使用時需要透過網路傳送資料，使用時請確認您的網路連線處於可連線之狀態。
 "</string>
+=======
+    <string name="start_msg_1">BahaBBS是一個巴哈姆特電玩資訊站BBS討論區的手機客戶端軟體，使用時需要透過網路傳送資料，使用時請確認您的網路連線處於可連線之狀態。\n</string>
+>>>>>>> dev_kodak
     <string name="start_msg_2">準備好成為勇者了嗎?</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="switch_connect_recovery">開啟自動連線恢復</string>
@@ -136,4 +111,15 @@
     <string name="word_r">R</string>
     <string name="write_mail">寫信</string>
     <string name="zero_word" />
+    <string name="title_activity_main2">Main2Activity</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="board_name">看板名稱</string>
+    <string name="GY_hint">GY</string>
+    <string name="author_hint">作者(第一個字打*表模糊搜尋)</string>
+    <string name="keyword_hint">請輸入關鍵字</string>
+    <string name="dialog_select_sign_text">0</string>
 </resources>

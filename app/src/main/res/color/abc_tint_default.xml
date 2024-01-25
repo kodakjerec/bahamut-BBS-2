@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <selector>
     <item n1:state_enabled="false" n1:color="?colorControlNormal" n2:alpha="?android:disabledAlpha"
       xmlns:n1="http://schemas.android.com/apk/res/android" xmlns:n2="http://schemas.android.com/apk/res-auto" />
@@ -15,3 +16,14 @@
     <item n8:color="?colorControlNormal"
       xmlns:n8="http://schemas.android.com/apk/res/android" />
 </selector>
+=======
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false" android:color="?attr/colorControlNormal" xmlns:android="http://schemas.android.com/apk/res-auto" android:alpha="?android:attr/disabledAlpha"/>
+    <item android:state_focused="true" android:color="?attr/colorControlActivated"/>
+    <item android:state_pressed="true" android:color="?attr/colorControlActivated"/>
+    <item android:color="?attr/colorControlActivated" android:state_activated="true"/>
+    <item android:state_selected="true" android:color="?attr/colorControlActivated"/>
+    <item android:state_checked="true" android:color="?attr/colorControlActivated"/>
+    <item android:color="?attr/colorControlNormal"/>
+</selector>
+>>>>>>> dev_kodak

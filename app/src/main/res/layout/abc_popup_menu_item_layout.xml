@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<<<<<<< HEAD
 <android.support.v7.view.menu.ListMenuItemView n1:layout_width="fill_parent" n1:layout_height="?dropdownListPreferredItemHeight" n1:minWidth="196.0dip" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem"
   xmlns:n1="http://schemas.android.com/apk/res/android">
     <RelativeLayout n1:layout_gravity="center_vertical" n1:duplicateParentState="true" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:layout_weight="1.0" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem.InternalGroup">
@@ -7,3 +8,12 @@
     </RelativeLayout>
     <ImageView n1:layout_gravity="center" n1:id="@id/submenuarrow" n1:visibility="gone" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:layout_marginLeft="8.0dip" n1:scaleType="center" />
 </android.support.v7.view.menu.ListMenuItemView>
+=======
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="?attr/dropdownListPreferredItemHeight" android:minWidth="196dp" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem">
+    <RelativeLayout android:layout_gravity="center_vertical" android:duplicateParentState="true" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem.InternalGroup">
+        <TextView android:textAppearance="?attr/textAppearanceLargePopupMenu" android:ellipsize="marquee" android:id="@+id/title" android:fadingEdge="horizontal" android:duplicateParentState="true" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true" android:layout_alignParentTop="true" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem.Text"/>
+        <TextView android:textAppearance="?attr/textAppearanceSmallPopupMenu" android:id="@+id/shortcut" android:duplicateParentState="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" android:layout_below="@+id/title" style="@style/RtlOverlay.Widget.AppCompat.PopupMenuItem.Text"/>
+    </RelativeLayout>
+    <ImageView android:layout_gravity="center" android:id="@+id/submenuarrow" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="8dp" android:scaleType="center"/>
+</LinearLayout>
+>>>>>>> dev_kodak
