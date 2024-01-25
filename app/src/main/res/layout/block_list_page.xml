@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="fill_parent"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <View style="@style/ItemViewDividerHorizontal" />
-    <LinearLayout n1:gravity="center_vertical" n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-        <EditText n1:textColor="#ffffffff" n1:gravity="center" n1:id="@id/BlockList_Input" n1:background="@null" n1:layout_width="0.0dip" n1:layout_height="60.0dip" n1:hint="@string/please_input_id" n1:cursorVisible="false" n1:singleLine="true" n1:editable="false" n1:layout_weight="1.0" n1:inputType="text" style="@style/TextViewLarge" />
-        <Button n1:textSize="24.0sp" n1:textColor="@color/button_text_color_1" n1:gravity="center" n1:id="@id/BlockList_Add" n1:background="@drawable/button_background_1" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:minWidth="100.0dip" n1:text="@string/add" style="@style/TouchBlock" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+    <View style="@style/ItemViewDividerHorizontal"/>
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <EditText android:textColor="#ffffffff" android:gravity="center" android:id="@+id/BlockList_Input" android:background="@null" android:layout_width="0dp" android:layout_height="60dp" android:hint="@string/please_input_id" android:cursorVisible="false" android:singleLine="true" android:editable="false" android:layout_weight="1" android:inputType="text" style="@style/TextViewLarge"/>
+        <Button android:textSize="24sp" android:textColor="@color/button_text_color_1" android:gravity="center" android:id="@+id/BlockList_Add" android:background="@drawable/button_background_1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="100dp" android:text="@string/add" style="@style/TouchBlock"/>
     </LinearLayout>
-    <View style="@style/ItemViewDividerHorizontal" />
-    <View n1:background="@color/divider_color" n1:layout_width="fill_parent" n1:layout_height="5.0dip" />
-    <ListView n1:id="@id/BlockList_List" n1:layout_width="fill_parent" n1:layout_height="0.0dip" n1:divider="@null" n1:dividerHeight="0.0dip" n1:layout_weight="1.0" />
+    <View style="@style/ItemViewDividerHorizontal"/>
+    <View android:background="@color/divider_color" android:layout_width="match_parent" android:layout_height="5dp"/>
+    <ListView android:id="@+id/BlockList_list" android:layout_width="match_parent" android:layout_height="0dp" android:divider="@null" android:dividerHeight="0dp" android:layout_weight="1"/>
 </LinearLayout>

@@ -209,7 +209,7 @@ public class ArticlePage extends TelnetPage {
     View.OnLongClickListener _page_top_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.4
         @Override // android.view.View.OnLongClickListener
         public boolean onLongClick(View v) {
-            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
+            if (ArticlePage.this._settings.isArticleMoveEnsable()) {
                 if (ArticlePage.this._top_action != null) {
                     v.removeCallbacks(ArticlePage.this._top_action);
                     ArticlePage.this._top_action = null;
@@ -243,7 +243,7 @@ public class ArticlePage extends TelnetPage {
     View.OnLongClickListener _page_bottom_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.6
         @Override // android.view.View.OnLongClickListener
         public boolean onLongClick(View v) {
-            if (!ArticlePage.this._settings.isArticleMoveDisable()) {
+            if (ArticlePage.this._settings.isArticleMoveEnsable()) {
                 if (ArticlePage.this._bottom_action != null) {
                     v.removeCallbacks(ArticlePage.this._bottom_action);
                     ArticlePage.this._bottom_action = null;
@@ -342,16 +342,16 @@ public class ArticlePage extends TelnetPage {
     @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
-        this._telnet_view = (TelnetView) findViewById(R.id.Article_ContentTelnetView);
+        this._telnet_view = (TelnetView) findViewById(R.id.Article_contentTelnetView);
         reloadTelnetLayout();
-        View empty_view = findViewById(R.id.Article_ContentEmptyView);
-        ASListView list_view = (ASListView) findViewById(R.id.Article_ContentList);
+        View empty_view = findViewById(R.id.Article_contentEmptyView);
+        ASListView list_view = (ASListView) findViewById(R.id.Article_contentList);
         list_view.setEmptyView(empty_view);
         list_view.setAdapter((ListAdapter) this._list_adapter);
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
-        Button back_button = (Button) findViewById(R.id.Article_BackButton);
-        Button page_up_button = (Button) findViewById(R.id.Article_PageUpButton);
-        Button page_down_button = (Button) findViewById(R.id.Article_PageDownButton);
+        Button back_button = (Button) findViewById(R.id.Article_backButton);
+        Button page_up_button = (Button) findViewById(R.id.Article_pageUpButton);
+        Button page_down_button = (Button) findViewById(R.id.Article_pageDownButton);
         back_button.setOnClickListener(this._back_listener);
         page_up_button.setOnClickListener(this._page_up_listener);
         page_up_button.setOnLongClickListener(this._page_top_listener);
@@ -467,7 +467,7 @@ public class ArticlePage extends TelnetPage {
             store.store();
             this._telnet_view.setFrame(this._article.getFrame());
             reloadTelnetLayout();
-            ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_ContentTelnetViewBlock);
+            ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_contentTelnetViewBlock);
             if (telnet_content_view != null) {
                 telnet_content_view.scrollTo(0, 0);
             }
@@ -569,7 +569,7 @@ public class ArticlePage extends TelnetPage {
 
     private void reloadViewMode() {
         ViewGroup text_content_view = (ViewGroup) findViewById(R.id.Article_TextContentView);
-        ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_ContentTelnetViewBlock);
+        ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_contentTelnetViewBlock);
         if (this._settings.getArticleViewMode() == 0) {
             if (text_content_view != null) {
                 text_content_view.setVisibility(View.VISIBLE);

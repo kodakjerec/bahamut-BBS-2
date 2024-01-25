@@ -29,7 +29,7 @@ public class BoardSearchPage extends BoardPage {
 
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_headerView);
         if (header_view != null) {
             String board_name = getListName();
             if (board_name == null) {

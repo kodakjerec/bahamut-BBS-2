@@ -23,8 +23,8 @@ public class LoginPage extends TelnetPage {
     View.OnClickListener _logout_listener = v -> {
         String err_message;
         LoginPage.this._username = ((EditText) LoginPage.this.findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
-        LoginPage.this._password = ((EditText) LoginPage.this.findViewById(R.id.Login_PasswordEdit)).getText().toString().trim();
-        LoginPage.this._save_logon_user = ((CheckBox) LoginPage.this.findViewById(R.id.Login_LoginRememberCheckBox)).isChecked();
+        LoginPage.this._password = ((EditText) LoginPage.this.findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
+        LoginPage.this._save_logon_user = ((CheckBox) LoginPage.this.findViewById(R.id.Login_loginRememberCheckBox)).isChecked();
         if (LoginPage.this._username.length() == 0 && LoginPage.this._password.length() == 0) {
             err_message = "帳號、密碼不可為空，請重新輸入。";
         } else if (LoginPage.this._username.length() == 0) {
@@ -60,9 +60,9 @@ public class LoginPage extends TelnetPage {
         this._settings = new UserSettings(getContext());
         // 登入
         getNavigationController().setNavigationTitle("勇者登入");
-        findViewById(R.id.Login_LoginButton).setOnClickListener(this._logout_listener);
+        findViewById(R.id.Login_loginButton).setOnClickListener(this._logout_listener);
         // checkbox區塊點擊
-        CheckBox checkBox = (CheckBox) findViewById(R.id.Login_LoginRememberCheckBox);
+        CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         findViewById(R.id.toolbar).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
         this._telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
         // 讀取預設勇者設定
@@ -109,8 +109,8 @@ public class LoginPage extends TelnetPage {
 
     private void loadLogonUser() {
         EditText login_username_field = (EditText) findViewById(R.id.Login_UsernameEdit);
-        EditText login_password_field = (EditText) findViewById(R.id.Login_PasswordEdit);
-        CheckBox login_remember = (CheckBox) findViewById(R.id.Login_LoginRememberCheckBox);
+        EditText login_password_field = (EditText) findViewById(R.id.Login_passwordEdit);
+        CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         String username = this._settings.getUsername();
         String password = this._settings.getPassword();
         if (username == null) {
@@ -127,10 +127,10 @@ public class LoginPage extends TelnetPage {
     }
 
     private void saveLogonUserToProperties() {
-        CheckBox login_remember = (CheckBox) findViewById(R.id.Login_LoginRememberCheckBox);
+        CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         if (login_remember.isChecked()) {
             String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
-            String password = ((EditText) findViewById(R.id.Login_PasswordEdit)).getText().toString().trim();
+            String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
             this._settings.setUsername(username);
             this._settings.setPassword(password);
         } else {

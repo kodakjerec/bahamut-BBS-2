@@ -1,3 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView n1:textSize="19.5dip" n1:textColor="#ffffffff" n1:ellipsize="marquee" n1:id="@android:id/text1" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:singleLine="true"
-  xmlns:n1="http://schemas.android.com/apk/res/android" />
+<TextView xmlns:android="http://schemas.android.com/apk/res/android" android:textSize="19.5dp" android:textColor="#ffffffff" android:ellipsize="marquee" android:id="@android:id/text1" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="true"/>

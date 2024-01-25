@@ -54,12 +54,12 @@ public class MainPage extends TelnetPage {
     }
 
     public void onPageDidLoad() {
-        findViewById(R.id.Main_BoardsButton).setOnClickListener(this._boards_listener);
-        findViewById(R.id.Main_ClassButton).setOnClickListener(this._class_listener);
+        findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
+        findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
         findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
-        findViewById(R.id.Main_LogoutButton).setOnClickListener(this._logout_listener);
-        findViewById(R.id.Main_MailButton).setOnClickListener(this._mail_listener);
-        findViewById(R.id.Main_SystemSettingsButton).setOnClickListener(this._system_setting_listener);
+        findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
+        findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
+        findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
     }
 
     public void onPageRefresh() {

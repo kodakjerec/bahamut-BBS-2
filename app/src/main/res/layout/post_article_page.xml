@@ -1,18 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<RelativeLayout n1:layout_width="fill_parent" n1:layout_height="fill_parent"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:orientation="horizontal" n1:id="@id/Post_TitleBlock" n1:background="@color/item_background_color" n1:layout_width="fill_parent" n1:layout_height="54.0dip" n1:layout_alignParentTop="true" style="@style/TouchBlock">
-        <Spinner n1:textSize="19.0sp" n1:id="@id/Post_HeaderSelector" n1:background="@null" n1:layout_width="65.0dip" n1:layout_height="fill_parent" />
-        <FrameLayout n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-            <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="#00000000" n1:ellipsize="end" n1:gravity="center_vertical" n1:id="@id/ArticlePostDialog_TitleFieldBackground" n1:background="#00000000" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:minHeight="54.0dip" n1:singleLine="true" style="@style/TextViewNormal" />
-            <EditText n1:textColor="#ffffffff" n1:ellipsize="end" n1:gravity="center_vertical" n1:id="@id/ArticlePostDialog_TitleField" n1:background="#00000000" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:minHeight="54.0dip" n1:hint="@string/input_title_here" n1:singleLine="true" style="@style/TextViewNormal" />
-=======
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
     <LinearLayout android:orientation="horizontal" android:id="@+id/Post_TitleBlock" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="54dp" android:layout_alignParentTop="true" style="@style/TouchBlock">
 
         <Spinner
-            android:id="@+id/Post_HeaderSelector"
+            android:id="@+id/Post_headerSelector"
             android:layout_width="65dp"
             android:layout_height="match_parent"
             android:background="@null"
@@ -20,22 +11,21 @@
         <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#00000000" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/ArticlePostDialog_TitleFieldBackground" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:singleLine="true" style="@style/TextViewNormal"/>
             <EditText android:textColor="#ffffffff" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/ArticlePostDialog_TitleField" android:background="#00000000" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:hint="@string/input_title_here" android:singleLine="true" style="@style/TextViewNormal"/>
->>>>>>> dev_kodak
         </FrameLayout>
     </LinearLayout>
-    <TextView n1:id="@id/Post_MiddleDivider" n1:layout_below="@id/Post_TitleBlock" style="@style/HorizontalDivider" />
-    <LinearLayout n1:id="@id/Post_Toolbar" n1:layout_alignParentBottom="true" style="@style/Toolbar">
-        <Button n1:id="@id/ArticlePostDialog_Cancel" n1:text="@string/symbol" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/ArticlePostDialog_Symbol" n1:text="@string/face" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/ArticlePostDialog_File" n1:text="@string/file" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/ArticlePostDialog_Post" n1:text="@string/post" style="@style/ToolbarItem" />
+    <TextView android:id="@+id/Post_MiddleDivider" android:layout_below="@+id/Post_TitleBlock" style="@style/HorizontalDivider"/>
+    <LinearLayout android:id="@+id/Post_Toolbar" android:layout_alignParentBottom="true" style="@style/Toolbar">
+        <Button android:id="@+id/ArticlePostDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:id="@+id/ArticlePostDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:id="@+id/ArticlePostDialog_File" android:text="@string/file" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:id="@+id/ArticlePostDialog_Post" android:text="@string/post" style="@style/ToolbarItem"/>
     </LinearLayout>
-    <LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:layout_above="@id/Post_Toolbar" n1:layout_below="@id/Post_MiddleDivider">
-        <EditText n1:textColor="@android:color/white" n1:gravity="center|left|top" n1:id="@id/ArticlePostDialog_EditField" n1:background="@color/item_background_color" n1:padding="10.0dip" n1:layout_width="0.0dip" n1:layout_height="fill_parent" n1:hint="@string/input_content_here" n1:layout_weight="1.0" style="@style/TextViewNormal" />
-        <View n1:id="@id/Post_SymbolDivider" n1:visibility="gone" style="@style/VerticalDivider" />
-        <LinearLayout n1:orientation="vertical" n1:id="@id/Post_SymbolList" n1:background="@color/item_background_color" n1:visibility="gone" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:layout_weight="2.0" />
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_above="@+id/Post_Toolbar" android:layout_below="@+id/Post_MiddleDivider">
+        <EditText android:textColor="@android:color/white" android:gravity="top|left|center_vertical|center_horizontal|center" android:id="@+id/ArticlePostDialog_EditField" android:background="@color/item_background_color" android:padding="10dp" android:layout_width="0dp" android:layout_height="match_parent" android:hint="@string/input_content_here" android:layout_weight="1" style="@style/TextViewNormal"/>
+        <View android:id="@+id/Post_SymbolDivider" android:visibility="gone" style="@style/VerticalDivider"/>
+        <LinearLayout android:orientation="vertical" android:id="@+id/Post_SymbolList" android:background="@color/item_background_color" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="2"/>
     </LinearLayout>
 </RelativeLayout>

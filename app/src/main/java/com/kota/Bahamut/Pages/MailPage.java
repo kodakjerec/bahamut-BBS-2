@@ -51,21 +51,21 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void onPageDidLoad() {
-        this._telnet_view_block = (ASScrollView) findViewById(R.id.Mail_ContentTelnetViewBlock);
-        this._telnet_view = (TelnetView) findViewById(R.id.Mail_ContentTelnetView);
+        this._telnet_view_block = (ASScrollView) findViewById(R.id.Mail_contentTelnetViewBlock);
+        this._telnet_view = (TelnetView) findViewById(R.id.Mail_contentTelnetView);
         int screen_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
         ViewGroup.LayoutParams telnet_layout = this._telnet_view.getLayoutParams();
         telnet_layout.width = screen_width;
         telnet_layout.height = -2;
         this._telnet_view.setLayoutParams(telnet_layout);
-        this._list = (ASListView) findViewById(R.id.Mail_ContentList);
-        this._back_button = (Button) findViewById(R.id.Mail_BackButton);
-        this._page_up_button = (Button) findViewById(R.id.Mail_PageUpButton);
-        this._page_down_button = (Button) findViewById(R.id.Mail_PageDownButton);
+        this._list = (ASListView) findViewById(R.id.Mail_contentList);
+        this._back_button = (Button) findViewById(R.id.Mail_backButton);
+        this._page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
+        this._page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
         this._back_button.setOnClickListener(this);
         this._page_up_button.setOnClickListener(this);
         this._page_down_button.setOnClickListener(this);
-        findViewById(R.id.Mail_ChangeModeButton).setOnClickListener(this);
+        findViewById(R.id.Mail_changeModeButton).setOnClickListener(this);
         resetAdapter();
     }
 
@@ -225,7 +225,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
             onPageUpButtonClicked();
         } else if (aView == this._page_down_button) {
             onPageDownButtonClicked();
-        } else if (aView.getId() == R.id.Mail_ChangeModeButton) {
+        } else if (aView.getId() == R.id.Mail_changeModeButton) {
             changeViewMode();
         }
     }

@@ -41,12 +41,12 @@ public class BoardExtendOptionalPageBookmarkItemView extends LinearLayout {
 
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.board_extend_optional_page_bookmark_item_view, this);
-        this._title_label = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_Title);
-        this._author_label = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_Author);
-        this._mark_label = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_Mark);
-        this._gy_label = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_GY);
-        this._divider_top = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_DividerTop);
-        this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_BookmarkItemView_DividerBottom);
+        this._title_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title);
+        this._author_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Author);
+        this._mark_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_mark);
+        this._gy_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_GY);
+        this._divider_top = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop);
+        this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerBottom);
     }
 
     public void setDividerTopVisible(boolean visible) {

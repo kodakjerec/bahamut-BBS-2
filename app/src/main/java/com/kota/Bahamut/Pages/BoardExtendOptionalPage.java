@@ -57,17 +57,17 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        this._header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_HeaderView);
+        this._header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_headerView);
         this._header_view.setData("我的書籤", this._board_name, "");
-        View _list_empty_view = findViewById(R.id.BoardExtendOptionalPage_ListEmptyView);
-        ListView _list_view = (ListView) findViewById(R.id.BoardExtendOptionalPage_ListView);
+        View _list_empty_view = findViewById(R.id.BoardExtendOptionalPage_listEmptyView);
+        ListView _list_view = (ListView) findViewById(R.id.BoardExtendOptionalPage_listView);
         _list_view.setAdapter(this);
         _list_view.setOnItemClickListener(this);
         _list_view.setOnItemLongClickListener(this);
         _list_view.setEmptyView(_list_empty_view);
-        this._bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_BookmarkButton);
-        this._history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_HistoryButton);
-        this._water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_WaterBallButton);
+        this._bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_bookmarkButton);
+        this._history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_historyButton);
+        this._water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_waterBallButton);
         this._bookmark_button.setOnClickListener(this);
         this._history_button.setOnClickListener(this);
         this._water_ball_button.setOnClickListener(this);
@@ -166,7 +166,7 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
 
     public void onItemClick(AdapterView<?> adapterView, View aView, int index, long id) {
         Bookmark bookmark = getItem(index);
-        BoardSearchPage page = PageContainer.getInstance().getBoard_Search_Page();
+        BoardSearchPage page = PageContainer.getInstance().getBoard_Search_page();
         page.clear();
         ListState state = ListStateStore.getInstance().getState(page.getListIdFromListName(this._board_name));
         if (state != null) {

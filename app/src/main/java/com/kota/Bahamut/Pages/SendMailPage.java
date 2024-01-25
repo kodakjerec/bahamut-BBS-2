@@ -121,7 +121,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         this._symbol_button.setOnClickListener(this);
         this._hide_title_button = (Button) findViewById(R.id.SendMailDialog_Cancel);
         this._hide_title_button.setOnClickListener(this);
-        findViewById(R.id.SendMailDialog_Change).setOnClickListener(this);
+        findViewById(R.id.SendMailDialog_change).setOnClickListener(this);
         this._title_block = findViewById(R.id.SendMail_TitleBlock);
         refresh();
     }
@@ -206,7 +206,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
             }).scheduleDismissOnPageDisappear(this).show();
         } else if (view == this._hide_title_button) {
             onInsertSymbolbuttonClicked();
-        } else if (view.getId() == R.id.SendMailDialog_Change) {
+        } else if (view.getId() == R.id.SendMailDialog_change) {
             changeViewMode();
         }
     }

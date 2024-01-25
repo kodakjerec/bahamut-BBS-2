@@ -110,9 +110,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     public void onPageDidLoad() {
         super.onPageDidLoad();
         this._settings = new UserSettings(getContext());
-        ASListView list_view = (ASListView) findViewById(R.id.BoardPage_ListView);
+        ASListView list_view = (ASListView) findViewById(R.id.BoardPage_listView);
         list_view.extendOptionalDelegate = this;
-        View list_empty_view = findViewById(R.id.BoardPage_ListEmptyView);
+        View list_empty_view = findViewById(R.id.BoardPage_listEmptyView);
         list_view.setEmptyView(list_empty_view);
         setListView(list_view);
         Button post_button = (Button) findViewById(R.id.BoardPage_PostButton);
@@ -133,7 +133,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         if (open_bookmark_button != null) {
             open_bookmark_button.setOnClickListener(this.mOpenBookmarkListener);
         }
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_headerView);
         header_view.setMenuButton(this.mMenuButtonListener);
         refreshHeaderView();
         refreshExternalToolbar();
@@ -144,7 +144,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         board_title = (board_title == null || board_title.length() == 0) ? "讀取中" : board_title;
         String board_manager = this._board_manager;
         board_manager = (board_manager == null || board_manager.length() == 0) ? "讀取中" : board_manager;
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_headerView);
         if (header_view != null) {
             header_view.setData(board_title, getListName(), board_manager);
         }
@@ -260,7 +260,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     private void searchArticle(String keyword, String author, String mark, String gy) {
         this._last_list_action = 1;
-        BoardSearchPage page = PageContainer.getInstance().getBoard_Search_Page();
+        BoardSearchPage page = PageContainer.getInstance().getBoard_Search_page();
         page.clear();
         getNavigationController().pushViewController(page);
         ListState state = ListStateStore.getInstance().getState(page.getListIdFromListName(getListName()));
@@ -350,7 +350,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     private void onListArticle(int itemIndex) {
         this._last_list_action = 0;
-        BoardLinkPage page = PageContainer.getInstance().getBoard_Linked_Title_Page();
+        BoardLinkPage page = PageContainer.getInstance().getBoard_linked_Title_page();
         page.clear();
         getNavigationController().pushViewController(page);
         ListState state = ListStateStore.getInstance().getState(page.getListIdFromListName(getListName()));

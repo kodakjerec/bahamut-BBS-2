@@ -123,7 +123,7 @@ public class PageContainer {
         }
     }
 
-    public BoardLinkPage getBoard_Linked_Title_Page() {
+    public BoardLinkPage getBoard_linked_Title_page() {
         if (this._board_title_linked_page == null) {
             this._board_title_linked_page = new BoardLinkPage();
         }
@@ -137,7 +137,7 @@ public class PageContainer {
         }
     }
 
-    public BoardSearchPage getBoard_Search_Page() {
+    public BoardSearchPage getBoard_Search_page() {
         if (this._board_search_page == null) {
             this._board_search_page = new BoardSearchPage();
         }

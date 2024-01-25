@@ -1,23 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="fill_parent"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <ScrollView n1:background="@color/item_background_color" n1:layout_width="fill_parent" n1:layout_height="0.0dip" n1:layout_weight="1.0">
-        <LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-            <LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="0.0dip" n1:layout_weight="1.0" style="@style/TouchBlock">
-                <com.kumi.TelnetUI.TextView.TelnetTextViewLarge n1:textColor="@android:color/white" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:text="@string/notices" style="@style/TextViewLarge" />
-                <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:text="@string/start_msg_1" style="@style/TextViewNormal" />
-                <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="@android:color/white" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:text="@string/start_msg_2" style="@style/TextViewLarge" />
-            </LinearLayout>
-        </LinearLayout>
-    </ScrollView>
-    <LinearLayout n1:id="@id/Start_Toolbar" style="@style/Toolbar">
-        <Button n1:id="@id/Start_ExitButton" n1:text="@string/exit" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:text="@string/zero_word" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/Start_ConnectButton" n1:text="@string/connect" style="@style/ToolbarItem" />
-=======
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
     <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
@@ -34,11 +15,10 @@
         </LinearLayout>
     </ScrollView>
     <LinearLayout android:id="@+id/Start_Toolbar" style="@style/Toolbar">
-        <Button android:id="@+id/Start_ExitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
+        <Button android:id="@+id/Start_exitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:text="@string/zero_word" style="@style/ToolbarItem" android:autofillHints=""/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Start_ConnectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
->>>>>>> dev_kodak
+        <Button android:id="@+id/Start_connectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
     </LinearLayout>
 </LinearLayout>

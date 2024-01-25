@@ -18,8 +18,8 @@ public class UserSettings {
     public static final String PROPERTIES_BLOCK_LIST = "BlockList";
     public static final String PROPERTIES_BLOCK_LIST_ENABLE = "BlockListEnable";
     public static final String PROPERTIES_EXTRA_TOOLBAR_ENABLE = "ExtraToolbarEnable";
-    public static final String PROPERTIES_KEEP_POWER = "KeepPower";
-    public static final String PROPERTIES_KEEP_WIFI_DISABLE = "KeepWifiDisable";
+    public static final String PROPERTIES_kEEP_POWER = "KeepPower";
+    public static final String PROPERTIES_kEEP_WIFI_DISABLE = "KeepWifiDisable";
     public static final String PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER = "LastConnectionIsNotOfflineByUser";
     public static final String PROPERTIES_PASSWORD = "Password";
     public static final String PROPERTIES_SAVE_LOGON_USER = "SaveLogonUser";
@@ -63,8 +63,8 @@ public class UserSettings {
                 int article_view_mode = perp.getPropertiesInteger(PROPERTIES_ARTICLE_VIEW_MODE);
                 String block_list = perp.getPropertiesString(PROPERTIES_BLOCK_LIST);
                 boolean block_list_enable = perp.getPropertiesBoolean(PROPERTIES_BLOCK_LIST_ENABLE);
-                boolean keep_wifi = perp.getPropertiesBoolean(PROPERTIES_KEEP_WIFI_DISABLE);
-                boolean keep_power = perp.getPropertiesBoolean(PROPERTIES_KEEP_POWER);
+                boolean keep_wifi = perp.getPropertiesBoolean(PROPERTIES_kEEP_WIFI_DISABLE);
+                boolean keep_power = perp.getPropertiesBoolean(PROPERTIES_kEEP_POWER);
                 boolean offline_by_user = perp.getPropertiesBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER);
                 boolean animation_disable = perp.getPropertiesBoolean(PROPERTIES_ANIMATION_DISABLE);
                 boolean extra_toolbar = perp.getPropertiesBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE);
@@ -75,8 +75,8 @@ public class UserSettings {
                 editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, article_view_mode);
                 editor.putString(PROPERTIES_BLOCK_LIST, block_list);
                 editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, block_list_enable);
-                editor.putBoolean(PROPERTIES_KEEP_WIFI_DISABLE, keep_wifi);
-                editor.putBoolean(PROPERTIES_KEEP_POWER, keep_power);
+                editor.putBoolean(PROPERTIES_kEEP_WIFI_DISABLE, keep_wifi);
+                editor.putBoolean(PROPERTIES_kEEP_POWER, keep_power);
                 editor.putBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, offline_by_user);
                 editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, animation_disable);
                 editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extra_toolbar);
@@ -144,8 +144,8 @@ public class UserSettings {
         editor.apply();
     }
 
-    public boolean isArticleMoveDisable() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, false);
+    public boolean isArticleMoveEnsable() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, true);
     }
 
     public void setArticleMoveDisable(boolean isDisable) {
@@ -290,7 +290,7 @@ public class UserSettings {
     }
 
     public boolean isKeepWifi() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_DISABLE, false);
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_kEEP_WIFI_DISABLE, false);
     }
 
     public void setKeepWifi(boolean keep) {
@@ -299,7 +299,7 @@ public class UserSettings {
         if (!keep) {
             z = true;
         }
-        editor.putBoolean(PROPERTIES_KEEP_WIFI_DISABLE, z);
+        editor.putBoolean(PROPERTIES_kEEP_WIFI_DISABLE, z);
         editor.apply();
     }
 

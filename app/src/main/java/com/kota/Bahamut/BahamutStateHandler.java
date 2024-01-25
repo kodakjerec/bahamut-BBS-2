@@ -250,7 +250,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleBoardSearchPage() {
         setCurrentPage(13);
         if (this._cursor.column == 1) {
-            BoardSearchPage page = PageContainer.getInstance().getBoard_Search_Page();
+            BoardSearchPage page = PageContainer.getInstance().getBoard_Search_page();
             if (page.onPagePreload()) {
                 showPage(page);
             }
@@ -260,7 +260,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleBoardTitleLinkedPage() {
         setCurrentPage(12);
         if (this._cursor.column == 1) {
-            BoardLinkPage page = PageContainer.getInstance().getBoard_Linked_Title_Page();
+            BoardLinkPage page = PageContainer.getInstance().getBoard_linked_Title_page();
             if (page.onPagePreload()) {
                 showPage(page);
             }

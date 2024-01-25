@@ -104,7 +104,7 @@ public class BlockListPage extends TelnetPage {
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
         this._block_list = this._settings.getBlockList();
-        ((ListView) findViewById(R.id.BlockList_List)).setAdapter(this._list_adapter);
+        ((ListView) findViewById(R.id.BlockList_list)).setAdapter(this._list_adapter);
         findViewById(R.id.BlockList_Add).setOnClickListener(this._add_listener);
     }
 

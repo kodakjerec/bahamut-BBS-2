@@ -140,7 +140,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         this._hide_title_button = (Button) findViewById(R.id.ArticlePostDialog_Cancel);
         this._hide_title_button.setOnClickListener(this);
         findViewById(R.id.ArticlePostDialog_File).setOnClickListener(this);
-        this._header_selector = (Spinner) findViewById(R.id.Post_HeaderSelector);
+        this._header_selector = (Spinner) findViewById(R.id.Post_headerSelector);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, this._settings.getArticleHeaders());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         this._header_selector.setAdapter(adapter);

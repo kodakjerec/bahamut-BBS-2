@@ -57,7 +57,7 @@ public class MailBoxPage_ItemView extends LinearLayout {
         this._title = findViewById(R.id.MailBoxPage_ItemView_Title);
         this._number = findViewById(R.id.MailBoxPage_ItemView_Number);
         this._date = findViewById(R.id.MailBoxPage_ItemView_Date);
-        this._mark = findViewById(R.id.MailBoxPage_ItemView_Mark);
+        this._mark = findViewById(R.id.MailBoxPage_ItemView_mark);
         this._author = findViewById(R.id.MailBoxPage_ItemView_Author);
         this._reply = findViewById(R.id.MailBoxPage_ItemView_Reply);
         this._divider_bottom = findViewById(R.id.MailBoxPage_ItemView_DividerBottom);

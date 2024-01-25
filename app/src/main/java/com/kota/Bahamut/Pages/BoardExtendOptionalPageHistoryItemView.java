@@ -34,9 +34,9 @@ public class BoardExtendOptionalPageHistoryItemView extends LinearLayout {
 
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.board_extend_optional_page_history_item_view, this);
-        this._title_label = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_Title);
-        this._divider_top = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_DividerTop);
-        this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_HistoryItemView_DividerBottom);
+        this._title_label = findViewById(R.id.BoardExtendOptionalPage_historyItemView_Title);
+        this._divider_top = findViewById(R.id.BoardExtendOptionalPage_historyItemView_DividerTop);
+        this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_historyItemView_DividerBottom);
     }
 
     public void setDividerTopVisible(boolean visible) {

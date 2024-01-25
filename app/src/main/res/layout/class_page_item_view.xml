@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="wrap_content"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-        <LinearLayout n1:orientation="vertical" n1:id="@id/ClassPage_ItemView_BackgroundView" n1:background="@color/list_page_item_content_background" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:layout_weight="1.0" style="@style/TouchBlock">
-            <LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-                <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="#ffffffff" n1:ellipsize="end" n1:id="@id/ClassPage_ItemView_ClassTitle" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:singleLine="false" n1:layout_weight="1.0" style="@style/TextViewNormal" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:id="@+id/ClassPage_ItemView_backgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="#ffffffff" android:ellipsize="end" android:id="@+id/ClassPage_ItemView_classTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
             </LinearLayout>
-            <LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-                <com.kumi.TelnetUI.TextView.TelnetTextViewSmall n1:textColor="#fff0f080" n1:id="@id/ClassPage_ItemView_ClassName" n1:layout_width="wrap_content" n1:layout_height="wrap_content" style="@style/TextViewSmall" />
-                <com.kumi.TelnetUI.TextView.TelnetTextViewSmall n1:textColor="#ffb0b0f0" n1:gravity="right" n1:id="@id/ClassPage_ItemView_ClassManager" n1:paddingLeft="12.0dip" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:singleLine="true" n1:layout_weight="1.0" style="@style/TextViewSmall" />
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#fff0f080" android:id="@+id/ClassPage_ItemView_className" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffb0b0f0" android:gravity="right" android:id="@+id/ClassPage_ItemView_classManager" android:paddingLeft="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
             </LinearLayout>
         </LinearLayout>
-        <View style="@style/ItemViewDividerVertical" />
-        <TextView n1:textStyle="bold" n1:textColor="@color/list_page_item_arrow_color" n1:gravity="center" n1:id="@id/ClassPage_ItemView_ArrowView" n1:background="@color/list_page_item_arrow_background" n1:paddingLeft="6.0dip" n1:paddingRight="6.0dip" n1:layout_width="wrap_content" n1:layout_height="fill_parent" n1:text="@string/arrow_right" style="@style/TextViewSmall" />
-        <LinearLayout n1:orientation="horizontal" n1:id="@id/ClassPage_ItemView_OrderBock" n1:visibility="gone" n1:layout_width="wrap_content" n1:layout_height="wrap_content">
-            <Button n1:textSize="30.0sp" n1:id="@id/BoardPage_ItemView_MoveUp" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:text="@string/arrow_up" style="@style/TouchBlock" />
-            <Button n1:textSize="30.0sp" n1:id="@id/BoardPage_ItemView_MoveDown" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:text="@string/arrow_down" style="@style/TouchBlock" />
+        <View style="@style/ItemViewDividerVertical"/>
+        <TextView android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/ClassPage_ItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+        <LinearLayout android:orientation="horizontal" android:id="@+id/ClassPage_ItemView_OrderBock" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content">
+            <Button android:textSize="30sp" android:id="@+id/BoardPage_ItemView_MoveUp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/arrow_up" style="@style/TouchBlock"/>
+            <Button android:textSize="30sp" android:id="@+id/BoardPage_ItemView_MoveDown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/arrow_down" style="@style/TouchBlock"/>
         </LinearLayout>
     </LinearLayout>
-    <View n1:id="@id/ClassPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal" />
+    <View android:id="@+id/ClassPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

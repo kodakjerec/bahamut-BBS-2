@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<LinearLayout n1:orientation="vertical" n1:layout_width="wrap_content" n1:layout_height="wrap_content"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:background="#ffffffff" n1:padding="3.0dip" n1:layout_width="wrap_content" n1:layout_height="wrap_content">
-        <LinearLayout n1:background="#ff000000" n1:layout_width="wrap_content" n1:layout_height="wrap_content">
-            <GridView n1:id="@id/SymbolDialog_GridView" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:numColumns="4" />
-        </LinearLayout>
-    </LinearLayout>
-</LinearLayout>
-=======
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
     <LinearLayout android:background="#ff000000" android:layout_width="wrap_content" android:layout_height="wrap_content">
         <GridView android:id="@+id/SymbolDialog_GridView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:numColumns="4"/>
     </LinearLayout>
 </LinearLayout>
 
->>>>>>> dev_kodak

@@ -37,6 +37,7 @@ public class SystemSettingsPage extends TelnetPage {
             SystemSettingsPage.this._settings.setKeepWifi(isChecked);
         }
     };
+
     UserSettings _settings;
 
     public int getPageLayout() {
@@ -53,31 +54,31 @@ public class SystemSettingsPage extends TelnetPage {
 
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
+
         // 黑名單
-        ((LinearLayout) findViewById(R.id.SystemSettings_BlockListSetting)).setOnClickListener(this._block_list_setting_listener);
-        CheckBox block_list_enable_box = (CheckBox) findViewById(R.id.SystemSettings_BlockListEnable);
+        ((LinearLayout) findViewById(R.id.SystemSettings_blockListSetting)).setOnClickListener(this._block_list_setting_listener);
+        CheckBox block_list_enable_box = (CheckBox) findViewById(R.id.SystemSettings_blockListEnable);
         block_list_enable_box.setChecked(this._settings.isBlockListEnable());
         block_list_enable_box.setOnCheckedChangeListener(this._block_list_enable_listener);
-        findViewById(R.id.SystemSettings_item_BlockListEnable).setOnClickListener(view -> block_list_enable_box.setChecked(!block_list_enable_box.isChecked()));
-        
+        findViewById(R.id.SystemSettings_item_blockListEnable).setOnClickListener(view -> block_list_enable_box.setChecked(!block_list_enable_box.isChecked()));
+
         // keep-wifi
-        CheckBox keep_wifi_box = (CheckBox) findViewById(R.id.SystemSettings_KeepWifi);
+        CheckBox keep_wifi_box = (CheckBox) findViewById(R.id.SystemSettings_keepWifi);
         keep_wifi_box.setChecked(this._settings.isKeepWifi());
         keep_wifi_box.setOnCheckedChangeListener(this._keep_wifi_listener);
-        findViewById(R.id.SystemSettings_item_KeepWifi).setOnClickListener(view -> keep_wifi_box.setChecked(!keep_wifi_box.isChecked()));
-        
+        findViewById(R.id.SystemSettings_item_keepWifi).setOnClickListener(view -> keep_wifi_box.setChecked(!keep_wifi_box.isChecked()));
+
         // 換頁動畫
-        CheckBox animation_enable_box = (CheckBox) findViewById(R.id.SystemSettings_AnimationEnable);
+        CheckBox animation_enable_box = (CheckBox) findViewById(R.id.SystemSettings_animationEnable);
         animation_enable_box.setChecked(this._settings.isAnimationEnable());
         animation_enable_box.setOnCheckedChangeListener(this._animation_enable_listener);
-        findViewById(R.id.SystemSettings_item_AnimationEnable).setOnClickListener(view -> animation_enable_box.setChecked(!animation_enable_box.isChecked()));
-        
+        findViewById(R.id.SystemSettings_item_animationEnable).setOnClickListener(view -> animation_enable_box.setChecked(!animation_enable_box.isChecked()));
+
         // 文章首篇/末篇
-        CheckBox article_move_enable_box = (CheckBox) findViewById(R.id.SystemSettings_DisableArticleMove);
-        article_move_enable_box.setChecked(this._settings.isArticleMoveDisable());
+        CheckBox article_move_enable_box = (CheckBox) findViewById(R.id.SystemSettings_enableArticleMove);
+        article_move_enable_box.setChecked(this._settings.isArticleMoveEnsable());
         article_move_enable_box.setOnCheckedChangeListener(this._article_move_enable_listener);
-        findViewById(R.id.SystemSettings_item_DisableArticleMove).setOnClickListener(view -> article_move_enable_box.setChecked(!article_move_enable_box.isChecked()));
-        
+        findViewById(R.id.SystemSettings_item_enableArticleMove).setOnClickListener(view -> article_move_enable_box.setChecked(!article_move_enable_box.isChecked()));
     }
 
     public String getName() {
@@ -98,4 +99,5 @@ public class SystemSettingsPage extends TelnetPage {
         ASToast.showShortToast("返回");
         return true;
     }
+
 }

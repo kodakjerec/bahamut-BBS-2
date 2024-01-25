@@ -49,21 +49,21 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        ListView list_view = (ListView) findViewById(R.id.MailBoxPage_ListView);
-        this._list_empty_view = findViewById(R.id.MailBoxPage_ListEmptyView);
+        ListView list_view = (ListView) findViewById(R.id.MailBoxPage_listView);
+        this._list_empty_view = findViewById(R.id.MailBoxPage_listEmptyView);
         list_view.setEmptyView(this._list_empty_view);
         setListView(list_view);
-        this._back_button = (Button) findViewById(R.id.Mail_BackButton);
+        this._back_button = (Button) findViewById(R.id.Mail_backButton);
         this._back_button.setOnClickListener(this);
         this._back_button.setOnLongClickListener(this);
-        this._page_up_button = (Button) findViewById(R.id.Mail_PageUpButton);
+        this._page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
         this._page_up_button.setOnClickListener(this);
         this._page_up_button.setOnLongClickListener(this);
-        this._page_down_button = (Button) findViewById(R.id.Mail_PageDownButton);
+        this._page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
         this._page_down_button.setOnClickListener(this);
         this._page_down_button.setOnLongClickListener(this);
         findViewById(R.id.Mail_SearchButton).setOnClickListener(this);
-        this._header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_HeaderView);
+        this._header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_headerView);
     }
 
     public void onPageDidDisappear() {
@@ -143,21 +143,21 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
 
     public boolean onLongClick(View aView) {
         int get_id = aView.getId();
-        if (get_id == R.id.Mail_PageDownButton) {
+        if (get_id == R.id.Mail_pageDownButton) {
             return true;
         } else {
-            return get_id == R.id.Mail_PageUpButton;
+            return get_id == R.id.Mail_pageUpButton;
         }
     }
 
     public void onClick(View aView) {
         int get_id = aView.getId();
-        if (get_id == R.id.Mail_BackButton) {
+        if (get_id == R.id.Mail_backButton) {
             onPostButtonClicked();
-        } else if (get_id == R.id.Mail_PageDownButton) {
+        } else if (get_id == R.id.Mail_pageDownButton) {
             setManualLoadPage();
             moveToLastPosition();
-        }else if (get_id == R.id.Mail_PageUpButton) {
+        }else if (get_id == R.id.Mail_pageUpButton) {
             moveToFirstPosition();
         }else if (get_id == R.id.Mail_SearchButton) {
             showSelectArticleDialog();

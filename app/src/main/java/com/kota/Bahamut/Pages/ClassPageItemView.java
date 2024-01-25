@@ -35,9 +35,9 @@ public class ClassPageItemView extends LinearLayout {
 
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.class_page_item_view, this);
-        this._board_title_label = findViewById(R.id.ClassPage_ItemView_ClassTitle);
-        this._board_name_label = findViewById(R.id.ClassPage_ItemView_ClassName);
-        this._board_manager_label = findViewById(R.id.ClassPage_ItemView_ClassManager);
+        this._board_title_label = findViewById(R.id.ClassPage_ItemView_classTitle);
+        this._board_name_label = findViewById(R.id.ClassPage_ItemView_className);
+        this._board_manager_label = findViewById(R.id.ClassPage_ItemView_classManager);
         this._divider_bottom = findViewById(R.id.ClassPage_ItemView_DividerBottom);
     }
 

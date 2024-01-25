@@ -32,9 +32,9 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
         this._author_label = (TextView) findViewById(R.id.ArticleTextItemView_Title);
-        this._content_label = (TextView) findViewById(R.id.ArticleTextItemView_Content);
+        this._content_label = (TextView) findViewById(R.id.ArticleTextItemView_content);
         this._divider_view = (DividerView) findViewById(R.id.ArticleTextItemView_DividerView);
-        this._content_view = (ViewGroup) findViewById(R.id.ArticleTextItemView_ContentView);
+        this._content_view = (ViewGroup) findViewById(R.id.ArticleTextItemView_contentView);
         setBackgroundResource(android.R.color.transparent);
     }
 

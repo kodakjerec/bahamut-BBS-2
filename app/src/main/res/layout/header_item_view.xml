@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:orientation="vertical" n1:background="@color/titlebar_background_color" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:layout_weight="1.0" style="@style/TouchBlock">
-        <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="@color/light_yellow" n1:id="@id/title" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:singleLine="false" style="@style/TextViewNormal" />
-        <LinearLayout n1:orientation="horizontal" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-            <com.kumi.TelnetUI.TextView.TelnetTextViewSmall n1:textColor="@color/white" n1:ellipsize="end" n1:id="@id/detail_1" n1:layout_width="0.0dip" n1:layout_height="wrap_content" n1:singleLine="true" n1:layout_weight="1.0" style="@style/TextViewSmall" />
-            <com.kumi.TelnetUI.TextView.TelnetTextViewSmall n1:textColor="#ffc0ffff" n1:id="@id/detail_2" n1:layout_width="wrap_content" n1:layout_height="wrap_content" n1:singleLine="true" style="@style/TextViewSmall" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="@color/titlebar_background_color" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/light_yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="false" style="@style/TextViewNormal"/>
+        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffc0ffff" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
         </LinearLayout>
     </LinearLayout>
-    <View n1:id="@id/menu_divider" n1:visibility="gone" style="@style/ItemViewDividerVertical" />
-    <ImageButton n1:textColor="@color/list_page_item_arrow_color" n1:gravity="center" n1:id="@id/menu_button" n1:background="#ff101090" n1:visibility="gone" n1:layout_width="60.0dip" n1:layout_height="fill_parent" n1:src="@drawable/menu_icon" n1:contentDescription="@string/zero_word" />
+    <View android:id="@+id/menu_divider" android:visibility="gone" style="@style/ItemViewDividerVertical"/>
+    <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="#ff101090" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
 </LinearLayout>

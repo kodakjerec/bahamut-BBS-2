@@ -1,16 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="wrap_content"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:orientation="vertical" n1:id="@id/ArticleTextItemView_ContentView" n1:layout_width="fill_parent" n1:layout_height="wrap_content" style="@style/TouchBlock">
-        <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:id="@id/ArticleTextItemView_Title" n1:layout_width="fill_parent" n1:layout_height="wrap_content" style="@style/TextViewNormal" />
-        <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:autoLink="email|web" n1:id="@id/ArticleTextItemView_Content" n1:layout_width="fill_parent" n1:layout_height="wrap_content" style="@style/TextViewNormal" />
-=======
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:id="@+id/ArticleTextItemView_ContentView" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
+    <LinearLayout android:orientation="vertical" android:id="@+id/ArticleTextItemView_contentView" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
         <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:id="@+id/ArticleTextItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:autoLink="all" android:id="@+id/ArticleTextItemView_Content" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
->>>>>>> dev_kodak
+        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:autoLink="all" android:id="@+id/ArticleTextItemView_content" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
     </LinearLayout>
-    <com.kumi.TelnetUI.DividerView n1:id="@id/ArticleTextItemView_DividerView" n1:layout_width="fill_parent" n1:layout_height="1.0px" />
+    <com.kota.TelnetUI.DividerView android:id="@+id/ArticleTextItemView_DividerView" android:layout_width="match_parent" android:layout_height="1px"/>
 </LinearLayout>

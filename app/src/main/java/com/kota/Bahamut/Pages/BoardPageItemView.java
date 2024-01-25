@@ -64,9 +64,9 @@ public class BoardPageItemView extends LinearLayout {
         this._date_label = findViewById(R.id.BoardPage_ItemView_Date);
         this._gy_title_label = findViewById(R.id.BoardPage_ItemView_GY_Title);
         this._gy_label = findViewById(R.id.BoardPage_ItemView_GY);
-        this._mark_label = findViewById(R.id.BoardPage_ItemView_Mark);
+        this._mark_label = findViewById(R.id.BoardPage_ItemView_mark);
         this._author_label = findViewById(R.id.BoardPage_ItemView_Author);
-        this._content_view = findViewById(R.id.BoardPage_ItemView_ContentView);
+        this._content_view = findViewById(R.id.BoardPage_ItemView_contentView);
         this._divider_bottom = findViewById(R.id.BoardPage_ItemView_DividerBottom);
     }
 

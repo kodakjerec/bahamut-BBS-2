@@ -1,30 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<RelativeLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="fill_parent"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <View style="@style/HorizontalDivider" />
-    <FrameLayout n1:background="@color/item_background_color" n1:layout_width="fill_parent" n1:layout_height="fill_parent" />
-    <com.kumi.TelnetUI.TelnetView n1:id="@id/Main_TelnetView" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:layout_centerHorizontal="true" />
-    <LinearLayout n1:id="@id/toolbar" n1:layout_alignParentBottom="true" style="@style/Toolbar">
-        <Button n1:id="@id/Main_LogoutButton" n1:text="@string/logout" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/Main_MailButton" n1:text="@string/mailbox" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/Main_SystemSettingsButton" n1:text="@string/setting" style="@style/ToolbarItem" />
-    </LinearLayout>
-    <LinearLayout n1:orientation="vertical" n1:id="@id/Main_ItemBlock" n1:background="#e0000000" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:layout_above="@id/toolbar">
-        <LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="72.0dip" n1:layout_weight="1.0">
-            <View style="@style/HorizontalDivider" />
-            <Button n1:textColor="@color/button_text_color" n1:id="@id/Main_BoardsButton" n1:background="@android:drawable/list_selector_background" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:text="@string/folder_boards" style="@style/MainItem" />
-        </LinearLayout>
-        <LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="72.0dip" n1:layout_weight="1.0">
-            <View style="@style/HorizontalDivider" />
-            <Button n1:textColor="@color/button_text_color" n1:id="@id/Main_ClassButton" n1:background="@android:drawable/list_selector_background" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:text="@string/folder_class" style="@style/MainItem" />
-        </LinearLayout>
-        <LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="72.0dip" n1:layout_weight="1.0">
-            <View style="@style/HorizontalDivider" />
-            <Button n1:textColor="@color/button_text_color" n1:id="@id/Main_FavoriteButton" n1:background="@android:drawable/list_selector_background" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:text="@string/folder_favorite" style="@style/MainItem" />
-=======
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -49,21 +23,21 @@
         android:layout_alignParentBottom="true">
 
         <Button
-            android:id="@+id/Main_LogoutButton"
+            android:id="@+id/Main_logoutButton"
             style="@style/ToolbarItem"
             android:text="@string/logout" />
 
         <View style="@style/ToolbarDivider" />
 
         <Button
-            android:id="@+id/Main_MailButton"
+            android:id="@+id/Main_mailButton"
             style="@style/ToolbarItem"
             android:text="@string/mailbox" />
 
         <View style="@style/ToolbarDivider" />
 
         <Button
-            android:id="@+id/Main_SystemSettingsButton"
+            android:id="@+id/Main_systemSettingsButton"
             style="@style/ToolbarItem"
             android:text="@string/setting" />
     </LinearLayout>
@@ -85,7 +59,7 @@
             <View style="@style/HorizontalDivider" />
 
             <Button
-                android:id="@+id/Main_BoardsButton"
+                android:id="@+id/Main_boardsButton"
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -104,7 +78,7 @@
             <View style="@style/HorizontalDivider" />
 
             <Button
-                android:id="@+id/Main_ClassButton"
+                android:id="@+id/Main_classButton"
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -131,7 +105,6 @@
                 android:text="@string/folder_favorite"
                 android:textColor="@color/button_text_color"
                 android:textSize="30sp"/>
->>>>>>> dev_kodak
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

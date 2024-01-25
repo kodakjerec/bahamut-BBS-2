@@ -1,14 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<FrameLayout n1:background="#ffffffff" n1:padding="3.0dip" n1:layout_width="260.0dip" n1:layout_height="wrap_content"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <LinearLayout n1:orientation="vertical" n1:background="#ff000000" n1:padding="1.0dip" n1:layout_width="fill_parent" n1:layout_height="wrap_content">
-        <com.kumi.TelnetUI.TextView.TelnetTextViewLarge n1:textColor="#ffffffff" n1:background="#ff202020" n1:padding="6.0dip" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:text="@string/search_board" style="@style/TextViewLarge" />
-        <LinearLayout n1:orientation="vertical" n1:background="@color/item_background_color" n1:layout_width="fill_parent" n1:layout_height="wrap_content" style="@style/TouchBlock">
-            <com.kumi.TelnetUI.TextView.TelnetTextViewNormal n1:textColor="#ffffffff" n1:layout_width="fill_parent" n1:layout_height="wrap_content" n1:text="@string/input_board_name" style="@style/TextViewNormal" />
-            <View style="@style/BlockDividerHorizontal" />
-            <EditText n1:id="@id/Bahamut_Dialog_Search_Board_Keyword" n1:text="" style="@style/EditTextSingleLineLight" />
-=======
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
     <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/search_board" style="@style/TextViewLarge"/>
@@ -17,24 +7,17 @@
             <View style="@style/BlockDividerHorizontal"/>
 
             <EditText
-                android:id="@+id/Bahamut_Dialog_Search_Board_Keyword"
+                android:id="@+id/Bahamut_Dialog_Search_board_keyword"
                 style="@style/EditTextSingleLineLight"
                 android:autofillHints=""
                 android:inputType="text"
                 android:hint="@string/board_name"/>
->>>>>>> dev_kodak
         </LinearLayout>
-        <View style="@style/BlockDividerHorizontal" />
+        <View style="@style/BlockDividerHorizontal"/>
         <LinearLayout style="@style/Toolbar">
-<<<<<<< HEAD
-            <Button n1:id="@id/Bahamut_Dialog_Search_Board_Cancel_Button" n1:text="@string/cancel" style="@style/DialogToolbarItem" />
-            <View style="@style/ToolbarDivider" />
-            <Button n1:id="@id/Bahamut_Dialog_Search_Board_Search_Button" n1:text="@string/search" style="@style/DialogToolbarItem" />
-=======
-            <Button android:id="@+id/Bahamut_Dialog_Search_Board_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem" />
+            <Button android:id="@+id/Bahamut_Dialog_Search_board_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem" />
             <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/Bahamut_Dialog_Search_Board_Search_Button" android:text="@string/search" style="@style/DialogToolbarItem"/>
->>>>>>> dev_kodak
+            <Button android:id="@+id/Bahamut_Dialog_Search_board_Search_Button" android:text="@string/search" style="@style/DialogToolbarItem"/>
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

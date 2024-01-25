@@ -43,7 +43,7 @@ public class BlockListPage_ItemView extends LinearLayout implements View.OnClick
 
     public void onClick(View v) {
         if (this.listener != null) {
-            this.listener.onBlockListPage_ItemView_Clicked(this);
+            this.listener.onBlockListPage_ItemView_clicked(this);
         }
     }
 

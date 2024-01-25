@@ -40,8 +40,8 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        ListView list_view = (ListView) findViewById(R.id.ClassPage_ListView);
-        list_view.setEmptyView(findViewById(R.id.ClassPage_ListEmptyView));
+        ListView list_view = (ListView) findViewById(R.id.ClassPage_listView);
+        list_view.setEmptyView(findViewById(R.id.ClassPage_listEmptyView));
         setListView(list_view);
         findViewById(R.id.ClassPage_SearchButton).setOnClickListener(this);
         findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
@@ -62,7 +62,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         if (detail == null || detail.length() == 0) {
             detail = "讀取中";
         }
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_HeaderView);
+        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_headerView);
         if (header_view != null) {
             header_view.setData(title, detail, "");
         }

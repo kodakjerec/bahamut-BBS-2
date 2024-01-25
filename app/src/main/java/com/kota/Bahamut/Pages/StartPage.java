@@ -24,8 +24,8 @@ public class StartPage extends TelnetPage {
 
     public void onPageDidLoad() {
         getNavigationController().setNavigationTitle("勇者入口");
-        findViewById(R.id.Start_ExitButton).setOnClickListener(this._exit_listener);
-        findViewById(R.id.Start_ConnectButton).setOnClickListener(this._connect_listener);
+        findViewById(R.id.Start_exitButton).setOnClickListener(this._exit_listener);
+        findViewById(R.id.Start_connectButton).setOnClickListener(this._connect_listener);
     }
 
     public void onPageWillAppear() {

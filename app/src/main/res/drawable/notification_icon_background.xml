@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape n1:shape="oval"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <solid n1:color="@color/notification_icon_bg_color" />
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/notification_icon_bg_color"/>
 </shape>

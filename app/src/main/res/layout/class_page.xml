@@ -1,37 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<<<<<<< HEAD
-<LinearLayout n1:orientation="vertical" n1:layout_width="fill_parent" n1:layout_height="fill_parent"
-  xmlns:n1="http://schemas.android.com/apk/res/android">
-    <com.kumi.TelnetUI.TelnetHeaderItemView n1:id="@id/ClassPage_HeaderView" n1:layout_width="fill_parent" n1:layout_height="wrap_content" />
-    <FrameLayout n1:id="@id/ClassPage_ListViewBlock" n1:layout_width="fill_parent" n1:layout_height="0.0dip" n1:layout_weight="1.0">
-        <com.kumi.TelnetUI.TextView.TelnetTextViewUltraLarge n1:textColor="#ffffffff" n1:gravity="center" n1:id="@id/ClassPage_ListEmptyView" n1:visibility="invisible" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:text="@string/loading_" style="@style/TextViewUltraLarge" />
-        <com.kumi.ASFramework.UI.ASListView n1:id="@id/ClassPage_ListView" n1:layout_width="fill_parent" n1:layout_height="fill_parent" n1:layout_marginBottom="-1.0dip" n1:divider="@null" n1:dividerHeight="0.0dip" style="@style/List" />
-    </FrameLayout>
-    <LinearLayout n1:id="@id/toolbar" style="@style/Toolbar">
-        <Button n1:id="@id/ClassPage_SearchButton" n1:text="@string/search" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/ClassPage_FirstPageButton" n1:text="@string/first_page" style="@style/ToolbarItem" />
-        <View style="@style/ToolbarDivider" />
-        <Button n1:id="@id/ClassPage_LastestPageButton" n1:text="@string/last_page" style="@style/ToolbarItem" />
-=======
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <com.kota.TelnetUI.TelnetHeaderItemView
-        android:id="@+id/ClassPage_HeaderView"
+        android:id="@+id/ClassPage_headerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <FrameLayout
-        android:id="@+id/ClassPage_ListViewBlock"
+        android:id="@+id/ClassPage_listViewBlock"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
         <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
-            android:id="@+id/ClassPage_ListEmptyView"
+            android:id="@+id/ClassPage_listEmptyView"
             style="@style/TextViewUltraLarge"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -41,7 +26,7 @@
             android:visibility="invisible" />
 
         <com.kota.ASFramework.UI.ASListView
-            android:id="@+id/ClassPage_ListView"
+            android:id="@+id/ClassPage_listView"
             style="@style/List"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -72,6 +57,5 @@
             android:id="@+id/ClassPage_LastestPageButton"
             style="@style/ToolbarItem"
             android:text="@string/last_page" />
->>>>>>> dev_kodak
     </LinearLayout>
 </LinearLayout>
