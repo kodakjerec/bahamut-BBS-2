@@ -34,5 +34,5 @@ It addresses the usability issues commonly found in generic BBS readers for mobi
 
 ## Donation
 * [PayPal](https://paypal.me/kodakjerec?country.x=TW&locale.x=zh_TW)
-* 台灣帳戶
-![jkopay account](developSource/jkopay_QRCode1706152454601.png)
+* 台灣帳戶  
+<img src="developSource/jkopay_QRCode1706152454601.png" width="200">
