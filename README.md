@@ -20,9 +20,20 @@ It addresses the usability issues commonly found in generic BBS readers for mobi
  Android平台上提供巴哈姆特電玩資訊站(BBS站台)的閱讀器，改善了行動裝置上通用型的BBS閱讀器不易使用的問題，讓喜歡巴哈姆特BBS的網友在Android平台上也可輕鬆交流。  
 
 ## Changelog
+### 1.8
+* 功能: 使用手勢在看板/文章(VIP)
+* 功能: 登入後自動進入洽特(VIP)
+* 功能: 書籤與工具列改成右方滑入
+* 功能: 文章長按內文改成選取，簽名檔保留"切換模式"
+* 功能: 文章內有多個連結，現在可以分別開啟
+* 功能: 螢幕旋轉方向開放
+* 功能: 深色模式開放
+* bug: 螢幕旋轉斷線
+* bug: 分割視窗、彈出視窗斷線
+* bug: 卡發文會出現旋轉圖案, 只能提醒沒辦法跳過:<
+* bug: 引言過長斷線
 ### 1.7
-* Fix android 10 and above problems
-* 改善 Android 10 以上程式問題
+* bug: 改善 Android 10 以上程式問題
 
 ## Install
 1. Download branch: main
