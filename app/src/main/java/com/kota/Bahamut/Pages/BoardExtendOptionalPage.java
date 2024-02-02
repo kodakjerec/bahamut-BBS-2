@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
+
 import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
@@ -166,7 +168,7 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
 
     public void onItemClick(AdapterView<?> adapterView, View aView, int index, long id) {
         Bookmark bookmark = getItem(index);
-        BoardSearchPage page = PageContainer.getInstance().getBoard_Search_page();
+        BoardSearchPage page = PageContainer.getInstance().getBoardSearchPage();
         page.clear();
         ListState state = ListStateStore.getInstance().getState(page.getListIdFromListName(this._board_name));
         if (state != null) {
@@ -201,10 +203,10 @@ public class BoardExtendOptionalPage extends TelnetPage implements ListAdapter, 
             this._selected_button = (Button) aView;
             for (Button tab_button : this._tab_buttons) {
                 if (tab_button == this._selected_button) {
-                    tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_selected));
+                    tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_selected));
                     tab_button.setBackgroundResource(R.drawable.tab_item_background_color_selected);
                 } else {
-                    tab_button.setTextColor(getContext().getColor(R.color.tab_item_text_color_unselected));
+                    tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_unselected));
                     tab_button.setBackgroundResource(R.drawable.tab_item_background_color_unselected);
                 }
             }

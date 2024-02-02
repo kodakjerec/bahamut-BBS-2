@@ -1,4 +1,4 @@
-package com.kumi.Bahamut;
+package com.kota.Bahamut;
 
 /* loaded from: classes.dex */
 public interface BahamutPage {

@@ -31,8 +31,8 @@ public class ASViewRemover {
   }
 
   private void remove() {
-    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASViewRemover.2
-      @Override // com.kumi.ASFramework.Thread.ASRunner
+    new ASRunner() { // from class: com.kota.ASFramework.PageController.ASViewRemover.2
+      @Override // com.kota.ASFramework.Thread.ASRunner
       public void run() {
         if (ASViewRemover.this._parent_view != null && ASViewRemover.this._target_view != null) {
           ASViewRemover.this._parent_view.removeView(ASViewRemover.this._target_view);

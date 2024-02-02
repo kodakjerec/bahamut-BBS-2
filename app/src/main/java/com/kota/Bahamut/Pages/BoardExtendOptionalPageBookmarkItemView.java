@@ -43,7 +43,7 @@ public class BoardExtendOptionalPageBookmarkItemView extends LinearLayout {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.board_extend_optional_page_bookmark_item_view, this);
         this._title_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title);
         this._author_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Author);
-        this._mark_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_mark);
+        this._mark_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark);
         this._gy_label = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_GY);
         this._divider_top = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop);
         this._divider_bottom = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerBottom);

@@ -36,6 +36,7 @@ public class StartPage extends TelnetPage {
         PageContainer.getInstance().cleanBoardSearchPage();
         PageContainer.getInstance().cleanBoardTitleLinkedPage();
         PageContainer.getInstance().cleanMainBoxPage();
+        PageContainer.getInstance().cleanBillingPage();
     }
 
     public void onPageDidDisappear() {

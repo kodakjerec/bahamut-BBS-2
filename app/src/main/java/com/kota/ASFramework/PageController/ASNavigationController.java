@@ -8,9 +8,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
-import androidx.core.view.ViewCompat;
-
 import com.kota.ASFramework.Thread.ASRunner;
+
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -29,9 +28,8 @@ public class ASNavigationController extends Activity {
   private Vector<PageCommand> _page_commands = new Vector<>();
   private boolean _is_animating = false;
 
-  /* JADX INFO: Access modifiers changed from: private */
   /* loaded from: classes.dex */
-  public abstract class PageCommand {
+  private abstract class PageCommand {
     public boolean animated;
 
     public abstract void run();
@@ -151,15 +149,13 @@ public class ASNavigationController extends Activity {
   private void buildPageView(ASViewController controller) {
     ASPageView page_view = new ASPageView(this);
     page_view.setLayoutParams(new FrameLayout.LayoutParams(-1, -1));
-    page_view.setBackgroundColor(ViewCompat.MEASURED_STATE_MASK);
-    page_view.setAnimationCacheEnabled(false);
+    page_view.setBackgroundColor(View.MEASURED_STATE_MASK);
     getLayoutInflater().inflate(controller.getPageLayout(), page_view);
     controller.setPageView(page_view);
     this._root_view.getContentView().addView(page_view);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void cleanPageView(ASViewController controller) {
+  private void cleanPageView(ASViewController controller) {
     controller.setPageView(null);
   }
 
@@ -204,8 +200,7 @@ public class ASNavigationController extends Activity {
     page_view.startAnimation(aAnimation);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void animatePopViewController(final ASViewController aRemovePage, final ASViewController aAddPage, boolean animated) {
+  private void animatePopViewController(final ASViewController aRemovePage, final ASViewController aAddPage, boolean animated) {
     if (aRemovePage != null) {
       aRemovePage.notifyPageWillDisappear();
       if (animated) {
@@ -254,8 +249,7 @@ public class ASNavigationController extends Activity {
     }.start(animated);
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void animatedPushViewController(final ASViewController sourceController, final ASViewController targetController, boolean animated) {
+  private void animatedPushViewController(final ASViewController sourceController, final ASViewController targetController, boolean animated) {
     if (targetController != null) {
       buildPageView(targetController);
       targetController.onPageDidLoad();
@@ -451,8 +445,7 @@ public class ASNavigationController extends Activity {
     return this._controllers.contains(aController);
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
-  public void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
+  protected void onSizeChanged(int newWidth, int newHeight, int oldWidth, int oldHeight) {
     ASViewController page = getTopController();
     if (page != null) {
       page.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight);
@@ -532,9 +525,8 @@ public class ASNavigationController extends Activity {
     this._animation_enable = enable;
   }
 
-  /* JADX INFO: Access modifiers changed from: protected */
   @Override // android.app.Activity
-  public void onPause() {
+  protected void onPause() {
     super.onPause();
     this._in_background = true;
   }
@@ -595,8 +587,7 @@ public class ASNavigationController extends Activity {
     }
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void onPageCommandExecuteFinished() {
+  private void onPageCommandExecuteFinished() {
     synchronized (this) {
       this._is_animating = false;
     }

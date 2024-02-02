@@ -1,6 +1,8 @@
 package com.kota.Bahamut.Pages;
 
 import android.view.View;
+import android.widget.Button;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.BahamutStateHandler;
@@ -53,13 +55,28 @@ public class MainPage extends TelnetPage {
         return 5;
     }
 
+    UserSettings _settings;
+
     public void onPageDidLoad() {
+        this._settings = new UserSettings(getContext());
+
         findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
         findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
         findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
         findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
         findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
+
+        // 自動登入洽特
+        if (this._settings.isUnderAutoToChat()) {
+            // 進入布告討論區
+            Button btn = (Button)findViewById(R.id.Main_boardsButton);
+            btn.performClick();
+
+            // 進入洽特
+            // 輸入版序:44 => 定位到44:Enter => 進入版面:Enter
+            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("44\n\n")).start();
+        }
     }
 
     public void onPageRefresh() {
@@ -137,9 +154,8 @@ public class MainPage extends TelnetPage {
                         TelnetClient.getClient().sendStringToServerInBackground("Q");
                         return;
                     case 1:
-                        UserSettings settings = new UserSettings(MainPage.this.getContext());
-                        settings.setLastConnectionIsOfflineByUser(true);
-                        settings.notifyDataUpdated();
+                        this._settings.setPropertiesLastConnectionIsOfflineByUser(true);
+                        this._settings.notifyDataUpdated();
                         TelnetClient.getClient().sendStringToServerInBackground("G");
                         return;
                     default:

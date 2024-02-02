@@ -26,6 +26,7 @@ import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
+import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
@@ -92,7 +93,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     public boolean onBackPressed() {
         clear();
         getNavigationController().popViewController();
-        TelnetOutputBuilder.create().pushKey(256).pushKey(256).sendToServerInBackground(1);
+        TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(TelnetKeyboard.LEFT_ARROW).sendToServerInBackground(1);
         return true;
     }
 
@@ -214,7 +215,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
         }
     }
 
-    public void loadLastestArticle() {
+    public void loadLatestArticle() {
         if (getLoadingItemNumber() == getItemSize()) {
             ASToast.showShortToast("已讀至列尾");
         } else {
@@ -256,6 +257,13 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     public void recoverPost() {
+        new ASRunner() {
+            public void run() {
+            }
+        }.runInMainThread();
+    }
+
+    public void finishPost() {
         new ASRunner() {
             public void run() {
             }

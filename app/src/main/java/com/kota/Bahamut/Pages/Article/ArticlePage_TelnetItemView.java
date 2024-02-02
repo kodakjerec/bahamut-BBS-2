@@ -21,8 +21,8 @@ public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetAr
 
     private void init(Context context) {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_telnet_item_view, this);
-        this._telnet_view = (TelnetView) findViewById(R.id.ArticlePage_TelnetItemView_TelnetView);
-        this._divider_view = (DividerView) findViewById(R.id.ArticlePage_TelnetItemView_DividerView);
+        this._telnet_view = findViewById(R.id.ArticlePage_TelnetItemView_TelnetView);
+        this._divider_view = findViewById(R.id.ArticlePage_TelnetItemView_DividerView);
         setBackgroundResource(android.R.color.transparent);
     }
 

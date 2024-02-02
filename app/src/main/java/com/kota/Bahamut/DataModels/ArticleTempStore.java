@@ -27,32 +27,16 @@ public class ArticleTempStore {
     public ArticleTempStore(Context context, String aFilePath) {
         this._context = context;
         this._file_path = aFilePath;
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
+        for (int i=0;i<10;i++) {
+            this.articles.add(new ArticleTemp());
+        }
     }
 
     public ArticleTempStore(Context context) {
         this._context = context;
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
-        this.articles.add(new ArticleTemp());
+        for (int i=0;i<10;i++) {
+            this.articles.add(new ArticleTemp());
+        }
         load();
     }
 
@@ -81,7 +65,7 @@ public class ArticleTempStore {
         if (!load_from_file && this._context != null) {
             try {
                 String save_data = this._context.getSharedPreferences("article_temp", 0).getString("save_data", "");
-                if (save_data != null && save_data.length() > 0) {
+                if (save_data.length() > 0) {
                     importFromJSON(new JSONObject(save_data));
                 }
             } catch (Exception e2) {
@@ -94,7 +78,7 @@ public class ArticleTempStore {
         if (this._context != null) {
             try {
                 SharedPreferences perf = this._context.getSharedPreferences("article_temp", 0);
-                perf.edit().putString("save_data", exportToJSON().toString()).commit();
+                perf.edit().putString("save_data", exportToJSON().toString()).apply();
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -23,7 +23,8 @@
             android:background="@drawable/toolbar_item_background_color">
 
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                style="@style/SystemSettings_item_text"
+                style="@style/SystemSettings_checkbox_text"
+                android:layout_marginStart="50dp"
                 android:id="@+id/loginRememberLabel"
                 android:text="@string/save_data" />
 
@@ -52,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:background="#e0000000"
+            android:background="@color/black"
             android:orientation="vertical"
             android:paddingLeft="0px"
             android:paddingRight="0px">
@@ -74,7 +75,7 @@
 
                 <EditText
                     android:id="@+id/Login_UsernameEdit"
-                    style="@style/EditTextSingleLineLight"
+                    style="@style/EditTextSingleLine"
                     android:autofillHints="username"
                     android:digits="@string/account_digits"
                     android:hint="@string/Username_hint"
@@ -102,7 +103,7 @@
 
                 <EditText
                     android:id="@+id/Login_passwordEdit"
-                    style="@style/EditTextSingleLineLight"
+                    style="@style/EditTextSingleLine"
                     android:maxLength="8"
                     android:hint="@string/password_hint"
                     android:labelFor="@id/Login_passwordLabel"

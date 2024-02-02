@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF121212</color>
+    <color name="edit_text_background_color">#FF393A3C</color>
+    <color name="edit_text_text_color">@color/white</color>
+    <color name="ripple_material">#FF333333</color>
+    <color name="title_bar_menu_icon_background_color">#FF204A77</color>
+    <color name="toolbar_background_color_disabled">#FF002020</color>
+    <color name="toolbar_background_color_focused">#FF22B14C</color>
+    <color name="toolbar_background_color_normal">#FF002020</color>
+    <color name="toolbar_background_color_pressed">#FFB5E61D</color>
+    <color name="checkbox_checked_color">#FF669900</color>
+</resources>

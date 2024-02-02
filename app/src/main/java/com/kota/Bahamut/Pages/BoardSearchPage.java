@@ -10,14 +10,10 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
 public class BoardSearchPage extends BoardPage {
-    /* access modifiers changed from: private */
-    public String _author = null;
-    /* access modifiers changed from: private */
-    public String _gy = null;
-    /* access modifiers changed from: private */
-    public String _keyword = null;
-    /* access modifiers changed from: private */
-    public String _mark = null;
+    private String _author = null;
+    private String _gy = null;
+    private String _keyword = null;
+    private String _mark = null;
 
     public int getPageType() {
         return 13;
@@ -29,7 +25,7 @@ public class BoardSearchPage extends BoardPage {
 
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_headerView);
+        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             String board_name = getListName();
             if (board_name == null) {
@@ -39,14 +35,12 @@ public class BoardSearchPage extends BoardPage {
         }
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onMenuButtonClicked() {
+    protected boolean onMenuButtonClicked() {
         showSelectArticleDialog();
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onListViewItemLongClicked(View itemView, int index) {
+    protected boolean onListViewItemLongClicked(View itemView, int index) {
         return false;
     }
 
@@ -58,8 +52,7 @@ public class BoardSearchPage extends BoardPage {
         return aName + "[Board][Search]";
     }
 
-    /* access modifiers changed from: protected */
-    public void onPostButtonClicked() {
+    protected void onPostButtonClicked() {
         ASAlertDialog.createDialog().setTitle("加入書籤").setMessage("是否要將此搜尋結果加入書籤?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
             if (index == 1) {
                 Bookmark bookmark = new Bookmark();
@@ -93,8 +86,7 @@ public class BoardSearchPage extends BoardPage {
         this._gy = gy;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    protected boolean onBackPressed() {
         clear();
         getNavigationController().popViewController();
         TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
@@ -102,8 +94,7 @@ public class BoardSearchPage extends BoardPage {
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean isBookmarkAvailable() {
+    protected boolean isBookmarkAvailable() {
         return false;
     }
 

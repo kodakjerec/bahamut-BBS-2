@@ -30,7 +30,7 @@ public class ASNavigationControllerPushAnimation {
     if (this._source_controller != null && this._source_controller.getPageView() != null) {
       Animation _source_animation = ASPageAnimation.getFadeOutToLeftAnimation();
       _source_animation.setDuration(animation_duration);
-      _source_animation.setAnimationListener(new Animation.AnimationListener() { // from class: com.kumi.ASFramework.PageController.ASNavigationControllerPushAnimation.1
+      _source_animation.setAnimationListener(new Animation.AnimationListener() { // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.1
         @Override // android.view.animation.Animation.AnimationListener
         public void onAnimationStart(Animation animation) {
         }
@@ -59,7 +59,7 @@ public class ASNavigationControllerPushAnimation {
     if (this._target_controller != null && this._target_controller.getPageView() != null) {
       Animation _target_animation = ASPageAnimation.getFadeInFromRightAnimation();
       _target_animation.setDuration(animation_duration);
-      _target_animation.setAnimationListener(new Animation.AnimationListener() { // from class: com.kumi.ASFramework.PageController.ASNavigationControllerPushAnimation.2
+      _target_animation.setAnimationListener(new Animation.AnimationListener() { // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.2
         @Override // android.view.animation.Animation.AnimationListener
         public void onAnimationStart(Animation animation) {
         }
@@ -95,8 +95,8 @@ public class ASNavigationControllerPushAnimation {
 
   private void finish() {
     if (!this._finished) {
-      new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASNavigationControllerPushAnimation.3
-        @Override // com.kumi.ASFramework.Thread.ASRunner
+      new ASRunner() { // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.3
+        @Override // com.kota.ASFramework.Thread.ASRunner
         public void run() {
           ASNavigationControllerPushAnimation.this.onAnimationFinished();
         }

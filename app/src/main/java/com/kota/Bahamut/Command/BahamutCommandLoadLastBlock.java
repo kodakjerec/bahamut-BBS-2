@@ -50,13 +50,13 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
         }
         switch (getLoadLastBlockMode(aListPage)) {
             case Left_Right_End:
-                TelnetOutputBuilder.create().pushKey(256).pushKey(257).pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(TelnetKeyboard.RIGHT_ARROW).pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case Home_End:
                 TelnetOutputBuilder.create().pushKey(TelnetKeyboard.HOME).pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case Left_S_End:
-                TelnetOutputBuilder.create().pushKey(256).pushKey(83).pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(83).pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case End:
                 TelnetOutputBuilder.create().pushKey(TelnetKeyboard.END).sendToServer();

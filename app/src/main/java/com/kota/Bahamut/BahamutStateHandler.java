@@ -134,10 +134,14 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 ASToast.showShortToast(continue_message);
             }
             if (this.row_string_23.startsWith("★ 引言太多")) {
-                byte[] data = TelnetOutputBuilder.create().pushKey(32).pushKey(24).pushString("a\n\n").build();
+                // 放棄此次編輯內容
+                byte[] data = TelnetOutputBuilder.create()
+                        .pushKey(TelnetKeyboard.SPACE)
+                        .build();
                 TelnetClient.getClient().sendDataToServer(data);
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof BoardPage) {
+                if (top_page instanceof PostArticlePage || top_page instanceof BoardPage) {
+                    // 最上層是 發文 或 看板
                     BoardPage page = PageContainer.getInstance().getBoardPage();
                     page.recoverPost();
                 } else if (top_page instanceof MailBoxPage) {
@@ -153,7 +157,20 @@ public class BahamutStateHandler extends TelnetStateHandler {
             TelnetClient.getClient().sendStringToServer("N");
             return false;
         } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
-            TelnetClient.getClient().sendKeyboardInputToServer(256);
+            if (this.row_string_00.equals("順利貼出佈告，此板不加 MP。")) {
+                // 順利貼出佈告, 請按任意鍵繼續
+                TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+                if (top_page instanceof PostArticlePage || top_page instanceof BoardPage) {
+                    // 最上層是 發文 或 看板
+                    BoardPage page = PageContainer.getInstance().getBoardPage();
+                    page.finishPost();
+                } else if (top_page instanceof MailBoxPage) {
+                    MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
+                    page2.finishPost();
+                }
+            }
+
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
             return false;
         } else {
             return run_pass_2;
@@ -250,7 +267,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleBoardSearchPage() {
         setCurrentPage(13);
         if (this._cursor.column == 1) {
-            BoardSearchPage page = PageContainer.getInstance().getBoard_Search_page();
+            BoardSearchPage page = PageContainer.getInstance().getBoardSearchPage();
             if (page.onPagePreload()) {
                 showPage(page);
             }
@@ -260,7 +277,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleBoardTitleLinkedPage() {
         setCurrentPage(12);
         if (this._cursor.column == 1) {
-            BoardLinkPage page = PageContainer.getInstance().getBoard_linked_Title_page();
+            BoardLinkPage page = PageContainer.getInstance().getBoardLinkedTitlePage();
             if (page.onPagePreload()) {
                 showPage(page);
             }
@@ -280,15 +297,15 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this._cursor = TelnetClient.getModel().getCursor();
         if (pass_1()) {
             if (getCurrentPage() == 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
-                TelnetClient.getClient().sendKeyboardInputToServer(256);
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
             } else if (getCurrentPage() > 9 && this.row_string_23.startsWith("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
                 handleArticle();
                 onReadArticleFinished();
-                TelnetClient.getClient().sendKeyboardInputToServer(256);
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
             } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("魚雁往返") && this.row_string_23.endsWith("標記")) {
                 handleArticle();
                 onReadArticleFinished();
-                TelnetClient.getClient().sendKeyboardInputToServer(256);
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
             } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 handleArticle();
                 onReadArticlePage();

@@ -1,7 +1,10 @@
 package com.kota.Bahamut.Pages.Article;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
+
 import android.content.Context;
 import android.graphics.Canvas;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -31,11 +34,11 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
 
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
-        this._author_label = (TextView) findViewById(R.id.ArticleTextItemView_Title);
-        this._content_label = (TextView) findViewById(R.id.ArticleTextItemView_content);
-        this._divider_view = (DividerView) findViewById(R.id.ArticleTextItemView_DividerView);
-        this._content_view = (ViewGroup) findViewById(R.id.ArticleTextItemView_contentView);
-        setBackgroundResource(android.R.color.transparent);
+        this._author_label = findViewById(R.id.ArticleTextItemView_Title);
+        this._content_label = findViewById(R.id.ArticleTextItemView_content);
+        this._divider_view = findViewById(R.id.ArticleTextItemView_DividerView);
+        this._content_view = findViewById(R.id.ArticleTextItemView_contentView);
+        setBackgroundResource(R.color.transparent);
     }
 
     public void setAuthor(String author, String nickname) {
@@ -55,18 +58,22 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     public void setContent(String content) {
         if (this._content_label != null) {
             this._content_label.setText(content);
+            // 讓內文可以響應多個連結
+            Linkify.addLinks(this._content_label, Linkify.WEB_URLS);
         }
     }
 
     public void setQuote(int quote) {
         this._quote = quote;
+        // 之前的引用文章
         if (quote > 0) {
-            this._author_label.setTextColor(-8323200);
-            this._content_label.setTextColor(-14614752);
+            this._author_label.setTextColor(getContextColor(R.color.article_page_text_item_author1));
+            this._content_label.setTextColor(getContextColor(R.color.article_page_text_item_content1));
             return;
         }
-        this._author_label.setTextColor(-1);
-        this._content_label.setTextColor(-4144960);
+        // 使用者回文
+        this._author_label.setTextColor(getContextColor(R.color.article_page_text_item_author0));
+        this._content_label.setTextColor(getContextColor(R.color.article_page_text_item_content0));
     }
 
     public void draw(Canvas canvas) {

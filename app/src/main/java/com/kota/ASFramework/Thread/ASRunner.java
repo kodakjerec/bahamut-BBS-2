@@ -15,7 +15,7 @@ public abstract class ASRunner {
   @SuppressLint("HandlerLeak")
   public static void construct() {
     _main_thread = Thread.currentThread();
-    _main_handler = new Handler() { // from class: com.kumi.ASFramework.Thread.ASRunner.1
+    _main_handler = new Handler() { // from class: com.kota.ASFramework.Thread.ASRunner.1
       @Override // android.os.Handler
       public void handleMessage(Message message) {
         ASRunner runner = (ASRunner) message.obj;

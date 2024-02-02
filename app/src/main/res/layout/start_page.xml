@@ -4,20 +4,35 @@
         <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
             <LinearLayout android:orientation="vertical" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1" style="@style/TouchBlock">
                 <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@android:color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/notices" style="@style/TextViewLarge"/>
-
                 <com.kota.TelnetUI.TextView.TelnetTextViewNormal
                     style="@style/TextViewNormal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/start_msg_1" />
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@android:color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/start_msg_2" style="@style/TextViewLarge"/>
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    style="@style/TextViewLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:text="@string/start_msg_2"
+                    android:textColor="@android:color/white" />
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    style="@style/TextViewSmall"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:autoLink="web"
+                    android:gravity="center_horizontal"
+                    android:text="@string/StartPage_open_account" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
     <LinearLayout android:id="@+id/Start_Toolbar" style="@style/Toolbar">
         <Button android:id="@+id/Start_exitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:text="@string/zero_word" style="@style/ToolbarItem" android:autofillHints=""/>
+        <Button android:text="@string/zero_word" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/No_Use"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/Start_connectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
     </LinearLayout>

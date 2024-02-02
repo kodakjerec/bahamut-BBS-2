@@ -38,6 +38,7 @@ public class BlockListPage_ItemView extends LinearLayout implements View.OnClick
     public void setName(String aName) {
         if (this._name_label != null) {
             this._name_label.setText(aName);
+            this._name_label.setContentDescription("從黑名單中剔除"+aName);
         }
     }
 
