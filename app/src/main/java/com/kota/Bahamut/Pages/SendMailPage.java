@@ -70,10 +70,6 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         super.onPageDidDisappear();
     }
 
-    public void onPageWillAppear() {
-        this._content_field.requestFocus();
-    }
-
     private void refreshTitleField() {
         if (this._title_field != null && this._title != null) {
             this._title_field.setText(this._title);

@@ -45,8 +45,8 @@ public abstract class ASAnimationRunner {
   }
 
   private void fail() {
-    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.2
-      @Override // com.kumi.ASFramework.Thread.ASRunner
+    new ASRunner() { // from class: com.kota.ASFramework.PageController.ASAnimationRunner.2
+      @Override // com.kota.ASFramework.Thread.ASRunner
       public void run() {
         ASAnimationRunner.this.onAnimationStartFail();
       }
@@ -54,8 +54,8 @@ public abstract class ASAnimationRunner {
   }
 
   private void animate() {
-    new ASRunner() { // from class: com.kumi.ASFramework.PageController.ASAnimationRunner.3
-      @Override // com.kumi.ASFramework.Thread.ASRunner
+    new ASRunner() { // from class: com.kota.ASFramework.PageController.ASAnimationRunner.3
+      @Override // com.kota.ASFramework.Thread.ASRunner
       public void run() {
         View target_view = ASAnimationRunner.this.getTargetView();
         if (target_view != null) {

@@ -95,14 +95,14 @@ public class ASDialog extends Dialog implements ASViewControllerDisappearListene
     return this;
   }
 
-  @Override // com.kumi.ASFramework.PageController.ASViewControllerDisappearListener
+  @Override // com.kota.ASFramework.PageController.ASViewControllerDisappearListener
   public void onASViewControllerWillDisappear(ASViewController aController) {
     if (isShowing()) {
       dismiss();
     }
   }
 
-  @Override // com.kumi.ASFramework.PageController.ASViewControllerDisappearListener
+  @Override // com.kota.ASFramework.PageController.ASViewControllerDisappearListener
   public void onASViewControllerDidDisappear(ASViewController aController) {
   }
 }

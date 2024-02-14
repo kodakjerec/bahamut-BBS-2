@@ -13,6 +13,12 @@ public class TelnetKeyboard {
     public static final int SPACE = 32;
     public static final int TAB = 9;
     public static final int UP_ARROW = 258;
+    public static final int CTRL_G = 7;
+    public static final int CTRL_X = 24;
+    public static final int CTRL_Y = 25;
+    public static final int CTRL_T = 14;
+    public static final int BACK_ONE_CHAR = 83;
+    public static final int CTRL_S = 115;
 
     public static byte[] getKeyDataWithTimes(int keyCode, int times) {
         byte[] keydata = getKeyData(keyCode);
@@ -26,13 +32,13 @@ public class TelnetKeyboard {
     public static byte[] getKeyData(int keyCode) {
         byte[] bArr = new byte[0];
         switch (keyCode) {
-            case 9:
+            case TAB: /* tab */
                 return new byte[]{9};
-            case 32:
+            case SPACE: /* space */
                 return new byte[]{32};
-            case 256:
+            case LEFT_ARROW: /* Left Arrow */
                 return new byte[]{27, 91, 68};
-            case 257:
+            case RIGHT_ARROW: /* Right Arrow */
                 return new byte[]{27, 91, 67};
             case UP_ARROW /*258*/:
                 return new byte[]{27, 91, 65};

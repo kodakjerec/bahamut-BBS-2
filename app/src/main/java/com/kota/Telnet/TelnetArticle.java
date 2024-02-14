@@ -1,6 +1,8 @@
 package com.kota.Telnet;
 
 import android.annotation.SuppressLint;
+import android.widget.TextView;
+
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.Model.TelnetRow;
 import java.util.Arrays;
@@ -233,18 +235,5 @@ public class TelnetArticle {
             builder.append(row.getRawString());
         }
         return builder.toString();
-    }
-
-    public String[] getUrls() {
-        String article_text = getFullText();
-        System.out.println("article_text:" + article_text);
-        Matcher matcher = Pattern.compile("(ftp://|http://|https://)?([a-zA-Z0-9_-~]+(:[a-zA-Z0-9_-~]+)?@)?([a-zA-Z0-9_-~]+(\\.[a-zA-Z0-9_-~]+){1,})((((/[a-zA-Z0-9_-~]+){0,})?((/[a-zA-Z0-9_-~*]+(\\.[a-zA-Z0-9_-~]+)?(\\?([a-zA-Z0-9_-~]+=([a-zA-Z0-9_-~%#*]+)?)(&[a-zA-Z0-9_-~]+=([a-zA-Z0-9_-~%#*]+)?){0,})?)|/))|(((/[a-zA-Z0-9_-~]+){0,})?((/[a-zA-Z0-9_-~*]+(\\.[a-zA-Z0-9_-~]+)?))))?").matcher(article_text);
-        Vector<String> buffer = new Vector<>();
-        while (matcher.find()) {
-            String url_string = matcher.group();
-            System.out.println("url_string:" + url_string);
-            buffer.add(url_string);
-        }
-        return (String[]) buffer.toArray(new String[buffer.size()]);
     }
 }

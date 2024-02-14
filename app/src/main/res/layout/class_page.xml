@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/loading_"
-            android:textColor="#ffffffff"
+            android:textColor="@color/white"
             android:visibility="invisible" />
 
         <com.kota.ASFramework.UI.ASListView

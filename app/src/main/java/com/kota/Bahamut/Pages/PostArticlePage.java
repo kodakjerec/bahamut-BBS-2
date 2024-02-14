@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
@@ -17,27 +18,27 @@ import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
+import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
+import com.kota.Telnet.Reference.TelnetKeyboard;
+import com.kota.Telnet.TelnetClient;
+import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 
 import java.util.Objects;
 
 public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener {
-    /* access modifiers changed from: private */
-    public String _article_number = null;
-    /* access modifiers changed from: private */
-    public BoardPage _board_page = null;
+    private String _article_number = null;
+    private BoardPage _board_page = null;
     private String _content = null;
-    /* access modifiers changed from: private */
-    public EditText _content_field = null;
+    private EditText _content_field = null;
     private String _edit_format = null;
     private boolean _header_hidden = false;
     private int _header_selected = 0;
     private Spinner _header_selector = null;
     private Button _hide_title_button = null;
-    /* access modifiers changed from: private */
-    public PostArticlePage_Listener _listener = null;
+    private PostArticlePage_Listener _listener = null;
     private OperationMode _operation_mode = OperationMode.New;
     private String _ori_title = null;
     private Button _post_button = null;
@@ -73,10 +74,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
         initial();
-    }
-
-    public void onPageWillAppear() {
-        this._content_field.requestFocus();
     }
 
     public void onPageDidDisappear() {
@@ -130,7 +127,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     @SuppressLint("ResourceType")
     private void initial() {
         this._title_field = (EditText) findViewById(R.id.ArticlePostDialog_TitleField);
-        this._title_field.setOnFocusChangeListener(this);
         this._title_field_background = (TextView) findViewById(R.id.ArticlePostDialog_TitleFieldBackground);
         this._content_field = (EditText) findViewById(R.id.ArticlePostDialog_EditField);
         this._post_button = (Button) findViewById(R.id.ArticlePostDialog_Post);
@@ -146,10 +142,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         this._header_selector.setAdapter(adapter);
         this._header_selector.setOnItemSelectedListener(this);
         this._title_block = findViewById(R.id.Post_TitleBlock);
-        if (this.recover) {
-            loadTempArticle(10);
-            this.recover = false;
-        }
     }
 
     public void clear() {
@@ -160,6 +152,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             this._content_field.setText("");
         }
         this._listener = null;
+        this.recover = false;
     }
 
     public void setPostTitle(String aTitle) {
@@ -210,48 +203,61 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void post(String title, String content) {
+    // 發文
+    private void post(String title, String content) {
         final String send_title;
-        saveTempArticle(10);
+
         if (this._article_number == null || !title.equals(this._ori_title)) {
             send_title = title;
         } else {
             send_title = null;
         }
         final String send_content = content;
-        if (this._article_number != null && this._operation_mode == OperationMode.Reply) {
-            Dialog_PostArticle dialog = new Dialog_PostArticle(1);
-            dialog.setListener((aTarget, aSign) -> {
-                if (PostArticlePage.this._listener != null) {
-                    PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign);
-                }
-                closeArticle();
-            });
-            dialog.show();
-        } else if (this._article_number != null) {
-            ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?").setListener((aDialog, index) -> {
-                if (index == 1) {
+        // 有來源文章編號, 可能為Reply, edit
+        if (this._article_number != null) {
+            if (this._operation_mode == OperationMode.Reply) {
+                // 回覆: 有註記回文
+                Dialog_PostArticle dialog = new Dialog_PostArticle(1);
+                dialog.setListener((aTarget, aSign) -> {
                     if (PostArticlePage.this._listener != null) {
-                        PostArticlePage.this._listener.onPostDialogEditButtonClicked(PostArticlePage.this, PostArticlePage.this._article_number, send_title, PostArticlePage.this.getEditContent());
+                        PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign, this.recover);
                     }
-                }
-                closeArticle();
-            }).show();
-        } else {
+                });
+                dialog.show();
+            } else {
+                // 修改: 沒有註記回文
+                ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?").setListener((aDialog, index) -> {
+                    if (index == 1) {
+                        if (PostArticlePage.this._listener != null) {
+                            PostArticlePage.this._listener.onPostDialogEditButtonClicked(PostArticlePage.this, PostArticlePage.this._article_number, send_title, PostArticlePage.this.getEditContent());
+                        }
+                    }
+                    closeArticle();
+                }).show();
+            }
+        }else {
+            // 新增文章
             Dialog_PostArticle dialog2 = new Dialog_PostArticle(0);
             dialog2.setListener((aTarget, aSign) -> {
                 if (PostArticlePage.this._listener != null) {
-                    PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, null, null, aSign);
+                    PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, null, null, aSign, this.recover);
                 }
-                closeArticle();
             });
             dialog2.show();
         }
     }
     public void closeArticle() {
+        // 引言過多情況下放棄, 要補上放棄存檔command
+        if (this.recover) {
+            byte[] data = TelnetOutputBuilder.create()
+                    .pushKey(TelnetKeyboard.CTRL_X)
+                    .pushString("a\n")
+                    .build();
+            TelnetClient.getClient().sendDataToServer(data);
+        }
         this.clear();
         this.getNavigationController().popToViewController(this._board_page);
+        PageContainer.getInstance().cleanPostArticlePage();
     }
 
     public void onItemSelected(AdapterView<?> adapterView, View aView, int index, long id) {
@@ -302,8 +308,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }).show();
     }
 
-    /* access modifiers changed from: private */
-    public void ontLoadArticleFromTempButtonClicked() {
+    private void ontLoadArticleFromTempButtonClicked() {
         ASListDialog.createDialog().setTitle("文章").addItem("讀取上次送出文章").addItem("讀取暫存檔.1").addItem("讀取暫存檔.2").addItem("讀取暫存檔.3").addItem("讀取暫存檔.4").addItem("讀取暫存檔.5").setListener(new ASListDialogItemClickListener() {
             public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                 return false;
@@ -323,16 +328,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }).show();
     }
 
-    /* access modifiers changed from: private */
-    public void loadTempArticle(int index) {
+    private void loadTempArticle(int index) {
         ArticleTemp article_temp = new ArticleTempStore(getContext()).articles.get(index);
         this._header_selector.setSelection(this._settings.getIndexOfHeader(article_temp.header));
         this._title_field.setText(article_temp.title);
         this._content_field.setText(article_temp.content);
     }
 
-    /* access modifiers changed from: private */
-    public void ontSaveArticleToTempButtonClicked() {
+    private void ontSaveArticleToTempButtonClicked() {
         ASListDialog.createDialog().setTitle("文章").addItem("存入暫存檔.1").addItem("存入暫存檔.2").addItem("存入暫存檔.3").addItem("存入暫存檔.4").addItem("存入暫存檔.5").setListener(new ASListDialogItemClickListener() {
             public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                 return false;
@@ -348,16 +351,21 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }).show();
     }
 
-    /* access modifiers changed from: private */
-    public void saveTempArticle(int index) {
+    // 儲存暫存檔
+    private void saveTempArticle(int index) {
         ArticleTempStore store = new ArticleTempStore(getContext());
         ArticleTemp article_temp = store.articles.get(index);
+        // 類別
         article_temp.header = "";
         if (this._header_selector.getSelectedItemPosition() > 0) {
             article_temp.header = this._settings.getArticleHeader(this._header_selector.getSelectedItemPosition());
         }
+        // 標題
         article_temp.title = this._title_field.getText().toString();
+        // 內文
         article_temp.content = this._content_field.getText().toString();
+
+        // 存檔
         store.store();
         if (index < 10) {
             ASAlertDialog.createDialog().setTitle("存檔").setMessage("存檔完成").addButton("確定").show();
@@ -412,9 +420,12 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         if (this._title_field.getText().toString().length() == 0 && this._content_field.getText().toString().length() == 0) {
             return super.onBackPressed();
         }
-        ASAlertDialog.createDialog().setTitle("文章").setMessage("是否要放棄此編輯內容?").addButton("取消").addButton("放棄").addButton("存檔").setListener((aDialog, index) -> {
+        ASAlertDialog.createDialog().setTitle("文章").setMessage("是否要放棄此編輯內容?")
+                .addButton("取消")
+                .addButton("放棄")
+                .addButton("存檔").setListener((aDialog, index) -> {
             if (index == 1) {
-                PostArticlePage.this.getNavigationController().popViewController();
+                closeArticle();
             } else if (index == 2) {
                 PostArticlePage.this.ontSaveArticleToTempAndLeaveButtonClicked();
             }
@@ -422,8 +433,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return true;
     }
 
-    /* access modifiers changed from: private */
-    public void ontSaveArticleToTempAndLeaveButtonClicked() {
+    private void ontSaveArticleToTempAndLeaveButtonClicked() {
         ASListDialog.createDialog().setTitle("文章").addItem("存入暫存檔.1").addItem("存入暫存檔.2").addItem("存入暫存檔.3").addItem("存入暫存檔.4").addItem("存入暫存檔.5").setListener(new ASListDialogItemClickListener() {
             public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                 return false;
@@ -435,7 +445,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                         PostArticlePage.this.onBackPressed();
                     } else if (index1 == 1) {
                         PostArticlePage.this.saveTempArticle(index1);
-                        PostArticlePage.this.getNavigationController().popViewController();
+                        closeArticle();
                     }
                 }).show();
             }

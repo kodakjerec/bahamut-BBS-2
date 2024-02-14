@@ -15,6 +15,7 @@ public class UserSettings {
     public static final String PROPERTIES_ANIMATION_DISABLE = "AnimationDisable";
     public static final String PROPERTIES_ARTICLE_MOVE_DISABLE = "ArticleModeDisable";
     public static final String PROPERTIES_ARTICLE_VIEW_MODE = "ArticleViewMode";
+    public static final String PROPERTIES_GETSURE_ON_BOARD = "GestureOnBoard";
     public static final String PROPERTIES_BLOCK_LIST = "BlockList";
     public static final String PROPERTIES_BLOCK_LIST_ENABLE = "BlockListEnable";
     public static final String PROPERTIES_EXTRA_TOOLBAR_ENABLE = "ExtraToolbarEnable";
@@ -24,6 +25,11 @@ public class UserSettings {
     public static final String PROPERTIES_PASSWORD = "Password";
     public static final String PROPERTIES_SAVE_LOGON_USER = "SaveLogonUser";
     public static final String PROPERTIES_USERNAME = "Username";
+    public static final String PROPERTIES_AUTO_TO_CHAT = "AutoToChat"; // 使用自動登入
+    private static final String PROPERTIES_VIP = "VIP"; // VIP 權限
+    private static final String PROPERTIES_SCREEN_ORIENTATION = "ScreenOrientation"; // 螢幕方向
+    private static final String isUnderAutoToChat = "isUnderAutoToChat"; // 正在自動登入ing
+
     private Vector<String> _block_list = null;
     private String _block_list_string_lower_cased = null;
     Context _context;
@@ -68,6 +74,9 @@ public class UserSettings {
                 boolean offline_by_user = perp.getPropertiesBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER);
                 boolean animation_disable = perp.getPropertiesBoolean(PROPERTIES_ANIMATION_DISABLE);
                 boolean extra_toolbar = perp.getPropertiesBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE);
+                boolean getsure_on_board = perp.getPropertiesBoolean(PROPERTIES_GETSURE_ON_BOARD);
+                boolean auto_to_chat = perp.getPropertiesBoolean(PROPERTIES_AUTO_TO_CHAT);
+                boolean is_vip = perp.getPropertiesBoolean(PROPERTIES_VIP);
                 SharedPreferences.Editor editor = perf.edit();
                 editor.putString(PROPERTIES_USERNAME, username);
                 editor.putString(PROPERTIES_PASSWORD, password);
@@ -80,6 +89,9 @@ public class UserSettings {
                 editor.putBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, offline_by_user);
                 editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, animation_disable);
                 editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extra_toolbar);
+                editor.putBoolean(PROPERTIES_GETSURE_ON_BOARD, getsure_on_board);
+                editor.putBoolean(PROPERTIES_AUTO_TO_CHAT, auto_to_chat);
+                editor.putBoolean(PROPERTIES_VIP, is_vip);
                 editor.putInt("upgrade", 1);
                 editor.apply();
             }
@@ -90,51 +102,91 @@ public class UserSettings {
         this._updated = true;
     }
 
-    public void setExternalToolbarEnable(boolean isEnable) {
+    public void setPropertiesScreenOrientation(int choice) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putInt(PROPERTIES_SCREEN_ORIENTATION, choice);
+        editor.apply();
+    }
+    public int getPropertiesScreenOrientation() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getInt(PROPERTIES_SCREEN_ORIENTATION, 0);
+    }
+    public void setPropertiesVIP(boolean isEnable) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putBoolean(PROPERTIES_VIP, isEnable);
+        editor.apply();
+    }
+    public boolean getPropertiesVIP() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_VIP, false);
+    }
+
+    public void setPropertiesAutoToChat(boolean isEnable) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putBoolean(PROPERTIES_AUTO_TO_CHAT, isEnable);
+        editor.apply();
+    }
+
+    public boolean getPropertiesAutoToChat() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_AUTO_TO_CHAT, false);
+    }
+    public void setIsUnderAutoToChat(boolean isEnable) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putBoolean(isUnderAutoToChat, isEnable);
+        editor.apply();
+    }
+    public boolean isUnderAutoToChat() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(isUnderAutoToChat, false);
+    }
+    
+    public void setPropertiesGetsureOnBoardEnable(boolean isEnable) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putBoolean(PROPERTIES_GETSURE_ON_BOARD, isEnable);
+        editor.apply();
+    }
+
+    public boolean getPropertiesGetsureOnBoardEnable() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_GETSURE_ON_BOARD, true);
+    }
+
+    public void setPropertiesExternalToolbarEnable(boolean isEnable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, isEnable);
         editor.apply();
     }
 
-    public boolean isExternalToolbarEnable() {
+    public boolean getPropertiesExternalToolbarEnable() {
         return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, false);
     }
 
-    public void setUsername(String username) {
+    public void setPropertiesUsername(String username) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putString(PROPERTIES_USERNAME, username);
         editor.apply();
     }
 
-    public String getUsername() {
+    public String getPropertiesUsername() {
         return this._context.getSharedPreferences(PERF_NAME, 0).getString(PROPERTIES_USERNAME, "");
     }
 
-    public void setPassword(String password) {
+    public void setPropertiesPassword(String password) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putString(PROPERTIES_PASSWORD, password);
         editor.apply();
     }
 
-    public String getPassword() {
+    public String getPropertiesPassword() {
         return this._context.getSharedPreferences(PERF_NAME, 0).getString(PROPERTIES_PASSWORD, "");
     }
 
-    public boolean isSaveLogonUser() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_SAVE_LOGON_USER, false);
-    }
-
-    public void setSaveLogonUser(boolean save) {
+    public void setPropertiesSaveLogonUser(boolean save) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_SAVE_LOGON_USER, save);
         editor.apply();
     }
-
-    public boolean isAnimationEnable() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false);
+    public boolean getPropertiesSaveLogonUser() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_SAVE_LOGON_USER, false);
     }
 
-    public void setAnimationEnable(boolean enable) {
+    public void setPropertiesAnimationEnable(boolean enable) {
         boolean z = false;
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         if (!enable) {
@@ -143,30 +195,32 @@ public class UserSettings {
         editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, z);
         editor.apply();
     }
-
-    public boolean isArticleMoveEnsable() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, true);
+    public boolean getPropertiesAnimationEnable() {
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ANIMATION_DISABLE, false);
     }
 
-    public void setArticleMoveDisable(boolean isDisable) {
+    public void setPropertiesArticleMoveDisable(boolean isDisable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable);
         editor.apply();
     }
-
-    public int getArticleViewMode() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getInt(PROPERTIES_ARTICLE_VIEW_MODE, 0);
+    public boolean getPropertiesArticleMoveEnsable() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, true);
     }
 
-    public void exchangeArticleViewMode() {
-        setArticleViewState(1 - getArticleViewMode());
-    }
-
-    public void setArticleViewState(int state) {
+    public void setPropertiesArticleViewState(int state) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state);
         editor.apply();
     }
+    public int getPropertiesArticleViewMode() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getInt(PROPERTIES_ARTICLE_VIEW_MODE, 0);
+    }
+
+    public void exchangeArticleViewMode() {
+        setPropertiesArticleViewState(1 - getPropertiesArticleViewMode());
+    }
+
 
     public String[] getArticleHeaders() {
         return this._headers;
@@ -271,14 +325,14 @@ public class UserSettings {
         return this._block_list_string_lower_cased.contains("," + aName.toLowerCase() + ",");
     }
 
-    public boolean isBlockListEnable() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_BLOCK_LIST_ENABLE, false);
-    }
-
-    public void setBlockListEnable(boolean enable) {
+    public void setPropertiesBlockListEnable(boolean enable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, enable);
         editor.apply();
+    }
+
+    public boolean getPropertiesBlockListEnable() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_BLOCK_LIST_ENABLE, false);
     }
 
     @SuppressLint({"DefaultLocale"})
@@ -289,11 +343,7 @@ public class UserSettings {
         return this._block_list_string_lower_cased;
     }
 
-    public boolean isKeepWifi() {
-        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_kEEP_WIFI_DISABLE, false);
-    }
-
-    public void setKeepWifi(boolean keep) {
+    public void setPropertiesKeepWifi(boolean keep) {
         boolean z = false;
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         if (!keep) {
@@ -302,9 +352,13 @@ public class UserSettings {
         editor.putBoolean(PROPERTIES_kEEP_WIFI_DISABLE, z);
         editor.apply();
     }
+    public boolean getPropertiesKeepWifi() {
+        return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_kEEP_WIFI_DISABLE, false);
+    }
+
 
     public void reloadWifiSetting() {
-        if (isKeepWifi()) {
+        if (getPropertiesKeepWifi()) {
             ASNavigationController.getCurrentController().getDeviceController().lockWifi();
         } else {
             ASNavigationController.getCurrentController().getDeviceController().unlockWifi();
@@ -316,10 +370,10 @@ public class UserSettings {
     }
 
     public void reloadAnimationSetting() {
-        ASNavigationController.getCurrentController().setAnimationEnable(isAnimationEnable());
+        ASNavigationController.getCurrentController().setAnimationEnable(getPropertiesAnimationEnable());
     }
 
-    public void setLastConnectionIsOfflineByUser(boolean isOfflineByUser) {
+    public void setPropertiesLastConnectionIsOfflineByUser(boolean isOfflineByUser) {
         boolean z = false;
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
         if (!isOfflineByUser) {
@@ -329,7 +383,7 @@ public class UserSettings {
         editor.apply();
     }
 
-    public boolean isLastConnectionIsOfflineByUser() {
+    public boolean getPropertiesLastConnectionIsOfflineByUser() {
         return !this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_LAST_CONNECTION_IS_NOT_OFFLINE_BY_USER, false);
     }
 }

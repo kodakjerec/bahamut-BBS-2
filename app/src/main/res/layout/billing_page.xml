@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/black">
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/black"
+    android:layout_marginTop="12dp"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@mipmap/ic_launcher"
+        android:contentDescription="@string/app_name"
+        />
+
+    <TextView
+        style="@style/TouchBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/BillingPage_note"
+        android:textColor="@color/button_text_color"
+        android:textSize="14sp"/>
+    <TextView
+        style="@style/TouchBlock"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="@string/BillingPage_note2"
+        android:textColor="@color/yellow"
+        android:textSize="16sp"/>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:minWidth="200dp">
+        <Button
+            android:id="@+id/button_90"
+            style="@style/BillingPage_button"
+            android:text="@string/BillingPage_Button_90" />
+        <Button
+            android:id="@+id/button_checkPurchaseQuery"
+            style="@style/BillingPage_button"
+            android:text="@string/BillingPage_Button_checkPurchaseQuery" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/BillingPage_already_billing_text" />
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                android:id="@+id/BillingPage_already_billing_value"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
+</ScrollView>

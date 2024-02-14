@@ -1,7 +1,20 @@
 package com.kota.Bahamut;
 
+import static com.kota.Bahamut.Service.CommonFunctions.changeScreenOrientation;
+import static com.kota.Bahamut.Service.CommonFunctions.initialCFActivity;
+import static com.kota.Bahamut.Service.CommonFunctions.initialCFContext;
+import static com.kota.Bahamut.Service.MyBillingClient.checkPurchase;
+import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
+import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
+
+import android.app.UiModeManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
+
+import androidx.appcompat.app.AppCompatDelegate;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
@@ -25,6 +38,7 @@ import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 import com.kota.TextEncoder.U2BEncoder;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -33,6 +47,7 @@ import java.util.Vector;
 
 /* loaded from: classes.dex */
 public class BahamutController extends ASNavigationController implements TelnetClientListener {
+    UserSettings _settings;
     @Override // com.kota.ASFramework.PageController.ASNavigationController
     protected void onControllerWillLoad() {
         requestWindowFeature(1);
@@ -42,26 +57,50 @@ public class BahamutController extends ASNavigationController implements TelnetC
         } catch (Exception e) {
             e.printStackTrace();
         }
+        // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";
         BookmarkStore.upgrade(this, bookmark_file_path);
-        UserSettings user_settings = new UserSettings(this);
-        setAnimationEnable(user_settings.isAnimationEnable());
+
+        // 暫存檔
         String article_file_path = getFilesDir().getPath() + "/article_temp.dat";
         ArticleTempStore.upgrade(this, article_file_path);
+
+        // 系統架構
         TelnetClient.construct(BahamutStateHandler.getInstance());
         TelnetClient.getClient().setListener(this);
         PageContainer.constructInstance();
+
+        // UserSettings
+        _settings = new UserSettings(this);
+        setAnimationEnable(_settings.getPropertiesAnimationEnable());
+
+        // 共用函數
+        initialCFContext(getApplicationContext());
+        initialCFActivity(ASNavigationController.getCurrentController());
+        changeScreenOrientation();
     }
 
     @Override // com.kota.ASFramework.PageController.ASNavigationController
     protected void onControllerDidLoad() {
         StartPage start_page = PageContainer.getInstance().getStartPage();
         pushViewController(start_page, false);
+        initBillingClient(getApplicationContext());
     }
 
-    /* JADX INFO: Access modifiers changed from: protected */
+    @Override
+    protected void onResume() {
+        checkPurchase();
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        closeBillingClient();
+        super.onDestroy();
+    }
+
     @Override // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity
-    public void onPause() {
+    protected void onPause() {
         super.onPause();
     }
 
@@ -80,9 +119,8 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
                     if (index == 1) {
                         TelnetClient.getClient().close();
-                        UserSettings settings = new UserSettings(BahamutController.this);
-                        settings.setLastConnectionIsOfflineByUser(true);
-                        settings.notifyDataUpdated();
+                        _settings.setPropertiesLastConnectionIsOfflineByUser(true);
+                        _settings.notifyDataUpdated();
                     }
                 }
             }).show();
@@ -93,8 +131,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         return result;
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public void showConnectionStartMessage() {
+    private void showConnectionStartMessage() {
         SimpleDateFormat date_format = new SimpleDateFormat("yyyy-MM-dd kk:hh:ss");
         date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
         String time_string = date_format.format(new Date());
@@ -141,8 +178,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         }.runInMainThread();
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    public void handleNormalConnectionClosed() {
+    private void handleNormalConnectionClosed() {
         Vector<ASViewController> pages = ASNavigationController.getCurrentController().getViewControllers();
         Vector<ASViewController> new_controllers = new Vector<>();
         Iterator<ASViewController> it = pages.iterator();

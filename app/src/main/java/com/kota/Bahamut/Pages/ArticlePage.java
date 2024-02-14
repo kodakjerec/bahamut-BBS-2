@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +14,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -48,6 +50,7 @@ public class ArticlePage extends TelnetPage {
     private TelnetView _telnet_view = null;
     private BoardPage _board_page = null;
     private boolean _full_screen = false;
+    private boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
     long _action_delay = 500;
     Runnable _top_action = null;
     Runnable _bottom_action = null;
@@ -87,6 +90,7 @@ public class ArticlePage extends TelnetPage {
         @Override // android.widget.Adapter
         public View getView(int itemIndex, View itemView, ViewGroup parentView) {
             int type = getItemViewType(itemIndex);
+            // 2-標題 0-本文 1-簽名檔 3-發文時間
             if (itemView == null) {
                 switch (type) {
                     case 0:
@@ -94,6 +98,7 @@ public class ArticlePage extends TelnetPage {
                         break;
                     case 1:
                         itemView = new ArticlePage_TelnetItemView(ArticlePage.this.getContext());
+                        _i_have_sign = true;
                         break;
                     case 2:
                         itemView = new ArticlePage_HeaderItemView(ArticlePage.this.getContext());
@@ -116,7 +121,7 @@ public class ArticlePage extends TelnetPage {
                     } else {
                         item_view.setDividerhidden(true);
                     }
-                    if (ArticlePage.this._settings.isBlockListEnable() && ArticlePage.this._settings.isBlockListContains(item.getAuthor())) {
+                    if (ArticlePage.this._settings.getPropertiesBlockListEnable() && ArticlePage.this._settings.isBlockListContains(item.getAuthor())) {
                         item_view.setVisible(false);
                         break;
                     } else {
@@ -188,6 +193,17 @@ public class ArticlePage extends TelnetPage {
     AdapterView.OnItemLongClickListener _list_long_click_listener = new AdapterView.OnItemLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.3
         @Override // android.widget.AdapterView.OnItemLongClickListener
         public boolean onItemLongClick(AdapterView<?> arg0, View arg1, int itemIndex, long arg3) {
+            // 沒有簽名檔直接往下走
+            if (!_i_have_sign) {
+                return false;
+            }
+            // 切換模式只適用於簽名檔
+            // 簽名檔一定是最後一個
+            Integer signIndex = ArticlePage.this._article.getItemSize();
+            if (itemIndex != signIndex){
+                return false;
+            }
+            // 開啟切換模式
             TelnetArticleItem item;
             if (ArticlePage.this._article == null || (item = ArticlePage.this._article.getItem(itemIndex - 1)) == null) {
                 return false;
@@ -209,7 +225,7 @@ public class ArticlePage extends TelnetPage {
     View.OnLongClickListener _page_top_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.4
         @Override // android.view.View.OnLongClickListener
         public boolean onLongClick(View v) {
-            if (ArticlePage.this._settings.isArticleMoveEnsable()) {
+            if (ArticlePage.this._settings.getPropertiesArticleMoveEnsable()) {
                 if (ArticlePage.this._top_action != null) {
                     v.removeCallbacks(ArticlePage.this._top_action);
                     ArticlePage.this._top_action = null;
@@ -243,7 +259,7 @@ public class ArticlePage extends TelnetPage {
     View.OnLongClickListener _page_bottom_listener = new View.OnLongClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.6
         @Override // android.view.View.OnLongClickListener
         public boolean onLongClick(View v) {
-            if (ArticlePage.this._settings.isArticleMoveEnsable()) {
+            if (ArticlePage.this._settings.getPropertiesArticleMoveEnsable()) {
                 if (ArticlePage.this._bottom_action != null) {
                     v.removeCallbacks(ArticlePage.this._bottom_action);
                     ArticlePage.this._bottom_action = null;
@@ -279,7 +295,7 @@ public class ArticlePage extends TelnetPage {
         public void onClick(View v) {
             if (TelnetClient.getConnector().isConnecting()) {
                 if (ArticlePage.this._article != null) {
-                    PostArticlePage page = new PostArticlePage();
+                    PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
                     String reply_title = ArticlePage.this._article.generateReplyTitle();
                     ArticlePage.this._article.setBlockList(ArticlePage.this._settings.getBlockListLowCasedString());
                     String reply_content = ArticlePage.this._article.generateReplyContent();
@@ -347,7 +363,7 @@ public class ArticlePage extends TelnetPage {
         View empty_view = findViewById(R.id.Article_contentEmptyView);
         ASListView list_view = (ASListView) findViewById(R.id.Article_contentList);
         list_view.setEmptyView(empty_view);
-        list_view.setAdapter((ListAdapter) this._list_adapter);
+        list_view.setAdapter(this._list_adapter);
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
         Button back_button = (Button) findViewById(R.id.Article_backButton);
         Button page_up_button = (Button) findViewById(R.id.Article_pageUpButton);
@@ -415,9 +431,9 @@ public class ArticlePage extends TelnetPage {
     void onMenuClicked() {
         if (this._article != null && this._article.Author != null) {
             String author = this._article.Author.toLowerCase();
-            String logon_user = this._settings.getUsername().trim().toLowerCase();
+            String logon_user = this._settings.getPropertiesUsername().trim().toLowerCase();
             boolean is_board = this._board_page.getPageType() == 10;
-            boolean ext_toolbar_enable = this._settings.isExternalToolbarEnable();
+            boolean ext_toolbar_enable = this._settings.getPropertiesExternalToolbarEnable();
             String external_toolbar_enable_title = ext_toolbar_enable ? "隱藏工具列" : "開啟工具列";
             ASListDialog.createDialog().addItem("推薦").addItem("切換模式").addItem((is_board && author.equals(logon_user)) ? "編輯文章" : null).addItem(author.equals(logon_user) ? "刪除文章" : null).addItem(external_toolbar_enable_title).addItem("加入黑名單").addItem("開啟連結").setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.1
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
@@ -493,7 +509,7 @@ public class ArticlePage extends TelnetPage {
         }
         ViewGroup.LayoutParams telnet_layout = this._telnet_view.getLayoutParams();
         telnet_layout.width = telnet_view_width;
-        telnet_layout.height = -2;
+        telnet_layout.height = ViewGroup.LayoutParams.WRAP_CONTENT;
         this._telnet_view.setLayoutParams(telnet_layout);
     }
 
@@ -545,7 +561,7 @@ public class ArticlePage extends TelnetPage {
 
     public void onEditButtonClicked() {
         if (this._article != null) {
-            PostArticlePage page = new PostArticlePage();
+            PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
             String edit_title = this._article.generateEditTitle();
             String edit_content = this._article.generateEditContent();
             String edit_format = this._article.generatrEditFormat();
@@ -570,7 +586,8 @@ public class ArticlePage extends TelnetPage {
     private void reloadViewMode() {
         ViewGroup text_content_view = (ViewGroup) findViewById(R.id.Article_TextContentView);
         ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_contentTelnetViewBlock);
-        if (this._settings.getArticleViewMode() == 0) {
+        // 文字模式
+        if (this._settings.getPropertiesArticleViewMode() == 0) {
             if (text_content_view != null) {
                 text_content_view.setVisibility(View.VISIBLE);
             }
@@ -580,6 +597,8 @@ public class ArticlePage extends TelnetPage {
             }
             return;
         }
+
+        // telnet模式
         if (text_content_view != null) {
             text_content_view.setVisibility(View.GONE);
         }
@@ -591,8 +610,9 @@ public class ArticlePage extends TelnetPage {
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public boolean onReceivedGestureRight() {
-        if (this._settings.getArticleViewMode() == 0 || this._full_screen) {
-            onBackPressed();
+        if (this._settings.getPropertiesArticleViewMode() == 0 || this._full_screen) {
+            if (this._settings.getPropertiesGetsureOnBoardEnable())
+                onBackPressed();
             return true;
         }
         return true;
@@ -608,14 +628,14 @@ public class ArticlePage extends TelnetPage {
     }
 
     public void onExternalToolbarClicked() {
-        boolean enable = this._settings.isExternalToolbarEnable();
-        this._settings.setExternalToolbarEnable(!enable);
+        boolean enable = this._settings.getPropertiesExternalToolbarEnable();
+        this._settings.setPropertiesExternalToolbarEnable(!enable);
         refreshExternalToolbar();
     }
 
     private void refreshExternalToolbar() {
-        boolean enable = this._settings.isExternalToolbarEnable();
-        int article_mode = this._settings.getArticleViewMode();
+        boolean enable = this._settings.getPropertiesExternalToolbarEnable();
+        int article_mode = this._settings.getPropertiesArticleViewMode();
         if (article_mode == 1) {
             enable = true;
         }
@@ -629,7 +649,11 @@ public class ArticlePage extends TelnetPage {
 
     private void onOpenLinkClicked() {
         if (this._article != null) {
-            final String[] urls = this._article.getUrls();
+            TextView textView = new TextView(getContext());
+            textView.setText(this._article.getFullText());
+            Linkify.addLinks(textView, Linkify.WEB_URLS);
+
+            final URLSpan[] urls = textView.getUrls();
             if (urls.length == 0) {
                 Context context = getContext();
                 if (context != null) {
@@ -639,8 +663,8 @@ public class ArticlePage extends TelnetPage {
                 return;
             }
             ASListDialog list_dialog = ASListDialog.createDialog();
-            for (String url : urls) {
-                list_dialog.addItem(url);
+            for (URLSpan urlspan : urls) {
+                list_dialog.addItem(urlspan.getURL());
             }
             list_dialog.setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.14
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
@@ -650,7 +674,7 @@ public class ArticlePage extends TelnetPage {
 
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                    String url2 = urls[index];
+                    String url2 = urls[index].getURL();
                     if (!url2.startsWith("http://") && !url2.startsWith("https://") && !url2.startsWith("ftp://")) {
                         url2 = url2.matches("([a-zA-Z0-9\\-]+:[a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "ftp://" + url2 : url2.matches("([a-zA-Z0-9\\-]+@)([a-zA-Z0-9\\-]+)(\\.[a-zA-Z0-9\\-]+){1,9}([/\\\\]([a-zA-Z0-9\\-]+))?([a-zA-Z0-9\\-]+(\\.[a-zA-Z0-9\\-]+){0,1}){0,1}(\\?([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)|(([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?)(&([a-zA-Z0-9\\-]+=[a-zA-Z0-9\\-%&;#]?))+)){0,1}") ? "mailto:" + url2 : "http://" + url2;
                     }
@@ -703,7 +727,7 @@ public class ArticlePage extends TelnetPage {
                 if (index == 1) {
                     ArticlePage.this._settings.addBlockName(aBlockName);
                     ArticlePage.this._settings.notifyDataUpdated();
-                    if (ArticlePage.this._settings.isBlockListEnable()) {
+                    if (ArticlePage.this._settings.getPropertiesBlockListEnable()) {
                         if (aBlockName.equals(ArticlePage.this._article.Author)) {
                             ArticlePage.this.onBackPressed();
                         } else {

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:background="#ff000000" android:padding="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="#ffffffff" android:background="#ff202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewLarge"/>
+    <LinearLayout android:orientation="vertical" android:background="@color/black" android:padding="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewLarge"/>
         <ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <TextView android:textColor="#ffffffff" android:gravity="center" android:id="@+id/Bahamut_Dialog_Select_Sign_Input_Field" android:background="@null" android:layout_width="match_parent" android:layout_height="60dp" android:hint="@string/select_sign_msg" android:maxLength="1" style="@style/TextViewLarge"/>
+                <TextView android:textColor="@color/white" android:gravity="center" android:id="@+id/Bahamut_Dialog_Select_Sign_Input_Field" android:background="@null" android:layout_width="match_parent" android:layout_height="60dp" android:hint="@string/select_sign_msg" android:maxLength="1" style="@style/TextViewLarge"/>
                 <View style="@style/DialogSelectArticleHorizontalDivider"/>
                 <LinearLayout android:orientation="vertical" android:id="@+id/Bahamut_Dialog_Select_block_L" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content">
                     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">

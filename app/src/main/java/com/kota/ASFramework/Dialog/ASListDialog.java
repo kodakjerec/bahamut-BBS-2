@@ -41,7 +41,7 @@ public class ASListDialog extends ASDialog {
     return this;
   }
 
-  @Override // com.kumi.ASFramework.Dialog.ASDialog
+  @Override // com.kota.ASFramework.Dialog.ASDialog
   public String getName() {
     return "ListDialog";
   }
@@ -115,10 +115,10 @@ public class ASListDialog extends ASDialog {
 
   public ASListDialog addItem(String aItemTitle) {
     Button button = createButton();
-    // from class: com.kumi.ASFramework.Dialog.ASListDialog.1
+    // from class: com.kota.ASFramework.Dialog.ASListDialog.1
 // android.view.View.OnClickListener
     button.setOnClickListener(v -> ASListDialog.this.onItemClicked((Button) v));
-    // from class: com.kumi.ASFramework.Dialog.ASListDialog.2
+    // from class: com.kota.ASFramework.Dialog.ASListDialog.2
 // android.view.View.OnLongClickListener
     button.setOnLongClickListener(v -> ASListDialog.this.onItemLongClicked((Button) v));
     if (aItemTitle == null) {

@@ -114,7 +114,51 @@
     <string name="keyword_hint">請輸入關鍵字</string>
     <string name="dialog_select_sign_text">0</string>
     <string name="system_setting_page_keep_wifi_on_sleep">防止Wifi因為待機而中斷</string>
-    <string name="system_setting_page_enable_aricle_move">使用文章首篇/末篇功能</string>
+    <string name="system_setting_page_enable_article_move">使用文章首篇/末篇功能</string>
     <string name="system_setting_page_enable_page_animation">使用換頁動畫</string>
+    <string name="system_setting_page_screen_orientation">螢幕方向</string>
+    <string name="system_setting_page_screen_orientation_0">系統預設值</string>
+    <string name="system_setting_page_screen_orientation_1">直立</string>
+    <string name="system_setting_page_screen_orientation_2">橫向</string>
+    <string-array name="system_setting_page_screen_orientation_items">
+        <item>@string/system_setting_page_screen_orientation_0</item>
+        <item>@string/system_setting_page_screen_orientation_1</item>
+        <item>@string/system_setting_page_screen_orientation_2</item>
+    </string-array>
     <string name="system_setting_page_enable_gesture_on_board">使用手勢在看板/文章</string>
+    <string name="system_setting_page_enable_auto_to_chat">登入自動進入洽特</string>
+    <string name="SystemSetting_goBillingPage">贊助開發者</string>
+    <string name="BillingPage_note">
+        開發者需要鼓勵，才能持續維護。\n
+        付費版獨享功能：\n
+        ． 滑動手勢在看板和閱讀文章\n
+        ． 自動登入洽特\n
+        (持續增加中)
+<!--        以下努力中：\n-->
+<!--        ． 看板下方工具列左移/右移/直立\n-->
+<!--        ． 內文顯示圖片\n-->
+<!--        ． 自定義介面配置\n-->
+<!--        ． 備份書籤/黑名單\n-->
+    </string>
+    <string name="BillingPage_note2">贊助一次即有付費版功能\n可重複贊助，感謝您🙏\n</string>
+    <string name="BillingPage_already_billing_text">已贊助</string>
+    <string name="BillingPage_Button_90">$90</string>
+    <string name="BillingPage_Button_checkPurchaseQuery">檢查已購買權限</string>
+    <string name="BillingPage_Result_Success">感謝您的贊助</string>
+    <string name="BillingPage_Result_Cancel">使用者取消購買</string>
+    <string name="BillingPage_Result_Error">購買發生錯誤</string>
+    <string name="No_Use">No use</string>
+    <string name="Drawer_button_text_enable">啟用</string>
+    <string name="Drawer_button_text_disable">停用</string>
+    <string name="StartPage_open_account">第一次登入請先至\n https://user.gamer.com.tw/openBBS.php \n啟用BBS權限 !</string>
+    <string name="BillingPage_promo_code">優惠碼</string>
+    <string name="system_setting_page_checkbox_blocklist_hint">核取方塊, 啟動或關閉黑名單</string>
+    <string name="system_setting_page_checkbox_animation_hint">核取方塊, 啟動或關閉換頁動畫</string>
+    <string name="system_setting_page_checkbox_article_move_hint">核取方塊, 啟動或關閉迅速跳到首頁最後頁</string>
+    <string name="system_setting_page_screen_orientation_hint">下拉選單, 切換螢幕方向</string>
+    <string name="system_setting_page_checkbox_gesture_hint">核取方塊, 啟動或關閉滑動手勢在看板和閱讀文章</string>
+    <string name="system_setting_page_checkbox_auto_chat_hint">核取方塊, 啟動或關閉自動登入洽特</string>
+    <string name="board_page_post_waiting_message_1">發文中</string>
+    <string name="board_page_post_waiting_message_2">發文中請稍後</string>
+    <string name="board_page_post_waiting_message_3">本站禁止連續快速發文\n如有異常請重新連線</string>
 </resources>

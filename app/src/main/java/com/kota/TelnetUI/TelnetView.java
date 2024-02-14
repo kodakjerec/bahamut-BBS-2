@@ -277,7 +277,7 @@ public class TelnetView extends View {
     @SuppressLint("HandlerLeak")
     private void startBlink() {
         if (this._handler == null) {
-            this._handler = new Handler() { // from class: com.kumi.TelnetUI.TelnetView.1
+            this._handler = new Handler() { // from class: com.kota.TelnetUI.TelnetView.1
                 @Override // android.os.Handler
                 public void handleMessage(Message msg) {
                     TelnetView.this._blink = !TelnetView.this._blink;

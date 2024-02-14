@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:background="@color/titlebar_background_color" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/light_yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="false" style="@style/TextViewNormal"/>
+    <LinearLayout android:orientation="vertical" android:background="@color/title_bar_background_color" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:singleLine="false" style="@style/TextViewNormal"/>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="#ffc0ffff" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
         </LinearLayout>
     </LinearLayout>
     <View android:id="@+id/menu_divider" android:visibility="gone" style="@style/ItemViewDividerVertical"/>
-    <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="#ff101090" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
+    <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="@color/title_bar_menu_icon_background_color" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
 </LinearLayout>

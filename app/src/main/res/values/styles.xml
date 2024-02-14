@@ -1,22 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Titlebar">
-        <item name="android:background">@color/titlebar_background_color</item>
+    <style name="baseTouchPart">
+        <item name="android:minWidth">60dp</item>
+        <item name="android:minHeight">60dp</item>
+    </style>
+    <style name="Title_bar">
+        <item name="android:background">@color/title_bar_background_color</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    <style name="Toolbar">
+    <style name="Toolbar" parent="baseTouchPart">
         <item name="android:orientation">@null</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">48dp</item>
     </style>
     <style name="ToolbarDivider">
         <item name="android:background">@color/toolbar_divider</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
     </style>
-    <style name="ToolbarItem">
+    <style name="ToolbarItem" parent="baseTouchPart">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/button_text_color</item>
         <item name="android:background">@drawable/toolbar_item_background_color</item>
@@ -25,18 +28,6 @@
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:minHeight">48dp</item>
-    </style>
-    <style name="ToolbarItemDark">
-        <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/toolbar_item_background_color_dark</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:minHeight">48dp</item>
     </style>
     <style name="Block">
         <item name="android:paddingLeft">6dp</item>
@@ -57,9 +48,6 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
     </style>
-    <style name="CheckBox">
-        <item name="android:singleLine">true</item>
-    </style>
     <style name="DialogSelectArticleHorizontalDivider">
         <item name="android:background">@color/dialog_select_article_divider_color</item>
         <item name="android:layout_width">match_parent</item>
@@ -72,7 +60,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>
     </style>
-    <style name="DialogToolbarItem">
+    <style name="DialogToolbarItem" parent="baseTouchPart">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">@color/button_text_color</item>
         <item name="android:background">@drawable/dialog_item_background_color</item>
@@ -92,7 +80,7 @@
     <style name="Dialog_Translucent">
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
-    <style name="EditTextSingleLineLight">
+    <style name="EditTextSingleLine" parent="TextViewUltraLarge">
         <item name="android:textColor">@color/edit_text_text_color</item>
         <item name="android:background">@color/edit_text_background_color</item>
         <item name="android:paddingLeft">6dp</item>
@@ -142,9 +130,9 @@
     </style>
     <style name="ListDialogItem">
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">#ffffffff</item>
+        <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@android:drawable/list_selector_background</item>
+        <item name="android:buttonTint">@color/button_checkbox</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
@@ -172,25 +160,22 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    <style name="MyTheme" parent="@style/Theme.AppCompat">
+    <style name="MyTheme" parent="Theme.AppCompat.DayNight">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColorHint">@android:color/tab_indicator_text</item>
-    </style>
-    <style name="TextViewLarge">
-        <item name="android:textColor">@android:color/tab_indicator_text</item>
-        <item name="android:textSize">24sp</item>
     </style>
     <style name="TextViewNormal">
         <item name="android:textColor">@android:color/tab_indicator_text</item>
         <item name="android:textSize">20sp</item>
     </style>
-    <style name="TextViewSmall">
-        <item name="android:textColor">@android:color/tab_indicator_text</item>
+    <style name="TextViewLarge" parent="TextViewNormal">
+        <item name="android:textSize">24sp</item>
+    </style>
+    <style name="TextViewSmall" parent="TextViewNormal">
         <item name="android:textSize">16sp</item>
     </style>
-    <style name="TextViewUltraLarge">
-        <item name="android:textColor">@android:color/tab_indicator_text</item>
+    <style name="TextViewUltraLarge" parent="TextViewNormal">
         <item name="android:textSize">28sp</item>
     </style>
     <style name="TouchBlock">
@@ -198,6 +183,8 @@
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingRight">6dp</item>
         <item name="android:paddingBottom">6dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:minWidth">48dp</item>
     </style>
     <style name="VerticalDivider">
         <item name="android:background">@color/divider_color</item>
@@ -205,7 +192,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>
     </style>
-    <style name="SelectArticleItem_l">
+    <style name="SelectArticleItem_l" parent="baseTouchPart">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
         <item name="android:gravity">center</item>
@@ -213,9 +200,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minWidth">70dp</item>
-        <item name="android:minHeight">60dp</item>
     </style>
-    <style name="SelectArticleItem_p">
+    <style name="SelectArticleItem_p" parent="baseTouchPart">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
         <item name="android:gravity">center</item>
@@ -223,7 +209,6 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minWidth">90dp</item>
-        <item name="android:minHeight">60dp</item>
     </style>
     <style name="TabItem">
         <item name="android:textSize">24sp</item>
@@ -233,19 +218,14 @@
         <item name="android:singleLine">true</item>
         <item name="android:layout_weight">1</item>
     </style>
-    <style name="baseTouchPart">
-        <item name="android:minWidth">60dp</item>
-        <item name="android:minHeight">60dp</item>
-    </style>
-    <style name="system_settings_item">
+    <style name="system_settings_item" parent="baseTouchPart">
         <item name="android:background">@android:drawable/list_selector_background</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">48dp</item>
         <item name="android:layout_marginStart">5dp</item>
+        <item name="android:gravity">center</item>
     </style>
-
-    <style name="Checkbox_bahamut" parent="CheckBox">
+    <style name="Checkbox_bahamut" parent="baseTouchPart">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
@@ -254,19 +234,82 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:scaleX">1</item>
         <item name="android:scaleY">1</item>
-        <item name="android:minHeight">48dp</item>
-        <item name="android:minWidth">48dp</item>
+        <item name="android:buttonTint">@color/button_checkbox</item>
     </style>
-    <style name="SystemSettings_item_text" parent="TextViewLarge">
-        <item name="android:textColor">#ffffffff</item>
+    <style name="SystemSettings_checkbox_text" parent="TextViewLarge">
+        <item name="android:textColor">@color/white</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_marginLeft">50dp</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
-    <style name="roundedImageView">
-        <item name="cornerFamily">rounded</item>
-        <item name="cornerRadius">5dp</item>
+    <style name="SystemSettings_checkbox" parent="baseTouchPart">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:scaleX">1</item>
+        <item name="android:scaleY">1</item>
+        <item name="android:buttonTint">@color/button_checkbox</item>
+    </style>
+    <style name="SystemSettings_spinner_text" parent="TextViewLarge">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+    </style>
+    <style name="SystemSettings_spinner_item" parent="spinner_style">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:textSize">19sp</item>
+    </style>
+    <style name="SystemSettings_directory_text" parent="TextViewLarge">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+    <style name="SystemSettings_directory_arrow" parent="TextViewSmall">
+        <item name="android:textColor">@color/list_page_item_arrow_color</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/list_page_item_arrow_background</item>
+        <item name="android:paddingLeft">6dp</item>
+        <item name="android:paddingRight">6dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:text">@string/arrow_right</item>
+    </style>
+    <style name="spinner_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:backgroundTint">@color/checkbox_unchecked_color</item>
+    </style>
+    <style name="RightMenuItem" parent="@style/baseTouchPart">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/toolbar_item_background_color</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:singleLine">true</item>
+    </style>
+    <style name="BillingPage_button" parent="baseTouchPart">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:layout_marginTop">12sp</item>
+        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:background">@drawable/button_rounded_background_2</item>
     </style>
 </resources>

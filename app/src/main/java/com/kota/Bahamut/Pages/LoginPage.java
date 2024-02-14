@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.MyBillingClient.checkPurchaseHistoryQuery;
+
 import android.os.Build;
 import android.view.View;
 import android.widget.CheckBox;
@@ -68,6 +70,14 @@ public class LoginPage extends TelnetPage {
         // 讀取預設勇者設定
         loadLogonUser();
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
+
+        // 關閉"正在自動登入"
+        this._settings.setIsUnderAutoToChat(false);
+
+        // check VIP
+        if (!_settings.getPropertiesVIP()) {
+            checkPurchaseHistoryQuery();
+        }
     }
 
     public synchronized boolean onPagePreload() {
@@ -100,6 +110,10 @@ public class LoginPage extends TelnetPage {
             TelnetClient.getClient().sendStringToServer("");
             return false;
         } else if (cursor.equals(23, 16)) {
+            // 開啟"自動登入中"
+            if (this._settings.getPropertiesAutoToChat()) {
+                this._settings.setIsUnderAutoToChat(true);
+            }
             sendPassword();
             return false;
         } else {
@@ -111,8 +125,8 @@ public class LoginPage extends TelnetPage {
         EditText login_username_field = (EditText) findViewById(R.id.Login_UsernameEdit);
         EditText login_password_field = (EditText) findViewById(R.id.Login_passwordEdit);
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        String username = this._settings.getUsername();
-        String password = this._settings.getPassword();
+        String username = this._settings.getPropertiesUsername();
+        String password = this._settings.getPropertiesPassword();
         if (username == null) {
             username = "";
         }
@@ -123,7 +137,7 @@ public class LoginPage extends TelnetPage {
         String password2 = password.trim();
         login_username_field.setText(username2);
         login_password_field.setText(password2);
-        login_remember.setChecked(this._settings.isSaveLogonUser());
+        login_remember.setChecked(this._settings.getPropertiesSaveLogonUser());
     }
 
     private void saveLogonUserToProperties() {
@@ -131,13 +145,13 @@ public class LoginPage extends TelnetPage {
         if (login_remember.isChecked()) {
             String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
             String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
-            this._settings.setUsername(username);
-            this._settings.setPassword(password);
+            this._settings.setPropertiesUsername(username);
+            this._settings.setPropertiesPassword(password);
         } else {
-            this._settings.setUsername("");
-            this._settings.setPassword("");
+            this._settings.setPropertiesUsername("");
+            this._settings.setPropertiesPassword("");
         }
-        this._settings.setSaveLogonUser(login_remember.isChecked());
+        this._settings.setPropertiesSaveLogonUser(login_remember.isChecked());
         this._settings.notifyDataUpdated();
     }
 
@@ -248,7 +262,7 @@ public class LoginPage extends TelnetPage {
 
     public void onLoginSuccess() {
         TelnetClient.getClient().setUsername(this._username);
-        this._settings.setLastConnectionIsOfflineByUser(false);
+        this._settings.setPropertiesLastConnectionIsOfflineByUser(false);
         saveLogonUserToProperties();
         this._settings.notifyDataUpdated();
     }

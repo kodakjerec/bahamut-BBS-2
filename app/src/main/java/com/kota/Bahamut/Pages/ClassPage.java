@@ -24,11 +24,14 @@ import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
+import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
 public class ClassPage extends TelnetListPage implements View.OnClickListener, Dialog_SearchBoard_Listener {
     private String _detail = "看板列表";
     private String _title = "";
+
+    UserSettings _settings;
 
     public int getPageType() {
         return 6;
@@ -40,6 +43,8 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
+        this._settings = new UserSettings(getContext());
+
         ListView list_view = (ListView) findViewById(R.id.ClassPage_listView);
         list_view.setEmptyView(findViewById(R.id.ClassPage_listEmptyView));
         setListView(list_view);
@@ -48,10 +53,12 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
     }
 
+    @Override
     public void onPageDidDisappear() {
         super.onPageDidDisappear();
     }
 
+    @Override
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
         String title = this._title;
@@ -68,8 +75,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         }
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    protected boolean onBackPressed() {
         clear();
         PageContainer.getInstance().popClassPage();
         getNavigationController().popViewController();
@@ -77,8 +83,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onSearchButtonClicked() {
+    protected boolean onSearchButtonClicked() {
         showSearchBoardDialog();
         return true;
     }
@@ -126,8 +131,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         }
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onListViewItemLongClicked(View itemView, int index) {
+    protected boolean onListViewItemLongClicked(View itemView, int index) {
         if (getListName() != null && getListName().equals("Favorite")) {
             final int item_index = index + 1;
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消").addButton("確定").setListener((aDialog, index1) -> {
@@ -179,7 +183,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     public void showAddBoardToFavoriteDialog(final String boardName) {
         ASAlertDialog.createDialog().setMessage("是否將看板" + boardName + "加入我的最愛?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
             if (index == 1) {
-                TelnetOutputBuilder.create().pushKey(256).pushString("B\n").pushKey(TelnetKeyboard.HOME).pushString("/" + boardName + "\na ").pushKey(256).pushString("F\ns" + boardName + "\n").sendToServerInBackground();
+                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushString("B\n").pushKey(TelnetKeyboard.HOME).pushString("/" + boardName + "\na ").pushKey(TelnetKeyboard.LEFT_ARROW).pushString("F\ns" + boardName + "\n").sendToServerInBackground();
                 return;
             }
             TelnetClient.getClient().sendStringToServerInBackground("s" + boardName);
@@ -199,6 +203,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         return aName + "[Class]";
     }
 
+    @Override
     public void loadItemAtIndex(int index) {
         ClassPageItem item = (ClassPageItem) getItem(index);
         if (item == null) return;

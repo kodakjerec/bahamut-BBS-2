@@ -1,6 +1,7 @@
 package com.kota.Bahamut;
 
 import com.kota.Bahamut.Pages.ArticlePage;
+import com.kota.Bahamut.Pages.BillingPage;
 import com.kota.Bahamut.Pages.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage;
 import com.kota.Bahamut.Pages.BoardSearchPage;
@@ -8,6 +9,7 @@ import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
+import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.StartPage;
 import java.util.Iterator;
 import java.util.Stack;
@@ -24,6 +26,9 @@ public class PageContainer {
     private BoardSearchPage _board_search_page = null;
     private MailBoxPage _mail_page = null;
     private ArticlePage _article_page = null;
+
+    private BillingPage _billing_page = null;
+    private PostArticlePage _post_article_page = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -123,7 +128,7 @@ public class PageContainer {
         }
     }
 
-    public BoardLinkPage getBoard_linked_Title_page() {
+    public BoardLinkPage getBoardLinkedTitlePage() {
         if (this._board_title_linked_page == null) {
             this._board_title_linked_page = new BoardLinkPage();
         }
@@ -137,7 +142,7 @@ public class PageContainer {
         }
     }
 
-    public BoardSearchPage getBoard_Search_page() {
+    public BoardSearchPage getBoardSearchPage() {
         if (this._board_search_page == null) {
             this._board_search_page = new BoardSearchPage();
         }
@@ -176,6 +181,34 @@ public class PageContainer {
         if (this._article_page != null) {
             this._article_page.clear();
             this._article_page = null;
+        }
+    }
+
+    public BillingPage getBillingPage() {
+        if (this._billing_page == null) {
+            this._billing_page = new BillingPage();
+        }
+        return this._billing_page;
+    }
+
+    public void cleanBillingPage() {
+        if (this._billing_page != null) {
+            this._billing_page.clear();
+            this._billing_page = null;
+        }
+    }
+
+    public PostArticlePage getPostArticlePage() {
+        if (this._post_article_page == null) {
+            this._post_article_page = new PostArticlePage();
+        }
+        return this._post_article_page;
+    }
+
+    public void cleanPostArticlePage() {
+        if (this._post_article_page != null) {
+            this._post_article_page.clear();
+            this._post_article_page = null;
         }
     }
 }
