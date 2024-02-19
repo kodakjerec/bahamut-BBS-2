@@ -15,7 +15,7 @@
                 </LinearLayout>
                 <LinearLayout android:orientation="vertical" android:id="@+id/sign_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
                     <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewNormal"/>
-                    <Spinner android:id="@+id/sign_spinner" style="@style/spinner_style"/>
+                    <Spinner android:id="@+id/sign_spinner" style="@style/SpinnerStyle"/>
                 </LinearLayout>
                 <View style="@style/BlockDividerHorizontal"/>
                 <LinearLayout style="@style/Toolbar">

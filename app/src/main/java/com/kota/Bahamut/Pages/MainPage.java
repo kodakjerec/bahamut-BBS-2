@@ -1,10 +1,13 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import android.widget.Button;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
@@ -72,10 +75,6 @@ public class MainPage extends TelnetPage {
             // 進入布告討論區
             Button btn = (Button)findViewById(R.id.Main_boardsButton);
             btn.performClick();
-
-            // 進入洽特
-            // 輸入版序:44 => 定位到44:Enter => 進入版面:Enter
-            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("44\n\n")).start();
         }
     }
 
@@ -154,8 +153,6 @@ public class MainPage extends TelnetPage {
                         TelnetClient.getClient().sendStringToServerInBackground("Q");
                         return;
                     case 1:
-                        this._settings.setPropertiesLastConnectionIsOfflineByUser(true);
-                        this._settings.notifyDataUpdated();
                         TelnetClient.getClient().sendStringToServerInBackground("G");
                         return;
                     default:

@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import static com.kota.Bahamut.Service.MyBillingClient.checkPurchaseHistoryQuery;
 
 import android.os.Build;
@@ -59,20 +60,20 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onPageDidLoad() {
-        this._settings = new UserSettings(getContext());
+        _settings = new UserSettings(getContext());
         // 登入
         getNavigationController().setNavigationTitle("勇者登入");
-        findViewById(R.id.Login_loginButton).setOnClickListener(this._logout_listener);
+        findViewById(R.id.Login_loginButton).setOnClickListener(_logout_listener);
         // checkbox區塊點擊
         CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         findViewById(R.id.toolbar).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
-        this._telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
+        _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
         // 讀取預設勇者設定
         loadLogonUser();
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
 
         // 關閉"正在自動登入"
-        this._settings.setIsUnderAutoToChat(false);
+        _settings.setIsUnderAutoToChat(false);
 
         // check VIP
         if (!_settings.getPropertiesVIP()) {
@@ -100,19 +101,19 @@ public class LoginPage extends TelnetPage {
             onCheckRemoveLogonUser();
             return false;
         } else if (row_23.startsWith("★ 密碼輸入錯誤") && cursor.row == 23) {
-            this._error_count++;
+            _error_count++;
             onPasswordError();
             TelnetClient.getClient().sendStringToServer("");
             return false;
         } else if (row_23.startsWith("★ 錯誤的使用者代號") && cursor.row == 23) {
-            this._error_count++;
+            _error_count++;
             onUsernameError();
             TelnetClient.getClient().sendStringToServer("");
             return false;
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
-            if (this._settings.getPropertiesAutoToChat()) {
-                this._settings.setIsUnderAutoToChat(true);
+            if (_settings.getPropertiesAutoToChat()) {
+                _settings.setIsUnderAutoToChat(true);
             }
             sendPassword();
             return false;
@@ -125,8 +126,8 @@ public class LoginPage extends TelnetPage {
         EditText login_username_field = (EditText) findViewById(R.id.Login_UsernameEdit);
         EditText login_password_field = (EditText) findViewById(R.id.Login_passwordEdit);
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        String username = this._settings.getPropertiesUsername();
-        String password = this._settings.getPropertiesPassword();
+        String username = _settings.getPropertiesUsername();
+        String password = _settings.getPropertiesPassword();
         if (username == null) {
             username = "";
         }
@@ -137,7 +138,7 @@ public class LoginPage extends TelnetPage {
         String password2 = password.trim();
         login_username_field.setText(username2);
         login_password_field.setText(password2);
-        login_remember.setChecked(this._settings.getPropertiesSaveLogonUser());
+        login_remember.setChecked(_settings.getPropertiesSaveLogonUser());
     }
 
     private void saveLogonUserToProperties() {
@@ -145,26 +146,26 @@ public class LoginPage extends TelnetPage {
         if (login_remember.isChecked()) {
             String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
             String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
-            this._settings.setPropertiesUsername(username);
-            this._settings.setPropertiesPassword(password);
+            _settings.setPropertiesUsername(username);
+            _settings.setPropertiesPassword(password);
         } else {
-            this._settings.setPropertiesUsername("");
-            this._settings.setPropertiesPassword("");
+            _settings.setPropertiesUsername("");
+            _settings.setPropertiesPassword("");
         }
-        this._settings.setPropertiesSaveLogonUser(login_remember.isChecked());
-        this._settings.notifyDataUpdated();
+        _settings.setPropertiesSaveLogonUser(login_remember.isChecked());
+        _settings.notifyDataUpdated();
     }
 
     public void onPageDidDisappear() {
-        this._telnet_view = null;
-        this._login_process_dialog = null;
-        this._remove_logon_user_dialog = null;
-        this._save_unfinished_article_dialog = null;
+        _telnet_view = null;
+        _login_process_dialog = null;
+        _remove_logon_user_dialog = null;
+        _save_unfinished_article_dialog = null;
         clear();
     }
 
     public void onPageRefresh() {
-        if (this._telnet_view != null) {
+        if (_telnet_view != null) {
             setFrameToTelnetView();
         }
     }
@@ -173,19 +174,22 @@ public class LoginPage extends TelnetPage {
         TelnetFrame frame = TelnetClient.getModel().getFrame().clone();
         frame.removeRow(23);
         frame.removeRow(22);
-        this._telnet_view.setFrame(frame);
+        _telnet_view.setFrame(frame);
     }
 
     public void onPageWillDisappear() {
         ASProcessingDialog.hideProcessingDialog();
+        if (this._settings.isUnderAutoToChat()) {
+            ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
+        }
     }
 
     public void clear() {
-        this._error_count = 0;
-        this._cache_telnet_view = false;
-        if (this._login_process_dialog != null) {
-            this._login_process_dialog.dismiss();
-            this._login_process_dialog = null;
+        _error_count = 0;
+        _cache_telnet_view = false;
+        if (_login_process_dialog != null) {
+            _login_process_dialog.dismiss();
+            _login_process_dialog = null;
         }
     }
 
@@ -222,7 +226,7 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onPasswordError() {
-        if (this._error_count < 3) {
+        if (_error_count < 3) {
             new ASRunner() {
                 public void run() {
                     ASProcessingDialog.hideProcessingDialog();
@@ -235,7 +239,7 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onUsernameError() {
-        if (this._error_count < 3) {
+        if (_error_count < 3) {
             new ASRunner() {
                 public void run() {
                     ASProcessingDialog.hideProcessingDialog();
@@ -257,19 +261,18 @@ public class LoginPage extends TelnetPage {
     }
 
     public void sendPassword() {
-        TelnetClient.getClient().sendStringToServer(this._password);
+        TelnetClient.getClient().sendStringToServer(_password);
     }
 
     public void onLoginSuccess() {
-        TelnetClient.getClient().setUsername(this._username);
-        this._settings.setPropertiesLastConnectionIsOfflineByUser(false);
+        TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();
-        this._settings.notifyDataUpdated();
+        _settings.notifyDataUpdated();
     }
 
     public void onSaveArticle() {
-        if (this._save_unfinished_article_dialog == null) {
-            this._save_unfinished_article_dialog = ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成").addButton("放棄").addButton("寫入暫存檔").setListener((aDialog, index) -> {
+        if (_save_unfinished_article_dialog == null) {
+            _save_unfinished_article_dialog = ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成").addButton("放棄").addButton("寫入暫存檔").setListener((aDialog, index) -> {
                 switch (index) {
                     case 0:
                         TelnetClient.getClient().sendStringToServer("Q");
@@ -280,7 +283,7 @@ public class LoginPage extends TelnetPage {
                 }
                 LoginPage.this._save_unfinished_article_dialog = null;
             }).scheduleDismissOnPageDisappear(this);
-            this._save_unfinished_article_dialog.show();
+            _save_unfinished_article_dialog.show();
         }
     }
 

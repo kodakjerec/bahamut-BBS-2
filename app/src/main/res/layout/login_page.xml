@@ -23,13 +23,13 @@
             android:background="@drawable/toolbar_item_background_color">
 
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                style="@style/SystemSettings_checkbox_text"
+                style="@style/SystemSettingsCheckboxText"
                 android:layout_marginStart="50dp"
                 android:id="@+id/loginRememberLabel"
                 android:text="@string/save_data" />
 
             <CheckBox
-                android:id="@+id/Login_loginRememberCheckBox" style="@style/Checkbox_bahamut" />
+                android:id="@+id/Login_loginRememberCheckBox" style="@style/CheckboxBahamut" />
         </RelativeLayout>
 
         <View style="@style/ToolbarDivider" />

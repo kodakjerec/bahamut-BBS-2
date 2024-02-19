@@ -124,16 +124,16 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     private boolean pass_1() {
         boolean run_pass_2 = true;
-        if (this.row_string_23.startsWith("您有一篇文章尚未完成")) {
+        if (this.row_string_23.contains("您有一篇文章尚未完成")) {
             TelnetClient.getClient().sendStringToServer("S\n1\n");
             run_pass_2 = false;
         }
-        if (run_pass_2 && this.row_string_23.endsWith("[請按任意鍵繼續]") && getCurrentPage() != 1) {
+        if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != 1) {
             String continue_message = cutOffContinueMessage(this.row_string_23);
             if (continue_message.length() > 0) {
                 ASToast.showShortToast(continue_message);
             }
-            if (this.row_string_23.startsWith("★ 引言太多")) {
+            if (this.row_string_23.contains("★ 引言太多")) {
                 // 放棄此次編輯內容
                 byte[] data = TelnetOutputBuilder.create()
                         .pushKey(TelnetKeyboard.SPACE)
@@ -152,12 +152,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
             }
             TelnetClient.getClient().sendStringToServer("");
             return false;
-        } else if (this.row_string_23.equals("要新增資料嗎？(Y/N) [N]")) {
+        } else if (this.row_string_23.contains("要新增資料嗎？(Y/N) [N]")) {
             ASToast.showShortToast("此看板無文章");
             TelnetClient.getClient().sendStringToServer("N");
             return false;
-        } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
-            if (this.row_string_00.equals("順利貼出佈告，此板不加 MP。")) {
+        } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
+            if (this.row_string_00.contains("順利貼出佈告")) {
                 // 順利貼出佈告, 請按任意鍵繼續
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
                 if (top_page instanceof PostArticlePage || top_page instanceof BoardPage) {
@@ -296,43 +296,43 @@ public class BahamutStateHandler extends TelnetStateHandler {
         loadState();
         this._cursor = TelnetClient.getModel().getCursor();
         if (pass_1()) {
-            if (getCurrentPage() == 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+            if (getCurrentPage() == 6 && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
-            } else if (getCurrentPage() > 9 && this.row_string_23.startsWith("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
+            } else if (getCurrentPage() > 9 && this.row_string_23.contains("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
                 handleArticle();
                 onReadArticleFinished();
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
-            } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("魚雁往返") && this.row_string_23.endsWith("標記")) {
+            } else if (getCurrentPage() > 6 && this.row_string_23.contains("魚雁往返") && this.row_string_23.endsWith("標記")) {
                 handleArticle();
                 onReadArticleFinished();
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW);
-            } else if (getCurrentPage() > 6 && this.row_string_23.startsWith("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+            } else if (getCurrentPage() > 6 && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 handleArticle();
                 onReadArticlePage();
                 TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.PAGE_DOWN, 1);
             } else if (this.first_header.equals("對戰") && getCurrentPage() < 5) {
                 handleLoginPage();
-            } else if (this.row_string_00.startsWith("【主功能表】")) {
+            } else if (this.row_string_00.contains("【主功能表】")) {
                 handleMainPage();
-            } else if (this.row_string_00.startsWith("【郵件選單】")) {
+            } else if (this.row_string_00.contains("【郵件選單】")) {
                 handleMailBoxPage();
-            } else if (this.row_string_00.startsWith("【看板列表】")) {
-                if (this.row_string_01.startsWith("請輸入看板名稱")) {
+            } else if (this.row_string_00.contains("【看板列表】")) {
+                if (this.row_string_01.contains("請輸入看板名稱")) {
                     handleSearchBoard();
-                } else if (this.row_string_02.startsWith("總數")) {
+                } else if (this.row_string_02.contains("總數")) {
                     TelnetClient.getClient().sendKeyboardInputToServer(99);
                 } else {
                     handleClassPage();
                 }
-            } else if (this.row_string_00.startsWith("【主題串列】")) {
+            } else if (this.row_string_00.contains("【主題串列】")) {
                 if (PageContainer.getInstance().getBoardPage().getLastListAction() == 1) {
                     handleBoardSearchPage();
                 } else {
                     handleBoardTitleLinkedPage();
                 }
-            } else if (this.row_string_00.startsWith("【板主：")) {
+            } else if (this.row_string_00.contains("【板主：")) {
                 handleBoardPage();
-            } else if (this.row_string_23.startsWith("您要刪除上述記錄嗎")) {
+            } else if (this.row_string_23.contains("您要刪除上述記錄嗎")) {
                 TelnetClient.getClient().sendStringToServer("n");
             } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
                 TelnetClient.getClient().sendKeyboardInputToServer(256);
@@ -346,7 +346,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         }
                     }
                 }.runInMainThread();
-            } else if (this.row_string_23.startsWith("★ 請閱讀最新公告")) {
+            } else if (this.row_string_23.contains("★ 請閱讀最新公告")) {
                 TelnetClient.getClient().sendStringToServer("");
             } else if (this._step == 0 && this.first_header.equals("--")) {
                 setCurrentPage(3);
@@ -386,7 +386,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (this._article_number != null) {
             article.Number = Integer.parseInt(this._article_number);
         }
-        if (this.row_string_23.startsWith("魚雁往返")) {
+        if (this.row_string_23.contains("魚雁往返")) {
             showMail(article);
         } else {
             showArticle(article);

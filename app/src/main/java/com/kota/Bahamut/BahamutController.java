@@ -7,13 +7,8 @@ import static com.kota.Bahamut.Service.MyBillingClient.checkPurchase;
 import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
-import android.app.UiModeManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
-
-import androidx.appcompat.app.AppCompatDelegate;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -73,6 +68,10 @@ public class BahamutController extends ASNavigationController implements TelnetC
         // UserSettings
         _settings = new UserSettings(this);
         setAnimationEnable(_settings.getPropertiesAnimationEnable());
+        // 啟用wifi鎖定
+        if (_settings.getPropertiesKeepWifi()) {
+            getDeviceController().lockWifi();
+        }
 
         // 共用函數
         initialCFContext(getApplicationContext());
@@ -114,13 +113,15 @@ public class BahamutController extends ASNavigationController implements TelnetC
         boolean result = true;
         if (TelnetClient.getConnector().isConnecting()) {
             ASAlertDialog dialog = new ASAlertDialog();
-            dialog.setMessage("是否確定要強制斷線?").addButton("取消").addButton("斷線").setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.BahamutController.1
+            dialog
+                    .setMessage("是否確定要強制斷線?")
+                    .addButton("取消")
+                    .addButton("斷線")
+                    .setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.BahamutController.1
                 @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
                 public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
                     if (index == 1) {
                         TelnetClient.getClient().close();
-                        _settings.setPropertiesLastConnectionIsOfflineByUser(true);
-                        _settings.notifyDataUpdated();
                     }
                 }
             }).show();

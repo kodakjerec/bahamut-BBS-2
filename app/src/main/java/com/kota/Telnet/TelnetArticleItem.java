@@ -1,22 +1,20 @@
 package com.kota.Telnet;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Model.TelnetRow;
-import java.util.Iterator;
+
 import java.util.Vector;
 
 public class TelnetArticleItem {
-    public static final int TYPE_HEADER = 2;
-    public static final int TYPE_TELNET = 1;
-    public static final int TYPE_TEXT = 0;
-    public static final int TYPE_TIME = 3;
     private String _author = "";
     private String _content = "";
     private TelnetFrame _frame = null;
     private String _nickname = "";
     private int _quote_level = 0;
-    private Vector<TelnetRow> _rows = new Vector<>();
+    private final Vector<TelnetRow> _rows = new Vector<>();
     private int _type = 0;
 
     public String getAuthor() {
@@ -59,22 +57,6 @@ public class TelnetArticleItem {
         this._rows.add(row);
     }
 
-    public TelnetRow getRow(int rowIndex) {
-        return this._rows.get(rowIndex);
-    }
-
-    public TelnetRow removeRow(int rowIndex) {
-        return this._rows.remove(rowIndex);
-    }
-
-    public void cleanRows() {
-        this._rows.clear();
-    }
-
-    public int getRowSize() {
-        return this._rows.size();
-    }
-
     public void clear() {
         this._author = "";
         this._nickname = "";
@@ -83,10 +65,8 @@ public class TelnetArticleItem {
     }
 
     public void build() {
-        StringBuffer buffer = new StringBuffer();
-        Iterator<TelnetRow> it = this._rows.iterator();
-        while (it.hasNext()) {
-            TelnetRow row = it.next();
+        StringBuilder buffer = new StringBuilder();
+        for (TelnetRow row : this._rows) {
             if (buffer.length() > 0) {
                 buffer.append("\n");
             }
@@ -103,13 +83,12 @@ public class TelnetArticleItem {
         return new TelnetModel(this._rows.size());
     }
 
+    @NonNull
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("QuoteLevel:" + this._quote_level + "\n");
-        buffer.append("Author:" + this._author + "\n");
-        buffer.append("Nickname:" + this._nickname + "\n");
-        buffer.append("Content:" + this._content + "\n");
-        return buffer.toString();
+        return "QuoteLevel:" + this._quote_level + "\n" +
+                "Author:" + this._author + "\n" +
+                "Nickname:" + this._nickname + "\n" +
+                "Content:" + this._content + "\n";
     }
 
     public void buildFrame() {

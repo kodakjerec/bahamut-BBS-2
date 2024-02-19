@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -21,6 +23,7 @@ import com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener;
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Bahamut.ListPage.TelnetListPageItem;
+import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
@@ -30,6 +33,7 @@ import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 
@@ -37,6 +41,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     private Button _back_button = null;
     private TelnetHeaderItemView _header_view = null;
     private View _list_empty_view = null;
+    private ListView _list_view = null;
     private Button _page_down_button = null;
     private Button _page_up_button = null;
 
@@ -50,29 +55,29 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        ListView list_view = (ListView) findViewById(R.id.MailBoxPage_listView);
-        this._list_empty_view = findViewById(R.id.MailBoxPage_listEmptyView);
-        list_view.setEmptyView(this._list_empty_view);
-        setListView(list_view);
-        this._back_button = (Button) findViewById(R.id.Mail_backButton);
-        this._back_button.setOnClickListener(this);
-        this._back_button.setOnLongClickListener(this);
-        this._page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
-        this._page_up_button.setOnClickListener(this);
-        this._page_up_button.setOnLongClickListener(this);
-        this._page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
-        this._page_down_button.setOnClickListener(this);
-        this._page_down_button.setOnLongClickListener(this);
+        _list_view = (ListView) findViewById(R.id.MailBoxPage_listView);
+        _list_empty_view = findViewById(R.id.MailBoxPage_listEmptyView);
+        _list_view.setEmptyView(_list_empty_view);
+        setListView(_list_view);
+        _back_button = (Button) findViewById(R.id.Mail_backButton);
+        _back_button.setOnClickListener(this);
+        _back_button.setOnLongClickListener(this);
+        _page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
+        _page_up_button.setOnClickListener(this);
+        _page_up_button.setOnLongClickListener(this);
+        _page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
+        _page_down_button.setOnClickListener(this);
+        _page_down_button.setOnLongClickListener(this);
         findViewById(R.id.Mail_SearchButton).setOnClickListener(this);
-        this._header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_headerView);
+        _header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_headerView);
     }
 
     public void onPageDidDisappear() {
-        this._back_button = null;
-        this._page_up_button = null;
-        this._page_down_button = null;
-        this._header_view = null;
-        this._list_empty_view = null;
+        _back_button = null;
+        _page_up_button = null;
+        _page_down_button = null;
+        _header_view = null;
+        _list_empty_view = null;
         super.onPageDidDisappear();
     }
 
@@ -82,7 +87,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
 
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        this._header_view.setData("我的信箱", "您有 " + getItemSize() + " 封信在信箱內", "");
+        _header_view.setData("我的信箱", "您有 " + getItemSize() + " 封信在信箱內", "");
     }
 
     public void clear() {
@@ -135,7 +140,12 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     private void onDeleteArticle(final int itemIndex) {
-        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此信件?").addButton("取消").addButton("刪除").setListener((aDialog, index) -> {
+        ASAlertDialog.createDialog()
+                .setTitle(getContextString(R.string.delete))
+                .setMessage(getContextString(R.string.del_this_mail))
+                .addButton(getContextString(R.string.cancel))
+                .addButton(getContextString(R.string.delete))
+                .setListener((aDialog, index) -> {
             if (index == 1) {
                 MailBoxPage.this.pushCommand(new BahamutCommandDeleteArticle(itemIndex));
             }
@@ -167,7 +177,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
 
     public boolean onReceivedGestureRight() {
         onBackPressed();
-        ASToast.showShortToast("返回");
+        ASToast.showShortToast(getContextString(R.string._back));
         return true;
     }
 
@@ -176,7 +186,12 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     }
 
     public void goodArticle(final int articleIndex) {
-        ASAlertDialog.createDialog().setTitle("推薦").setMessage("是否要推薦此文章?").addButton("取消").addButton("推薦").setListener((aDialog, index) -> {
+        ASAlertDialog.createDialog()
+                .setTitle(getContextString(R.string.do_gy))
+                .setMessage(getContextString(R.string.gy_this_article))
+                .addButton(getContextString(R.string.cancel))
+                .addButton(getContextString(R.string.do_gy))
+                .setListener((aDialog, index) -> {
             if (index == 1) {
                 MailBoxPage.this.pushCommand(new BahamutCommandGoodArticle(articleIndex));
             }
@@ -243,6 +258,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
             itemView.setLayoutParams(new AbsListView.LayoutParams(-1, -2));
         }
         MailBoxPage_ItemView item_view = (MailBoxPage_ItemView) itemView;
+        // 信件已經被刪除就不要顯示
+        if (item == null)
+            item_view.setVisibility(View.GONE);
         item_view.setItem(item);
         item_view.setIndex(index + 1);
         return itemView;
@@ -268,5 +286,10 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
             public void run() {
             }
         }.runInMainThread();
+    }
+
+    @Override
+    public void onSearchDialogCancelButtonClicked() {
+
     }
 }

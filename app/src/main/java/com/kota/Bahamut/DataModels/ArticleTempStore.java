@@ -78,7 +78,7 @@ public class ArticleTempStore {
         if (this._context != null) {
             try {
                 SharedPreferences perf = this._context.getSharedPreferences("article_temp", 0);
-                perf.edit().putString("save_data", exportToJSON().toString()).apply();
+                perf.edit().putString("save_data", exportToJSON().toString()).commit();
             } catch (Exception e) {
                 e.printStackTrace();
             }

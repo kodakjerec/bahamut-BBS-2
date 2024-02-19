@@ -100,10 +100,13 @@ public class ASNavigationController extends Activity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setNavigationController(this);
+
     getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics);
     ASRunner.construct();
+
     this._device_controller = new ASDeviceController(this);
     onControllerWillLoad();
+
     this._root_view = new ASNavigationControllerView(this);
     this._root_view.setPageController(this);
     setContentView(this._root_view);
@@ -514,6 +517,7 @@ public class ASNavigationController extends Activity {
   public void finish() {
     onControllerWillFinish();
     getDeviceController().unlockWifi();
+    getDeviceController().unlockWake();
     super.finish();
   }
 

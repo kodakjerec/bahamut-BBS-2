@@ -6,64 +6,121 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/black">
-            <RelativeLayout android:visibility="gone" android:id="@+id/SystemSettings_item_AutoConnectionRecover" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_connect_recovery" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" style="@style/SystemSettings_checkbox"/>
-            </RelativeLayout>
-            <View android:visibility="gone" style="@style/HorizontalDivider"/>
-            <RelativeLayout android:id="@+id/SystemSettings_item_blockListEnable" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_blockListEnable" style="@style/SystemSettings_checkbox" android:contentDescription="@string/system_setting_page_checkbox_blocklist_hint" />
-            </RelativeLayout>
-            <View style="@style/HorizontalDivider"/>
-            <LinearLayout android:id="@+id/SystemSettings_blockListSetting"
-                android:clickable="true"
-                style="@style/system_settings_item">
-                <TextView android:text="@string/block_list_setting" style="@style/SystemSettings_directory_text"/>
-                <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettings_directory_arrow"/>
-            </LinearLayout>
-            <View style="@style/HorizontalDivider"/>
-            <RelativeLayout android:id="@+id/SystemSettings_item_animationEnable" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_page_animation" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_animationEnable" style="@style/SystemSettings_checkbox" android:contentDescription="@string/system_setting_page_checkbox_animation_hint"/>
-            </RelativeLayout>
-            <View style="@style/HorizontalDivider"/>
-            <RelativeLayout android:visibility="gone" android:id="@+id/SystemSettings_item_keepWifi" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_keep_wifi_on_sleep" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_keepWifi" style="@style/SystemSettings_checkbox"/>
-            </RelativeLayout>
-            <View style="@style/HorizontalDivider"/>
-            <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettings_checkbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>
-            </RelativeLayout>
-            <View style="@style/HorizontalDivider"/>
-            <LinearLayout android:id="@+id/SystemSettings_item_screen_orientation" style="@style/system_settings_item">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                    android:text="@string/system_setting_page_screen_orientation"
-                    style="@style/SystemSettings_spinner_text"/>
-                <Spinner
-                    android:id="@+id/SystemSettings_screen_orientation_spinner"
-                    style="@style/SystemSettings_spinner_item"/>
-            </LinearLayout>
-            <RelativeLayout android:id="@+id/SystemSettings_item_enableGestureOnBoard" style="@style/system_settings_item" android:visibility="gone">
-                <View style="@style/HorizontalDivider"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_gesture_on_board" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_enableGestureOnBoard" style="@style/SystemSettings_checkbox" android:contentDescription="@string/system_setting_page_checkbox_gesture_hint"/>
-            </RelativeLayout>
-            <RelativeLayout android:id="@+id/SystemSettings_item_enableAutoToChat" style="@style/system_settings_item" android:visibility="gone">
-                <View style="@style/HorizontalDivider"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_auto_to_chat" style="@style/SystemSettings_checkbox_text"/>
-                <CheckBox android:id="@+id/SystemSettings_enableAutoToChat" style="@style/SystemSettings_checkbox" android:contentDescription="@string/system_setting_page_checkbox_auto_chat_hint"/>
-            </RelativeLayout>
-            <View style="@style/HorizontalDivider"/>
-            <LinearLayout android:id="@+id/SystemSettings_goBillingPage"
-                android:clickable="true"
-                style="@style/system_settings_item">
-                <TextView android:text="@string/SystemSetting_goBillingPage" style="@style/SystemSettings_directory_text"/>
-                <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettings_directory_arrow"/>
-            </LinearLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_blocklist"/>
+        <View android:visibility="gone" style="@style/HorizontalDivider"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_blockListEnable" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_blockListEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_blocklist_hint" />
+        </RelativeLayout>
+        <View style="@style/HorizontalDivider"/>
+        <LinearLayout android:id="@+id/SystemSettings_blockListSetting"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/block_list_setting" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_board_article"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>
+        </RelativeLayout>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableGestureOnBoard" style="@style/SystemSettingsItem">
+            <View style="@style/HorizontalDivider"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_gesture_on_board" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableGestureOnBoard" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_gesture_hint"/>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/SystemSettings_item_toolbar_location">
+            <View style="@style/HorizontalDivider"/>
+            <LinearLayout style="@style/SystemSettingsItem">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:text="@string/system_setting_page_toolbar_location"
+                    style="@style/SystemSettingsSpinnerText"/>
+                <Spinner
+                    android:id="@+id/SystemSettings_toolbar_location_spinner"
+                    style="@style/SystemSettingsSpinnerItem"/>
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/SystemSettings_item_toolbar_order">
+            <View style="@style/HorizontalDivider"/>
+            <LinearLayout style="@style/SystemSettingsItem">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:text="@string/system_setting_page_toolbar_order"
+                    style="@style/SystemSettingsSpinnerText"/>
+                <Spinner
+                    android:id="@+id/SystemSettings_toolbar_order_spinner"
+                    style="@style/SystemSettingsSpinnerItem"/>
+            </LinearLayout>
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/SystemSettings_item_drawer_location">
+            <View style="@style/HorizontalDivider"/>
+            <LinearLayout style="@style/SystemSettingsItem">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:text="@string/system_setting_page_drawer_location"
+                    style="@style/SystemSettingsSpinnerText"/>
+                <Spinner
+                    android:id="@+id/SystemSettings_drawer_location_spinner"
+                    style="@style/SystemSettingsSpinnerItem"/>
+            </LinearLayout>
+        </RelativeLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_preference"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableAutoToChat" style="@style/SystemSettingsItem">
+            <View style="@style/HorizontalDivider"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_auto_to_chat" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableAutoToChat" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_auto_chat_hint"/>
+        </RelativeLayout>
+        <RelativeLayout android:id="@+id/SystemSettings_item_animationEnable" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_page_animation" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_animationEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_animation_hint"/>
+        </RelativeLayout>
+        <View style="@style/HorizontalDivider"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_keepWifi" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_keep_wifi_on_sleep" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_keepWifi" style="@style/SystemSettingsCheckbox"/>
+        </RelativeLayout>
+        <View style="@style/HorizontalDivider"/>
+        <LinearLayout android:id="@+id/SystemSettings_item_screen_orientation" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_screen_orientation"
+                style="@style/SystemSettingsSpinnerText"/>
+            <Spinner
+                android:id="@+id/SystemSettings_screen_orientation_spinner"
+                style="@style/SystemSettingsSpinnerItem"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/SystemSettings_item_IgnoreBatteryOptimizations" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_ignore_battery_optimizations"
+                style="@style/SystemSettingsSpinnerText"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
+        <RelativeLayout android:visibility="gone" android:id="@+id/SystemSettings_item_AutoConnectionRecover" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_connect_recovery" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" style="@style/SystemSettingsCheckbox"/>
+        </RelativeLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_donation"/>
+        <LinearLayout android:id="@+id/SystemSettings_goBillingPage"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/system_setting_page_goBillingPage" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
+    </LinearLayout>
 </ScrollView>

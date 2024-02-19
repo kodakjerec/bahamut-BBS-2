@@ -222,8 +222,13 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                     if (PostArticlePage.this._listener != null) {
                         PostArticlePage.this._listener.onPostDialogSendButtonClicked(PostArticlePage.this, send_title, send_content, aTarget, PostArticlePage.this._article_number, aSign, this.recover);
                     }
+                    // 回應到作者信箱
+                    if (aTarget.equals("M")) {
+                        closeArticle();
+                    }
                 });
                 dialog.show();
+
             } else {
                 // 修改: 沒有註記回文
                 ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?").setListener((aDialog, index) -> {

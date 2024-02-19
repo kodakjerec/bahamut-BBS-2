@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
@@ -51,6 +52,13 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         findViewById(R.id.ClassPage_SearchButton).setOnClickListener(this);
         findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
         findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
+
+        // 自動登入洽特
+        if (this._settings.isUnderAutoToChat()) {
+            // 進入洽特
+            // 輸入版序:44 => 定位到44:Enter => 進入版面:Enter
+            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("44\n\n")).start();
+        }
     }
 
     @Override

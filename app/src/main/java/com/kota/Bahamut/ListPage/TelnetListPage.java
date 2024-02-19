@@ -27,14 +27,11 @@ import java.util.Vector;
 
 /* loaded from: classes.dex */
 public abstract class TelnetListPage extends TelnetPage implements ListAdapter, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
-    public static final int LIST_TYPE_BOARD = 0;
-    public static final int LIST_TYPE_LINK = 1;
-    public static final int LIST_TYPE_SEARCH = 2;
-    private Vector<TelnetCommand> _operation_command_stack = new Vector<>();
-    private Stack<TelnetCommand> _load_command_stack = new Stack<>();
+    private final Vector<TelnetCommand> _operation_command_stack = new Vector<>();
+    private final Stack<TelnetCommand> _load_command_stack = new Stack<>();
     private TelnetCommand _executing_command = null;
-    private boolean[] _page_preload_command = new boolean[1];
-    private boolean[] _page_refresh_command = new boolean[2];
+    private final boolean[] _page_preload_command = new boolean[1];
+    private final boolean[] _page_refresh_command = new boolean[2];
     private String _list_name = null;
     private ListView _list_view = null;
     private boolean _list_loaded = false;
@@ -49,7 +46,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     private boolean _initialed = false;
     private boolean _manual_load_page = false;
     @SuppressLint({"UseSparseArrays"})
-    private Map<Integer, TelnetListPageBlock> _block_list = new HashMap();
+    private final Map<Integer, TelnetListPageBlock> _block_list = new HashMap();
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
     @Override // android.widget.Adapter
@@ -65,25 +62,23 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
 
     @Override // android.widget.Adapter
     public void registerDataSetObserver(DataSetObserver observer) {
-        this.mDataSetObservable.registerObserver(observer);
+        mDataSetObservable.registerObserver(observer);
     }
 
     @Override // android.widget.Adapter
     public void unregisterDataSetObserver(DataSetObserver observer) {
-        this.mDataSetObservable.unregisterObserver(observer);
+        mDataSetObservable.unregisterObserver(observer);
     }
 
     public void notifyDataSetChanged() {
-        this.mDataSetObservable.notifyChanged();
+        mDataSetObservable.notifyChanged();
     }
 
-    /* JADX INFO: Access modifiers changed from: private */
-    /* loaded from: classes.dex */
-    public class AutoLoadThread extends Thread {
+    private class AutoLoadThread extends Thread {
         public boolean run;
 
         private AutoLoadThread() {
-            this.run = true;
+            run = true;
         }
 
         @Override // java.lang.Thread, java.lang.Runnable
@@ -91,7 +86,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
             boolean send_command;
             try {
                 sleep(10000L);
-                while (this.run) {
+                while (run) {
                     long current_time = System.currentTimeMillis();
                     long total_offset = current_time - TelnetListPage.this._last_load_time;
                     long span_offset = current_time - TelnetListPage.this._last_send_time;
@@ -104,7 +99,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
                     } else {
                         send_command = false;
                     }
-                    if ((send_command || TelnetListPage.this._manual_load_page) && this.run) {
+                    if ((send_command || TelnetListPage.this._manual_load_page) && run) {
                         TelnetListPage.this.loadLastBlock(false);
                         TelnetListPage.this._last_send_time = current_time;
                     }
@@ -113,13 +108,13 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                this.run = false;
+                run = false;
             }
         }
     }
 
     public void setManualLoadPage() {
-        this._manual_load_page = true;
+        _manual_load_page = true;
     }
 
     @Override // com.kota.TelnetUI.TelnetPage, com.kota.ASFramework.PageController.ASViewController
@@ -130,22 +125,22 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidRemoveFromNavigationController() {
-        this._initialed = false;
+        _initialed = false;
         cleanAllItem();
         stopAutoLoad();
     }
 
     public void setListView(ListView aListView) {
-        this._list_view = aListView;
-        if (this._list_view != null) {
-            this._list_view.setOnItemClickListener(this);
-            this._list_view.setOnItemLongClickListener(this);
-            this._list_view.setAdapter((ListAdapter) this);
+        _list_view = aListView;
+        if (_list_view != null) {
+            _list_view.setOnItemClickListener(this);
+            _list_view.setOnItemLongClickListener(this);
+            _list_view.setAdapter((ListAdapter) this);
         }
     }
 
     public int getLastLoadItemIndex() {
-        return this._last_load_item_index;
+        return _last_load_item_index;
     }
 
     public int getLoadingItemNumber() {
@@ -170,7 +165,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
 
     public void loadItemAtIndex(int index) {
         if (isItemCanLoadAtIndex(index)) {
-            this._last_load_item_index = index;
+            _last_load_item_index = index;
             TelnetCommand command = new BahamutCommandLoadArticle(index + 1);
             pushCommand(command);
         }
@@ -193,11 +188,11 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void pushRefreshCommand(int aCommand) {
-        this._page_refresh_command[aCommand] = true;
+        _page_refresh_command[aCommand] = true;
     }
 
     public void pushPreloadCommand(int aCommand) {
-        this._page_preload_command[aCommand] = true;
+        _page_preload_command[aCommand] = true;
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
@@ -209,17 +204,17 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     public void clear() {
         cleanCommand();
         cleanAllItem();
-        this._list_loaded = false;
-        this._selected_index = 0;
-        this._current_block = 0;
-        this._item_size = 0;
-        this._last_load_time = 0L;
-        this._last_send_time = 0L;
-        this._list_name = null;
+        _list_loaded = false;
+        _selected_index = 0;
+        _current_block = 0;
+        _item_size = 0;
+        _last_load_time = 0L;
+        _last_send_time = 0L;
+        _list_name = null;
     }
 
     public ListView getListView() {
-        return this._list_view;
+        return _list_view;
     }
 
     public void setListViewSelection(final int selection) {
@@ -238,18 +233,18 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void setListViewSelectionFromTop(int selection, int top) {
-        if (this._list_view != null) {
+        if (_list_view != null) {
             if (selection == -1) {
-                this._list_view.setSelection(getCount() - 1);
+                _list_view.setSelection(getCount() - 1);
             } else {
-                this._list_view.setSelectionFromTop(selection, top);
+                _list_view.setSelectionFromTop(selection, top);
             }
         }
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
-        this._load_command_stack.setSize(2);
+        _load_command_stack.setSize(2);
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
@@ -260,9 +255,9 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     @Override // com.kota.TelnetUI.TelnetPage
     public synchronized boolean onPagePreload() {
         TelnetListPageBlock page_data = loadPage();
-        if (!this._initialed) {
+        if (!_initialed) {
             pushPreloadCommand(0);
-            this._initialed = true;
+            _initialed = true;
         }
         executeCommandFinished(page_data);
         insertPageData(page_data);
@@ -273,45 +268,45 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public synchronized void onPageRefresh() {
-        synchronized (this._list_count) {
-            this._list_count = Integer.valueOf(this._item_size);
+        synchronized (_list_count) {
+            _list_count = Integer.valueOf(_item_size);
             reloadListView();
         }
         executeRefreshCommand();
     }
 
     private void executeRefreshCommand() {
-        if (this._page_refresh_command[0]) {
+        if (_page_refresh_command[0]) {
             setListViewSelection(0);
         }
-        if (this._page_refresh_command[1]) {
+        if (_page_refresh_command[1]) {
             setListViewSelection(getItemSize() - 1);
         }
         cleanRefreshCommand();
     }
 
     private void cleanRefreshCommand() {
-        for (int i = 0; i < this._page_refresh_command.length; i++) {
-            this._page_refresh_command[i] = false;
+        for (int i = 0; i < _page_refresh_command.length; i++) {
+            _page_refresh_command[i] = false;
         }
     }
 
     private void executePreloadCommand() {
-        if (this._page_preload_command[0]) {
+        if (_page_preload_command[0]) {
             loadLastBlock();
         }
         cleanPreloadCommand();
     }
 
     private void cleanPreloadCommand() {
-        for (int i = 0; i < this._page_preload_command.length; i++) {
-            this._page_preload_command[i] = false;
+        for (int i = 0; i < _page_preload_command.length; i++) {
+            _page_preload_command[i] = false;
         }
     }
 
     private void removeBlock(Integer key) {
         TelnetListPageItem item;
-        TelnetListPageBlock block = this._block_list.remove(key);
+        TelnetListPageBlock block = _block_list.remove(key);
         if (block != null) {
             for (int i = 0; i < 20 && (item = block.getItem(i)) != null; i++) {
                 item.clear();
@@ -325,22 +320,22 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     private void insertPageData(TelnetListPageBlock aPageData) {
         if (aPageData != null) {
             int block_index = getBlockIndex(aPageData.minimumItemNumber - 1);
-            synchronized (this._block_list) {
+            synchronized (_block_list) {
                 setBlock(block_index, aPageData);
                 int first_block_index = getFirstVisibleBlockIndex();
                 int last_block_index = getLastVisibleBlockIndex();
                 if (first_block_index != 0 && last_block_index != 0 && first_block_index >= 0 && last_block_index >= 0) {
-                    Set<Integer> keys = new HashSet<>(this._block_list.keySet());
+                    Set<Integer> keys = new HashSet<>(_block_list.keySet());
                     for (Integer key : keys) {
-                        if (key.intValue() != block_index && (key.intValue() > last_block_index + 3 || key.intValue() < first_block_index - 3)) {
+                        if (key != block_index && (key > last_block_index + 3 || key < first_block_index - 3)) {
                             removeBlock(key);
                         }
                     }
                 }
             }
             if (aPageData.selectedItemNumber > 0) {
-                this._selected_index = aPageData.selectedItemNumber;
-                this._current_block = ItemUtils.getBlock(this._selected_index);
+                _selected_index = aPageData.selectedItemNumber;
+                _current_block = ItemUtils.getBlock(_selected_index);
             }
             if (aPageData.maximumItemNumber > getItemSize()) {
                 setItemSize(aPageData.maximumItemNumber);
@@ -349,54 +344,50 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public int getFirstVisibleBlockIndex() {
-        if (this._list_view == null) {
+        if (_list_view == null) {
             return -1;
         }
-        int index = getBlockIndex(this._list_view.getFirstVisiblePosition());
-        return index;
+        return getBlockIndex(_list_view.getFirstVisiblePosition());
     }
 
     public int getLastVisibleBlockIndex() {
-        if (this._list_view == null) {
+        if (_list_view == null) {
             return -1;
         }
-        int index = getBlockIndex(this._list_view.getLastVisiblePosition());
-        return index;
+        return getBlockIndex(_list_view.getLastVisiblePosition());
     }
 
     private void startAutoLoad() {
-        if (isAutoLoadEnable() && this._auto_load_thread == null) {
-            this._auto_load_thread = new AutoLoadThread();
-            this._auto_load_thread.start();
+        if (isAutoLoadEnable() && _auto_load_thread == null) {
+            _auto_load_thread = new AutoLoadThread();
+            _auto_load_thread.start();
         }
     }
 
     private void stopAutoLoad() {
-        if (this._auto_load_thread != null) {
-            this._auto_load_thread.run = false;
-            this._auto_load_thread = null;
+        if (_auto_load_thread != null) {
+            _auto_load_thread.run = false;
+            _auto_load_thread = null;
         }
     }
 
     public synchronized TelnetCommand popCommand() {
         TelnetCommand command;
         command = null;
-        if (this._operation_command_stack.size() > 0) {
-            TelnetCommand command2 = this._operation_command_stack.remove(0);
-            command = command2;
-        } else if (!this._load_command_stack.isEmpty()) {
-            TelnetCommand command3 = this._load_command_stack.pop();
-            command = command3;
+        if (_operation_command_stack.size() > 0) {
+            command = _operation_command_stack.remove(0);
+        } else if (!_load_command_stack.isEmpty()) {
+            command = _load_command_stack.pop();
         }
         return command;
     }
 
-    public synchronized void repushCommand(TelnetCommand aCommand) {
+    public synchronized void rePushCommand(TelnetCommand aCommand) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand()) {
-                this._load_command_stack.push(aCommand);
+                _load_command_stack.push(aCommand);
             } else {
-                this._operation_command_stack.insertElementAt(aCommand, 0);
+                _operation_command_stack.insertElementAt(aCommand, 0);
             }
         }
     }
@@ -408,9 +399,9 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     public synchronized void pushCommand(TelnetCommand aCommand, boolean executeNow) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand()) {
-                this._load_command_stack.push(aCommand);
+                _load_command_stack.push(aCommand);
             } else {
-                this._operation_command_stack.add(aCommand);
+                _operation_command_stack.add(aCommand);
             }
         }
         if (executeNow) {
@@ -419,23 +410,23 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public synchronized void cleanCommand() {
-        this._operation_command_stack.clear();
-        this._load_command_stack.clear();
-        this._executing_command = null;
+        _operation_command_stack.clear();
+        _load_command_stack.clear();
+        _executing_command = null;
         cleanRefreshCommand();
         cleanPreloadCommand();
     }
 
     public synchronized void executeCommand() {
-        if (this._executing_command == null) {
-            this._executing_command = popCommand();
-            if (this._executing_command != null) {
-                if (this._executing_command.recordTime) {
-                    this._last_load_time = System.currentTimeMillis();
+        if (_executing_command == null) {
+            _executing_command = popCommand();
+            if (_executing_command != null) {
+                if (_executing_command.recordTime) {
+                    _last_load_time = System.currentTimeMillis();
                 }
-                this._executing_command.execute(this);
-                if (this._executing_command.isDone()) {
-                    this._executing_command = null;
+                _executing_command.execute(this);
+                if (_executing_command.isDone()) {
+                    _executing_command = null;
                     executeCommand();
                 }
             }
@@ -443,24 +434,24 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public synchronized void executeCommandFinished(TelnetListPageBlock aPageData) {
-        if (this._executing_command != null) {
-            this._executing_command.executeFinished(this, aPageData);
-            if (!this._executing_command.isDone()) {
-                repushCommand(this._executing_command);
+        if (_executing_command != null) {
+            _executing_command.executeFinished(this, aPageData);
+            if (!_executing_command.isDone()) {
+                rePushCommand(_executing_command);
             }
-            this._executing_command = null;
+            _executing_command = null;
         }
     }
 
     public synchronized boolean isLoadingBlock(int itemIndex) {
         boolean result;
         result = false;
-        if (this._executing_command != null && this._executing_command.Action == 0) {
-            BahamutCommandLoadBlock load_block_command = (BahamutCommandLoadBlock) this._executing_command;
+        if (_executing_command != null && _executing_command.Action == 0) {
+            BahamutCommandLoadBlock load_block_command = (BahamutCommandLoadBlock) _executing_command;
             result = load_block_command.containsArticle(itemIndex);
         }
         if (!result) {
-            Iterator<TelnetCommand> it = this._load_command_stack.iterator();
+            Iterator<TelnetCommand> it = _load_command_stack.iterator();
             while (true) {
                 if (!it.hasNext()) {
                     break;
@@ -481,7 +472,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     public synchronized boolean isLoadingSize() {
         boolean load_size_command_exists;
         load_size_command_exists = false;
-        Iterator<TelnetCommand> it = this._operation_command_stack.iterator();
+        Iterator<TelnetCommand> it = _operation_command_stack.iterator();
         while (true) {
             if (!it.hasNext()) {
                 break;
@@ -518,9 +509,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     private boolean containsLoadLastBlock() {
-        Iterator<TelnetCommand> it = this._operation_command_stack.iterator();
-        while (it.hasNext()) {
-            TelnetCommand command = it.next();
+        for (TelnetCommand command : _operation_command_stack) {
             if (command.Action == 1) {
                 return true;
             }
@@ -534,10 +523,10 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void reloadListView() {
-        if (this._list_view != null) {
+        if (_list_view != null) {
             notifyDataSetChanged();
-            if (!this._list_loaded) {
-                this._list_loaded = true;
+            if (!_list_loaded) {
+                _list_loaded = true;
                 setListViewSelection(getCount() - 1);
             }
         }
@@ -546,8 +535,8 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     @Override // android.widget.Adapter
     public int getCount() {
         int intValue;
-        synchronized (this._list_count) {
-            intValue = this._list_count.intValue();
+        synchronized (_list_count) {
+            intValue = _list_count;
         }
         return intValue;
     }
@@ -561,27 +550,27 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void setBlock(int blockIndex, TelnetListPageBlock aBlock) {
-        this._block_list.put(Integer.valueOf(blockIndex), aBlock);
+        _block_list.put(blockIndex, aBlock);
     }
 
     public TelnetListPageBlock getBlock(int blockIndex) {
-        return this._block_list.get(Integer.valueOf(blockIndex));
+        return _block_list.get(blockIndex);
     }
 
     public int getBlockSize() {
-        return this._block_list.size();
+        return _block_list.size();
     }
 
     @Override // android.widget.Adapter
     public synchronized TelnetListPageItem getItem(int index) {
         TelnetListPageItem item;
-        Integer item_index = Integer.valueOf(index + 1);
-        synchronized (this._block_list) {
+        Integer item_index = index + 1;
+        synchronized (_block_list) {
             TelnetListPageBlock block = getBlock(getBlockIndex(index));
             item = block != null ? block.getItem(getIndexInBlock(index)) : null;
         }
         if (item != null) {
-            item.Number = item_index.intValue();
+            item.Number = item_index;
         }
         return item;
     }
@@ -636,10 +625,10 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     protected void saveListState() {
-        if (this._list_view != null) {
+        if (_list_view != null) {
             ListState state = ListStateStore.getInstance().getState(getListId());
-            state.Position = this._list_view.getFirstVisiblePosition();
-            View first_visible_item_view = this._list_view.getChildAt(0);
+            state.Position = _list_view.getFirstVisiblePosition();
+            View first_visible_item_view = _list_view.getChildAt(0);
             if (first_visible_item_view != null) {
                 state.Top = first_visible_item_view.getTop();
             }
@@ -647,14 +636,14 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     protected void loadListState() {
-        if (this._list_view != null) {
+        if (_list_view != null) {
             ListState state = ListStateStore.getInstance().getState(getListId());
             setListViewSelectionFromTop(state.Position, state.Top);
         }
     }
 
     public int getSelectedIndex() {
-        return this._selected_index;
+        return _selected_index;
     }
 
     public int getListType() {
@@ -662,29 +651,29 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void setItemSize(int size) {
-        this._item_size = size;
+        _item_size = size;
     }
 
     public int getItemSize() {
-        return this._item_size;
+        return _item_size;
     }
 
     public void cleanAllItem() {
-        synchronized (this._block_list) {
-            Set<Integer> keys = new HashSet<>(this._block_list.keySet());
+        synchronized (_block_list) {
+            Set<Integer> keys = new HashSet<>(_block_list.keySet());
             for (Integer key : keys) {
                 removeBlock(key);
             }
-            this._block_list.clear();
+            _block_list.clear();
         }
     }
 
     public void setListName(String aListName) {
-        this._list_name = aListName;
+        _list_name = aListName;
     }
 
     public String getListName() {
-        return this._list_name;
+        return _list_name;
     }
 
     public boolean isItemBlocked(TelnetListPageItem aItem) {
@@ -712,6 +701,6 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public int getCurrentBlock() {
-        return this._current_block;
+        return _current_block;
     }
 }

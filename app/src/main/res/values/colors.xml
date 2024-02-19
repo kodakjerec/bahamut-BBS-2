@@ -4,6 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
     <color name="yellow">#FFf0f080</color>
+    <color name="red">#FF800000</color>
     <color name="button_label_color_disable">#FF808080</color>
     <color name="button_label_color_focused">@color/black</color>
     <color name="button_label_color_normal">@color/white</color>
@@ -88,4 +89,6 @@
     <color name="article_page_text_item_content1">#FF20FF20</color>
     <color name="article_page_text_item_author0">@color/white</color>
     <color name="article_page_text_item_content0">#FFC0C0C0</color>
+    <color name="system_page_chapter_text">@color/button_label_color_disable</color>
+    <color name="system_page_chapter_background">@color/list_page_item_arrow_background</color>
 </resources>

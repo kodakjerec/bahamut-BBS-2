@@ -1,9 +1,12 @@
 package com.kota.TelnetUI;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,6 +60,13 @@ public class TelnetHeaderItemView extends LinearLayout {
     public void setTitle(String aTitle) {
         if (this._title != null) {
             this._title.setText(aTitle);
+            if (aTitle!= null && aTitle.contains("系統精靈送信來了")) {
+                this._title.setTextColor(getContextColor(R.color.white));
+                this._title.setBackgroundColor(getContextColor(R.color.red));
+                ViewGroup.LayoutParams layoutParams = this._title.getLayoutParams();
+                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                this._title.setLayoutParams(layoutParams);
+            }
         }
     }
 

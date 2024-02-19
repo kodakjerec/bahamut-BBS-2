@@ -1,37 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/Article_contentView" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
-        <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ExtToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/change_mode" android:text="@string/change_mode" style="@style/ExtToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/show_link" android:text="@string/open_url" style="@style/ExtToolbarItem"/>
-    </LinearLayout>
-    <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <!-- 文字模式 -->
-        <FrameLayout android:id="@+id/Article_TextContentView" android:layout_width="match_parent" android:layout_height="match_parent">
-            <LinearLayout android:orientation="vertical" android:id="@+id/Article_contentEmptyView" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
-                <LinearLayout android:orientation="vertical" android:background="@color/title_bar_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/loading_" android:singleLine="false" style="@style/TextViewNormal"/>
-                    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-                        <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" style="@style/TextViewSmall"/>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/content_view"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical" android:id="@+id/Article_contentView" android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
+            <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ExtToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/change_mode" android:text="@string/change_mode" style="@style/ExtToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/show_link" android:text="@string/open_url" style="@style/ExtToolbarItem"/>
+        </LinearLayout>
+        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <!-- 文字模式 -->
+            <FrameLayout android:id="@+id/Article_TextContentView" android:layout_width="match_parent" android:layout_height="match_parent">
+                <LinearLayout android:orientation="vertical" android:id="@+id/Article_contentEmptyView" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
+                    <LinearLayout android:orientation="vertical" android:background="@color/title_bar_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
+                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/loading_" android:singleLine="false" style="@style/TextViewNormal"/>
+                        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+                            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" style="@style/TextViewSmall"/>
+                        </LinearLayout>
                     </LinearLayout>
+                    <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading" style="@style/TextViewUltraLarge"/>
                 </LinearLayout>
-                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading" style="@style/TextViewUltraLarge"/>
-            </LinearLayout>
-            <com.kota.ASFramework.UI.ASListView android:id="@+id/Article_contentList" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:listSelector="@android:color/transparent" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
+                <com.kota.ASFramework.UI.ASListView android:id="@+id/Article_contentList" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:listSelector="@android:color/transparent" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
+            </FrameLayout>
+            <!-- telnet模式 -->
+            <com.kota.ASFramework.UI.ASScrollView android:id="@+id/Article_contentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
+                <com.kota.TelnetUI.TelnetView android:id="@+id/Article_contentTelnetView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            </com.kota.ASFramework.UI.ASScrollView>
         </FrameLayout>
-        <!-- telnet模式 -->
-        <com.kota.ASFramework.UI.ASScrollView android:id="@+id/Article_contentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
-            <com.kota.TelnetUI.TelnetView android:id="@+id/Article_contentTelnetView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-        </com.kota.ASFramework.UI.ASScrollView>
-    </FrameLayout>
-    <LinearLayout android:id="@+id/toolbar" style="@style/Toolbar">
-        <Button android:id="@+id/Article_backButton" android:text="@string/reply" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Article_pageUpButton" android:text="@string/prev_article" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Article_pageDownButton" android:text="@string/next_article" style="@style/ToolbarItem"/>
+        <LinearLayout
+            android:id="@+id/toolbar_block"
+            style="@style/Toolbar">
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+    <!-- toolbar 0 1 2 -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/Toolbar"
+        android:layout_alignParentBottom="true"
+        >
+        <Button
+            android:id="@+id/Article_backButton"
+            style="@style/ToolbarItem"
+            android:text="@string/reply" />
+        <View android:id="@+id/toolbar_divider_1" style="@style/ToolbarDivider" />
+        <Button
+            android:id="@+id/Article_pageUpButton"
+            style="@style/ToolbarItem"
+            android:text="@string/prev_article" />
+        <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
+        <Button
+            android:id="@+id/Article_pageDownButton"
+            style="@style/ToolbarItem"
+            android:text="@string/next_article" />
+    </LinearLayout>
+</RelativeLayout>

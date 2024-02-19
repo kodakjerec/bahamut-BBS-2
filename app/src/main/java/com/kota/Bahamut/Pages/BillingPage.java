@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import static com.kota.Bahamut.Service.MyBillingClient.getBillingClient;
 
 import android.annotation.SuppressLint;
@@ -19,6 +20,7 @@ import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.PurchaseHistoryResponseListener;
 import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
@@ -91,31 +93,38 @@ public class BillingPage extends TelnetPage {
                         // process returned productDetailsList
                         for(ProductDetails product: list) {
                             String btnName = product.getProductId().replace("com.kota.billing.","");
-                            Button btn = null;
-                            if (btnName.equals("90")) {
-                                btn = (Button) findViewById(R.id.button_90);
-                                btn.setText(product.getName());
-                            }
-                            if (btn!=null) {
-                                btn.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View view) {
-                                        ArrayList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
+                            new ASRunner() {
+                                @Override
+                                public void run() {
 
-                                        productDetailsParamsList.add(BillingFlowParams.ProductDetailsParams.newBuilder()
-                                                .setProductDetails(product)
-                                                .build());
-
-                                        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                                                .setProductDetailsParamsList(productDetailsParamsList)
-                                                .setIsOfferPersonalized(true)
-                                                .build();
-
-                                        // Launch the billing flow
-                                        BillingResult billingResult1 = billingClient.launchBillingFlow(activity, billingFlowParams);
+                                    Button btn = null;
+                                    if (btnName.equals("90")) {
+                                        btn = (Button) findViewById(R.id.button_90);
+                                        btn.setEnabled(true);
+                                        btn.setText(product.getName());
                                     }
-                                });
-                            }
+                                    if (btn!=null) {
+                                        btn.setOnClickListener(new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View view) {
+                                                ArrayList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
+
+                                                productDetailsParamsList.add(BillingFlowParams.ProductDetailsParams.newBuilder()
+                                                        .setProductDetails(product)
+                                                        .build());
+
+                                                BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                                                        .setProductDetailsParamsList(productDetailsParamsList)
+                                                        .setIsOfferPersonalized(true)
+                                                        .build();
+
+                                                // Launch the billing flow
+                                                BillingResult billingResult1 = billingClient.launchBillingFlow(activity, billingFlowParams);
+                                            }
+                                        });
+                                    }
+                                }
+                            }.runInMainThread();
                         }
                     }
                 });
@@ -131,14 +140,14 @@ public class BillingPage extends TelnetPage {
                     @SuppressLint("SetTextI18n")
                     @Override
                     public void onPurchaseHistoryResponse(@NonNull BillingResult billingResult, @Nullable List<PurchaseHistoryRecord> list) {
+                        // 統計總金額
+                        int totalValue = 0;
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
                             // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                             if (list.toArray().length>0) {
                                 if (!_settings.getPropertiesVIP()) {
                                     _settings.setPropertiesVIP(true);
                                 }
-                                // 統計總金額
-                                int totalValue = 0;
                                 for(PurchaseHistoryRecord purchaseHistoryRecord: list) {
                                     String productName = purchaseHistoryRecord.getProducts().get(0);
                                     if (productName.contains("com.kota.billing.")) {
@@ -148,11 +157,14 @@ public class BillingPage extends TelnetPage {
                                         totalValue += donatePrice * donateQuality;
                                     }
                                 }
-
-                                TelnetTextViewNormal textView = (TelnetTextViewNormal) findViewById(R.id.BillingPage_already_billing_value);
-                                textView.setText(Integer.toString(totalValue));
+                                ASToast.showShortToast(getContextString(R.string.billing_page_result_success));
                             }
+                        } else {
+                            ASToast.showShortToast(getContextString(R.string.billing_page_result_error_check) + billingResult.getResponseCode());
                         }
+
+                        TelnetTextViewNormal textView = (TelnetTextViewNormal) findViewById(R.id.BillingPage_already_billing_value);
+                        textView.setText(Integer.toString(totalValue));
                     }
                 }
         );

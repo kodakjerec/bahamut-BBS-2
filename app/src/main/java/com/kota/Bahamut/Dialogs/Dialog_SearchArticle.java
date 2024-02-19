@@ -6,22 +6,25 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RadioGroup;
+
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
+
+import java.util.Objects;
 import java.util.Vector;
 
 public class Dialog_SearchArticle extends ASDialog implements View.OnClickListener {
-    LinearLayout _author_block = null;
-    EditText _author_label = null;
-    Button _cancel_button = null;
-    EditText _gy_field = null;
-    LinearLayout _header_block = null;
-    LinearLayout _keyword_block = null;
-    EditText _keyword_label = null;
-    Dialog_SearchArticle_Listener _listener = null;
-    LinearLayout _mark_block = null;
-    RadioGroup _mark_radio = null;
-    Button _search_button = null;
+    LinearLayout _author_block;
+    EditText _author_label;
+    Button _cancel_button;
+    EditText _gy_field;
+    LinearLayout _header_block;
+    LinearLayout _keyword_block;
+    EditText _keyword_label;
+    Dialog_SearchArticle_Listener _listener;
+    LinearLayout _mark_block;
+    RadioGroup _mark_radio;
+    Button _search_button;
 
     public String getName() {
         return "BahamutBoardSearchDialog";
@@ -32,44 +35,55 @@ public class Dialog_SearchArticle extends ASDialog implements View.OnClickListen
         setContentView(R.layout.dialog_search_article);
         getWindow().setBackgroundDrawable((Drawable) null);
         setTitle("搜尋文章");
-        this._keyword_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_keyword);
-        this._author_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_Author);
-        this._mark_radio = (RadioGroup) findViewById(R.id.Bahamut_Dialog_Search_mark);
-        this._gy_field = (EditText) findViewById(R.id.gy_number_field);
-        this._search_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Search_Button);
-        this._cancel_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Cancel_Button);
-        this._header_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_headerBlock);
-        this._keyword_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_keywordBlock);
-        this._author_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_AuthorBlock);
-        this._mark_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_markBlock);
-        this._search_button.setOnClickListener(this);
-        this._cancel_button.setOnClickListener(this);
+        _keyword_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_keyword);
+        _author_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_Author);
+        _mark_radio = (RadioGroup) findViewById(R.id.Bahamut_Dialog_Search_mark);
+        _gy_field = (EditText) findViewById(R.id.gy_number_field);
+        _search_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Search_Button);
+        _cancel_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Cancel_Button);
+        _header_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_headerBlock);
+        _keyword_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_keywordBlock);
+        _author_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_AuthorBlock);
+        _mark_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_markBlock);
+        _search_button.setOnClickListener(this);
+        _cancel_button.setOnClickListener(this);
     }
 
     public void onClick(View view) {
-        if (view == this._search_button && this._listener != null) {
+        if (view == _search_button && _listener != null) {
             Vector<String> search_options = new Vector<>();
-            String keyword = this._keyword_label.getText().toString().replace("\n", "");
-            String author = this._author_label.getText().toString().replace("\n", "");
+            String keyword = _keyword_label.getText().toString().replace("\n", "");
+            String author = _author_label.getText().toString().replace("\n", "");
             String mark = "NO";
-            if (this._mark_radio.getCheckedRadioButtonId() == R.id.Bahamut_Dialog_Search_mark_YES) {
+            if (_mark_radio.getCheckedRadioButtonId() == R.id.Bahamut_Dialog_Search_mark_YES) {
                 mark = "YES";
             }
-            String gy = this._gy_field.getText().toString();
+            String gy = _gy_field.getText().toString();
             search_options.add(keyword);
             search_options.add(author);
             search_options.add(mark);
             search_options.add(gy);
-            this._listener.onSearchDialogSearchButtonClickedWithValues(search_options);
+            _listener.onSearchDialogSearchButtonClickedWithValues(search_options);
         }
         dismiss();
+        _listener.onSearchDialogCancelButtonClicked();
     }
 
     public void setListener(Dialog_SearchArticle_Listener listener) {
-        this._listener = listener;
+        _listener = listener;
     }
 
     public void show() {
         super.show();
+    }
+
+    public void editContent(Vector<String> search_options) {
+        setTitle("修改搜尋內容");
+        _search_button.setText("確定");
+        _keyword_label.setText(search_options.get(0));
+        _author_label.setText(search_options.get(1));
+        if (Objects.equals(search_options.get(2), "y"))
+            _mark_radio.check(R.id.Bahamut_Dialog_Search_mark_YES);
+        _gy_field.setText(search_options.get(3));
     }
 }

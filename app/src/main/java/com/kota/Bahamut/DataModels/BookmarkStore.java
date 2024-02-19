@@ -1,25 +1,27 @@
 package com.kota.Bahamut.DataModels;
+/**
+ * 書籤清單的儲存
+ */
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Vector;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class BookmarkStore {
     private final Map<String, BookmarkList> _bookmarks = new HashMap();
-    private Context _context = null;
-    private byte[] _ext_data = new byte[0];
+    private final Context _context;
     private String _file_path = "";
     private final BookmarkList _global_bookmarks = new BookmarkList("");
     private String _owner = "";
@@ -92,9 +94,6 @@ public class BookmarkStore {
         }
     }
 
-    public void notifyDataUpdated() {
-    }
-
     public void store() {
         JSONObject obj;
         System.out.println("save bookmark store to file");
@@ -108,7 +107,7 @@ public class BookmarkStore {
         String save_data;
         System.out.println("load bookmark store from file");
         boolean load_file = false;
-        if (this._file_path == null || this._file_path.length() <= 0) {
+        if (this._file_path == null || this._file_path.length() == 0) {
             System.out.println("bookmark file not exists");
         } else {
             File file = new File(this._file_path);
@@ -147,8 +146,8 @@ public class BookmarkStore {
         for (int i = 0; i < size; i++) {
             addBookmark(new Bookmark(aStream));
         }
-        this._ext_data = new byte[aStream.readInt()];
-        aStream.read(this._ext_data);
+        byte[] _ext_data = new byte[aStream.readInt()];
+        aStream.read(_ext_data);
     }
 
     public void importFromJSON(JSONObject obj) {
@@ -181,9 +180,8 @@ public class BookmarkStore {
             obj.put("version", this._version);
             obj.put("owner", this._owner);
             JSONArray data = new JSONArray();
-            Iterator<Bookmark> it = getTotalBookmarkList().iterator();
-            while (it.hasNext()) {
-                data.put(it.next().exportToJSON());
+            for (Bookmark bookmark : getTotalBookmarkList()) {
+                data.put(bookmark.exportToJSON());
             }
             obj.put("data", data);
         } catch (Exception e) {

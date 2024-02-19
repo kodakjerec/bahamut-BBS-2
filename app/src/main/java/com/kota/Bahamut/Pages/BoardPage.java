@@ -3,7 +3,6 @@ package com.kota.Bahamut.Pages;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -12,21 +11,18 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
-import com.kota.ASFramework.Dialog.ASListDialog;
-import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASListViewExtentOptionalDelegate;
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
@@ -48,6 +44,9 @@ import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BookmarkPage.BoardExtendOptionalPageListener;
+import com.kota.Bahamut.Pages.BookmarkPage.BookmarkManagePage;
+import com.kota.Bahamut.Pages.BookmarkPage.BoardExtendOptionalPageBookmarkItemView;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageHandler;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
@@ -71,55 +70,27 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     protected String _board_manager = null;
     private int _last_list_action = 0;
     private boolean _initialed = false;
-    private boolean _refresh_header_view = false;
+    private boolean _refresh_header_view = false; // 正在更新標題列
+    private boolean blockListEnable = false; // 是否啟用黑名單
+    private boolean _isDrawerOpening = false; // 側邊選單正在開啟中
     private final List<Bookmark> _list = new ArrayList<>();
-    private final View.OnClickListener mOpenBookmarkListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.2
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.onBookmarkButtonClicked();
-        }
+
+    private final View.OnClickListener mPostListener = view -> BoardPage.this.onPostButtonClicked();
+
+    private final View.OnClickListener mFirstPageClicked = view -> BoardPage.this.moveToFirstPosition();
+
+    private final View.OnClickListener mLastPageClicked = view -> {
+        BoardPage.this.setManualLoadPage();
+        BoardPage.this.moveToLastPosition();
     };
-    private final View.OnClickListener mPostListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.5
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.onPostButtonClicked();
-        }
-    };
-    private final View.OnClickListener mSearchByKeywordListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.6
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.onSearchButtonClicked();
-        }
-    };
-    private final View.OnClickListener mSearchByNumberListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.7
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.showSelectArticleDialog();
-        }
-    };
-    private final View.OnClickListener mFirstPageClicked = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.8
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.moveToFirstPosition();
-        }
-    };
-    private final View.OnClickListener mLastPageClicked = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.9
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.setManualLoadPage();
-            BoardPage.this.moveToLastPosition();
-        }
-    };
-    private final View.OnClickListener mMenuButtonListener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.11
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            DrawerLayout drawerLayout = (DrawerLayout) BoardPage.this.findViewById(R.id.drawer_layout);
-            if (drawerLayout != null) {
-                if (drawerLayout.isDrawerOpen(GravityCompat.END)) {
-                    drawerLayout.closeDrawers();
-                } else {
-                    drawerLayout.openDrawer(GravityCompat.END, true);
-                }
+
+    private final View.OnClickListener mMenuButtonListener = view -> {
+        DrawerLayout drawerLayout = (DrawerLayout) BoardPage.this.findViewById(R.id.drawer_layout);
+        if (drawerLayout != null) {
+            if (drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation())) {
+                drawerLayout.closeDrawers();
+            } else {
+                drawerLayout.openDrawer(getDrawerLayoutGravityLocation(), true);
             }
         }
     };
@@ -139,6 +110,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
             return (Bookmark) BoardPage.this._list.get(i);
         }
 
+        // 顯示側邊選單書籤
         @Override // android.widget.Adapter
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
@@ -153,69 +125,63 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     DrawerLayout.DrawerListener _drawer_listener = new DrawerLayout.DrawerListener() {
         @Override
-        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-            Log.i("BahaBBS", "slideOffset:" + slideOffset);
-            BoardPage.this.reloadBlockEnableButton();
-            BoardPage.this.reloadBookmark();
-        }
+        public void onDrawerSlide(@NonNull View drawerView, float slideOffset) { }
 
         @Override
-        public void onDrawerOpened(@NonNull View drawerView) {
-
-        }
+        public void onDrawerOpened(@NonNull View drawerView) { }
 
         @Override
-        public void onDrawerClosed(@NonNull View drawerView) {
-
-        }
+        public void onDrawerClosed(@NonNull View drawerView) { }
 
         @Override
         public void onDrawerStateChanged(int newState) {
+            if (newState == DrawerLayout.STATE_SETTLING) {
+                _isDrawerOpening = true;
+            } else {
+                _isDrawerOpening = false;
+            }
 
+            // 側邊選單未完全開啟 && 正要啟動狀態
+            if ( !isDrawerOpen() && _isDrawerOpening) {
+                BoardPage.this.reloadBlockEnableButton();
+                BoardPage.this.reloadBookmark();
+            }
         }
     };
-    AdapterView.OnItemClickListener _bookmark_listener = new AdapterView.OnItemClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.15
-        @Override // android.widget.AdapterView.OnItemClickListener
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long j) {
-            BoardPage.this.closeDrawer();
-            Bookmark bookmark = (Bookmark) BoardPage.this._list.get(i);
-            BoardPage.this._last_list_action = 1;
-            BoardPage.this.pushCommand(new BahamutCommandSearchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy()));
-        }
+
+    // 點書籤
+    AdapterView.OnItemClickListener _bookmark_listener = (adapterView, view, i, j) -> {
+        BoardPage.this.closeDrawer();
+        Bookmark bookmark = (Bookmark) BoardPage.this._list.get(i);
+        BoardPage.this._last_list_action = 1;
+        BoardPage.this.pushCommand(new BahamutCommandSearchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy()));
     };
-    View.OnClickListener _search_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.16
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.closeDrawer();
-            BoardPage.this.showSearchArticleDialog();
-        }
+
+    // 搜尋文章
+    View.OnClickListener _search_listener = view -> {
+        BoardPage.this.closeDrawer();
+        BoardPage.this.showSearchArticleDialog();
     };
-    View.OnClickListener _select_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.17
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.closeDrawer();
-            BoardPage.this.showSelectArticleDialog();
-        }
+
+    // 選擇文章
+    View.OnClickListener _select_listener = view -> {
+        BoardPage.this.closeDrawer();
+        BoardPage.this.showSelectArticleDialog();
     };
-    View.OnClickListener _enable_block_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.18
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.onChangeBlockStateButtonClicked();
-        }
+
+    // 啟用/停用 黑名單
+    View.OnClickListener _enable_block_listener = view -> BoardPage.this.onChangeBlockStateButtonClicked();
+
+    // 修改黑名單
+    View.OnClickListener _edit_block_listener = view -> {
+        BoardPage.this.closeDrawer();
+        BoardPage.this.onEditBlockListButtonClicked();
     };
-    View.OnClickListener _edit_block_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.19
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.closeDrawer();
-            BoardPage.this.onEditBlockListButtonClicked();
-        }
-    };
-    View.OnClickListener _edit_bookmark_listener = new View.OnClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.20
-        @Override // android.view.View.OnClickListener
-        public void onClick(View view) {
-            BoardPage.this.closeDrawer();
-            BoardPage.this.onBookmarkButtonClicked();
-        }
+
+    // 開啟書籤管理
+    View.OnClickListener _edit_bookmark_listener = view -> {
+        BoardPage.this.closeDrawer();
+        BoardPage.this.onBookmarkButtonClicked();
     };
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
@@ -233,10 +199,6 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         return true;
     }
 
-    protected boolean isBookmarkAvailable() {
-        return true;
-    }
-
     @Override // com.kota.ASFramework.UI.ASListViewExtentOptionalDelegate
     public boolean onASListViewHandleExtentOptional(ASListView aSListView, int i) {
         return false;
@@ -245,74 +207,186 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        this._settings = new UserSettings(getContext());
+        _settings = new UserSettings(getContext());
 
-        ASListView aSListView = (ASListView) findViewById(R.id.BoardPage_ListView);
+        ASListView aSListView = (ASListView) findViewById(R.id.BoardPageListView);
         aSListView.extendOptionalDelegate = this;
-        aSListView.setEmptyView(findViewById(R.id.BoardPage_ListEmptyView));
+        aSListView.setEmptyView(findViewById(R.id.BoardPageListEmptyView));
         setListView(aSListView);
-        findViewById(R.id.BoardPage_PostButton).setOnClickListener(this.mPostListener);
-        findViewById(R.id.BoardPage_FirstPageButton).setOnClickListener(this.mFirstPageClicked);
-        findViewById(R.id.BoardPage_LastestPageButton).setOnClickListener(this.mLastPageClicked);
-        View findViewById = findViewById(R.id.search_article_button);
-        if (findViewById != null) {
-            findViewById.setOnClickListener(this._search_listener);
+        findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
+        findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClicked);
+        findViewById(R.id.BoardPageLastestPageButton).setOnClickListener(mLastPageClicked);
+        View search_article_button = findViewById(R.id.search_article_button);
+        if (search_article_button != null) {
+            search_article_button.setOnClickListener(_search_listener);
         }
-        View findViewById2 = findViewById(R.id.select_article_button);
-        if (findViewById2 != null) {
-            findViewById2.setOnClickListener(this._select_listener);
+        View select_article_button = findViewById(R.id.select_article_button);
+        if (select_article_button != null) {
+            select_article_button.setOnClickListener(_select_listener);
         }
-        View findViewById3 = findViewById(R.id.block_enable_button);
-        if (findViewById3 != null) {
-            findViewById3.setOnClickListener(this._enable_block_listener);
+        View block_enable_button = findViewById(R.id.block_enable_button);
+        if (block_enable_button != null) {
+            block_enable_button.setOnClickListener(_enable_block_listener);
         }
-        View findViewById4 = findViewById(R.id.block_setting_button);
-        if (findViewById4 != null) {
-            findViewById4.setOnClickListener(this._edit_block_listener);
+        View block_setting_button = findViewById(R.id.block_setting_button);
+        if (block_setting_button != null) {
+            block_setting_button.setOnClickListener(_edit_block_listener);
         }
-        View findViewById5 = findViewById(R.id.bookmark_edit_button);
-        if (findViewById5 != null) {
-            findViewById5.setOnClickListener(this._edit_bookmark_listener);
+        View bookmark_edit_button = findViewById(R.id.bookmark_edit_button);
+        if (bookmark_edit_button != null) {
+            bookmark_edit_button.setOnClickListener(_edit_bookmark_listener);
         }
+        // 側邊選單
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            drawerLayout.addDrawerListener(this._drawer_listener);
+            LinearLayout menu_view = (LinearLayout)findViewById(R.id.menu_view);
+            DrawerLayout.LayoutParams layoutParams_drawer = (DrawerLayout.LayoutParams) menu_view.getLayoutParams();
+            layoutParams_drawer.gravity = getDrawerLayoutGravityLocation();
+            menu_view.setLayoutParams(layoutParams_drawer);
+            drawerLayout.addDrawerListener(_drawer_listener);
         }
+        // 側邊選單內的書籤
         ListView listView = (ListView) findViewById(R.id.bookmark_list_view);
         if (listView != null) {
-            listView.setAdapter(this._bookmark_adapter);
-            listView.setOnItemClickListener(this._bookmark_listener);
+            listView.setAdapter(_bookmark_adapter);
+            listView.setOnItemClickListener(_bookmark_listener);
         }
-        ((TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView)).setMenuButton(this.mMenuButtonListener);
+        ((TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView)).setMenuButton(mMenuButtonListener);
         refreshHeaderView();
 
-        // 自動登入洽特
-        if (this._settings.isUnderAutoToChat()) {
-            // 最後頁
-            findViewById(R.id.BoardPage_LastestPageButton).performClick();
-            // 任務完成
-            // 關閉"正在自動登入"
-            this._settings.setIsUnderAutoToChat(false);
-        }
+        blockListEnable = _settings.getPropertiesBlockListEnable();
 
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
         // keyword: clearFocusInternal
-        LinearLayout linearLayout = (LinearLayout) findViewById(R.id.content_view);
-        if (linearLayout != null)
-            linearLayout.requestFocus();
+        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_view);
+        if (relativeLayout != null)
+            relativeLayout.requestFocus();
+
+        // 工具列位置
+        changeToolbarLocation();
+
+        // 自動登入洽特
+        if (_settings.isUnderAutoToChat()) {
+            // 最後頁
+            findViewById(R.id.BoardPageLastestPageButton).performClick();
+            // 任務完成
+            // 關閉"正在自動登入"
+            _settings.setIsUnderAutoToChat(false);
+
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    ASProcessingDialog.hideProcessingDialog();
+                }
+            };
+            timer.schedule(task, 2000);
+        }
+    }
+
+    // 側邊選單的位置
+    private int getDrawerLayoutGravityLocation() {
+        int location = _settings.getPropertiesDrawerLocation();
+        if (location == 1) {
+            return GravityCompat.START;
+        }
+        return GravityCompat.END;
+    }
+    // 變更工具列位置
+    private void changeToolbarLocation() {
+        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
+        LinearLayout toolbarBlock = (LinearLayout)findViewById(R.id.toolbar_block);
+        final float scale = getResource().getDisplayMetrics().density;
+        View toolbar_divider_1 = (View) findViewById(R.id.toolbar_divider_1);
+        View toolbar_divider_2 = (View) findViewById(R.id.toolbar_divider_2);
+        ViewGroup.LayoutParams layoutParams1 = toolbar_divider_1.getLayoutParams();
+        Button btnBoardPageFirstPageButton = (Button) findViewById(R.id.BoardPageFirstPageButton);
+        Button btnBoardPageLatestPageButton = (Button) findViewById(R.id.BoardPageLastestPageButton);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
+        int choice_toolbar_location = _settings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-直立靠左 4-直立靠右
+        switch (choice_toolbar_location) {
+            case 1:
+                // 底部-最左邊
+                layoutParams.width = (int)(230 * scale);
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.addRule(RelativeLayout.ALIGN_START);
+                break;
+            case 2:
+                // 底部-最右邊
+                layoutParams.width = (int)(230 * scale);
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                break;
+            case 3:
+                // 直立-最左邊
+                // 變成直立
+                layoutParams.width = (int)(70 * scale);
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+                toolbar.setOrientation(LinearLayout.VERTICAL);
+                // 去除底部卡位用view
+                toolbarBlock.setVisibility(View.GONE);
+                // 分隔線
+                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams1.height = (int)(1 * scale);
+                toolbar_divider_1.setLayoutParams(layoutParams1);
+                toolbar_divider_2.setLayoutParams(layoutParams1);
+                // 按鈕
+                btnBoardPageFirstPageButton.setText("最前");
+                btnBoardPageLatestPageButton.setText("最後");
+                break;
+            case 4:
+                // 直立-最右邊
+                // 變成直立
+                layoutParams.width = (int)(70 * scale);
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                toolbar.setOrientation(LinearLayout.VERTICAL);
+                // 去除底部卡位用view
+                toolbarBlock.setVisibility(View.GONE);
+                // 分隔線
+                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams1.height = (int)(1 * scale);
+                toolbar_divider_1.setLayoutParams(layoutParams1);
+                toolbar_divider_2.setLayoutParams(layoutParams1);
+                // 按鈕
+                btnBoardPageFirstPageButton.setText("最前");
+                btnBoardPageLatestPageButton.setText("最後");
+                break;
+            default:
+                // 底部-中間
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                break;
+        }
+
+        // 反轉按鈕順序
+        int choice_toolbar_order = _settings.getPropertiesToolbarOrder();
+        if (choice_toolbar_order == 1) {
+            ArrayList<View> alViews = new ArrayList<>();
+            for (int i = toolbar.getChildCount() - 1; i >= 0; i--) {
+                View view = toolbar.getChildAt(i);
+                alViews.add(view);
+            }
+            toolbar.removeAllViews();
+            for (int j = 0; j < alViews.size(); j++) {
+                toolbar.addView(alViews.get(j));
+            }
+        }
+        toolbar.setLayoutParams(layoutParams);
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     protected boolean onMenuButtonClicked() {
-        this.mMenuButtonListener.onClick(null);
+        mMenuButtonListener.onClick(null);
         return true;
     }
 
     private void refreshHeaderView() {
-        String board_title = this._board_title;
+        String board_title = _board_title;
         board_title = (board_title == null || board_title.length() == 0) ? "讀取中" : board_title;
-        String board_manager = this._board_manager;
+        String board_manager = _board_manager;
         board_manager = (board_manager == null || board_manager.length() == 0) ? "讀取中" : board_manager;
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
@@ -328,16 +402,16 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     @Override // com.kota.Bahamut.ListPage.TelnetListPage
     public TelnetListPageBlock loadPage() {
         BoardPageBlock load = BoardPageHandler.getInstance().load();
-        if (!this._initialed) {
+        if (!_initialed) {
             clear();
             if (load.Type == 1) {
                 pushRefreshCommand(0);
             }
-            this._board_manager = load.BoardManager;
-            this._board_title = load.BoardTitle;
+            _board_manager = load.BoardManager;
+            _board_title = load.BoardTitle;
             setListName(load.BoardName);
-            this._refresh_header_view = true;
-            this._initialed = true;
+            _refresh_header_view = true;
+            _initialed = true;
         }
         return load;
     }
@@ -352,28 +426,20 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         return false;
     }
 
-    public void setBoardTitle(String str) {
-        this._board_title = str;
-    }
-
-    public void setBoardManager(String str) {
-        this._board_manager = str;
-    }
-
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        if (this._refresh_header_view) {
+        if (_refresh_header_view) {
             refreshHeaderView();
-            this._refresh_header_view = false;
+            _refresh_header_view = false;
         }
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     protected boolean onBackPressed() {
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.END)) {
-            drawerLayout.closeDrawer(GravityCompat.END);
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation())) {
+            drawerLayout.closeDrawer(getDrawerLayoutGravityLocation());
             return true;
         }
         clear();
@@ -387,20 +453,6 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     protected boolean onListViewItemLongClicked(View view, int i) {
         onListArticle(i + 1);
         return true;
-    }
-
-    public void onBlockButtonClicked(final String str) {
-        ASAlertDialog title = ASAlertDialog.createDialog().setTitle("加入黑名單");
-        title.setMessage("是否要將\"" + str + "\"加入黑名單?").addButton("取消").addButton("加入").setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.Pages.BoardPage.1
-            @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aSAlertDialog, int i) {
-                if (i == 1) {
-                    BoardPage.this._settings.addBlockName(str);
-                    BoardPage.this._settings.notifyDataUpdated();
-                    BoardPage.this.reloadListView();
-                }
-            }
-        }).scheduleDismissOnPageDisappear(this).show();
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
@@ -428,7 +480,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     // 搜尋文章
     private void searchArticle(String str, String str2, String str3, String str4) {
-        this._last_list_action = 1;
+        _last_list_action = 1;
         BoardSearchPage board_Search_Page = PageContainer.getInstance().getBoardSearchPage();
         board_Search_Page.clear();
         getNavigationController().pushViewController(board_Search_Page);
@@ -459,42 +511,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void onBookmarkButtonClicked() {
-        getNavigationController().pushViewController(new BoardExtendOptionalPage(getListName(), this));
-    }
-
-    void onMenuClicked() {
-        ASListDialog.createDialog().addItem(isBookmarkAvailable() ? "開啟書籤" : null).addItem("搜尋文章").addItem("選擇文章").addItem(this._settings.getPropertiesBlockListEnable() ? "停用黑名單" : "啟用黑名單").addItem("編輯黑名單").setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.BoardPage.3
-            @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
-            public boolean onListDialogItemLongClicked(ASListDialog aSListDialog, int i, String str) {
-                return false;
-            }
-
-            @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
-            public void onListDialogItemClicked(ASListDialog aSListDialog, int i, String str) {
-                switch (i) {
-                    case 0:
-                        BoardPage.this.onBookmarkButtonClicked();
-                        return;
-                    case 1:
-                        BoardPage.this.showSearchArticleDialog();
-                        return;
-                    case 2:
-                        BoardPage.this.showSelectArticleDialog();
-                        return;
-                    case 3:
-                        BoardPage.this.onChangeBlockStateButtonClicked();
-                        return;
-                    case 4:
-                        BoardPage.this.onEditBlockListButtonClicked();
-                        return;
-                    default:
-                }
-            }
-        }).scheduleDismissOnPageDisappear(this).show();
+        getNavigationController().pushViewController(new BookmarkManagePage(getListName(), this));
     }
 
     private void onListArticle(int i) {
-        this._last_list_action = 0;
+        _last_list_action = 0;
         BoardLinkPage board_Linked_Title_Page = PageContainer.getInstance().getBoardLinkedTitlePage();
         board_Linked_Title_Page.clear();
         getNavigationController().pushViewController(board_Linked_Title_Page);
@@ -506,25 +527,10 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         pushCommand(new BahamutCommandListArticle(i));
     }
 
-    protected void onDeleteArticle(final int i) {
-        ASAlertDialog.createDialog().setTitle("刪除").setMessage("是否確定要刪除此文章?").addButton("取消").addButton("刪除").setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.Pages.BoardPage.4
-            @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aSAlertDialog, int i2) {
-                switch (i2) {
-                    case 0:
-                    default:
-                        return;
-                    case 1:
-                        BoardPage.this.pushCommand(new BahamutCommandDeleteArticle(i));
-                }
-            }
-        }).scheduleDismissOnPageDisappear(this).show();
-    }
-
     @Override // com.kota.ASFramework.PageController.ASViewController
     public boolean onReceivedGestureRight() {
-            if (this._settings.getPropertiesGetsureOnBoardEnable()) {
-                if (isDrawerOpen()) {
+            if (_settings.getPropertiesGestureOnBoardEnable()) {
+                if (isDrawerOpen() || _isDrawerOpening) {
                     return false;
                 }
                 onBackPressed();
@@ -545,22 +551,20 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void goodArticle(final int i) {
+        // from class: com.kota.Bahamut.Pages.BoardPage.10
+// com.kota.ASFramework.Dialog.ASAlertDialogListener
         ASAlertDialog.createDialog()
-                .setTitle("推薦")
-                .setMessage("是否要推薦此文章?")
-                .addButton("取消")
-                .addButton("推薦")
-                .setListener(new ASAlertDialogListener() {
-                    // from class: com.kota.Bahamut.Pages.BoardPage.10
-            @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
-            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aSAlertDialog, int i2) {
-                switch (i2) {
-                    case 0:
-                    default:
-                        return;
-                    case 1:
-                        BoardPage.this.pushCommand(new BahamutCommandGoodArticle(i));
-                }
+                .setTitle(getContextString(R.string.do_gy))
+                .setMessage(getContextString(R.string.gy_this_article))
+                .addButton(getContextString(R.string.cancel))
+                .addButton(getContextString(R.string.do_gy))
+                .setListener((aSAlertDialog, i2) -> {
+            switch (i2) {
+                case 0:
+                default:
+                    return;
+                case 1:
+                    BoardPage.this.pushCommand(new BahamutCommandGoodArticle(i));
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -588,22 +592,23 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     @Override // com.kota.Bahamut.ListPage.TelnetListPage
     public boolean isItemBlocked(TelnetListPageItem telnetListPageItem) {
         if (telnetListPageItem != null) {
-            return this._settings.getPropertiesBlockListEnable() && this._settings.isBlockListContains(((BoardPageItem) telnetListPageItem).Author);
+            return blockListEnable && _settings.isBlockListContains(((BoardPageItem) telnetListPageItem).Author);
         }
         return false;
     }
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage
     public boolean isItemBlockEnable() {
-        return this._settings.getPropertiesBlockListEnable();
+        return blockListEnable;
     }
 
     public int getLastListAction() {
-        return this._last_list_action;
+        return _last_list_action;
     }
 
     private void onChangeBlockStateButtonClicked() {
-        this._settings.setPropertiesBlockListEnable(!this._settings.getPropertiesBlockListEnable());
+        _settings.setPropertiesBlockListEnable(!blockListEnable);
+        blockListEnable = _settings.getPropertiesBlockListEnable();
         reloadBlockEnableButton();
         reloadListView();
     }
@@ -625,13 +630,13 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     public void prepareInitial() {
-        this._initialed = false;
+        _initialed = false;
     }
 
-    @Override // com.kota.Bahamut.Pages.BoardExtendOptionalPageListener
+    @Override // com.kota.Bahamut.BookmarkPage.BoardExtendOptionalPageListener
     public void onBoardExtendOptionalPageDidSelectBookmark(Bookmark bookmark) {
         if (bookmark != null) {
-            this._last_list_action = 1;
+            _last_list_action = 1;
             pushCommand(new BahamutCommandSearchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy()));
         }
     }
@@ -646,12 +651,12 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         }
         if (view == null) {
             view = new BoardPageItemView(getContext());
-            view.setLayoutParams(new AbsListView.LayoutParams(-1, -2));
+            view.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
         BoardPageItemView boardPageItemView = (BoardPageItemView) view;
         boardPageItemView.setItem(boardPageItem);
         boardPageItemView.setNumber(i2);
-        if (boardPageItem != null && this._settings.getPropertiesBlockListEnable() && this._settings.isBlockListContains(boardPageItem.Author)) {
+        if (boardPageItem != null && blockListEnable && _settings.isBlockListContains(boardPageItem.Author)) {
             boardPageItemView.setVisible(false);
         } else {
             boardPageItemView.setVisible(true);
@@ -680,6 +685,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     @Override // com.kota.Bahamut.Pages.PostArticlePage_Listener
     public void onPostDialogSendButtonClicked(PostArticlePage postArticlePage, String str, String str2, String str3, String str4, String str5, Boolean boolean6) {
         pushCommand(new BahamutCommandPostArticle(this, str, str2, str3, str4, str5, boolean6));
+        // 回應到作者信箱
+        if (str3!= null && str3.equals("M")) {
+            return;
+        }
+        // 發文中等待視窗
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.board_page_post_waiting_message_1));
 
         timer = new Timer();
@@ -709,8 +719,10 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                 page.recover = true;
             }
         }.runInMainThread();
-        if (timer!=null)
+        if (timer!=null) {
             timer.cancel();
+            timer = null;
+        }
         ASProcessingDialog.hideProcessingDialog();
     }
     // 完成發文
@@ -722,14 +734,16 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                 page.closeArticle();
             }
         }.runInMainThread();
-        if (timer!=null)
+        if (timer!=null) {
             timer.cancel();
+            timer = null;
+        }
         ASProcessingDialog.hideProcessingDialog();
     }
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public void onPageDidAppear() {
         super.onPageDidAppear();
-        this._bookmark_adapter.notifyDataSetChanged();
+        _bookmark_adapter.notifyDataSetChanged();
     }
 
     private void reloadBookmark() {
@@ -738,9 +752,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         if (context == null) {
             return;
         }
-        new BookmarkStore(context).getBookmarkList(listName).loadTitleList(this._list);
+        new BookmarkStore(context).getBookmarkList(listName).loadTitleList(_list);
         if (isPageAppeared()) {
-            this._bookmark_adapter.notifyDataSetChanged();
+            _bookmark_adapter.notifyDataSetChanged();
         }
     }
 
@@ -754,19 +768,25 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     void reloadBlockEnableButton() {
         Button button = (Button) findViewById(R.id.block_enable_button);
         if (button != null) {
-            if (this._settings.getPropertiesBlockListEnable()) {
-                button.setText(R.string.Drawer_button_text_enable);
+            if (blockListEnable) {
+                button.setText(R.string.drawer_button_text_enable);
                 return;
             }
-            button.setText(R.string.Drawer_button_text_disable);
+            button.setText(R.string.drawer_button_text_disable);
         }
     }
 
+    // 側邊選單已開啟 或 正在開啟中
     boolean isDrawerOpen() {
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            return drawerLayout.isDrawerOpen(GravityCompat.END);
+            return drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation());
         }
         return false;
+    }
+
+    @Override
+    public void onSearchDialogCancelButtonClicked() {
+
     }
 }

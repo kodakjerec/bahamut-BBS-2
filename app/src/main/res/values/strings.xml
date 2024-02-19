@@ -2,6 +2,7 @@
     <string name="app_name">BahaBBS</string>
     <string name="hello_world">Hello world!!</string>
     <string name="account">帳號</string>
+    <string name="_back">返回</string>
     <string name="account_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="add">新增</string>
     <string name="arrow_down">▼</string>
@@ -9,7 +10,7 @@
     <string name="arrow_up">▲</string>
     <string name="article_top_bottom_function_notificaiton">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
     <string name="author">作者</string>
-    <string name="author_">作者 :</string>
+    <string name="author_">作者：</string>
     <string name="block_list_setting">黑名單設定</string>
     <string name="bookmark">書籤</string>
     <string name="cancel">取消</string>
@@ -20,6 +21,10 @@
     <string name="del">DEL</string>
     <string name="delete">刪除</string>
     <string name="do_gy">推薦</string>
+    <string name="do_gy_">推薦：</string>
+    <string name="gy_this_article">是否要推薦此文章？</string>
+    <string name="del_this_article">是否確定要刪除此文章？</string>
+    <string name="del_this_mail">是否確定要刪除此信件？</string>
     <string name="exit">離開</string>
     <string name="face">表情</string>
     <string name="file">檔案</string>
@@ -27,14 +32,14 @@
     <string name="folder_boards">佈告討論區</string>
     <string name="folder_class">分組討論區</string>
     <string name="folder_favorite">我的最愛</string>
-    <string name="gy_">GY :</string>
+    <string name="gy_">GY：</string>
     <string name="gy_minimum">GY值下限：</string>
-    <string name="input_board_name">請輸入看板名稱:</string>
+    <string name="input_board_name">請輸入看板名稱：</string>
     <string name="input_content_here">請在此輸入內文</string>
     <string name="input_receiver_here">請在此輸入收件人ID</string>
     <string name="input_title_here">請在此輸入標題</string>
-    <string name="is_post_article">是否確定要張貼此文章?</string>
-    <string name="is_post_article_reply">回應至:</string>
+    <string name="is_post_article">是否確定要張貼此文章？</string>
+    <string name="is_post_article_reply">回應至：</string>
     <string name="keyword">關鍵字</string>
     <string name="last_page">最後頁</string>
     <string name="limit">限定</string>
@@ -45,9 +50,9 @@
     <string name="logout">登出</string>
     <string name="mailbox">信箱</string>
     <string name="mark_n">不限定</string>
-    <string name="mark_only">限定有m標記的文章?</string>
+    <string name="mark_only">限定有m標記的文章？</string>
     <string name="mark_y">限定</string>
-    <string name="marked_unly">限定有m標記的文章?</string>
+    <string name="marked_unly">限定有m標記的文章？</string>
     <string name="next_article">下一篇</string>
     <string name="notices">注意事項</string>
     <string name="number_0">0</string>
@@ -84,36 +89,32 @@
     <string name="search_menu_title">Search</string>
     <string name="select">選擇</string>
     <string name="select_article">選擇文章</string>
-    <string name="select_sign">選擇簽名檔:</string>
-    <string name="select_sign_msg">要使用的簽名檔(0=不加):</string>
+    <string name="select_sign">選擇簽名檔：</string>
+    <string name="select_sign_msg">要使用的簽名檔(0=不加)：</string>
     <string name="send">送出</string>
     <string name="setting">設定</string>
     <string name="start_msg_1">BahaBBS是一個巴哈姆特電玩資訊站BBS討論區的手機客戶端軟體，使用時需要透過網路傳送資料，使用時請確認您的網路連線處於可連線之狀態。\n</string>
-    <string name="start_msg_2">準備好成為勇者了嗎?</string>
+    <string name="start_msg_2">準備好成為勇者了嗎？</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="switch_connect_recovery">開啟自動連線恢復</string>
     <string name="switch_on_block_list">開啟黑名單功能</string>
     <string name="symbol">符號</string>
     <string name="title">標題</string>
     <string name="title_">標題：</string>
-    <string name="uninput">未輸入</string>
-    <string name="unlimit">不限定</string>
+    <string name="un_input">未輸入</string>
+    <string name="un_limit">不限定</string>
+    <string name="no_assign">未指定</string>
     <string name="word_m">M</string>
     <string name="word_r">R</string>
     <string name="write_mail">寫信</string>
     <string name="zero_word" />
-    <string name="title_activity_main2">Main2Activity</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
     <string name="board_name">看板名稱</string>
     <string name="GY_hint">GY</string>
     <string name="author_hint">作者(第一個字打*表模糊搜尋)</string>
     <string name="keyword_hint">請輸入關鍵字</string>
     <string name="dialog_select_sign_text">0</string>
-    <string name="system_setting_page_keep_wifi_on_sleep">防止Wifi因為待機而中斷</string>
+    <string name="system_setting_page_keep_wifi_on_sleep">防止Wifi因為待機中斷</string>
+    <string name="system_setting_page_keep_wake">保持螢幕開啟</string>
     <string name="system_setting_page_enable_article_move">使用文章首篇/末篇功能</string>
     <string name="system_setting_page_enable_page_animation">使用換頁動畫</string>
     <string name="system_setting_page_screen_orientation">螢幕方向</string>
@@ -125,40 +126,76 @@
         <item>@string/system_setting_page_screen_orientation_1</item>
         <item>@string/system_setting_page_screen_orientation_2</item>
     </string-array>
-    <string name="system_setting_page_enable_gesture_on_board">使用手勢在看板/文章</string>
+    <string name="system_setting_page_toolbar_location">工具列位置</string>
+    <string name="system_setting_page_toolbar_location_0">正下方</string>
+    <string name="system_setting_page_toolbar_location_1">下方靠左</string>
+    <string name="system_setting_page_toolbar_location_2">下方靠右</string>
+    <string name="system_setting_page_toolbar_location_3">直立靠左</string>
+    <string name="system_setting_page_toolbar_location_4">直立靠右</string>
+    <string-array name="system_setting_page_toolbar_location_items">
+        <item>@string/system_setting_page_toolbar_location_0</item>
+        <item>@string/system_setting_page_toolbar_location_1</item>
+        <item>@string/system_setting_page_toolbar_location_2</item>
+        <item>@string/system_setting_page_toolbar_location_3</item>
+        <item>@string/system_setting_page_toolbar_location_4</item>
+    </string-array>
+    <string name="system_setting_page_enable_gesture_on_board">使用手勢</string>
+    <string name="system_setting_page_drawer_location">側邊選單位置</string>
+    <string name="system_setting_page_drawer_location_0">右</string>
+    <string name="system_setting_page_drawer_location_1">左</string>
+    <string-array name="system_setting_page_drawer_location_items">
+        <item>@string/system_setting_page_drawer_location_0</item>
+        <item>@string/system_setting_page_drawer_location_1</item>
+    </string-array>
+    <string name="system_setting_page_toolbar_order">工具列順序</string>
+    <string name="system_setting_page_toolbar_order_0">發表 最前 最後</string>
+    <string name="system_setting_page_toolbar_order_1">最後 最前 發表</string>
+    <string-array name="system_setting_page_toolbar_order_items">
+        <item>@string/system_setting_page_toolbar_order_0</item>
+        <item>@string/system_setting_page_toolbar_order_1</item>
+    </string-array>
     <string name="system_setting_page_enable_auto_to_chat">登入自動進入洽特</string>
-    <string name="SystemSetting_goBillingPage">贊助開發者</string>
-    <string name="BillingPage_note">
+    <string name="is_under_auto_logging_chat">自動進入洽特中\n請稍後</string>
+    <string name="system_setting_page_goBillingPage">贊助開發者</string>
+    <string name="billing_page_note">
         開發者需要鼓勵，才能持續維護。\n
         付費版獨享功能：\n
-        ． 滑動手勢在看板和閱讀文章\n
         ． 自動登入洽特\n
+        ． 滑動手勢關閉(看板和閱讀文章)\n
+        ． 工具列左移/右移/直立(看板和閱讀文章)\n
+        ． 側邊選單位置(看板)\n
+        ． 書籤可排序、修改\n
         (持續增加中)
 <!--        以下努力中：\n-->
-<!--        ． 看板下方工具列左移/右移/直立\n-->
 <!--        ． 內文顯示圖片\n-->
 <!--        ． 自定義介面配置\n-->
 <!--        ． 備份書籤/黑名單\n-->
     </string>
-    <string name="BillingPage_note2">贊助一次即有付費版功能\n可重複贊助，感謝您🙏\n</string>
-    <string name="BillingPage_already_billing_text">已贊助</string>
-    <string name="BillingPage_Button_90">$90</string>
-    <string name="BillingPage_Button_checkPurchaseQuery">檢查已購買權限</string>
-    <string name="BillingPage_Result_Success">感謝您的贊助</string>
-    <string name="BillingPage_Result_Cancel">使用者取消購買</string>
-    <string name="BillingPage_Result_Error">購買發生錯誤</string>
-    <string name="No_Use">No use</string>
-    <string name="Drawer_button_text_enable">啟用</string>
-    <string name="Drawer_button_text_disable">停用</string>
+    <string name="billing_page_note2">贊助一次即有付費版功能\n可重複贊助，感謝您🙏\n</string>
+    <string name="billing_page_already_billing_text">已贊助</string>
+    <string name="billing_page_button_90">贊助?_?</string>
+    <string name="billing_page_button_check_purchase_query">檢查已購買權限</string>
+    <string name="billing_page_result_success">感謝您的贊助</string>
+    <string name="billing_page_result_cancel">使用者取消購買</string>
+    <string name="billing_page_result_error">購買發生錯誤</string>
+    <string name="billing_page_result_error_check">檢查購買權限發生錯誤，錯誤碼：</string>
+    <string name="no_use">No use</string>
+    <string name="drawer_button_text_enable">啟用</string>
+    <string name="drawer_button_text_disable">停用</string>
     <string name="StartPage_open_account">第一次登入請先至\n https://user.gamer.com.tw/openBBS.php \n啟用BBS權限 !</string>
-    <string name="BillingPage_promo_code">優惠碼</string>
     <string name="system_setting_page_checkbox_blocklist_hint">核取方塊, 啟動或關閉黑名單</string>
     <string name="system_setting_page_checkbox_animation_hint">核取方塊, 啟動或關閉換頁動畫</string>
     <string name="system_setting_page_checkbox_article_move_hint">核取方塊, 啟動或關閉迅速跳到首頁最後頁</string>
     <string name="system_setting_page_screen_orientation_hint">下拉選單, 切換螢幕方向</string>
     <string name="system_setting_page_checkbox_gesture_hint">核取方塊, 啟動或關閉滑動手勢在看板和閱讀文章</string>
     <string name="system_setting_page_checkbox_auto_chat_hint">核取方塊, 啟動或關閉自動登入洽特</string>
+    <string name="system_setting_page_ignore_battery_optimizations">不受電池最佳化限制</string>
     <string name="board_page_post_waiting_message_1">發文中</string>
     <string name="board_page_post_waiting_message_2">發文中請稍後</string>
     <string name="board_page_post_waiting_message_3">本站禁止連續快速發文\n如有異常請重新連線</string>
+    <string name="system_setting_page_chapter_blocklist">黑名單</string>
+    <string name="system_setting_page_chapter_board_article">看板/文章</string>
+    <string name="system_setting_page_chapter_preference">偏好設定</string>
+    <string name="system_setting_page_chapter_donation">贊助</string>
+    <string name="vip_only_message">VIP獨享功能:)</string>
 </resources>

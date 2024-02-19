@@ -38,9 +38,9 @@ public final class MyBillingClient {
                     handlePurchase(purchase);
                 }
             } else if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.USER_CANCELED) {
-                ASToast.showShortToast(myContext.getString(R.string.BillingPage_Result_Cancel));
+                ASToast.showShortToast(myContext.getString(R.string.billing_page_result_cancel));
             } else {
-                ASToast.showShortToast(myContext.getString(R.string.BillingPage_Result_Error));
+                ASToast.showShortToast(myContext.getString(R.string.billing_page_result_error));
             }
         }
     };
@@ -76,7 +76,7 @@ public final class MyBillingClient {
                     if (!_settings.getPropertiesVIP()) {
                         _settings.setPropertiesVIP(true);
                     }
-                    ASToast.showShortToast(myContext.getString(R.string.BillingPage_Result_Success));
+                    ASToast.showShortToast(myContext.getString(R.string.billing_page_result_success));
                 }
             }
         };

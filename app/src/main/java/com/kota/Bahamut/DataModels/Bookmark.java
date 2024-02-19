@@ -1,4 +1,10 @@
 package com.kota.Bahamut.DataModels;
+/**
+ * 基本的書籤元件
+ */
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
+import com.kota.Bahamut.R;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -156,19 +162,19 @@ public class Bookmark {
     public String generateTitle() {
         String title = "";
         if (this._keyword.trim().length() > 0) {
-            title = "標題:" + this._keyword;
+            title = getContextString(R.string.title_) + this._keyword;
         }
         if (title.length() == 0 && this._author.trim().length() > 0) {
-            title = "作者:" + this._author;
+            title = getContextString(R.string.author_) + this._author;
         }
         if (title.length() == 0 && this._gy.trim().length() > 0) {
-            title = "推薦:" + this._gy;
+            title = getContextString(R.string.do_gy_) + this._gy;
         }
         if (this._mark.equals("y")) {
             title = "M " + title;
         }
         if (title.length() == 0) {
-            return "未指定";
+            return getContextString(R.string.no_assign);
         }
         return title;
     }

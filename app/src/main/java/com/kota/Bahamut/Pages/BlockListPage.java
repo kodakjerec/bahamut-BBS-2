@@ -23,8 +23,9 @@ public class BlockListPage extends TelnetPage {
             BlockListPage.this.reload();
         }
     };
-    /* access modifiers changed from: private */
-    public Vector<String> _block_list = null;
+
+    private Vector<String> _block_list = null;
+    // 刪除黑名單
     BlockListPage_ItemView_Listener _block_listener = aItemView -> {
         int deleted_index = aItemView.index;
         Vector<String> new_list = new Vector<>(BlockListPage.this._block_list);
@@ -117,8 +118,7 @@ public class BlockListPage extends TelnetPage {
         super.onPageDidDisappear();
     }
 
-    /* access modifiers changed from: private */
-    public void reload() {
+    private void reload() {
         this._block_list = this._settings.getBlockList();
         this._list_adapter.notifyDataSetChanged();
     }

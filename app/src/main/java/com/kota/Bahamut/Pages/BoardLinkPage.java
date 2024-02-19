@@ -32,14 +32,12 @@ public class BoardLinkPage extends BoardPage {
         }
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onMenuButtonClicked() {
+    protected boolean onMenuButtonClicked() {
         showSelectArticleDialog();
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onListViewItemLongClicked(View itemView, int index) {
+    protected boolean onListViewItemLongClicked(View itemView, int index) {
         return false;
     }
 
@@ -51,8 +49,7 @@ public class BoardLinkPage extends BoardPage {
         return aName + "[Board][TitleLinked]";
     }
 
-    /* access modifiers changed from: protected */
-    public void onPostButtonClicked() {
+    protected void onPostButtonClicked() {
         ASAlertDialog.createDialog().setTitle("加入書籤").setMessage("是否要將此標題加入書籤?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
             if (index == 1) {
                 BoardPageItem item = null;
@@ -73,8 +70,7 @@ public class BoardLinkPage extends BoardPage {
         }).scheduleDismissOnPageDisappear(this).show();
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    protected boolean onBackPressed() {
         clear();
         getNavigationController().popViewController();
         TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
@@ -82,8 +78,7 @@ public class BoardLinkPage extends BoardPage {
         return true;
     }
 
-    /* access modifiers changed from: protected */
-    public boolean isBookmarkAvailable() {
+    protected boolean isBookmarkAvailable() {
         return false;
     }
 }

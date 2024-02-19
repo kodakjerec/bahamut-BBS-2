@@ -1,5 +1,6 @@
 package com.kota.ASFramework.PageController;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -7,6 +8,7 @@ import android.net.NetworkCapabilities;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.PowerManager;
+import android.view.WindowManager;
 
 public class ASDeviceController {
   private static final String wakeLockKey = "myapp:wakeLockKey";
@@ -15,22 +17,27 @@ public class ASDeviceController {
   
   private final Context _context;
   
-  private boolean _wifi_locked = true;
+  private boolean _wifi_locked = false;
+  private boolean _wake_locked = true; // 讓CPU保持開啟, 目前不需要作用
   
   private final PowerManager.WakeLock mWakeLock;
   
   private final WifiManager.WifiLock mWifiLock;
   
   public ASDeviceController(Context paramContext) {
-    this._context = paramContext;
-    this.mWakeLock = ((PowerManager)paramContext.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockKey);
-    this.mWakeLock.setReferenceCounted(true);
+    _context = paramContext;
+
+    // create wake-lock
+    mWakeLock = ((PowerManager)paramContext.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockKey);
+    mWakeLock.setReferenceCounted(true);
+
+    // create wifi-lock
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      this.mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, wifiLockKey);
+      mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_LOW_LATENCY, wifiLockKey);
     } else {
-      this.mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, wifiLockKey);
+      mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, wifiLockKey);
     }
-    this.mWifiLock.setReferenceCounted(true);
+    mWifiLock.setReferenceCounted(true);
   }
   
   public boolean isNetworkAvailable() {
@@ -44,33 +51,48 @@ public class ASDeviceController {
     }
     return bool;
   }
-  
+
+  public void lockWake() {
+    System.out.println("Lock Wake");
+    ((Activity)_context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+  }
+  public void unlockWake() {
+    ((Activity)_context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+  }
+
   public void lockWifi() {
     System.out.println("Lock Wifi");
-    if (!this._wifi_locked) {
-      this._wifi_locked = true;
-      this.mWakeLock.acquire(10*60*1000L /*10 minutes*/);
-      this.mWifiLock.acquire();
-    } 
+    if (!_wifi_locked) {
+      _wifi_locked = true;
+      mWifiLock.acquire();
+    }
+    if (!_wake_locked) {
+      _wake_locked = true;
+      mWakeLock.acquire(60*1000L /*10 minutes*/);
+    }
   }
   
   public void unlockWifi() {
-    if (this._wifi_locked) {
+    if (_wifi_locked) {
       System.out.println("Unlock Wifi");
       try {
-        if (this.mWifiLock.isHeld())
-          this.mWifiLock.release();
+        if (mWifiLock.isHeld())
+          mWifiLock.release();
       } catch (Exception exception) {
         exception.printStackTrace();
-      } 
+      }
+      _wifi_locked = false;
+    }
+    if (_wake_locked) {
+      System.out.println("Unlock Wake");
       try {
-        if (this.mWakeLock.isHeld())
-          this.mWakeLock.release();
+        if (mWakeLock.isHeld())
+          mWakeLock.release();
       } catch (Exception exception) {
         exception.printStackTrace();
-      } 
-      this._wifi_locked = false;
-    } 
+      }
+      _wake_locked = false;
+    }
   }
 }
 

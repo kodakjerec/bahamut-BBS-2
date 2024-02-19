@@ -1,16 +1,21 @@
 package com.kota.Bahamut.Pages;
 
-import com.kota.TelnetUI.TelnetPage;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.view.View;
+
+import androidx.core.content.pm.PackageInfoCompat;
+
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
-import com.kota.ASFramework.UI.ASToast;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
+import com.kota.TelnetUI.TelnetPage;
+import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
 
-import android.view.View;
-
-public class StartPage extends TelnetPage {
+public class StartPage extends TelnetPage{
     View.OnClickListener _connect_listener = v -> StartPage.this.onConnectButtonClicked();
     View.OnClickListener _exit_listener = v -> StartPage.this.onExitButtonClicked();
 
@@ -26,6 +31,15 @@ public class StartPage extends TelnetPage {
         getNavigationController().setNavigationTitle("勇者入口");
         findViewById(R.id.Start_exitButton).setOnClickListener(this._exit_listener);
         findViewById(R.id.Start_connectButton).setOnClickListener(this._connect_listener);
+        PackageInfo packageInfo;
+        try {
+            packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(),0);
+            int versionCode = (int) PackageInfoCompat.getLongVersionCode(packageInfo);
+            String versionName = packageInfo.versionName;
+            ((TelnetTextViewSmall)findViewById(R.id.version)).setText(versionCode + " - "+versionName );
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void onPageWillAppear() {

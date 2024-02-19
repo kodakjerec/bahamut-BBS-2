@@ -1,5 +1,7 @@
 package com.kota.DataPool;
 
+import android.util.Log;
+
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Stack;
@@ -52,7 +54,8 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
 
     public MutableByteBuffer put(byte data) {
         if (this._is_closed) {
-            throw new IllegalStateException("This buffer has been closed.");
+            Log.e("ERROR","This buffer has been closed.");
+            return this;
         }
         if (!this._writing_buffer.hasRemaining()) {
             this._writing_buffer.flip();
