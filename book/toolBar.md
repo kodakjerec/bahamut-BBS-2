@@ -3,11 +3,12 @@
 * 點按鈕執行對應動作
 * 文章頁面，長按上一篇可跳到最前篇，長按下一篇可跳到最後
 篇  
-* 設定內可切換靠左對齊、置中、靠右對齊  
-```放上工具列圖片，設定工具列```
-# 浮動工具列
-## 操作
-* 按住「發表」或「回覆」可移動，手指起來自動對齊螢幕邊緣
-* 停駐2秒後自動隱藏(設定內，可調整閒置時間與不透明度)
-## 示範影片
-![image](pics/floatingToolBar.gif)
+* 設定內可切換下方靠左、正下方、下方靠右  
+### 設定：正下方工具列
+![image](pics/toolbar_normal.jpg)
+#### 下方靠左
+#### ![image](pics/toolbar_bottom_left.jpg)
+#### 正下方
+#### ![image](pics/toolbar_bottom.jpg)
+#### 下方靠右
+#### ![image](pics/toolbar_bottom_right.jpg)
