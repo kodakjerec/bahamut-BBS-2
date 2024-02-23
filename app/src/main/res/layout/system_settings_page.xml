@@ -53,12 +53,53 @@
             android:layout_height="wrap_content"
             android:id="@+id/SystemSettings_item_toolbar_order">
             <View style="@style/HorizontalDivider"/>
-            <LinearLayout style="@style/SystemSettingsItem">
+            <LinearLayout style="@style/SystemSettingsItem"
+                android:id="@+id/SystemSettings_item_toolbar_order_item_1">
                 <com.kota.TelnetUI.TextView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_toolbar_order"
                     style="@style/SystemSettingsSpinnerText"/>
                 <Spinner
                     android:id="@+id/SystemSettings_toolbar_order_spinner"
+                    style="@style/SystemSettingsSpinnerItem"/>
+            </LinearLayout>
+            <LinearLayout style="@style/SystemSettingsItem"
+                android:id="@+id/SystemSettings_item_toolbar_order_item_2"
+                android:layout_below="@+id/SystemSettings_item_toolbar_order_item_1">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:text="@string/system_setting_page_toolbar_idle"
+                    style="@style/SystemSettingsSpinnerText"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/system_setting_page_toolbar_idle_text"
+                    android:text="@string/zero_word"
+                    style="@style/SystemSettingsSpinnerText"
+                    android:layout_width="50dp"
+                    android:layout_weight="0"/>
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/system_setting_page_toolbar_idle"
+                    android:value="2.0"
+                    android:valueFrom="0.0"
+                    android:valueTo="4.0"
+                    android:stepSize="0.5"
+                    style="@style/SystemSettingsSpinnerItem"/>
+            </LinearLayout>
+            <LinearLayout style="@style/SystemSettingsItem"
+                android:id="@+id/SystemSettings_item_toolbar_order_item_3"
+                android:layout_below="@+id/SystemSettings_item_toolbar_order_item_2">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:text="@string/system_setting_page_toolbar_alpha"
+                    style="@style/SystemSettingsSpinnerText"/>
+                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                    android:id="@+id/system_setting_page_toolbar_alpha_text"
+                    android:text="@string/zero_word"
+                    style="@style/SystemSettingsSpinnerText"
+                    android:layout_width="50dp"
+                    android:layout_weight="0"/>
+                <com.google.android.material.slider.Slider
+                    android:id="@+id/system_setting_page_toolbar_alpha"
+                    android:value="20"
+                    android:valueFrom="0"
+                    android:valueTo="100"
+                    android:stepSize="10"
                     style="@style/SystemSettingsSpinnerItem"/>
             </LinearLayout>
         </RelativeLayout>

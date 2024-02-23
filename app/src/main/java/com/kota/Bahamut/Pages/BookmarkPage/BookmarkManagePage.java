@@ -58,6 +58,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private BookmarkStore store;
     private boolean isUnderRecycleView = false;
     UserSettings _settings;
+    private float scale;
     public int getPageLayout() {
         return R.layout.bookmark_manage_page;
     }
@@ -96,10 +97,10 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                 if (direction == ItemTouchHelper.LEFT) {
                     // 左滑刪除
                     ASAlertDialog.createDialog()
-                            .setTitle("刪除書籤")
-                            .setMessage("是否確定要刪除此書籤\"" + bookmark_index + BookmarkManagePage.this.bookmarkAdapter.getItem(bookmark_index).getTitle() + "\"?")
-                            .addButton("取消")
-                            .addButton("刪除")
+                            .setTitle(getContextString(R.string.delete)+getContextString(R.string.bookmark))
+                            .setMessage(getContextString(R.string.delete_this_bookmark) +"\n\"" + BookmarkManagePage.this.bookmarkAdapter.getItem(bookmark_index).getTitle() + "\"")
+                            .addButton(getContextString(R.string.cancel))
+                            .addButton(getContextString(R.string.delete))
                             .setListener((aDialog, index1) -> {
                                 if (index1 == 1) {
                                     store.getBookmarkList(BookmarkManagePage.this._board_name).removeBookmark(bookmark_index);
@@ -192,6 +193,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         @Override
         public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
             super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            float fontWidth = 18 * scale;
             if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
                 float offset = Math.abs(dX);
                 int right = viewHolder.itemView.getRight();
@@ -201,29 +203,29 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                     // Draw button at the right edge of the item
                     Paint paint = new Paint();
                     paint.setColor(getContextColor(R.color.tab_item_text_color_selected));
-                    paint.setTextSize(40.0f);
+                    paint.setTextSize(fontWidth);
                     // Calculate the top-left corner of the item
                     float x = right - offset;
-                    float y = top+40;
+                    float y = top + fontWidth*2;
 
                     // Draw the text line by line
                     String[] lines = "◀左滑刪除".split("");
                     for (int i = 0; i < lines.length; i++) {
-                        c.drawText(lines[i], x, y + i * (paint.getTextSize()+10), paint);
+                        c.drawText(lines[i], x + i * (paint.getTextSize()+10), y, paint);
                     }
                 } else {
                     // Draw button at the right edge of the item
                     Paint paint = new Paint();
                     paint.setColor(getContextColor(R.color.tab_item_text_color_selected));
-                    paint.setTextSize(40.0f);
+                    paint.setTextSize(fontWidth);
                     // Calculate the top-left corner of the item
-                    float x = offset - left - 40;
-                    float y = top+40;
+                    float x = offset - left - fontWidth;
+                    float y = top + fontWidth*2;
 
                     // Draw the text line by line
                     String[] lines = "▶右滑修改".split("");
                     for (int i = 0; i < lines.length; i++) {
-                        c.drawText(lines[i], x, y + i * (paint.getTextSize()+10), paint);
+                        c.drawText(lines[i], x - i * (paint.getTextSize()+10), y, paint);
                     }
                 }
             }
@@ -260,6 +262,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         this._water_ball_button.setOnClickListener(buttonClickListener);
         this._selected_button = this._bookmark_button;
         this._tab_buttons = new Button[]{this._bookmark_button, this._history_button, this._water_ball_button};
+        scale = getResource().getDisplayMetrics().scaledDensity;
     }
 
     private void reloadList() {
@@ -317,6 +320,8 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         }
     };
 
+    // 書籤管理->按下書籤
+    // 實際動作由看板頁去實作
     @Override
     public void onItemClick(View view, int position) {
         Bookmark bookmark = BookmarkManagePage.this.bookmarkAdapter.getItem(position);
@@ -378,6 +383,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         else
             bookmark.setMark("n");
         bookmark.setGy(vector.get(3));
+        bookmark.setTitle(bookmark.generateTitle());
         store.getBookmarkList(this._board_name).updateBookmark(editBookmarkIndex, bookmark);
         store.store();
         reloadList();

@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
@@ -85,19 +87,19 @@ public class BoardPageItemView extends LinearLayout {
 
     public void setTitle(String title) {
         if (this._title_label != null) {
-            this._title_label.setText(Objects.requireNonNullElse(title, "讀取中..."));
+            this._title_label.setText(Objects.requireNonNullElse(title, getContextString(R.string.loading_)));
         }
     }
 
     public void setAuthor(String author) {
         if (this._author_label != null) {
-            this._author_label.setText(Objects.requireNonNullElse(author, "讀取中"));
+            this._author_label.setText(Objects.requireNonNullElse(author, getContextString(R.string.loading)));
         }
     }
 
     public void setDate(String date) {
         if (this._date_label != null) {
-            this._date_label.setText(Objects.requireNonNullElse(date, "讀取中"));
+            this._date_label.setText(Objects.requireNonNullElse(date, getContextString(R.string.loading)));
         }
     }
 
@@ -108,7 +110,7 @@ public class BoardPageItemView extends LinearLayout {
                 this._number_label.setText(String.format("%1$05d", number));
                 return;
             }
-            this._number_label.setText("讀取中");
+            this._number_label.setText(getContextString(R.string.loading));
         }
     }
 

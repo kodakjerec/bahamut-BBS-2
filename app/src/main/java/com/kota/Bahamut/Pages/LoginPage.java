@@ -11,7 +11,9 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCursor;
@@ -52,7 +54,7 @@ public class LoginPage extends TelnetPage {
     String _username = "";
 
     public int getPageType() {
-        return 1;
+        return BahamutPage.BAHAMUT_LOGIN;
     }
 
     public int getPageLayout() {
@@ -73,7 +75,7 @@ public class LoginPage extends TelnetPage {
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
 
         // 關閉"正在自動登入"
-        _settings.setIsUnderAutoToChat(false);
+        TempSettings.setIsUnderAutoToChat(false);
 
         // check VIP
         if (!_settings.getPropertiesVIP()) {
@@ -113,7 +115,7 @@ public class LoginPage extends TelnetPage {
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
             if (_settings.getPropertiesAutoToChat()) {
-                _settings.setIsUnderAutoToChat(true);
+                TempSettings.setIsUnderAutoToChat(true);
             }
             sendPassword();
             return false;
@@ -179,7 +181,7 @@ public class LoginPage extends TelnetPage {
 
     public void onPageWillDisappear() {
         ASProcessingDialog.hideProcessingDialog();
-        if (this._settings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat()) {
             ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
         }
     }

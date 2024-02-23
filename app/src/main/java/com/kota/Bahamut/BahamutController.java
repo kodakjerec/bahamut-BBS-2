@@ -182,9 +182,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
     private void handleNormalConnectionClosed() {
         Vector<ASViewController> pages = ASNavigationController.getCurrentController().getViewControllers();
         Vector<ASViewController> new_controllers = new Vector<>();
-        Iterator<ASViewController> it = pages.iterator();
-        while (it.hasNext()) {
-            ASViewController controller = it.next();
+        for (ASViewController controller : pages) {
             TelnetPage telnet_page = (TelnetPage) controller;
             if (telnet_page.getPageType() == 0 || telnet_page.isKeepOnOffline()) {
                 new_controllers.add(telnet_page);

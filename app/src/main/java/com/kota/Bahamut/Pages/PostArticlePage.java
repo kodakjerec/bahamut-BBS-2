@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
@@ -64,7 +65,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     }
 
     public int getPageType() {
-        return 16;
+        return BahamutPage.BAHAMUT_POST_ARTICLE;
     }
 
     public boolean isPopupPage() {

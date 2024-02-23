@@ -36,18 +36,46 @@
                 style="@style/ToolbarItem"
                 android:text="@string/last_page" />
         </LinearLayout>
+        <com.kota.Bahamut.Pages.Model.ToolBarFloating
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ToolbarFloatingComponent"/>
     </RelativeLayout>
     <LinearLayout android:layout_gravity="end" android:orientation="vertical" android:id="@+id/menu_view" android:background="@color/black" android:layout_width="240dp" android:layout_height="match_parent">
-        <Button android:id="@+id/bookmark_edit_button" android:text="@string/bookmark" style="@style/RightMenuItem"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button android:id="@+id/bookmark_edit_button" android:text="@string/bookmark_manager" style="@style/RightMenuItem" android:layout_width="0dp" android:layout_weight="1"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
         <ListView android:id="@+id/bookmark_list_view" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/>
         <Button android:id="@+id/search_article_button" android:text="@string/search_article" style="@style/RightMenuItem"/>
         <View android:background="@color/black" android:layout_width="match_parent" android:layout_height="1dp"/>
         <Button android:id="@+id/select_article_button" android:text="@string/select_article" style="@style/RightMenuItem"/>
         <View android:background="@color/black" android:layout_width="match_parent" android:layout_height="1dp"/>
-        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="60dp">
-            <Button android:id="@+id/block_enable_button" android:layout_width="80dp" android:layout_height="match_parent" android:text="@string/drawer_button_text_enable" style="@style/RightMenuItem"/>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/toolbar_item_background_color">
+            <CheckBox
+                android:id="@+id/block_enable_button_checkbox"
+                style="@style/CheckboxBahamut"
+                android:layout_height="match_parent"
+                android:layout_width="40dp"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                android:id="@+id/block_enable_button_checkbox_label"
+                style="@style/TextViewLarge"
+                android:layout_height="match_parent"
+                android:layout_width="60dp"
+                android:text="@string/drawer_button_text_enable"
+                android:textColor="@color/white"
+                android:gravity="center_vertical"/>
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>
-            <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:text="@string/block_list_setting" android:layout_weight="1" style="@style/RightMenuItem"/>
+            <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:layout_weight="1" android:text="@string/system_setting_page_chapter_blocklist" style="@style/RightMenuItem"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

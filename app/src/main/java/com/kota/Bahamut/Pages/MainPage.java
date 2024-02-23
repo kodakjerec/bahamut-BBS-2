@@ -8,9 +8,11 @@ import android.widget.Button;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;
@@ -55,7 +57,7 @@ public class MainPage extends TelnetPage {
     }
 
     public int getPageType() {
-        return 5;
+        return BahamutPage.BAHAMUT_MAIN;
     }
 
     UserSettings _settings;
@@ -71,7 +73,7 @@ public class MainPage extends TelnetPage {
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
         // 自動登入洽特
-        if (this._settings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat()) {
             // 進入布告討論區
             Button btn = (Button)findViewById(R.id.Main_boardsButton);
             btn.performClick();

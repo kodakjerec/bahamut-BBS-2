@@ -6,6 +6,7 @@ import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.AppDatabase;
 import com.kota.Bahamut.Pages.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage;
+import com.kota.Bahamut.Pages.BoardPageAction;
 import com.kota.Bahamut.Pages.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.LoginPage;
@@ -325,7 +326,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     handleClassPage();
                 }
             } else if (this.row_string_00.contains("【主題串列】")) {
-                if (PageContainer.getInstance().getBoardPage().getLastListAction() == 1) {
+                if (PageContainer.getInstance().getBoardPage().getLastListAction() == BoardPageAction.SEARCH) {
                     handleBoardSearchPage();
                 } else {
                     handleBoardTitleLinkedPage();

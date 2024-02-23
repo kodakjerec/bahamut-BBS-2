@@ -13,6 +13,7 @@ import android.widget.ListView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
@@ -46,7 +47,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     private Button _page_up_button = null;
 
     public int getPageType() {
-        return 9;
+        return BahamutPage.BAHAMUT_MAIL_BOX;
     }
 
     public int getPageLayout() {

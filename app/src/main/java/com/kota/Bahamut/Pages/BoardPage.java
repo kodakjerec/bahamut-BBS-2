@@ -9,6 +9,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -23,6 +24,7 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASListViewExtentOptionalDelegate;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
@@ -50,11 +52,15 @@ import com.kota.Bahamut.Pages.BookmarkPage.BoardExtendOptionalPageBookmarkItemVi
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageHandler;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
+import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
+import com.kota.TelnetUI.TextView.TelnetTextViewLarge;
+import com.kota.TelnetUI.TextView.TelnetTextViewNormal;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,18 +74,21 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     UserSettings _settings;
     protected String _board_title = null;
     protected String _board_manager = null;
-    private int _last_list_action = 0;
+    private int _last_list_action = BoardPageAction.LIST;
     private boolean _initialed = false;
     private boolean _refresh_header_view = false; // 正在更新標題列
     private boolean blockListEnable = false; // 是否啟用黑名單
     private boolean _isDrawerOpening = false; // 側邊選單正在開啟中
     private final List<Bookmark> _list = new ArrayList<>();
 
+    // 發文
     private final View.OnClickListener mPostListener = view -> BoardPage.this.onPostButtonClicked();
 
-    private final View.OnClickListener mFirstPageClicked = view -> BoardPage.this.moveToFirstPosition();
+    // 前一頁
+    private final View.OnClickListener mFirstPageClickListener = view -> BoardPage.this.moveToFirstPosition();
 
-    private final View.OnClickListener mLastPageClicked = view -> {
+    // 下一頁
+    private final View.OnClickListener mLastPageClickListener = view -> {
         BoardPage.this.setManualLoadPage();
         BoardPage.this.moveToLastPosition();
     };
@@ -123,6 +132,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         }
     };
 
+    // 側邊選單 listener
     DrawerLayout.DrawerListener _drawer_listener = new DrawerLayout.DrawerListener() {
         @Override
         public void onDrawerSlide(@NonNull View drawerView, float slideOffset) { }
@@ -135,15 +145,14 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            if (newState == DrawerLayout.STATE_SETTLING) {
-                _isDrawerOpening = true;
-            } else {
+            if (newState == DrawerLayout.STATE_IDLE) {
                 _isDrawerOpening = false;
+            } else {
+                _isDrawerOpening = true;
             }
 
-            // 側邊選單未完全開啟 && 正要啟動狀態
-            if ( !isDrawerOpen() && _isDrawerOpening) {
-                BoardPage.this.reloadBlockEnableButton();
+            // 側邊選單未完全開啟 or 正要啟動狀態
+            if ( !isDrawerOpen() || _isDrawerOpening) {
                 BoardPage.this.reloadBookmark();
             }
         }
@@ -153,8 +162,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     AdapterView.OnItemClickListener _bookmark_listener = (adapterView, view, i, j) -> {
         BoardPage.this.closeDrawer();
         Bookmark bookmark = (Bookmark) BoardPage.this._list.get(i);
-        BoardPage.this._last_list_action = 1;
-        BoardPage.this.pushCommand(new BahamutCommandSearchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy()));
+        searchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy());
     };
 
     // 搜尋文章
@@ -191,7 +199,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
-        return 10;
+        return BahamutPage.BAHAMUT_BOARD;
     }
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage
@@ -214,8 +222,8 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         aSListView.setEmptyView(findViewById(R.id.BoardPageListEmptyView));
         setListView(aSListView);
         findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
-        findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClicked);
-        findViewById(R.id.BoardPageLastestPageButton).setOnClickListener(mLastPageClicked);
+        findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
+        findViewById(R.id.BoardPageLastestPageButton).setOnClickListener(mLastPageClickListener);
         View search_article_button = findViewById(R.id.search_article_button);
         if (search_article_button != null) {
             search_article_button.setOnClickListener(_search_listener);
@@ -224,9 +232,13 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         if (select_article_button != null) {
             select_article_button.setOnClickListener(_select_listener);
         }
-        View block_enable_button = findViewById(R.id.block_enable_button);
-        if (block_enable_button != null) {
-            block_enable_button.setOnClickListener(_enable_block_listener);
+        CheckBox block_enable_checkbox = (CheckBox) findViewById(R.id.block_enable_button_checkbox);
+        if (block_enable_checkbox != null) {
+            block_enable_checkbox.setChecked(_settings.getPropertiesBlockListEnable());
+            block_enable_checkbox.setOnClickListener(_enable_block_listener);
+
+            TelnetTextViewLarge text_checkbox = (TelnetTextViewLarge) findViewById(R.id.block_enable_button_checkbox_label);
+            text_checkbox.setOnClickListener(_enable_block_listener);
         }
         View block_setting_button = findViewById(R.id.block_setting_button);
         if (block_setting_button != null) {
@@ -267,12 +279,12 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         changeToolbarLocation();
 
         // 自動登入洽特
-        if (_settings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat()) {
             // 最後頁
             findViewById(R.id.BoardPageLastestPageButton).performClick();
             // 任務完成
             // 關閉"正在自動登入"
-            _settings.setIsUnderAutoToChat(false);
+            TempSettings.setIsUnderAutoToChat(false);
 
             Timer timer = new Timer();
             TimerTask task = new TimerTask() {
@@ -281,7 +293,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                     ASProcessingDialog.hideProcessingDialog();
                 }
             };
-            timer.schedule(task, 2000);
+            timer.schedule(task, 500);
         }
     }
 
@@ -297,14 +309,12 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     private void changeToolbarLocation() {
         LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
         LinearLayout toolbarBlock = (LinearLayout)findViewById(R.id.toolbar_block);
+        ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
+        toolBarFloating.setVisibility(View.GONE);
+
         final float scale = getResource().getDisplayMetrics().density;
-        View toolbar_divider_1 = (View) findViewById(R.id.toolbar_divider_1);
-        View toolbar_divider_2 = (View) findViewById(R.id.toolbar_divider_2);
-        ViewGroup.LayoutParams layoutParams1 = toolbar_divider_1.getLayoutParams();
-        Button btnBoardPageFirstPageButton = (Button) findViewById(R.id.BoardPageFirstPageButton);
-        Button btnBoardPageLatestPageButton = (Button) findViewById(R.id.BoardPageLastestPageButton);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
-        int choice_toolbar_location = _settings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-直立靠左 4-直立靠右
+        int choice_toolbar_location = _settings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-浮動
         switch (choice_toolbar_location) {
             case 1:
                 // 底部-最左邊
@@ -319,40 +329,23 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
                 break;
             case 3:
-                // 直立-最左邊
-                // 變成直立
-                layoutParams.width = (int)(70 * scale);
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
-                toolbar.setOrientation(LinearLayout.VERTICAL);
+                // 浮動
+                // 去除 原本工具列
+                toolbar.setVisibility(View.GONE);
                 // 去除底部卡位用view
                 toolbarBlock.setVisibility(View.GONE);
-                // 分隔線
-                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                layoutParams1.height = (int)(1 * scale);
-                toolbar_divider_1.setLayoutParams(layoutParams1);
-                toolbar_divider_2.setLayoutParams(layoutParams1);
-                // 按鈕
-                btnBoardPageFirstPageButton.setText("最前");
-                btnBoardPageLatestPageButton.setText("最後");
-                break;
-            case 4:
-                // 直立-最右邊
-                // 變成直立
-                layoutParams.width = (int)(70 * scale);
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
-                toolbar.setOrientation(LinearLayout.VERTICAL);
-                // 去除底部卡位用view
-                toolbarBlock.setVisibility(View.GONE);
-                // 分隔線
-                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                layoutParams1.height = (int)(1 * scale);
-                toolbar_divider_1.setLayoutParams(layoutParams1);
-                toolbar_divider_2.setLayoutParams(layoutParams1);
-                // 按鈕
-                btnBoardPageFirstPageButton.setText("最前");
-                btnBoardPageLatestPageButton.setText("最後");
+                // 浮動工具列
+                toolBarFloating.setVisibility(View.VISIBLE);
+                // button setting
+                toolBarFloating.setOnClickListenerSetting(mPostListener);
+                Button OriginalBtn = ((Button)findViewById(R.id.BoardPagePostButton));
+                toolBarFloating.setTextSetting(OriginalBtn.getText().toString());
+                // button 1
+                toolBarFloating.setOnClickListener1(mFirstPageClickListener);
+                toolBarFloating.setText1(getContextString(R.string.first_page));
+                // button 2
+                toolBarFloating.setOnClickListener2(mLastPageClickListener);
+                toolBarFloating.setText2(getContextString(R.string.last_page));
                 break;
             default:
                 // 底部-中間
@@ -385,9 +378,9 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
     private void refreshHeaderView() {
         String board_title = _board_title;
-        board_title = (board_title == null || board_title.length() == 0) ? "讀取中" : board_title;
+        board_title = (board_title == null || board_title.length() == 0) ? getContextString(R.string.loading) : board_title;
         String board_manager = _board_manager;
-        board_manager = (board_manager == null || board_manager.length() == 0) ? "讀取中" : board_manager;
+        board_manager = (board_manager == null || board_manager.length() == 0) ? getContextString(R.string.loading) : board_manager;
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             header_view.setData(board_title, getListName(), board_manager);
@@ -479,8 +472,8 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     // 搜尋文章
-    private void searchArticle(String str, String str2, String str3, String str4) {
-        _last_list_action = 1;
+    private void searchArticle(String _keyword, String _author, String _mark, String _gy) {
+        _last_list_action = BoardPageAction.SEARCH;
         BoardSearchPage board_Search_Page = PageContainer.getInstance().getBoardSearchPage();
         board_Search_Page.clear();
         getNavigationController().pushViewController(board_Search_Page);
@@ -489,11 +482,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
             state.Top = 0;
             state.Position = 0;
         }
-        board_Search_Page.setKeyword(str);
-        board_Search_Page.setAuthor(str2);
-        board_Search_Page.setMark(str3);
-        board_Search_Page.setGy(str4);
-        pushCommand(new BahamutCommandSearchArticle(str, str2, str3, str4));
+        board_Search_Page.setKeyword(_keyword);
+        board_Search_Page.setAuthor(_author);
+        board_Search_Page.setMark(_mark);
+        board_Search_Page.setGy(_gy);
+        pushCommand(new BahamutCommandSearchArticle(_keyword, _author, _mark, _gy));
     }
 
     @Override // com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener
@@ -515,7 +508,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     private void onListArticle(int i) {
-        _last_list_action = 0;
+        _last_list_action = BoardPageAction.LIST;
         BoardLinkPage board_Linked_Title_Page = PageContainer.getInstance().getBoardLinkedTitlePage();
         board_Linked_Title_Page.clear();
         getNavigationController().pushViewController(board_Linked_Title_Page);
@@ -609,7 +602,8 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     private void onChangeBlockStateButtonClicked() {
         _settings.setPropertiesBlockListEnable(!blockListEnable);
         blockListEnable = _settings.getPropertiesBlockListEnable();
-        reloadBlockEnableButton();
+        CheckBox block_enable_checkbox = (CheckBox) findViewById(R.id.block_enable_button_checkbox);
+        block_enable_checkbox.setChecked(blockListEnable);
         reloadListView();
     }
 
@@ -633,10 +627,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         _initialed = false;
     }
 
+    // 書籤管理->按下書籤
     @Override // com.kota.Bahamut.BookmarkPage.BoardExtendOptionalPageListener
     public void onBoardExtendOptionalPageDidSelectBookmark(Bookmark bookmark) {
         if (bookmark != null) {
-            _last_list_action = 1;
+            _last_list_action = BoardPageAction.SEARCH;
             pushCommand(new BahamutCommandSearchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy()));
         }
     }
@@ -719,7 +714,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                 page.recover = true;
             }
         }.runInMainThread();
-        if (timer!=null) {
+        if (timer != null) {
             timer.cancel();
             timer = null;
         }
@@ -734,7 +729,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
                 page.closeArticle();
             }
         }.runInMainThread();
-        if (timer!=null) {
+        if (timer != null) {
             timer.cancel();
             timer = null;
         }
@@ -762,17 +757,6 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             drawerLayout.closeDrawers();
-        }
-    }
-
-    void reloadBlockEnableButton() {
-        Button button = (Button) findViewById(R.id.block_enable_button);
-        if (button != null) {
-            if (blockListEnable) {
-                button.setText(R.string.drawer_button_text_enable);
-                return;
-            }
-            button.setText(R.string.drawer_button_text_disable);
         }
     }
 

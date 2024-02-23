@@ -28,6 +28,7 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.DataModels.BookmarkList;
@@ -37,6 +38,7 @@ import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
+import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -198,8 +200,8 @@ public class ArticlePage extends TelnetPage {
             return type == 0 || type == 1;
         }
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.3
-// android.widget.AdapterView.OnItemLongClickListener
+
+    // 長按內文
     AdapterView.OnItemLongClickListener _list_long_click_listener = (arg0, arg1, itemIndex, arg3) -> {
         // 沒有簽名檔直接往下走
         if (!_i_have_sign) {
@@ -229,8 +231,8 @@ public class ArticlePage extends TelnetPage {
             return false;
         }
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.4
-// android.view.View.OnLongClickListener
+
+    // 最前篇
     View.OnLongClickListener _page_top_listener = v -> {
         if (ArticlePage.this._settings.getPropertiesArticleMoveEnable()) {
             if (ArticlePage.this._top_action != null) {
@@ -246,8 +248,8 @@ public class ArticlePage extends TelnetPage {
         }
         return false;
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.5
-// android.view.View.OnClickListener
+
+    // 上一篇
     View.OnClickListener _page_up_listener = v -> {
         if (ArticlePage.this._top_action != null) {
             v.removeCallbacks(ArticlePage.this._top_action);
@@ -259,8 +261,8 @@ public class ArticlePage extends TelnetPage {
             ArticlePage.this._board_page.loadTheSameTitleUp();
         }
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.6
-// android.view.View.OnLongClickListener
+
+    // 最後篇
     View.OnLongClickListener _page_bottom_listener = v -> {
         if (ArticlePage.this._settings.getPropertiesArticleMoveEnable()) {
             if (ArticlePage.this._bottom_action != null) {
@@ -276,8 +278,8 @@ public class ArticlePage extends TelnetPage {
         }
         return false;
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.7
-// android.view.View.OnClickListener
+
+    // 下一篇
     View.OnClickListener _page_down_listener = v -> {
         if (ArticlePage.this._bottom_action != null) {
             v.removeCallbacks(ArticlePage.this._bottom_action);
@@ -289,8 +291,8 @@ public class ArticlePage extends TelnetPage {
             ArticlePage.this._board_page.loadTheSameTitleDown();
         }
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.8
-// android.view.View.OnClickListener
+
+    // 回復
     View.OnClickListener _back_listener = v -> {
         if (TelnetClient.getConnector().isConnecting()) {
             if (ArticlePage.this._article != null) {
@@ -312,25 +314,25 @@ public class ArticlePage extends TelnetPage {
         }
         ArticlePage.this.showConnectionClosedToast();
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.10
-// android.view.View.OnClickListener
+
+    // 選單
     private final View.OnClickListener mMenuListener = v -> ArticlePage.this.onMenuClicked();
-    // from class: com.kota.Bahamut.Pages.ArticlePage.11
-// android.view.View.OnClickListener
+
+    // 推薦
     private final View.OnClickListener mDoGyListener = v -> ArticlePage.this.onGYButtonClicked();
-    // from class: com.kota.Bahamut.Pages.ArticlePage.12
-// android.view.View.OnClickListener
+
+    // 切換模式
     private final View.OnClickListener mChangeModeListener = v -> {
         ArticlePage.this.changeViewMode();
         ArticlePage.this.refreshExternalToolbar();
     };
-    // from class: com.kota.Bahamut.Pages.ArticlePage.13
-// android.view.View.OnClickListener
+
+    // 開啟連結
     private final View.OnClickListener mShowLinkListener = v -> ArticlePage.this.onOpenLinkClicked();
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
-        return 14;
+        return BahamutPage.BAHAMUT_ARTICLE;
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
@@ -387,30 +389,18 @@ public class ArticlePage extends TelnetPage {
     private void changeToolbarLocation() {
         LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
         LinearLayout toolbarBlock = (LinearLayout)findViewById(R.id.toolbar_block);
+        ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
+        toolBarFloating.setVisibility(View.GONE);
+
         final float scale = getResource().getDisplayMetrics().density;
-        View toolbar_divider_1 = (View) findViewById(R.id.toolbar_divider_1);
-        View toolbar_divider_2 = (View) findViewById(R.id.toolbar_divider_2);
-        ViewGroup.LayoutParams layoutParams1 = toolbar_divider_1.getLayoutParams();
-        Button btnBoardPageFirstPageButton = (Button) findViewById(R.id.Article_pageUpButton);
-        Button btnBoardPageLatestPageButton = (Button) findViewById(R.id.Article_pageDownButton);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
-        int choice_toolbar_location = _settings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-直立靠左 4-直立靠右
+        int choice_toolbar_location = _settings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-浮動
         switch (choice_toolbar_location) {
             case 1:
                 // 底部-最左邊
                 layoutParams.width = (int)(230 * scale);
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 layoutParams.addRule(RelativeLayout.ALIGN_START);
-                // 反轉按鈕順序
-                ArrayList<View> alViews = new ArrayList<>();
-                for (int i=toolbar.getChildCount() -1; i>=0; i--) {
-                    View view = toolbar.getChildAt(i);
-                    alViews.add(view);
-                }
-                toolbar.removeAllViews();
-                for(int j=0;j<alViews.size();j++) {
-                    toolbar.addView(alViews.get(j));
-                }
                 break;
             case 2:
                 // 底部-最右邊
@@ -419,48 +409,44 @@ public class ArticlePage extends TelnetPage {
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
                 break;
             case 3:
-                // 直立-最左邊
-                // 變成直立
-                layoutParams.width = (int)(70 * scale);
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_START);
-                toolbar.setOrientation(LinearLayout.VERTICAL);
+                // 浮動
+                // 去除 原本工具列
+                toolbar.setVisibility(View.GONE);
                 // 去除底部卡位用view
                 toolbarBlock.setVisibility(View.GONE);
-                // 分隔線
-                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                layoutParams1.height = (int)(1 * scale);
-                toolbar_divider_1.setLayoutParams(layoutParams1);
-                toolbar_divider_2.setLayoutParams(layoutParams1);
-                // 按鈕
-                btnBoardPageFirstPageButton.setText("前一");
-                btnBoardPageLatestPageButton.setText("後一");
-                break;
-            case 4:
-                // 直立-最右邊
-                // 變成直立
-                layoutParams.width = (int)(70 * scale);
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.addRule(RelativeLayout.CENTER_VERTICAL);
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
-                toolbar.setOrientation(LinearLayout.VERTICAL);
-                // 去除底部卡位用view
-                toolbarBlock.setVisibility(View.GONE);
-                // 分隔線
-                layoutParams1.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                layoutParams1.height = (int)(1 * scale);
-                toolbar_divider_1.setLayoutParams(layoutParams1);
-                toolbar_divider_2.setLayoutParams(layoutParams1);
-                // 按鈕
-                btnBoardPageFirstPageButton.setText("前一");
-                btnBoardPageLatestPageButton.setText("後一");
+                // 浮動工具列
+                toolBarFloating.setVisibility(View.VISIBLE);
+                // button setting
+                toolBarFloating.setOnClickListenerSetting(_back_listener);
+                toolBarFloating.setTextSetting(getContextString(R.string.reply));
+                // button 1
+                toolBarFloating.setOnClickListener1(_page_up_listener);
+                toolBarFloating.setOnLongClickListener1(_page_top_listener);
+                toolBarFloating.setText1(getContextString(R.string.prev_article));
+                // button 2
+                toolBarFloating.setOnClickListener2(_page_down_listener);
+                toolBarFloating.setOnLongClickListener2(_page_bottom_listener);
+                toolBarFloating.setText2(getContextString(R.string.next_article));
                 break;
             default:
                 // 底部-中間
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 break;
+        }
+
+        // 反轉按鈕順序
+        int choice_toolbar_order = _settings.getPropertiesToolbarOrder();
+        if (choice_toolbar_order == 1) {
+            ArrayList<View> alViews = new ArrayList<>();
+            for (int i = toolbar.getChildCount() - 1; i >= 0; i--) {
+                View view = toolbar.getChildAt(i);
+                alViews.add(view);
+            }
+            toolbar.removeAllViews();
+            for (int j = 0; j < alViews.size(); j++) {
+                toolbar.addView(alViews.get(j));
+            }
         }
         toolbar.setLayoutParams(layoutParams);
     }
@@ -506,7 +492,7 @@ public class ArticlePage extends TelnetPage {
         if (this._article != null && this._article.Author != null) {
             String author = this._article.Author.toLowerCase();
             String logon_user = this._settings.getPropertiesUsername().trim().toLowerCase();
-            boolean is_board = this._board_page.getPageType() == 10;
+            boolean is_board = this._board_page.getPageType() == BahamutPage.BAHAMUT_BOARD;
             boolean ext_toolbar_enable = this._settings.getPropertiesExternalToolbarEnable();
             String external_toolbar_enable_title = ext_toolbar_enable ? "隱藏工具列" : "開啟工具列";
             ASListDialog.createDialog().addItem(getContextString(R.string.do_gy)).addItem("切換模式").addItem((is_board && author.equals(logon_user)) ? "編輯文章" : null).addItem(author.equals(logon_user) ? "刪除文章" : null).addItem(external_toolbar_enable_title).addItem("加入黑名單").addItem("開啟連結").setListener(new ASListDialogItemClickListener() { // from class: com.kota.Bahamut.Pages.ArticlePage.1

@@ -6,6 +6,7 @@ import com.kota.Bahamut.Pages.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage;
 import com.kota.Bahamut.Pages.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
+import com.kota.Bahamut.Pages.InstructionsPage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
@@ -26,9 +27,9 @@ public class PageContainer {
     private BoardSearchPage _board_search_page = null;
     private MailBoxPage _mail_page = null;
     private ArticlePage _article_page = null;
-
     private BillingPage _billing_page = null;
     private PostArticlePage _post_article_page = null;
+    private InstructionsPage _instruction_page = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -105,9 +106,7 @@ public class PageContainer {
 
     public void cleanClassPage() {
         if (this._class_page != null) {
-            Iterator<ClassPage> it = this._class_page.iterator();
-            while (it.hasNext()) {
-                ClassPage page = it.next();
+            for (ClassPage page : this._class_page) {
                 page.clear();
             }
             this._class_page.clear();
@@ -195,6 +194,20 @@ public class PageContainer {
         if (this._billing_page != null) {
             this._billing_page.clear();
             this._billing_page = null;
+        }
+    }
+
+    public InstructionsPage getInstructionPage() {
+        if (this._instruction_page == null) {
+            this._instruction_page = new InstructionsPage();
+        }
+        return this._instruction_page;
+    }
+
+    public void cleanInstructionPage() {
+        if (this._instruction_page != null) {
+            this._instruction_page.clear();
+            this._instruction_page = null;
         }
     }
 

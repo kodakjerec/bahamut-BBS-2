@@ -22,6 +22,7 @@ import com.android.billingclient.api.QueryProductDetailsParams;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
@@ -36,7 +37,7 @@ public class BillingPage extends TelnetPage {
     UserSettings _settings;
     @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
-        return 18;
+        return BahamutPage.BAHAMUT_BILLING;
     }
 
     @Override

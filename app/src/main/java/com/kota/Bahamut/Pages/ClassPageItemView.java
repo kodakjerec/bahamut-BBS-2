@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -58,21 +60,21 @@ public class ClassPageItemView extends LinearLayout {
         if (this._board_title_label == null) {
             return;
         }
-        this._board_title_label.setText(Objects.requireNonNullElse(title, "讀取中..."));
+        this._board_title_label.setText(Objects.requireNonNullElse(title, getContextString(R.string.loading_)));
     }
 
     public void setBoardNameText(String boardName) {
         if (this._board_name_label == null) {
             return;
         }
-        this._board_name_label.setText(Objects.requireNonNullElse(boardName, "讀取中"));
+        this._board_name_label.setText(Objects.requireNonNullElse(boardName, getContextString(R.string.loading)));
     }
 
     public void setBoardManagerText(String boardManager) {
         if (this._board_manager_label == null) {
             return;
         }
-        this._board_manager_label.setText(Objects.requireNonNullElse(boardManager, "讀取中"));
+        this._board_manager_label.setText(Objects.requireNonNullElse(boardManager, getContextString(R.string.loading)));
     }
 
     public void setItem(ClassPageItem aItem) {

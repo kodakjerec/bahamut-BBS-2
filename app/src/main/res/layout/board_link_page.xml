@@ -40,4 +40,8 @@
             style="@style/ToolbarItem"
             android:text="@string/last_page" />
     </LinearLayout>
+    <com.kota.Bahamut.Pages.Model.ToolBarFloating
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/ToolbarFloatingComponent"/>
 </RelativeLayout>

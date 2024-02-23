@@ -10,6 +10,7 @@ import android.widget.ListAdapter;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
@@ -43,7 +44,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public int getPageType() {
-        return 15;
+        return BahamutPage.BAHAMUT_MAIL;
     }
 
     public boolean isPopupPage() {

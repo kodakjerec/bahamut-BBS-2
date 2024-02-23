@@ -16,12 +16,17 @@ import android.widget.CompoundButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.material.slider.Slider;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
+import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
 
 public class SystemSettingsPage extends TelnetPage {
     UserSettings _settings;
@@ -115,6 +120,15 @@ public class SystemSettingsPage extends TelnetPage {
     AdapterView.OnItemSelectedListener _toolbar_location_listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+            if (i <= 2) {
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_1).setVisibility(View.VISIBLE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.GONE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.GONE);
+            } else {
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_1).setVisibility(View.GONE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.VISIBLE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.VISIBLE);
+            }
             _settings.setPropertiesToolbarLocation(i);
         }
 
@@ -141,13 +155,14 @@ public class SystemSettingsPage extends TelnetPage {
     }
 
     public int getPageType() {
-        return 7;
+        return BahamutPage.BAHAMUT_SYSTEM_SETTINGS;
     }
 
     public boolean isPopupPage() {
         return true;
     }
 
+    @SuppressLint("SetTextI18n")
     public void onPageDidLoad() {
         this._settings = new UserSettings(getContext());
 
@@ -211,6 +226,7 @@ public class SystemSettingsPage extends TelnetPage {
             spinner_toolbar_location.setAdapter(adapter_toolbar_location);
             spinner_toolbar_location.setSelection(_settings.getPropertiesToolbarLocation());
             spinner_toolbar_location.setOnItemSelectedListener(_toolbar_location_listener);
+
             // 工具列順序
             ArrayAdapter<String> adapter_toolbar_order = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, getResource().getStringArray(R.array.system_setting_page_toolbar_order_items));
             adapter_toolbar_order.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -218,6 +234,39 @@ public class SystemSettingsPage extends TelnetPage {
             spinner_toolbar_order.setAdapter(adapter_toolbar_order);
             spinner_toolbar_order.setSelection(_settings.getPropertiesToolbarOrder());
             spinner_toolbar_order.setOnItemSelectedListener(_toolbar_order_listener);
+            if (_settings.getPropertiesToolbarLocation() <= 2) { // 底部工具列
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_1).setVisibility(View.VISIBLE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.GONE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.GONE);
+            } else { // 浮動
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_1).setVisibility(View.GONE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.VISIBLE);
+                findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.VISIBLE);
+            }
+            TelnetTextViewSmall textSmall_idle = (TelnetTextViewSmall) findViewById(R.id.system_setting_page_toolbar_idle_text);
+            Slider slider_idle = (Slider) findViewById(R.id.system_setting_page_toolbar_idle);
+            slider_idle.setValue(_settings.getToolbarIdle());
+            textSmall_idle.setText(slider_idle.getValue() + "s");
+            slider_idle.addOnChangeListener(new Slider.OnChangeListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                    _settings.setToolbarIdle(value);
+                    textSmall_idle.setText(value + "s");
+                }
+            });
+            TelnetTextViewSmall textSmall_alpha = (TelnetTextViewSmall) findViewById(R.id.system_setting_page_toolbar_alpha_text);
+            Slider slider_alpha = (Slider) findViewById(R.id.system_setting_page_toolbar_alpha);
+            slider_alpha.setValue(_settings.getToolbarAlpha());
+            textSmall_alpha.setText((int)slider_alpha.getValue() + "%");
+            slider_alpha.addOnChangeListener(new Slider.OnChangeListener() {
+                @SuppressLint("SetTextI18n")
+                @Override
+                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
+                    _settings.setToolbarAlpha(value);
+                    textSmall_alpha.setText((int)value + "%");
+                }
+            });
             // 側滑選單位置
             ArrayAdapter<String> adapter_drawer_location = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, getResource().getStringArray(R.array.system_setting_page_drawer_location_items));
             adapter_drawer_location.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -225,7 +274,6 @@ public class SystemSettingsPage extends TelnetPage {
             spinner_drawer_location.setAdapter(adapter_drawer_location);
             spinner_drawer_location.setSelection(_settings.getPropertiesDrawerLocation());
             spinner_drawer_location.setOnItemSelectedListener(_drawer_location_listener);
-
         } else {
             findViewById(R.id.SystemSettings_item_enableGestureOnBoard).setVisibility(View.GONE);
             findViewById(R.id.SystemSettings_item_enableAutoToChat).setVisibility(View.GONE);

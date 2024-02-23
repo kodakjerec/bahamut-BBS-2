@@ -1,10 +1,14 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetHeaderItemView;
@@ -16,7 +20,7 @@ public class BoardSearchPage extends BoardPage {
     private String _mark = null;
 
     public int getPageType() {
-        return 13;
+        return BahamutPage.BAHAMUT_BOARD_SEARCH;
     }
 
     public int getPageLayout() {
@@ -29,7 +33,7 @@ public class BoardSearchPage extends BoardPage {
         if (header_view != null) {
             String board_name = getListName();
             if (board_name == null) {
-                board_name = "讀取中";
+                board_name = getContextString(R.string.loading);
             }
             header_view.setData(this._board_title, "文章搜尋", board_name);
         }
@@ -40,8 +44,29 @@ public class BoardSearchPage extends BoardPage {
         return true;
     }
 
-    protected boolean onListViewItemLongClicked(View itemView, int index) {
-        return false;
+    protected boolean onListViewItemLongClicked(View itemView, int selectedIndex) {
+        BoardPageItem item = (BoardPageItem) BoardSearchPage.this.getItem(selectedIndex);
+
+        if (item!=null) {
+            ASAlertDialog.createDialog()
+                    .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
+                    .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.Title + "\"")
+                    .addButton(getContextString(R.string.cancel))
+                    .addButton(getContextString(R.string.insert))
+                    .setListener((aDialog, index) -> {
+                        if (index == 1) {
+                            Bookmark bookmark = new Bookmark();
+                            System.out.println("add bookmark:" + bookmark.getTitle());
+                            bookmark.setBoard(BoardSearchPage.this.getListName());
+                            bookmark.setKeyword(item.Title);
+                            bookmark.setTitle(bookmark.generateTitle());
+                            BookmarkStore store = new BookmarkStore(BoardSearchPage.this.getContext());
+                            store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
+                            store.store();
+                        }
+                    }).scheduleDismissOnPageDisappear(this).show();
+        }
+        return true;
     }
 
     public int getListType() {
@@ -53,7 +78,12 @@ public class BoardSearchPage extends BoardPage {
     }
 
     protected void onPostButtonClicked() {
-        ASAlertDialog.createDialog().setTitle("加入書籤").setMessage("是否要將此搜尋結果加入書籤?").addButton("取消").addButton("加入").setListener((aDialog, index) -> {
+        ASAlertDialog.createDialog()
+                .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
+                .setMessage(getContextString(R.string.insert_this_bookmark_search))
+                .addButton(getContextString(R.string.cancel))
+                .addButton(getContextString(R.string.insert))
+                .setListener((aDialog, index) -> {
             if (index == 1) {
                 Bookmark bookmark = new Bookmark();
                 System.out.println("add bookmark:" + bookmark.getTitle());

@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Service;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -27,6 +28,7 @@ import java.util.List;
 public final class MyBillingClient {
     static UserSettings _settings;
     public static  BillingClient billingClient;
+    @SuppressLint("StaticFieldLeak")
     private static Context myContext;
 
     // 購買結果

@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 public class UserSettings {
@@ -26,8 +28,12 @@ public class UserSettings {
     private static final String PROPERTIES_TOOLBAR_LOCATION = "ToolBarLocation"; // 工具列位置
     private static final String PROPERTIES_TOOLBAR_ORDER = "ToolBarOrder"; // 工具列順序
     private static final String PROPERTIES_DRAWER_LOCATION = "DrawerLocation"; // 側滑選單
+    private static final String PROPERTIES_TOOLBAR_IDLE = "ToolBarIdle"; // 浮動工具列閒置多久隱藏
+    private static final String PROPERTIES_TOOLBAR_ALPHA = "ToolBarAlpha"; // 浮動工具列閒置多久隱藏不透明度
 
-    private static final String isUnderAutoToChat = "isUnderAutoToChat"; // 正在自動登入ing
+    // 執行階段比較不重要的設定
+    private static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
+    private static final String floatingLocationY = "floatingLocationY"; // 浮動工具列位置 Y
 
     private Vector<String> _block_list = null; // 轉換後的黑名單清單
     private String _block_list_string_lower_cased = null; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
@@ -74,6 +80,10 @@ public class UserSettings {
                 int toolbar_location = prep.getPropertiesInteger(PROPERTIES_TOOLBAR_LOCATION);
                 int toolbar_order = prep.getPropertiesInteger(PROPERTIES_TOOLBAR_ORDER);
                 int drawer_location = prep.getPropertiesInteger(PROPERTIES_DRAWER_LOCATION);
+                float toolbar_idle = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_IDLE);
+                float toolbar_alpha = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_ALPHA);
+                float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
+                float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
 
                 SharedPreferences.Editor editor = perf.edit();
                 editor.putString(PROPERTIES_USERNAME, username);
@@ -91,6 +101,10 @@ public class UserSettings {
                 editor.putInt(PROPERTIES_TOOLBAR_LOCATION, toolbar_location);
                 editor.putInt(PROPERTIES_TOOLBAR_ORDER, toolbar_order);
                 editor.putInt(PROPERTIES_DRAWER_LOCATION, drawer_location);
+                editor.putFloat(PROPERTIES_TOOLBAR_IDLE, toolbar_idle);
+                editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, toolbar_alpha);
+                editor.putFloat(floatingLocationX, floating_location_x);
+                editor.putFloat(floatingLocationY, floating_location_y);
                 editor.putInt("upgrade", 1);
                 editor.apply();
             }
@@ -151,14 +165,6 @@ public class UserSettings {
     public boolean getPropertiesAutoToChat() {
         return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_AUTO_TO_CHAT, false);
     }
-    public void setIsUnderAutoToChat(boolean isEnable) {
-        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
-        editor.putBoolean(isUnderAutoToChat, isEnable);
-        editor.apply();
-    }
-    public boolean isUnderAutoToChat() {
-        return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(isUnderAutoToChat, false);
-    }
     
     public void setPropertiesGestureOnBoardEnable(boolean isEnable) {
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
@@ -210,12 +216,8 @@ public class UserSettings {
     }
 
     public void setPropertiesAnimationEnable(boolean enable) {
-        boolean z = false;
         SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
-        if (!enable) {
-            z = true;
-        }
-        editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, z);
+        editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, enable);
         editor.apply();
     }
     public boolean getPropertiesAnimationEnable() {
@@ -352,5 +354,37 @@ public class UserSettings {
 
     public boolean getPropertiesKeepWifi() {
         return this._context.getSharedPreferences(PERF_NAME, 0).getBoolean(PROPERTIES_KEEP_WIFI_ENABLE, true);
+    }
+
+    public List<Float> getFloatingLocation() {
+        SharedPreferences pref = this._context.getSharedPreferences(PERF_NAME, 0);
+        List<Float> list = new ArrayList<>();
+        list.add(pref.getFloat(floatingLocationX, -1));
+        list.add(pref.getFloat(floatingLocationY, -1));
+        return list;
+    }
+
+    public void setFloatingLocation(float x, float y) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putFloat(floatingLocationX, x);
+        editor.putFloat(floatingLocationY, y);
+        editor.apply();
+    }
+
+    public void setToolbarIdle(float idle) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putFloat(PROPERTIES_TOOLBAR_IDLE, idle);
+        editor.apply();
+    }
+    public float getToolbarIdle() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
+    }
+    public void setToolbarAlpha(float alpha) {
+        SharedPreferences.Editor editor = this._context.getSharedPreferences(PERF_NAME, 0).edit();
+        editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, alpha);
+        editor.apply();
+    }
+    public float getToolbarAlpha() {
+        return this._context.getSharedPreferences(PERF_NAME, 0).getFloat(PROPERTIES_TOOLBAR_ALPHA, 20);
     }
 }

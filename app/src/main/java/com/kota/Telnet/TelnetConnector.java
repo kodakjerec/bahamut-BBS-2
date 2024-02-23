@@ -1,5 +1,7 @@
 package com.kota.Telnet;
 
+import android.util.Log;
+
 import java.io.IOException;
 
 public class TelnetConnector implements TelnetChannelListener {
@@ -25,7 +27,7 @@ public class TelnetConnector implements TelnetChannelListener {
             try {
                 this._socket_channel.finishConnect();
             } catch (IOException e) {
-                e.printStackTrace();
+                Log.v("SocketChannel", "IO Exception");
             }
         }
         this._socket_channel = null;
@@ -58,8 +60,7 @@ public class TelnetConnector implements TelnetChannelListener {
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void finalize() throws Throwable {
+    protected void finalize() throws Throwable {
         if (isConnecting()) {
             close();
         }
@@ -106,8 +107,7 @@ public class TelnetConnector implements TelnetChannelListener {
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public TelnetChannel getChannel(int channel) {
+    private TelnetChannel getChannel(int channel) {
         TelnetChannel telnetChannel;
         synchronized (this) {
             if (this._channel != null) {
@@ -119,10 +119,15 @@ public class TelnetConnector implements TelnetChannelListener {
         return telnetChannel;
     }
 
-    public byte readData(int channel) throws TelnetConnectionClosedException, IOException {
+    public byte readData(int channel) throws TelnetConnectionClosedException {
         TelnetChannel selected_channel = getChannel(channel);
         if (selected_channel != null) {
-            return selected_channel.readData();
+            try {
+                return selected_channel.readData();
+            } catch (IOException e) {
+                Log.v("SocketChannel", "readData IO Exception");
+                return 0;
+            }
         }
         return 0;
     }
@@ -189,8 +194,7 @@ public class TelnetConnector implements TelnetChannelListener {
         return 0;
     }
 
-    /* access modifiers changed from: private */
-    public void sendHoldMessage() {
+    private void sendHoldMessage() {
         TelnetOutputBuilder.create().pushData((byte) 27).pushData((byte) 91).pushData((byte) 65).pushData((byte) 27).pushData((byte) 91).pushData((byte) 66).sendToServer();
     }
 

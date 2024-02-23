@@ -8,6 +8,7 @@ import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.R;
@@ -46,7 +47,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
     }
 
     public int getPageType() {
-        return 17;
+        return BahamutPage.BAHAMUT_SEND_MAIL;
     }
 
     public boolean isPopupPage() {

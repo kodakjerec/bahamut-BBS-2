@@ -7,6 +7,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
@@ -91,7 +92,7 @@ public class BlockListPage extends TelnetPage {
     UserSettings _settings;
 
     public int getPageType() {
-        return 8;
+        return BahamutPage.BAHAMUT_BLOCK_LIST;
     }
 
     public int getPageLayout() {

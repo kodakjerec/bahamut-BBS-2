@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -10,6 +12,7 @@ import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Dialogs.Dialog_SearchBoard;
 import com.kota.Bahamut.Dialogs.Dialog_SearchBoard_Listener;
 import com.kota.Bahamut.ListPage.TelnetListPage;
@@ -20,6 +23,7 @@ import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageHandler;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -35,7 +39,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     UserSettings _settings;
 
     public int getPageType() {
-        return 6;
+        return BahamutPage.BAHAMUT_CLASS;
     }
 
     public int getPageLayout() {
@@ -54,10 +58,10 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
 
         // 自動登入洽特
-        if (this._settings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat()) {
             // 進入洽特
-            // 輸入版序:44 => 定位到44:Enter => 進入版面:Enter
-            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("44\n\n")).start();
+            // 查詢看板 => Chat => 定位到Chat:Enter => 進入版面:Enter
+            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("/Chat\n\n")).start();
         }
     }
 
@@ -71,11 +75,11 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         super.onPageRefresh();
         String title = this._title;
         if (title == null || title.length() == 0) {
-            title = "讀取中";
+            title = getContextString(R.string.loading);
         }
         String detail = this._detail;
         if (detail == null || detail.length() == 0) {
-            detail = "讀取中";
+            detail = getContextString(R.string.loading);
         }
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_headerView);
         if (header_view != null) {

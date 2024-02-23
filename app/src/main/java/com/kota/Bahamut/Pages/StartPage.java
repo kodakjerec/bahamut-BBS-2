@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages;
 
+import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
@@ -9,28 +10,36 @@ import androidx.core.content.pm.PackageInfoCompat;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
 
-public class StartPage extends TelnetPage{
+public class StartPage extends TelnetPage {
     View.OnClickListener _connect_listener = v -> StartPage.this.onConnectButtonClicked();
     View.OnClickListener _exit_listener = v -> StartPage.this.onExitButtonClicked();
+
+    View.OnClickListener _instruction_listener = v -> {
+        InstructionsPage page = PageContainer.getInstance().getInstructionPage();
+        getNavigationController().pushViewController(page);
+    };
 
     public int getPageLayout() {
         return R.layout.start_page;
     }
 
     public int getPageType() {
-        return 0;
+        return BahamutPage.START;
     }
 
+    @SuppressLint("SetTextI18n")
     public void onPageDidLoad() {
         getNavigationController().setNavigationTitle("勇者入口");
-        findViewById(R.id.Start_exitButton).setOnClickListener(this._exit_listener);
-        findViewById(R.id.Start_connectButton).setOnClickListener(this._connect_listener);
+        findViewById(R.id.Start_exitButton).setOnClickListener(_exit_listener);
+        findViewById(R.id.Start_connectButton).setOnClickListener(_connect_listener);
+        findViewById(R.id.Start_instructions).setOnClickListener(_instruction_listener);
         PackageInfo packageInfo;
         try {
             packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(),0);

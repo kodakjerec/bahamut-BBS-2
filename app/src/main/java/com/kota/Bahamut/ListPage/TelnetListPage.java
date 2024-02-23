@@ -1,5 +1,7 @@
 package com.kota.Bahamut.ListPage;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.annotation.SuppressLint;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
@@ -15,6 +17,7 @@ import com.kota.Bahamut.Command.BahamutCommandLoadBlock;
 import com.kota.Bahamut.Command.BahamutCommandLoadLastBlock;
 import com.kota.Bahamut.Command.BahamutCommandMoveToLastBlock;
 import com.kota.Bahamut.Command.TelnetCommand;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.HashMap;
@@ -693,7 +696,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void onLoadItemStart() {
-        ASProcessingDialog.showProcessingDialog("讀取中");
+        ASProcessingDialog.showProcessingDialog(getContextString(R.string.loading));
     }
 
     public void onLoadItemFinished() {
