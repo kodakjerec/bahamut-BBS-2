@@ -1,29 +1,30 @@
 package com.kota.Bahamut.DataModels;
-/**
- * 基本的書籤元件
+/*
+  基本的書籤元件
  */
+
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import com.kota.Bahamut.R;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 public class Bookmark {
     public static final String OPTIONAL_BOOKMARK = "0";
-    public static final String OPTIONAL_HOSTORY = "1";
+    public static final String OPTIONAL_STORY = "1";
     public static final int version = 1;
-    private String _author = "";
-    private String _board = "";
-    private String _detail = "";
-    private byte[] _ext_data = new byte[0];
-    private String _gy = "";
-    private String _keyword = "";
-    private String _mark = "n";
-    private String _title = "";
+    String _author = "";
+    String _board = "";
+    String _detail = "";
+    byte[] _ext_data = new byte[0];
+    String _gy = "";
+    String _keyword = "";
+    String _mark = "n";
+    String _title = "";
     public int index = 0;
     public String optional = OPTIONAL_BOOKMARK;
     public int weight = 0;
@@ -42,135 +43,135 @@ public class Bookmark {
     public JSONObject exportToJSON() throws Exception {
         JSONObject obj = new JSONObject();
         obj.put("version", 1);
-        obj.put("index", this.index);
-        obj.put("optional", this.optional);
-        obj.put("board", this._board);
-        obj.put("title", this._title);
-        obj.put("weight", this.weight);
-        obj.put("detail", this._detail);
-        obj.put("keyword", this._keyword);
-        obj.put("author", this._author);
-        obj.put("mark", this._mark);
-        obj.put("gy", this._gy);
+        obj.put("index", index);
+        obj.put("optional", optional);
+        obj.put("board", _board);
+        obj.put("title", _title);
+        obj.put("weight", weight);
+        obj.put("detail", _detail);
+        obj.put("keyword", _keyword);
+        obj.put("author", _author);
+        obj.put("mark", _mark);
+        obj.put("gy", _gy);
         return obj;
     }
 
     public void importFromJSON(JSONObject obj) throws JSONException {
-        this.index = obj.isNull("index") ? 0 : obj.getInt("index");
-        if (this.index == 0) {
+        index = obj.isNull("index") ? 0 : obj.getInt("index");
+        if (index == 0) {
             System.out.print("index:0");
         }
-        this.optional = obj.getString("optional");
-        this._board = obj.getString("board");
-        this._title = obj.getString("title");
-        this.weight = obj.getInt("weight");
-        this._detail = obj.getString("detail");
-        this._keyword = obj.getString("keyword");
-        this._author = obj.getString("author");
-        this._mark = obj.getString("mark");
-        this._gy = obj.getString("gy");
+        optional = obj.getString("optional");
+        _board = obj.getString("board");
+        _title = obj.getString("title");
+        weight = obj.getInt("weight");
+        _detail = obj.getString("detail");
+        _keyword = obj.getString("keyword");
+        _author = obj.getString("author");
+        _mark = obj.getString("mark");
+        _gy = obj.getString("gy");
     }
 
     public void importFromStream(ObjectInputStream aStream) throws IOException {
         aStream.readInt();
-        this.index = 0;
-        this.optional = aStream.readUTF();
-        this._board = aStream.readUTF();
-        this._title = aStream.readUTF();
-        this.weight = aStream.readInt();
-        this._detail = aStream.readUTF();
-        this._keyword = aStream.readUTF();
-        this._author = aStream.readUTF();
-        this._mark = aStream.readUTF();
-        this._gy = aStream.readUTF();
-        this._ext_data = new byte[aStream.readInt()];
-        aStream.read(this._ext_data);
+        index = 0;
+        optional = aStream.readUTF();
+        _board = aStream.readUTF();
+        _title = aStream.readUTF();
+        weight = aStream.readInt();
+        _detail = aStream.readUTF();
+        _keyword = aStream.readUTF();
+        _author = aStream.readUTF();
+        _mark = aStream.readUTF();
+        _gy = aStream.readUTF();
+        _ext_data = new byte[aStream.readInt()];
+        aStream.read(_ext_data);
     }
 
     public String getTitle() {
-        return this._title;
+        return _title;
     }
 
     public void setTitle(String title) {
         if (title == null) {
-            this._title = "";
+            _title = "";
         } else {
-            this._title = title;
+            _title = title;
         }
     }
 
     public String getKeyword() {
-        return this._keyword;
+        return _keyword;
     }
 
     public void setKeyword(String keyword) {
         if (keyword == null) {
-            this._keyword = "";
+            _keyword = "";
         } else {
-            this._keyword = keyword;
+            _keyword = keyword;
         }
     }
 
     public String getAuthor() {
-        return this._author;
+        return _author;
     }
 
     public void setAuthor(String author) {
         if (author == null) {
-            this._author = "";
+            _author = "";
         } else {
-            this._author = author;
+            _author = author;
         }
     }
 
     public String getMark() {
-        return this._mark;
+        return _mark;
     }
 
     public void setMark(String mark) {
         if (mark == null || !mark.equals("y")) {
-            this._mark = "n";
+            _mark = "n";
         } else {
-            this._mark = mark;
+            _mark = mark;
         }
     }
 
     public String getGy() {
-        return this._gy;
+        return _gy;
     }
 
     public void setGy(String gy) {
         if (gy == null) {
-            this._gy = "";
+            _gy = "";
         } else {
-            this._gy = gy;
+            _gy = gy;
         }
     }
 
     public void setBoard(String board) {
         if (board == null) {
-            this._board = "";
+            _board = "";
         } else {
-            this._board = board;
+            _board = board;
         }
     }
 
     public String getBoard() {
-        return this._board;
+        return _board;
     }
 
     public String generateTitle() {
         String title = "";
-        if (this._keyword.trim().length() > 0) {
-            title = getContextString(R.string.title_) + this._keyword;
+        if (_keyword.trim().length() > 0) {
+            title = getContextString(R.string.title_) + _keyword;
         }
-        if (title.length() == 0 && this._author.trim().length() > 0) {
-            title = getContextString(R.string.author_) + this._author;
+        if (title.length() == 0 && _author.trim().length() > 0) {
+            title = getContextString(R.string.author_) + _author;
         }
-        if (title.length() == 0 && this._gy.trim().length() > 0) {
-            title = getContextString(R.string.do_gy_) + this._gy;
+        if (title.length() == 0 && _gy.trim().length() > 0) {
+            title = getContextString(R.string.do_gy_) + _gy;
         }
-        if (this._mark.equals("y")) {
+        if (_mark.equals("y")) {
             title = "M " + title;
         }
         if (title.length() == 0) {

@@ -4,23 +4,20 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class ToolBarFloating extends LinearLayout {
     private LinearLayout _myView;
-    private UserSettings _settings;
     private Button _btnSetting;
     private Button _btn1;
     private Button _btn2;
@@ -37,15 +34,14 @@ public class ToolBarFloating extends LinearLayout {
 
     @SuppressLint("ClickableViewAccessibility")
     private void init(Context context) {
-        _settings = new UserSettings(getContext());
-        _idle = _settings.getToolbarIdle();
-        _alpha = _settings.getToolbarAlpha()/100;
+        _idle = UserSettings.getToolbarIdle();
+        _alpha = UserSettings.getToolbarAlpha()/100;
         inflate(context, R.layout.toolbar_floating, this);
         scale = getContext().getResources().getDisplayMetrics().density;
 
         _myView = (LinearLayout) findViewById(R.id.ToolbarFloating);
         // 取得上次紀錄
-        List<Float> list = _settings.getFloatingLocation();
+        List<Float> list = UserSettings.getFloatingLocation();
         if (list.size()>0 && list.get(0)>=0.0f) {
             float pointX = list.get(0);
             float pointY = list.get(1);
@@ -146,7 +142,7 @@ public class ToolBarFloating extends LinearLayout {
         // 应用新的LayoutParams
         _myView.setLayoutParams(params);
         // 儲存位置
-        _settings.setFloatingLocation(deltaX, deltaY);
+        UserSettings.setFloatingLocation(deltaX, deltaY);
 
     }
 

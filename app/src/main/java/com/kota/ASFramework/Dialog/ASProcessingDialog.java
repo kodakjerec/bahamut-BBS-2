@@ -3,6 +3,7 @@ package com.kota.ASFramework.Dialog;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 
 import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
@@ -91,9 +92,17 @@ public class ASProcessingDialog extends ASDialog {
     frame_view.addView(content_view);
     // progress bar
     ProgressBar _progress_bar = new ProgressBar(getContext());
-    _progress_bar.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+    ViewGroup.LayoutParams _pb_layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    _progress_bar.setLayoutParams(_pb_layoutParams);
     int progress_padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10.0f, getContext().getResources().getDisplayMetrics());
     _progress_bar.setPadding(0, 0, 0, progress_padding);
+    // progress bar color
+    TypedValue typedValue = new TypedValue();
+    getContext().getTheme().resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true);
+    int pb_color = typedValue.resourceId;
+    @SuppressLint("ResourceAsColor") ColorStateList pb_colorList = ColorStateList.valueOf(pb_color);
+    _progress_bar.setProgressTintList(pb_colorList);
+    // add progress bar
     content_view.addView(_progress_bar);
     // 訊息
     this._message_label = new TextView(getContext());

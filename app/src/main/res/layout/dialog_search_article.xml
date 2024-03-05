@@ -17,7 +17,7 @@
                     </LinearLayout>
                     <View style="@style/BlockDividerHorizontal"/>
                     <LinearLayout android:gravity="center_vertical" android:orientation="vertical" android:id="@+id/SearchArticleDialog_markBlock" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="57dp">
-                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:paddingStart="0dp" android:paddingEnd="20dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/marked_unly" style="@style/TextViewNormal"/>
+                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:paddingStart="0dp" android:paddingEnd="20dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/mark_only" style="@style/TextViewNormal"/>
                         <RadioGroup android:orientation="horizontal" android:id="@+id/Bahamut_Dialog_Search_mark" android:layout_width="match_parent" android:layout_height="wrap_content" android:checkedButton="@+id/Bahamut_Dialog_Search_mark_NO">
                             <RadioButton style="@style/ListDialogItem" android:textSize="21sp" android:id="@+id/Bahamut_Dialog_Search_mark_YES" android:layout_width="100dp" android:layout_height="48dp" android:text="@string/limit" android:layout_weight="1"/>
                             <RadioButton style="@style/ListDialogItem" android:textSize="21sp" android:id="@+id/Bahamut_Dialog_Search_mark_NO" android:layout_width="100dp" android:layout_height="48dp" android:text="@string/un_limit" android:layout_weight="1"/>

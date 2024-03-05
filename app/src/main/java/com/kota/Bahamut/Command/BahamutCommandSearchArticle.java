@@ -1,32 +1,35 @@
 package com.kota.Bahamut.Command;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Telnet.TelnetClient;
 
 public class BahamutCommandSearchArticle extends TelnetCommand {
-    private String _author = "";
-    private String _gy = "";
-    private String _keyword = "";
-    private String _mark = "";
+    String _author;
+    String _gy;
+    String _keyword;
+    String _mark;
 
     public BahamutCommandSearchArticle(String keyword, String author, String mark, String gy) {
-        this._keyword = keyword;
-        this._author = author;
-        this._mark = mark;
-        this._gy = gy;
-        this.Action = 4;
+        _keyword = keyword;
+        _author = author;
+        _mark = mark;
+        _gy = gy;
+        Action = SearchArticle;
     }
 
     public void execute(TelnetListPage aListPage) {
-        TelnetClient.getClient().sendStringToServerInBackground("~" + this._keyword + "\n" + this._author + "\n" + this._mark + "\n" + this._gy);
+        TelnetClient.getClient().sendStringToServerInBackground("~" + _keyword + "\n" + _author + "\n" + _mark + "\n" + _gy);
     }
 
     public void executeFinished(TelnetListPage aListPage, TelnetListPageBlock aPageData) {
         setDone(true);
     }
 
+    @NonNull
     public String toString() {
-        return "[SearchArticle][keyword=" + this._keyword + " author=" + this._author + " mark=" + this._mark + " gy=" + this._gy + "]";
+        return "[SearchArticle][keyword=" + _keyword + " author=" + _author + " mark=" + _mark + " gy=" + _gy + "]";
     }
 }

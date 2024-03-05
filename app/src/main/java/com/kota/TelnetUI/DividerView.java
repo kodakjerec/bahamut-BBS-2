@@ -21,8 +21,7 @@ public class DividerView extends View {
         super(context, attrs);
     }
 
-    /* access modifiers changed from: protected */
-    public void onDraw(Canvas canvas) {
+    protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         float line_size = (float) Math.ceil((double) (((float) getWidth()) / ((float) 80)));
         float origin_x = (float) Math.floor((double) ((((float) getWidth()) - (((float) 79) * line_size)) / 2.0f));

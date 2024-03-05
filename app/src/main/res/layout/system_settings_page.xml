@@ -80,7 +80,7 @@
                     android:valueFrom="0.0"
                     android:valueTo="4.0"
                     android:stepSize="0.5"
-                    style="@style/SystemSettingsSpinnerItem"/>
+                    style="@style/SystemSettingsSlider"/>
             </LinearLayout>
             <LinearLayout style="@style/SystemSettingsItem"
                 android:id="@+id/SystemSettings_item_toolbar_order_item_3"
@@ -100,7 +100,7 @@
                     android:valueFrom="0"
                     android:valueTo="100"
                     android:stepSize="10"
-                    style="@style/SystemSettingsSpinnerItem"/>
+                    style="@style/SystemSettingsSlider"/>
             </LinearLayout>
         </RelativeLayout>
         <RelativeLayout
@@ -116,6 +116,19 @@
                     android:id="@+id/SystemSettings_drawer_location_spinner"
                     style="@style/SystemSettingsSpinnerItem"/>
             </LinearLayout>
+        </RelativeLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_link"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableLinkAutoShow" style="@style/SystemSettingsItem">
+            <View style="@style/HorizontalDivider"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_chapter_link_auto_show" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableLinkAutoShow" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_auto_show"/>
+        </RelativeLayout>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableLinkShowThumbnail" style="@style/SystemSettingsItem">
+            <View style="@style/HorizontalDivider"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_chapter_link_show_thumbnail" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableLinkShowThumbnail" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_show_thumbnail"/>
         </RelativeLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"

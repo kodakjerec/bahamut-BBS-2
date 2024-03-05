@@ -1,10 +1,13 @@
 package com.kota.Bahamut.Pages.Model;
 
+import android.text.SpannableString;
+
 import com.kota.Bahamut.ListPage.TelnetListPageItem;
+import com.kota.Telnet.Model.TelnetRow;
+
 import java.util.Stack;
 
 public class BoardPageItem extends TelnetListPageItem {
-    private static final int _count = 0;
     private static final Stack<BoardPageItem> _pool = new Stack<>();
     public String Author = null;
     public String Date = null;
@@ -55,7 +58,6 @@ public class BoardPageItem extends TelnetListPageItem {
         this.Title = null;
     }
 
-    /* access modifiers changed from: protected */
     protected void finalize() throws Throwable {
         super.finalize();
     }

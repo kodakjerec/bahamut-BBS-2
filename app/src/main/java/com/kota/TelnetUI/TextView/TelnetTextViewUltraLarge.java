@@ -21,6 +21,6 @@ public class TelnetTextViewUltraLarge extends TelnetTextView {
 
     /* access modifiers changed from: protected */
     public void reloadTextSize() {
-        setTextModelSize(2);
+        setTextModelSize(TEXT_VIEW_SIZE_ULTRA_LARGE);
     }
 }

@@ -1,29 +1,31 @@
 package com.kota.Bahamut.Dialogs;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
 
+import java.util.Objects;
+
 public class Dialog_SelectArticle extends ASDialog implements View.OnClickListener {
-    Button _button_0_p = null;
-    Button _button_1_p = null;
-    Button _button_2_p = null;
-    Button _button_3_p = null;
-    Button _button_4_p = null;
-    Button _button_5_p = null;
-    Button _button_6_p = null;
-    Button _button_7_p = null;
-    Button _button_8_p = null;
-    Button _button_9_p = null;
-    Button _button_back_space_p = null;
-    Button _cancel_button = null;
-    TextView _content = null;
+    Button _button_0_p;
+    Button _button_1_p;
+    Button _button_2_p;
+    Button _button_3_p;
+    Button _button_4_p;
+    Button _button_5_p;
+    Button _button_6_p;
+    Button _button_7_p;
+    Button _button_8_p;
+    Button _button_9_p;
+    Button _button_back_space_p;
+    Button _cancel_button;
+    TextView _content;
     String _content_string = "";
-    Dialog_SelectArticle_Listener _listener = null;
-    Button _search_button = null;
+    Dialog_SelectArticle_Listener _listener;
+    Button _search_button;
 
     public String getName() {
         return "BahamutBoardSelectDialog";
@@ -32,21 +34,21 @@ public class Dialog_SelectArticle extends ASDialog implements View.OnClickListen
     public Dialog_SelectArticle() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_select_article);
-        getWindow().setBackgroundDrawable((Drawable) null);
-        this._content = (TextView) findViewById(R.id.Bahamut_Dialog_Select_content_Label);
-        this._button_0_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_0_p);
-        this._button_1_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_1_p);
-        this._button_2_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_2_p);
-        this._button_3_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_3_p);
-        this._button_4_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_4_p);
-        this._button_5_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_5_p);
-        this._button_6_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_6_p);
-        this._button_7_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_7_p);
-        this._button_8_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_8_p);
-        this._button_9_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_9_p);
-        this._button_back_space_p = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_backSpace_p);
-        this._search_button = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_Search);
-        this._cancel_button = (Button) findViewById(R.id.Bahamut_Dialog_Select_Button_Cancel);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        this._content = findViewById(R.id.Bahamut_Dialog_Select_content_Label);
+        this._button_0_p = findViewById(R.id.Bahamut_Dialog_Select_Button_0_p);
+        this._button_1_p = findViewById(R.id.Bahamut_Dialog_Select_Button_1_p);
+        this._button_2_p = findViewById(R.id.Bahamut_Dialog_Select_Button_2_p);
+        this._button_3_p = findViewById(R.id.Bahamut_Dialog_Select_Button_3_p);
+        this._button_4_p = findViewById(R.id.Bahamut_Dialog_Select_Button_4_p);
+        this._button_5_p = findViewById(R.id.Bahamut_Dialog_Select_Button_5_p);
+        this._button_6_p = findViewById(R.id.Bahamut_Dialog_Select_Button_6_p);
+        this._button_7_p = findViewById(R.id.Bahamut_Dialog_Select_Button_7_p);
+        this._button_8_p = findViewById(R.id.Bahamut_Dialog_Select_Button_8_p);
+        this._button_9_p = findViewById(R.id.Bahamut_Dialog_Select_Button_9_p);
+        this._button_back_space_p = findViewById(R.id.Bahamut_Dialog_Select_Button_backSpace_p);
+        this._search_button = findViewById(R.id.Bahamut_Dialog_Select_Button_Search);
+        this._cancel_button = findViewById(R.id.Bahamut_Dialog_Select_Button_Cancel);
         this._button_0_p.setOnClickListener(this);
         this._button_1_p.setOnClickListener(this);
         this._button_2_p.setOnClickListener(this);

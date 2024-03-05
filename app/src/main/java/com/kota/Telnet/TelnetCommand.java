@@ -1,5 +1,7 @@
 package com.kota.Telnet;
 
+import androidx.annotation.NonNull;
+
 /* loaded from: classes.dex */
 public class TelnetCommand {
     public static final byte AUTH = 37;
@@ -79,6 +81,7 @@ public class TelnetCommand {
         }
     }
 
+    @NonNull
     public String toString() {
         return getCommandNameString(this.header) + "," + getCommandNameString(this.action) + "," + getCommandNameString(this.option);
     }

@@ -9,18 +9,19 @@ import android.widget.ListView;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.Vector;
 
 public class BlockListPage extends TelnetPage {
+    EditText _input_field;
+    View _blockList_Add;
     View.OnClickListener _add_listener = v -> {
-        EditText input_field = (EditText) BlockListPage.this.findViewById(R.id.BlockList_Input);
-        if (input_field != null) {
-            String block_name = input_field.getText().toString().trim();
-            input_field.setText("");
-            BlockListPage.this._settings.addBlockName(block_name);
-            BlockListPage.this._settings.notifyDataUpdated();
+        if (_input_field != null) {
+            String block_name = _input_field.getText().toString().trim();
+            _input_field.setText("");
+            UserSettings.addBlockName(block_name);
+            UserSettings.notifyDataUpdated();
             BlockListPage.this.reload();
         }
     };
@@ -31,7 +32,7 @@ public class BlockListPage extends TelnetPage {
         int deleted_index = aItemView.index;
         Vector<String> new_list = new Vector<>(BlockListPage.this._block_list);
         new_list.remove(deleted_index);
-        BlockListPage.this._settings.updateBlockList(new_list);
+        UserSettings.updateBlockList(new_list);
         BlockListPage.this.reload();
     };
     BaseAdapter _list_adapter = new BaseAdapter() {
@@ -43,7 +44,7 @@ public class BlockListPage extends TelnetPage {
         }
 
         public String getItem(int index) {
-            return BlockListPage.this._block_list.get(index);
+            return _block_list.get(index);
         }
 
         public long getItemId(int position) {
@@ -57,9 +58,9 @@ public class BlockListPage extends TelnetPage {
         public View getView(int position, View convertView, ViewGroup parent) {
             BlockListPage_ItemView item_view;
             if (convertView == null) {
-                item_view = new BlockListPage_ItemView(BlockListPage.this.getContext());
+                item_view = new BlockListPage_ItemView(getContext());
                 item_view.setLayoutParams(new AbsListView.LayoutParams(-1, -2));
-                item_view.listener = BlockListPage.this._block_listener;
+                item_view.listener = _block_listener;
             } else {
                 item_view = (BlockListPage_ItemView) convertView;
             }
@@ -89,7 +90,6 @@ public class BlockListPage extends TelnetPage {
             return false;
         }
     };
-    UserSettings _settings;
 
     public int getPageType() {
         return BahamutPage.BAHAMUT_BLOCK_LIST;
@@ -104,24 +104,27 @@ public class BlockListPage extends TelnetPage {
     }
 
     public void onPageDidLoad() {
-        this._settings = new UserSettings(getContext());
-        this._block_list = this._settings.getBlockList();
-        ((ListView) findViewById(R.id.BlockList_list)).setAdapter(this._list_adapter);
-        findViewById(R.id.BlockList_Add).setOnClickListener(this._add_listener);
+        _block_list = UserSettings.getBlockList();
+        ListView mainLayout = (ListView) findViewById(R.id.BlockList_list);
+        mainLayout.setAdapter(_list_adapter);
+        _input_field = (EditText) findViewById(R.id.BlockList_Input);
+        _blockList_Add = findViewById(R.id.BlockList_Add);
+        _blockList_Add.setOnClickListener(_add_listener);
+        mainLayout.requestFocus();
     }
 
     public void onPageWillDisappear() {
-        this._settings.notifyDataUpdated();
+        UserSettings.notifyDataUpdated();
     }
 
     public void onPageDidDisappear() {
-        this._block_list = null;
+        _block_list = null;
         super.onPageDidDisappear();
     }
 
     private void reload() {
-        this._block_list = this._settings.getBlockList();
-        this._list_adapter.notifyDataSetChanged();
+        _block_list = UserSettings.getBlockList();
+        _list_adapter.notifyDataSetChanged();
     }
 
     public boolean onReceivedGestureRight() {

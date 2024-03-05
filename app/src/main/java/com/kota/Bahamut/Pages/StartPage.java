@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import androidx.core.content.pm.PackageInfoCompat;
 
@@ -11,8 +13,10 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
+import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;

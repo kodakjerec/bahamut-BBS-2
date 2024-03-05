@@ -25,7 +25,7 @@ import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewNormal;
 
@@ -34,7 +34,6 @@ import java.util.List;
 
 public class BillingPage extends TelnetPage {
     private BillingClient billingClient;
-    UserSettings _settings;
     @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
         return BahamutPage.BAHAMUT_BILLING;
@@ -59,7 +58,6 @@ public class BillingPage extends TelnetPage {
     public void onPageDidLoad() {
         billingClient = getBillingClient();
         getProductList();
-        _settings = new UserSettings(getContext());
 
         // 檢查已購買
         Button button1 = (Button)findViewById(R.id.button_checkPurchaseQuery);
@@ -146,8 +144,8 @@ public class BillingPage extends TelnetPage {
                         if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
                             // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                             if (list.toArray().length>0) {
-                                if (!_settings.getPropertiesVIP()) {
-                                    _settings.setPropertiesVIP(true);
+                                if (!UserSettings.getPropertiesVIP()) {
+                                    UserSettings.setPropertiesVIP(true);
                                 }
                                 for(PurchaseHistoryRecord purchaseHistoryRecord: list) {
                                     String productName = purchaseHistoryRecord.getProducts().get(0);

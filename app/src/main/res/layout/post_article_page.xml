@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:orientation="horizontal" android:id="@+id/Post_TitleBlock" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="54dp" android:layout_alignParentTop="true" style="@style/TouchBlock">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/Post_TitleBlock"
+        android:background="@color/item_background_color"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_alignParentTop="true"
+        android:focusableInTouchMode="true"
+        style="@style/TouchBlock">
         <Spinner
             android:id="@+id/Post_headerSelector"
             android:layout_width="65dp"
@@ -14,6 +22,8 @@
     </LinearLayout>
     <TextView android:id="@+id/Post_MiddleDivider" android:layout_below="@+id/Post_TitleBlock" style="@style/HorizontalDivider"/>
     <LinearLayout android:id="@+id/Post_Toolbar" android:layout_alignParentBottom="true" style="@style/Toolbar">
+        <Button android:id="@+id/ArticlePostDialog_Color" android:text="@string/post_article_page_paint_color" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/ArticlePostDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/ArticlePostDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem"/>

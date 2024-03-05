@@ -13,20 +13,15 @@ import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ConsumeParams;
 import com.android.billingclient.api.ConsumeResponseListener;
 import com.android.billingclient.api.Purchase;
-import com.android.billingclient.api.PurchaseHistoryRecord;
-import com.android.billingclient.api.PurchaseHistoryResponseListener;
-import com.android.billingclient.api.PurchasesResponseListener;
 import com.android.billingclient.api.PurchasesUpdatedListener;
 import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.android.billingclient.api.QueryPurchasesParams;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
 
 import java.util.List;
 
 public final class MyBillingClient {
-    static UserSettings _settings;
     public static  BillingClient billingClient;
     @SuppressLint("StaticFieldLeak")
     private static Context myContext;
@@ -71,15 +66,12 @@ public final class MyBillingClient {
                 .setPurchaseToken(purchase.getPurchaseToken())
                 .build();
 
-        ConsumeResponseListener consumeResponseListener = new ConsumeResponseListener() {
-            @Override
-            public void onConsumeResponse(@NonNull BillingResult billingResult, @NonNull String s) {
-                if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                    if (!_settings.getPropertiesVIP()) {
-                        _settings.setPropertiesVIP(true);
-                    }
-                    ASToast.showShortToast(myContext.getString(R.string.billing_page_result_success));
+        ConsumeResponseListener consumeResponseListener = (billingResult, s) -> {
+            if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
+                if (!UserSettings.getPropertiesVIP()) {
+                    UserSettings.setPropertiesVIP(true);
                 }
+                ASToast.showShortToast(myContext.getString(R.string.billing_page_result_success));
             }
         };
 
@@ -88,20 +80,16 @@ public final class MyBillingClient {
 
     // 重新確認已購買的商品
     public static void checkPurchaseHistoryQuery() {
-        UserSettings userSettings = new UserSettings(myContext);
         billingClient.queryPurchaseHistoryAsync(
                 QueryPurchaseHistoryParams.newBuilder()
                         .setProductType(BillingClient.ProductType.INAPP)
                         .build(),
-                new PurchaseHistoryResponseListener() {
-                    @Override
-                    public void onPurchaseHistoryResponse(@NonNull BillingResult billingResult, @Nullable List<PurchaseHistoryRecord> list) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
-                            // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
-                            if (list.toArray().length>0) {
-                                if (!_settings.getPropertiesVIP()) {
-                                    _settings.setPropertiesVIP(true);
-                                }
+                (billingResult, list) -> {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
+                        // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
+                        if (list.toArray().length>0) {
+                            if (!UserSettings.getPropertiesVIP()) {
+                                UserSettings.setPropertiesVIP(true);
                             }
                         }
                     }
@@ -113,13 +101,10 @@ public final class MyBillingClient {
     public static void checkPurchase() {
         billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP).build(),
-                new PurchasesResponseListener() {
-                    @Override
-                    public void onQueryPurchasesResponse(@NonNull BillingResult billingResult, @NonNull List<Purchase> list) {
-                        if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
-                            for (Purchase purchase: list) {
-                                handlePurchase(purchase);
-                            }
+                (billingResult, list) -> {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
+                        for (Purchase purchase: list) {
+                            handlePurchase(purchase);
                         }
                     }
                 }
@@ -132,7 +117,6 @@ public final class MyBillingClient {
                 .setListener(purchasesUpdatedListener)
                 .enablePendingPurchases()
                 .build();
-        _settings = new UserSettings(myContext);
 
 
         // 商店付款建立

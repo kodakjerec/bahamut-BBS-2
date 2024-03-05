@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId "com.kota.Bahamut"
-        minSdk 28
+        minSdk 26
         targetSdk 34
-        versionCode 5
-        versionName "1.9"
+        versionCode 6
+        versionName "1.9.1"
     }
 
     buildTypes {
@@ -22,8 +22,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -41,11 +41,15 @@ android {
 dependencies {
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.5.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.5.2'
     implementation 'androidx.navigation:navigation-ui:2.5.2'
+    // for url head
+    implementation 'org.jsoup:jsoup:1.17.2'
+    // for image loading
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
+
+    // billing
     implementation 'com.android.billingclient:billing:6.1.0'
     implementation 'com.google.android.play:integrity:1.3.0'
 
@@ -55,4 +59,5 @@ dependencies {
     // define any required OkHttp artifacts without version
     implementation("com.squareup.okhttp3:okhttp")
     implementation("com.squareup.okhttp3:logging-interceptor")
+    implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 }

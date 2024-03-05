@@ -1,17 +1,19 @@
 package com.kota.Telnet;
 
+import static com.kota.Telnet.Reference.TelnetAnsiCode.getBackAsciiCode;
+import static com.kota.Telnet.Reference.TelnetAnsiCode.getTextAsciiCode;
+
 import android.annotation.SuppressLint;
-import android.widget.TextView;
+import android.text.SpannableString;
 
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.Model.TelnetRow;
+import com.kota.Telnet.Reference.TelnetAnsiCode;
+
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class TelnetArticle {
     public static final int MINIMUM_REMOVE_QUOTE = 1;
@@ -25,165 +27,202 @@ public class TelnetArticle {
     public String Title = "";
     public int Type = 0;
     private String _block_list = null;
-    private Vector<TelnetArticleItem> _extend_items = new Vector<>();
+    private final Vector<TelnetArticleItem> _extend_items = new Vector<>();
     private TelnetFrame _frame = null;
-    private Vector<TelnetArticleItemInfo> _infos = new Vector<>();
-    private Vector<TelnetArticleItem> _items = new Vector<>();
-    private Vector<TelnetArticleItem> _main_items = new Vector<>();
-    private Vector<TelnetArticlePush> _pushs = new Vector<>();
+    private final Vector<TelnetArticleItemInfo> _info = new Vector<>();
+    private final Vector<TelnetArticleItem> _items = new Vector<>();
+    private final Vector<TelnetArticleItem> _main_items = new Vector<>();
+    private final Vector<TelnetArticlePush> _push = new Vector<>();
 
     public void setFrameData(Vector<TelnetRow> rows) {
-        this._frame = new TelnetFrame(rows.size());
+        _frame = new TelnetFrame(rows.size());
         for (int i = 0; i < rows.size(); i++) {
-            this._frame.setRow(i, rows.get(i).clone());
+            _frame.setRow(i, rows.get(i).clone());
         }
     }
 
     public TelnetFrame getFrame() {
-        return this._frame;
+        return _frame;
     }
 
     public void addMainItem(TelnetArticleItem aItem) {
-        this._main_items.add(aItem);
+        _main_items.add(aItem);
     }
 
     public void addExtendItem(TelnetArticleItem aItem) {
-        this._extend_items.add(aItem);
+        _extend_items.add(aItem);
     }
 
     public void addInfo(TelnetArticleItemInfo aInfo) {
-        this._infos.add(aInfo);
+        _info.add(aInfo);
     }
 
     public int getInfoSize() {
-        return this._infos.size();
+        return _info.size();
     }
 
     public TelnetArticleItemInfo getInfo(int index) {
-        return this._infos.get(index);
+        return _info.get(index);
     }
 
     public void addPush(TelnetArticlePush aPush) {
-        this._pushs.add(aPush);
+        _push.add(aPush);
     }
 
     public void build() {
-        Iterator<TelnetArticleItem> it = this._main_items.iterator();
-        while (it.hasNext()) {
-            it.next().build();
+        for (TelnetArticleItem main_item : _main_items) {
+            main_item.build();
         }
-        Iterator<TelnetArticleItem> it2 = this._extend_items.iterator();
-        while (it2.hasNext()) {
-            it2.next().build();
+        for (TelnetArticleItem extend_item : _extend_items) {
+            extend_item.build();
         }
         Vector<TelnetArticleItem> remove_items = new Vector<>();
-        Iterator<TelnetArticleItem> it3 = this._main_items.iterator();
-        while (it3.hasNext()) {
-            TelnetArticleItem item = it3.next();
+        for (TelnetArticleItem item : _main_items) {
             if (item.isEmpty()) {
                 remove_items.add(item);
             }
         }
-        Iterator<TelnetArticleItem> it4 = remove_items.iterator();
-        while (it4.hasNext()) {
-            this._main_items.remove(it4.next());
+        for (TelnetArticleItem removeItem : remove_items) {
+            _main_items.remove(removeItem);
         }
         remove_items.clear();
-        Iterator<TelnetArticleItem> it5 = this._extend_items.iterator();
-        while (it5.hasNext()) {
-            TelnetArticleItem item2 = it5.next();
+        for (TelnetArticleItem item2 : _extend_items) {
             if (item2.isEmpty()) {
                 remove_items.add(item2);
             }
         }
-        Iterator<TelnetArticleItem> it6 = remove_items.iterator();
-        while (it6.hasNext()) {
-            this._extend_items.remove(it6.next());
+        for (TelnetArticleItem remove_item : remove_items) {
+            _extend_items.remove(remove_item);
         }
         remove_items.clear();
-        if (this._extend_items.size() > 0) {
-            this._extend_items.lastElement().setType(1);
+        if (_extend_items.size() > 0) {
+            _extend_items.lastElement().setType(1);
         }
-        this._items.clear();
-        this._items.addAll(this._main_items);
-        this._items.addAll(this._extend_items);
+        _items.clear();
+        _items.addAll(_main_items);
+        _items.addAll(_extend_items);
     }
 
     public void clear() {
-        this.Title = "";
-        this.Author = "";
-        this.BoardName = "";
-        this.DateTime = "";
-        this._main_items.clear();
-        this._items.clear();
-        this._pushs.clear();
-        this._infos.clear();
-        this._frame = null;
+        Title = "";
+        Author = "";
+        BoardName = "";
+        DateTime = "";
+        _main_items.clear();
+        _items.clear();
+        _push.clear();
+        _info.clear();
+        _frame = null;
     }
 
     public String generateReplyTitle() {
-        return "Re: " + this.Title;
+        return "Re: " + Title;
     }
 
     // 設定文章標題
-    public String generatrEditFormat() {
-        StringBuffer content_buffer = new StringBuffer();
-        String time_string = this._frame.getRow(2).toString().substring(4);
-        content_buffer.append("作者: " + this.Author);
-        if (this.Nickname != null && this.Nickname.length() > 0) {
-            content_buffer.append("(" + this.Nickname + ")");
+    public String generateEditFormat() {
+        StringBuilder content_buffer = new StringBuilder();
+        String time_string = _frame.getRow(2).toString().substring(4);
+        content_buffer.append("作者: ").append(Author);
+        if (Nickname != null && Nickname.length() > 0) {
+            content_buffer.append("(").append(Nickname).append(")");
         }
-        content_buffer.append(" 看板: " + this.BoardName + "\n");
+        content_buffer.append(" 看板: ").append(BoardName).append("\n");
         content_buffer.append("標題: %s\n");
-        content_buffer.append("時間: " + time_string + "\n");
+        content_buffer.append("時間: ").append(time_string).append("\n");
         content_buffer.append("\n%s");
         return content_buffer.toString();
     }
 
     public String generateEditTitle() {
-        return this._frame.getRow(1).toString().substring(4);
+        return _frame.getRow(1).toString().substring(4);
     }
 
-    // 設定文章內容
+    // 產生 修改用的文章內容
+    // 有附上ASCII色碼
     public String generateEditContent() {
-        StringBuffer content_buffer = new StringBuffer();
-        for (int i = 5; i < this._frame.getRowSize(); i++) {
-            content_buffer.append(this._frame.getRow(i).getRawString() + "\n");
+        StringBuilder content_buffer = new StringBuilder();
+        byte paintTextColor = TelnetAnsi.getDefaultTextColor();
+        byte paintBackColor = TelnetAnsi.getDefaultBackgroundColor();
+
+        for (int rowIndex = 5; rowIndex < _frame.getRowSize(); rowIndex++) {
+            TelnetRow _row = _frame.getRow(rowIndex);
+            String contentString = _row.getRawString();
+            if (contentString.length()>0) {
+                // 不用換顏色的內容
+                if (contentString.matches("※ .*") || contentString.matches("> .*")|| contentString.matches("--.*")) {
+                    content_buffer.append(contentString).append("\n");
+                } else {
+                    // 換顏色
+                    SpannableString ss = new SpannableString(contentString);
+                    StringBuilder finalString = new StringBuilder();
+                    byte[] textColor = _row.getTextColor();
+                    byte[] backColor = _row.getBackgroundColor();
+                    for (int i = 0; i < ss.length(); i++) {
+                        finalString.append(ss.charAt(i));
+
+                        // 有附加顏色
+                        if (textColor[i] != paintTextColor || backColor[i] != paintBackColor) {
+                            String appendString = "*[";
+
+                            if (textColor[i] != paintTextColor) { // 前景不同
+                                appendString += getTextAsciiCode(textColor[i]);
+
+                                if (backColor[i] != paintBackColor) { // 背景不同
+                                    appendString += ";" + getBackAsciiCode(backColor[i]);
+                                }
+                            } else if (backColor[i] != paintBackColor) { // 背景不同
+                                appendString += getBackAsciiCode(backColor[i]);
+                            }
+                            appendString += "m";
+                            finalString.insert(finalString.length() - 1, appendString);
+
+                            // 下一輪
+                            paintTextColor = textColor[i];
+                            paintBackColor = backColor[i];
+                        }
+                    }
+
+                    content_buffer.append(finalString).append("\n");
+                }
+            }
         }
+//        // 全部跑完後還有不同顏色
+//        if (paintTextColor != TelnetAnsi.getDefaultTextColor() || paintBackColor != TelnetAnsi.getDefaultBackgroundColor()) {
+//            content_buffer.append("*[m");
+//        }
+
+
         return content_buffer.toString();
     }
 
+    // 產生 回應用的文章內容
     public String generateReplyContent() {
         int maximum_quote;
         StringBuilder content_builder = new StringBuilder();
         Set<Integer> level_buffer = new HashSet<>();
         level_buffer.add(0);
-        Iterator<TelnetArticleItemInfo> it = this._infos.iterator();
-        while (it.hasNext()) {
-            level_buffer.add(Integer.valueOf(it.next().quoteLevel));
+        for (TelnetArticleItemInfo telnetArticleItemInfo : _info) {
+            level_buffer.add(telnetArticleItemInfo.quoteLevel);
         }
-        Integer[] quote_level_list = (Integer[]) level_buffer.toArray(new Integer[level_buffer.size()]);
+        Integer[] quote_level_list = level_buffer.toArray(new Integer[level_buffer.size()]);
         Arrays.sort(quote_level_list);
         if (quote_level_list.length < 2) {
-            maximum_quote = quote_level_list[quote_level_list.length - 1].intValue();
+            maximum_quote = quote_level_list[quote_level_list.length - 1];
         } else {
-            maximum_quote = quote_level_list[1].intValue();
+            maximum_quote = quote_level_list[1];
         }
-        content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", new Object[]{this.Author, this.Nickname}));
+        content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", Author, Nickname));
         content_builder.append("\n");
-        Iterator<TelnetArticleItemInfo> it2 = this._infos.iterator();
-        while (it2.hasNext()) {
-            TelnetArticleItemInfo info = it2.next();
+        for (TelnetArticleItemInfo info : _info) {
             if (!isBlocked(info.author) && info.quoteLevel <= maximum_quote) {
                 for (int i = 0; i < info.quoteLevel; i++) {
                     content_builder.append("> ");
                 }
-                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", new Object[]{info.author, info.nickname}));
+                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
             }
         }
-        Iterator<TelnetArticleItem> it3 = this._main_items.iterator();
-        while (it3.hasNext()) {
-            TelnetArticleItem item = it3.next();
+        for (TelnetArticleItem item : _main_items) {
             if (!isBlocked(item.getAuthor()) && item.getQuoteLevel() <= maximum_quote) {
                 String[] row_strings = item.getContent().split("\n");
                 for (String append : row_strings) {
@@ -199,36 +238,36 @@ public class TelnetArticle {
     }
 
     public int getItemSize() {
-        return this._items.size();
+        return _items.size();
     }
 
     public TelnetArticleItem getItem(int index) {
-        if (index < 0 || index >= this._items.size()) {
+        if (index < 0 || index >= _items.size()) {
             return null;
         }
-        return this._items.get(index);
+        return _items.get(index);
     }
 
     public void setBlockList(String aList) {
-        this._block_list = aList;
+        _block_list = aList;
     }
 
     @SuppressLint({"DefaultLocale"})
     public boolean isBlocked(String name) {
-        if (this._block_list == null || name == null || !this._block_list.contains("," + name.trim().toLowerCase() + ",")) {
+        if (_block_list == null || name == null || !_block_list.contains("," + name.trim().toLowerCase() + ",")) {
             return false;
         }
         return true;
     }
 
     public String getFullText() {
-        if (this._frame == null) {
+        if (_frame == null) {
             return "";
         }
         StringBuilder builder = new StringBuilder();
-        int len = this._frame.getRowSize();
+        int len = _frame.getRowSize();
         for (int i = 0; i < len; i++) {
-            TelnetRow row = this._frame.getRow(i);
+            TelnetRow row = _frame.getRow(i);
             if (i > 0) {
                 builder.append("\n");
             }

@@ -45,11 +45,10 @@ public class TelnetOutputBuilder {
         return this;
     }
 
-    public TelnetOutputBuilder pushData(byte[] data) {
+    public void pushData(byte[] data) {
         for (byte pushData : data) {
             pushData(pushData);
         }
-        return this;
     }
 
     public TelnetOutputBuilder pushKey(int key) {

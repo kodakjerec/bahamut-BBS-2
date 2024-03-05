@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Command;
 
+import androidx.annotation.NonNull;
+
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.ListPage.TelnetListPage;
@@ -8,10 +10,10 @@ import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
 
 public class BahamutCommandTheSameTitleUp extends TelnetCommand {
-    int _article_index = 0;
+    int _article_index;
 
     public BahamutCommandTheSameTitleUp(int articleIndex) {
-        this.Action = 10;
+        this.Action = LoadForwardSameTitleItem;
         this._article_index = articleIndex;
     }
 
@@ -27,9 +29,12 @@ public class BahamutCommandTheSameTitleUp extends TelnetCommand {
                 setDone(true);
                 return;
             }
-            TelnetOutputBuilder.create().pushString(this._article_index + "\n").pushKey(TelnetKeyboard.UP_ARROW).sendToServer();
+            TelnetOutputBuilder.create()
+                    .pushString(this._article_index + "\n")
+                    .pushKey(TelnetKeyboard.UP_ARROW).sendToServer();
         } else if (this._article_index > 0) {
-            TelnetOutputBuilder.create().pushString(this._article_index + "\n[").sendToServer();
+            TelnetOutputBuilder.create()
+                    .pushString(this._article_index + "\n[").sendToServer();
         } else {
             setDone(true);
         }
@@ -53,6 +58,7 @@ public class BahamutCommandTheSameTitleUp extends TelnetCommand {
         }
     }
 
+    @NonNull
     public String toString() {
         return "[TheSameTitleDown][articleIndex=" + this._article_index + "]";
     }

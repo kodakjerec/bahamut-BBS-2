@@ -13,10 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
-
-import androidx.annotation.NonNull;
 
 import com.google.android.material.slider.Slider;
 import com.kota.ASFramework.PageController.ASNavigationController;
@@ -24,99 +21,81 @@ import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
 
 public class SystemSettingsPage extends TelnetPage {
-    UserSettings _settings;
-    CompoundButton.OnCheckedChangeListener _auto_to_chat_enable_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesAutoToChat(isChecked);}
+    CompoundButton.OnCheckedChangeListener _auto_to_chat_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesAutoToChat(isChecked);
+    CompoundButton.OnCheckedChangeListener _gesture_on_board_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesGestureOnBoardEnable(isChecked);
+    CompoundButton.OnCheckedChangeListener _animation_enable_listener = (buttonView, isChecked) -> {
+        UserSettings.setPropertiesAnimationEnable(isChecked);
+        ASNavigationController.getCurrentController().setAnimationEnable(UserSettings.getPropertiesAnimationEnable());
     };
-    CompoundButton.OnCheckedChangeListener _gesture_on_board_enable_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesGestureOnBoardEnable(isChecked);}
-    };
-    CompoundButton.OnCheckedChangeListener _animation_enable_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesAnimationEnable(isChecked);
-            ASNavigationController.getCurrentController().setAnimationEnable(_settings.getPropertiesAnimationEnable());
-        }
-    };
-    CompoundButton.OnCheckedChangeListener _article_move_enable_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesArticleMoveDisable(isChecked);
-        }
-    };
-    CompoundButton.OnCheckedChangeListener _block_list_enable_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesBlockListEnable(isChecked);
-        }
-    };
+    CompoundButton.OnCheckedChangeListener _article_move_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesArticleMoveDisable(isChecked);
+    CompoundButton.OnCheckedChangeListener _block_list_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListEnable(isChecked);
     // 切換到黑名單設定
     View.OnClickListener _block_list_setting_listener = v -> getNavigationController().pushViewController(new BlockListPage());
 
     // 防止Wifi斷線
-    CompoundButton.OnCheckedChangeListener _keep_wifi_listener = new CompoundButton.OnCheckedChangeListener() {
-        public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            _settings.setPropertiesKeepWifi(isChecked);
-            if (isChecked)
-                getNavigationController().getDeviceController().lockWifi();
-            else
-                getNavigationController().getDeviceController().unlockWifi();
-        }
+    CompoundButton.OnCheckedChangeListener _keep_wifi_listener = (buttonView, isChecked) -> {
+        UserSettings.setPropertiesKeepWifi(isChecked);
+        if (isChecked)
+            getNavigationController().getDeviceController().lockWifi();
+        else
+            getNavigationController().getDeviceController().unlockWifi();
     };
 
     // 不受電池最佳化限制
-    View.OnClickListener _ignore_battery_listener = new View.OnClickListener() {
-        @SuppressLint("BatteryLife")
-        @Override
-        public void onClick(View view) {
-            PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
-            String packageName = getContext().getPackageName();
-            Intent intent = new Intent();
+    @SuppressLint("BatteryLife")
+    View.OnClickListener _ignore_battery_listener = view -> {
+        PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+        String packageName = getContext().getPackageName();
+        Intent intent = new Intent();
 
-            if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
-                intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
-            } else {
-                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-                intent.setData(Uri.parse("package:"+packageName));
-            }
-            getContext().startActivity(intent);
+        if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
+            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+        } else {
+            intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+            intent.setData(Uri.parse("package:"+packageName));
         }
+        getContext().startActivity(intent);
     };
 
+    // 開啟贊助葉面
     View.OnClickListener _billing_page_listener = v -> {
         BillingPage page = PageContainer.getInstance().getBillingPage();
         getNavigationController().pushViewController(page);};
 
+    // 畫面旋轉
     AdapterView.OnItemSelectedListener _screen_orientation_listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            _settings.setPropertiesScreenOrientation(i);
+            UserSettings.setPropertiesScreenOrientation(i);
             changeScreenOrientation();
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-            _settings.setPropertiesScreenOrientation(0);
+            UserSettings.setPropertiesScreenOrientation(0);
         }
     };
 
+    // 側邊選單位置
     AdapterView.OnItemSelectedListener _drawer_location_listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            _settings.setPropertiesDrawerLocation(i);
+            UserSettings.setPropertiesDrawerLocation(i);
             changeScreenOrientation();
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-            _settings.setPropertiesDrawerLocation(0);
+            UserSettings.setPropertiesDrawerLocation(0);
         }
     };
 
+    // 工具列位置
     AdapterView.OnItemSelectedListener _toolbar_location_listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
@@ -129,25 +108,45 @@ public class SystemSettingsPage extends TelnetPage {
                 findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.VISIBLE);
                 findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.VISIBLE);
             }
-            _settings.setPropertiesToolbarLocation(i);
+            UserSettings.setPropertiesToolbarLocation(i);
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-            _settings.setPropertiesToolbarLocation(0);
+            UserSettings.setPropertiesToolbarLocation(0);
         }
     };
+
+    // 工具列排序
     AdapterView.OnItemSelectedListener _toolbar_order_listener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-            _settings.setPropertiesToolbarOrder(i);
+            UserSettings.setPropertiesToolbarOrder(i);
         }
 
         @Override
         public void onNothingSelected(AdapterView<?> adapterView) {
-            _settings.setPropertiesToolbarOrder(0);
+            UserSettings.setPropertiesToolbarOrder(0);
         }
     };
+
+    // 連結自動預覽
+    CompoundButton.OnCheckedChangeListener _link_auto_show_listener = (buttonView, isChecked) -> {
+        UserSettings.setPropertiesLinkAutoShow(isChecked);
+        changeLinkAutoShowStatus(isChecked);
+    };
+    private void changeLinkAutoShowStatus(boolean enable) {
+        if (enable) {
+            findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.VISIBLE);
+            ((CheckBox) findViewById(R.id.SystemSettings_enableLinkShowThumbnail)).setChecked(UserSettings.getLinkShowThumbnail());
+        } else {
+            UserSettings.setPropertiesLinkShowThumbnail(false);
+            findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.GONE);
+        }
+    }
+
+    // 顯示預覽圖
+    CompoundButton.OnCheckedChangeListener _link_show_thumbnail_listener = (buttonView, isChecked) -> UserSettings.setPropertiesLinkShowThumbnail(isChecked);
 
 
     public int getPageLayout() {
@@ -164,30 +163,28 @@ public class SystemSettingsPage extends TelnetPage {
 
     @SuppressLint("SetTextI18n")
     public void onPageDidLoad() {
-        this._settings = new UserSettings(getContext());
-
         // 黑名單
-        ((LinearLayout) findViewById(R.id.SystemSettings_blockListSetting)).setOnClickListener(_block_list_setting_listener);
+        findViewById(R.id.SystemSettings_blockListSetting).setOnClickListener(_block_list_setting_listener);
         CheckBox block_list_enable_box = (CheckBox) findViewById(R.id.SystemSettings_blockListEnable);
-        block_list_enable_box.setChecked(_settings.getPropertiesBlockListEnable());
+        block_list_enable_box.setChecked(UserSettings.getPropertiesBlockListEnable());
         block_list_enable_box.setOnCheckedChangeListener(_block_list_enable_listener);
         findViewById(R.id.SystemSettings_item_blockListEnable).setOnClickListener(view -> block_list_enable_box.setChecked(!block_list_enable_box.isChecked()));
 
         // keep-wifi
         CheckBox keep_wifi_box = (CheckBox) findViewById(R.id.SystemSettings_keepWifi);
-        keep_wifi_box.setChecked(_settings.getPropertiesKeepWifi());
+        keep_wifi_box.setChecked(UserSettings.getPropertiesKeepWifi());
         keep_wifi_box.setOnCheckedChangeListener(_keep_wifi_listener);
         findViewById(R.id.SystemSettings_item_keepWifi).setOnClickListener(view -> keep_wifi_box.setChecked(!keep_wifi_box.isChecked()));
         
         // 換頁動畫
         CheckBox animation_enable_box = (CheckBox) findViewById(R.id.SystemSettings_animationEnable);
-        animation_enable_box.setChecked(_settings.getPropertiesAnimationEnable());
+        animation_enable_box.setChecked(UserSettings.getPropertiesAnimationEnable());
         animation_enable_box.setOnCheckedChangeListener(_animation_enable_listener);
         findViewById(R.id.SystemSettings_item_animationEnable).setOnClickListener(view -> animation_enable_box.setChecked(!animation_enable_box.isChecked()));
 
         // 文章首篇/末篇
         CheckBox article_move_enable_box = (CheckBox) findViewById(R.id.SystemSettings_enableArticleMove);
-        article_move_enable_box.setChecked(_settings.getPropertiesArticleMoveEnable());
+        article_move_enable_box.setChecked(UserSettings.getPropertiesArticleMoveEnable());
         article_move_enable_box.setOnCheckedChangeListener(_article_move_enable_listener);
         findViewById(R.id.SystemSettings_item_enableArticleMove).setOnClickListener(view -> article_move_enable_box.setChecked(!article_move_enable_box.isChecked()));
 
@@ -196,26 +193,38 @@ public class SystemSettingsPage extends TelnetPage {
         adapter_screen_orientation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         Spinner spinner_screen_orientation = (Spinner) findViewById(R.id.SystemSettings_screen_orientation_spinner);
         spinner_screen_orientation.setAdapter(adapter_screen_orientation);
-        spinner_screen_orientation.setSelection(_settings.getPropertiesScreenOrientation());
+        spinner_screen_orientation.setSelection(UserSettings.getPropertiesScreenOrientation());
         spinner_screen_orientation.setOnItemSelectedListener(_screen_orientation_listener);
 
         // 不受電池最佳化限制
-        ((LinearLayout) findViewById(R.id.SystemSettings_item_IgnoreBatteryOptimizations)).setOnClickListener(_ignore_battery_listener);
+        findViewById(R.id.SystemSettings_item_IgnoreBatteryOptimizations).setOnClickListener(_ignore_battery_listener);
 
+        // 連結自動預覽
+        CheckBox link_auto_show_box = (CheckBox) findViewById(R.id.SystemSettings_enableLinkAutoShow);
+        link_auto_show_box.setChecked(UserSettings.getLinkAutoShow());
+        link_auto_show_box.setOnCheckedChangeListener(_link_auto_show_listener);
+        findViewById(R.id.SystemSettings_item_enableLinkAutoShow).setOnClickListener(view -> link_auto_show_box.setChecked(!link_auto_show_box.isChecked()));
+        changeLinkAutoShowStatus(UserSettings.getLinkAutoShow());
+
+        // 顯示預覽圖
+        CheckBox link_show_thumbnail = (CheckBox) findViewById(R.id.SystemSettings_enableLinkShowThumbnail);
+        link_show_thumbnail.setChecked(UserSettings.getLinkShowThumbnail());
+        link_show_thumbnail.setOnCheckedChangeListener(_link_show_thumbnail_listener);
+        findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setOnClickListener(view -> link_show_thumbnail.setChecked(!link_show_thumbnail.isChecked()));
 
         // VIP
-        if (_settings.getPropertiesVIP()) {
+        if (UserSettings.getPropertiesVIP()) {
             // 使用手勢在看板/文章
             findViewById(R.id.SystemSettings_item_enableGestureOnBoard).setVisibility(View.VISIBLE);
             CheckBox gesture_on_board_enable_box = (CheckBox) findViewById(R.id.SystemSettings_enableGestureOnBoard);
-            gesture_on_board_enable_box.setChecked(_settings.getPropertiesGestureOnBoardEnable());
+            gesture_on_board_enable_box.setChecked(UserSettings.getPropertiesGestureOnBoardEnable());
             gesture_on_board_enable_box.setOnCheckedChangeListener(_gesture_on_board_enable_listener);
             findViewById(R.id.SystemSettings_item_enableGestureOnBoard).setOnClickListener(view -> gesture_on_board_enable_box.setChecked(!gesture_on_board_enable_box.isChecked()));
 
             // 自動登入洽特
             findViewById(R.id.SystemSettings_item_enableAutoToChat).setVisibility(View.VISIBLE);
             CheckBox auto_to_chat_enable_box = (CheckBox) findViewById(R.id.SystemSettings_enableAutoToChat);
-            auto_to_chat_enable_box.setChecked(_settings.getPropertiesAutoToChat());
+            auto_to_chat_enable_box.setChecked(UserSettings.getPropertiesAutoToChat());
             auto_to_chat_enable_box.setOnCheckedChangeListener(_auto_to_chat_enable_listener);
             findViewById(R.id.SystemSettings_item_enableAutoToChat).setOnClickListener(view -> auto_to_chat_enable_box.setChecked(!auto_to_chat_enable_box.isChecked()));
 
@@ -224,7 +233,7 @@ public class SystemSettingsPage extends TelnetPage {
             adapter_toolbar_location.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             Spinner spinner_toolbar_location = (Spinner) findViewById(R.id.SystemSettings_toolbar_location_spinner);
             spinner_toolbar_location.setAdapter(adapter_toolbar_location);
-            spinner_toolbar_location.setSelection(_settings.getPropertiesToolbarLocation());
+            spinner_toolbar_location.setSelection(UserSettings.getPropertiesToolbarLocation());
             spinner_toolbar_location.setOnItemSelectedListener(_toolbar_location_listener);
 
             // 工具列順序
@@ -232,9 +241,9 @@ public class SystemSettingsPage extends TelnetPage {
             adapter_toolbar_order.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             Spinner spinner_toolbar_order = (Spinner) findViewById(R.id.SystemSettings_toolbar_order_spinner);
             spinner_toolbar_order.setAdapter(adapter_toolbar_order);
-            spinner_toolbar_order.setSelection(_settings.getPropertiesToolbarOrder());
+            spinner_toolbar_order.setSelection(UserSettings.getPropertiesToolbarOrder());
             spinner_toolbar_order.setOnItemSelectedListener(_toolbar_order_listener);
-            if (_settings.getPropertiesToolbarLocation() <= 2) { // 底部工具列
+            if (UserSettings.getPropertiesToolbarLocation() <= 2) { // 底部工具列
                 findViewById(R.id.SystemSettings_item_toolbar_order_item_1).setVisibility(View.VISIBLE);
                 findViewById(R.id.SystemSettings_item_toolbar_order_item_2).setVisibility(View.GONE);
                 findViewById(R.id.SystemSettings_item_toolbar_order_item_3).setVisibility(View.GONE);
@@ -245,34 +254,26 @@ public class SystemSettingsPage extends TelnetPage {
             }
             TelnetTextViewSmall textSmall_idle = (TelnetTextViewSmall) findViewById(R.id.system_setting_page_toolbar_idle_text);
             Slider slider_idle = (Slider) findViewById(R.id.system_setting_page_toolbar_idle);
-            slider_idle.setValue(_settings.getToolbarIdle());
+            slider_idle.setValue(UserSettings.getToolbarIdle());
             textSmall_idle.setText(slider_idle.getValue() + "s");
-            slider_idle.addOnChangeListener(new Slider.OnChangeListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                    _settings.setToolbarIdle(value);
-                    textSmall_idle.setText(value + "s");
-                }
+            slider_idle.addOnChangeListener((slider, value, fromUser) -> {
+                UserSettings.setToolbarIdle(value);
+                textSmall_idle.setText(value + "s");
             });
             TelnetTextViewSmall textSmall_alpha = (TelnetTextViewSmall) findViewById(R.id.system_setting_page_toolbar_alpha_text);
             Slider slider_alpha = (Slider) findViewById(R.id.system_setting_page_toolbar_alpha);
-            slider_alpha.setValue(_settings.getToolbarAlpha());
+            slider_alpha.setValue(UserSettings.getToolbarAlpha());
             textSmall_alpha.setText((int)slider_alpha.getValue() + "%");
-            slider_alpha.addOnChangeListener(new Slider.OnChangeListener() {
-                @SuppressLint("SetTextI18n")
-                @Override
-                public void onValueChange(@NonNull Slider slider, float value, boolean fromUser) {
-                    _settings.setToolbarAlpha(value);
-                    textSmall_alpha.setText((int)value + "%");
-                }
+            slider_alpha.addOnChangeListener((slider, value, fromUser) -> {
+                UserSettings.setToolbarAlpha(value);
+                textSmall_alpha.setText((int)value + "%");
             });
             // 側滑選單位置
             ArrayAdapter<String> adapter_drawer_location = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, getResource().getStringArray(R.array.system_setting_page_drawer_location_items));
             adapter_drawer_location.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             Spinner spinner_drawer_location = (Spinner) findViewById(R.id.SystemSettings_drawer_location_spinner);
             spinner_drawer_location.setAdapter(adapter_drawer_location);
-            spinner_drawer_location.setSelection(_settings.getPropertiesDrawerLocation());
+            spinner_drawer_location.setSelection(UserSettings.getPropertiesDrawerLocation());
             spinner_drawer_location.setOnItemSelectedListener(_drawer_location_listener);
         } else {
             findViewById(R.id.SystemSettings_item_enableGestureOnBoard).setVisibility(View.GONE);
@@ -283,7 +284,7 @@ public class SystemSettingsPage extends TelnetPage {
         }
 
         // billing-page
-        ((LinearLayout) findViewById(R.id.SystemSettings_goBillingPage)).setOnClickListener(this._billing_page_listener);
+        findViewById(R.id.SystemSettings_goBillingPage).setOnClickListener(this._billing_page_listener);
     }
 
     public String getName() {
@@ -291,7 +292,7 @@ public class SystemSettingsPage extends TelnetPage {
     }
 
     public boolean onBackPressed() {
-        this._settings.notifyDataUpdated();
+        UserSettings.notifyDataUpdated();
         return super.onBackPressed();
     }
 

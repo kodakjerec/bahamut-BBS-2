@@ -1,5 +1,7 @@
 package com.kota.Telnet;
 
+import androidx.annotation.NonNull;
+
 public class TelnetCursor {
     public int column = 0;
     public int row = 0;
@@ -29,10 +31,12 @@ public class TelnetCursor {
         return aCursor.row == this.row && aCursor.column == this.column;
     }
 
+    @NonNull
     public TelnetCursor clone() {
         return new TelnetCursor(this.row, this.column);
     }
 
+    @NonNull
     public String toString() {
         return "( " + this.row + " , " + this.column + " )";
     }

@@ -1,11 +1,13 @@
 package com.kota.Bahamut.Command;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 
 public class BahamutCommandMoveToLastBlock extends BahamutCommandLoadLastBlock {
     public BahamutCommandMoveToLastBlock() {
-        this.Action = 3;
+        this.Action = MoveToLastBlock;
     }
 
     public void executeFinished(TelnetListPage aListPage, TelnetListPageBlock aPageData) {
@@ -14,6 +16,7 @@ public class BahamutCommandMoveToLastBlock extends BahamutCommandLoadLastBlock {
         setDone(true);
     }
 
+    @NonNull
     public String toString() {
         return "[MoveToLastBlock]";
     }

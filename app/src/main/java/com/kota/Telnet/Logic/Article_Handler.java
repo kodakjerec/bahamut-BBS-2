@@ -7,7 +7,7 @@ import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetArticleItemInfo;
 import com.kota.Telnet.TelnetArticlePage;
 import com.kota.Telnet.TelnetArticlePush;
-import java.util.Iterator;
+
 import java.util.Vector;
 
 public class Article_Handler {
@@ -26,12 +26,12 @@ public class Article_Handler {
             for (int source_index = start_line; source_index < 23; source_index++) {
                 page.addRow(aModel.getRow(source_index));
             }
-            this._pages.add(page);
+            _pages.add(page);
         }
     }
 
     public void loadLastPage(TelnetModel aModel) {
-        int start = this._pages.size() > 0 ? 1 : 0;
+        int start = _pages.size() > 0 ? 1 : 0;
         int end = 23;
         while (start < 23 && aModel.getRow(start).isEmpty()) {
             start++;
@@ -39,7 +39,7 @@ public class Article_Handler {
         while (end > start && aModel.getRow(end).isEmpty()) {
             end--;
         }
-        TelnetArticlePage page = this._last_page;
+        TelnetArticlePage page = _last_page;
         if (page == null) {
             page = new TelnetArticlePage();
         }
@@ -47,33 +47,29 @@ public class Article_Handler {
         for (int i = start; i < end; i++) {
             page.addRow(aModel.getRow(i));
         }
-        this._last_page = page;
+        _last_page = page;
     }
 
     public void clear() {
-        this._article.clear();
-        this._pages.clear();
-        this._last_page = null;
+        _article.clear();
+        _pages.clear();
+        _last_page = null;
     }
 
     // 分析每行內容
     public void build() {
-        this._article.clear();
+        _article.clear();
         Vector<TelnetRow> rows = new Vector<>();
         buildRows(rows);
         trimRows(rows);
-        this._article.setFrameData(rows);
+        _article.setFrameData(rows);
         if (loadHeader(rows)) {
-            for (int i = 0; i < 5; i++) {
-                rows.remove(0);
-            }
+            rows.subList(0, 4).clear();
         }
         boolean main_block_did_read = false;
         boolean end_line_did_read = false;
         TelnetArticleItem processing_item = null;
-        Iterator<TelnetRow> it = rows.iterator();
-        while (it.hasNext()) {
-            TelnetRow row = it.next();
+        for (TelnetRow row : rows) {
             String row_string = row.toString();
             int quoteLevel = row.getQuoteLevel();
             if (row_string.matches("※( *)引述( *)《(.+)( *)(\\((.+)\\))?》之銘言：")) {
@@ -127,7 +123,7 @@ public class Article_Handler {
                 item_info.author = author2;
                 item_info.nickname = nickname;
                 item_info.quoteLevel = quoteLevel + 1;
-                this._article.addInfo(item_info);
+                _article.addInfo(item_info);
             } else if (!row_string.matches("※ 修改:.*")) {
                 if (row_string.equals("--")) {
                     main_block_did_read = true;
@@ -139,18 +135,18 @@ public class Article_Handler {
                     if (processing_item == null || processing_item.getQuoteLevel() != quoteLevel) {
                         processing_item = new TelnetArticleItem();
                         if (main_block_did_read) {
-                            this._article.addExtendItem(processing_item);
+                            _article.addExtendItem(processing_item);
                         } else {
-                            this._article.addMainItem(processing_item);
+                            _article.addMainItem(processing_item);
                         }
                         processing_item.setQuoteLevel(quoteLevel);
                         if (quoteLevel != 0) {
-                            int i4 = this._article.getInfoSize() - 1;
+                            int i4 = _article.getInfoSize() - 1;
                             while (true) {
                                 if (i4 < 0) {
                                     break;
                                 }
-                                TelnetArticleItemInfo item_info2 = this._article.getInfo(i4);
+                                TelnetArticleItemInfo item_info2 = _article.getInfo(i4);
                                 if (item_info2.quoteLevel == quoteLevel) {
                                     processing_item.setAuthor(item_info2.author);
                                     processing_item.setNickname(item_info2.nickname);
@@ -159,14 +155,12 @@ public class Article_Handler {
                                 i4--;
                             }
                         } else {
-                            processing_item.setAuthor(this._article.Author);
-                            processing_item.setNickname(this._article.Nickname);
+                            processing_item.setAuthor(_article.Author);
+                            processing_item.setNickname(_article.Nickname);
                         }
                     }
                     // 其他狀況
-                    if (processing_item != null) {
-                        processing_item.addRow(row);
-                    }
+                    processing_item.addRow(row);
                 } else {
                     String author3 = "";
                     String content = "";
@@ -231,11 +225,11 @@ public class Article_Handler {
                     push.content = content;
                     push.date = date;
                     push.time = time;
-                    this._article.addPush(push);
+                    _article.addPush(push);
                 }
             }
         }
-        this._article.build();
+        _article.build();
     }
 
     private boolean loadHeader(Vector<TelnetRow> rows) {
@@ -284,18 +278,18 @@ public class Article_Handler {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this._article.Author = author;
-        this._article.Nickname = nickname;
-        this._article.BoardName = row_0.getSpaceString(66, 78).trim();
+        _article.Author = author;
+        _article.Nickname = nickname;
+        _article.BoardName = row_0.getSpaceString(66, 78).trim();
         String title_string = row_1.getSpaceString(7, 78).trim();
         if (title_string.startsWith("Re: ")) {
-            this._article.Title = title_string.substring(4);
-            this._article.Type = 0;
+            _article.Title = title_string.substring(4);
+            _article.Type = 0;
         } else {
-            this._article.Title = title_string;
-            this._article.Type = 0;
+            _article.Title = title_string;
+            _article.Type = 0;
         }
-        this._article.DateTime = row_2.getSpaceString(7, 30).trim();
+        _article.DateTime = row_2.getSpaceString(7, 30).trim();
         return true;
     }
 
@@ -312,15 +306,15 @@ public class Article_Handler {
     }
 
     private void buildRows(Vector<TelnetRow> rows) {
-        synchronized (this._pages) {
-            if (this._pages != null && this._pages.size() > 0) {
-                int page_count = this._pages.size();
+        synchronized (_pages) {
+            if (_pages != null && _pages.size() > 0) {
+                int page_count = _pages.size();
                 for (int page_index = 0; page_index < page_count; page_index++) {
-                    addPage(this._pages.get(page_index), rows);
+                    addPage(_pages.get(page_index), rows);
                 }
             }
-            if (this._last_page != null) {
-                addPage(this._last_page, rows);
+            if (_last_page != null) {
+                addPage(_last_page, rows);
             }
         }
     }
@@ -350,10 +344,10 @@ public class Article_Handler {
     }
 
     public TelnetArticle getArticle() {
-        return this._article;
+        return _article;
     }
 
     public void newArticle() {
-        this._article = new TelnetArticle();
+        _article = new TelnetArticle();
     }
 }

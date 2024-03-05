@@ -29,14 +29,12 @@ import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
 public class ClassPage extends TelnetListPage implements View.OnClickListener, Dialog_SearchBoard_Listener {
     private String _detail = "看板列表";
     private String _title = "";
-
-    UserSettings _settings;
 
     public int getPageType() {
         return BahamutPage.BAHAMUT_CLASS;
@@ -48,7 +46,6 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
 
     public void onPageDidLoad() {
         super.onPageDidLoad();
-        this._settings = new UserSettings(getContext());
 
         ListView list_view = (ListView) findViewById(R.id.ClassPage_listView);
         list_view.setEmptyView(findViewById(R.id.ClassPage_listEmptyView));

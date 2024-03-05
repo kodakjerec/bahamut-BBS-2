@@ -20,6 +20,8 @@ import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.TelnetUI.TelnetPage;
+
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -49,7 +51,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     private boolean _initialed = false;
     private boolean _manual_load_page = false;
     @SuppressLint({"UseSparseArrays"})
-    private final Map<Integer, TelnetListPageBlock> _block_list = new HashMap();
+    private final Map<Integer, TelnetListPageBlock> _block_list = new HashMap<>();
     private final DataSetObservable mDataSetObservable = new DataSetObservable();
 
     @Override // android.widget.Adapter
@@ -138,7 +140,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
         if (_list_view != null) {
             _list_view.setOnItemClickListener(this);
             _list_view.setOnItemLongClickListener(this);
-            _list_view.setAdapter((ListAdapter) this);
+            _list_view.setAdapter(this);
         }
     }
 
@@ -272,7 +274,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public synchronized void onPageRefresh() {
         synchronized (_list_count) {
-            _list_count = Integer.valueOf(_item_size);
+            _list_count = _item_size;
             reloadListView();
         }
         executeRefreshCommand();
@@ -289,9 +291,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     private void cleanRefreshCommand() {
-        for (int i = 0; i < _page_refresh_command.length; i++) {
-            _page_refresh_command[i] = false;
-        }
+        Arrays.fill(_page_refresh_command, false);
     }
 
     private void executePreloadCommand() {
@@ -302,9 +302,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     private void cleanPreloadCommand() {
-        for (int i = 0; i < _page_preload_command.length; i++) {
-            _page_preload_command[i] = false;
-        }
+        Arrays.fill(_page_preload_command, false);
     }
 
     private void removeBlock(Integer key) {
@@ -567,7 +565,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     @Override // android.widget.Adapter
     public synchronized TelnetListPageItem getItem(int index) {
         TelnetListPageItem item;
-        Integer item_index = index + 1;
+        int item_index = index + 1;
         synchronized (_block_list) {
             TelnetListPageBlock block = getBlock(getBlockIndex(index));
             item = block != null ? block.getItem(getIndexInBlock(index)) : null;

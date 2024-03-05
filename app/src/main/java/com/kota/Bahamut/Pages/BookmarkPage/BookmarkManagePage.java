@@ -6,12 +6,10 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,13 +25,12 @@ import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.Dialogs.Dialog_SearchArticle;
 import com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener;
-import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
 import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardSearchPage;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TelnetPage;
 
@@ -57,7 +54,6 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     HistoryAdapter historyAdapter;
     private BookmarkStore store;
     private boolean isUnderRecycleView = false;
-    UserSettings _settings;
     private float scale;
     public int getPageLayout() {
         return R.layout.bookmark_manage_page;
@@ -78,7 +74,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
             start = viewHolder.getAdapterPosition();
             end = target.getAdapterPosition();
             if (BookmarkManagePage.this._mode == 0) {
-                if (BookmarkManagePage.this._settings.getPropertiesVIP()) {
+                if (UserSettings.getPropertiesVIP()) {
                     Collections.swap(_bookmarks, start, end);
                     bookmarkAdapter.notifyItemMoved(start, end);
                 } else {
@@ -116,7 +112,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                 }
 
                 else if (direction == ItemTouchHelper.RIGHT) {
-                    if (BookmarkManagePage.this._settings.getPropertiesVIP()) {
+                    if (UserSettings.getPropertiesVIP()) {
                         // 右滑修改
                         editBookmarkIndex = bookmark_index;
                         showSearchArticleDialog();
@@ -239,8 +235,6 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
 
     @Override
     public void onPageDidLoad() {
-        _settings = new UserSettings(getContext());
-
         store = new BookmarkStore(getContext());
         reloadList();
 
@@ -378,7 +372,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         Bookmark bookmark = bookmarkAdapter.getItem(editBookmarkIndex);
         bookmark.setKeyword(vector.get(0));
         bookmark.setAuthor(vector.get(1));
-        if (vector.get(2) == "YES")
+        if (vector.get(2).equals("YES"))
             bookmark.setMark("y");
         else
             bookmark.setMark("n");

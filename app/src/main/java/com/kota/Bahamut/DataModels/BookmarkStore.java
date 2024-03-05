@@ -66,7 +66,7 @@ public class BookmarkStore {
             for (int i2 = 0; i2 < bookmark_list.getHistoryBookmarkSize(); i2++) {
                 Bookmark bookmark2 = bookmark_list.getHistoryBookmark(i2);
                 bookmark2.index = i2;
-                bookmark2.optional = Bookmark.OPTIONAL_HOSTORY;
+                bookmark2.optional = Bookmark.OPTIONAL_STORY;
                 total_list.add(bookmark2);
             }
         }
@@ -87,7 +87,7 @@ public class BookmarkStore {
         String board_name = aBookmark.getBoard().trim();
         if (board_name.length() == 0) {
             this._global_bookmarks.addBookmark(aBookmark);
-        } else if (aBookmark.optional.equals(Bookmark.OPTIONAL_HOSTORY)) {
+        } else if (aBookmark.optional.equals(Bookmark.OPTIONAL_STORY)) {
             getBookmarkList(board_name).addHistoryBookmark(aBookmark);
         } else {
             getBookmarkList(board_name).addBookmark(aBookmark);

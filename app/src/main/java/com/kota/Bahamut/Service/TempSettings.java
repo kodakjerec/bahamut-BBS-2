@@ -5,8 +5,15 @@ package com.kota.Bahamut.Service;
 * */
 
 public class TempSettings {
-    private static Boolean isUnderAutoToChat = false; // 正在自動登入ing
-    private static Boolean isFloatingInvisible = false; // 浮動工具列是否正處於隱藏狀態
+    static Boolean isUnderAutoToChat = false; // 正在自動登入ing
+    static Boolean isFloatingInvisible = false; // 浮動工具列是否正處於隱藏狀態
+    static String boardFollowTitle = ""; // 正在看的討論串標題
+
+    public static void clearTempSettings() {
+        setIsUnderAutoToChat(false);
+        setIsFloatingInvisible(false);
+        setBoardFollowTitle("");
+    }
     public static void setIsUnderAutoToChat(boolean isEnable) {
         isUnderAutoToChat = isEnable;
     }
@@ -20,4 +27,7 @@ public class TempSettings {
     public static boolean isFloatingInvisible() {
         return isFloatingInvisible;
     }
+
+    public static void setBoardFollowTitle(String _title) { boardFollowTitle = _title; };
+    public static boolean isBoardFollowTitle(String _readTitle) { return boardFollowTitle.equals(_readTitle); };
 }

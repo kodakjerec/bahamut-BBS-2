@@ -1,6 +1,6 @@
 package com.kota.Bahamut.DataModels;
-/**
- * 書籤元件 清單
+/*
+  書籤元件 清單
  */
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,7 +47,7 @@ public class BookmarkList {
         return _history_bookmarks.get(index);
     }
 
-    public void addHistoryBookmark(String aKeywork) {
+    public void addHistoryBookmark(String _key_work) {
         Bookmark new_bookmark = null;
         Iterator<Bookmark> it = _history_bookmarks.iterator();
         while (true) {
@@ -55,7 +55,7 @@ public class BookmarkList {
                 break;
             }
             Bookmark bookmark = it.next();
-            if (bookmark.getKeyword().equals(aKeywork)) {
+            if (bookmark.getKeyword().equals(_key_work)) {
                 new_bookmark = bookmark;
                 _history_bookmarks.remove(bookmark);
                 break;
@@ -64,7 +64,7 @@ public class BookmarkList {
         if (new_bookmark == null) {
             new_bookmark = new Bookmark();
             new_bookmark.setBoard(_board);
-            new_bookmark.setKeyword(aKeywork);
+            new_bookmark.setKeyword(_key_work);
         }
         _history_bookmarks.add(0, new_bookmark);
         while (_history_bookmarks.size() > limit) {

@@ -1,6 +1,12 @@
 package com.kota.Bahamut.Pages.Model;
 
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+
 import com.kota.Telnet.Model.TelnetRow;
+import com.kota.Telnet.Reference.TelnetAnsiCode;
+import com.kota.Telnet.TelnetAnsi;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetUtils;
 
@@ -104,6 +110,7 @@ public class BoardPageHandler {
         int end_index = 3 + 20;
         int i6 = 3;
         while (i6 < end_index && (row = TelnetClient.getModel().getRow(i6)) != null && row.toString().trim().length() != 0) {
+            row.reloadSpace();
             String article_selected = row.getSpaceString(0, 0).trim();
             int article_number = TelnetUtils.getIntegerFromData(row, 1, 5);
             if (article_number != 0) {

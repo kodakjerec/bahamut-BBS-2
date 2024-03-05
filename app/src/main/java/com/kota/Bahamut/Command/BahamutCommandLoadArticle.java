@@ -2,17 +2,19 @@ package com.kota.Bahamut.Command;
 
 import static com.kota.Bahamut.BahamutStateHandler.*;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Telnet.TelnetClient;
 
 public class BahamutCommandLoadArticle extends TelnetCommand {
-    int _article_number = 0;
+    int _article_number;
 
     public BahamutCommandLoadArticle(int articleNumber) {
         this._article_number = articleNumber;
-        this.Action = 5;
+        this.Action = LoadArticle;
     }
 
     public int getArticleIndex() {
@@ -31,6 +33,7 @@ public class BahamutCommandLoadArticle extends TelnetCommand {
         setDone(true);
     }
 
+    @NonNull
     public String toString() {
         return "[LoadArticle][articleIndex=" + this._article_number + "]";
     }

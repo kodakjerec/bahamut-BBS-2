@@ -21,6 +21,6 @@ public class TelnetTextViewNormal extends TelnetTextView {
 
     /* access modifiers changed from: protected */
     public void reloadTextSize() {
-        setTextModelSize(0);
+        setTextModelSize(TEXT_VIEW_SIZE_NORMAL);
     }
 }

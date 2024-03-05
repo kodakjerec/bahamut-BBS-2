@@ -32,7 +32,7 @@ public class U2BEncoder {
             this._table_size = readCharFromStream(inputStream);
             this._table = new char[this._table_size];
             for (int i = 0; i < this._table.length; i++) {
-                this._table[i] = 65533;
+                this._table[i] = NULL_CHAR;
             }
             for (int i2 = 0; i2 < total; i2++) {
                 char index = readCharFromStream(inputStream);

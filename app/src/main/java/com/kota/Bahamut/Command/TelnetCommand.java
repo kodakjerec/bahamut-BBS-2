@@ -4,7 +4,7 @@ import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 
 public abstract class TelnetCommand implements BahamutCommandDefs {
-    public int Action = 0;
+    public int Action = LoadBlock;
     private boolean _is_done = false;
     public boolean recordTime = true;
 

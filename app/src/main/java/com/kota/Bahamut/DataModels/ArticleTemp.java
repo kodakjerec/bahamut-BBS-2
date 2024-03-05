@@ -1,11 +1,11 @@
 package com.kota.Bahamut.DataModels;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.StreamCorruptedException;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ArticleTemp {
     public static final int version = 1;

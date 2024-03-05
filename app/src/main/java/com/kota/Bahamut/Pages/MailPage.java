@@ -12,10 +12,11 @@ import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.Pages.Article.ArticlePage_HeaderItemView;
-import com.kota.Bahamut.Pages.Article.ArticlePage_TelnetItemView;
-import com.kota.Bahamut.Pages.Article.ArticlePage_TextItemView;
-import com.kota.Bahamut.Pages.Article.ArticlePage_TimeTimeView;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_HeaderItemView;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TelnetItemView;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TextItemView;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TimeTimeView;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePageItemType;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -136,34 +137,34 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         int type = getItemViewType(itemIndex);
         if (itemView == null) {
             switch (type) {
-                case 0:
+                case ArticlePageItemType.Content:
                     itemView = new ArticlePage_TextItemView(getContext());
                     break;
-                case 1:
+                case ArticlePageItemType.Sign:
                     itemView = new ArticlePage_TelnetItemView(getContext());
                     break;
-                case 2:
+                case ArticlePageItemType.Header:
                     itemView = new ArticlePage_HeaderItemView(getContext());
                     break;
-                case 3:
+                case ArticlePageItemType.PostTime:
                     itemView = new ArticlePage_TimeTimeView(getContext());
                     break;
             }
         }
         switch (type) {
-            case 0:
+            case ArticlePageItemType.Content:
                 TelnetArticleItem item = getItem(itemIndex);
                 ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemView;
                 item_view.setAuthor(item.getAuthor(), item.getNickname());
                 item_view.setQuote(item.getQuoteLevel());
-                item_view.setContent(item.getContent());
+                item_view.setContent(item.getContent(), item.getFrame().rows);
                 if (itemIndex >= getCount() - 2) {
-                    item_view.setDividerhidden(true);
+                    item_view.setDividerHidden(true);
                 } else {
-                    item_view.setDividerhidden(false);
+                    item_view.setDividerHidden(false);
                 }
                 break;
-            case 1:
+            case ArticlePageItemType.Sign:
                 ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemView;
                 item_view2.setFrame(getItem(itemIndex).getFrame());
                 if (itemIndex >= getCount() - 2) {
@@ -172,7 +173,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                     item_view2.setDividerhidden(false);
                 }
                 break;
-            case 2:
+            case ArticlePageItemType.Header:
                 ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
                 String author = this._article.Author;
                 if (this._article.Nickname != null) {
@@ -180,7 +181,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 }
                 item_view3.setData(this._article.Title, author, this._article.BoardName);
                 break;
-            case 3:
+            case ArticlePageItemType.PostTime:
                 ((ArticlePage_TimeTimeView) itemView).setTime("《" + this._article.DateTime + "》");
                 break;
         }

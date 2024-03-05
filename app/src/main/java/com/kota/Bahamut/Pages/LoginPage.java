@@ -12,12 +12,13 @@ import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.BahamutPage;
+import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCursor;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
@@ -25,7 +26,7 @@ public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
     int _error_count = 0;
     ASProcessingDialog _login_process_dialog = null;
-    View.OnClickListener _logout_listener = v -> {
+    View.OnClickListener _login_listener = v -> {
         String err_message;
         LoginPage.this._username = ((EditText) LoginPage.this.findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
         LoginPage.this._password = ((EditText) LoginPage.this.findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
@@ -49,7 +50,6 @@ public class LoginPage extends TelnetPage {
     ASAlertDialog _remove_logon_user_dialog = null;
     boolean _save_logon_user = false;
     ASDialog _save_unfinished_article_dialog = null;
-    UserSettings _settings;
     TelnetView _telnet_view = null;
     String _username = "";
 
@@ -62,10 +62,9 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onPageDidLoad() {
-        _settings = new UserSettings(getContext());
         // 登入
         getNavigationController().setNavigationTitle("勇者登入");
-        findViewById(R.id.Login_loginButton).setOnClickListener(_logout_listener);
+        findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
         // checkbox區塊點擊
         CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         findViewById(R.id.toolbar).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
@@ -74,11 +73,13 @@ public class LoginPage extends TelnetPage {
         loadLogonUser();
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
 
-        // 關閉"正在自動登入"
-        TempSettings.setIsUnderAutoToChat(false);
+        // 清空暫存和執行中變數
+        TempSettings.clearTempSettings(); // 清除暫存資料
+        UrlDatabase urlDatabase = new UrlDatabase(getContext()); // 清除URL資料庫
+        urlDatabase.clearDb();
 
         // check VIP
-        if (!_settings.getPropertiesVIP()) {
+        if (!UserSettings.getPropertiesVIP()) {
             checkPurchaseHistoryQuery();
         }
     }
@@ -87,13 +88,13 @@ public class LoginPage extends TelnetPage {
         return handleNormalState();
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    // 按下返回
+    protected boolean onBackPressed() {
         TelnetClient.getClient().close();
         return true;
     }
 
-    private boolean handleNormalState() {
+    boolean handleNormalState() {
         String row_23 = TelnetClient.getModel().getRowString(23);
         TelnetCursor cursor = TelnetClient.getModel().getCursor();
         if (row_23.endsWith("再見 ...")) {
@@ -114,7 +115,7 @@ public class LoginPage extends TelnetPage {
             return false;
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
-            if (_settings.getPropertiesAutoToChat()) {
+            if (UserSettings.getPropertiesAutoToChat()) {
                 TempSettings.setIsUnderAutoToChat(true);
             }
             sendPassword();
@@ -124,38 +125,32 @@ public class LoginPage extends TelnetPage {
         }
     }
 
-    private void loadLogonUser() {
+    void loadLogonUser() {
         EditText login_username_field = (EditText) findViewById(R.id.Login_UsernameEdit);
         EditText login_password_field = (EditText) findViewById(R.id.Login_passwordEdit);
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        String username = _settings.getPropertiesUsername();
-        String password = _settings.getPropertiesPassword();
-        if (username == null) {
-            username = "";
-        }
-        if (password == null) {
-            password = "";
-        }
+        String username = UserSettings.getPropertiesUsername();
+        String password = UserSettings.getPropertiesPassword();
         String username2 = username.trim();
         String password2 = password.trim();
         login_username_field.setText(username2);
         login_password_field.setText(password2);
-        login_remember.setChecked(_settings.getPropertiesSaveLogonUser());
+        login_remember.setChecked(UserSettings.getPropertiesSaveLogonUser());
     }
 
-    private void saveLogonUserToProperties() {
+    void saveLogonUserToProperties() {
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
         if (login_remember.isChecked()) {
             String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
             String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
-            _settings.setPropertiesUsername(username);
-            _settings.setPropertiesPassword(password);
+            UserSettings.setPropertiesUsername(username);
+            UserSettings.setPropertiesPassword(password);
         } else {
-            _settings.setPropertiesUsername("");
-            _settings.setPropertiesPassword("");
+            UserSettings.setPropertiesUsername("");
+            UserSettings.setPropertiesPassword("");
         }
-        _settings.setPropertiesSaveLogonUser(login_remember.isChecked());
-        _settings.notifyDataUpdated();
+        UserSettings.setPropertiesSaveLogonUser(login_remember.isChecked());
+        UserSettings.notifyDataUpdated();
     }
 
     public void onPageDidDisappear() {
@@ -172,7 +167,7 @@ public class LoginPage extends TelnetPage {
         }
     }
 
-    private void setFrameToTelnetView() {
+    void setFrameToTelnetView() {
         TelnetFrame frame = TelnetClient.getModel().getFrame().clone();
         frame.removeRow(23);
         frame.removeRow(22);
@@ -195,8 +190,7 @@ public class LoginPage extends TelnetPage {
         }
     }
 
-    /* access modifiers changed from: private */
-    public void login() {
+    void login() {
         ASProcessingDialog.showProcessingDialog("登入中");
         new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground(LoginPage.this._username)).start();
     }
@@ -269,19 +263,15 @@ public class LoginPage extends TelnetPage {
     public void onLoginSuccess() {
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();
-        _settings.notifyDataUpdated();
+        UserSettings.notifyDataUpdated();
     }
 
     public void onSaveArticle() {
         if (_save_unfinished_article_dialog == null) {
             _save_unfinished_article_dialog = ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成").addButton("放棄").addButton("寫入暫存檔").setListener((aDialog, index) -> {
                 switch (index) {
-                    case 0:
-                        TelnetClient.getClient().sendStringToServer("Q");
-                        break;
-                    case 1:
-                        TelnetClient.getClient().sendStringToServer("S");
-                        break;
+                    case 0 -> TelnetClient.getClient().sendStringToServer("Q");
+                    case 1 -> TelnetClient.getClient().sendStringToServer("S");
                 }
                 LoginPage.this._save_unfinished_article_dialog = null;
             }).scheduleDismissOnPageDisappear(this);

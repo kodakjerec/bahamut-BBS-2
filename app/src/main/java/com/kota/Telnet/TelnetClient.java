@@ -1,6 +1,9 @@
 package com.kota.Telnet;
 
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.DataModels.UrlDatabase;
+import com.kota.Bahamut.MyApplication;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -15,7 +18,7 @@ public class TelnetClient implements TelnetConnectorListener {
     private TelnetConnector _connector;
     private TelnetModel _model;
     private TelnetReceiver _receiver;
-    private TelnetStateHandler _state_handler;
+    private final TelnetStateHandler _state_handler;
     private String _username;
     private TelnetClientListener _listener = null;
     ExecutorService _send_executor = Executors.newSingleThreadExecutor();
@@ -37,31 +40,30 @@ public class TelnetClient implements TelnetConnectorListener {
     }
 
     private TelnetClient(TelnetStateHandler aStateHandler) {
-        this._state_handler = null;
-        this._connector = null;
-        this._receiver = null;
-        this._model = null;
-        this._state_handler = aStateHandler;
-        this._model = new TelnetModel();
-        this._connector = new TelnetConnector();
-        this._connector.setListener(this);
-        this._receiver = new TelnetReceiver(this._connector, this._model);
+        _connector = null;
+        _receiver = null;
+        _model = null;
+        _state_handler = aStateHandler;
+        _model = new TelnetModel();
+        _connector = new TelnetConnector();
+        _connector.setListener(this);
+        _receiver = new TelnetReceiver(_connector, _model);
     }
 
     public void clear() {
-        this._state_handler.clear();
-        this._connector.clear();
-        this._model.clear();
-        this._receiver.stopReceiver();
+        _state_handler.clear();
+        _connector.clear();
+        _model.clear();
+        _receiver.stopReceiver();
     }
 
     public void connect(String serverIp, int serverPort) {
-        this._connector.connect(serverIp, serverPort);
+        _connector.connect(serverIp, serverPort);
     }
 
     public void close() {
         try {
-            this._connector.close();
+            _connector.close(); // 關閉連線
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,9 +140,9 @@ public class TelnetClient implements TelnetConnectorListener {
     }
 
     protected void sendDataToServer(byte[] data, int channel) {
-        if (data != null && this._connector.isConnecting()) {
-            this._connector.writeData(data, channel);
-            this._connector.sendData(channel);
+        if (data != null && _connector.isConnecting()) {
+            _connector.writeData(data, channel);
+            _connector.sendData(channel);
         }
     }
 
@@ -149,73 +151,70 @@ public class TelnetClient implements TelnetConnectorListener {
     }
 
     public void sendDataToServerInBackground(final byte[] data, final int channel) {
-        if (data != null && this._connector.isConnecting()) {
-            this._send_executor.submit(new Runnable() { // from class: com.kota.Telnet.TelnetClient.1
-                @Override // java.lang.Runnable
-                public void run() {
-                    TelnetClient.this._connector.writeData(data, channel);
-                    TelnetClient.this._connector.sendData(channel);
-                }
+        if (data != null && _connector.isConnecting()) {
+            _send_executor.submit(() -> {
+                TelnetClient.this._connector.writeData(data, channel);
+                TelnetClient.this._connector.sendData(channel);
             });
         }
     }
 
     public void setListener(TelnetClientListener aListener) {
-        this._listener = aListener;
+        _listener = aListener;
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectStart(TelnetConnector aConnector) {
-        if (this._listener != null) {
-            this._listener.onTelnetClientConnectionStart(this);
+        if (_listener != null) {
+            _listener.onTelnetClientConnectionStart(this);
         }
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorClosed(TelnetConnector aConnector) {
         clear();
-        if (this._listener != null) {
-            this._listener.onTelnetClientConnectionClosed(this);
+        if (_listener != null) {
+            _listener.onTelnetClientConnectionClosed(this);
         }
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectSuccess(TelnetConnector aConnector) {
-        this._receiver.startReceiver();
-        if (this._listener != null) {
-            this._listener.onTelnetClientConnectionSuccess(this);
+        _receiver.startReceiver();
+        if (_listener != null) {
+            _listener.onTelnetClientConnectionSuccess(this);
         }
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorConnectFail(TelnetConnector aConnector) {
         clear();
-        if (this._listener != null) {
-            this._listener.onTelnetClientConnectionFail(this);
+        if (_listener != null) {
+            _listener.onTelnetClientConnectionFail(this);
         }
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorReceiveDataStart(TelnetConnector aConnector) {
-        if (this._state_handler != null) {
-            this._model.cleanCahcedData();
-            this._state_handler.handleState();
+        if (_state_handler != null) {
+            _model.cleanCahcedData();
+            _state_handler.handleState();
         }
     }
 
     @Override // com.kota.Telnet.TelnetConnectorListener
     public void onTelnetConnectorReceiveDataFinished(TelnetConnector aConnector) {
-        this._connector.cleanReadDataSize();
+        _connector.cleanReadDataSize();
     }
 
     public void setUsername(String aUsername) {
-        this._username = aUsername;
+        _username = aUsername;
     }
 
     public String getUsername() {
-        if (this._username == null) {
-            this._username = "";
+        if (_username == null) {
+            _username = "";
         }
-        return this._username;
+        return _username;
     }
 }

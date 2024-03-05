@@ -6,7 +6,6 @@ import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.PageController.ASViewControllerDisappearListener;
 
-/* loaded from: classes.dex */
 public class ASDialog extends Dialog implements ASViewControllerDisappearListener {
   private ASViewController _controller;
   private ASDialogOnBackPressedDelegate _on_back_delegate;

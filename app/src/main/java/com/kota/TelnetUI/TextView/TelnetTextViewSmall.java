@@ -19,8 +19,7 @@ public class TelnetTextViewSmall extends TelnetTextView {
         reloadTextSize();
     }
 
-    /* access modifiers changed from: protected */
-    public void reloadTextSize() {
-        setTextModelSize(-1);
+    protected void reloadTextSize() {
+        setTextModelSize(TEXT_VIEW_SIZE_SMALL);
     }
 }

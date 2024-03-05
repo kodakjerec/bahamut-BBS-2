@@ -16,7 +16,7 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
     }
 
     public BahamutCommandLoadLastBlock() {
-        this.Action = 2;
+        this.Action = LoadLastBlock;
     }
 
     private OperationMode getLoadLastBlockMode(TelnetListPage aListPage) {
@@ -50,16 +50,25 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
         }
         switch (getLoadLastBlockMode(aListPage)) {
             case Left_Right_End:
-                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(TelnetKeyboard.RIGHT_ARROW).pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create()
+                        .pushKey(TelnetKeyboard.LEFT_ARROW)
+                        .pushKey(TelnetKeyboard.RIGHT_ARROW)
+                        .pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case Home_End:
-                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.HOME).pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create()
+                        .pushKey(TelnetKeyboard.HOME)
+                        .pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case Left_S_End:
-                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(83).pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create()
+                        .pushKey(TelnetKeyboard.LEFT_ARROW)
+                        .pushKey(TelnetKeyboard.BACK_ONE_CHAR)
+                        .pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             case End:
-                TelnetOutputBuilder.create().pushKey(TelnetKeyboard.END).sendToServer();
+                TelnetOutputBuilder.create()
+                        .pushKey(TelnetKeyboard.END).sendToServer();
                 return;
             default:
                 setDone(true);

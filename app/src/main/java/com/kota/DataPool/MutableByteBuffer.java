@@ -2,6 +2,8 @@ package com.kota.DataPool;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.Stack;
@@ -9,12 +11,12 @@ import java.util.Vector;
 
 public class MutableByteBuffer implements Iterable<ByteBuffer> {
     public static int BUFFER_SIZE = 128;
-    private static Stack<ByteBuffer> _buffer_pool = new Stack<>();
-    private static Stack<MutableByteBuffer> _pool = new Stack<>();
+    private static final Stack<ByteBuffer> _buffer_pool = new Stack<>();
+    private static final Stack<MutableByteBuffer> _pool = new Stack<>();
     private boolean _is_closed = false;
     private int _size = 0;
     /* access modifiers changed from: private */
-    public Vector<ByteBuffer> _writed_buffers = new Vector<>();
+    public Vector<ByteBuffer> _written_buffers = new Vector<>();
     private ByteBuffer _writing_buffer = createByteBuffer();
 
     public static MutableByteBuffer createMutableByteBuffer() {
@@ -59,7 +61,7 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
         }
         if (!this._writing_buffer.hasRemaining()) {
             this._writing_buffer.flip();
-            this._writed_buffers.add(this._writing_buffer);
+            this._written_buffers.add(this._writing_buffer);
             this._writing_buffer = createByteBuffer();
         }
         this._writing_buffer.put(data);
@@ -80,7 +82,7 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
 
     public void close() {
         this._writing_buffer.flip();
-        this._writed_buffers.add(this._writing_buffer);
+        this._written_buffers.add(this._writing_buffer);
         this._writing_buffer = createByteBuffer();
         this._is_closed = true;
     }
@@ -90,11 +92,10 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
     }
 
     public void clear() {
-        Iterator<ByteBuffer> it = this._writed_buffers.iterator();
-        while (it.hasNext()) {
-            recycleByteBuffer(it.next());
+        for (ByteBuffer written_buffer : this._written_buffers) {
+            recycleByteBuffer(written_buffer);
         }
-        this._writed_buffers.clear();
+        this._written_buffers.clear();
         if (this._writing_buffer != null) {
             this._writing_buffer.clear();
         }
@@ -108,9 +109,7 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
         }
         byte[] data = new byte[this._size];
         int position = 0;
-        Iterator<ByteBuffer> it = iterator();
-        while (it.hasNext()) {
-            ByteBuffer buffer = it.next();
+        for (ByteBuffer buffer : this) {
             for (int i = 0; i < buffer.limit(); i++) {
                 data[position] = buffer.get(i);
                 position++;
@@ -122,17 +121,18 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
         return data;
     }
 
+    @NonNull
     public Iterator<ByteBuffer> iterator() {
-        return new Iterator<ByteBuffer>() {
+        return new Iterator<>() {
             private int _position = 0;
 
             public boolean hasNext() {
-                return this._position < MutableByteBuffer.this._writed_buffers.size();
+                return this._position < MutableByteBuffer.this._written_buffers.size();
             }
 
             public ByteBuffer next() {
                 this._position++;
-                return (ByteBuffer) MutableByteBuffer.this._writed_buffers.get(this._position - 1);
+                return MutableByteBuffer.this._written_buffers.get(this._position - 1);
             }
 
             public void remove() {

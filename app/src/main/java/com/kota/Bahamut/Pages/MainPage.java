@@ -1,21 +1,20 @@
 package com.kota.Bahamut.Pages;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-
 import android.view.View;
 import android.widget.Button;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.Bahamut.BahamutController;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
+import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
@@ -60,11 +59,7 @@ public class MainPage extends TelnetPage {
         return BahamutPage.BAHAMUT_MAIN;
     }
 
-    UserSettings _settings;
-
     public void onPageDidLoad() {
-        this._settings = new UserSettings(getContext());
-
         findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
         findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
         findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
@@ -152,9 +147,11 @@ public class MainPage extends TelnetPage {
                 MainPage.this._goodbye_dialog = null;
                 switch (index) {
                     case 0:
+                        // 取消
                         TelnetClient.getClient().sendStringToServerInBackground("Q");
                         return;
                     case 1:
+                        // 確定
                         TelnetClient.getClient().sendStringToServerInBackground("G");
                         return;
                     default:

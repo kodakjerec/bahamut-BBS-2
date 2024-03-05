@@ -2,17 +2,18 @@ package com.kota.Bahamut.DataModels;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.StreamCorruptedException;
 import java.util.Iterator;
 import java.util.Vector;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class ArticleTempStore {
     public static final int version = 1;
@@ -99,9 +100,8 @@ public class ArticleTempStore {
     public JSONObject exportToJSON() throws JSONException {
         JSONObject obj = new JSONObject();
         JSONArray save_data = new JSONArray();
-        Iterator<ArticleTemp> it = this.articles.iterator();
-        while (it.hasNext()) {
-            save_data.put(it.next().exportToJSON());
+        for (ArticleTemp article : this.articles) {
+            save_data.put(article.exportToJSON());
         }
         obj.put("data", save_data);
         return obj;

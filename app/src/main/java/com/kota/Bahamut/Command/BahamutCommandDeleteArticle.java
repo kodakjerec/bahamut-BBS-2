@@ -1,20 +1,22 @@
 package com.kota.Bahamut.Command;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Telnet.TelnetClient;
 
 public class BahamutCommandDeleteArticle extends TelnetCommand {
-    int _article_index = 0;
+    int _article_index;
 
     public BahamutCommandDeleteArticle(int articleIndex) {
-        this._article_index = articleIndex;
-        this.Action = 7;
+        _article_index = articleIndex;
+        Action = DeleteArticle;
     }
 
     public void execute(TelnetListPage aListPage) {
-        if (this._article_index > 0) {
-            TelnetClient.getClient().sendStringToServer(this._article_index + "\ndy");
+        if (_article_index > 0) {
+            TelnetClient.getClient().sendStringToServer(_article_index + "\ndy");
         }
     }
 
@@ -22,7 +24,8 @@ public class BahamutCommandDeleteArticle extends TelnetCommand {
         setDone(true);
     }
 
+    @NonNull
     public String toString() {
-        return "[DeleteArticle][articleIndex=" + this._article_index + "]";
+        return "[DeleteArticle][articleIndex=" + _article_index + "]";
     }
 }

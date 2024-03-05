@@ -6,11 +6,9 @@ import java.io.IOException;
 
 public class TelnetConnector implements TelnetChannelListener {
     private TelnetChannel[] _channel = new TelnetChannel[2];
-    /* access modifiers changed from: private */
-    public HolderThread _holder_thread = null;
+    private HolderThread _holder_thread = null;
     private boolean _is_connecting = false;
-    /* access modifiers changed from: private */
-    public long _last_send_data_time = 0;
+    private long _last_send_data_time = 0;
     private TelnetConnectorListener _listener = null;
     private TelnetSocketChannel _socket_channel = null;
 

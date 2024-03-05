@@ -2,16 +2,16 @@ package com.kota.Telnet;
 
 import com.kota.DataPool.MutableByteBuffer;
 import com.kota.TextEncoder.B2UEncoder;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 
 public class TelnetChannel {
     public static int BUFFER_SIZE = 2048;
-    private ByteBuffer _input_buffer = ByteBuffer.allocate(BUFFER_SIZE);
+    private final ByteBuffer _input_buffer = ByteBuffer.allocate(BUFFER_SIZE);
     private TelnetChannelListener _listener = null;
     private boolean _lock = false;
-    private MutableByteBuffer _output_buffer = MutableByteBuffer.createMutableByteBuffer();
+    private final MutableByteBuffer _output_buffer = MutableByteBuffer.createMutableByteBuffer();
     private int _read_data_size = 0;
     private TelnetSocketChannel _socket_channel = null;
 
@@ -52,9 +52,8 @@ public class TelnetChannel {
         }
         try {
             this._output_buffer.close();
-            Iterator<ByteBuffer> it = this._output_buffer.iterator();
-            while (it.hasNext()) {
-                this._socket_channel.write(it.next());
+            for (ByteBuffer byteBuffer : this._output_buffer) {
+                this._socket_channel.write(byteBuffer);
             }
             this._output_buffer.clear();
             return true;
@@ -118,9 +117,7 @@ public class TelnetChannel {
     private void printOutputBuffer() {
         byte[] data = new byte[this._output_buffer.size()];
         int position = 0;
-        Iterator<ByteBuffer> it = this._output_buffer.iterator();
-        while (it.hasNext()) {
-            ByteBuffer output_buffer = it.next();
+        for (ByteBuffer output_buffer : this._output_buffer) {
             for (int i = 0; i < output_buffer.limit(); i++) {
                 data[position] = output_buffer.array()[i];
                 position++;
@@ -129,8 +126,8 @@ public class TelnetChannel {
         try {
             System.out.println("send data:\n" + B2UEncoder.getInstance().encodeToString(data));
             String hex_data = "";
-            for (int i2 = 0; i2 < data.length; i2++) {
-                hex_data = hex_data + String.format(" %1$02x", new Object[]{Byte.valueOf(data[i2])});
+            for (byte datum : data) {
+                hex_data = hex_data + String.format(" %1$02x", datum);
             }
             System.out.println("send hex data:\n" + hex_data.substring(1));
         } catch (Exception e) {

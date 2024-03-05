@@ -3,9 +3,10 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
-    <color name="yellow">#FFf0f080</color>
+    <color name="yellow">#FFF0F080</color>
     <color name="red">#FF800000</color>
-    <color name="button_label_color_disable">#FF808080</color>
+    <color name="halfWhite">#FF808080</color>
+    <color name="button_label_color_disable">@color/halfWhite</color>
     <color name="button_label_color_focused">@color/black</color>
     <color name="button_label_color_normal">@color/white</color>
     <color name="button_label_color_pressed">@color/black</color>
@@ -55,7 +56,7 @@
     <color name="tab_unselected_text_color_focused">@color/black</color>
     <color name="tab_unselected_text_color_normal">#FF608060</color>
     <color name="tab_unselected_text_color_pressed">@color/white</color>
-    <color name="dialog_border_color">#FF808080</color>
+    <color name="dialog_border_color">@color/halfWhite</color>
     <color name="time_line_background_color">#FF000060</color>
     <color name="title_bar_background_color">#FF000060</color>
     <color name="title_bar_menu_icon_background_color">#FF101090</color>
@@ -66,6 +67,7 @@
     <color name="toolbar_divider">@color/black</color>
     <color name="checkbox_checked_color">#FF99CC00</color>
     <color name="checkbox_unchecked_color">#FFB8B8B8</color>
+    <color name="slider_inactive_color">#3399CC00</color>
     <color name="mail_box_page_item_view_status">#FFF0F080</color>
     <color name="mail_box_page_item_view_mark">#FFFF7F27</color>
     <color name="mail_box_page_item_view_reply">#FF00FFFF</color>
@@ -91,4 +93,10 @@
     <color name="article_page_text_item_content0">#FFC0C0C0</color>
     <color name="system_page_chapter_text">@color/button_label_color_disable</color>
     <color name="system_page_chapter_background">@color/list_page_item_arrow_background</color>
+    <color name="board_item_follow_first">#FF00FF00</color>
+    <color name="board_item_follow_first_read">#FF008000</color>
+    <color name="board_item_follow_other">#FFFFFF00</color>
+    <color name="board_item_follow_other_read">#FF808000</color>
+    <color name="board_item_normal">@color/white</color>
+    <color name="board_item_normal_read">@color/halfWhite</color>
 </resources>

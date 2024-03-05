@@ -1,5 +1,6 @@
 package com.kota.Bahamut.DataModels;
 
+import android.annotation.SuppressLint;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -15,12 +16,20 @@ import java.util.Map;
 
 public class AppDatabase extends SQLiteOpenHelper {
     public AppDatabase(Context context) {
-        super(context, TelnetClient.getClient().getUsername().toLowerCase().trim() + "_database", (SQLiteDatabase.CursorFactory) null, 1);
+        super(context, TelnetClient.getClient().getUsername().toLowerCase().trim() + "_database", null, 1);
     }
 
     public void onCreate(SQLiteDatabase aDatabase) {
         try {
-            aDatabase.execSQL("CREATE TABLE IF NOT EXISTS messages ( message_id    INTEGER PRIMARY KEY AUTOINCREMENT ,  sender_name   TEXT  NOT NULL ,  message       TEXT  NOT NULL ,  received_date INTEGER ,  read_date     INTEGER );");
+            String CREATE_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS messages (" +
+                    "message_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                    "sender_name TEXT NOT NULL, " +
+                    "message TEXT NOT NULL, " +
+                    "received_date INTEGER, " +
+                    "read_date INTEGER" +
+                    ")";
+
+            aDatabase.execSQL(CREATE_TABLE_QUERY);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -33,25 +42,25 @@ public class AppDatabase extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put("sender_name", aSenderName);
         values.put("message", aMessage);
-        values.put("received_date", Long.valueOf(new Date().getTime()));
+        values.put("received_date", new Date().getTime());
         SQLiteDatabase db = getWritableDatabase();
-        db.insert("messages", (String) null, values);
+        db.insert("messages", null, values);
         db.close();
     }
 
-    public List<Map<String, Object>> loadMessages() {
+    public void loadMessages() {
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query("messages", (String[]) null, (String) null, (String[]) null, (String) null, (String) null, "received_date DESC", "0,100");
+        @SuppressLint("Recycle") Cursor cursor = db.query("messages", null, null, null, null, null, "received_date DESC", "0,100");
         List<Map<String, Object>> buffer = new ArrayList<>();
         if (cursor.moveToFirst()) {
             do {
-                long message_id = cursor.getLong(cursor.getColumnIndex("message_id"));
-                String sender_name = cursor.getString(cursor.getColumnIndex("sender_name"));
-                String message = cursor.getString(cursor.getColumnIndex("message"));
-                long received_date_value = cursor.getLong(cursor.getColumnIndex("received_date"));
-                long read_date_value = cursor.isNull(cursor.getColumnIndex("read_date")) ? 0 : cursor.getLong(cursor.getColumnIndex("read_date"));
-                HashMap hashMap = new HashMap();
-                hashMap.put("message_id", Long.valueOf(message_id));
+                @SuppressLint("Range") long message_id = cursor.getLong(cursor.getColumnIndex("message_id"));
+                @SuppressLint("Range") String sender_name = cursor.getString(cursor.getColumnIndex("sender_name"));
+                @SuppressLint("Range") String message = cursor.getString(cursor.getColumnIndex("message"));
+                @SuppressLint("Range") long received_date_value = cursor.getLong(cursor.getColumnIndex("received_date"));
+                @SuppressLint("Range") long read_date_value = cursor.isNull(cursor.getColumnIndex("read_date")) ? 0 : cursor.getLong(cursor.getColumnIndex("read_date"));
+                HashMap<String, Object> hashMap = new HashMap<>();
+                hashMap.put("message_id", message_id);
                 hashMap.put("sender_name", sender_name);
                 hashMap.put("message", message);
                 hashMap.put("received_date", new Date(received_date_value));
@@ -62,6 +71,5 @@ public class AppDatabase extends SQLiteOpenHelper {
             } while (cursor.moveToNext());
         }
         db.close();
-        return buffer;
     }
 }

@@ -1,6 +1,5 @@
 package com.kota.Bahamut.Dialogs;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,18 +32,18 @@ public class Dialog_SearchArticle extends ASDialog implements View.OnClickListen
     public Dialog_SearchArticle() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_search_article);
-        getWindow().setBackgroundDrawable((Drawable) null);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
         setTitle("搜尋文章");
-        _keyword_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_keyword);
-        _author_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_Author);
-        _mark_radio = (RadioGroup) findViewById(R.id.Bahamut_Dialog_Search_mark);
-        _gy_field = (EditText) findViewById(R.id.gy_number_field);
-        _search_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Search_Button);
-        _cancel_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_Cancel_Button);
-        _header_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_headerBlock);
-        _keyword_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_keywordBlock);
-        _author_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_AuthorBlock);
-        _mark_block = (LinearLayout) findViewById(R.id.SearchArticleDialog_markBlock);
+        _keyword_label = findViewById(R.id.Bahamut_Dialog_Search_keyword);
+        _author_label = findViewById(R.id.Bahamut_Dialog_Search_Author);
+        _mark_radio = findViewById(R.id.Bahamut_Dialog_Search_mark);
+        _gy_field = findViewById(R.id.gy_number_field);
+        _search_button = findViewById(R.id.Bahamut_Dialog_Search_Search_Button);
+        _cancel_button = findViewById(R.id.Bahamut_Dialog_Search_Cancel_Button);
+        _header_block = findViewById(R.id.SearchArticleDialog_headerBlock);
+        _keyword_block = findViewById(R.id.SearchArticleDialog_keywordBlock);
+        _author_block = findViewById(R.id.SearchArticleDialog_AuthorBlock);
+        _mark_block = findViewById(R.id.SearchArticleDialog_markBlock);
         _search_button.setOnClickListener(this);
         _cancel_button.setOnClickListener(this);
     }

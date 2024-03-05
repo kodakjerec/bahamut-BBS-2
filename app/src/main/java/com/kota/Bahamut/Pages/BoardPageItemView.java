@@ -1,9 +1,12 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Color;
+import android.text.SpannableString;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,12 +15,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 
 import java.util.Objects;
 
 public class BoardPageItemView extends LinearLayout {
     private static final int _count = 0;
-    private TextView _author_label = null;
+    public TextView _author_label = null;
     private ViewGroup _content_view = null;
     private TextView _date_label = null;
     private View _divider_bottom = null;
@@ -38,7 +42,6 @@ public class BoardPageItemView extends LinearLayout {
         init();
     }
 
-    /* access modifiers changed from: protected */
     protected void finalize() throws Throwable {
         super.finalize();
     }
@@ -96,6 +99,9 @@ public class BoardPageItemView extends LinearLayout {
             this._author_label.setText(Objects.requireNonNullElse(author, getContextString(R.string.loading)));
         }
     }
+    public String getAuthor() {
+        return (String) _author_label.getText();
+    }
 
     public void setDate(String date) {
         if (this._date_label != null) {
@@ -148,11 +154,28 @@ public class BoardPageItemView extends LinearLayout {
         }
     }
 
+    // 設定已讀/未讀
     public void setRead(boolean isRead) {
-        if (isRead) {
-            this._title_label.setTextColor(-8355712);
-        } else {
-            this._title_label.setTextColor(-1);
+        if (TempSettings.isBoardFollowTitle((String) _title_label.getText())) { // 關注的討論串
+            if (_status_label.getText().equals("◆")) { // 首篇文章
+                if (isRead) {
+                    this._title_label.setTextColor(getContextColor(R.color.board_item_follow_first_read));
+                } else {
+                    this._title_label.setTextColor(getContextColor(R.color.board_item_follow_first));
+                }
+            } else { // 回應文章
+                if (isRead) {
+                    this._title_label.setTextColor(getContextColor(R.color.board_item_follow_other_read));
+                } else {
+                    this._title_label.setTextColor(getContextColor(R.color.board_item_follow_other));
+                }
+            }
+        } else { // 其他文章
+            if (isRead) {
+                this._title_label.setTextColor(getContextColor(R.color.board_item_normal_read));
+            } else {
+                this._title_label.setTextColor(getContextColor(R.color.board_item_normal));
+            }
         }
     }
 

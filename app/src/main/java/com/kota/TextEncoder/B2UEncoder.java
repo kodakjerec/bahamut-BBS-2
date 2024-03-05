@@ -36,7 +36,7 @@ public class B2UEncoder {
             this._table_size = readCharFromStream(inputStream);
             this._table = new char[this._table_size];
             for (int i = 0; i < this._table.length; i++) {
-                this._table[i] = 65533;
+                this._table[i] = NULL_CHAR;
             }
             for (int i2 = 0; i2 < total; i2++) {
                 char index = readCharFromStream(inputStream);
@@ -107,13 +107,11 @@ public class B2UEncoder {
         buffers.lastElement().flip();
         int buffer_size = 0;
         for (int i2 = 0; i2 < buffers.size() - 1; i2++) {
-            buffer_size += 1024;
+            buffer_size += BUFFER_SIZE;
         }
         byte[] result_data = new byte[(buffer_size + buffers.lastElement().limit())];
         int count = 0;
-        Iterator<ByteBuffer> it = buffers.iterator();
-        while (it.hasNext()) {
-            ByteBuffer buffer = it.next();
+        for (ByteBuffer buffer : buffers) {
             for (int i3 = 0; i3 < buffer.limit(); i3++) {
                 result_data[count] = buffer.get(i3);
                 count++;
@@ -129,7 +127,7 @@ public class B2UEncoder {
                 }
 
                 public ByteBuffer createByteBuffer() {
-                    return ByteBuffer.allocate(1024);
+                    return ByteBuffer.allocate(BUFFER_SIZE);
                 }
             };
         }

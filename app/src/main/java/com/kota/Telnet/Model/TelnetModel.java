@@ -2,7 +2,6 @@ package com.kota.Telnet.Model;
 
 import com.kota.Telnet.Reference.TelnetAnsiCode;
 import com.kota.Telnet.TelnetAnsi;
-import com.kota.Telnet.TelnetCommand;
 import com.kota.Telnet.TelnetCursor;
 import java.nio.ByteBuffer;
 
@@ -128,11 +127,13 @@ public class TelnetModel {
         }
     }
 
+    // 給予顏色定義
     private void setCursorData(byte data, TelnetAnsi ansiState) {
         if (this._cursor.row >= 0 && this._cursor.row < this._row && this._cursor.column >= 0 && this._cursor.column < 80) {
             TelnetRow row = this._frame.getRow(this._cursor.row);
             row.cleanColumn(this._cursor.column);
             row.data[this._cursor.column] = data;
+            // byte 顏色
             if (ansiState != null) {
                 byte text_color = ansiState.textColor;
                 if (ansiState.textBright) {
@@ -166,7 +167,7 @@ public class TelnetModel {
     }
 
     public TelnetRow getLastRow() {
-        return this._frame.getLastestRow();
+        return this._frame.getLatestRow();
     }
 
     public TelnetRow getFirstRow() {
@@ -280,7 +281,7 @@ public class TelnetModel {
             for (int i = 0; i < this._row - 1; i++) {
                 this._frame.switchRow(i, i + 1);
             }
-            this._frame.getLastestRow().clear();
+            this._frame.getLatestRow().clear();
         } else if (this._cursor.row < this._row - 1) {
             this._cursor.row++;
         }

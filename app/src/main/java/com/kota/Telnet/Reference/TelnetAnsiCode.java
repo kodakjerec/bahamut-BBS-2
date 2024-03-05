@@ -5,7 +5,8 @@ import android.view.View;
 
 import androidx.core.internal.view.SupportMenu;
 import androidx.core.view.InputDeviceCompat;
-import androidx.core.view.ViewCompat;
+
+import com.kota.Telnet.TelnetAnsi;
 
 public class TelnetAnsiCode {
     public static final int[] BACKGROUND_COLOR_NORMAL = {View.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
@@ -37,15 +38,20 @@ public class TelnetAnsiCode {
 
     public static class Color {
         public static final byte BLACK = 0;
-        public static final byte BLUE = 4;
-        public static final byte CYAN = 6;
-        public static final byte GRAY = 7;
-        public static final byte GREEN = 2;
-        public static final byte MAGENTA = 5;
         public static final byte RED = 1;
+        public static final byte GREEN = 2;
         public static final byte YELLOW = 3;
+        public static final byte BLUE = 4;
+        public static final byte MAGENTA = 5;
+        public static final byte CYAN = 6;
+        public static final byte WHITE = 7;
     }
 
+    /*
+        瀏覽文章, 返回前景色
+        輸入: index
+        返回: int (color code)
+     */
     public static int getTextColor(byte colorIndex) {
         int color_index = colorIndex & 255;
         if (colorIndex < 8) {
@@ -59,6 +65,11 @@ public class TelnetAnsiCode {
         }
     }
 
+    /*
+        瀏覽文章, 返回背景色
+        輸入: index
+        返回: int (color code)
+     */
     public static int getBackgroundColor(byte colorIndex) {
         int color_index = colorIndex & 255;
         if (colorIndex < 8) {
@@ -70,5 +81,42 @@ public class TelnetAnsiCode {
             e.printStackTrace();
             return -4144960;
         }
+    }
+
+    /*
+        修改文章, 返回前景字碼
+        輸入: index
+        返回: string
+     */
+    public static String getTextAsciiCode(byte colorIndex) {
+        int color_index = colorIndex & 255;
+        if (color_index == TelnetAnsi.getDefaultTextColor()) {
+            return "";
+        }
+        if (colorIndex < 8) {
+            return "3" + colorIndex;
+        }
+        try {
+            return "1;3" + (color_index - 8);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /*
+        修改文章, 返回背景字碼
+        輸入: index
+        返回: string
+     */
+    public static String getBackAsciiCode(byte colorIndex) {
+        int color_index = colorIndex & 255;
+        if (color_index == TelnetAnsi.getDefaultBackgroundColor()) {
+            return "";
+        }
+        if (colorIndex < 8) {
+            return "4" + colorIndex;
+        }
+        return "";
     }
 }

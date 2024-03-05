@@ -11,35 +11,36 @@ import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
+import com.kota.Bahamut.Dialogs.Dialog_PaintColor;
+import com.kota.Bahamut.Dialogs.Dialog_PaintColor_Listener;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.UserSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import java.util.Vector;
 
-public class SendMailPage extends TelnetPage implements View.OnClickListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener {
-    private String _content = null;
-    /* access modifiers changed from: private */
-    public EditText _content_field = null;
-    private Button _hide_title_button = null;
-    /* access modifiers changed from: private */
-    public SendMailPage_Listener _listener = null;
-    private Button _post_button = null;
-    private String _receiver = null;
-    private EditText _receiver_field = null;
-    private TextView _receiver_field_background = null;
-    private Button _symbol_button = null;
-    private String _title = null;
-    private View _title_block = null;
-    private boolean _title_block_hidden = false;
-    private EditText _title_field = null;
-    private TextView _title_field_background = null;
+public class SendMailPage extends TelnetPage implements View.OnClickListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener, Dialog_PaintColor_Listener {
+    String _content = null;
+    EditText _content_field = null;
+    Button _hide_title_button = null;
+    Button _paint_color_button = null;
+    SendMailPage_Listener _listener = null;
+    Button _post_button = null;
+    String _receiver = null;
+    EditText _receiver_field = null;
+    TextView _receiver_field_background = null;
+    Button _symbol_button = null;
+    String _title = null;
+    View _title_block = null;
+    boolean _title_block_hidden = false;
+    EditText _title_field = null;
+    TextView _title_field_background = null;
 
     public String getName() {
         return "BahamutSendMailDialog";
     }
 
     public void setListener(SendMailPage_Listener aListener) {
-        this._listener = aListener;
+        _listener = aListener;
     }
 
     public int getPageLayout() {
@@ -59,42 +60,42 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
     }
 
     public void onPageDidDisappear() {
-        this._title_field = null;
-        this._title_field_background = null;
-        this._receiver_field = null;
-        this._receiver_field_background = null;
-        this._content_field = null;
-        this._post_button = null;
-        this._symbol_button = null;
-        this._hide_title_button = null;
-        this._title_block = null;
+        _title_field = null;
+        _title_field_background = null;
+        _receiver_field = null;
+        _receiver_field_background = null;
+        _content_field = null;
+        _post_button = null;
+        _symbol_button = null;
+        _hide_title_button = null;
+        _title_block = null;
         super.onPageDidDisappear();
     }
 
-    private void refreshTitleField() {
-        if (this._title_field != null && this._title != null) {
-            this._title_field.setText(this._title);
-            if (this._title.length() > 0) {
-                Selection.setSelection(this._title_field.getText(), 1);
+    void refreshTitleField() {
+        if (_title_field != null && _title != null) {
+            _title_field.setText(_title);
+            if (_title.length() > 0) {
+                Selection.setSelection(_title_field.getText(), 1);
             }
-            this._title = null;
+            _title = null;
         }
     }
 
-    private void refreshReceiverField() {
-        if (this._receiver_field != null && this._receiver != null) {
-            this._receiver_field.setText(this._receiver);
-            this._receiver = null;
+    void refreshReceiverField() {
+        if (_receiver_field != null && _receiver != null) {
+            _receiver_field.setText(_receiver);
+            _receiver = null;
         }
     }
 
-    private void refreshContentField() {
-        if (this._content_field != null && this._content != null) {
-            this._content_field.setText(this._content);
-            if (this._content.length() > 0) {
-                Selection.setSelection(this._content_field.getText(), this._content.length());
+    void refreshContentField() {
+        if (_content_field != null && _content != null) {
+            _content_field.setText(_content);
+            if (_content.length() > 0) {
+                Selection.setSelection(_content_field.getText(), _content.length());
             }
-            this._content = null;
+            _content = null;
         }
     }
 
@@ -104,54 +105,63 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         refreshReceiverField();
     }
 
-    private void initial() {
-        this._title_field = (EditText) findViewById(R.id.SendMail_TitleField);
-        this._title_field.setOnFocusChangeListener(this);
-        this._title_field_background = (TextView) findViewById(R.id.SendMail_TitleFieldBackground);
-        this._receiver_field = (EditText) findViewById(R.id.SendMail_ReceiverField);
-        this._receiver_field.setOnFocusChangeListener(this);
-        this._receiver_field_background = (TextView) findViewById(R.id.SendMail_ReceiverFieldBackground);
-        this._content_field = (EditText) findViewById(R.id.SendMailDialog_EditField);
-        this._post_button = (Button) findViewById(R.id.SendMailDialog_Post);
-        this._post_button.setOnClickListener(this);
-        this._symbol_button = (Button) findViewById(R.id.SendMailDialog_Symbol);
-        this._symbol_button.setOnClickListener(this);
-        this._hide_title_button = (Button) findViewById(R.id.SendMailDialog_Cancel);
-        this._hide_title_button.setOnClickListener(this);
+    void initial() {
+        _title_field = (EditText) findViewById(R.id.SendMail_TitleField);
+        _title_field.setOnFocusChangeListener(this);
+        _title_field_background = (TextView) findViewById(R.id.SendMail_TitleFieldBackground);
+        
+        _receiver_field = (EditText) findViewById(R.id.SendMail_ReceiverField);
+        _receiver_field.setOnFocusChangeListener(this);
+        _receiver_field_background = (TextView) findViewById(R.id.SendMail_ReceiverFieldBackground);
+        
+        _content_field = (EditText) findViewById(R.id.SendMailDialog_EditField);
+        
+        _post_button = (Button) findViewById(R.id.SendMailDialog_Post);
+        _post_button.setOnClickListener(this);
+        
+        _symbol_button = (Button) findViewById(R.id.SendMailDialog_Symbol);
+        _symbol_button.setOnClickListener(this);
+        
+        _hide_title_button = (Button) findViewById(R.id.SendMailDialog_Cancel);
+        _hide_title_button.setOnClickListener(this);
+        
+        _paint_color_button = (Button) findViewById(R.id.ArticlePostDialog_Color);
+        _paint_color_button.setOnClickListener(this);
+        
         findViewById(R.id.SendMailDialog_change).setOnClickListener(this);
-        this._title_block = findViewById(R.id.SendMail_TitleBlock);
+        _title_block = findViewById(R.id.SendMail_TitleBlock);
         refresh();
     }
 
     public void clear() {
-        if (this._receiver_field != null) {
-            this._receiver_field.setText("");
+        if (_receiver_field != null) {
+            _receiver_field.setText("");
         }
-        if (this._title_field != null) {
-            this._title_field.setText("");
+        if (_title_field != null) {
+            _title_field.setText("");
         }
-        if (this._content_field != null) {
-            this._content_field.setText("");
+        if (_content_field != null) {
+            _content_field.setText("");
         }
-        this._listener = null;
+        _listener = null;
     }
 
     public void setPostTitle(String aTitle) {
-        this._title = aTitle;
+        _title = aTitle;
         refreshTitleField();
     }
 
     public void setPostContent(String aContent) {
-        this._content = aContent;
+        _content = aContent;
         refreshContentField();
     }
 
     public void onClick(View view) {
-        if (view == this._post_button) {
-            if (this._listener != null) {
-                String receiver = this._receiver_field.getText().toString().replace("\n", "");
-                String title = this._title_field.getText().toString().replace("\n", "");
-                String content = this._content_field.getText().toString();
+        if (view == _post_button) {
+            if (_listener != null) {
+                String receiver = _receiver_field.getText().toString().replace("\n", "");
+                String title = _title_field.getText().toString().replace("\n", "");
+                String content = _content_field.getText().toString();
                 StringBuilder err_msg = new StringBuilder();
                 Vector<String> empty = new Vector<>();
                 if (receiver.length() == 0) {
@@ -183,89 +193,97 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
                 final String send_content = content;
                 ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認").setMessage("您是否確定要送出此信件?").setListener((aDialog, index) -> {
                     if (index == 1) {
-                        SendMailPage.this._listener.onSendMailDialogSendButtonClicked(SendMailPage.this, send_receiver, send_title, send_content);
-                        SendMailPage.this.getNavigationController().popViewController();
-                        SendMailPage.this.clear();
+                        _listener.onSendMailDialogSendButtonClicked(SendMailPage.this, send_receiver, send_title, send_content);
+                        getNavigationController().popViewController();
+                        clear();
                     }
                 }).show();
             }
-        } else if (view == this._symbol_button) {
-            final String[] items = new UserSettings(getContext()).getSymbols();
+        } else if (view == _symbol_button) {
+            final String[] items = UserSettings.getSymbols();
             ASListDialog.createDialog().setDialogWidth(320.0f).setTitle("表情符號").addItems(items).setListener(new ASListDialogItemClickListener() {
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                     String symbol = items[index];
-                    SendMailPage.this._content_field.getEditableText().insert(SendMailPage.this._content_field.getSelectionStart(), symbol);
+                    _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
                 }
 
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
                     return false;
                 }
             }).scheduleDismissOnPageDisappear(this).show();
-        } else if (view == this._hide_title_button) {
-            onInsertSymbolbuttonClicked();
+        } else if (view == _hide_title_button) {
+            onInsertSymbolButtonClicked();
+        } else if (view == _paint_color_button) {
+            Dialog_PaintColor dialog = new Dialog_PaintColor();
+            dialog.setListener(this);
+            dialog.show();
         } else if (view.getId() == R.id.SendMailDialog_change) {
             changeViewMode();
         }
     }
 
     public void refresh() {
-        if (this._title_block_hidden) {
-            this._title_block.setVisibility(View.GONE);
+        if (_title_block_hidden) {
+            _title_block.setVisibility(View.GONE);
         } else {
-            this._title_block.setVisibility(View.VISIBLE);
+            _title_block.setVisibility(View.VISIBLE);
         }
     }
 
     public void onFocusChange(View v, boolean hasFocus) {
-        if (v == this._receiver_field) {
+        if (v == _receiver_field) {
             if (hasFocus) {
-                this._receiver_field.setSingleLine(false);
-                this._receiver_field_background.setTextColor(0);
-                this._receiver_field.setTextColor(-1);
+                _receiver_field.setSingleLine(false);
+                _receiver_field_background.setTextColor(0);
+                _receiver_field.setTextColor(-1);
             } else {
-                this._receiver_field.setSingleLine(true);
-                this._receiver_field.setTextColor(0);
-                this._receiver_field_background.setTextColor(-1);
-                this._receiver_field_background.setText(this._receiver_field.getText().toString());
+                _receiver_field.setSingleLine(true);
+                _receiver_field.setTextColor(0);
+                _receiver_field_background.setTextColor(-1);
+                _receiver_field_background.setText(_receiver_field.getText().toString());
             }
         }
-        if (v != this._title_field) {
+        if (v != _title_field) {
             return;
         }
         if (hasFocus) {
-            this._title_field.setSingleLine(false);
-            this._title_field.setTextColor(-1);
-            this._title_field_background.setTextColor(0);
+            _title_field.setSingleLine(false);
+            _title_field.setTextColor(-1);
+            _title_field_background.setTextColor(0);
             return;
         }
-        this._title_field.setSingleLine(true);
-        this._title_field.setTextColor(0);
-        this._title_field_background.setTextColor(-1);
-        this._title_field_background.setText(this._title_field.getText().toString());
+        _title_field.setSingleLine(true);
+        _title_field.setTextColor(0);
+        _title_field_background.setTextColor(-1);
+        _title_field_background.setText(_title_field.getText().toString());
     }
 
-    /* access modifiers changed from: package-private */
-    public void changeViewMode() {
-        this._title_block_hidden = !this._title_block_hidden;
+    void changeViewMode() {
+        _title_block_hidden = !_title_block_hidden;
         refresh();
     }
 
-    private void onInsertSymbolbuttonClicked() {
+    void onInsertSymbolButtonClicked() {
         Dialog_InsertSymbol dialog = new Dialog_InsertSymbol();
-        dialog.setListsner(this);
+        dialog.setListener(this);
         dialog.show();
     }
 
     public void onSymbolDialogDismissWithSymbol(String symbol) {
-        this._content_field.getEditableText().insert(this._content_field.getSelectionStart(), symbol);
+        _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
     }
 
-    public void setReceiver(String aRecevier) {
-        this._receiver = aRecevier;
+    public void setReceiver(String a_receiver) {
+        _receiver = a_receiver;
         refreshReceiverField();
     }
 
     public boolean isKeepOnOffline() {
         return true;
+    }
+
+    @Override
+    public void onPaintColorDone(String str) {
+        _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
     }
 }

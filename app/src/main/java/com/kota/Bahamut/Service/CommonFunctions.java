@@ -2,25 +2,19 @@ package com.kota.Bahamut.Service;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.UiModeManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.Build;
-
-import androidx.appcompat.app.AppCompatDelegate;
-
-import com.kota.Telnet.UserSettings;
+import android.graphics.Color;
+import android.util.Log;
 
 public class CommonFunctions {
     @SuppressLint("StaticFieldLeak")
     private static Context myContext;
     @SuppressLint("StaticFieldLeak")
     private static Activity myActivity;
-    static UserSettings _settings;
 
     public static void initialCFContext(Context fromContext) {
         myContext = fromContext;
-        _settings = new UserSettings(myContext);
     }
     public static void initialCFActivity(Activity activity) {
         myActivity = activity;
@@ -46,7 +40,7 @@ public class CommonFunctions {
 
     // 調整螢幕方向
     public static void changeScreenOrientation() {
-        int val = _settings.getPropertiesScreenOrientation();
+        int val = UserSettings.getPropertiesScreenOrientation();
         switch (val) {
             case 0:
                 myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
@@ -58,5 +52,13 @@ public class CommonFunctions {
                 myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                 break;
         }
+    }
+    
+    public static void getColorARGB(int colorCode) {
+        int red = Color.red(colorCode);
+        int green = Color.green(colorCode);
+        int blue = Color.blue(colorCode);
+        int alpha = Color.alpha(colorCode);
+        Log.v("ColorCode","A:"+ alpha + " R:"+red+" G:"+green+" B"+blue);
     }
 }

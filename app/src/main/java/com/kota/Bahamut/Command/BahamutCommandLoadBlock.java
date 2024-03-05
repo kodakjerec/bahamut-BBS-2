@@ -1,15 +1,17 @@
 package com.kota.Bahamut.Command;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.TelnetClient;
 
 public class BahamutCommandLoadBlock extends TelnetCommand {
-    private int _block = -1;
+    int _block;
 
     public BahamutCommandLoadBlock(int aBlock) {
-        this.Action = 0;
+        this.Action = LoadBlock;
         this._block = aBlock;
     }
 
@@ -31,6 +33,7 @@ public class BahamutCommandLoadBlock extends TelnetCommand {
         setDone(true);
     }
 
+    @NonNull
     public String toString() {
         return "[LoadBlock][block=" + this._block + " targetIndex=" + ((this._block * 20) + 1) + "]";
     }

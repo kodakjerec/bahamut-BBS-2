@@ -1,17 +1,19 @@
 package com.kota.Bahamut.Dialogs;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
 
+import java.util.Objects;
+
 public class Dialog_SearchBoard extends ASDialog implements View.OnClickListener {
-    Button _cancel_button = null;
-    EditText _keyword_label = null;
+    Button _cancel_button;
+    EditText _keyword_label;
     Dialog_SearchBoard_Listener _listener = null;
-    Button _search_button = null;
+    Button _search_button;
 
     public String getName() {
         return "BahamutBoardsSearchDialog";
@@ -20,11 +22,11 @@ public class Dialog_SearchBoard extends ASDialog implements View.OnClickListener
     public Dialog_SearchBoard() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_search_board);
-        getWindow().setBackgroundDrawable((Drawable) null);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
         setTitle("搜尋看板");
-        this._keyword_label = (EditText) findViewById(R.id.Bahamut_Dialog_Search_board_keyword);
-        this._search_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_board_Search_Button);
-        this._cancel_button = (Button) findViewById(R.id.Bahamut_Dialog_Search_board_Cancel_Button);
+        this._keyword_label = findViewById(R.id.Bahamut_Dialog_Search_board_keyword);
+        this._search_button = findViewById(R.id.Bahamut_Dialog_Search_board_Search_Button);
+        this._cancel_button = findViewById(R.id.Bahamut_Dialog_Search_board_Cancel_Button);
         this._search_button.setOnClickListener(this);
         this._cancel_button.setOnClickListener(this);
     }

@@ -23,6 +23,8 @@
             <LinearLayout android:orientation="vertical" android:id="@+id/SendMail_SymbolList" android:background="@color/item_background_color" android:visibility="gone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"/>
         </LinearLayout>
         <LinearLayout android:id="@+id/Sendtoolbar" style="@style/Toolbar">
+            <Button android:id="@+id/ArticlePostDialog_Color" android:text="@string/post_article_page_paint_color" style="@style/ToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
             <Button android:id="@+id/SendMailDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem"/>
             <View style="@style/ToolbarDivider"/>
             <Button android:id="@+id/SendMailDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem"/>

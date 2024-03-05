@@ -9,6 +9,7 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.Service.UserSettings;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -103,6 +104,8 @@ public class ASNavigationController extends Activity {
 
     getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics);
     ASRunner.construct();
+
+    new UserSettings(this);
 
     this._device_controller = new ASDeviceController(this);
     onControllerWillLoad();

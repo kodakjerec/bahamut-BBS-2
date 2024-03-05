@@ -4,20 +4,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class TelnetContainer<ObjectType> {
-    Map<Integer, ObjectType> _container = new TreeMap();
+    Map<Integer, ObjectType> _container = new TreeMap<>();
     int _max_index = 0;
 
     public void add(Integer index, ObjectType object) {
         if (this._container != null) {
             this._container.put(index, object);
-            if (index.intValue() > this._max_index) {
-                this._max_index = index.intValue();
+            if (index > this._max_index) {
+                this._max_index = index;
             }
         }
     }
 
     public ObjectType get(Integer index) {
-        if (index.intValue() < 0 || index.intValue() > this._max_index || this._container == null || !this._container.containsKey(index)) {
+        if (index < 0 || index > this._max_index || this._container == null || !this._container.containsKey(index)) {
             return null;
         }
         return this._container.get(index);

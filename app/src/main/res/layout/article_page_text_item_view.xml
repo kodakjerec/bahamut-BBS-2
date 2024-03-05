@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:id="@+id/ArticleTextItemView_contentView" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
+    <LinearLayout android:orientation="vertical"
+        android:id="@+id/ArticleTextItemView_contentView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/TouchBlock">
         <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:id="@+id/ArticleTextItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
         <com.kota.TelnetUI.TextView.TelnetTextViewNormal
             android:id="@+id/ArticleTextItemView_content"
             style="@style/TextViewNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:autoLink="web"
             android:enabled="true"
             android:textIsSelectable="true"
             android:focusable="true"

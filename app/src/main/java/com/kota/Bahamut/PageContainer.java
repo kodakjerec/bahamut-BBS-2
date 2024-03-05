@@ -1,6 +1,6 @@
 package com.kota.Bahamut;
 
-import com.kota.Bahamut.Pages.ArticlePage;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
 import com.kota.Bahamut.Pages.BillingPage;
 import com.kota.Bahamut.Pages.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage;
@@ -12,7 +12,7 @@ import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.StartPage;
-import java.util.Iterator;
+
 import java.util.Stack;
 
 /* loaded from: classes.dex */

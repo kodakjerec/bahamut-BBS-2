@@ -13,8 +13,6 @@ public class TelnetTextView extends AppCompatTextView {
     private static final float text_size_normal = 20.0f;
     private static final float text_size_small = 16.0f;
     private static final float text_size_ultra_large = 28.0f;
-    private float text_scale = 1.0f;
-    private float text_scale_weight = 0.0f;
 
     public TelnetTextView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -28,20 +26,20 @@ public class TelnetTextView extends AppCompatTextView {
         super(context);
     }
 
-    /* access modifiers changed from: protected */
-    public void reloadTextSize() {
+    protected void reloadTextSize() {
     }
 
-    /* access modifiers changed from: protected */
-    public void setTextModelSize(int size) {
-        if (size == -1) {
-            setTextSize(2, (text_size_small * this.text_scale) + this.text_scale_weight);
-        } else if (size == 1) {
-            setTextSize(2, (text_size_large * this.text_scale) + this.text_scale_weight);
-        } else if (size == 2) {
-            setTextSize(2, (text_size_ultra_large * this.text_scale) + this.text_scale_weight);
+    protected void setTextModelSize(int size) {
+        float text_scale = 1.0f;
+        float text_scale_weight = 0.0f;
+        if (size == TEXT_VIEW_SIZE_SMALL) {
+            setTextSize(2, (text_size_small * text_scale) + text_scale_weight);
+        } else if (size == TEXT_VIEW_SIZE_LARGE) {
+            setTextSize(2, (text_size_large * text_scale) + text_scale_weight);
+        } else if (size == TEXT_VIEW_SIZE_ULTRA_LARGE) {
+            setTextSize(2, (text_size_ultra_large * text_scale) + text_scale_weight);
         } else {
-            setTextSize(2, (text_size_normal * this.text_scale) + this.text_scale_weight);
+            setTextSize(2, (text_size_normal * text_scale) + text_scale_weight);
         }
     }
 }

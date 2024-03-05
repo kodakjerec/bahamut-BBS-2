@@ -1,7 +1,6 @@
 package com.kota.Bahamut.Dialogs;
 
 import android.database.DataSetObserver;
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -12,20 +11,22 @@ import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
 
+import java.util.Objects;
+
 public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemClickListener, ListAdapter {
-    GridView _grid_view = null;
+    GridView _grid_view;
     private Dialog_InsertSymbol_Listener _listener = null;
     String _symbols = "├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂〔〕【】《》（）｛｝﹙﹚『』﹛﹜﹝﹞＜＞≦≧﹤﹥「」︵︶︷︸︹︺︻︼︽︾〈〉︿﹀∩∪﹁﹂﹃﹄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω╳＋﹢－×÷＝≠≒∞ˇ±√⊥∠∟⊿㏒㏑∫∮∵∴";
 
     public Dialog_InsertSymbol() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_symbol);
-        getWindow().setBackgroundDrawable((Drawable) null);
-        this._grid_view = (GridView) findViewById(R.id.SymbolDialog_GridView);
+        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        this._grid_view = findViewById(R.id.SymbolDialog_GridView);
         this._grid_view.setOnItemClickListener(this);
         String[] list = new String[this._symbols.length()];
         for (int i = 0; i < list.length; i++) {
-            list[i] = "" + this._symbols.charAt(i);
+            list[i] = String.valueOf(this._symbols.charAt(i));
         }
         this._grid_view.setAdapter(new ArrayAdapter<>(getContext(), R.layout.simple_list_item_1, list));
     }
@@ -42,11 +43,11 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
     }
 
     public String getItem(int position) {
-        return "" + this._symbols.charAt(position);
+        return String.valueOf(this._symbols.charAt(position));
     }
 
     public long getItemId(int position) {
-        return (long) position;
+        return position;
     }
 
     public int getItemViewType(int position) {
@@ -88,7 +89,7 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
         return false;
     }
 
-    public void setListsner(Dialog_InsertSymbol_Listener aListener) {
+    public void setListener(Dialog_InsertSymbol_Listener aListener) {
         this._listener = aListener;
     }
 

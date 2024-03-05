@@ -14,15 +14,14 @@ import com.kota.Bahamut.R;
 import java.util.Objects;
 
 public class MailBoxPage_ItemView extends LinearLayout {
-    private static final int _count = 0;
-    private TextView _author = null;
-    private TextView _date = null;
-    private View _divider_bottom = null;
-    private TextView _mark = null;
-    private TextView _number = null;
-    private TextView _reply = null;
-    private TextView _status = null;
-    private TextView _title = null;
+    TextView _author = null;
+    TextView _date = null;
+    View _divider_bottom = null;
+    TextView _mark = null;
+    TextView _number = null;
+    TextView _reply = null;
+    TextView _status = null;
+    TextView _title = null;
 
     public MailBoxPage_ItemView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -53,71 +52,71 @@ public class MailBoxPage_ItemView extends LinearLayout {
         clear();
     }
 
-    private void init() {
+    void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.mail_box_page_item_view, this);
-        this._status = findViewById(R.id.MailBoxPage_ItemView_Status);
-        this._title = findViewById(R.id.MailBoxPage_ItemView_Title);
-        this._number = findViewById(R.id.MailBoxPage_ItemView_Number);
-        this._date = findViewById(R.id.MailBoxPage_ItemView_Date);
-        this._mark = findViewById(R.id.MailBoxPage_ItemView_mark);
-        this._author = findViewById(R.id.MailBoxPage_ItemView_Author);
-        this._reply = findViewById(R.id.MailBoxPage_ItemView_Reply);
-        this._divider_bottom = findViewById(R.id.MailBoxPage_ItemView_DividerBottom);
+        _status = findViewById(R.id.MailBoxPage_ItemView_Status);
+        _title = findViewById(R.id.MailBoxPage_ItemView_Title);
+        _number = findViewById(R.id.MailBoxPage_ItemView_Number);
+        _date = findViewById(R.id.MailBoxPage_ItemView_Date);
+        _mark = findViewById(R.id.MailBoxPage_ItemView_mark);
+        _author = findViewById(R.id.MailBoxPage_ItemView_Author);
+        _reply = findViewById(R.id.MailBoxPage_ItemView_Reply);
+        _divider_bottom = findViewById(R.id.MailBoxPage_ItemView_DividerBottom);
     }
 
     public void setTitle(String title) {
-        if (this._title != null) {
-            this._title.setText(Objects.requireNonNullElse(title, getContextString(R.string.loading_)));
+        if (_title != null) {
+            _title.setText(Objects.requireNonNullElse(title, getContextString(R.string.loading_)));
         }
     }
 
     public void setAuthor(String author) {
-        if (this._author != null) {
-            this._author.setText(Objects.requireNonNullElse(author, getContextString(R.string.loading)));
+        if (_author != null) {
+            _author.setText(Objects.requireNonNullElse(author, getContextString(R.string.loading)));
         }
     }
 
     public void setDate(String date) {
-        if (this._date != null) {
-            this._date.setText(Objects.requireNonNullElse(date, getContextString(R.string.loading)));
+        if (_date != null) {
+            _date.setText(Objects.requireNonNullElse(date, getContextString(R.string.loading)));
         }
     }
 
     @SuppressLint({"DefaultLocale"})
     public void setIndex(int number) {
-        if (this._number != null) {
+        if (_number != null) {
             if (number > 0) {
-                this._number.setText(String.format("%1$05d", number));
+                _number.setText(String.format("%1$05d", number));
                 return;
             }
-            this._number.setText(getContextString(R.string.loading));
+            _number.setText(getContextString(R.string.loading));
         }
     }
 
     public void setReply(boolean isReply) {
         if (isReply) {
-            this._reply.setVisibility(View.VISIBLE);
+            _reply.setVisibility(View.VISIBLE);
         } else {
-            this._reply.setVisibility(View.INVISIBLE);
+            _reply.setVisibility(View.INVISIBLE);
         }
     }
 
     public void setMark(boolean isMarked) {
         if (isMarked) {
-            this._mark.setVisibility(View.VISIBLE);
+            _mark.setVisibility(View.VISIBLE);
         } else {
-            this._mark.setVisibility(View.INVISIBLE);
+            _mark.setVisibility(View.INVISIBLE);
         }
     }
 
     public void setRead(boolean isRead) {
         if (isRead) {
-            this._status.setText("◇");
-            this._title.setTextColor(-8355712);
+            _status.setText("◇");
+            _title.setTextColor(-8355712);
             return;
         }
-        this._status.setText("◆");
-        this._title.setTextColor(-1);
+        _status.setText("◆");
+        _title.setTextColor(-1);
     }
 
     public void clear() {
@@ -131,15 +130,15 @@ public class MailBoxPage_ItemView extends LinearLayout {
     }
 
     public void setDividerBottomVisible(boolean visible) {
-        if (this._divider_bottom == null) {
+        if (_divider_bottom == null) {
             return;
         }
         if (visible) {
-            if (this._divider_bottom.getVisibility() != View.VISIBLE) {
-                this._divider_bottom.setVisibility(View.VISIBLE);
+            if (_divider_bottom.getVisibility() != View.VISIBLE) {
+                _divider_bottom.setVisibility(View.VISIBLE);
             }
-        } else if (this._divider_bottom.getVisibility() != View.GONE) {
-            this._divider_bottom.setVisibility(View.GONE);
+        } else if (_divider_bottom.getVisibility() != View.GONE) {
+            _divider_bottom.setVisibility(View.GONE);
         }
     }
 }

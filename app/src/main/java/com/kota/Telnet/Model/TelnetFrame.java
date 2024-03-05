@@ -1,14 +1,14 @@
 package com.kota.Telnet.Model;
 
+import androidx.annotation.NonNull;
+
 import com.kota.Telnet.Reference.TelnetAnsiCode;
-import java.util.Iterator;
+
 import java.util.Vector;
 
-/* loaded from: classes.dex */
 public class TelnetFrame {
     public static final int DEFAULT_COLUMN = 80;
     public static final int DEFAULT_ROW = 24;
-    private static int _count = 0;
     public Vector<TelnetRow> rows = new Vector<>();
 
     protected void finalize() throws Throwable {
@@ -16,7 +16,7 @@ public class TelnetFrame {
     }
 
     public TelnetFrame() {
-        initialData(24);
+        initialData(DEFAULT_ROW);
         clear();
     }
 
@@ -97,7 +97,7 @@ public class TelnetFrame {
         return this.rows.firstElement();
     }
 
-    public TelnetRow getLastestRow() {
+    public TelnetRow getLatestRow() {
         return this.rows.lastElement();
     }
 
@@ -111,6 +111,7 @@ public class TelnetFrame {
         return this.rows.size();
     }
 
+    @NonNull
     public TelnetFrame clone() {
         return new TelnetFrame(this);
     }
@@ -125,14 +126,14 @@ public class TelnetFrame {
     }
 
     public TelnetRow removeRow(int index) {
-        TelnetRow row = this.rows.remove(index);
-        return row;
+        return this.rows.remove(index);
     }
 
+    // 雙字元判斷
     public void reloadSpace() {
         for (int row = 0; row < getRowSize(); row++) {
             int column = 0;
-            while (column < 80) {
+            while (column < DEFAULT_COLUMN) {
                 int data = getPositionData(row, column);
                 if (data > 127 && column < 79) {
                     boolean text_color_diff = getPositionTextColor(row, column) != getPositionTextColor(row, column + 1);
@@ -153,21 +154,8 @@ public class TelnetFrame {
         }
     }
 
-    public void printBackgroundColor() {
-        for (int i = 0; i < this.rows.size(); i++) {
-            StringBuffer s = new StringBuffer();
-            TelnetRow row = this.rows.get(i);
-            for (int j = 0; j < 80; j++) {
-                s.append(String.format("%1$02d ", Byte.valueOf(row.backgroundColor[j])));
-            }
-            System.out.println(s.toString());
-        }
-    }
-
     public void cleanCachedData() {
-        Iterator<TelnetRow> it = this.rows.iterator();
-        while (it.hasNext()) {
-            TelnetRow row = it.next();
+        for (TelnetRow row : this.rows) {
             row.cleanCachedData();
         }
     }
