@@ -135,18 +135,34 @@ public class SystemSettingsPage extends TelnetPage {
         UserSettings.setPropertiesLinkAutoShow(isChecked);
         changeLinkAutoShowStatus(isChecked);
     };
-    private void changeLinkAutoShowStatus(boolean enable) {
+    void changeLinkAutoShowStatus(boolean enable) {
         if (enable) {
             findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.VISIBLE);
             ((CheckBox) findViewById(R.id.SystemSettings_enableLinkShowThumbnail)).setChecked(UserSettings.getLinkShowThumbnail());
+            changeLinkOnlyWifiStatus(UserSettings.getLinkShowThumbnail());
         } else {
             UserSettings.setPropertiesLinkShowThumbnail(false);
             findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.GONE);
+            changeLinkOnlyWifiStatus(false);
         }
     }
 
     // 顯示預覽圖
-    CompoundButton.OnCheckedChangeListener _link_show_thumbnail_listener = (buttonView, isChecked) -> UserSettings.setPropertiesLinkShowThumbnail(isChecked);
+    CompoundButton.OnCheckedChangeListener _link_show_thumbnail_listener = (buttonView, isChecked) -> {
+        UserSettings.setPropertiesLinkShowThumbnail(isChecked);
+        changeLinkOnlyWifiStatus(isChecked);
+    };
+    void changeLinkOnlyWifiStatus(boolean enable) {
+        if (enable) {
+            findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.VISIBLE);
+            ((CheckBox) findViewById(R.id.SystemSettings_enableLinkShowOnlyWifi)).setChecked(UserSettings.getLinkShowOnlyWifi());
+        } else {
+            UserSettings.setPropertiesLinkShowOnlyWifi(false);
+            findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.GONE);
+        }
+    }
+    // 只在Wifi下預覽
+    CompoundButton.OnCheckedChangeListener _link_show_only_wifi_listener = (buttonView, isChecked) -> UserSettings.setPropertiesLinkShowOnlyWifi(isChecked);
 
 
     public int getPageLayout() {
@@ -211,6 +227,12 @@ public class SystemSettingsPage extends TelnetPage {
         link_show_thumbnail.setChecked(UserSettings.getLinkShowThumbnail());
         link_show_thumbnail.setOnCheckedChangeListener(_link_show_thumbnail_listener);
         findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setOnClickListener(view -> link_show_thumbnail.setChecked(!link_show_thumbnail.isChecked()));
+
+        // 顯示預覽圖
+        CheckBox link_show_only_wifi = (CheckBox) findViewById(R.id.SystemSettings_enableLinkShowOnlyWifi);
+        link_show_only_wifi.setChecked(UserSettings.getLinkShowOnlyWifi());
+        link_show_only_wifi.setOnCheckedChangeListener(_link_show_only_wifi_listener);
+        findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setOnClickListener(view -> link_show_only_wifi.setChecked(!link_show_only_wifi.isChecked()));
 
         // VIP
         if (UserSettings.getPropertiesVIP()) {

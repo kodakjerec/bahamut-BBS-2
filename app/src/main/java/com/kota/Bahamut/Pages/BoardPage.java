@@ -190,6 +190,16 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         BoardPage.this.closeDrawer();
         BoardPage.this.onBookmarkButtonClicked();
     };
+    // 靠左對其
+    View.OnClickListener _btnLL_listener = view -> {
+        UserSettings.setPropertiesToolbarLocation(1);
+        BoardPage.this.changeToolbarLocation();
+    };
+    // 靠右對其
+    View.OnClickListener _btnRR_listener = view -> {
+        UserSettings.setPropertiesToolbarLocation(2);
+        BoardPage.this.changeToolbarLocation();
+    };
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public int getPageLayout() {
@@ -219,9 +229,13 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         aSListView.extendOptionalDelegate = this;
         aSListView.setEmptyView(findViewById(R.id.BoardPageListEmptyView));
         setListView(aSListView);
+
         findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
         findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
-        findViewById(R.id.BoardPageLastestPageButton).setOnClickListener(mLastPageClickListener);
+        findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
+        findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
+        findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
+
         View search_article_button = findViewById(R.id.search_article_button);
         if (search_article_button != null) {
             search_article_button.setOnClickListener(_search_listener);
@@ -275,11 +289,10 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
         // 工具列位置
         changeToolbarLocation();
+        changeToolbarOrder();
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat()) {
-            // 最後頁
-            findViewById(R.id.BoardPageLastestPageButton).performClick();
             // 任務完成
             // 關閉"正在自動登入"
             TempSettings.setIsUnderAutoToChat(false);
@@ -303,6 +316,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         }
         return GravityCompat.END;
     }
+
     // 變更工具列位置
     private void changeToolbarLocation() {
         LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
@@ -310,21 +324,34 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
         toolBarFloating.setVisibility(View.GONE);
 
-        final float scale = getResource().getDisplayMetrics().density;
+        // 最左邊最右邊
+        Button _btnLL = toolbar.findViewById(R.id.BoardPageLLButton);
+        View _btnLLDivider = toolbar.findViewById(R.id.toolbar_divider_0);
+        Button _btnRR = toolbar.findViewById(R.id.BoardPageRRButton);
+        View _btnRRDivider = toolbar.findViewById(R.id.toolbar_divider_3);
+        _btnLL.setVisibility(View.GONE);
+        _btnLLDivider.setVisibility(View.GONE);
+        _btnRR.setVisibility(View.GONE);
+        _btnRRDivider.setVisibility(View.GONE);
+
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
         int choice_toolbar_location = UserSettings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-浮動
         switch (choice_toolbar_location) {
             case 1 -> {
                 // 底部-最左邊
-                layoutParams.width = (int) (230 * scale);
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 layoutParams.addRule(RelativeLayout.ALIGN_START);
+                _btnRR.setVisibility(View.VISIBLE);
+                _btnRRDivider.setVisibility(View.VISIBLE);
             }
             case 2 -> {
                 // 底部-最右邊
-                layoutParams.width = (int) (230 * scale);
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.removeRule(RelativeLayout.ALIGN_START);
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                _btnLL.setVisibility(View.VISIBLE);
+                _btnLLDivider.setVisibility(View.VISIBLE);
             }
             case 3 -> {
                 // 浮動
@@ -352,20 +379,40 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
             }
         }
 
-        // 反轉按鈕順序
+        toolbar.setLayoutParams(layoutParams);
+    }
+
+    // 反轉按鈕順序
+    void changeToolbarOrder() {
+        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
+
         int choice_toolbar_order = UserSettings.getPropertiesToolbarOrder();
         if (choice_toolbar_order == 1) {
-            ArrayList<View> alViews = new ArrayList<>();
-            for (int i = toolbar.getChildCount() - 1; i >= 0; i--) {
+            // 最左邊最右邊
+            Button _btnLL = toolbar.findViewById(R.id.BoardPageLLButton);
+            View _btnLLDivider = toolbar.findViewById(R.id.toolbar_divider_0);
+            Button _btnRR = toolbar.findViewById(R.id.BoardPageRRButton);
+            View _btnRRDivider = toolbar.findViewById(R.id.toolbar_divider_3);
+
+            // 擷取中間的元素
+            ArrayList<View> allViews = new ArrayList<>();
+            for (int i = toolbar.getChildCount() - 3; i >= 2; i--) {
                 View view = toolbar.getChildAt(i);
-                alViews.add(view);
+                allViews.add(view);
             }
+
+            // 清空
             toolbar.removeAllViews();
-            for (int j = 0; j < alViews.size(); j++) {
-                toolbar.addView(alViews.get(j));
+
+            // 插入
+            toolbar.addView(_btnLL);
+            toolbar.addView(_btnLLDivider);
+            for (int j = 0; j < allViews.size(); j++) {
+                toolbar.addView(allViews.get(j));
             }
+            toolbar.addView(_btnRRDivider);
+            toolbar.addView(_btnRR);
         }
-        toolbar.setLayoutParams(layoutParams);
     }
 
     @Override // com.kota.ASFramework.PageController.ASViewController
@@ -649,11 +696,11 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
     }
 
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        int i2 = i + 1;
-        int block = ItemUtils.getBlock(i2);
-        BoardPageItem boardPageItem = (BoardPageItem) getItem(i);
-        if (boardPageItem == null && getCurrentBlock() != block && !isLoadingBlock(i2)) {
+    public View getView(int index, View view, ViewGroup viewGroup) {
+        int item_index = index + 1;
+        int block = ItemUtils.getBlock(item_index);
+        BoardPageItem boardPageItem = (BoardPageItem) getItem(index);
+        if (boardPageItem == null && getCurrentBlock() != block && !isLoadingBlock(item_index)) {
             loadBoardBlock(block);
         }
         if (view == null) {
@@ -663,7 +710,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
 
         BoardPageItemView boardPageItemView = (BoardPageItemView) view;
         boardPageItemView.setItem(boardPageItem);
-        boardPageItemView.setNumber(i2);
+        boardPageItemView.setNumber(item_index);
         if (boardPageItem != null && blockListEnable && UserSettings.isBlockListContains(boardPageItem.Author)) {
             boardPageItemView.setVisible(false);
         } else {

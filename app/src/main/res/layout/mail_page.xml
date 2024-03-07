@@ -28,7 +28,11 @@
                 <com.kota.TelnetUI.TelnetView
                     android:id="@+id/Mail_contentTelnetView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:enabled="true"
+                    android:textIsSelectable="true"
+                    android:focusable="true"
+                    android:longClickable="true" />
             </com.kota.ASFramework.UI.ASScrollView>
         </FrameLayout>
 

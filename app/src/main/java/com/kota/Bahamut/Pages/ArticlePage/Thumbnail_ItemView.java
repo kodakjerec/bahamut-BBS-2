@@ -34,6 +34,7 @@ import com.bumptech.glide.request.transition.Transition;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 
 import org.jsoup.Connection;
@@ -59,13 +60,15 @@ public class Thumbnail_ItemView extends LinearLayout {
     TextView _description_view;
     TextView _url_view;
     boolean _isPic = false; // 是否為圖片
-    boolean _load_thumbnail_img = false; // 是否可以開啟預覽圖
+    boolean _load_thumbnail_img = false; // 自動顯示預覽圖
+    boolean _load_only_wifi = false; // 只在wifi下預覽
     boolean _img_loaded = false; // 已經讀取預覽圖
 
-    String _url;
-    String _title;
-    String _description;
-    String _imageUrl;
+    String _url = "";
+    String _title = "";
+    String _description = "";
+    String _imageUrl = "";
+
     public Thumbnail_ItemView(Context context) {
         super(context);
         _context = context;
@@ -77,7 +80,6 @@ public class Thumbnail_ItemView extends LinearLayout {
     }
 
     public void loadUrl(String url) {
-        _load_thumbnail_img = UserSettings.getLinkShowThumbnail();
         _url = url;
         UrlDatabase urlDatabase = new UrlDatabase(getContext());
         Vector<String> findUrl = urlDatabase.getUrl(_url);
@@ -89,45 +91,7 @@ public class Thumbnail_ItemView extends LinearLayout {
             _description = findUrl.get(2);
             _imageUrl = findUrl.get(3);
             _isPic = !findUrl.get(4).equals("0");
-
-            if (_isPic) {
-                new ASRunner() {
-                    @Override // com.kota.ASFramework.Thread.ASRunner
-                    public void run() {
-                        _layout_default.setVisibility(GONE);
-
-                        // 圖片
-                        _layout_pic.setVisibility(VISIBLE);
-                        if (_load_thumbnail_img) {
-                            load_image();
-                        } else if (_imageUrl.equals("")) {
-                            _image_view_button.setVisibility(GONE);
-                        }
-
-                        // 內容
-                        _layout_normal.setVisibility(GONE);
-                    }
-                }.runInMainThread();
-            } else {
-                new ASRunner() {
-                    @Override // com.kota.ASFramework.Thread.ASRunner
-                    public void run() {
-                        _layout_default.setVisibility(GONE);
-
-                        // 圖片
-                        _layout_pic.setVisibility(VISIBLE);
-                        if (_load_thumbnail_img) {
-                            load_image();
-                        } else if (_imageUrl.equals("")) {
-                            _image_view_button.setVisibility(GONE);
-                        }
-
-                        // 內容
-                        _layout_normal.setVisibility(VISIBLE);
-                        set_normal();
-                    }
-                }.runInMainThread();
-            }
+            picOrUrl_changeStatus(_isPic);
         } else {
             // 尋找URL資料
             ASRunner.runInNewThread(() -> {
@@ -153,24 +117,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                         _title = _url;
                         _description = "";
                         _imageUrl = _url;
-                        new ASRunner() {
-                            @Override // com.kota.ASFramework.Thread.ASRunner
-                            public void run() {
-                                _layout_default.setVisibility(GONE);
-
-                                // 圖片
-                                _layout_pic.setVisibility(VISIBLE);
-                                if (_load_thumbnail_img) {
-                                    load_image();
-                                } else if (_imageUrl.equals("")) {
-                                    _image_view_button.setVisibility(GONE);
-                                }
-
-                                // 內容
-                                _layout_normal.setVisibility(GONE);
-                            }
-                        }.runInMainThread();
-                        urlDatabase.addUrl(_url, _title, _description, _imageUrl,_isPic);
+                        picOrUrl_changeStatus(true);
                     } else {
                         // 文字處理
                         Document document = resp.parse();
@@ -187,25 +134,10 @@ public class Thumbnail_ItemView extends LinearLayout {
                         if (_imageUrl.isEmpty())
                             _imageUrl = document.select("meta[property=og:image]").attr("content");
 
-                        new ASRunner() {
-                            @Override // com.kota.ASFramework.Thread.ASRunner
-                            public void run() {
-                                _layout_default.setVisibility(GONE);
-                                // 圖片
-                                _layout_pic.setVisibility(VISIBLE);
-                                if (_load_thumbnail_img) {
-                                    load_image();
-                                } else if (_imageUrl.equals("")) {
-                                    _image_view_button.setVisibility(GONE);
-                                }
-
-                                // 內容
-                                _layout_normal.setVisibility(VISIBLE);
-                                set_normal();
-                            }
-                        }.runInMainThread();
-                        urlDatabase.addUrl(_url, _title, _description, _imageUrl,_isPic);
+                        picOrUrl_changeStatus(false);
                     }
+
+                    urlDatabase.addUrl(_url, _title, _description, _imageUrl,_isPic);
                 } catch (IOException e) {
                     new ASRunner() {
                         @Override // com.kota.ASFramework.Thread.ASRunner
@@ -216,6 +148,51 @@ public class Thumbnail_ItemView extends LinearLayout {
                     Log.v("LoadUrlFail", url);
                 }
             });
+        }
+    }
+    // 判斷是圖片或連結, 改變顯示狀態
+    void picOrUrl_changeStatus(boolean _isPic) {
+        _load_thumbnail_img = UserSettings.getLinkShowThumbnail();
+        _load_only_wifi = UserSettings.getLinkShowOnlyWifi();
+        int _transportType = TempSettings.get_transportType();
+
+        if (_isPic) {
+            new ASRunner() {
+                @Override // com.kota.ASFramework.Thread.ASRunner
+                public void run() {
+                    _layout_default.setVisibility(GONE);
+
+                    // 圖片
+                    _layout_pic.setVisibility(VISIBLE);
+                    if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
+                        load_image();
+                    } else if (_imageUrl.equals("")) {
+                        _image_view_button.setVisibility(GONE);
+                    }
+
+                    // 內容
+                    _layout_normal.setVisibility(GONE);
+                }
+            }.runInMainThread();
+        } else {
+            new ASRunner() {
+                @Override // com.kota.ASFramework.Thread.ASRunner
+                public void run() {
+                    _layout_default.setVisibility(GONE);
+
+                    // 圖片
+                    _layout_pic.setVisibility(VISIBLE);
+                    if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
+                        load_image();
+                    } else if (_imageUrl.equals("")) {
+                        _image_view_button.setVisibility(GONE);
+                    }
+
+                    // 內容
+                    _layout_normal.setVisibility(VISIBLE);
+                    set_normal();
+                }
+            }.runInMainThread();
         }
     }
 
@@ -277,7 +254,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     circularProgressDrawable.start();
 
                     if (_imageUrl.isEmpty()) {
-                        throw new Exception("");
+                        throw new Exception(_url);
                     }
 
                     _image_view_pic.setImageDrawable(circularProgressDrawable);
@@ -312,20 +289,10 @@ public class Thumbnail_ItemView extends LinearLayout {
                                     int targetHeight = _height;
                                     int targetWidth = _width;
 
-                                    float scale = 1;
+                                    float scaleWidth = (float)targetWidth / picWidth;
+                                    float scaleHeight = (float) targetHeight / picHeight;
+                                    float scale = Math.min(scaleWidth, scaleHeight);
 
-                                    // 圖騙取比較長的邊去做計算
-                                    if (picWidth>picHeight) {
-                                        // 如果圖片寬>圖層寬, 因為圖片寬縮到圖層寬, 等比縮小高度
-                                        if (picWidth>targetWidth) {
-                                            scale = (float)targetWidth / picWidth;
-                                        }
-                                    } else {
-                                        // 如果圖片高>圖層高, 因為圖片高縮到圖層高, 等比縮小寬度
-                                        if (picHeight > targetHeight) {
-                                            scale = (float) targetHeight / picHeight;
-                                        }
-                                    }
                                     int tempHeight = (int) (picHeight * scale);
                                     targetHeight = Math.min(tempHeight,targetHeight);
                                     _image_view_pic.setMinimumHeight(targetHeight);
@@ -350,7 +317,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                             set_fail();
                         }
                     }.runInMainThread();
-                    Log.v("Thumbnail_Fail", _imageUrl);
+                    Log.v("Thumbnail_Fail", _imageUrl.isEmpty()?_url:_imageUrl);
                 }
             }
         }.runInMainThread();

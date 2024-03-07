@@ -34,6 +34,7 @@ public class UserSettings {
     static final String PROPERTIES_TOOLBAR_ALPHA = "ToolBarAlpha"; // 浮動工具列閒置多久隱藏不透明度
     static final String PROPERTIES_LINK_AUTO_SHOW = "LinkAutoShow"; // 連結自動預覽
     static final String PROPERTIES_LINK_SHOW_THUMBNAIL = "LinkShowThumbnail"; // 顯示預覽圖
+    static final String PROPERTIES_LINK_SHOW_ONLY_WIFI = "LinkShowOnlyWifi"; // 只在Wifi下顯示預覽圖
 
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
@@ -87,6 +88,7 @@ public class UserSettings {
                 boolean is_vip = prep.getPropertiesBoolean(PROPERTIES_VIP);
                 boolean linkAutoShow = prep.getPropertiesBoolean(PROPERTIES_LINK_AUTO_SHOW);
                 boolean linkShowThumbnail = prep.getPropertiesBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL);
+                boolean linkShowOnlyWifi = prep.getPropertiesBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI);
                 int toolbar_location = prep.getPropertiesInteger(PROPERTIES_TOOLBAR_LOCATION);
                 int toolbar_order = prep.getPropertiesInteger(PROPERTIES_TOOLBAR_ORDER);
                 int drawer_location = prep.getPropertiesInteger(PROPERTIES_DRAWER_LOCATION);
@@ -114,6 +116,7 @@ public class UserSettings {
                 _editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, toolbar_alpha);
                 _editor.putBoolean(PROPERTIES_LINK_AUTO_SHOW, linkAutoShow);
                 _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, linkShowThumbnail);
+                _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, linkShowOnlyWifi);
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
                 _editor.putInt("upgrade", 1);
@@ -397,5 +400,12 @@ public class UserSettings {
     }
     public static boolean getLinkShowThumbnail() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, false);
+    }
+    public static void setPropertiesLinkShowOnlyWifi(boolean enable) {
+        _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, enable);
+        _editor.apply();
+    }
+    public static boolean getLinkShowOnlyWifi() {
+        return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, false);
     }
 }

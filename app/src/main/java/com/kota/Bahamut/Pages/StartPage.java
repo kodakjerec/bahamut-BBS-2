@@ -17,6 +17,7 @@ import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
@@ -100,7 +101,9 @@ public class StartPage extends TelnetPage {
 
     /** 連線 */
     public void connect() {
-        if (getNavigationController().getDeviceController().isNetworkAvailable()) {
+        int _transportType = getNavigationController().getDeviceController().isNetworkAvailable();
+        TempSettings.set_transportType(_transportType);
+        if (_transportType>-1) {
             ASProcessingDialog.showProcessingDialog("連線中", aDialog -> {
                 TelnetClient.getClient().close();
                 return false;

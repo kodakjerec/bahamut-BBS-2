@@ -8,7 +8,9 @@ public class TempSettings {
     static Boolean isUnderAutoToChat = false; // 正在自動登入ing
     static Boolean isFloatingInvisible = false; // 浮動工具列是否正處於隱藏狀態
     static String boardFollowTitle = ""; // 正在看的討論串標題
+    static int _transportType = -1; // 網路狀況
 
+    // 清空數據但不包含 網路狀況
     public static void clearTempSettings() {
         setIsUnderAutoToChat(false);
         setIsFloatingInvisible(false);
@@ -28,6 +30,10 @@ public class TempSettings {
         return isFloatingInvisible;
     }
 
-    public static void setBoardFollowTitle(String _title) { boardFollowTitle = _title; };
-    public static boolean isBoardFollowTitle(String _readTitle) { return boardFollowTitle.equals(_readTitle); };
+    public static void setBoardFollowTitle(String _title) { boardFollowTitle = _title; }
+
+    public static boolean isBoardFollowTitle(String _readTitle) { return boardFollowTitle.equals(_readTitle); }
+
+    public static void set_transportType(int from_transportType) {_transportType = from_transportType; }
+    public static int get_transportType() { return _transportType; }
 }

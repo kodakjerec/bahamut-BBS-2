@@ -32,6 +32,9 @@ import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class ClassPage extends TelnetListPage implements View.OnClickListener, Dialog_SearchBoard_Listener {
     private String _detail = "看板列表";
     private String _title = "";
@@ -58,7 +61,14 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         if (TempSettings.isUnderAutoToChat()) {
             // 進入洽特
             // 查詢看板 => Chat => 定位到Chat:Enter => 進入版面:Enter
-            new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground("/Chat\n\n")).start();
+            Timer timer = new Timer();
+            TimerTask task = new TimerTask() {
+                @Override
+                public void run() {
+                    TelnetClient.getClient().sendStringToServerInBackground("/Chat\n\n");
+                }
+            };
+            timer.schedule(task, 500);
         }
     }
 

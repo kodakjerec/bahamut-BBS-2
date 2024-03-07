@@ -327,6 +327,17 @@ public class ArticlePage extends TelnetPage {
     // 開啟連結
     private final View.OnClickListener mShowLinkListener = v -> onOpenLinkClicked();
 
+    // 靠左對其
+    View.OnClickListener _btnLL_listener = view -> {
+        UserSettings.setPropertiesToolbarLocation(1);
+        ArticlePage.this.changeToolbarLocation();
+    };
+    // 靠右對其
+    View.OnClickListener _btnRR_listener = view -> {
+        UserSettings.setPropertiesToolbarLocation(2);
+        ArticlePage.this.changeToolbarLocation();
+    };
+
     @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
         return BahamutPage.BAHAMUT_ARTICLE;
@@ -351,14 +362,18 @@ public class ArticlePage extends TelnetPage {
         list_view.setEmptyView(empty_view);
         list_view.setAdapter(this._list_adapter);
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
+
         Button back_button = (Button) findViewById(R.id.Article_backButton);
-        Button page_up_button = (Button) findViewById(R.id.Article_pageUpButton);
-        Button page_down_button = (Button) findViewById(R.id.Article_pageDownButton);
         back_button.setOnClickListener(this._back_listener);
+
+        Button page_up_button = (Button) findViewById(R.id.Article_pageUpButton);
         page_up_button.setOnClickListener(this._page_up_listener);
         page_up_button.setOnLongClickListener(this._page_top_listener);
+
+        Button page_down_button = (Button) findViewById(R.id.Article_pageDownButton);
         page_down_button.setOnClickListener(this._page_down_listener);
         page_down_button.setOnLongClickListener(this._page_bottom_listener);
+
         Button do_gy_button = (Button) findViewById(R.id.do_gy);
         if (do_gy_button != null) {
             do_gy_button.setOnClickListener(this.mDoGyListener);
@@ -371,6 +386,10 @@ public class ArticlePage extends TelnetPage {
         if (show_link_button != null) {
             show_link_button.setOnClickListener(this.mShowLinkListener);
         }
+
+        findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
+        findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
+
         if (this._telnet_view.getFrame() == null && this._article != null) {
             this._telnet_view.setFrame(this._article.getFrame());
         }
@@ -379,6 +398,7 @@ public class ArticlePage extends TelnetPage {
 
         // 工具列位置
         changeToolbarLocation();
+        changeToolbarOrder();
     }
 
     // 變更工具列位置
@@ -388,21 +408,34 @@ public class ArticlePage extends TelnetPage {
         ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
         toolBarFloating.setVisibility(View.GONE);
 
-        final float scale = getResource().getDisplayMetrics().density;
+        // 最左邊最右邊
+        Button _btnLL = toolbar.findViewById(R.id.BoardPageLLButton);
+        View _btnLLDivider = toolbar.findViewById(R.id.toolbar_divider_0);
+        Button _btnRR = toolbar.findViewById(R.id.BoardPageRRButton);
+        View _btnRRDivider = toolbar.findViewById(R.id.toolbar_divider_3);
+        _btnLL.setVisibility(View.GONE);
+        _btnLLDivider.setVisibility(View.GONE);
+        _btnRR.setVisibility(View.GONE);
+        _btnRRDivider.setVisibility(View.GONE);
+
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
         int choice_toolbar_location = UserSettings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-浮動
         switch (choice_toolbar_location) {
             case 1 -> {
                 // 底部-最左邊
-                layoutParams.width = (int) (230 * scale);
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 layoutParams.addRule(RelativeLayout.ALIGN_START);
+                _btnRR.setVisibility(View.VISIBLE);
+                _btnRRDivider.setVisibility(View.VISIBLE);
             }
             case 2 -> {
                 // 底部-最右邊
-                layoutParams.width = (int) (230 * scale);
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.removeRule(RelativeLayout.ALIGN_START);
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+                _btnLL.setVisibility(View.VISIBLE);
+                _btnLLDivider.setVisibility(View.VISIBLE);
             }
             case 3 -> {
                 // 浮動
@@ -431,20 +464,40 @@ public class ArticlePage extends TelnetPage {
             }
         }
 
-        // 反轉按鈕順序
+        toolbar.setLayoutParams(layoutParams);
+    }
+
+    // 反轉按鈕順序
+    void changeToolbarOrder() {
+        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
+
         int choice_toolbar_order = UserSettings.getPropertiesToolbarOrder();
         if (choice_toolbar_order == 1) {
-            ArrayList<View> alViews = new ArrayList<>();
-            for (int i = toolbar.getChildCount() - 1; i >= 0; i--) {
+            // 最左邊最右邊
+            Button _btnLL = toolbar.findViewById(R.id.BoardPageLLButton);
+            View _btnLLDivider = toolbar.findViewById(R.id.toolbar_divider_0);
+            Button _btnRR = toolbar.findViewById(R.id.BoardPageRRButton);
+            View _btnRRDivider = toolbar.findViewById(R.id.toolbar_divider_3);
+
+            // 擷取中間的元素
+            ArrayList<View> allViews = new ArrayList<>();
+            for (int i = toolbar.getChildCount() - 3; i >= 2; i--) {
                 View view = toolbar.getChildAt(i);
-                alViews.add(view);
+                allViews.add(view);
             }
+
+            // 清空
             toolbar.removeAllViews();
-            for (int j = 0; j < alViews.size(); j++) {
-                toolbar.addView(alViews.get(j));
+
+            // 插入
+            toolbar.addView(_btnLL);
+            toolbar.addView(_btnLLDivider);
+            for (int j = 0; j < allViews.size(); j++) {
+                toolbar.addView(allViews.get(j));
             }
+            toolbar.addView(_btnRRDivider);
+            toolbar.addView(_btnRR);
         }
-        toolbar.setLayoutParams(layoutParams);
     }
 
     // 第一次進入的提示訊息

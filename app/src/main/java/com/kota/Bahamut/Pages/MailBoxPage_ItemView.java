@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
@@ -33,7 +34,6 @@ public class MailBoxPage_ItemView extends LinearLayout {
         init();
     }
 
-    /* access modifiers changed from: protected */
     protected void finalize() throws Throwable {
         super.finalize();
     }
@@ -110,13 +110,14 @@ public class MailBoxPage_ItemView extends LinearLayout {
     }
 
     public void setRead(boolean isRead) {
+        // 戰巴哈信件只要看到有沒有讀取
         if (isRead) {
             _status.setText("◇");
-            _title.setTextColor(-8355712);
+            _title.setTextColor(getContextColor(R.color.board_item_normal_read));
             return;
         }
         _status.setText("◆");
-        _title.setTextColor(-1);
+        _title.setTextColor(getContextColor(R.color.board_item_normal));
     }
 
     public void clear() {

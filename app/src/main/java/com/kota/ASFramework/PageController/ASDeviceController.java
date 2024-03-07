@@ -11,18 +11,19 @@ import android.os.PowerManager;
 import android.view.WindowManager;
 
 public class ASDeviceController {
-  private static final String wakeLockKey = "myapp:wakeLockKey";
+  static final String wakeLockKey = "myapp:wakeLockKey";
   
-  private static final String wifiLockKey = "myapp:wifiLockKey";
+  static final String wifiLockKey = "myapp:wifiLockKey";
   
-  private final Context _context;
+  final Context _context;
   
-  private boolean _wifi_locked = false;
-  private boolean _wake_locked = true; // 讓CPU保持開啟, 目前不需要作用
+  boolean _wifi_locked = false;
+  boolean _wake_locked = true; // 讓CPU保持開啟, 目前不需要作用
   
-  private final PowerManager.WakeLock mWakeLock;
+  final PowerManager.WakeLock mWakeLock;
   
-  private final WifiManager.WifiLock mWifiLock;
+  final WifiManager.WifiLock mWifiLock;
+  int _transportType = -1;
   
   public ASDeviceController(Context paramContext) {
     _context = paramContext;
@@ -39,17 +40,24 @@ public class ASDeviceController {
     }
     mWifiLock.setReferenceCounted(true);
   }
-  
-  public boolean isNetworkAvailable() {
-    boolean bool = false;
+
+  // 檢查網路狀況
+  // return _transportType 網路類型, -1=斷線
+  public int isNetworkAvailable() {
     ConnectivityManager connectivityManager = (ConnectivityManager) _context.getSystemService(Context.CONNECTIVITY_SERVICE);
     Network activeNetwork = connectivityManager.getActiveNetwork();
     NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(activeNetwork);
+    _transportType = -1;
     if (capabilities != null) {
       // any type of internet
-      bool = true;
+      for (int i=0;i<10;i++) {
+        if (capabilities.hasTransport(i)) {
+          _transportType = i;
+          break;
+        }
+      }
     }
-    return bool;
+    return _transportType;
   }
 
   public void lockWake() {
@@ -95,9 +103,3 @@ public class ASDeviceController {
     }
   }
 }
-
-
-/* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASDeviceController.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */

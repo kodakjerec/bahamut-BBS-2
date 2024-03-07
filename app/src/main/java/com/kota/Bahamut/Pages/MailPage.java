@@ -25,15 +25,15 @@ import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
 public class MailPage extends TelnetPage implements ListAdapter, View.OnClickListener, SendMailPage_Listener {
-    private TelnetArticle _article = null;
-    private Button _back_button = null;
-    private ASListView _list = null;
-    private Button _page_down_button = null;
-    private Button _page_up_button = null;
-    private TelnetView _telnet_view = null;
-    private ASScrollView _telnet_view_block = null;
-    private ArticleViewMode _view_mode = ArticleViewMode.MODE_TEXT;
-    private final DataSetObservable mDataSetObservable = new DataSetObservable();
+    TelnetArticle _article = null;
+    Button _back_button = null;
+    ASListView _list = null;
+    Button _page_down_button = null;
+    Button _page_up_button = null;
+    TelnetView _telnet_view = null;
+    ASScrollView _telnet_view_block = null;
+    ArticleViewMode _view_mode = ArticleViewMode.MODE_TEXT;
+    final DataSetObservable mDataSetObservable = new DataSetObservable();
 
     enum ArticleViewMode {
         MODE_TEXT,
@@ -53,70 +53,68 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void onPageDidLoad() {
-        this._telnet_view_block = (ASScrollView) findViewById(R.id.Mail_contentTelnetViewBlock);
-        this._telnet_view = (TelnetView) findViewById(R.id.Mail_contentTelnetView);
+        _telnet_view_block = (ASScrollView) findViewById(R.id.Mail_contentTelnetViewBlock);
+        _telnet_view = (TelnetView) findViewById(R.id.Mail_contentTelnetView);
         int screen_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
-        ViewGroup.LayoutParams telnet_layout = this._telnet_view.getLayoutParams();
+        ViewGroup.LayoutParams telnet_layout = _telnet_view.getLayoutParams();
         telnet_layout.width = screen_width;
         telnet_layout.height = -2;
-        this._telnet_view.setLayoutParams(telnet_layout);
-        this._list = (ASListView) findViewById(R.id.Mail_contentList);
-        this._back_button = (Button) findViewById(R.id.Mail_backButton);
-        this._page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
-        this._page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
-        this._back_button.setOnClickListener(this);
-        this._page_up_button.setOnClickListener(this);
-        this._page_down_button.setOnClickListener(this);
+        _telnet_view.setLayoutParams(telnet_layout);
+        _list = (ASListView) findViewById(R.id.Mail_contentList);
+        _back_button = (Button) findViewById(R.id.Mail_backButton);
+        _page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
+        _page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
+        _back_button.setOnClickListener(this);
+        _page_up_button.setOnClickListener(this);
+        _page_down_button.setOnClickListener(this);
         findViewById(R.id.Mail_changeModeButton).setOnClickListener(this);
         resetAdapter();
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onBackPressed() {
+    protected boolean onBackPressed() {
         clear();
         return super.onBackPressed();
     }
 
     public void onPageDidDisappear() {
-        this._back_button = null;
-        this._page_up_button = null;
-        this._page_down_button = null;
-        this._list = null;
-        this._telnet_view_block = null;
-        this._telnet_view = null;
+        _back_button = null;
+        _page_up_button = null;
+        _page_down_button = null;
+        _list = null;
+        _telnet_view_block = null;
+        _telnet_view = null;
         super.onPageDidDisappear();
     }
 
-    /* access modifiers changed from: protected */
-    public boolean onMenuButtonClicked() {
+    protected boolean onMenuButtonClicked() {
         changeViewMode();
         return true;
     }
 
     public void setArticle(TelnetArticle aArticle) {
         clear();
-        this._article = aArticle;
-        this._telnet_view.setFrame(this._article.getFrame());
-        this._telnet_view.setLayoutParams(this._telnet_view.getLayoutParams());
-        this._telnet_view_block.scrollTo(0, 0);
+        _article = aArticle;
+        _telnet_view.setFrame(_article.getFrame());
+        _telnet_view.setLayoutParams(_telnet_view.getLayoutParams());
+        _telnet_view_block.scrollTo(0, 0);
         resetAdapter();
     }
 
     public void resetAdapter() {
-        if (this._article != null) {
-            this._list.setAdapter(this);
+        if (_article != null) {
+            _list.setAdapter(this);
         }
     }
 
     public int getCount() {
-        if (this._article != null) {
-            return this._article.getItemSize() + 2;
+        if (_article != null) {
+            return _article.getItemSize() + 2;
         }
         return 0;
     }
 
     public TelnetArticleItem getItem(int itemIndex) {
-        return this._article.getItem(itemIndex - 1);
+        return _article.getItem(itemIndex - 1);
     }
 
     public long getItemId(int itemIndex) {
@@ -175,14 +173,14 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 break;
             case ArticlePageItemType.Header:
                 ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
-                String author = this._article.Author;
-                if (this._article.Nickname != null) {
-                    author = author + "(" + this._article.Nickname + ")";
+                String author = _article.Author;
+                if (_article.Nickname != null) {
+                    author = author + "(" + _article.Nickname + ")";
                 }
-                item_view3.setData(this._article.Title, author, this._article.BoardName);
+                item_view3.setData(_article.Title, author, _article.BoardName);
                 break;
             case ArticlePageItemType.PostTime:
-                ((ArticlePage_TimeTimeView) itemView).setTime("《" + this._article.DateTime + "》");
+                ((ArticlePage_TimeTimeView) itemView).setTime("《" + _article.DateTime + "》");
                 break;
         }
         return itemView;
@@ -201,11 +199,11 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void registerDataSetObserver(DataSetObserver observer) {
-        this.mDataSetObservable.registerObserver(observer);
+        mDataSetObservable.registerObserver(observer);
     }
 
     public void unregisterDataSetObserver(DataSetObserver observer) {
-        this.mDataSetObservable.unregisterObserver(observer);
+        mDataSetObservable.unregisterObserver(observer);
     }
 
     public boolean areAllItemsEnabled() {
@@ -217,15 +215,15 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void clear() {
-        this._article = null;
+        _article = null;
     }
 
     public void onClick(View aView) {
-        if (aView == this._back_button) {
+        if (aView == _back_button) {
             onReplyButtonClicked();
-        } else if (aView == this._page_up_button) {
+        } else if (aView == _page_up_button) {
             onPageUpButtonClicked();
-        } else if (aView == this._page_down_button) {
+        } else if (aView == _page_down_button) {
             onPageDownButtonClicked();
         } else if (aView.getId() == R.id.Mail_changeModeButton) {
             changeViewMode();
@@ -237,7 +235,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         onBackPressed();
     }
 
-    private void onPageUpButtonClicked() {
+    void onPageUpButtonClicked() {
         if (TelnetClient.getConnector().isConnecting()) {
             PageContainer.getInstance().getMailBoxPage().loadPreviousArticle();
         } else {
@@ -245,7 +243,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         }
     }
 
-    private void onPageDownButtonClicked() {
+    void onPageDownButtonClicked() {
         if (TelnetClient.getConnector().isConnecting()) {
             PageContainer.getInstance().getMailBoxPage().loadNextArticle();
         } else {
@@ -253,39 +251,39 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         }
     }
 
-    private void showConnectionClosedToast() {
+    void showConnectionClosedToast() {
         ASToast.showShortToast("連線已中斷");
     }
 
-    private void onReplyButtonClicked() {
+    void onReplyButtonClicked() {
         SendMailPage send_mail_page = new SendMailPage();
-        String reply_title = this._article.generateReplyTitle();
-        String reply_content = this._article.generateReplyContent();
+        String reply_title = _article.generateReplyTitle();
+        String reply_content = _article.generateReplyContent();
         send_mail_page.setPostTitle(reply_title);
         send_mail_page.setPostContent(reply_content);
-        send_mail_page.setReceiver(this._article.Author);
+        send_mail_page.setReceiver(_article.Author);
         send_mail_page.setListener(this);
         getNavigationController().pushViewController(send_mail_page);
     }
 
     public void changeViewMode() {
-        if (this._view_mode == ArticleViewMode.MODE_TEXT) {
-            this._view_mode = ArticleViewMode.MODE_TELNET;
+        if (_view_mode == ArticleViewMode.MODE_TEXT) {
+            _view_mode = ArticleViewMode.MODE_TELNET;
         } else {
-            this._view_mode = ArticleViewMode.MODE_TEXT;
+            _view_mode = ArticleViewMode.MODE_TEXT;
         }
-        if (this._view_mode == ArticleViewMode.MODE_TEXT) {
-            this._list.setVisibility(View.VISIBLE);
-            this._telnet_view_block.setVisibility(View.GONE);
+        if (_view_mode == ArticleViewMode.MODE_TEXT) {
+            _list.setVisibility(View.VISIBLE);
+            _telnet_view_block.setVisibility(View.GONE);
             return;
         }
-        this._list.setVisibility(View.GONE);
-        this._telnet_view_block.setVisibility(View.VISIBLE);
-        this._telnet_view_block.invalidate();
+        _list.setVisibility(View.GONE);
+        _telnet_view_block.setVisibility(View.VISIBLE);
+        _telnet_view_block.invalidate();
     }
 
     public boolean onReceivedGestureRight() {
-        if (this._view_mode != ArticleViewMode.MODE_TEXT) {
+        if (_view_mode != ArticleViewMode.MODE_TEXT) {
             return true;
         }
         onBackPressed();

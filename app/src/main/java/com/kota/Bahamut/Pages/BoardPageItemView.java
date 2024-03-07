@@ -139,6 +139,7 @@ public class BoardPageItemView extends LinearLayout {
         if (this._status_label == null) {
             return;
         }
+        // 戰巴哈只要看到第一篇和回應就可
         if (isReply) {
             this._status_label.setText("Re");
         } else {

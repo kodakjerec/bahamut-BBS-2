@@ -26,7 +26,14 @@
                     </LinearLayout>
                     <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading" style="@style/TextViewUltraLarge"/>
                 </LinearLayout>
-                <com.kota.ASFramework.UI.ASListView android:id="@+id/Article_contentList" android:scrollbars="vertical" android:layout_width="match_parent" android:layout_height="match_parent" android:listSelector="@android:color/transparent" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
+                <com.kota.ASFramework.UI.ASListView
+                    android:id="@+id/Article_contentList"
+                    android:scrollbars="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:listSelector="@android:color/transparent"
+                    android:divider="@null"
+                    android:dividerHeight="0dp" style="@style/List"/>
             </FrameLayout>
             <!-- telnet模式 -->
             <com.kota.ASFramework.UI.ASScrollView android:id="@+id/Article_contentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
@@ -45,6 +52,12 @@
         android:layout_alignParentBottom="true"
         >
         <Button
+            android:id="@+id/BoardPageLLButton"
+            style="@style/ToolbarItemLR"
+            android:text="@string/toolbar_item_ll"/>
+        <View android:id="@+id/toolbar_divider_0" style="@style/ToolbarDivider"
+            android:visibility="gone" />
+        <Button
             android:id="@+id/Article_backButton"
             style="@style/ToolbarItem"
             android:text="@string/reply" />
@@ -58,6 +71,12 @@
             android:id="@+id/Article_pageDownButton"
             style="@style/ToolbarItem"
             android:text="@string/next_article" />
+        <View android:id="@+id/toolbar_divider_3" style="@style/ToolbarDivider"
+            android:visibility="gone" />
+        <Button
+            android:id="@+id/BoardPageRRButton"
+            style="@style/ToolbarItemLR"
+            android:text="@string/toolbar_item_rr"/>
     </LinearLayout>
     <com.kota.Bahamut.Pages.Model.ToolBarFloating
         android:layout_width="wrap_content"
