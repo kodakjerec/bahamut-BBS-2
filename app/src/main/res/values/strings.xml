@@ -28,7 +28,6 @@
     <string name="do_gy">推薦</string>
     <string name="do_gy_">推薦：</string>
     <string name="load_temp">讀取暫存檔</string>
-    <string name="save_temp">加入暫存檔</string>
     <string name="save_to_temp">存入暫存檔</string>
     <string name="give_up_post_article">是否要放棄此編輯內容？</string>
     <string name="gy_this_article">是否要推薦此文章？</string>

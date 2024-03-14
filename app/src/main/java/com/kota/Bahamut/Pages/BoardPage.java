@@ -771,7 +771,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
             public void run() {
                 cleanCommand(); // 清除引言過多留下的command buffer
                 PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-                page.recover = true;
+                page.setRecover();
             }
         }.runInMainThread();
         if (timer != null) {

@@ -169,6 +169,12 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         recover = false;
     }
 
+    // 引言過多失敗存檔
+    public void setRecover() {
+        recover = true;
+        saveTempArticle(9);
+    }
+
     // 設定文章標題
     public void setPostTitle(String aTitle) {
         _ori_title = aTitle;
@@ -332,7 +338,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                     public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                         if (Objects.equals(aTitle, getContextString(R.string.load_temp))) {
                             PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
-                        } else if (Objects.equals(aTitle, getContextString(R.string.save_temp))) {
+                        } else if (Objects.equals(aTitle, getContextString(R.string.save_to_temp))) {
                             PostArticlePage.this.ontSaveArticleToTempButtonClicked();
                         }
                     }
@@ -360,7 +366,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                     .setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?")
                                     .addButton(getContextString(R.string.cancel))
                                     .addButton(getContextString(R.string.sure))
-                                    .setListener((aDialog12, button_index) -> PostArticlePage.this.loadTempArticle(10)).show();
+                                    .setListener((aDialog12, button_index) -> PostArticlePage.this.loadTempArticle(9)).show();
                         } else {
                             ASAlertDialog.createDialog()
                                     .setTitle(getContextString(R.string.load_temp))
@@ -428,7 +434,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
         // 存檔
         store.store();
-        if (index < 10) {
+        if (index < 9) {
             ASAlertDialog.createDialog().setTitle(getContextString(R.string._save)).setMessage("存檔完成").addButton(getContextString(R.string.sure)).show();
         }
     }
@@ -517,11 +523,11 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
                                 .addButton(getContextString(R.string.cancel))
                                 .addButton(getContextString(R.string.sure))
-                                .setListener((aDialog1, index1) -> {
-                                    if (index1 == 0) {
+                                .setListener((aDialog1, button_index) -> {
+                                    if (button_index == 0) {
                                         PostArticlePage.this.onBackPressed();
-                                    } else if (index1 == 1) {
-                                        PostArticlePage.this.saveTempArticle(index1);
+                                    } else {
+                                        PostArticlePage.this.saveTempArticle(index);
                                         closeArticle();
                                     }
                                 }).show();

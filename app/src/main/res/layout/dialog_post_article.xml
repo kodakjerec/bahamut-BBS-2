@@ -3,25 +3,108 @@
     <LinearLayout android:orientation="vertical" android:background="@color/black" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="@color/list_page_item_arrow_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/confirm" style="@style/TextViewLarge"/>
         <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
-            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/is_post_article" style="@style/TextViewNormal"/>
-                <LinearLayout android:orientation="vertical" android:id="@+id/reply_target_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/is_post_article_reply" style="@style/TextViewNormal"/>
-                    <RadioGroup android:orientation="vertical" android:id="@+id/post_target" android:layout_width="match_parent" android:layout_height="wrap_content">
-                        <RadioButton style="@style/ListDialogItem" android:textSize="20sp" android:id="@+id/post_to_board" android:paddingStart="10dp" android:paddingEnd="0dp" android:layout_width="match_parent" android:layout_height="50dp" android:checked="true" android:text="@string/post_to_board"/>
-                        <RadioButton style="@style/ListDialogItem" android:textSize="20sp" android:id="@+id/post_to_mail" android:paddingStart="10dp" android:paddingEnd="0dp" android:layout_width="match_parent" android:layout_height="50dp" android:text="@string/post_to_mail"/>
-                        <RadioButton style="@style/ListDialogItem" android:textSize="20sp" android:id="@+id/post_to_both" android:paddingStart="10dp" android:paddingEnd="0dp" android:layout_width="match_parent" android:layout_height="50dp" android:text="@string/post_to_both"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/item_background_color"
+                android:orientation="vertical">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    style="@style/TextViewNormal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/is_post_article"
+                    android:textColor="@color/white" />
+
+                <LinearLayout
+                    android:id="@+id/reply_target_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/is_post_article_reply"
+                        android:textColor="@color/white" />
+
+                    <RadioGroup
+                        android:id="@+id/post_target"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RadioButton
+                            android:id="@+id/post_to_board"
+                            style="@style/ListDialogItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="0dp"
+                            android:text="@string/post_to_board"
+                            android:textSize="20sp" />
+
+                        <RadioButton
+                            android:id="@+id/post_to_mail"
+                            style="@style/ListDialogItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="0dp"
+                            android:text="@string/post_to_mail"
+                            android:textSize="20sp" />
+
+                        <RadioButton
+                            android:id="@+id/post_to_both"
+                            style="@style/ListDialogItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:paddingStart="10dp"
+                            android:paddingEnd="0dp"
+                            android:text="@string/post_to_both"
+                            android:textSize="20sp" />
                     </RadioGroup>
                 </LinearLayout>
-                <LinearLayout android:orientation="vertical" android:id="@+id/sign_view" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewNormal"/>
-                    <Spinner android:id="@+id/sign_spinner" style="@style/SpinnerStyle"/>
+
+                <LinearLayout
+                    android:id="@+id/sign_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="vertical">
+
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/select_sign"
+                        android:textColor="@color/white" />
+
+                    <Spinner
+                        android:id="@+id/sign_spinner"
+                        style="@style/SpinnerStyle" />
                 </LinearLayout>
-                <View style="@style/BlockDividerHorizontal"/>
+
+                <View style="@style/BlockDividerHorizontal" />
+
                 <LinearLayout style="@style/Toolbar">
-                    <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
-                    <View style="@style/ToolbarDivider"/>
-                    <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+
+                    <Button
+                        android:id="@+id/cancel"
+                        style="@style/DialogToolbarItem"
+                        android:text="@string/cancel" />
+
+                    <View style="@style/ToolbarDivider" />
+
+                    <Button
+                        android:id="@+id/send"
+                        style="@style/DialogToolbarItem"
+                        android:text="@string/send" />
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>

@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -27,6 +28,7 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.gif.GifDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.CustomTarget;
 import com.bumptech.glide.request.target.Target;
@@ -145,7 +147,6 @@ public class Thumbnail_ItemView extends LinearLayout {
                             set_fail();
                         }
                     }.runInMainThread();
-                    Log.v("LoadUrlFail", url);
                 }
             });
         }
@@ -230,6 +231,8 @@ public class Thumbnail_ItemView extends LinearLayout {
 
         // 內容
         _layout_normal.setVisibility(GONE);
+
+        Log.v("Thumbnail_Fail", _imageUrl.isEmpty()?_url:_imageUrl);
     }
 
     // 讀取圖片
@@ -270,7 +273,6 @@ public class Thumbnail_ItemView extends LinearLayout {
                                             set_fail();
                                         }
                                     }.runInMainThread();
-                                    Log.v("Thumbnail_Fail", _imageUrl);
                                     return false;
                                 }
 
@@ -282,28 +284,47 @@ public class Thumbnail_ItemView extends LinearLayout {
                             .into(new CustomTarget<Drawable>() {
                                 @Override
                                 public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                    BitmapDrawable bitmapDrawable = (BitmapDrawable) resource;
-                                    Bitmap bitmap = bitmapDrawable.getBitmap();
-                                    int picHeight = bitmap.getHeight();
-                                    int picWidth = bitmap.getWidth();
-                                    int targetHeight = _height;
-                                    int targetWidth = _width;
+                                    try {
+                                        Bitmap bitmap;
+                                        if (resource instanceof GifDrawable)
+                                            bitmap = ((GifDrawable) resource).getFirstFrame();
+                                        else
+                                            bitmap = ((BitmapDrawable)resource).getBitmap();
+                                        int picHeight = bitmap.getHeight();
+                                        int picWidth = bitmap.getWidth();
+                                        int targetHeight = _height;
+                                        int targetWidth = _width;
 
-                                    float scaleWidth = (float)targetWidth / picWidth;
-                                    float scaleHeight = (float) targetHeight / picHeight;
-                                    float scale = Math.min(scaleWidth, scaleHeight);
+                                        float scaleWidth = (float) targetWidth / picWidth;
+                                        float scaleHeight = (float) targetHeight / picHeight;
+                                        float scale = Math.min(scaleWidth, scaleHeight);
+                                        if (scale>1) scale=1;
 
-                                    int tempHeight = (int) (picHeight * scale);
-                                    targetHeight = Math.min(tempHeight,targetHeight);
-                                    _image_view_pic.setMinimumHeight(targetHeight);
+                                        int tempHeight = (int) (picHeight * scale);
+                                        targetHeight = Math.min(tempHeight, targetHeight);
+                                        _image_view_pic.setMinimumHeight(targetHeight);
 
-                                    int tempWidth = (int) (picWidth * scale);
-                                    targetWidth = Math.min(tempWidth, targetWidth);
-                                    _image_view_pic.setMinimumWidth(targetWidth);
+                                        int tempWidth = (int) (picWidth * scale);
+                                        targetWidth = Math.min(tempWidth, targetWidth);
+                                        _image_view_pic.setMinimumWidth(targetWidth);
 
-                                    bitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
+                                        if (resource instanceof GifDrawable) {
+                                            GifDrawable gifDrawable = (GifDrawable) resource;
+                                            gifDrawable.startFromFirstFrame();
+                                            _image_view_pic.setImageDrawable(resource);
+                                        } else {
+                                            Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
+                                            _image_view_pic.setImageBitmap(newBitmap);
+                                        }
 
-                                    _image_view_pic.setImageBitmap(bitmap);
+                                    } catch (Exception e) {
+                                        new ASRunner() {
+                                            @Override // com.kota.ASFramework.Thread.ASRunner
+                                            public void run() {
+                                                set_fail();
+                                            }
+                                        }.runInMainThread();
+                                    }
                                 }
 
                                 @Override
@@ -317,7 +338,6 @@ public class Thumbnail_ItemView extends LinearLayout {
                             set_fail();
                         }
                     }.runInMainThread();
-                    Log.v("Thumbnail_Fail", _imageUrl.isEmpty()?_url:_imageUrl);
                 }
             }
         }.runInMainThread();

@@ -40,25 +40,18 @@ public class BahamutCommandPostArticle extends TelnetCommand {
         // Reply
         if (_article_number != null && _target != null) {
             if (_isRecoverPost) {
-                // 引言過長
-                if (_title != null) {
-                    buffer.pushKey(TelnetKeyboard.CTRL_T); // ctrl + T
-                    buffer.pushString(_title + "\n");
-                }
-
                 // 砍掉所有內文重新貼上
-                int pageUpCounts = (int)Math.ceil((double)_content.split("\n").length/22);
+                int pageUpCounts = (int)Math.ceil((double)_content.split("\n").length/23)+1;
                 for (int i = 0;i< pageUpCounts; i++) {
                     buffer.pushKey(TelnetKeyboard.PAGE_UP); // ctrl+B, pageUp
                 }
-                buffer.sendToServer();
-
                 buffer.pushKey(TelnetKeyboard.CTRL_G); // ^G 刪除目前這行之後至檔案結尾
                 buffer.pushKey(TelnetKeyboard.CTRL_Y); // ^Y 刪除目前這行
                 buffer.sendToServer();
                 // 內文全部刪除
 
                 // 重新貼文
+                buffer = TelnetOutputBuilder.create();
                 // 將內文依照 *[ 切換成多段
                 List<String> outputs = convertContentToStringList(_content);
                 // 貼入內文
@@ -68,7 +61,6 @@ public class BahamutCommandPostArticle extends TelnetCommand {
                     else
                         buffer.pushString(output);
                 }
-
 
                 buffer.pushKey(TelnetKeyboard.CTRL_X); // ctrl+x 存檔
                 buffer.pushString("s\n"); // S-存檔
