@@ -60,12 +60,12 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat()) {
             // 進入洽特
-            // 查詢看板 => Chat => 定位到Chat:Enter => 進入版面:Enter
+            // 查詢看板 => Chat => 定位到Chat:Enter
             Timer timer = new Timer();
             TimerTask task = new TimerTask() {
                 @Override
                 public void run() {
-                    TelnetClient.getClient().sendStringToServerInBackground("/Chat\n\n");
+                    TelnetClient.getClient().sendStringToServerInBackground("sChat\n");
                 }
             };
             timer.schedule(task, 500);
