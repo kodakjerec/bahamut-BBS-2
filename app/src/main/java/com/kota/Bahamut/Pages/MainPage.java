@@ -67,12 +67,15 @@ public class MainPage extends TelnetPage {
         findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
+        TempSettings.setLastVisitBoard("");
+
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat()) {
             // 進入布告討論區
             Button btn = (Button)findViewById(R.id.Main_boardsButton);
             btn.performClick();
         }
+
     }
 
     public void onPageRefresh() {

@@ -4,6 +4,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetRow;
 import com.kota.Telnet.Reference.TelnetAnsiCode;
 import com.kota.Telnet.TelnetAnsi;
@@ -85,6 +86,8 @@ public class BoardPageHandler {
         }
         if (board_name_end > board_name_start) {
             board_package.BoardName = first_row_string.substring(board_name_start, board_name_end).trim();
+            // 紀錄最後瀏覽的看板
+            TempSettings.setLastVisitBoard(board_package.BoardName);
         }
         int board_title_start = board_manager_end + 1;
         int board_title_end = row_char.length - 1;

@@ -47,7 +47,7 @@ public class UserSettings {
     static SharedPreferences _sharedPref;
     static SharedPreferences.Editor _editor;
     static final String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
-    static final String[] _symbols = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
+    static final String[] _expressions = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
 
     public static int getIndexOfHeader(String aHeader) {
         if (aHeader == null || aHeader.length() == 0) {
@@ -251,10 +251,12 @@ public class UserSettings {
     }
 
 
+    // 取出所有符號
     public static String[] getArticleHeaders() {
         return _headers;
     }
 
+    // 取出特定符號
     public static String getArticleHeader(int index) {
         if (index <= 0 || index >= _headers.length) {
             return "";
@@ -262,14 +264,17 @@ public class UserSettings {
         return _headers[index];
     }
 
+    // 取出所有表情符號
     public static String[] getSymbols() {
-        return _symbols;
+        return _expressions;
     }
 
+    // 取出黑名單字串(原始檔)
     static String getBlockListString() {
         return _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
     }
 
+    // 取出黑名單(格式化後)
     public static Vector<String> getBlockList() {
         String blockListString = getBlockListString();
         if (_block_list == null) {
@@ -285,6 +290,7 @@ public class UserSettings {
         return _block_list;
     }
 
+    // 更新黑名單
     public static void updateBlockList(Vector<String> aList) {
         StringBuilder list_string = new StringBuilder(",");
         if (aList == null || aList.size() == 0) {
@@ -301,6 +307,7 @@ public class UserSettings {
         _block_list_string_lower_cased = null;
     }
 
+    // 新增黑名單
     public static void addBlockName(String aBlockName) {
         Vector<String> new_list = new Vector<>(getBlockList());
         int ref = aBlockName.hashCode();

@@ -58,6 +58,7 @@ import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.ItemUtils;
+import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
@@ -486,7 +487,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         }
         clear();
         getNavigationController().popViewController();
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
+        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1);
         PageContainer.getInstance().cleanBoardPage();
         return true;
     }

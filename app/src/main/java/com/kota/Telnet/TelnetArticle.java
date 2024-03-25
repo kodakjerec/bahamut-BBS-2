@@ -275,4 +275,8 @@ public class TelnetArticle {
         }
         return builder.toString();
     }
+
+    public String getAuthor() {
+        return Author;
+    }
 }

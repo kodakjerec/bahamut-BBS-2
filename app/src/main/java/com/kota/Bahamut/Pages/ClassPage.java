@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
@@ -62,13 +63,22 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
             // 進入洽特
             // 查詢看板 => Chat => 定位到Chat:Enter
             Timer timer = new Timer();
-            TimerTask task = new TimerTask() {
+            TimerTask task1 = new TimerTask() {
                 @Override
                 public void run() {
-                    TelnetClient.getClient().sendStringToServerInBackground("sChat\n");
+                TelnetClient.getClient().sendStringToServerInBackground("sChat");
                 }
             };
-            timer.schedule(task, 500);
+            TimerTask task2 = new TimerTask() {
+                @Override
+                public void run() {
+                    TelnetOutputBuilder builder = TelnetOutputBuilder.create()
+                            .pushString("sChat\n");
+                    TelnetClient.getClient().sendDataToServer(builder.build());
+                }
+            };
+            timer.schedule(task1, 0);
+            timer.schedule(task2, 1000);
         }
     }
 
@@ -90,6 +100,21 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         }
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_headerView);
         if (header_view != null) {
+            if  (!TempSettings.getLastVisitBoard().isEmpty()) {
+                String finalLastVisitBoard = TempSettings.getLastVisitBoard();
+                String lastVisitBoard = finalLastVisitBoard + getContextString(R.string.toolbar_item_rr);
+
+                TextView _detail_2 = (TextView) findViewById(R.id.ClassPage_lastVisit);
+                _detail_2.setVisibility(View.VISIBLE);
+                _detail_2.bringToFront();
+                _detail_2.setText(lastVisitBoard);
+                _detail_2.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        TelnetClient.getClient().sendStringToServer("s"+ finalLastVisitBoard);
+                    }
+                });
+            }
             header_view.setData(title, detail, "");
         }
     }
@@ -98,7 +123,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         clear();
         PageContainer.getInstance().popClassPage();
         getNavigationController().popViewController();
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
+        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1);
         return true;
     }
 

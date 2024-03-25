@@ -140,7 +140,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     }
 
                     urlDatabase.addUrl(_url, _title, _description, _imageUrl,_isPic);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     new ASRunner() {
                         @Override // com.kota.ASFramework.Thread.ASRunner
                         public void run() {

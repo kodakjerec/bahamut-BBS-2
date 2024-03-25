@@ -114,7 +114,6 @@ public class BookmarkList {
         aList.addAll(_history_bookmarks);
     }
 
-    /* access modifiers changed from: package-private */
     public void sort() {
         _bookmarks.sort((o1, o2) -> {
             if (o1.index == 0 && o2.index == 0) {

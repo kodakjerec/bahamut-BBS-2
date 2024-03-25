@@ -822,10 +822,14 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
+    // 加入黑名單
     public void onAddBlockListClicked() {
         TelnetArticle article = this._article;
         if (article != null) {
             Set<String> buffer = new HashSet<>();
+            // 作者黑名單
+            buffer.add(article.getAuthor());
+            // 內文黑名單
             int len = article.getItemSize();
             for (int i = 0; i < len; i++) {
                 TelnetArticleItem item = article.getItem(i);

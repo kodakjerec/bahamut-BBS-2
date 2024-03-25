@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
@@ -52,14 +53,14 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private final BoardExtendOptionalPageListener _listener;
     BookmarkAdapter bookmarkAdapter;
     HistoryAdapter historyAdapter;
-    private BookmarkStore store;
+    private BookmarkStore _bookmarkStore;
     private boolean isUnderRecycleView = false;
     private float scale;
     public int getPageLayout() {
         return R.layout.bookmark_manage_page;
     }
     public int getPageType() {
-        return 11;
+        return BahamutPage.BAHAMUT_BOOKMARK;
     }
 
     ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN, ItemTouchHelper.LEFT|ItemTouchHelper.RIGHT) {
@@ -99,8 +100,8 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                             .addButton(getContextString(R.string.delete))
                             .setListener((aDialog, index1) -> {
                                 if (index1 == 1) {
-                                    store.getBookmarkList(BookmarkManagePage.this._board_name).removeBookmark(bookmark_index);
-                                    store.store();
+                                    _bookmarkStore.getBookmarkList(BookmarkManagePage.this._board_name).removeBookmark(bookmark_index);
+                                    _bookmarkStore.store();
                                     reloadList();
                                     bookmarkAdapter.notifyDataSetChanged();
                                 } else {
@@ -124,8 +125,8 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                 }
             } else if (BookmarkManagePage.this._mode == 1) {
                 if (direction == ItemTouchHelper.LEFT) {
-                    store.getBookmarkList(BookmarkManagePage.this._board_name).removeHistoryBookmark(bookmark_index);
-                    store.store();
+                    _bookmarkStore.getBookmarkList(BookmarkManagePage.this._board_name).removeHistoryBookmark(bookmark_index);
+                    _bookmarkStore.store();
                     reloadList();
                     historyAdapter.notifyDataSetChanged();
                 } else {
@@ -167,7 +168,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                                 dragView.setBackgroundResource(R.color.transparent);
                                 dragView = null;
                             }
-                            BookmarkList bookmark_list = store.getBookmarkList(BookmarkManagePage.this._board_name);
+                            BookmarkList bookmark_list = _bookmarkStore.getBookmarkList(BookmarkManagePage.this._board_name);
                             bookmark_list.clear();
                             for (Bookmark bookmark : _bookmarks) {
                                 if (bookmark.index == start)
@@ -176,7 +177,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                                     bookmark.index = start;
                                 bookmark_list.addBookmark(bookmark);
                             }
-                            store.store();
+                            _bookmarkStore.store();
                         }
 
                         isSwiped = false;
@@ -235,7 +236,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
 
     @Override
     public void onPageDidLoad() {
-        store = new BookmarkStore(getContext());
+        _bookmarkStore = new BookmarkStore(getContext());
         reloadList();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycleView);
@@ -262,7 +263,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private void reloadList() {
         Context context = getContext();
         if (context != null) {
-            BookmarkList bookmark_list = store.getBookmarkList(this._board_name);
+            BookmarkList bookmark_list = _bookmarkStore.getBookmarkList(this._board_name);
             if (_mode == 1) {
                 bookmark_list.loadHistoryList(this._bookmarks);
             } else {
@@ -378,8 +379,8 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
             bookmark.setMark("n");
         bookmark.setGy(vector.get(3));
         bookmark.setTitle(bookmark.generateTitle());
-        store.getBookmarkList(this._board_name).updateBookmark(editBookmarkIndex, bookmark);
-        store.store();
+        _bookmarkStore.getBookmarkList(this._board_name).updateBookmark(editBookmarkIndex, bookmark);
+        _bookmarkStore.store();
         reloadList();
         // 還原
         bookmarkAdapter.notifyItemChanged(editBookmarkIndex);
