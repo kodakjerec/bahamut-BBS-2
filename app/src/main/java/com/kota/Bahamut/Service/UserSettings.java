@@ -51,7 +51,7 @@ public class UserSettings {
     
     static SharedPreferences _sharedPref;
     static SharedPreferences.Editor _editor;
-    static final String _articleHeadersDefault = "不加 ▼, [問題], [情報], [心得], [討論], [攻略], [秘技], [閒聊], [程設], [職場], [推廣], [手機], [平板], [新番], [電影], [新聞], [其它]";
+    static final String _articleHeadersDefault = "不加 ▼,[問題],[情報],[心得],[討論],[攻略],[秘技],[閒聊],[程設],[職場],[推廣],[手機],[平板],[新番],[電影],[新聞],[其它]";
     static final String _articleExpressions = "( >_0)b,( ;-w-)a,( -3-)y-~,ˋ(°▽ ° )ノˋ( ° ▽° )ノ,#/-_-)/~╨──╨,(||￣▽￣)a,o( -_-)=0))-3-)/,(#‵′)o,O(‵皿′)o,( T_T),(o_O ),_ψ(._. ),v(￣︶￣)y,ㄟ(￣▽￣ㄟ)...,(っ´▽`)っ,m(_ _)m,ˋ(°ω ° )ノ,◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣,( O口O)!?, ☆━━━(ﾟ∀ﾟ)━━━, *[1;33m洽特*[m";
 
     public UserSettings(Context context) {
@@ -315,17 +315,6 @@ public class UserSettings {
         _editor.apply();
         _block_list = null;
         _block_list_string_lower_cased = null;
-    }
-
-    // 新增黑名單
-    public static void addBlockName(String aBlockName) {
-        List<String> new_list = getBlockList();
-        if (new_list.contains(aBlockName)) {
-            ASToast.showShortToast(getContextString(R.string.already_have_item));
-        } else {
-            new_list.add(aBlockName);
-        }
-        setBlockList(new_list);
     }
 
     @SuppressLint({"DefaultLocale"})

@@ -34,7 +34,15 @@ public class ArticleExpressionListPage extends TelnetPage implements BlockListCl
         if (_inputField != null) {
             String block_name = _inputField.getText().toString().trim();
             _inputField.setText("");
-            UserSettings.addBlockName(block_name);
+
+            List<String> new_list = new ArrayList<>(Arrays.asList(UserSettings.getArticleExpressions()));
+            if (new_list.contains(block_name)) {
+                ASToast.showShortToast(getContextString(R.string.already_have_item));
+            } else {
+                new_list.add(block_name);
+            }
+            UserSettings.setArticleExpressions(new_list);
+
             UserSettings.notifyDataUpdated();
             ArticleExpressionListPage.this.reload();
         }

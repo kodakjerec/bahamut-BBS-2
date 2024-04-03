@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Pages.BlockListPage;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+import static com.kota.Bahamut.Service.UserSettings.setBlockList;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
@@ -35,7 +36,15 @@ public class ArticleHeaderListPage extends TelnetPage implements BlockListClickL
         if (_inputField != null) {
             String block_name = _inputField.getText().toString().trim();
             _inputField.setText("");
-            UserSettings.addBlockName(block_name);
+
+            List<String> new_list = new ArrayList<>(Arrays.asList(UserSettings.getArticleHeaders()));
+            if (new_list.contains(block_name)) {
+                ASToast.showShortToast(getContextString(R.string.already_have_item));
+            } else {
+                new_list.add(block_name);
+            }
+            UserSettings.setArticleHeaders(new_list);
+
             UserSettings.notifyDataUpdated();
             ArticleHeaderListPage.this.reload();
         }

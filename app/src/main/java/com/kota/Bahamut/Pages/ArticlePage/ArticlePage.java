@@ -48,6 +48,7 @@ import com.kota.TelnetUI.TelnetView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 public class ArticlePage extends TelnetPage {
@@ -866,7 +867,15 @@ public class ArticlePage extends TelnetPage {
                 .addButton("加入")
                 .setListener((aDialog, index) -> {
                     if (index == 1) {
-                        UserSettings.addBlockName(aBlockName);
+
+                        List<String> new_list = UserSettings.getBlockList();
+                        if (new_list.contains(aBlockName)) {
+                            ASToast.showShortToast(getContextString(R.string.already_have_item));
+                        } else {
+                            new_list.add(aBlockName);
+                        }
+                        UserSettings.setBlockList(new_list);
+
                         UserSettings.notifyDataUpdated();
                         if (UserSettings.getPropertiesBlockListEnable()) {
                             if (aBlockName.equals(_article.Author)) {
