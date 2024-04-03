@@ -1,15 +1,18 @@
 package com.kota.Bahamut.Service;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.R;
 import com.kota.Telnet.PropertiesOperator;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
@@ -35,31 +38,21 @@ public class UserSettings {
     static final String PROPERTIES_LINK_AUTO_SHOW = "LinkAutoShow"; // 連結自動預覽
     static final String PROPERTIES_LINK_SHOW_THUMBNAIL = "LinkShowThumbnail"; // 顯示預覽圖
     static final String PROPERTIES_LINK_SHOW_ONLY_WIFI = "LinkShowOnlyWifi"; // 只在Wifi下顯示預覽圖
+    static final String PROPERTIES_ARTICLE_HEADS = "ArticleHeaders"; // 文章標題清單
+    static final String PROPERTIES_ARTICLE_EXPRESSIONS = "ArticleExpressions"; // 表情符號清單
 
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
     static final String floatingLocationY = "floatingLocationY"; // 浮動工具列位置 Y
 
-    static Vector<String> _block_list = null; // 轉換後的黑名單清單
+    static List<String> _block_list = null; // 轉換後的黑名單清單
     static String _block_list_string_lower_cased = null; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
     Context _context;
     
     static SharedPreferences _sharedPref;
     static SharedPreferences.Editor _editor;
-    static final String[] _headers = {"不加 ▼", "[問題]", "[情報]", "[心得]", "[討論]", "[攻略]", "[秘技]", "[閒聊]", "[程設]", "[職場]", "[推廣]", "[手機]", "[平板]", "[新番]", "[電影]", "[新聞]", "[其它]"};
-    static final String[] _expressions = {"( >_0)b", "( ;-w-)a", "( -3-)y-~", "ˋ(°▽ ° )ノˋ( ° ▽° )ノ", "#/-_-)/~╨──╨", "(||￣▽￣)a", "o( -_-)=0))-3-)/", "(#‵′)o", "O(‵皿′)o", "( T_T)", "(o_O )", "_ψ(._. )", "v(￣︶￣)y", "ㄟ(￣▽￣ㄟ)...", "(っ´▽`)っ", "m(_ _)m", "ˋ(°ω ° )ノ", "◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣", "( O口O)!?", "☆━━━(ﾟ∀ﾟ)━━━"};
-
-    public static int getIndexOfHeader(String aHeader) {
-        if (aHeader == null || aHeader.length() == 0) {
-            return 0;
-        }
-        for (int i = 1; i < _headers.length; i++) {
-            if (_headers[i].equals(aHeader)) {
-                return i;
-            }
-        }
-        return -1;
-    }
+    static final String _articleHeadersDefault = "不加 ▼, [問題], [情報], [心得], [討論], [攻略], [秘技], [閒聊], [程設], [職場], [推廣], [手機], [平板], [新番], [電影], [新聞], [其它]";
+    static final String _articleExpressions = "( >_0)b,( ;-w-)a,( -3-)y-~,ˋ(°▽ ° )ノˋ( ° ▽° )ノ,#/-_-)/~╨──╨,(||￣▽￣)a,o( -_-)=0))-3-)/,(#‵′)o,O(‵皿′)o,( T_T),(o_O ),_ψ(._. ),v(￣︶￣)y,ㄟ(￣▽￣ㄟ)...,(っ´▽`)っ,m(_ _)m,ˋ(°ω ° )ノ,◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣,( O口O)!?, ☆━━━(ﾟ∀ﾟ)━━━, *[1;33m洽特*[m";
 
     public UserSettings(Context context) {
         _context = context;
@@ -94,6 +87,7 @@ public class UserSettings {
                 int drawer_location = prep.getPropertiesInteger(PROPERTIES_DRAWER_LOCATION);
                 float toolbar_idle = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_IDLE);
                 float toolbar_alpha = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_ALPHA);
+                String article_headers = prep.getPropertiesString(PROPERTIES_ARTICLE_HEADS);
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
 
@@ -117,6 +111,7 @@ public class UserSettings {
                 _editor.putBoolean(PROPERTIES_LINK_AUTO_SHOW, linkAutoShow);
                 _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, linkShowThumbnail);
                 _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, linkShowOnlyWifi);
+                _editor.putString(PROPERTIES_ARTICLE_HEADS, article_headers);
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
                 _editor.putInt("upgrade", 1);
@@ -250,35 +245,46 @@ public class UserSettings {
         setPropertiesArticleViewState(1 - getPropertiesArticleViewMode());
     }
 
-
     // 取出所有符號
     public static String[] getArticleHeaders() {
-        return _headers;
+        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_HEADS, "");
+        if (_source.equals(""))
+            _source = _articleHeadersDefault;
+        return _source.split(",");
+    }
+    public static void resetArticleHeaders() {
+        _editor.putString(PROPERTIES_ARTICLE_HEADS, _articleHeadersDefault);
+        _editor.apply();
+    }
+    public static void setArticleHeaders(List<String> _stringList) {
+        String _saveString = String.join(",",_stringList);
+        _editor.putString(PROPERTIES_ARTICLE_HEADS, _saveString);
+        _editor.apply();
     }
 
-    // 取出特定符號
-    public static String getArticleHeader(int index) {
-        if (index <= 0 || index >= _headers.length) {
-            return "";
-        }
-        return _headers[index];
-    }
 
-    // 取出所有表情符號
-    public static String[] getSymbols() {
-        return _expressions;
+    // 取出所有表情
+    public static String[] getArticleExpressions() {
+        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_EXPRESSIONS, "");
+        if (_source.equals(""))
+            _source = _articleExpressions;
+        return _source.split(",");
     }
-
-    // 取出黑名單字串(原始檔)
-    static String getBlockListString() {
-        return _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
+    public static void resetArticleExpressions() {
+        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _articleExpressions);
+        _editor.apply();
+    }
+    public static void setArticleExpressions(List<String> _stringList) {
+        String _saveString = String.join(",",_stringList);
+        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _saveString);
+        _editor.apply();
     }
 
     // 取出黑名單(格式化後)
-    public static Vector<String> getBlockList() {
-        String blockListString = getBlockListString();
+    public static List<String> getBlockList() {
+        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
         if (_block_list == null) {
-            _block_list = new Vector<>();
+            _block_list = new ArrayList<String>();
             if (blockListString.length() > 0) {
                 for (String block_name : blockListString.split(" *, *")) {
                     if (block_name.length() > 0) {
@@ -289,9 +295,13 @@ public class UserSettings {
         }
         return _block_list;
     }
-
+    // 重置黑名單
+    public static void resetBlockList() {
+        _editor.putString(PROPERTIES_BLOCK_LIST, "");
+        _editor.apply();
+    }
     // 更新黑名單
-    public static void updateBlockList(Vector<String> aList) {
+    public static void setBlockList(List<String> aList) {
         StringBuilder list_string = new StringBuilder(",");
         if (aList == null || aList.size() == 0) {
             list_string = new StringBuilder();
@@ -309,30 +319,18 @@ public class UserSettings {
 
     // 新增黑名單
     public static void addBlockName(String aBlockName) {
-        Vector<String> new_list = new Vector<>(getBlockList());
-        int ref = aBlockName.hashCode();
-        boolean find = false;
-        int i = 0;
-        while (true) {
-            if (i >= new_list.size()) {
-                break;
-            } else if (new_list.get(i).hashCode() > ref) {
-                new_list.insertElementAt(aBlockName, i);
-                find = true;
-                break;
-            } else {
-                i++;
-            }
-        }
-        if (!find) {
+        List<String> new_list = getBlockList();
+        if (new_list.contains(aBlockName)) {
+            ASToast.showShortToast(getContextString(R.string.already_have_item));
+        } else {
             new_list.add(aBlockName);
         }
-        updateBlockList(new_list);
+        setBlockList(new_list);
     }
 
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContains(String aName) {
-        String blockListString = getBlockListString();
+        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
         if (_block_list_string_lower_cased == null) {
             _block_list_string_lower_cased = blockListString.toLowerCase();
         }
@@ -351,7 +349,7 @@ public class UserSettings {
     @SuppressLint({"DefaultLocale"})
     public static String getBlockListLowCasedString() {
         if (_block_list_string_lower_cased == null) {
-            _block_list_string_lower_cased = getBlockListString().toLowerCase();
+            _block_list_string_lower_cased = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "").toLowerCase();
         }
         return _block_list_string_lower_cased;
     }

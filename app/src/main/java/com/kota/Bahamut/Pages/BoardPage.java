@@ -48,6 +48,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
+import com.kota.Bahamut.Pages.BlockListPage.BlockListPage;
 import com.kota.Bahamut.Pages.BookmarkPage.BoardExtendOptionalPageListener;
 import com.kota.Bahamut.Pages.BookmarkPage.BookmarkManagePage;
 import com.kota.Bahamut.Pages.BookmarkPage.BoardExtendOptionalPageBookmarkItemView;
@@ -132,7 +133,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         }
     };
 
-    // 側邊選單 listener
+    // 側邊選單 mListener
     DrawerLayout.DrawerListener _drawer_listener = new DrawerLayout.DrawerListener() {
         @Override
         public void onDrawerSlide(@NonNull View drawerView, float slideOffset) { }
@@ -810,7 +811,7 @@ public class BoardPage extends TelnetListPage implements Dialog_SearchArticle_Li
         if (context == null) {
             return;
         }
-        new BookmarkStore(context).getBookmarkList(listName).loadTitleList(_list);
+        TempSettings.get_bookmarkStore().getBookmarkList(listName).loadTitleList(_list);
         if (isPageAppeared()) {
             _bookmark_adapter.notifyDataSetChanged();
         }

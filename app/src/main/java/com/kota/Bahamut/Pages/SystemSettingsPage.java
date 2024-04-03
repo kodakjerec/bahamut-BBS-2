@@ -16,10 +16,14 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 
 import com.google.android.material.slider.Slider;
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
+import com.kota.Bahamut.Pages.BlockListPage.ArticleHeaderListPage;
+import com.kota.Bahamut.Pages.BlockListPage.BlockListPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
@@ -36,6 +40,10 @@ public class SystemSettingsPage extends TelnetPage {
     CompoundButton.OnCheckedChangeListener _block_list_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListEnable(isChecked);
     // 切換到黑名單設定
     View.OnClickListener _block_list_setting_listener = v -> getNavigationController().pushViewController(new BlockListPage());
+    // 切換到發文標題設定
+    View.OnClickListener _article_header_setting_listener = v -> getNavigationController().pushViewController(new ArticleHeaderListPage());
+    // 切換到發文表情符號設定
+    View.OnClickListener _article_expression_setting_listener = v -> getNavigationController().pushViewController(new ArticleExpressionListPage());
 
     // 防止Wifi斷線
     CompoundButton.OnCheckedChangeListener _keep_wifi_listener = (buttonView, isChecked) -> {
@@ -49,9 +57,13 @@ public class SystemSettingsPage extends TelnetPage {
     // 不受電池最佳化限制
     @SuppressLint("BatteryLife")
     View.OnClickListener _ignore_battery_listener = view -> {
+        // 2024.4.3 另外開intent, 會導致hide的dialog又出現
+        ASProcessingDialog.dismissProcessingDialog();
+
         PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
         String packageName = getContext().getPackageName();
-        Intent intent = new Intent();
+        Intent intent = new Intent("android.intent.action.VIEW");
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
             intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
@@ -297,12 +309,18 @@ public class SystemSettingsPage extends TelnetPage {
             spinner_drawer_location.setAdapter(adapter_drawer_location);
             spinner_drawer_location.setSelection(UserSettings.getPropertiesDrawerLocation());
             spinner_drawer_location.setOnItemSelectedListener(_drawer_location_listener);
+
+            // 表情符號設定
+            findViewById(R.id.SystemSettings_ArticleHeaderSetting).setOnClickListener(_article_header_setting_listener);
+            findViewById(R.id.SystemSettings_ArticleExpressionSetting).setOnClickListener(_article_expression_setting_listener);
         } else {
             findViewById(R.id.SystemSettings_item_enableGestureOnBoard).setVisibility(View.GONE);
             findViewById(R.id.SystemSettings_item_enableAutoToChat).setVisibility(View.GONE);
             findViewById(R.id.SystemSettings_item_toolbar_location).setVisibility(View.GONE);
             findViewById(R.id.SystemSettings_item_toolbar_order).setVisibility(View.GONE);
             findViewById(R.id.SystemSettings_item_drawer_location).setVisibility(View.GONE);
+            findViewById(R.id.SystemSettings_ArticleHeaderSetting).setVisibility(View.GONE);
+            findViewById(R.id.SystemSettings_ArticleExpressionSetting).setVisibility(View.GONE);
         }
 
         // billing-page

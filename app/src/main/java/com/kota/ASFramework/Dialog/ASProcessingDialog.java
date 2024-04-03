@@ -52,14 +52,26 @@ public class ASProcessingDialog extends ASDialog {
     }
   }
 
+  public static void dismissProcessingDialog() {
+    if (!ASNavigationController.getCurrentController().isInBackground()) {
+      new ASRunner() {
+        @Override
+        public void run() {
+          if (_instance != null) {
+            _instance.dismiss();
+            releaseInstance();
+          }
+        }
+      }.runInMainThread();
+    }
+  }
   public static void hideProcessingDialog() {
     if (!ASNavigationController.getCurrentController().isInBackground()) {
-      new ASRunner() { // from class: com.kota.ASFramework.Dialog.ASProcessingDialog.2
-        @Override // com.kota.ASFramework.Thread.ASRunner
+      new ASRunner() {
+        @Override
         public void run() {
-          if (ASProcessingDialog._instance != null) {
-            ASProcessingDialog._instance.dismiss();
-            ASProcessingDialog.releaseInstance();
+          if (_instance != null) {
+            _instance.hide();
           }
         }
       }.runInMainThread();

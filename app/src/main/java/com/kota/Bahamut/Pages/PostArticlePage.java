@@ -18,25 +18,26 @@ import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
-import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PaintColor;
-import com.kota.Bahamut.Dialogs.Dialog_PaintColor_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 
 import java.util.Objects;
 
-public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener, Dialog_PaintColor_Listener {
+public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener {
     private String _article_number = null;
     private BoardPage _board_page = null;
-    private String _content = null;
+    private String _ori_content = null;
     private EditText _content_field = null;
     private String _edit_format = null;
     private boolean _header_hidden = false;
@@ -52,6 +53,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     private View _title_block = null;
     private EditText _title_field = null;
     private TextView _title_field_background = null;
+    String[] _headers;
     public boolean recover = false;
 
 
@@ -79,6 +81,10 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
     public void onPageDidLoad() {
         initial();
+        if (recover) {
+            loadTempArticle(9);
+            recover = false;
+        }
     }
 
     public void onPageDidDisappear() {
@@ -100,16 +106,17 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             if (_ori_title.length() > 0) {
                 Selection.setSelection(_title_field.getText(), 1);
             }
+            _ori_title = null;
         }
     }
 
     private void refreshContentField() {
-        if (_content_field != null && _content != null) {
-            _content_field.setText(_content);
-            if (_content.length() > 0) {
-                Selection.setSelection(_content_field.getText(), _content.length());
+        if (_content_field != null && _ori_content != null) {
+            _content_field.setText(_ori_content);
+            if (_ori_content.length() > 0) {
+                Selection.setSelection(_content_field.getText(), _ori_content.length());
             }
-            _content = null;
+            _ori_content = null;
         }
     }
 
@@ -132,6 +139,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
     @SuppressLint("ResourceType")
     private void initial() {
+        _headers = UserSettings.getArticleHeaders();
+
         _title_field = (EditText) findViewById(R.id.ArticlePostDialog_TitleField);
         _title_field_background = (TextView) findViewById(R.id.ArticlePostDialog_TitleFieldBackground);
         _content_field = (EditText) findViewById(R.id.ArticlePostDialog_EditField);
@@ -150,7 +159,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
         findViewById(R.id.ArticlePostDialog_File).setOnClickListener(this);
         _header_selector = (Spinner) findViewById(R.id.Post_headerSelector);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, UserSettings.getArticleHeaders());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, _headers);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         _header_selector.setAdapter(adapter);
         _header_selector.setOnItemSelectedListener(this);
@@ -183,14 +192,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
     // 設定內文
     public void setPostContent(String aContent) {
-        _content = aContent;
+        _ori_content = aContent;
         refreshContentField();
     }
 
     public void onClick(View view) {
         if (view == _post_button) {
             if (_listener != null) {
-                String title = UserSettings.getArticleHeader(_header_selected) + _title_field.getText().toString().replace("\n", "");
+                String title = getArticleHeader(_header_selected) + _title_field.getText().toString().replace("\n", "");
                 String content = _content_field.getText().toString();
                 String err_msg = null;
                 if (title.length() == 0 && content.length() == 0) {
@@ -207,24 +216,38 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }
             }
         } else if (view == _symbol_button) {
-            final String[] items = UserSettings.getSymbols();
-            ASListDialog.createDialog().setItemTextSize(0).setTitle("表情符號").addItems(items).setListener(new ASListDialogItemClickListener() {
-                public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+            // 表情符號
+            final String[] items = UserSettings.getArticleExpressions();
+            Dialog_InsertExpression.createDialog().setTitle("表情符號").addItems(items).setListener(new Dialog_InsertExpression_Listener() {
+                @Override
+                public void onListDialogItemClicked(Dialog_InsertExpression paramASListDialog, int index, String aTitle) {
                     String symbol = items[index];
                     PostArticlePage.this._content_field.getEditableText().insert(PostArticlePage.this._content_field.getSelectionStart(), symbol);
                 }
 
-                public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return false;
+                @Override
+                public void onListDialogSettingClicked() {
+                    // 將當前內容存檔, pushView會讓當前頁面消失
+                    setRecover();
+                    getNavigationController().pushViewController(new ArticleExpressionListPage());
                 }
             }).scheduleDismissOnPageDisappear(this).show();
         } else if (view == _insert_symbol_button) {
+            // 符號
             Dialog_InsertSymbol dialog = new Dialog_InsertSymbol();
-            dialog.setListener(this);
+            dialog.setListener(symbol -> {
+                if (_content_field != null) {
+                    _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
+                }
+            });
             dialog.show();
         } else if (view == _paint_color_button) {
             Dialog_PaintColor dialog = new Dialog_PaintColor();
-            dialog.setListener(this);
+            dialog.setListener(str -> {
+                if (_content_field != null) {
+                    _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
+                }
+            });
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_File) {
             onFileClicked();
@@ -287,6 +310,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                     .pushString("a\n")
                     .build();
             TelnetClient.getClient().sendDataToServer(data);
+            recover = false;
         }
         clear();
         getNavigationController().popToViewController(_board_page);
@@ -383,11 +407,55 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }).show();
     }
 
+    // 讀取暫存檔
     private void loadTempArticle(int index) {
         ArticleTemp article_temp = new ArticleTempStore(getContext()).articles.get(index);
-        _header_selector.setSelection(UserSettings.getIndexOfHeader(article_temp.header));
+        _header_selector.setSelection(getIndexOfHeader(article_temp.header));
         _title_field.setText(article_temp.title);
         _content_field.setText(article_temp.content);
+    }
+
+    // 儲存暫存檔
+    private void saveTempArticle(int index) {
+        ArticleTempStore store = new ArticleTempStore(getContext());
+        ArticleTemp article_temp = store.articles.get(index);
+        // 類別
+        article_temp.header = "";
+        if (_header_selector.getSelectedItemPosition() > 0) {
+            article_temp.header = getArticleHeader(_header_selector.getSelectedItemPosition());
+        }
+        // 標題
+        article_temp.title = _title_field.getText().toString();
+        // 內文
+        article_temp.content = _content_field.getText().toString();
+
+        // 存檔
+        store.store();
+        // ArticleTempStore 有暫存檔定義
+        if (index < 8) {
+            ASAlertDialog.createDialog().setTitle(getContextString(R.string._save)).setMessage("存檔完成").addButton(getContextString(R.string.sure)).show();
+        }
+    }
+
+    // 從字串去回推標題定位
+    int getIndexOfHeader(String aHeader) {
+        if (aHeader == null || aHeader.length() == 0) {
+            return 0;
+        }
+        for (int i = 1; i < _headers.length; i++) {
+            if (_headers[i].equals(aHeader)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    // 從定位取出特定標題
+    String getArticleHeader(int index) {
+        if (index <= 0 || index >= _headers.length) {
+            return "";
+        }
+        return _headers[index];
     }
 
     private void ontSaveArticleToTempButtonClicked() {
@@ -416,42 +484,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 }).show();
                     }
                 }).show();
-    }
-
-    // 儲存暫存檔
-    private void saveTempArticle(int index) {
-        ArticleTempStore store = new ArticleTempStore(getContext());
-        ArticleTemp article_temp = store.articles.get(index);
-        // 類別
-        article_temp.header = "";
-        if (_header_selector.getSelectedItemPosition() > 0) {
-            article_temp.header = UserSettings.getArticleHeader(_header_selector.getSelectedItemPosition());
-        }
-        // 標題
-        article_temp.title = _title_field.getText().toString();
-        // 內文
-        article_temp.content = _content_field.getText().toString();
-
-        // 存檔
-        store.store();
-        if (index < 9) {
-            ASAlertDialog.createDialog().setTitle(getContextString(R.string._save)).setMessage("存檔完成").addButton(getContextString(R.string.sure)).show();
-        }
-    }
-
-    // 帶回符號
-    public void onSymbolDialogDismissWithSymbol(String symbol) {
-        if (_content_field != null) {
-            _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
-        }
-    }
-
-    // 取回上色內容
-    @Override
-    public void onPaintColorDone(String str) {
-        if (_content_field != null) {
-            _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
-        }
     }
 
     public void setOperationMode(OperationMode aMode) {

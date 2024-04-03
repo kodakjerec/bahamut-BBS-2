@@ -12,6 +12,7 @@ import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
@@ -58,7 +59,7 @@ public class BoardLinkPage extends BoardPage {
                             bookmark.setBoard(BoardLinkPage.this.getListName());
                             bookmark.setKeyword(item.Title);
                             bookmark.setTitle(bookmark.generateTitle());
-                            BookmarkStore store = new BookmarkStore(BoardLinkPage.this.getContext());
+                            BookmarkStore store = TempSettings.get_bookmarkStore();
                             store.getBookmarkList(BoardLinkPage.this.getListName()).addBookmark(bookmark);
                             store.store();
                         }
@@ -92,7 +93,7 @@ public class BoardLinkPage extends BoardPage {
                                 bookmark.setBoard(BoardLinkPage.this.getListName());
                                 bookmark.setKeyword(item.Title);
                                 bookmark.setTitle(bookmark.generateTitle());
-                                BookmarkStore store = new BookmarkStore(BoardLinkPage.this.getContext());
+                                BookmarkStore store = TempSettings.get_bookmarkStore();
                                 store.getBookmarkList(BoardLinkPage.this.getListName()).addBookmark(bookmark);
                                 store.store();
                             }

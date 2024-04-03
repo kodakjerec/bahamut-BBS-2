@@ -31,6 +31,7 @@ import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardSearchPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TelnetPage;
@@ -53,7 +54,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private final BoardExtendOptionalPageListener _listener;
     BookmarkAdapter bookmarkAdapter;
     HistoryAdapter historyAdapter;
-    private BookmarkStore _bookmarkStore;
+    BookmarkStore _bookmarkStore = TempSettings.get_bookmarkStore();
     private boolean isUnderRecycleView = false;
     private float scale;
     public int getPageLayout() {
@@ -236,7 +237,6 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
 
     @Override
     public void onPageDidLoad() {
-        _bookmarkStore = new BookmarkStore(getContext());
         reloadList();
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycleView);

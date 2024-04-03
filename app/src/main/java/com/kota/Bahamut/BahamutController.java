@@ -8,11 +8,6 @@ import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteCursorDriver;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQuery;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -23,7 +18,6 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.DataModels.BookmarkStore;
-import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
@@ -32,10 +26,9 @@ import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.Pages.StartPage;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
-import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 import com.kota.TextEncoder.U2BEncoder;
@@ -45,7 +38,6 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.Vector;
 
-/* loaded from: classes.dex */
 public class BahamutController extends ASNavigationController implements TelnetClientListener {
     @Override // com.kota.ASFramework.PageController.ASNavigationController
     protected void onControllerWillLoad() {

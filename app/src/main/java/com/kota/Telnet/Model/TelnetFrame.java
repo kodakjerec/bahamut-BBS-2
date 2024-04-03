@@ -92,6 +92,9 @@ public class TelnetFrame {
     public TelnetRow getRow(int index) {
         return this.rows.get(index);
     }
+    public Vector<TelnetRow> getRows() {
+        return this.rows;
+    }
 
     public TelnetRow getFirstRow() {
         return this.rows.firstElement();

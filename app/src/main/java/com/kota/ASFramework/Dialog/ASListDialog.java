@@ -2,7 +2,9 @@ package com.kota.ASFramework.Dialog;
 
 import android.annotation.SuppressLint;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -26,9 +28,7 @@ public class ASListDialog extends ASDialog {
   private ScrollView _scroll_view = null;
   private int _item_text_size = 1;
 
-  /* JADX INFO: Access modifiers changed from: package-private */
-  /* loaded from: classes.dex */
-  public static class ASListDialogItem {
+  private static class ASListDialogItem {
     public Button button = null;
     public String title = null;
 
@@ -60,32 +60,32 @@ public class ASListDialog extends ASDialog {
     frame.setBackgroundResource(R.color.dialog_border_color);
     frame.setPadding(frame_padding, frame_padding, frame_padding, frame_padding);
     LinearLayout content_view = new LinearLayout(getContext());
-    content_view.setLayoutParams(new LinearLayout.LayoutParams(-2, -2));
+    content_view.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     content_view.setBackgroundColor(View.MEASURED_STATE_MASK);
     frame.addView(content_view);
     content_view.setOrientation(LinearLayout.VERTICAL);
     int dialog_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
     this._scroll_view = new ScrollView(getContext());
-    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
+    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
     content_view.addView(this._scroll_view);
     this._content_view = new LinearLayout(getContext());
-    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
     this._content_view.setOrientation(LinearLayout.VERTICAL);
-    this._content_view.setGravity(17);
+    this._content_view.setGravity(Gravity.CENTER);
     this._scroll_view.addView(this._content_view);
     this._title_label = new TextView(getContext());
-    this._title_label.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+    this._title_label.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     this._title_label.setPadding(padding, padding, padding, padding);
     this._title_label.setTextColor(-1);
     this._title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
     this._title_label.setText("選項");
     this._title_label.setBackgroundColor(-14671840);
-    this._title_label.setGravity(17);
+    this._title_label.setGravity(Gravity.CENTER);
     this._content_view.addView(this._title_label);
     this._item_block = new LinearLayout(getContext());
-    this._item_block.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    this._item_block.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
     this._item_block.setOrientation(LinearLayout.VERTICAL);
-    this._item_block.setGravity(17);
+    this._item_block.setGravity(Gravity.CENTER);
     this._content_view.addView(this._item_block);
     return frame;
   }
@@ -147,9 +147,9 @@ public class ASListDialog extends ASDialog {
 
   private Button createButton() {
     Button button = new Button(getContext());
-    button.setLayoutParams(new LinearLayout.LayoutParams(-1, -2));
+    button.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
     button.setMinimumHeight((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60.0f, getContext().getResources().getDisplayMetrics()));
-    button.setGravity(17);
+    button.setGravity(Gravity.CENTER);
     if (this._item_text_size == 0) {
       button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
     } else if (this._item_text_size == 1) {
@@ -174,8 +174,7 @@ public class ASListDialog extends ASDialog {
     return -1;
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public void onItemClicked(Button button) {
+  private void onItemClicked(Button button) {
     if (this._listener != null) {
       int index = indexOfButton(button);
       if (index != -1) {
@@ -185,8 +184,7 @@ public class ASListDialog extends ASDialog {
     }
   }
 
-  /* JADX INFO: Access modifiers changed from: private */
-  public boolean onItemLongClicked(Button button) {
+  private boolean onItemLongClicked(Button button) {
     int index;
     boolean result = false;
     if (this._listener != null && (index = indexOfButton(button)) != -1) {
@@ -201,8 +199,8 @@ public class ASListDialog extends ASDialog {
   public ASListDialog setDialogWidth(float width) {
     this._dialog_width = width;
     int dialog_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
-    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, -2));
-    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, -2));
+    this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
+    this._content_view.setLayoutParams(new FrameLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
     return this;
   }
 }

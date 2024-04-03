@@ -9,6 +9,7 @@ import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.Bahamut.R;
 
 import java.util.Objects;
@@ -20,7 +21,7 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
 
     public Dialog_InsertSymbol() {
         requestWindowFeature(1);
-        setContentView(R.layout.dialog_symbol);
+        setContentView(R.layout.dialog_insert_symbol);
         Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
         this._grid_view = findViewById(R.id.SymbolDialog_GridView);
         this._grid_view.setOnItemClickListener(this);

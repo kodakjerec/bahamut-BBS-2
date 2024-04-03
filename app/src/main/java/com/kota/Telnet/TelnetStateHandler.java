@@ -1,5 +1,9 @@
 package com.kota.Telnet;
 
+import com.kota.Telnet.Model.TelnetRow;
+
+import java.util.Vector;
+
 public abstract class TelnetStateHandler {
     int _current_page = 0;
 
@@ -22,6 +26,10 @@ public abstract class TelnetStateHandler {
             return TelnetClient.getModel().getRowString(row);
         }
         return "";
+    }
+
+    public Vector<TelnetRow> getRows() {
+        return TelnetClient.getModel().getRows();
     }
 
     public void setCurrentPage(int pageID) {

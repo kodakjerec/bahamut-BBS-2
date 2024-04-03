@@ -15,6 +15,13 @@ import java.io.ObjectInputStream;
 import java.util.Iterator;
 import java.util.Vector;
 
+/*
+    戰巴哈專用暫存檔
+    0~4 文章使用
+    8  mail
+    9  發文
+ */
+
 public class ArticleTempStore {
     public static final int version = 1;
     private final Context _context;

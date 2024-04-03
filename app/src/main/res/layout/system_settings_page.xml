@@ -119,6 +119,20 @@
                     style="@style/SystemSettingsSpinnerItem"/>
             </LinearLayout>
         </RelativeLayout>
+        <LinearLayout android:id="@+id/SystemSettings_ArticleHeaderSetting"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/article_header_setting" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
+        <LinearLayout android:id="@+id/SystemSettings_ArticleExpressionSetting"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/article_expression_setting" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_link"/>

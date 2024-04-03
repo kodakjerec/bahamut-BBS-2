@@ -38,6 +38,7 @@ import com.kota.Bahamut.Pages.BoardPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;
@@ -597,7 +598,7 @@ public class ArticlePage extends TelnetPage {
                 for (int childIndex2 = 0; childIndex2<childCount2;childIndex2++) {
                     View view1 = secondLLayout.getChildAt(childIndex2);
                     if (view1.getClass().equals(Thumbnail_ItemView.class)){
-                        ((Thumbnail_ItemView) view1).load_image();
+                        ((Thumbnail_ItemView) view1).prepare_load_image();
                     }
                 }
             }
@@ -608,7 +609,7 @@ public class ArticlePage extends TelnetPage {
         this._article = aArticle;
         if (this._article != null) {
             String board_name = this._board_page.getListName();
-            BookmarkStore store = new BookmarkStore(getContext());
+            BookmarkStore store = TempSettings.get_bookmarkStore();
             BookmarkList bookmark_list = store.getBookmarkList(board_name);
             bookmark_list.addHistoryBookmark(this._article.Title);
             store.store();

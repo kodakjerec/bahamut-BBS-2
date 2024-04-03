@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.text.Selection;
 import android.view.View;
 import android.widget.Button;
@@ -9,10 +11,15 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.BahamutPage;
+import com.kota.Bahamut.DataModels.ArticleTemp;
+import com.kota.Bahamut.DataModels.ArticleTempStore;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PaintColor;
 import com.kota.Bahamut.Dialogs.Dialog_PaintColor_Listener;
+import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
@@ -34,6 +41,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
     boolean _title_block_hidden = false;
     EditText _title_field = null;
     TextView _title_field_background = null;
+    public boolean recover = false;
 
     public String getName() {
         return "BahamutSendMailDialog";
@@ -57,6 +65,10 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
 
     public void onPageDidLoad() {
         initial();
+        if (recover) {
+            loadTempArticle(8);
+            recover = false;
+        }
     }
 
     public void onPageDidDisappear() {
@@ -200,15 +212,21 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
                 }).show();
             }
         } else if (view == _symbol_button) {
-            final String[] items = UserSettings.getSymbols();
-            ASListDialog.createDialog().setDialogWidth(320.0f).setTitle("表情符號").addItems(items).setListener(new ASListDialogItemClickListener() {
-                public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+
+            // 表情符號
+            final String[] items = UserSettings.getArticleExpressions();
+            Dialog_InsertExpression.createDialog().setTitle("表情符號").addItems(items).setListener(new Dialog_InsertExpression_Listener() {
+                @Override
+                public void onListDialogItemClicked(Dialog_InsertExpression paramASListDialog, int index, String aTitle) {
                     String symbol = items[index];
                     _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
                 }
 
-                public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return false;
+                @Override
+                public void onListDialogSettingClicked() {
+                    // 將當前內容存檔, pushView會讓當前頁面消失
+                    setRecover();
+                    getNavigationController().pushViewController(new ArticleExpressionListPage());
                 }
             }).scheduleDismissOnPageDisappear(this).show();
         } else if (view == _hide_title_button) {
@@ -220,6 +238,11 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         } else if (view.getId() == R.id.SendMailDialog_change) {
             changeViewMode();
         }
+    }
+
+    public void setRecover() {
+        recover = true;
+        saveTempArticle(8);
     }
 
     public void refresh() {
@@ -285,5 +308,28 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
     @Override
     public void onPaintColorDone(String str) {
         _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
+    }
+
+    // 讀取暫存檔
+    private void loadTempArticle(int index) {
+        ArticleTemp article_temp = new ArticleTempStore(getContext()).articles.get(index);
+        _receiver_field.setText(article_temp.header);
+        _title_field.setText(article_temp.title);
+        _content_field.setText(article_temp.content);
+    }
+
+    // 儲存暫存檔
+    private void saveTempArticle(int index) {
+        ArticleTempStore store = new ArticleTempStore(getContext());
+        ArticleTemp article_temp = store.articles.get(index);
+        // 收信者
+        article_temp.header = _receiver_field.getText().toString();
+        // 標題
+        article_temp.title = _title_field.getText().toString();
+        // 內文
+        article_temp.content = _content_field.getText().toString();
+
+        // 存檔
+        store.store();
     }
 }

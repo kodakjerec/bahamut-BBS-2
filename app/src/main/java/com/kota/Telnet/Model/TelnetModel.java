@@ -4,6 +4,7 @@ import com.kota.Telnet.Reference.TelnetAnsiCode;
 import com.kota.Telnet.TelnetAnsi;
 import com.kota.Telnet.TelnetCursor;
 import java.nio.ByteBuffer;
+import java.util.Vector;
 
 /* loaded from: classes.dex */
 public class TelnetModel {
@@ -164,6 +165,9 @@ public class TelnetModel {
             return null;
         }
         return this._frame.getRow(row);
+    }
+    public Vector<TelnetRow> getRows() {
+        return this._frame.getRows();
     }
 
     public TelnetRow getLastRow() {

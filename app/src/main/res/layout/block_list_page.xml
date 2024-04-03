@@ -7,6 +7,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:focusableInTouchMode="true">
+        <Button
+            android:textSize="24sp"
+            android:textColor="@color/button_text_color_1"
+            android:gravity="center"
+            android:id="@+id/BlockList_Reset"
+            android:background="@drawable/button_background_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="100dp"
+            android:text="@string/reset"
+            style="@style/TouchBlock"/>
         <EditText
             android:id="@+id/BlockList_Input"
             style="@style/TextViewLarge"
@@ -34,5 +45,11 @@
     </LinearLayout>
     <View style="@style/ItemViewDividerHorizontal"/>
     <View android:background="@color/divider_color" android:layout_width="match_parent" android:layout_height="5dp"/>
-    <ListView android:id="@+id/BlockList_list" android:layout_width="match_parent" android:layout_height="0dp" android:divider="@null" android:dividerHeight="0dp" android:layout_weight="1"/>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/BlockList_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:layout_weight="1"/>
 </LinearLayout>

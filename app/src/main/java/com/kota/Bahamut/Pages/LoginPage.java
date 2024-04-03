@@ -25,7 +25,6 @@ import com.kota.TelnetUI.TelnetView;
 public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
     int _error_count = 0;
-    ASProcessingDialog _login_process_dialog = null;
     View.OnClickListener _login_listener = v -> {
         String err_message;
         LoginPage.this._username = ((EditText) LoginPage.this.findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
@@ -155,7 +154,6 @@ public class LoginPage extends TelnetPage {
 
     public void onPageDidDisappear() {
         _telnet_view = null;
-        _login_process_dialog = null;
         _remove_logon_user_dialog = null;
         _save_unfinished_article_dialog = null;
         clear();
@@ -184,10 +182,6 @@ public class LoginPage extends TelnetPage {
     public void clear() {
         _error_count = 0;
         _cache_telnet_view = false;
-        if (_login_process_dialog != null) {
-            _login_process_dialog.dismiss();
-            _login_process_dialog = null;
-        }
     }
 
     void login() {
@@ -215,8 +209,8 @@ public class LoginPage extends TelnetPage {
                         ASProcessingDialog.showProcessingDialog("登入中");
                         return true;
                     });
-                    LoginPage.this._remove_logon_user_dialog.show();
                 }
+                LoginPage.this._remove_logon_user_dialog.show();
             }
         }.runInMainThread();
     }

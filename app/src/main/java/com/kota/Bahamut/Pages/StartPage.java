@@ -14,7 +14,10 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.UrlDatabase;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
+import com.kota.Bahamut.Dialogs.Dialog_InsertExpression_Listener;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
@@ -80,7 +83,7 @@ public class StartPage extends TelnetPage {
     }
 
     public void clear() {
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
     }
 
     /** 按下離開 */

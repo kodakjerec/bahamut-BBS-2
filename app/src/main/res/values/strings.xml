@@ -7,6 +7,8 @@
     <string name="_save">存檔</string>
     <string name="account_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="add">新增</string>
+    <string name="reset">重置</string>
+    <string name="reset_message">是否確定重置為預設值？</string>
     <string name="arrow_down">▼</string>
     <string name="arrow_right">&gt;</string>
     <string name="arrow_up">▲</string>
@@ -14,6 +16,8 @@
     <string name="author">作者</string>
     <string name="author_">作者：</string>
     <string name="block_list_setting">黑名單設定</string>
+    <string name="article_header_setting">發文標題設定</string>
+    <string name="article_expression_setting">表情符號設定</string>
     <string name="bookmark">書籤</string>
     <string name="bookmark_manager">書籤管理</string>
     <string name="cancel">取消</string>
@@ -24,6 +28,7 @@
     <string name="connect">連線</string>
     <string name="del">DEL</string>
     <string name="delete">刪除</string>
+    <string name="article_header_zero_error_message">第一個選項無法被刪除或移動位置</string>
     <string name="insert">加入</string>
     <string name="do_gy">推薦</string>
     <string name="do_gy_">推薦：</string>
@@ -178,7 +183,8 @@
         ． 工具列左移/右移(看板和閱讀文章)\n
         ． 浮動工具列\n
         ． 側邊選單位置(看板)\n
-        ． 書籤可排序、修改\n
+        ． 黑名單、書籤 可排序、修改\n
+        ． 發文標題、表情符號 可排序、修改\n
         (持續增加中)
 <!--        以下努力中：\n-->
 <!--        ． 備份書籤/黑名單\n-->
@@ -260,4 +266,5 @@
     </string-array>
     <string name="toolbar_item_ll">◀◀</string>
     <string name="toolbar_item_rr">▶▶</string>
+    <string name="already_have_item">已加入過此名稱</string>
 </resources>

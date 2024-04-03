@@ -4,12 +4,15 @@ package com.kota.Bahamut.Service;
 * 此處存放app執行階段使用的變數, 存放於記憶體, 關閉就消失
 * */
 
+import com.kota.Bahamut.DataModels.BookmarkStore;
+
 public class TempSettings {
     static Boolean isUnderAutoToChat = false; // 正在自動登入ing
     static Boolean isFloatingInvisible = false; // 浮動工具列是否正處於隱藏狀態
     static String boardFollowTitle = ""; // 正在看的討論串標題
     static int _transportType = -1; // 網路狀況
-    private static String lastVisitBoard = "";// 最後離開的看板
+    static String lastVisitBoard = "";// 最後離開的看板
+    static BookmarkStore _bookmarkStore; // 公用的bookmarkStore
 
     // 清空數據但不包含 網路狀況
     public static void clearTempSettings() {
@@ -39,4 +42,11 @@ public class TempSettings {
     public static int get_transportType() { return _transportType; }
     public static void setLastVisitBoard(String _name) { lastVisitBoard = _name; };
     public static String getLastVisitBoard() { return lastVisitBoard; };
+
+    public static void set_bookmarkStore(BookmarkStore frombookmarkStore) {
+        _bookmarkStore = frombookmarkStore;
+    }
+    public static BookmarkStore get_bookmarkStore() {
+        return _bookmarkStore;
+    }
 }

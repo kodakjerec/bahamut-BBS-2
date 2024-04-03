@@ -48,6 +48,12 @@ public class ASDialog extends Dialog implements ASViewControllerDisappearListene
     this._showing = true;
   }
 
+  @Override
+  public void hide() {
+    super.hide();
+    this._showing = false;
+  }
+
   @Override // android.app.Dialog
   public boolean isShowing() {
     return this._showing;

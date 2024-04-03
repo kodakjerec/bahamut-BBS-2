@@ -6,6 +6,8 @@ package com.kota.Bahamut.DataModels;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.kota.Bahamut.Service.TempSettings;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,28 +22,23 @@ import java.util.Map;
 import java.util.Vector;
 
 public class BookmarkStore {
-    private final Map<String, BookmarkList> _bookmarks = new HashMap();
-    private final Context _context;
-    private String _file_path = "";
-    private final BookmarkList _global_bookmarks = new BookmarkList("");
-    private String _owner = "";
-    private int _version = 1;
+    final Map<String, BookmarkList> _bookmarks = new HashMap<>();
+    final Context _context;
+    String _file_path;
+    final BookmarkList _global_bookmarks = new BookmarkList("");
+    String _owner = "";
+    int _version = 1;
 
     public BookmarkStore(Context context, String aFilePath) {
         this._file_path = aFilePath;
         this._context = context;
-    }
-
-    public BookmarkStore(Context context) {
-        this._context = context;
         if (this._context == null) {
             System.out.println("Bookmark context can't null.");
         }
-        load();
     }
 
     public static void upgrade(Context context, String aFilePath) {
-        new BookmarkStore(context, aFilePath).load();
+        TempSettings.set_bookmarkStore(new BookmarkStore(context, aFilePath).load());
     }
 
     public BookmarkList getBookmarkList(String aBoardName) {
@@ -102,7 +99,7 @@ public class BookmarkStore {
         }
     }
 
-    private void load() {
+    private BookmarkStore load() {
         SharedPreferences perf;
         String save_data;
         System.out.println("load bookmark store from file");
@@ -136,6 +133,7 @@ public class BookmarkStore {
                 e2.printStackTrace();
             }
         }
+        return this;
     }
 
     public void importFromStream(ObjectInputStream aStream) throws IOException {

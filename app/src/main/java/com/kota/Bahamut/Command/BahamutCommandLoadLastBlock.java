@@ -20,11 +20,11 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
     }
 
     private OperationMode getLoadLastBlockMode(TelnetListPage aListPage) {
-        OperationMode operationMode = OperationMode.End;
+
         switch (aListPage.getListType()) {
-            case 1:
+            case 1: // BoardLinkPage
                 return OperationMode.Left_S_End;
-            case 2:
+            case 2: // BoardSearchPage
                 if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {
                     return OperationMode.End;
                 }
@@ -32,10 +32,12 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
                     return OperationMode.Home_End;
                 }
                 return OperationMode.NotAvailable;
-            default:
-                if (aListPage == null || aListPage.getSelectedIndex() != aListPage.getItemSize()) {
+            default: // TelnetListPage
+                // 目前的文章index != 所有文章
+                if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {
                     return OperationMode.End;
                 }
+                // 只有一篇 看板/文章
                 if (aListPage.getItemSize() == 1) {
                     return OperationMode.Left_Right_End;
                 }

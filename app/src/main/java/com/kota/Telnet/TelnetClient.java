@@ -146,10 +146,6 @@ public class TelnetClient implements TelnetConnectorListener {
         }
     }
 
-    public void sendDataToServerInBackground(byte[] data) {
-        sendDataToServerInBackground(data, 0);
-    }
-
     public void sendDataToServerInBackground(final byte[] data, final int channel) {
         if (data != null && _connector.isConnecting()) {
             _send_executor.submit(() -> {

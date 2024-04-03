@@ -215,6 +215,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                     return;
                 }
                 TelnetClient.getClient().sendStringToServerInBackground("s" + board);
+
                 SearchBoard_Handler.getInstance().clear();
             }
 

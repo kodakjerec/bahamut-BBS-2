@@ -262,7 +262,7 @@ public class ASNavigationController extends Activity {
       @Override // com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation
       public void onAnimationFinished() {
         if (sourceController != null) {
-          sourceController.onPageDidDisappear();
+            sourceController.onPageDidDisappear();
         }
         if (targetController != null) {
           Vector<View> remove_list = new Vector<>();

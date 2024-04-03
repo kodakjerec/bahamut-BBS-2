@@ -7,7 +7,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -43,7 +42,6 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.io.IOException;
 import java.util.Vector;
 
 public class Thumbnail_ItemView extends LinearLayout {
@@ -81,6 +79,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         init();
     }
 
+    // 判斷URL內容
     public void loadUrl(String url) {
         _url = url;
         UrlDatabase urlDatabase = new UrlDatabase(getContext());
@@ -157,7 +156,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         _load_only_wifi = UserSettings.getLinkShowOnlyWifi();
         int _transportType = TempSettings.get_transportType();
 
-        if (_isPic) {
+        if (_isPic) { // 純圖片
             new ASRunner() {
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
@@ -166,7 +165,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     // 圖片
                     _layout_pic.setVisibility(VISIBLE);
                     if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
-                        load_image();
+                        prepare_load_image();
                     } else if (_imageUrl.equals("")) {
                         _image_view_button.setVisibility(GONE);
                     }
@@ -175,7 +174,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     _layout_normal.setVisibility(GONE);
                 }
             }.runInMainThread();
-        } else {
+        } else { // 內容網址
             new ASRunner() {
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
@@ -184,7 +183,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     // 圖片
                     _layout_pic.setVisibility(VISIBLE);
                     if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
-                        load_image();
+                        prepare_load_image();
                     } else if (_imageUrl.equals("")) {
                         _image_view_button.setVisibility(GONE);
                     }
@@ -197,7 +196,8 @@ public class Thumbnail_ItemView extends LinearLayout {
         }
     }
 
-    public void load_image() {
+    // 純圖片
+    public void prepare_load_image() {
         if (_img_loaded) return;
         if (_isPic) {
             _height = _height/2;
@@ -207,6 +207,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         }
         _image_view_pic.setMinimumHeight(_height);
         loadImage();
+        _url_view.setText(_imageUrl);
     }
 
     // 內容網址
@@ -251,6 +252,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     circularProgressDrawable.setCenterRadius(60f);
                     // progress bar color
                     TypedValue typedValue = new TypedValue();
+
                     getContext().getTheme().resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true);
                     circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId));
                     // progress bar start
@@ -359,7 +361,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         _image_view_pic = findViewById(R.id.thumbnail_image_pic);
         _image_view_pic.setOnClickListener(_open_url_listener);
         _image_view_button = findViewById(R.id.thumbnail_image_button);
-        _image_view_button.setOnClickListener(view -> load_image());
+        _image_view_button.setOnClickListener(view -> prepare_load_image());
 
         _layout_normal = findViewById(R.id.thumbnail_normal);
         _title_view = findViewById(R.id.thumbnail_title);
