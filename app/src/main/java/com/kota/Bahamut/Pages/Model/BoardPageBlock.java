@@ -1,6 +1,8 @@
 package com.kota.Bahamut.Pages.Model;
 
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
+import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
+
 import java.util.Stack;
 
 public class BoardPageBlock extends TelnetListPageBlock {
@@ -8,7 +10,7 @@ public class BoardPageBlock extends TelnetListPageBlock {
     public String BoardManager = null;
     public String BoardName = null;
     public String BoardTitle = null;
-    public int Type = 0;
+    public int Type = BoardPageAction.LIST;
     public int mode = 0;
 
     private BoardPageBlock() {

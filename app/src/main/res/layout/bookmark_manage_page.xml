@@ -10,7 +10,7 @@
             android:layout_weight="1"
             android:id="@+id/recycleView"/>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_bookmarkButton" android:background="@drawable/tab_item_background_color_selected" android:text="@string/title" style="@style/TabItem"/>
+        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_bookmarkButton" android:background="@drawable/tab_item_background_color_selected" android:text="@string/bookmark" style="@style/TabItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_historyButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/record" style="@style/TabItem"/>
         <View style="@style/ToolbarDivider"/>

@@ -698,7 +698,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public void onLoadItemFinished() {
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
     }
 
     public int getCurrentBlock() {

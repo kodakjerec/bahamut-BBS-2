@@ -34,7 +34,7 @@ public class BahamutCommandFSendMail extends TelnetCommand  {
     @Override
     public void executeFinished(TelnetListPage telnetListPage, TelnetListPageBlock telnetListPageBlock) {
         setDone(true);
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
         ASToast.showShortToast(getContextString(R.string.board_page_send_mail_finish));
     }
 

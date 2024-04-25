@@ -173,7 +173,7 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onPageWillDisappear() {
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
         if (TempSettings.isUnderAutoToChat()) {
             ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
         }
@@ -192,7 +192,7 @@ public class LoginPage extends TelnetPage {
     public void onCheckRemoveLogonUser() {
         new ASRunner() {
             public void run() {
-                ASProcessingDialog.hideProcessingDialog();
+                ASProcessingDialog.dismissProcessingDialog();
                 if (LoginPage.this._remove_logon_user_dialog == null) {
                     LoginPage.this._remove_logon_user_dialog = (ASAlertDialog) ASAlertDialog.createDialog().setTitle("提示").setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是").setListener((aDialog, index) -> {
                         if (index == 0) {
@@ -219,7 +219,7 @@ public class LoginPage extends TelnetPage {
         if (_error_count < 3) {
             new ASRunner() {
                 public void run() {
-                    ASProcessingDialog.hideProcessingDialog();
+                    ASProcessingDialog.dismissProcessingDialog();
                     ASAlertDialog.createDialog().setTitle("勇者密碼錯誤").setMessage("勇者密碼錯誤，請重新輸入勇者密碼").addButton("確定").scheduleDismissOnPageDisappear(LoginPage.this).show();
                 }
             }.runInMainThread();
@@ -232,7 +232,7 @@ public class LoginPage extends TelnetPage {
         if (_error_count < 3) {
             new ASRunner() {
                 public void run() {
-                    ASProcessingDialog.hideProcessingDialog();
+                    ASProcessingDialog.dismissProcessingDialog();
                     ASAlertDialog.createDialog().setTitle("勇者代號錯誤").setMessage("勇者代號錯誤，請重新輸入勇者代號").addButton("確定").scheduleDismissOnPageDisappear(LoginPage.this).show();
                 }
             }.runInMainThread();
@@ -244,7 +244,7 @@ public class LoginPage extends TelnetPage {
     public void onLoginErrorAndDisconnected() {
         new ASRunner() {
             public void run() {
-                ASProcessingDialog.hideProcessingDialog();
+                ASProcessingDialog.dismissProcessingDialog();
                 ASAlertDialog.createDialog().setTitle("斷線").setMessage("帳號密碼輸入錯誤次數過多，請重新連線。").addButton("確定").show();
             }
         }.runInMainThread();
@@ -276,7 +276,7 @@ public class LoginPage extends TelnetPage {
     public void onLoginAccountOverLimit() {
         new ASRunner() {
             public void run() {
-                ASProcessingDialog.hideProcessingDialog();
+                ASProcessingDialog.dismissProcessingDialog();
                 ASAlertDialog.createDialog().setTitle("警告").setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。").addButton("確定").show();
             }
         }.runInMainThread();

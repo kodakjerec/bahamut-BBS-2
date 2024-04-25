@@ -57,9 +57,6 @@ public class SystemSettingsPage extends TelnetPage {
     // 不受電池最佳化限制
     @SuppressLint("BatteryLife")
     View.OnClickListener _ignore_battery_listener = view -> {
-        // 2024.4.3 另外開intent, 會導致hide的dialog又出現
-        ASProcessingDialog.dismissProcessingDialog();
-
         PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
         String packageName = getContext().getPackageName();
         Intent intent = new Intent("android.intent.action.VIEW");

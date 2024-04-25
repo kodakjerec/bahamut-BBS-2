@@ -123,7 +123,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         } else {
             result = false;
         }
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
         return result;
     }
 
@@ -152,7 +152,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionFail(TelnetClient aClient) {
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
         ASToast.showShortToast("連線失敗，請檢查網路連線或稍後再試");
     }
 
@@ -169,7 +169,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 System.out.println("BahaBBS connection close:" + time_string);
                 BahamutController.this.handleNormalConnectionClosed();
                 ASToast.showShortToast("連線已中斷");
-                ASProcessingDialog.hideProcessingDialog();
+                ASProcessingDialog.dismissProcessingDialog();
             }
         }.runInMainThread();
     }

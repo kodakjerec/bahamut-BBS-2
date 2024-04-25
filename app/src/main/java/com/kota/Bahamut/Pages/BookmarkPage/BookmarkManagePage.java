@@ -29,7 +29,7 @@ import com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener;
 import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.Pages.BoardSearchPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
@@ -231,7 +231,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     });
 
     public BookmarkManagePage(String aBoardName, BoardExtendOptionalPageListener aListener) {
-        this._listener = aListener;
+        _listener = aListener;
         setBoardName(aBoardName);
     }
 
@@ -247,33 +247,33 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         recyclerView.setAdapter(bookmarkAdapter);
         bookmarkAdapter.setOnItemClickListener(this);
 
-        this._header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_headerView);
-        this._header_view.setData("我的書籤", this._board_name, "");
-        this._bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_bookmarkButton);
-        this._history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_historyButton);
-        this._water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_waterBallButton);
-        this._bookmark_button.setOnClickListener(buttonClickListener);
-        this._history_button.setOnClickListener(buttonClickListener);
-        this._water_ball_button.setOnClickListener(buttonClickListener);
-        this._selected_button = this._bookmark_button;
-        this._tab_buttons = new Button[]{this._bookmark_button, this._history_button, this._water_ball_button};
+        _header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_headerView);
+        _header_view.setData("我的書籤", _board_name, "");
+        _bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_bookmarkButton);
+        _history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_historyButton);
+        _water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_waterBallButton);
+        _bookmark_button.setOnClickListener(buttonClickListener);
+        _history_button.setOnClickListener(buttonClickListener);
+        _water_ball_button.setOnClickListener(buttonClickListener);
+        _selected_button = _bookmark_button;
+        _tab_buttons = new Button[]{_bookmark_button, _history_button, _water_ball_button};
         scale = getResource().getDisplayMetrics().scaledDensity;
     }
 
     private void reloadList() {
         Context context = getContext();
         if (context != null) {
-            BookmarkList bookmark_list = _bookmarkStore.getBookmarkList(this._board_name);
+            BookmarkList bookmark_list = _bookmarkStore.getBookmarkList(_board_name);
             if (_mode == 1) {
-                bookmark_list.loadHistoryList(this._bookmarks);
+                bookmark_list.loadHistoryList(_bookmarks);
             } else {
-                bookmark_list.loadTitleList(this._bookmarks);
+                bookmark_list.loadBookmarkList(_bookmarks);
             }
         }
     }
 
     public void setBoardName(String aBoardName) {
-        this._board_name = aBoardName;
+        _board_name = aBoardName;
     }
 
     View.OnClickListener buttonClickListener = new View.OnClickListener() {
@@ -379,7 +379,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
             bookmark.setMark("n");
         bookmark.setGy(vector.get(3));
         bookmark.setTitle(bookmark.generateTitle());
-        _bookmarkStore.getBookmarkList(this._board_name).updateBookmark(editBookmarkIndex, bookmark);
+        _bookmarkStore.getBookmarkList(_board_name).updateBookmark(editBookmarkIndex, bookmark);
         _bookmarkStore.store();
         reloadList();
         // 還原

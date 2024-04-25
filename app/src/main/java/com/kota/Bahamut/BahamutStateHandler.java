@@ -7,10 +7,10 @@ import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
 import com.kota.Bahamut.DataModels.AppDatabase;
-import com.kota.Bahamut.Pages.BoardLinkPage;
-import com.kota.Bahamut.Pages.BoardPage;
-import com.kota.Bahamut.Pages.BoardPageAction;
-import com.kota.Bahamut.Pages.BoardSearchPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
+import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
@@ -147,9 +147,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         .build();
                 TelnetClient.getClient().sendDataToServer(data);
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof PostArticlePage || top_page instanceof BoardPage) {
+                if (top_page instanceof PostArticlePage || top_page instanceof BoardMainPage) {
                     // 最上層是 發文 或 看板
-                    BoardPage page = PageContainer.getInstance().getBoardPage();
+                    BoardMainPage page = PageContainer.getInstance().getBoardPage();
                     page.recoverPost();
                 } else if (top_page instanceof MailBoxPage) {
                     MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
@@ -167,9 +167,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
             if (this.row_string_00.contains("順利貼出佈告")) {
                 // 順利貼出佈告, 請按任意鍵繼續
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof PostArticlePage || top_page instanceof BoardPage) {
+                if (top_page instanceof PostArticlePage || top_page instanceof BoardMainPage) {
                     // 最上層是 發文 或 看板
-                    BoardPage page = PageContainer.getInstance().getBoardPage();
+                    BoardMainPage page = PageContainer.getInstance().getBoardPage();
                     page.finishPost();
                 } else if (top_page instanceof MailBoxPage) {
                     MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
@@ -264,7 +264,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleBoardPage() {
         setCurrentPage(BahamutPage.BAHAMUT_BOARD);
         if (this._cursor.column == 1) {
-            BoardPage page = PageContainer.getInstance().getBoardPage();
+            BoardMainPage page = PageContainer.getInstance().getBoardPage();
             if (page.onPagePreload()) {
                 showPage(page);
             }

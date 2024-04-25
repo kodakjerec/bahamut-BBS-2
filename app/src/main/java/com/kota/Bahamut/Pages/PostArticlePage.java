@@ -25,6 +25,7 @@ import com.kota.Bahamut.Dialogs.Dialog_PaintColor;
 import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -36,7 +37,7 @@ import java.util.Objects;
 
 public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener {
     private String _article_number = null;
-    private BoardPage _board_page = null;
+    private BoardMainPage _board_page = null;
     private String _ori_content = null;
     private EditText _content_field = null;
     private String _edit_format = null;
@@ -513,8 +514,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return true;
     }
 
-    public void setBoardPage(BoardPage aBoardPage) {
-        _board_page = aBoardPage;
+    public void setBoardPage(BoardMainPage aBoardMainPage) {
+        _board_page = aBoardMainPage;
     }
 
     protected boolean onBackPressed() {

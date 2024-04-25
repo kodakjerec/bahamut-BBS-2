@@ -65,18 +65,6 @@ public class ASProcessingDialog extends ASDialog {
       }.runInMainThread();
     }
   }
-  public static void hideProcessingDialog() {
-    if (!ASNavigationController.getCurrentController().isInBackground()) {
-      new ASRunner() {
-        @Override
-        public void run() {
-          if (_instance != null) {
-            _instance.hide();
-          }
-        }
-      }.runInMainThread();
-    }
-  }
 
   public ASProcessingDialog() {
     requestWindowFeature(1);

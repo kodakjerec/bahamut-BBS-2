@@ -34,7 +34,7 @@ import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.Pages.BoardPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
@@ -54,7 +54,7 @@ import java.util.Set;
 public class ArticlePage extends TelnetPage {
     private TelnetArticle _article = null;
     private TelnetView _telnet_view = null;
-    private BoardPage _board_page = null;
+    private BoardMainPage _board_page = null;
     private boolean _full_screen = false;
     private boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
     long _action_delay = 500;
@@ -622,7 +622,7 @@ public class ArticlePage extends TelnetPage {
             }
             this._list_adapter.notifyDataSetChanged();
         }
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
     }
 
     private void reloadTelnetLayout() {
@@ -760,8 +760,8 @@ public class ArticlePage extends TelnetPage {
         return true;
     }
 
-    public void setBoardPage(BoardPage aBoardPage) {
-        this._board_page = aBoardPage;
+    public void setBoardPage(BoardMainPage aBoardMainPage) {
+        this._board_page = aBoardMainPage;
     }
 
     public void onExternalToolbarClicked() {

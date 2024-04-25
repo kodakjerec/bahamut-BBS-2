@@ -68,7 +68,6 @@ public class TelnetReceiverThread extends Thread {
                 this._model.parseAnsiBuffer();
             }
         } catch (Exception exception) {
-            exception.printStackTrace();
             result = false;
             if (this._connector != null && this._connector.isConnecting()) {
                 this._connector.close();

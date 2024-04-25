@@ -2,9 +2,9 @@ package com.kota.Bahamut;
 
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
 import com.kota.Bahamut.Pages.BillingPage;
-import com.kota.Bahamut.Pages.BoardLinkPage;
-import com.kota.Bahamut.Pages.BoardPage;
-import com.kota.Bahamut.Pages.BoardSearchPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
+import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.InstructionsPage;
 import com.kota.Bahamut.Pages.LoginPage;
@@ -22,7 +22,7 @@ public class PageContainer {
     private LoginPage _login_page = null;
     private MainPage _main_page = null;
     private Stack<ClassPage> _class_page = new Stack<>();
-    private BoardPage _board_page = null;
+    private BoardMainPage _board_page = null;
     private BoardLinkPage _board_title_linked_page = null;
     private BoardSearchPage _board_search_page = null;
     private MailBoxPage _mail_page = null;
@@ -113,9 +113,9 @@ public class PageContainer {
         }
     }
 
-    public BoardPage getBoardPage() {
+    public BoardMainPage getBoardPage() {
         if (this._board_page == null) {
-            this._board_page = new BoardPage();
+            this._board_page = new BoardMainPage();
         }
         return this._board_page;
     }

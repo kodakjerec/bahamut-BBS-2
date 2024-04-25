@@ -20,6 +20,7 @@ import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageHandler;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
@@ -30,7 +31,6 @@ import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
 import java.util.Timer;
@@ -69,16 +69,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                 TelnetClient.getClient().sendStringToServerInBackground("sChat");
                 }
             };
-            TimerTask task2 = new TimerTask() {
-                @Override
-                public void run() {
-                    TelnetOutputBuilder builder = TelnetOutputBuilder.create()
-                            .pushString("sChat\n");
-                    TelnetClient.getClient().sendDataToServer(builder.build());
-                }
-            };
             timer.schedule(task1, 0);
-            timer.schedule(task2, 1000);
         }
     }
 
@@ -206,7 +197,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
 
     public void onSearchBoardFinished() {
         System.out.println("onSearchBoardFinished");
-        ASProcessingDialog.hideProcessingDialog();
+        ASProcessingDialog.dismissProcessingDialog();
         ASListDialog.createDialog().addItems(SearchBoard_Handler.getInstance().getBoards()).setListener(new ASListDialogItemClickListener() {
             public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                 String board = SearchBoard_Handler.getInstance().getBoard(index);
@@ -257,7 +248,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
             PageContainer.getInstance().pushClassPage(item.Name, item.Title);
             getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
         } else {
-            BoardPage page = PageContainer.getInstance().getBoardPage();
+            BoardMainPage page = PageContainer.getInstance().getBoardPage();
             page.prepareInitial();
             getNavigationController().pushViewController(page);
         }

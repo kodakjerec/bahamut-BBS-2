@@ -4,6 +4,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 
+import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetRow;
 import com.kota.Telnet.Reference.TelnetAnsiCode;
@@ -86,8 +87,6 @@ public class BoardPageHandler {
         }
         if (board_name_end > board_name_start) {
             board_package.BoardName = first_row_string.substring(board_name_start, board_name_end).trim();
-            // 紀錄最後瀏覽的看板
-            TempSettings.setLastVisitBoard(board_package.BoardName);
         }
         int board_title_start = board_manager_end + 1;
         int board_title_end = row_char.length - 1;
@@ -106,9 +105,9 @@ public class BoardPageHandler {
             board_package.BoardTitle = first_row_string.substring(board_title_start, board_title_end).trim();
         }
         if (board_package.BoardManager == null || !board_package.BoardManager.equals("主題串列")) {
-            board_package.Type = 0;
+            board_package.Type = BoardPageAction.LIST;
         } else {
-            board_package.Type = 1;
+            board_package.Type = BoardPageAction.SEARCH;
         }
         int end_index = 3 + 20;
         int i6 = 3;

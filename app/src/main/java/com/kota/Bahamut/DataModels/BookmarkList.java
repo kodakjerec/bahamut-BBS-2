@@ -10,7 +10,7 @@ public class BookmarkList {
     private final String _board;
     private final List<Bookmark> _bookmarks = new ArrayList<>();
     private final List<Bookmark> _history_bookmarks = new ArrayList<>();
-    public int limit = 20;
+    public int limit = 40;
 
     public BookmarkList(String aBoardName) {
         _board = aBoardName;
@@ -28,8 +28,8 @@ public class BookmarkList {
         _bookmarks.add(bookmark);
     }
 
-    public Bookmark removeBookmark(int index) {
-        return _bookmarks.remove(index);
+    public void removeBookmark(int index) {
+        _bookmarks.remove(index);
     }
     public void updateBookmark(int index, Bookmark bookmark) {
         _bookmarks.set(index, bookmark);
@@ -47,6 +47,9 @@ public class BookmarkList {
         return _history_bookmarks.get(index);
     }
 
+    /*
+    傳入 string 新增 bookmark
+     */
     public void addHistoryBookmark(String _key_work) {
         Bookmark new_bookmark = null;
         Iterator<Bookmark> it = _history_bookmarks.iterator();
@@ -72,6 +75,9 @@ public class BookmarkList {
         }
     }
 
+    /*
+    傳入 bookmark 新增 bookmark
+     */
     public void addHistoryBookmark(Bookmark aBookmark) {
         Iterator<Bookmark> it = _history_bookmarks.iterator();
         while (true) {
@@ -90,21 +96,11 @@ public class BookmarkList {
         }
     }
 
-    public Bookmark removeHistoryBookmark(int index) {
-        return _history_bookmarks.remove(index);
+    public void removeHistoryBookmark(int index) {
+        _history_bookmarks.remove(index);
     }
 
-    public void clearHistoryBookmark() {
-        _history_bookmarks.clear();
-    }
-
-    public void printHistoryBookmark() {
-        for (int i = 0; i < _history_bookmarks.size(); i++) {
-            System.out.println((i + 1) + ". " + _history_bookmarks.get(i).getTitle());
-        }
-    }
-
-    public void loadTitleList(List<Bookmark> aList) {
+    public void loadBookmarkList(List<Bookmark> aList) {
         aList.clear();
         aList.addAll(_bookmarks);
     }

@@ -148,7 +148,7 @@ public class TelnetArticle {
         for (int rowIndex = 5; rowIndex < _frame.getRowSize(); rowIndex++) {
             TelnetRow _row = _frame.getRow(rowIndex);
             String contentString = _row.getRawString();
-            if (contentString.length()>0) {
+            if (contentString != null) {
                 // 不用換顏色的內容
                 if (contentString.matches("※ .*") || contentString.matches("> .*")|| contentString.matches("--.*")) {
                     content_buffer.append(contentString).append("\n");

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import androidx.core.content.pm.PackageInfoCompat;
 
@@ -13,14 +11,9 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
-import com.kota.Bahamut.DataModels.UrlDatabase;
-import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
-import com.kota.Bahamut.Dialogs.Dialog_InsertExpression_Listener;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
@@ -82,12 +75,15 @@ public class StartPage extends TelnetPage {
         return true;
     }
 
+    @Override
     public void clear() {
         ASProcessingDialog.dismissProcessingDialog();
+        super.clear();
     }
 
     /** 按下離開 */
     public void onExitButtonClicked() {
+        ASProcessingDialog.dismissProcessingDialog();
         getNavigationController().finish();
     }
 
