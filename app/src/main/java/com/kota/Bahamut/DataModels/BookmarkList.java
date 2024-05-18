@@ -31,6 +31,10 @@ public class BookmarkList {
     public void removeBookmark(int index) {
         _bookmarks.remove(index);
     }
+    public void loadBookmarkList(List<Bookmark> aList) {
+        aList.clear();
+        aList.addAll(_bookmarks);
+    }
     public void updateBookmark(int index, Bookmark bookmark) {
         _bookmarks.set(index, bookmark);
     }
@@ -98,11 +102,6 @@ public class BookmarkList {
 
     public void removeHistoryBookmark(int index) {
         _history_bookmarks.remove(index);
-    }
-
-    public void loadBookmarkList(List<Bookmark> aList) {
-        aList.clear();
-        aList.addAll(_bookmarks);
     }
 
     public void loadHistoryList(List<Bookmark> aList) {

@@ -38,7 +38,7 @@ public class BookmarkStore {
     }
 
     public static void upgrade(Context context, String aFilePath) {
-        TempSettings.set_bookmarkStore(new BookmarkStore(context, aFilePath).load());
+        TempSettings.setBookmarkStore(new BookmarkStore(context, aFilePath).load());
     }
 
     public BookmarkList getBookmarkList(String aBoardName) {
@@ -164,8 +164,7 @@ public class BookmarkStore {
         System.out.println("load " + getTotalBookmarkList().size() + " bookmarks.");
     }
 
-    /* access modifiers changed from: package-private */
-    public void sortBookmarks() {
+    private void sortBookmarks() {
         for (String key : this._bookmarks.keySet()) {
             getBookmarkList(key).sort();
         }

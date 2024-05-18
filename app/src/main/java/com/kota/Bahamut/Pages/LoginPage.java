@@ -22,6 +22,12 @@ import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
     int _error_count = 0;
@@ -40,7 +46,7 @@ public class LoginPage extends TelnetPage {
             err_message = null;
         }
         if (err_message != null) {
-            ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_message).addButton("確定").setListener((aDialog, index) -> aDialog.dismiss()).scheduleDismissOnPageDisappear(LoginPage.this).show();
+            ASAlertDialog.showErrorDialog(err_message, LoginPage.this);
         } else {
             LoginPage.this.login();
         }
@@ -66,7 +72,7 @@ public class LoginPage extends TelnetPage {
         findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
         // checkbox區塊點擊
         CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        findViewById(R.id.toolbar).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
+        findViewById(R.id.blockRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
         _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
         // 讀取預設勇者設定
         loadLogonUser();
@@ -115,7 +121,7 @@ public class LoginPage extends TelnetPage {
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
             if (UserSettings.getPropertiesAutoToChat()) {
-                TempSettings.setIsUnderAutoToChat(true);
+                TempSettings.isUnderAutoToChat = true;
             }
             sendPassword();
             return false;
@@ -174,7 +180,7 @@ public class LoginPage extends TelnetPage {
 
     public void onPageWillDisappear() {
         ASProcessingDialog.dismissProcessingDialog();
-        if (TempSettings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat) {
             ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
         }
     }

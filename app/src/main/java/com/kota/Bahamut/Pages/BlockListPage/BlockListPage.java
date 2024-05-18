@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 
@@ -32,23 +34,37 @@ public class BlockListPage extends TelnetPage implements BlockListClickListener 
         if (_inputField != null) {
             String block_name = _inputField.getText().toString().trim();
             _inputField.setText("");
+            if (block_name.length()>0) {
+                List<String> new_list = UserSettings.getBlockList();
+                if (new_list.contains(block_name)) {
+                    ASAlertDialog.showErrorDialog(getContextString(R.string.already_have_item), BlockListPage.this);
+                } else {
+                    new_list.add(block_name);
+                }
+                UserSettings.setBlockList(new_list);
 
-            List<String> new_list = UserSettings.getBlockList();
-            if (new_list.contains(block_name)) {
-                ASToast.showShortToast(getContextString(R.string.already_have_item));
+                UserSettings.notifyDataUpdated();
+                BlockListPage.this.reload();
             } else {
-                new_list.add(block_name);
+                ASAlertDialog.showErrorDialog(getContextString(R.string.please_input_id), BlockListPage.this);
             }
-            UserSettings.setBlockList(new_list);
-
-            UserSettings.notifyDataUpdated();
-            BlockListPage.this.reload();
         }
     };
     // 按下重置
     View.OnClickListener _resetListener = v -> {
-        UserSettings.resetBlockList();
-        BlockListPage.this.reload();
+        ASAlertDialog.createDialog()
+                .setTitle(getContextString(R.string.reset))
+                .setMessage(getContextString(R.string.reset_message))
+                .addButton(getContextString(R.string.cancel))
+                .addButton(getContextString(R.string.sure))
+                .setListener((aDialog1, button_index) -> {
+                    if (button_index > 0) {
+                        ASToast.showShortToast(getContextString(R.string.reset_ok));
+                        _inputField.setText("");
+                        UserSettings.resetBlockList();
+                        BlockListPage.this.reload();
+                    }
+                }).show();
     };
 
     ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP|ItemTouchHelper.DOWN,0) {
@@ -141,7 +157,18 @@ public class BlockListPage extends TelnetPage implements BlockListClickListener 
         findViewById(R.id.BlockList_Add).setOnClickListener(_addListener);
         findViewById(R.id.BlockList_Reset).setOnClickListener(_resetListener);
 
+        showNotification();
+
         reload();
+    }
+
+    // 第一次進入的提示訊息
+    private void showNotification() {
+        boolean show_top_bottom_function = NotificationSettings.getShowBlockList();
+        if (!show_top_bottom_function) {
+            ASToast.showLongToast(getContextString(R.string.notification_block_list));
+            NotificationSettings.setShowBlockList(true);
+        }
     }
 
     public void onPageWillDisappear() {

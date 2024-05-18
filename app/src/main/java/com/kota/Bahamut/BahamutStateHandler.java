@@ -1,6 +1,7 @@
 package com.kota.Bahamut;
 
 import com.kota.ASFramework.PageController.ASNavigationController;
+import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
@@ -147,13 +148,30 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         .build();
                 TelnetClient.getClient().sendDataToServer(data);
                 TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof PostArticlePage || top_page instanceof BoardMainPage) {
-                    // 最上層是 發文 或 看板
-                    BoardMainPage page = PageContainer.getInstance().getBoardPage();
-                    page.recoverPost();
-                } else if (top_page instanceof MailBoxPage) {
+                if (top_page instanceof MailBoxPage) {
                     MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
                     page2.recoverPost();
+                } else if (top_page instanceof PostArticlePage) {
+                    // 最上層是 發文 或 看板
+                    // 清除最先遇到的 BoardSearch, BoardLink, BoardMain
+                    Vector<ASViewController> controllers = ASNavigationController.getCurrentController().getAllController();
+                    for(int i= controllers.size(); i>0; i--) {
+                        TelnetPage nowPage = (TelnetPage) controllers.get(i-1);
+
+                        if (nowPage.getClass().equals(BoardMainPage.class)) {
+                            BoardMainPage page = PageContainer.getInstance().getBoardPage();
+                            page.recoverPost();
+                            return false;
+                        } else if (nowPage.getClass().equals(BoardLinkPage.class)) {
+                            BoardLinkPage page = PageContainer.getInstance().getBoardLinkedTitlePage();
+                            page.recoverPost();
+                            return false;
+                        } else if (nowPage.getClass().equals(BoardSearchPage.class)) {
+                            BoardSearchPage page = PageContainer.getInstance().getBoardSearchPage();
+                            page.recoverPost();
+                            return false;
+                        }
+                    }
                 }
                 return false;
             }

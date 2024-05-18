@@ -14,6 +14,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.view.GravityCompat;
@@ -83,6 +84,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     boolean _isDrawerOpening = false; // 側邊選單正在開啟中
     final List<Bookmark> _bookmarkList = new ArrayList<>();
     ListView _drawerListView;
+    TextView _drawerListViewNone;
     int _mode = 0; // 現在開啟的是 0-書籤 1-紀錄
     Button[] _tab_buttons;
     Button _show_bookmark_button; // 顯示書籤按鈕
@@ -339,6 +341,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
         // 側邊選單內的書籤
         _drawerListView = (ListView) findViewById(R.id.bookmark_list_view);
+        _drawerListViewNone = (TextView) findViewById(R.id.bookmark_list_view_none);
         if (_drawerListView != null) {
             _show_bookmark_button = (Button) findViewById(R.id.show_bookmark_button);
             _show_history_button = (Button) findViewById(R.id.show_history_button);
@@ -369,10 +372,10 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         changeToolbarOrder();
 
         // 自動登入洽特
-        if (TempSettings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat) {
             // 任務完成
             // 關閉"正在自動登入"
-            TempSettings.setIsUnderAutoToChat(false);
+            TempSettings.isUnderAutoToChat = false;
 
             Timer timer = new Timer();
             TimerTask task = new TimerTask() {
@@ -518,10 +521,10 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     public TelnetListPageBlock loadPage() {
         BoardPageBlock load = BoardPageHandler.getInstance().load();
         if (!_initialed) {
-            String _lastVisitBoard = TempSettings.getLastVisitBoard();
+            String _lastVisitBoard = TempSettings.lastVisitBoard;
             if (!_lastVisitBoard.equals(load.BoardName)) {
                 // 紀錄最後瀏覽的看板
-                TempSettings.setLastVisitBoard(load.BoardName);
+                TempSettings.lastVisitBoard = load.BoardName;
                 clear();
                 if (load.Type == BoardPageAction.SEARCH) {
                     pushRefreshCommand(0);
@@ -620,6 +623,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         pushCommand(new BahamutCommandSearchArticle(_keyword, _author, _mark, _gy));
     }
 
+    // 選擇文章
     @Override // com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener
     public void onSelectDialogDismissWIthIndex(String str) {
         int i;
@@ -894,15 +898,22 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             return;
         }
         if (_mode ==0) {
-            TempSettings.get_bookmarkStore().getBookmarkList(listName).loadBookmarkList(_bookmarkList);
+            TempSettings.getBookmarkStore().getBookmarkList(listName).loadBookmarkList(_bookmarkList);
             if (isPageAppeared()) {
                 _bookmark_adapter.notifyDataSetChanged();
             }
         } else {
-            TempSettings.get_bookmarkStore().getBookmarkList(listName).loadHistoryList(_bookmarkList);
+            TempSettings.getBookmarkStore().getBookmarkList(listName).loadHistoryList(_bookmarkList);
             if (isPageAppeared()) {
                 _history_adapter.notifyDataSetChanged();
             }
+        }
+        if (_bookmarkList.size()==0) {
+            _drawerListView.setVisibility(View.GONE);
+            _drawerListViewNone.setVisibility(View.VISIBLE);
+        } else {
+            _drawerListView.setVisibility(View.VISIBLE);
+            _drawerListViewNone.setVisibility(View.GONE);
         }
     }
 

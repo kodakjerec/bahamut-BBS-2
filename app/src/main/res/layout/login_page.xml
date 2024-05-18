@@ -15,25 +15,6 @@
         android:layout_alignParentBottom="true"
         android:clickable="true"
         android:focusable="true">
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="@drawable/toolbar_item_background_color">
-
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-                style="@style/SystemSettingsCheckboxText"
-                android:layout_marginStart="50dp"
-                android:id="@+id/loginRememberLabel"
-                android:text="@string/save_data" />
-
-            <CheckBox
-                android:id="@+id/Login_loginRememberCheckBox" style="@style/CheckboxBahamut" />
-        </RelativeLayout>
-
-        <View style="@style/ToolbarDivider" />
-
         <Button
             android:id="@+id/Login_loginButton"
             style="@style/ToolbarItem"
@@ -112,6 +93,21 @@
                     android:singleLine="true"
                     android:textSize="30sp"/>
             </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:id="@+id/blockRememberLabel">
+                <CheckBox
+                    android:id="@+id/Login_loginRememberCheckBox" style="@style/CheckboxBahamut" />
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    style="@style/SystemSettingsCheckboxText"
+                    android:layout_marginStart="50dp"
+                    android:id="@+id/loginRememberLabel"
+                    android:text="@string/save_data" />
+            </RelativeLayout>
         </LinearLayout>
     </RelativeLayout>
 </RelativeLayout>

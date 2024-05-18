@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Pages;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
@@ -11,8 +12,10 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
+import com.kota.Bahamut.Dialogs.DialogShortenImage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.CommonFunctions;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
@@ -22,6 +25,7 @@ public class StartPage extends TelnetPage {
     View.OnClickListener _connect_listener = v -> StartPage.this.onConnectButtonClicked();
     View.OnClickListener _exit_listener = v -> StartPage.this.onExitButtonClicked();
 
+    /** 按下教學 */
     View.OnClickListener _instruction_listener = v -> {
         InstructionsPage page = PageContainer.getInstance().getInstructionPage();
         getNavigationController().pushViewController(page);
@@ -101,7 +105,7 @@ public class StartPage extends TelnetPage {
     /** 連線 */
     public void connect() {
         int _transportType = getNavigationController().getDeviceController().isNetworkAvailable();
-        TempSettings.set_transportType(_transportType);
+        TempSettings.setTransportType(_transportType);
         if (_transportType>-1) {
             ASProcessingDialog.showProcessingDialog("連線中", aDialog -> {
                 TelnetClient.getClient().close();

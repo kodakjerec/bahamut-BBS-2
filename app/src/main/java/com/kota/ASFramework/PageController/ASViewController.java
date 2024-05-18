@@ -234,6 +234,12 @@ public abstract class ASViewController {
     }
   }
 
+  public void startActivityForResult(Intent intent, int code) {
+    if (this._controller != null) {
+      this._controller.startActivityForResult(intent, code);
+    }
+  }
+
   public void setNavigationController(ASNavigationController controller) {
     this._controller = controller;
   }

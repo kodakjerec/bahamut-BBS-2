@@ -2,10 +2,8 @@ package com.kota.Bahamut.Pages.ArticlePage;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
@@ -19,7 +17,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
@@ -38,11 +35,12 @@ import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
 import com.kota.Telnet.TelnetClient;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
@@ -297,7 +295,6 @@ public class ArticlePage extends TelnetPage {
             if (_article != null) {
                 PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
                 String reply_title = _article.generateReplyTitle();
-                _article.setBlockList(UserSettings.getBlockListLowCasedString());
                 String reply_content = _article.generateReplyContent();
                 page.setBoardPage(_board_page);
                 page.setOperationMode(PostArticlePage.OperationMode.Reply);
@@ -504,14 +501,10 @@ public class ArticlePage extends TelnetPage {
 
     // 第一次進入的提示訊息
     void showNotification() {
-        Activity activity = getNavigationController();
-        if (activity != null) {
-            SharedPreferences perf = activity.getSharedPreferences("notification", 0);
-            boolean show_top_bottom_function = perf.getBoolean("show_top_bottom_function", false);
-            if (!show_top_bottom_function) {
-                Toast.makeText(activity, R.string.article_top_bottom_function_notificaiton, Toast.LENGTH_LONG).show();
-                perf.edit().putBoolean("show_top_bottom_function", true).apply();
-            }
+        boolean show_top_bottom_function = NotificationSettings.getShowTopBottomButton();
+        if (!show_top_bottom_function) {
+            ASToast.showLongToast(getContextString(R.string.notification_article_top_bottom_function));
+            NotificationSettings.setShowTopBottomButton(true);
         }
     }
 
@@ -610,7 +603,7 @@ public class ArticlePage extends TelnetPage {
         this._article = aArticle;
         if (this._article != null) {
             String board_name = this._board_page.getListName();
-            BookmarkStore store = TempSettings.get_bookmarkStore();
+            BookmarkStore store = TempSettings.getBookmarkStore();
             BookmarkList bookmark_list = store.getBookmarkList(board_name);
             bookmark_list.addHistoryBookmark(this._article.Title);
             store.store();
@@ -793,11 +786,7 @@ public class ArticlePage extends TelnetPage {
 
             final URLSpan[] urls = textView.getUrls();
             if (urls.length == 0) {
-                Context context = getContext();
-                if (context != null) {
-                    Toast.makeText(context, "此文章內容未包含連結", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                ASToast.showShortToast(getContextString(R.string.no_url));
                 return;
             }
             ASListDialog list_dialog = ASListDialog.createDialog();
@@ -841,7 +830,7 @@ public class ArticlePage extends TelnetPage {
                 }
             }
             if (buffer.size() == 0) {
-                ASAlertDialog.createDialog().setMessage("無可加入黑名單的ID").show();
+                ASToast.showShortToast("無可加入黑名單的ID");
                 return;
             }
             final String[] names = buffer.toArray(new String[0]);

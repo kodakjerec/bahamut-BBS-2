@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 public class Bookmark {
-    public static final String OPTIONAL_BOOKMARK = "0";
-    public static final String OPTIONAL_STORY = "1";
+    public static final String OPTIONAL_BOOKMARK = "0"; // 書籤
+    public static final String OPTIONAL_STORY = "1"; // 紀錄
     public static final int version = 1;
     String _author = "";
     String _board = "";

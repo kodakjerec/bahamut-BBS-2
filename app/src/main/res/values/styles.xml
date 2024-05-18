@@ -29,6 +29,12 @@
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
     </style>
+    <style name="ToolbarItem.Grid">
+        <item name="android:layout_marginRight">1dp</item>
+        <item name="android:layout_marginBottom">1dp</item>
+        <item name="android:layout_columnWeight">1</item>
+        <item name="android:layout_gravity">fill</item>
+    </style>
     <style name="ToolbarItemLR" parent="ToolbarItem">
         <item name="android:layout_weight">9</item>
         <item name="android:visibility">gone</item>
@@ -168,6 +174,10 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:textColorHint">@android:color/tab_indicator_text</item>
+    </style>
+    <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
     <style name="TextViewUltraLarge" parent="TextViewNormal">
         <item name="android:textSize">28sp</item>

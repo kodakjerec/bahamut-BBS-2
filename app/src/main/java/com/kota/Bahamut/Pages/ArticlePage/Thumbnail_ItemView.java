@@ -154,7 +154,7 @@ public class Thumbnail_ItemView extends LinearLayout {
     void picOrUrl_changeStatus(boolean _isPic) {
         _load_thumbnail_img = UserSettings.getLinkShowThumbnail();
         _load_only_wifi = UserSettings.getLinkShowOnlyWifi();
-        int _transportType = TempSettings.get_transportType();
+        int _transportType = TempSettings.getTransportType();
 
         if (_isPic) { // 純圖片
             new ASRunner() {

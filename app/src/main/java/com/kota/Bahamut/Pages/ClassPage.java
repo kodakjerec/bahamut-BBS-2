@@ -59,7 +59,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
 
         // 自動登入洽特
-        if (TempSettings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat) {
             // 進入洽特
             // 查詢看板 => Chat => 定位到Chat:Enter
             Timer timer = new Timer();
@@ -91,8 +91,8 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         }
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_headerView);
         if (header_view != null) {
-            if  (!TempSettings.getLastVisitBoard().isEmpty()) {
-                String finalLastVisitBoard = TempSettings.getLastVisitBoard();
+            if  (!TempSettings.lastVisitBoard.isEmpty()) {
+                String finalLastVisitBoard = TempSettings.lastVisitBoard;
                 String lastVisitBoard = finalLastVisitBoard + getContextString(R.string.toolbar_item_rr);
 
                 TextView _detail_2 = (TextView) findViewById(R.id.ClassPage_lastVisit);

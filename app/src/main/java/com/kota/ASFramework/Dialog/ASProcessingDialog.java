@@ -15,6 +15,8 @@ import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.R;
 
+import java.util.Objects;
+
 /* loaded from: classes.dex */
 public class ASProcessingDialog extends ASDialog {
   @SuppressLint("StaticFieldLeak")
@@ -68,50 +70,16 @@ public class ASProcessingDialog extends ASDialog {
 
   public ASProcessingDialog() {
     requestWindowFeature(1);
-    setContentView(buildContentView());
-    getWindow().setBackgroundDrawable(null);
+    setContentView(R.layout.as_processing_dialog);
+    Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+    buildContentView();
   }
 
-  private View buildContentView() {
+  void buildContentView() {
     // frame_view
-    LinearLayout frame_view = new LinearLayout(getContext());
-    frame_view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-    int frame_padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3.0f, getContext().getResources().getDisplayMetrics());
-    frame_view.setPadding(frame_padding, frame_padding, frame_padding, frame_padding);
-    frame_view.setBackgroundResource(R.color.dialog_border_color);
-    // content_view
-    LinearLayout content_view = new LinearLayout(getContext());
-    content_view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-    int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15.0f, getContext().getResources().getDisplayMetrics());
-    int padding_bottom = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10.0f, getContext().getResources().getDisplayMetrics());
-    content_view.setPadding(padding, padding, padding, padding_bottom);
-    content_view.setOrientation(LinearLayout.VERTICAL);
-    content_view.setGravity(Gravity.CENTER_HORIZONTAL);
-    content_view.setMinimumWidth((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 100.0f, getContext().getResources().getDisplayMetrics()));
-    content_view.setBackgroundColor(View.MEASURED_STATE_MASK);
-    frame_view.addView(content_view);
-    // progress bar
-    ProgressBar _progress_bar = new ProgressBar(getContext());
-    ViewGroup.LayoutParams _pb_layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-    _progress_bar.setLayoutParams(_pb_layoutParams);
-    int progress_padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 10.0f, getContext().getResources().getDisplayMetrics());
-    _progress_bar.setPadding(0, 0, 0, progress_padding);
-    // progress bar color
-    TypedValue typedValue = new TypedValue();
-    getContext().getTheme().resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true);
-    int pb_color = typedValue.resourceId;
-    @SuppressLint("ResourceAsColor") ColorStateList pb_colorList = ColorStateList.valueOf(pb_color);
-    _progress_bar.setProgressTintList(pb_colorList);
-    // add progress bar
-    content_view.addView(_progress_bar);
-    // 訊息
-    this._message_label = new TextView(getContext());
-    this._message_label.setTextSize(2, 24.0f);
-    this._message_label.setTextColor(getContextColor(R.color.white));
-    this._message_label.setGravity(Gravity.CENTER_HORIZONTAL);
-    this._message_label.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f));
-    content_view.addView(this._message_label);
-    return frame_view;
+    LinearLayout frame_view = findViewById(R.id.as_processing_dialog_frame_view);
+    _message_label = frame_view.findViewById(R.id.as_processing_dialog_text);
+    _message_label.setText(R.string.zero_word);
   }
 
   public static void setMessage(String message) {

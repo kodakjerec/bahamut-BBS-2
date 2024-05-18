@@ -1,10 +1,15 @@
 package com.kota.Bahamut.Dialogs;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.R;
 
 import java.util.Objects;
@@ -90,6 +95,10 @@ public class Dialog_SelectArticle extends ASDialog implements View.OnClickListen
                 this._content_string = this._content_string.substring(0, this._content_string.length() - 1);
             }
         } else if (view == this._search_button) {
+            if (this._content_string.isEmpty()) {
+                ASToast.showShortToast(getContextString(R.string.please_input_article_number));
+                return;
+            }
             if (this._listener != null) {
                 this._listener.onSelectDialogDismissWIthIndex(this._content_string);
             }

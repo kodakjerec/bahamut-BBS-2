@@ -19,6 +19,7 @@ public class CommonFunctions {
     public static void initialCFActivity(Activity activity) {
         myActivity = activity;
     }
+    public static Activity getActivity() { return myActivity; }
 
     public static String intToRGB(int intColor) {
         return String.format("#%06X", (0xFFFFFF & intColor));

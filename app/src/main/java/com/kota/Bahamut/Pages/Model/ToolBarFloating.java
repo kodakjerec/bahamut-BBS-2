@@ -61,7 +61,7 @@ public class ToolBarFloating extends LinearLayout {
 
         // 啟用定時隱藏
         // 如果之前已經隱藏就不要再讓他顯現出來
-        if (TempSettings.isFloatingInvisible())
+        if (TempSettings.isFloatingInvisible)
             _myView.setAlpha(_alpha);
         else
             startInvisible();
@@ -201,12 +201,12 @@ public class ToolBarFloating extends LinearLayout {
             }
         };
         timer.schedule(task1, (int)_idle* 1000L);
-        TempSettings.setIsFloatingInvisible(true);
+        TempSettings.isFloatingInvisible = true;
     }
     private void cancelInvisible() {
         if (timer != null)
             timer.cancel();
         _myView.setAlpha(1);
-        TempSettings.setIsFloatingInvisible(false);
+        TempSettings.isFloatingInvisible = false;
     }
 }

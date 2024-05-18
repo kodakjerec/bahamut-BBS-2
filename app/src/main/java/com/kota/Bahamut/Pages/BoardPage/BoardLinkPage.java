@@ -57,7 +57,7 @@ public class BoardLinkPage extends BoardMainPage {
                             bookmark.setBoard(BoardLinkPage.this.getListName());
                             bookmark.setKeyword(item.Title);
                             bookmark.setTitle(bookmark.generateTitle());
-                            BookmarkStore store = TempSettings.get_bookmarkStore();
+                            BookmarkStore store = TempSettings.getBookmarkStore();
                             store.getBookmarkList(BoardLinkPage.this.getListName()).addBookmark(bookmark);
                             store.store();
                         }
@@ -91,7 +91,7 @@ public class BoardLinkPage extends BoardMainPage {
                                 bookmark.setBoard(BoardLinkPage.this.getListName());
                                 bookmark.setKeyword(item.Title);
                                 bookmark.setTitle(bookmark.generateTitle());
-                                BookmarkStore store = TempSettings.get_bookmarkStore();
+                                BookmarkStore store = TempSettings.getBookmarkStore();
                                 store.getBookmarkList(BoardLinkPage.this.getListName()).addBookmark(bookmark);
                                 store.store();
                             }

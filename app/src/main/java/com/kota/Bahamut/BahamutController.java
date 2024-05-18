@@ -206,4 +206,9 @@ public class BahamutController extends ASNavigationController implements TelnetC
     public boolean isAnimationEnable() {
         return UserSettings.getPropertiesAnimationEnable();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 }

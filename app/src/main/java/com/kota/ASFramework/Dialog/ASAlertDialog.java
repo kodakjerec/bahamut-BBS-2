@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.core.content.ContextCompat;
 
+import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.Bahamut.R;
 
 import java.util.HashMap;
@@ -217,6 +218,17 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
       _alerts.put(this._alert_id, this);
     } 
     super.show();
+  }
+
+  public static void showErrorDialog(String err_message, ASViewController bahamutController) {
+    ASAlertDialog.createDialog()
+            .setTitle("錯誤")
+            .setMessage(err_message)
+            .addButton("確定")
+            .setListener((aDialog, index) ->
+                    aDialog.dismiss())
+            .scheduleDismissOnPageDisappear(bahamutController)
+            .show();
   }
 }
 

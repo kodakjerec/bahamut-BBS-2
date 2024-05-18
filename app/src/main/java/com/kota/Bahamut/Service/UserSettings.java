@@ -1,13 +1,10 @@
 package com.kota.Bahamut.Service;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.R;
 import com.kota.Telnet.PropertiesOperator;
 
 import java.io.File;
@@ -44,9 +41,8 @@ public class UserSettings {
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
     static final String floatingLocationY = "floatingLocationY"; // 浮動工具列位置 Y
-
-    static List<String> _block_list = null; // 轉換後的黑名單清單
-    static String _block_list_string_lower_cased = null; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
+    static final String noVipShortenTimes = "noVipShortenTimes"; // 非VIP轉檔限制
+    static String _blockListDefault = "guest"; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
     Context _context;
     
     static SharedPreferences _sharedPref;
@@ -90,6 +86,7 @@ public class UserSettings {
                 String article_headers = prep.getPropertiesString(PROPERTIES_ARTICLE_HEADS);
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
+                int varNoVipShortenTimes = prep.getPropertiesInteger(noVipShortenTimes);
 
                 _editor.putString(PROPERTIES_USERNAME, username);
                 _editor.putString(PROPERTIES_PASSWORD, password);
@@ -114,6 +111,7 @@ public class UserSettings {
                 _editor.putString(PROPERTIES_ARTICLE_HEADS, article_headers);
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
+                _editor.putInt(noVipShortenTimes, varNoVipShortenTimes);
                 _editor.putInt("upgrade", 1);
                 _editor.commit();
             }
@@ -124,45 +122,39 @@ public class UserSettings {
     }
 
     public static void setPropertiesDrawerLocation(int choice) {
-        _editor.putInt(PROPERTIES_DRAWER_LOCATION, choice);
-        _editor.apply();
+        _editor.putInt(PROPERTIES_DRAWER_LOCATION, choice).apply();
     }
     public static int getPropertiesDrawerLocation() {
         return _sharedPref.getInt(PROPERTIES_DRAWER_LOCATION, 0);
     }
     public static void setPropertiesToolbarLocation(int choice) {
-        _editor.putInt(PROPERTIES_TOOLBAR_LOCATION, choice);
-        _editor.apply();
+        _editor.putInt(PROPERTIES_TOOLBAR_LOCATION, choice).apply();
     }
     public static int getPropertiesToolbarLocation() {
         return _sharedPref.getInt(PROPERTIES_TOOLBAR_LOCATION, 0);
     }
     public static void setPropertiesToolbarOrder(int choice) {
-        _editor.putInt(PROPERTIES_TOOLBAR_ORDER, choice);
-        _editor.apply();
+        _editor.putInt(PROPERTIES_TOOLBAR_ORDER, choice).apply();
     }
 
     public static int getPropertiesToolbarOrder() {
         return _sharedPref.getInt(PROPERTIES_TOOLBAR_ORDER, 0);
     }
     public static void setPropertiesScreenOrientation(int choice) {
-        _editor.putInt(PROPERTIES_SCREEN_ORIENTATION, choice);
-        _editor.apply();
+        _editor.putInt(PROPERTIES_SCREEN_ORIENTATION, choice).apply();
     }
     public static int getPropertiesScreenOrientation() {
         return _sharedPref.getInt(PROPERTIES_SCREEN_ORIENTATION, 0);
     }
     public static void setPropertiesVIP(boolean isEnable) {
-        _editor.putBoolean(PROPERTIES_VIP, isEnable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_VIP, isEnable).apply();
     }
     public static boolean getPropertiesVIP() {
         return _sharedPref.getBoolean(PROPERTIES_VIP, false);
     }
 
     public static void setPropertiesAutoToChat(boolean isEnable) {
-        _editor.putBoolean(PROPERTIES_AUTO_TO_CHAT, isEnable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_AUTO_TO_CHAT, isEnable).apply();
     }
 
     public static boolean getPropertiesAutoToChat() {
@@ -170,8 +162,7 @@ public class UserSettings {
     }
     
     public static void setPropertiesGestureOnBoardEnable(boolean isEnable) {
-        _editor.putBoolean(PROPERTIES_GESTURE_ON_BOARD, isEnable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_GESTURE_ON_BOARD, isEnable).apply();
     }
 
     public static boolean getPropertiesGestureOnBoardEnable() {
@@ -179,8 +170,7 @@ public class UserSettings {
     }
 
     public static void setPropertiesExternalToolbarEnable(boolean isEnable) {
-        _editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, isEnable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, isEnable).apply();
     }
 
     public static boolean getPropertiesExternalToolbarEnable() {
@@ -188,8 +178,7 @@ public class UserSettings {
     }
 
     public static void setPropertiesUsername(String username) {
-        _editor.putString(PROPERTIES_USERNAME, username);
-        _editor.apply();
+        _editor.putString(PROPERTIES_USERNAME, username).apply();
     }
 
     public static String getPropertiesUsername() {
@@ -197,9 +186,7 @@ public class UserSettings {
     }
 
     public static void setPropertiesPassword(String password) {
-        
-        _editor.putString(PROPERTIES_PASSWORD, password);
-        _editor.apply();
+        _editor.putString(PROPERTIES_PASSWORD, password).apply();
     }
 
     public static String getPropertiesPassword() {
@@ -207,35 +194,28 @@ public class UserSettings {
     }
 
     public static void setPropertiesSaveLogonUser(boolean save) {
-        
-        _editor.putBoolean(PROPERTIES_SAVE_LOGON_USER, save);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_SAVE_LOGON_USER, save).apply();
     }
     public static boolean getPropertiesSaveLogonUser() {
         return _sharedPref.getBoolean(PROPERTIES_SAVE_LOGON_USER, false);
     }
 
     public static void setPropertiesAnimationEnable(boolean enable) {
-        
-        _editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, enable).apply();
     }
     public static boolean getPropertiesAnimationEnable() {
         return _sharedPref.getBoolean(PROPERTIES_ANIMATION_DISABLE, true);
     }
 
     public static void setPropertiesArticleMoveDisable(boolean isDisable) {
-        _editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply();
     }
     public static boolean getPropertiesArticleMoveEnable() {
         return _sharedPref.getBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, true);
     }
 
     public static void setPropertiesArticleViewState(int state) {
-        
-        _editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state);
-        _editor.apply();
+        _editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state).apply();
     }
     public static int getPropertiesArticleViewMode() {
         return _sharedPref.getInt(PROPERTIES_ARTICLE_VIEW_MODE, 0);
@@ -253,13 +233,11 @@ public class UserSettings {
         return _source.split(",");
     }
     public static void resetArticleHeaders() {
-        _editor.putString(PROPERTIES_ARTICLE_HEADS, _articleHeadersDefault);
-        _editor.apply();
+        _editor.putString(PROPERTIES_ARTICLE_HEADS, _articleHeadersDefault).apply();
     }
     public static void setArticleHeaders(List<String> _stringList) {
         String _saveString = String.join(",",_stringList);
-        _editor.putString(PROPERTIES_ARTICLE_HEADS, _saveString);
-        _editor.apply();
+        _editor.putString(PROPERTIES_ARTICLE_HEADS, _saveString).apply();
     }
 
 
@@ -271,81 +249,64 @@ public class UserSettings {
         return _source.split(",");
     }
     public static void resetArticleExpressions() {
-        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _articleExpressions);
-        _editor.apply();
+        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _articleExpressions).apply();
     }
     public static void setArticleExpressions(List<String> _stringList) {
         String _saveString = String.join(",",_stringList);
-        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _saveString);
-        _editor.apply();
+        _editor.putString(PROPERTIES_ARTICLE_EXPRESSIONS, _saveString).apply();
     }
 
     // 取出黑名單(格式化後)
     public static List<String> getBlockList() {
-        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
-        if (_block_list == null) {
-            _block_list = new ArrayList<String>();
-            if (blockListString.length() > 0) {
-                for (String block_name : blockListString.split(" *, *")) {
-                    if (block_name.length() > 0) {
-                        _block_list.add(block_name);
-                    }
+        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
+
+        List<String> _block_list = new ArrayList<String>();
+        if (blockListString.length() > 0) {
+            for (String block_name : blockListString.split(",")) {
+                if (block_name.length() > 0) {
+                    _block_list.add(block_name);
                 }
             }
         }
+
         return _block_list;
     }
     // 重置黑名單
     public static void resetBlockList() {
-        _editor.putString(PROPERTIES_BLOCK_LIST, "");
-        _editor.apply();
+        _editor.putString(PROPERTIES_BLOCK_LIST, _blockListDefault).apply();
     }
     // 更新黑名單
     public static void setBlockList(List<String> aList) {
-        StringBuilder list_string = new StringBuilder(",");
+        StringBuilder list_string = new StringBuilder();
         if (aList == null || aList.size() == 0) {
-            list_string = new StringBuilder();
+            list_string = new StringBuilder("guest");
+            ASToast.showLongToast("黑名單至少保留guest，為了政策");
         } else {
             for (String s : aList) {
                 list_string.append(s.trim()).append(",");
             }
         }
         
-        _editor.putString(PROPERTIES_BLOCK_LIST, list_string.toString());
-        _editor.apply();
-        _block_list = null;
-        _block_list_string_lower_cased = null;
+        _editor.putString(PROPERTIES_BLOCK_LIST, list_string.toString()).apply();
     }
 
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContains(String aName) {
-        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "");
-        if (_block_list_string_lower_cased == null) {
-            _block_list_string_lower_cased = blockListString.toLowerCase();
-        }
-        return _block_list_string_lower_cased.contains("," + aName.toLowerCase() + ",");
+        String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
+        boolean isBlocked = blockListString.contains(aName.toLowerCase());
+        return isBlocked;
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {
-        _editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, enable).apply();
     }
 
     public static boolean getPropertiesBlockListEnable() {
         return _sharedPref.getBoolean(PROPERTIES_BLOCK_LIST_ENABLE, false);
     }
 
-    @SuppressLint({"DefaultLocale"})
-    public static String getBlockListLowCasedString() {
-        if (_block_list_string_lower_cased == null) {
-            _block_list_string_lower_cased = _sharedPref.getString(PROPERTIES_BLOCK_LIST, "").toLowerCase();
-        }
-        return _block_list_string_lower_cased;
-    }
-
     public static void setPropertiesKeepWifi(boolean enable) {
-        _editor.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, enable).apply();
     }
 
     public static boolean getPropertiesKeepWifi() {
@@ -362,44 +323,45 @@ public class UserSettings {
 
     public static void setFloatingLocation(float x, float y) {
         _editor.putFloat(floatingLocationX, x);
-        _editor.putFloat(floatingLocationY, y);
-        _editor.apply();
+        _editor.putFloat(floatingLocationY, y).apply();
     }
 
     public static void setToolbarIdle(float idle) {
-        _editor.putFloat(PROPERTIES_TOOLBAR_IDLE, idle);
-        _editor.apply();
+        _editor.putFloat(PROPERTIES_TOOLBAR_IDLE, idle).apply();
     }
     public static float getToolbarIdle() {
         return _sharedPref.getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
     }
     public static void setToolbarAlpha(float alpha) {
-        _editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, alpha);
-        _editor.apply();
+        _editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, alpha).apply();
     }
     public static float getToolbarAlpha() {
         return _sharedPref.getFloat(PROPERTIES_TOOLBAR_ALPHA, 20);
     }
     
     public static void setPropertiesLinkAutoShow(boolean enable) {
-        _editor.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable).apply();
     }
     public static boolean getLinkAutoShow() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_AUTO_SHOW, true);
     }
     public static void setPropertiesLinkShowThumbnail(boolean enable) {
-        _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, enable).apply();
     }
     public static boolean getLinkShowThumbnail() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, false);
     }
     public static void setPropertiesLinkShowOnlyWifi(boolean enable) {
-        _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, enable);
-        _editor.apply();
+        _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, enable).apply();
     }
     public static boolean getLinkShowOnlyWifi() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, false);
+    }
+
+    public static void setPropertiesNoVipShortenTimes(int times) {
+        _editor.putInt(noVipShortenTimes, times).apply();
+    }
+    public static int getPropertiesNoVipShortenTimes() {
+        return _sharedPref.getInt(noVipShortenTimes, 0);
     }
 }

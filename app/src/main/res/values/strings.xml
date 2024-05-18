@@ -9,10 +9,14 @@
     <string name="add">新增</string>
     <string name="reset">重置</string>
     <string name="reset_message">是否確定重置為預設值？</string>
+    <string name="reset_ok">已成功重置輸入ID為預設值</string>
     <string name="arrow_down">▼</string>
     <string name="arrow_right">&gt;</string>
     <string name="arrow_up">▲</string>
-    <string name="article_top_bottom_function_notificaiton">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
+    <string name="notification_article_top_bottom_function">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
+    <string name="notification_block_list">輸入ID內輸入對方帳號，按下新增加入黑名單，可阻擋對方訊息</string>
+    <string name="notification_header">輸入ID內輸入標題，發文時可選擇成為預設標題</string>
+    <string name="notification_expression">輸入ID內輸入關鍵字，發文時可選擇當表情符號或快速語詞帶入(支援色碼)</string>
     <string name="author">作者</string>
     <string name="author_">作者：</string>
     <string name="block_list_setting">黑名單設定</string>
@@ -53,6 +57,7 @@
     <string name="folder_favorite">我的最愛</string>
     <string name="gy_">GY：</string>
     <string name="gy_minimum">GY值下限：</string>
+    <string name="input_search_article">請輸入關鍵字、作者、GY值</string>
     <string name="input_board_name">請輸入看板名稱：</string>
     <string name="input_content_here">請在此輸入內文</string>
     <string name="input_receiver_here">請在此輸入收件人ID</string>
@@ -61,7 +66,7 @@
     <string name="is_post_article_reply">回應至：</string>
     <string name="keyword">關鍵字</string>
     <string name="limit">限定</string>
-    <string name="list_empty">這個列表是空的喔\10( ° ▽° )ノ</string>
+    <string name="list_empty">這個列表是空的喔\n( ´ ▽ ` )ノ</string>
     <string name="loading">讀取中</string>
     <string name="loading_">讀取中...</string>
     <string name="login">登入</string>
@@ -185,9 +190,10 @@
         ． 側邊選單位置(看板)\n
         ． 黑名單、書籤 可排序、修改\n
         ． 發文標題、表情符號 可排序、修改\n
+        ． 發文快捷鍵: 縮網址(reurl)、縮圖(imgur)\n
         (持續增加中)
-<!--        以下努力中：\n-->
-<!--        ． 備份書籤/黑名單\n-->
+        <!--        以下努力中：\n-->
+        <!--        ． 備份書籤/黑名單\n-->
     </string>
     <string name="billing_page_note2">贊助一次即有付費版功能\n可重複贊助，感謝您🙏\n</string>
     <string name="billing_page_already_billing_text">已贊助</string>
@@ -267,4 +273,28 @@
     <string name="toolbar_item_ll">◀◀</string>
     <string name="toolbar_item_rr">▶▶</string>
     <string name="already_have_item">已加入過此名稱</string>
+    <string name="dialog_shorten_url_title">短網址</string>
+    <string name="dialog_shorten_url_button_text1">短</string>
+    <string name="dialog_shorten_url_button_text2">網址</string>
+    <string name="dialog_shorten_img_title">縮圖</string>
+    <string name="dialog_shorten_img_transfer_album">從相簿</string>
+    <string name="dialog_shorten_img_transfer_camera">從相機</string>
+    <string name="dialog_shorten_url_transfer">縮址</string>
+    <string name="dialog_shorten_url_under_transfer">轉檔中</string>
+    <string name="dialog_shorten_url_same_url">網址已使用過</string>
+    <string name="dialog_shorten_url_hint">1. 把網址貼到這裡面\n2. 按鈕\"縮址\"產生短網址\n3. 按鈕\"送出\"貼到文章內</string>
+    <string name="post_toolbar_button_management_1">編輯</string>
+    <string name="post_toolbar_button_management_2">按鈕</string>
+    <string name="post_toolbar_show">展開</string>
+    <string name="post_toolbar_collapse">摺疊</string>
+    <string name="no_url">此文章內容未包含連結</string>
+    <string name="dialog_shorten_image_album">相簿</string>
+    <string name="dialog_shorten_image_camera_shot">拍照</string>
+    <string name="dialog_shorten_image_camera_video">錄影</string>
+    <string name="dialog_shorten_image_hint">1. 選擇從\"相簿\"選取圖片或影片，或者\"拍照\"\"錄影\"取得圖片或影片\n2. 按鈕\"縮圖\"產生imgur短網址\n3. 按鈕\"送出\"貼到文章內</string>
+    <string name="dialog_shorten_image_error01">取得imgur權限失敗</string>
+    <string name="dialog_shorten_image_error02">圖片轉檔有問題，無法上傳</string>
+    <string name="dialog_shorten_image_error03">上傳失敗</string>
+    <string name="error_under_develop">尚未完成</string>
+
 </resources>

@@ -3,12 +3,11 @@ package com.kota.Telnet;
 import static com.kota.Telnet.Reference.TelnetAnsiCode.getBackAsciiCode;
 import static com.kota.Telnet.Reference.TelnetAnsiCode.getTextAsciiCode;
 
-import android.annotation.SuppressLint;
 import android.text.SpannableString;
 
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.Model.TelnetRow;
-import com.kota.Telnet.Reference.TelnetAnsiCode;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,7 +25,6 @@ public class TelnetArticle {
     public int Number = 0;
     public String Title = "";
     public int Type = 0;
-    private String _block_list = null;
     private final Vector<TelnetArticleItem> _extend_items = new Vector<>();
     private TelnetFrame _frame = null;
     private final Vector<TelnetArticleItemInfo> _info = new Vector<>();
@@ -215,7 +213,7 @@ public class TelnetArticle {
         content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", Author, Nickname));
         content_builder.append("\n");
         for (TelnetArticleItemInfo info : _info) {
-            if (!isBlocked(info.author) && info.quoteLevel <= maximum_quote) {
+            if (!UserSettings.isBlockListContains(info.author) && info.quoteLevel <= maximum_quote) {
                 for (int i = 0; i < info.quoteLevel; i++) {
                     content_builder.append("> ");
                 }
@@ -223,7 +221,7 @@ public class TelnetArticle {
             }
         }
         for (TelnetArticleItem item : _main_items) {
-            if (!isBlocked(item.getAuthor()) && item.getQuoteLevel() <= maximum_quote) {
+            if (!UserSettings.isBlockListContains(item.getAuthor()) && item.getQuoteLevel() <= maximum_quote) {
                 String[] row_strings = item.getContent().split("\n");
                 for (String append : row_strings) {
                     for (int j = 0; j <= item.getQuoteLevel(); j++) {
@@ -246,18 +244,6 @@ public class TelnetArticle {
             return null;
         }
         return _items.get(index);
-    }
-
-    public void setBlockList(String aList) {
-        _block_list = aList;
-    }
-
-    @SuppressLint({"DefaultLocale"})
-    public boolean isBlocked(String name) {
-        if (_block_list == null || name == null || !_block_list.contains("," + name.trim().toLowerCase() + ",")) {
-            return false;
-        }
-        return true;
     }
 
     public String getFullText() {

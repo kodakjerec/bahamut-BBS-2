@@ -21,20 +21,103 @@
         </FrameLayout>
     </LinearLayout>
     <TextView android:id="@+id/Post_MiddleDivider" android:layout_below="@+id/Post_TitleBlock" style="@style/HorizontalDivider"/>
-    <LinearLayout android:id="@+id/Post_Toolbar" android:layout_alignParentBottom="true" style="@style/Toolbar">
-        <Button android:id="@+id/ArticlePostDialog_Color" android:text="@string/post_article_page_paint_color" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/ArticlePostDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/ArticlePostDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/ArticlePostDialog_File" android:text="@string/file" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/ArticlePostDialog_Post" android:text="@string/post" style="@style/ToolbarItem"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/Post_Toolbar"
+        android:layout_below="@+id/Post_MiddleDivider"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/ArticlePostDialog_EditField"
+            style="@style/TextViewNormal"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@color/item_background_color"
+            android:gravity="top|start|center_vertical|center_horizontal|center"
+            android:hint="@string/input_content_here"
+            android:inputType="textMultiLine"
+            android:padding="10dp"
+            android:textColor="@android:color/white"
+            android:importantForAutofill="no" />
+
+        <View
+            android:id="@+id/Post_SymbolDivider"
+            style="@style/VerticalDivider"
+            android:visibility="gone" />
+
+        <LinearLayout
+            android:id="@+id/Post_SymbolList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:background="@color/item_background_color"
+            android:orientation="vertical"
+            android:visibility="gone" />
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_above="@+id/Post_Toolbar" android:layout_below="@+id/Post_MiddleDivider">
-        <EditText android:textColor="@android:color/white" android:gravity="top|left|center_vertical|center_horizontal|center" android:id="@+id/ArticlePostDialog_EditField" android:background="@color/item_background_color" android:padding="10dp" android:layout_width="0dp" android:layout_height="match_parent" android:hint="@string/input_content_here" android:layout_weight="1" style="@style/TextViewNormal" android:inputType="textMultiLine"/>
-        <View android:id="@+id/Post_SymbolDivider" android:visibility="gone" style="@style/VerticalDivider"/>
-        <LinearLayout android:orientation="vertical" android:id="@+id/Post_SymbolList" android:background="@color/item_background_color" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_weight="2"/>
-    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/Post_Toolbar"
+        android:layout_alignParentBottom="true"
+        style="@style/Toolbar"
+        android:orientation="vertical"
+        android:layout_height="60dp">
+        <GridLayout style="@style/Toolbar"
+            android:columnCount="5"
+            android:rowCount="2">
+            <Button
+                android:id="@+id/Post_Toolbar_Show"
+                android:text="@string/post_toolbar_show"
+                style="@style/ToolbarItem.Grid"/>
+            <Button android:id="@+id/ArticlePostDialog_Color" android:text="@string/post_article_page_paint_color" style="@style/ToolbarItem.Grid"/>
+            <Button android:id="@+id/ArticlePostDialog_Cancel" android:text="@string/symbol" style="@style/ToolbarItem.Grid"/>
+            <Button android:id="@+id/ArticlePostDialog_Symbol" android:text="@string/face" style="@style/ToolbarItem.Grid"/>
+            <Button android:id="@+id/ArticlePostDialog_Post" android:text="@string/post" style="@style/ToolbarItem.Grid"/>
+            <Button android:id="@+id/ArticlePostDialog_File" android:text="@string/file" style="@style/ToolbarItem.Grid"/>
+            <LinearLayout
+                android:id="@+id/ArticlePostDialog_ShortenUrl"
+                android:text="@string/dialog_shorten_url_title"
+                android:orientation="vertical"
+                style="@style/ToolbarItem.Grid"
+                android:clickable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_shorten_url_button_text1"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_shorten_url_button_text2"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+            <Button
+                android:id="@+id/ArticlePostDialog_ShortenImage"
+                android:text="@string/dialog_shorten_img_title"
+                style="@style/ToolbarItem.Grid"/>
+            <LinearLayout
+                android:id="@+id/ArticlePostDialog_EditButtons"
+                android:orientation="vertical"
+                style="@style/ToolbarItem.Grid"
+                android:clickable="true">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/post_toolbar_button_management_1"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/post_toolbar_button_management_2"
+                    android:textSize="18sp"
+                    android:textColor="@color/white"/>
+            </LinearLayout>
+            <Button android:text="@string/zero_word" style="@style/ToolbarItem.Grid" android:visibility="invisible"/>
+            <Button android:text="@string/zero_word" style="@style/ToolbarItem.Grid" android:visibility="invisible"/>
+        </GridLayout>
+        </LinearLayout>
 </RelativeLayout>

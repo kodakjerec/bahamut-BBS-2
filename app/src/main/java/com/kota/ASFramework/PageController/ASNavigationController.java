@@ -9,9 +9,9 @@ import android.view.animation.Animation;
 import android.widget.FrameLayout;
 
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.UserSettings;
 
-import java.util.Iterator;
 import java.util.Vector;
 
 /* loaded from: classes.dex */
@@ -106,6 +106,7 @@ public class ASNavigationController extends Activity {
     ASRunner.construct();
 
     new UserSettings(this);
+    NotificationSettings.upgrade(this);
 
     this._device_controller = new ASDeviceController(this);
     onControllerWillLoad();
@@ -145,6 +146,13 @@ public class ASNavigationController extends Activity {
       }
     }
     return controller;
+  }
+  public Vector<ASViewController> getAllController() {
+    Vector<ASViewController> controllers = new Vector<>();
+    synchronized (this._controllers) {
+      controllers = this._controllers;
+    }
+    return controllers;
   }
 
   private void buildPageView(ASViewController controller) {

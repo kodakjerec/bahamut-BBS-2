@@ -54,7 +54,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private final BoardExtendOptionalPageListener _listener;
     BookmarkAdapter bookmarkAdapter;
     HistoryAdapter historyAdapter;
-    BookmarkStore _bookmarkStore = TempSettings.get_bookmarkStore();
+    BookmarkStore _bookmarkStore = TempSettings.getBookmarkStore();
     private boolean isUnderRecycleView = false;
     private float scale;
     public int getPageLayout() {
@@ -248,7 +248,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         bookmarkAdapter.setOnItemClickListener(this);
 
         _header_view = (TelnetHeaderItemView) findViewById(R.id.BoardExtendOptionalPage_headerView);
-        _header_view.setData("我的書籤", _board_name, "");
+        _header_view.setData("我的書籤", _board_name, "左滑刪除,右滑修改");
         _bookmark_button = (Button) findViewById(R.id.BoardExtendOptionalPage_bookmarkButton);
         _history_button = (Button) findViewById(R.id.BoardExtendOptionalPage_historyButton);
         _water_ball_button = (Button) findViewById(R.id.BoardExtendOptionalPage_waterBallButton);

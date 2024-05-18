@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Dialogs;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -7,6 +9,7 @@ import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.R;
 
 import java.util.Objects;
@@ -62,6 +65,10 @@ public class Dialog_SearchArticle extends ASDialog implements View.OnClickListen
             search_options.add(author);
             search_options.add(mark);
             search_options.add(gy);
+            if (keyword.isEmpty() && author.isEmpty() && gy.isEmpty()) {
+                ASToast.showShortToast(getContextString(R.string.input_search_article));
+                return;
+            }
             _listener.onSearchDialogSearchButtonClickedWithValues(search_options);
         }
         dismiss();

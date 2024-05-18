@@ -18,6 +18,12 @@ import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
+import java.io.IOException;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class MainPage extends TelnetPage {
     View.OnClickListener _boards_listener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
@@ -68,12 +74,11 @@ public class MainPage extends TelnetPage {
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
         // 自動登入洽特
-        if (TempSettings.isUnderAutoToChat()) {
+        if (TempSettings.isUnderAutoToChat) {
             // 進入布告討論區
             Button btn = (Button)findViewById(R.id.Main_boardsButton);
             btn.performClick();
         }
-
     }
 
     public void onPageRefresh() {

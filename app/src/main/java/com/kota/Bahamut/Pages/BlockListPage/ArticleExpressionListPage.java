@@ -17,6 +17,7 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 
@@ -34,17 +35,20 @@ public class ArticleExpressionListPage extends TelnetPage implements BlockListCl
         if (_inputField != null) {
             String block_name = _inputField.getText().toString().trim();
             _inputField.setText("");
+            if (block_name.length() > 0) {
+                List<String> new_list = new ArrayList<>(Arrays.asList(UserSettings.getArticleExpressions()));
+                if (new_list.contains(block_name)) {
+                    ASAlertDialog.showErrorDialog(getContextString(R.string.already_have_item), ArticleExpressionListPage.this);
+                } else {
+                    new_list.add(block_name);
+                }
+                UserSettings.setArticleExpressions(new_list);
 
-            List<String> new_list = new ArrayList<>(Arrays.asList(UserSettings.getArticleExpressions()));
-            if (new_list.contains(block_name)) {
-                ASToast.showShortToast(getContextString(R.string.already_have_item));
+                UserSettings.notifyDataUpdated();
+                ArticleExpressionListPage.this.reload();
             } else {
-                new_list.add(block_name);
+                ASAlertDialog.showErrorDialog(getContextString(R.string.please_input_id), ArticleExpressionListPage.this);
             }
-            UserSettings.setArticleExpressions(new_list);
-
-            UserSettings.notifyDataUpdated();
-            ArticleExpressionListPage.this.reload();
         }
     };
     // 按下重置
@@ -56,6 +60,8 @@ public class ArticleExpressionListPage extends TelnetPage implements BlockListCl
                 .addButton(getContextString(R.string.sure))
                 .setListener((aDialog1, button_index) -> {
                     if (button_index > 0) {
+                        ASToast.showShortToast(getContextString(R.string.reset_ok));
+                        _inputField.setText("");
                         UserSettings.resetArticleExpressions();
                         ArticleExpressionListPage.this.reload();
                     }
@@ -151,7 +157,18 @@ public class ArticleExpressionListPage extends TelnetPage implements BlockListCl
         findViewById(R.id.BlockList_Add).setOnClickListener(_addListener);
         findViewById(R.id.BlockList_Reset).setOnClickListener(_resetListener);
 
+        showNotification();
+
         reload();
+    }
+
+    // 第一次進入的提示訊息
+    private void showNotification() {
+        boolean show_top_bottom_function = NotificationSettings.getShowExpression();
+        if (!show_top_bottom_function) {
+            ASToast.showLongToast(getContextString(R.string.notification_expression));
+            NotificationSettings.setShowExpression(true);
+        }
     }
 
     public void onPageWillDisappear() {

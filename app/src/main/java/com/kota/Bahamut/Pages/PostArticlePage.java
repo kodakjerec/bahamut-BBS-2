@@ -3,21 +3,29 @@ package com.kota.Bahamut.Pages;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.text.Selection;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
+import com.kota.Bahamut.Dialogs.DialogShortenImage;
+import com.kota.Bahamut.Dialogs.DialogShortenUrl;
 import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
 import com.kota.Bahamut.Dialogs.Dialog_InsertExpression_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol;
@@ -27,6 +35,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.CommonFunctions;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
@@ -56,6 +65,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     private TextView _title_field_background = null;
     String[] _headers;
     public boolean recover = false;
+
+    private boolean isToolbarShow = false; // 是否展開工具列
 
 
     public enum OperationMode {
@@ -159,6 +170,10 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _paint_color_button.setOnClickListener(this);
 
         findViewById(R.id.ArticlePostDialog_File).setOnClickListener(this);
+        findViewById(R.id.ArticlePostDialog_ShortenUrl).setOnClickListener(this);
+        findViewById(R.id.ArticlePostDialog_ShortenImage).setOnClickListener(this);
+        findViewById(R.id.ArticlePostDialog_EditButtons).setOnClickListener(this);
+
         _header_selector = (Spinner) findViewById(R.id.Post_headerSelector);
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, _headers);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -166,6 +181,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _header_selector.setOnItemSelectedListener(this);
         _title_block = findViewById(R.id.Post_TitleBlock);
         _title_block.requestFocus();
+
+        findViewById(R.id.Post_Toolbar_Show).setOnClickListener(postToolbarShowOnClickListener);
     }
 
     public void clear() {
@@ -223,7 +240,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 @Override
                 public void onListDialogItemClicked(Dialog_InsertExpression paramASListDialog, int index, String aTitle) {
                     String symbol = items[index];
-                    PostArticlePage.this._content_field.getEditableText().insert(PostArticlePage.this._content_field.getSelectionStart(), symbol);
+                    PostArticlePage.this.insertString(symbol);
                 }
 
                 @Override
@@ -236,22 +253,23 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         } else if (view == _insert_symbol_button) {
             // 符號
             Dialog_InsertSymbol dialog = new Dialog_InsertSymbol();
-            dialog.setListener(symbol -> {
-                if (_content_field != null) {
-                    _content_field.getEditableText().insert(_content_field.getSelectionStart(), symbol);
-                }
-            });
+            dialog.setListener(this::insertString);
             dialog.show();
         } else if (view == _paint_color_button) {
             Dialog_PaintColor dialog = new Dialog_PaintColor();
-            dialog.setListener(str -> {
-                if (_content_field != null) {
-                    _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
-                }
-            });
+            dialog.setListener(this::insertString);
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_File) {
             onFileClicked();
+        } else if (view.getId() == R.id.ArticlePostDialog_ShortenUrl) {
+            DialogShortenUrl dialog = new DialogShortenUrl();
+            dialog.setListener(this::insertString);
+            dialog.show();
+        } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
+            Intent intent = new Intent(CommonFunctions.getActivity(), DialogShortenImage.class);
+            startActivity(intent);
+        } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
+            ASToast.showShortToast(getContextString(R.string.error_under_develop));
         }
     }
 
@@ -539,32 +557,55 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
 
     private void ontSaveArticleToTempAndLeaveButtonClicked() {
         ASListDialog.createDialog()
-                .setTitle(getContextString(R.string._article))
-                .addItem(getContextString(R.string.save_to_temp)+".1")
-                .addItem(getContextString(R.string.save_to_temp)+".2")
-                .addItem(getContextString(R.string.save_to_temp)+".3")
-                .addItem(getContextString(R.string.save_to_temp)+".4")
-                .addItem(getContextString(R.string.save_to_temp)+".5")
-                .setListener(new ASListDialogItemClickListener() {
-                    public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                        return false;
-                    }
-        
-                    public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                        ASAlertDialog.createDialog()
-                                .setTitle(getContextString(R.string.load_temp))
-                                .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
-                                .addButton(getContextString(R.string.cancel))
-                                .addButton(getContextString(R.string.sure))
-                                .setListener((aDialog1, button_index) -> {
-                                    if (button_index == 0) {
-                                        PostArticlePage.this.onBackPressed();
-                                    } else {
-                                        PostArticlePage.this.saveTempArticle(index);
-                                        closeArticle();
-                                    }
-                                }).show();
-                    }
-                }).show();
+            .setTitle(getContextString(R.string._article))
+            .addItem(getContextString(R.string.save_to_temp)+".1")
+            .addItem(getContextString(R.string.save_to_temp)+".2")
+            .addItem(getContextString(R.string.save_to_temp)+".3")
+            .addItem(getContextString(R.string.save_to_temp)+".4")
+            .addItem(getContextString(R.string.save_to_temp)+".5")
+            .setListener(new ASListDialogItemClickListener() {
+                public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
+                    return false;
+                }
+
+                public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+                    ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string.load_temp))
+                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                        .addButton(getContextString(R.string.cancel))
+                        .addButton(getContextString(R.string.sure))
+                        .setListener((aDialog1, button_index) -> {
+                            if (button_index == 0) {
+                                PostArticlePage.this.onBackPressed();
+                            } else {
+                                PostArticlePage.this.saveTempArticle(index);
+                                closeArticle();
+                            }
+                        }).show();
+                }
+            }).show();
+    }
+
+    View.OnClickListener postToolbarShowOnClickListener = view -> {
+        Button thisBtn = (Button) view;
+        LinearLayout toolBar = (LinearLayout) findViewById(R.id.Post_Toolbar);
+        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolBar.getLayoutParams();
+        if (isToolbarShow) {
+            // 從展開->摺疊
+            isToolbarShow = false;
+            thisBtn.setText(getContextString(R.string.post_toolbar_show));
+            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 60, getResource().getDisplayMetrics());
+        } else {
+            isToolbarShow = true;
+            thisBtn.setText(getContextString(R.string.post_toolbar_collapse));
+            layoutParams.height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120, getResource().getDisplayMetrics());
+        }
+        toolBar.setLayoutParams(layoutParams);
+    };
+
+    public void insertString(String str) {
+        if (_content_field != null) {
+            _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
+        }
     }
 }

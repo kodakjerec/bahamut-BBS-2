@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
+    <View android:id="@+id/BlockListPage_ItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
+    <LinearLayout android:gravity="center_vertical" android:orientation="vertical" android:background="@color/list_page_item_content_background" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
+        <TextView
+            android:id="@+id/thumbnail_title"
+            style="@style/TextViewNormal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:textColor="@color/article_page_text_item_content0"/>
+        <TextView
+            android:id="@+id/thumbnail_description"
+            style="@style/TextViewSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/halfWhite"/>
+    </LinearLayout>
+    <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+</LinearLayout>
