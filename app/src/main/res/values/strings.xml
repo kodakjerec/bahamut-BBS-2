@@ -13,6 +13,10 @@
     <string name="arrow_down">▼</string>
     <string name="arrow_right">&gt;</string>
     <string name="arrow_up">▲</string>
+    <string name="already_to_top">"已讀至列首"</string>
+    <string name="already_to_bottom">"已讀至列尾"</string>
+    <string name="already_to_top_page">"已讀至頁首"</string>
+    <string name="already_to_bottom_page">"已讀至頁尾"</string>
     <string name="notification_article_top_bottom_function">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
     <string name="notification_block_list">輸入ID內輸入對方帳號，按下新增加入黑名單，可阻擋對方訊息</string>
     <string name="notification_header">輸入ID內輸入標題，發文時可選擇成為預設標題</string>
@@ -295,6 +299,7 @@
     <string name="dialog_shorten_image_error01">取得imgur權限失敗</string>
     <string name="dialog_shorten_image_error02">圖片轉檔有問題，無法上傳</string>
     <string name="dialog_shorten_image_error03">上傳失敗</string>
+    <string name="dialog_shorten_image_error04">相機開啟有問題</string>
     <string name="error_under_develop">尚未完成</string>
 
 </resources>

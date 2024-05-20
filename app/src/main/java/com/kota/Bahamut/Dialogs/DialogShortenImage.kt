@@ -4,10 +4,10 @@ import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
@@ -25,12 +25,13 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.CommonFunctions
+import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.UserSettings
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -39,6 +40,7 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -69,7 +71,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         requestWindowFeature(1)
         setContentView(layoutId)
         Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
-        layout = findViewById<LinearLayout>(R.id.dialog_shorten_image_layout)
+        layout = findViewById(R.id.dialog_shorten_image_layout)
         layout.setOnClickListener { _ -> closeProcessingDialog() }
         textView = layout.findViewById(R.id.dialog_shorten_image_hint)
         imageView = layout.findViewById(R.id.dialog_shorten_image_image)
@@ -103,11 +105,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     accessToken = jsonObject.getString("accessToken")
                     albumHash = jsonObject.getString("albumHash")
                     if (accessToken.isEmpty()){
-                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error01))
+                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
                     }
                 }
             } catch (e: Exception) {
-                ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error01))
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
                 Log.e("ShortenImage", e.printStackTrace().toString())
             }
         }.start()
@@ -144,42 +146,43 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private var transferListener = OnClickListener {
         var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
         if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
-            ASToast.showLongToast(CommonFunctions.getContextString(R.string.vip_only_message))
+            ASToast.showLongToast(getContextString(R.string.vip_only_message))
             return@OnClickListener
         }
 
         showProcessingDialog()
 
-        var encodedBase64 = ""
+        val encodedBase64: String
         val byteArrayOutputStream = ByteArrayOutputStream()
-        if (selectedBitmap != null) {
-            (selectedBitmap as Bitmap).compress(
-                Bitmap.CompressFormat.PNG,
-                100,
-                byteArrayOutputStream
-            )
-            val byteArray = byteArrayOutputStream.toByteArray()
-            encodedBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
+        var finalUri: Uri? = null
+        if (selectedImageUri != null) {
+            finalUri = selectedImageUri
         } else if (selectedVideoUri != null) {
-            val inputStream = contentResolver.openInputStream(selectedVideoUri!!)
-            val reader = BufferedReader(inputStream!!.reader())
-            val buffer = ByteArray(1024)
-            var len: Int = 0
-            while ((inputStream.read(buffer).also { len = it }) !=-1) {
-                byteArrayOutputStream.write(buffer, 0, len)
-            }
-            val byteArray = byteArrayOutputStream.toByteArray()
-            encodedBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            finalUri = selectedVideoUri
         }
+        if (finalUri == null) {
+            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
+            closeProcessingDialog()
+            return@OnClickListener
+        }
+        val inputStream = contentResolver.openInputStream(finalUri)
+        BufferedReader(inputStream!!.reader())
+        val buffer = ByteArray(1024)
+        var len: Int
+        while ((inputStream.read(buffer).also { len = it }) !=-1) {
+            byteArrayOutputStream.write(buffer, 0, len)
+        }
+        val byteArray = byteArrayOutputStream.toByteArray()
+        encodedBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
         // error handle
         if (encodedBase64.isEmpty()) {
-            ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error02))
+            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
             closeProcessingDialog()
             return@OnClickListener
         }
         if (accessToken.isEmpty()) {
-            ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error01))
+            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
             closeProcessingDialog()
             return@OnClickListener
         }
@@ -234,11 +237,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                         }.start()
                     } else {
                         val error = jsonObject.getJSONObject("data").getString("error")
-                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error03)+ " " + error)
+                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + error)
                     }
                 }
             } catch (e: Exception) {
-                ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
                 Log.e("ShortenImage", e.printStackTrace().toString())
             } finally {
                 closeProcessingDialog()
@@ -258,9 +261,9 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         videoView.suspend()
         videoView.setVideoURI(null)
         videoView.visibility = INVISIBLE
-        sampleTextView!!.text = CommonFunctions.getContextString(R.string.dialog_paint_color_sample)
+        sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample)
         outputParam = ""
-        selectedBitmap = null
+        selectedImageUri = null
         selectedVideoUri = null
         sendButton!!.isEnabled = false
     }
@@ -273,11 +276,20 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 textView.visibility = INVISIBLE
                 imageView.visibility = VISIBLE
                 videoView.visibility = INVISIBLE
-                val bitmap = result.data!!.extras!!.get("data")
-                selectedBitmap = bitmap as Bitmap?
-                Glide.with(this).load(bitmap).into(imageView)
+                if (android.os.Build.VERSION.SDK_INT>=29) {
+                    val source = ImageDecoder.createSource(contentResolver, selectedImageUri!!)
+                    val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
+                        decoder.setTargetSampleSize(1)
+                        decoder.isMutableRequired = true
+                    }
+                    Glide.with(this).load(bitmap).into(imageView)
+                } else {
+                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+                    Glide.with(this).load(bitmap).into(imageView)
+                }
             } catch (e:Exception) {
                 Log.d("DialogShortenImage", e.printStackTrace().toString())
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
             }
         }
     }
@@ -312,8 +324,32 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         }
     }
     /** 開啟相機 */
+    private lateinit var currentPhotoPath: String
+
+    @SuppressLint("SimpleDateFormat")
     private fun openCameraIntent() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
+        val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        try {
+            val photoFile: File? =
+                File.createTempFile(
+                    "babamutBBS_${timeStamp}_", /* prefix */
+                    ".png", /* suffix */
+                    storageDir /* directory */
+                ).apply {
+                    // Save a file: path for use with ACTION_VIEW intents
+                    currentPhotoPath = absolutePath
+                }
+            photoFile?.also {
+                selectedImageUri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
+            }
+        } catch (e: Exception) {
+            Log.d("DialogShortenImage", e.printStackTrace().toString())
+            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error04))
+            return
+        }
         intentCameraLauncher.launch(intent)
     }
     private fun openVideoIntent() {
@@ -322,7 +358,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     }
 
     /** 註冊 相簿回傳相片或影片 */
-    private var selectedBitmap: Bitmap? = null
+    private var selectedImageUri: Uri? = null
     private var selectedVideoUri: Uri? = null
     private val pickMedia = registerForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -342,11 +378,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                             decoder.setTargetSampleSize(1)
                             decoder.isMutableRequired = true
                         }
-                        selectedBitmap = bitmap
+                        selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
                     } else {
                         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                        selectedBitmap = bitmap
+                        selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
                     }
                 } else {

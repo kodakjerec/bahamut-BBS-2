@@ -191,10 +191,10 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
         } else if (get_id == R.id.Mail_pageDownButton) {
             setManualLoadPage();
             moveToLastPosition();
-            ASToast.showShortToast("已讀至列尾");
+            ASToast.showShortToast(getContextString(R.string.already_to_bottom));
         }else if (get_id == R.id.Mail_pageUpButton) {
             moveToFirstPosition();
-            ASToast.showShortToast("已讀至列首");
+            ASToast.showShortToast(getContextString(R.string.already_to_top));
         }else if (get_id == R.id.Mail_SearchButton) {
             showSelectArticleDialog();
         }

@@ -12,6 +12,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticle;
 import com.kota.Bahamut.Command.BahamutCommandLoadBlock;
 import com.kota.Bahamut.Command.BahamutCommandLoadLastBlock;
@@ -494,6 +495,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
 
     public void moveToFirstPosition() {
         setListViewSelection(0);
+        ASToast.showShortToast(getContextString(R.string.already_to_top_page));
     }
 
     public void loadLastBlock() {
@@ -521,6 +523,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     public void moveToLastPosition() {
         TelnetCommand command = new BahamutCommandMoveToLastBlock();
         pushCommand(command);
+        ASToast.showShortToast(getContextString(R.string.already_to_bottom_page));
     }
 
     public void reloadListView() {

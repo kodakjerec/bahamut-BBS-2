@@ -1,7 +1,6 @@
 package com.kota.Bahamut.Pages;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.view.View;
@@ -12,10 +11,8 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
-import com.kota.Bahamut.Dialogs.DialogShortenImage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
-import com.kota.Bahamut.Service.CommonFunctions;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;

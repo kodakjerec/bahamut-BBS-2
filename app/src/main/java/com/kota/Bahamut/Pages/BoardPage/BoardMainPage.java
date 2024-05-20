@@ -705,12 +705,14 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     public void loadTheSameTitleTop() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleTop(getLoadingItemNumber()));
+        ASToast.showShortToast(getContextString(R.string.already_to_top));
     }
 
     // 最後篇
     public void loadTheSameTitleBottom() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleBottom(getLoadingItemNumber()));
+        ASToast.showShortToast(getContextString(R.string.already_to_bottom));
     }
 
     // 上一篇
