@@ -135,22 +135,18 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         int type = getItemViewType(itemIndex);
         if (itemView == null) {
             switch (type) {
-                case ArticlePageItemType.Content:
-                    itemView = new ArticlePage_TextItemView(getContext());
-                    break;
-                case ArticlePageItemType.Sign:
-                    itemView = new ArticlePage_TelnetItemView(getContext());
-                    break;
-                case ArticlePageItemType.Header:
-                    itemView = new ArticlePage_HeaderItemView(getContext());
-                    break;
-                case ArticlePageItemType.PostTime:
-                    itemView = new ArticlePage_TimeTimeView(getContext());
-                    break;
+                case ArticlePageItemType.Content ->
+                        itemView = new ArticlePage_TextItemView(getContext());
+                case ArticlePageItemType.Sign ->
+                        itemView = new ArticlePage_TelnetItemView(getContext());
+                case ArticlePageItemType.Header ->
+                        itemView = new ArticlePage_HeaderItemView(getContext());
+                case ArticlePageItemType.PostTime ->
+                        itemView = new ArticlePage_TimeTimeView(getContext());
             }
         }
         switch (type) {
-            case ArticlePageItemType.Content:
+            case ArticlePageItemType.Content -> {
                 TelnetArticleItem item = getItem(itemIndex);
                 ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemView;
                 item_view.setAuthor(item.getAuthor(), item.getNickname());
@@ -161,8 +157,8 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 } else {
                     item_view.setDividerHidden(false);
                 }
-                break;
-            case ArticlePageItemType.Sign:
+            }
+            case ArticlePageItemType.Sign -> {
                 ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemView;
                 item_view2.setFrame(getItem(itemIndex).getFrame());
                 if (itemIndex >= getCount() - 2) {
@@ -170,18 +166,17 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 } else {
                     item_view2.setDividerhidden(false);
                 }
-                break;
-            case ArticlePageItemType.Header:
+            }
+            case ArticlePageItemType.Header -> {
                 ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemView;
                 String author = _article.Author;
                 if (_article.Nickname != null) {
                     author = author + "(" + _article.Nickname + ")";
                 }
                 item_view3.setData(_article.Title, author, _article.BoardName);
-                break;
-            case ArticlePageItemType.PostTime:
-                ((ArticlePage_TimeTimeView) itemView).setTime("《" + _article.DateTime + "》");
-                break;
+            }
+            case ArticlePageItemType.PostTime ->
+                    ((ArticlePage_TimeTimeView) itemView).setTime("《" + _article.DateTime + "》");
         }
         return itemView;
     }

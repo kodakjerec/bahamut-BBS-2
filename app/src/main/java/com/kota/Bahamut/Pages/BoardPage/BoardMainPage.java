@@ -75,6 +75,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticle_Listener, Dialog_SelectArticle_Listener, PostArticlePage_Listener, BoardExtendOptionalPageListener, ASListViewExtentOptionalDelegate {
+    DrawerLayout mainDrawerLayout;
     protected String _board_title = null;
     protected String _board_manager = null;
     int _last_list_action = BoardPageAction.LIST;
@@ -183,11 +184,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
         @Override
         public void onDrawerStateChanged(int newState) {
-            if (newState == DrawerLayout.STATE_IDLE) {
-                _isDrawerOpening = false;
-            } else {
-                _isDrawerOpening = true;
-            }
+            _isDrawerOpening = newState != DrawerLayout.STATE_IDLE;
 
             // 側邊選單未完全開啟 or 正要啟動狀態
             if ( !isDrawerOpen() || _isDrawerOpening) {
@@ -295,56 +292,58 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     public void onPageDidLoad() {
         super.onPageDidLoad();
 
-        ASListView aSListView = (ASListView) findViewById(R.id.BoardPageListView);
+        mainDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        ASListView aSListView = mainDrawerLayout.findViewById(R.id.BoardPageListView);
         aSListView.extendOptionalDelegate = this;
-        aSListView.setEmptyView(findViewById(R.id.BoardPageListEmptyView));
+        aSListView.setEmptyView(mainDrawerLayout.findViewById(R.id.BoardPageListEmptyView));
         setListView(aSListView);
 
-        findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
-        findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
-        findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
-        findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
-        findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
+        mainDrawerLayout.findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
+        mainDrawerLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
+        mainDrawerLayout.findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
+        mainDrawerLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
+        mainDrawerLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
-        View search_article_button = findViewById(R.id.search_article_button);
+        View search_article_button = mainDrawerLayout.findViewById(R.id.search_article_button);
         if (search_article_button != null) {
             search_article_button.setOnClickListener(_search_listener);
         }
-        View select_article_button = findViewById(R.id.select_article_button);
+        View select_article_button = mainDrawerLayout.findViewById(R.id.select_article_button);
         if (select_article_button != null) {
             select_article_button.setOnClickListener(_select_listener);
         }
-        CheckBox block_enable_checkbox = (CheckBox) findViewById(R.id.block_enable_button_checkbox);
+        CheckBox block_enable_checkbox = mainDrawerLayout.findViewById(R.id.block_enable_button_checkbox);
         if (block_enable_checkbox != null) {
             block_enable_checkbox.setChecked(UserSettings.getPropertiesBlockListEnable());
             block_enable_checkbox.setOnClickListener(_enable_block_listener);
 
-            TelnetTextViewLarge text_checkbox = (TelnetTextViewLarge) findViewById(R.id.block_enable_button_checkbox_label);
+            TelnetTextViewLarge text_checkbox = mainDrawerLayout.findViewById(R.id.block_enable_button_checkbox_label);
             text_checkbox.setOnClickListener(_enable_block_listener);
         }
-        View block_setting_button = findViewById(R.id.block_setting_button);
+        View block_setting_button = mainDrawerLayout.findViewById(R.id.block_setting_button);
         if (block_setting_button != null) {
             block_setting_button.setOnClickListener(_edit_block_listener);
         }
-        View bookmark_edit_button = findViewById(R.id.bookmark_edit_button);
+        View bookmark_edit_button = mainDrawerLayout.findViewById(R.id.bookmark_edit_button);
         if (bookmark_edit_button != null) {
             bookmark_edit_button.setOnClickListener(_edit_bookmark_listener);
         }
         // 側邊選單
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawerLayout = mainDrawerLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            LinearLayout menu_view = (LinearLayout)findViewById(R.id.menu_view);
+            LinearLayout menu_view = mainDrawerLayout.findViewById(R.id.menu_view);
             DrawerLayout.LayoutParams layoutParams_drawer = (DrawerLayout.LayoutParams) menu_view.getLayoutParams();
             layoutParams_drawer.gravity = getDrawerLayoutGravityLocation();
             menu_view.setLayoutParams(layoutParams_drawer);
             drawerLayout.addDrawerListener(_drawer_listener);
         }
         // 側邊選單內的書籤
-        _drawerListView = (ListView) findViewById(R.id.bookmark_list_view);
-        _drawerListViewNone = (TextView) findViewById(R.id.bookmark_list_view_none);
+        _drawerListView = mainDrawerLayout.findViewById(R.id.bookmark_list_view);
+        _drawerListViewNone = mainDrawerLayout.findViewById(R.id.bookmark_list_view_none);
         if (_drawerListView != null) {
-            _show_bookmark_button = (Button) findViewById(R.id.show_bookmark_button);
-            _show_history_button = (Button) findViewById(R.id.show_history_button);
+            _show_bookmark_button = mainDrawerLayout.findViewById(R.id.show_bookmark_button);
+            _show_history_button = mainDrawerLayout.findViewById(R.id.show_history_button);
             _tab_buttons = new Button[]{_show_bookmark_button, _show_history_button};
             _show_bookmark_button.setOnClickListener(buttonClickListener);
             _show_history_button.setOnClickListener(buttonClickListener);
@@ -355,7 +354,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
 
         // 標題
-        ((TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView)).setMenuButton(mMenuButtonListener);
+        ((TelnetHeaderItemView) mainDrawerLayout.findViewById(R.id.BoardPage_HeaderView)).setMenuButton(mMenuButtonListener);
         refreshHeaderView();
 
         blockListEnable = UserSettings.getPropertiesBlockListEnable();
@@ -363,9 +362,8 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
         // keyword: clearFocusInternal
-        RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.content_view);
-        if (relativeLayout != null)
-            relativeLayout.requestFocus();
+        if (mainDrawerLayout != null)
+            mainDrawerLayout.requestFocus();
 
         // 工具列位置
         changeToolbarLocation();
@@ -399,9 +397,9 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
     // 變更工具列位置
     void changeToolbarLocation() {
-        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
-        LinearLayout toolbarBlock = (LinearLayout)findViewById(R.id.toolbar_block);
-        ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
+        LinearLayout toolbar = mainDrawerLayout.findViewById(R.id.toolbar);
+        LinearLayout toolbarBlock = mainDrawerLayout.findViewById(R.id.toolbar_block);
+        ToolBarFloating toolBarFloating = mainDrawerLayout.findViewById(R.id.ToolbarFloatingComponent);
         toolBarFloating.setVisibility(View.GONE);
 
         // 最左邊最右邊
@@ -443,7 +441,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
                 toolBarFloating.setVisibility(View.VISIBLE);
                 // button setting
                 toolBarFloating.setOnClickListenerSetting(mPostListener);
-                Button OriginalBtn = ((Button) findViewById(R.id.BoardPagePostButton));
+                Button OriginalBtn = mainDrawerLayout.findViewById(R.id.BoardPagePostButton);
                 toolBarFloating.setTextSetting(OriginalBtn.getText().toString());
                 // button 1
                 toolBarFloating.setOnClickListener1(mFirstPageClickListener);
@@ -464,7 +462,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
     // 反轉按鈕順序
     void changeToolbarOrder() {
-        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
+        LinearLayout toolbar = mainDrawerLayout.findViewById(R.id.toolbar);
 
         int choice_toolbar_order = UserSettings.getPropertiesToolbarOrder();
         if (choice_toolbar_order == 1) {
@@ -506,7 +504,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         board_title = (board_title == null || board_title.length() == 0) ? getContextString(R.string.loading) : board_title;
         String board_manager = _board_manager;
         board_manager = (board_manager == null || board_manager.length() == 0) ? getContextString(R.string.loading) : board_manager;
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        TelnetHeaderItemView header_view = mainDrawerLayout.findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             header_view.setData(board_title, getListName(), board_manager);
         }
@@ -564,7 +562,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     protected boolean onBackPressed() {
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawerLayout = mainDrawerLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null && drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation())) {
             drawerLayout.closeDrawer(getDrawerLayoutGravityLocation());
             return true;
@@ -686,13 +684,9 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.do_gy))
                 .setListener((aSAlertDialog, i2) -> {
-            switch (i2) {
-                case 0:
-                default:
-                    return;
-                case 1:
-                    BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(i));
-            }
+                    if (i2 == 1) {
+                        BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(i));
+                    }
         }).scheduleDismissOnPageDisappear(this).show();
     }
 
@@ -705,14 +699,12 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     public void loadTheSameTitleTop() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleTop(getLoadingItemNumber()));
-        ASToast.showShortToast(getContextString(R.string.already_to_top));
     }
 
     // 最後篇
     public void loadTheSameTitleBottom() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleBottom(getLoadingItemNumber()));
-        ASToast.showShortToast(getContextString(R.string.already_to_bottom));
     }
 
     // 上一篇
@@ -748,7 +740,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     void onChangeBlockStateButtonClicked() {
         UserSettings.setPropertiesBlockListEnable(!blockListEnable);
         blockListEnable = UserSettings.getPropertiesBlockListEnable();
-        CheckBox block_enable_checkbox = (CheckBox) findViewById(R.id.block_enable_button_checkbox);
+        CheckBox block_enable_checkbox = mainDrawerLayout.findViewById(R.id.block_enable_button_checkbox);
         block_enable_checkbox.setChecked(blockListEnable);
         reloadListView();
     }
@@ -920,7 +912,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     }
 
     void closeDrawer() {
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawerLayout = mainDrawerLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             drawerLayout.closeDrawers();
         }
@@ -928,7 +920,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
     // 側邊選單已開啟 或 正在開啟中
     boolean isDrawerOpen() {
-        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawerLayout = mainDrawerLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             return drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation());
         }

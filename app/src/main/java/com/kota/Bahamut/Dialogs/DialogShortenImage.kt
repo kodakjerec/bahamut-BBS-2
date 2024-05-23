@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
@@ -46,6 +47,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Objects
 
+@Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private lateinit var layout: LinearLayout
     private lateinit var textView: TextView
@@ -54,6 +56,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private lateinit var middleToolbar: LinearLayout
     private lateinit var middleToolbar2: LinearLayout
     private lateinit var processingDialog: LinearLayout
+    private var transferButton: Button? = null
     private var sendButton: Button? = null
     private var outputParam: String = ""
     private var sampleTextView: TextView? = null
@@ -84,7 +87,8 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         layout.findViewById<Button>(R.id.dialog_shorten_image_album).setOnClickListener(selectImageListener)
         layout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
         layout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
-        layout.findViewById<Button>(R.id.dialog_shorten_image_transfer).setOnClickListener(transferListener)
+        transferButton = layout.findViewById(R.id.dialog_shorten_image_transfer)
+        transferButton!!.setOnClickListener(transferListener)
         sendButton = layout.findViewById(R.id.send)
         sendButton!!.setOnClickListener(this)
         sendButton!!.isEnabled = false
@@ -97,7 +101,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             .url(apiUrl)
             .get()
             .build()
-        Thread {
+        ASRunner.runInNewThread {
             try{
                 client.newCall(request).execute().use { response->
                     val data = response.body!!.string()
@@ -112,12 +116,12 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
                 Log.e("ShortenImage", e.printStackTrace().toString())
             }
-        }.start()
+        }
     }
 
     /** 選擇相簿 */
     private val selectImageListener = OnClickListener { _->
-        pickMedia.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
+        pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
     }
     /** 選擇相機 */
     private val selectCameraListener = OnClickListener { _->
@@ -200,7 +204,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             .addHeader("Authorization", "Bearer $accessToken")
             .post(body)
             .build()
-        Thread {
+        ASRunner.runInNewThread {
             try {
                 client.newCall(request).execute().use { response ->
                     val data = response.body!!.string()
@@ -214,6 +218,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                                 sampleTextView!!.text = link
                                 outputParam = sampleTextView!!.text.toString()
                                 sendButton!!.isEnabled = true
+                                transferButton!!.isEnabled = false
                                 UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
                             }
                         }.runInMainThread()
@@ -228,13 +233,13 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                             .addHeader("Authorization", "Bearer $accessToken")
                             .post(bodyAlbum)
                             .build()
-                        Thread {
+                        ASRunner.runInNewThread {
                             try {
                                 client.newCall(requestAlbum).execute().use { }
                             } catch (e: Exception) {
                                 Log.e("ShortenImage", e.printStackTrace().toString())
                             }
-                        }.start()
+                        }
                     } else {
                         val error = jsonObject.getJSONObject("data").getString("error")
                         ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + error)
@@ -246,7 +251,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             } finally {
                 closeProcessingDialog()
             }
-        }.start()
+        }
     }
 
     /** 清除內容 */
@@ -266,6 +271,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         selectedImageUri = null
         selectedVideoUri = null
         sendButton!!.isEnabled = false
+        transferButton!!.isEnabled = true
     }
     /** 註冊 intent */
     private val intentCameraLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -276,7 +282,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 textView.visibility = INVISIBLE
                 imageView.visibility = VISIBLE
                 videoView.visibility = INVISIBLE
-                if (android.os.Build.VERSION.SDK_INT>=29) {
+                if (Build.VERSION.SDK_INT>=29) {
                     val source = ImageDecoder.createSource(contentResolver, selectedImageUri!!)
                     val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
                         decoder.setTargetSampleSize(1)
@@ -287,6 +293,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
                     Glide.with(this).load(bitmap).into(imageView)
                 }
+                transferButton!!.performClick()
             } catch (e:Exception) {
                 Log.d("DialogShortenImage", e.printStackTrace().toString())
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
@@ -306,9 +313,56 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 videoView.setVideoURI(uri)
                 videoView.start()
                 videoView.requestFocus()
+                transferButton!!.performClick()
             } catch (e:Exception) {
                 Log.d("DialogShortenImage", e.printStackTrace().toString())
             }
+        }
+    }
+    /** 註冊 相簿回傳相片或影片 */
+    private var selectedImageUri: Uri? = null
+    private var selectedVideoUri: Uri? = null
+    private val pickMediaLauncher = registerForActivityResult(PickVisualMedia()) { uri ->
+        if (uri != null) {
+            try {
+                // Check if it's an image
+                middleToolbar.visibility = INVISIBLE
+                middleToolbar2.visibility = VISIBLE
+                textView.visibility = INVISIBLE
+                val uriType = contentResolver.getType(uri)
+                if (uriType?.startsWith("image/") == true) {
+                    // 影像
+                    imageView.visibility = VISIBLE
+                    videoView.visibility = INVISIBLE
+                    if (Build.VERSION.SDK_INT>= 29) {
+                        val source = ImageDecoder.createSource(contentResolver, uri)
+                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
+                            decoder.setTargetSampleSize(1)
+                            decoder.isMutableRequired = true
+                        }
+                        selectedImageUri = uri
+                        Glide.with(this).load(bitmap).into(imageView)
+                    } else {
+                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                        selectedImageUri = uri
+                        Glide.with(this).load(bitmap).into(imageView)
+                    }
+                    transferButton!!.performClick()
+                } else {
+                    // 影片
+                    imageView.visibility = INVISIBLE
+                    videoView.visibility = VISIBLE
+                    selectedVideoUri = uri
+                    videoView.setVideoURI(uri)
+                    videoView.start()
+                    videoView.requestFocus()
+                    transferButton!!.performClick()
+                }
+            } catch (e: IOException) {
+                Log.e("PhotoPicker", "Error loading image/video", e)
+            }
+        } else {
+            Log.d("PhotoPicker", "No media selected")
         }
     }
 
@@ -355,53 +409,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private fun openVideoIntent() {
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
         intentVideoLauncher.launch(intent)
-    }
-
-    /** 註冊 相簿回傳相片或影片 */
-    private var selectedImageUri: Uri? = null
-    private var selectedVideoUri: Uri? = null
-    private val pickMedia = registerForActivityResult(PickVisualMedia()) { uri ->
-        if (uri != null) {
-            try {
-                // Check if it's an image
-                middleToolbar.visibility = INVISIBLE
-                middleToolbar2.visibility = VISIBLE
-                textView.visibility = INVISIBLE
-                val uriType = contentResolver.getType(uri)
-                if (uriType?.startsWith("image/") == true) {
-                    // 影像
-                    imageView.visibility = VISIBLE
-                    videoView.visibility = INVISIBLE
-                    if (android.os.Build.VERSION.SDK_INT>=29) {
-                        val source = ImageDecoder.createSource(contentResolver, uri)
-                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
-                            decoder.setTargetSampleSize(1)
-                            decoder.isMutableRequired = true
-                        }
-                        selectedImageUri = uri
-                        Glide.with(this).load(bitmap).into(imageView)
-                    } else {
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                        selectedImageUri = uri
-                        Glide.with(this).load(bitmap).into(imageView)
-                    }
-                } else {
-                    // 影片
-                    imageView.visibility = INVISIBLE
-                    videoView.visibility = VISIBLE
-                    selectedVideoUri = uri
-                    videoView.setVideoURI(uri)
-                    videoView.start()
-                    videoView.requestFocus()
-                    // Handle video (consider using a VideoView for playback)
-                    Log.d("PhotoPicker", "Selected video: $uri")
-                }
-            } catch (e: IOException) {
-                Log.e("PhotoPicker", "Error loading image/video", e)
-            }
-        } else {
-            Log.d("PhotoPicker", "No media selected")
-        }
     }
 
     private fun showProcessingDialog() {

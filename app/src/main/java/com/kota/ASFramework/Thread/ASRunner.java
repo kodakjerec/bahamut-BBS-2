@@ -2,22 +2,26 @@ package com.kota.ASFramework.Thread;
 
 import android.annotation.SuppressLint;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 
-/* loaded from: classes.dex */
+import androidx.annotation.NonNull;
+
 public abstract class ASRunner {
-  private long _timeout = 0;
-  private static Thread _main_thread = null;
-  private static Handler _main_handler = null;
+  static Looper mainLooper = Looper.getMainLooper();
+  static Thread _main_thread = null;
+  static Handler _main_handler = null;
+
+  static Runnable runnable;
 
   public abstract void run();
 
   @SuppressLint("HandlerLeak")
   public static void construct() {
     _main_thread = Thread.currentThread();
-    _main_handler = new Handler() { // from class: com.kota.ASFramework.Thread.ASRunner.1
+    _main_handler = new Handler(mainLooper) {
       @Override // android.os.Handler
-      public void handleMessage(Message message) {
+      public void handleMessage(@NonNull Message message) {
         ASRunner runner = (ASRunner) message.obj;
         runner.run();
       }
@@ -28,6 +32,7 @@ public abstract class ASRunner {
     return Thread.currentThread() == _main_thread;
   }
 
+  /** 在主執行序內執行 */
   public ASRunner runInMainThread() {
     if (Thread.currentThread() == _main_thread) {
       run();
@@ -39,17 +44,22 @@ public abstract class ASRunner {
     return this;
   }
 
+  /** 在新執行序內執行 */
   public static void runInNewThread(Runnable runnable) {
     Thread thread = new Thread(runnable);
     thread.start();
-}
-
-  public long getTimeout() {
-    return this._timeout;
   }
 
-  public ASRunner setTimeout(long timeout) {
-    this._timeout = timeout;
-    return this;
+  /** 延遲執行 */
+  public void postDelayed(int delayMillis) {
+    if (runnable == null)
+      runnable = ASRunner.this::run;
+    // Call the actual run method after delay
+    _main_handler.postDelayed(runnable, delayMillis);
+  }
+  /** 取消執行 */
+  public void cancel() {
+    if (runnable!=null)
+      _main_handler.removeCallbacks(runnable);
   }
 }

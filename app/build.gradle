@@ -11,8 +11,8 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 34
-        versionCode 18
-        versionName "2.2.1"
+        versionCode 19
+        versionName "2.2.2"
     }
 
     buildTypes {
@@ -47,6 +47,8 @@ dependencies {
     // for image loading
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    // gson
+    implementation 'com.google.code.gson:gson:2.10'
 
     // billing
     implementation 'com.android.billingclient:billing:7.0.0'

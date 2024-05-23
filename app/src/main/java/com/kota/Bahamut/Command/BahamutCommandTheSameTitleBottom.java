@@ -6,6 +6,7 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
+import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
 
@@ -19,7 +20,18 @@ public class BahamutCommandTheSameTitleBottom extends TelnetCommand {
 
     public void execute(final TelnetListPage aListPage) {
         if (aListPage.getListType() == 1 || aListPage.getListType() == 2) {
-            if (_article_index == aListPage.getItemSize()) {
+            // 找出沒被block的最大index
+            int maximumAvailableIndex = 1;
+            int itemSize = aListPage.getItemSize();
+            for(int i=itemSize-1;i>=0;i--) {
+                TelnetListPageItem item = aListPage.getItem(i);
+                if (!item.isDeleted && !aListPage.isItemBlocked(item)) {
+                    maximumAvailableIndex = (i+1);
+                    break;
+                }
+            }
+
+            if (_article_index == maximumAvailableIndex) {
                 new ASRunner() {
                     public void run() {
                         ASToast.showShortToast("找沒有了耶...:(");
@@ -27,11 +39,16 @@ public class BahamutCommandTheSameTitleBottom extends TelnetCommand {
                     }
                 }.runInMainThread();
                 setDone(true);
-                return;
+            } else {
+                TelnetOutputBuilder.create()
+                        .pushString(maximumAvailableIndex + "\n")
+                        .sendToServer();
             }
-            TelnetOutputBuilder.create().pushString(aListPage.getItemSize() + "\n").sendToServer();
         } else if (_article_index > 0) {
-            TelnetOutputBuilder.create().pushKey(TelnetKeyboard.END).pushString("[").sendToServer();
+            TelnetOutputBuilder.create()
+                    .pushKey(TelnetKeyboard.END)
+                    .pushString("[")
+                    .sendToServer();
         } else {
             setDone(true);
         }
@@ -39,8 +56,17 @@ public class BahamutCommandTheSameTitleBottom extends TelnetCommand {
 
     public void executeFinished(final TelnetListPage aListPage, TelnetListPageBlock aPageData) {
         if (aPageData.selectedItem.isDeleted || aListPage.isItemBlocked(aPageData.selectedItem)) {
-            _article_index = aPageData.selectedItemNumber;
-            setDone(false);
+            if (_article_index == aPageData.selectedItemNumber) {
+                new ASRunner() {
+                    public void run() {
+                        aListPage.onLoadItemFinished();
+                    }
+                }.runInMainThread();
+                setDone(true);
+            } else {
+                _article_index = aPageData.selectedItemNumber;
+                setDone(false);
+            }
         } else if (aListPage.isItemLoadingByNumber(aPageData.selectedItemNumber)) {
             new ASRunner() {
                 public void run() {

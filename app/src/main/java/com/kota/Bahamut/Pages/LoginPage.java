@@ -14,6 +14,8 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.CloudBackup;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
@@ -22,11 +24,7 @@ import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
@@ -261,9 +259,13 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onLoginSuccess() {
+        // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();
         UserSettings.notifyDataUpdated();
+
+        // 詢問雲端
+//        askCloudSave();
     }
 
     public void onSaveArticle() {
@@ -286,5 +288,50 @@ public class LoginPage extends TelnetPage {
                 ASAlertDialog.createDialog().setTitle("警告").setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。").addButton("確定").show();
             }
         }.runInMainThread();
+    }
+
+    private void askCloudSave() {
+        final int[] cloudSaveStatus = new int[]{NotificationSettings.getShowCloudSave()};
+        switch (cloudSaveStatus[0]){
+            case 0:
+                AtomicReference<Boolean> isCloudExist = new AtomicReference<>(false);
+                // 詢問是否啟用雲端備份
+                ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string.cloud_save))
+                        .setMessage(getContextString(R.string.cloud_save_question1))
+                        .addButton(getContextString(R.string.cancel))
+                        .addButton(getContextString(R.string.on))
+                        .setListener((aDialog, index) -> {
+                            // 決定同步, 檢查雲端存檔是否存在
+                            if (index == 1) {
+                                isCloudExist.set(CloudBackup.INSTANCE.checkCloud());
+                            } else {// 取消同步, 以本地端為主
+                                cloudSaveStatus[0] = 1;
+                                NotificationSettings.setShowCloudSave(cloudSaveStatus[0]);
+                            }
+                        }).show();
+
+                // 雲端存在, 選擇本地或雲端
+                if (isCloudExist.get()) {
+                    ASAlertDialog.createDialog()
+                            .setTitle(getContextString(R.string.cloud_save))
+                            .setMessage(getContextString(R.string.cloud_save_question2))
+                            .addButton(getContextString(R.string.cloud_save_local))
+                            .addButton(getContextString(R.string.cloud_save_cloud))
+                            .setListener((aDialog, index) -> {
+                                if (index==0) {
+                                    // 選擇本地=>覆蓋雲端
+                                    CloudBackup.INSTANCE.backup();
+                                } else {
+                                    // 選擇雲端=>覆蓋本地
+                                    CloudBackup.INSTANCE.restore();
+                                }
+                            });
+
+                }
+                break;
+            case 1, 2:
+                break;
+        }
     }
 }

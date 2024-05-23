@@ -16,7 +16,6 @@ import android.widget.CompoundButton;
 import android.widget.Spinner;
 
 import com.google.android.material.slider.Slider;
-import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;

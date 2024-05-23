@@ -33,13 +33,13 @@ public class TelnetHeaderItemView extends LinearLayout {
         init();
     }
 
-    private void init() {
-        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.header_item_view, this);
-        this._title = findViewById(R.id.title);
-        this._detail_1 = findViewById(R.id.detail_1);
-        this._detail_2 = findViewById(R.id.detail_2);
-        this.mMenuDivider = findViewById(R.id.menu_divider);
-        this.mMenuButton = findViewById(R.id.menu_button);
+    void init() {
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.telnet_header_item_view, this);
+        _title = findViewById(R.id.title);
+        _detail_1 = findViewById(R.id.detail_1);
+        _detail_2 = findViewById(R.id.detail_2);
+        mMenuDivider = findViewById(R.id.menu_divider);
+        mMenuButton = findViewById(R.id.menu_button);
 
         // 側邊選單
         int location = UserSettings.getPropertiesDrawerLocation();
@@ -62,14 +62,14 @@ public class TelnetHeaderItemView extends LinearLayout {
 
     public void setMenuButton(View.OnClickListener aListener) {
         if (aListener == null) {
-            this.mMenuDivider.setVisibility(View.GONE);
-            this.mMenuButton.setVisibility(View.GONE);
-            this.mMenuButton.setOnClickListener(null);
+            mMenuDivider.setVisibility(View.GONE);
+            mMenuButton.setVisibility(View.GONE);
+            mMenuButton.setOnClickListener(null);
             return;
         }
-        this.mMenuDivider.setVisibility(View.VISIBLE);
-        this.mMenuButton.setVisibility(View.VISIBLE);
-        this.mMenuButton.setOnClickListener(aListener);
+        mMenuDivider.setVisibility(View.VISIBLE);
+        mMenuButton.setVisibility(View.VISIBLE);
+        mMenuButton.setOnClickListener(aListener);
     }
 
     public void setData(String aTitle, String aDetail1, String aDetail2) {
@@ -79,27 +79,28 @@ public class TelnetHeaderItemView extends LinearLayout {
     }
 
     public void setTitle(String aTitle) {
-        if (this._title != null) {
-            this._title.setText(aTitle);
+        if (_title != null) {
+            _title.setText(aTitle);
             if (aTitle!= null && aTitle.contains("系統精靈送信來了")) {
-                this._title.setTextColor(getContextColor(R.color.white));
-                this._title.setBackgroundColor(getContextColor(R.color.red));
-                ViewGroup.LayoutParams layoutParams = this._title.getLayoutParams();
+                _title.setTextColor(getContextColor(R.color.white));
+                _title.setBackgroundColor(getContextColor(R.color.red));
+                ViewGroup.LayoutParams layoutParams = _title.getLayoutParams();
                 layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                this._title.setLayoutParams(layoutParams);
+                _title.setLayoutParams(layoutParams);
             }
         }
     }
 
     public void setDetail1(String aDetail1) {
-        if (this._detail_1 != null) {
-            this._detail_1.setText(aDetail1);
+        if (_detail_1 != null) {
+            _detail_1.setText(aDetail1);
         }
     }
 
     public void setDetail2(String aDetail2) {
-        if (this._detail_2 != null) {
-            this._detail_2.setText(aDetail2);
+        if (_detail_2 != null) {
+            _detail_2.setText(aDetail2);
         }
     }
+
 }

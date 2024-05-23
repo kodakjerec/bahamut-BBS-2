@@ -1,15 +1,12 @@
 package com.kota.Bahamut.Pages;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-
 import android.text.Selection;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASListDialog;
-import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
@@ -23,6 +20,7 @@ import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
+
 import java.util.Vector;
 
 public class SendMailPage extends TelnetPage implements View.OnClickListener, View.OnFocusChangeListener, Dialog_InsertSymbol_Listener, Dialog_PaintColor_Listener {

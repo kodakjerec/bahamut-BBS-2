@@ -28,12 +28,16 @@
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
+        <item name="autoSizeTextType">uniform</item>
+        <item name="autoSizeMinTextSize">2sp</item>
+        <item name="autoSizeMaxTextSize">24sp</item>
+        <item name="autoSizeStepGranularity">2sp</item>
     </style>
     <style name="ToolbarItem.Grid">
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_marginRight">1dp</item>
         <item name="android:layout_marginBottom">1dp</item>
         <item name="android:layout_columnWeight">1</item>
-        <item name="android:layout_gravity">fill</item>
     </style>
     <style name="ToolbarItemLR" parent="ToolbarItem">
         <item name="android:layout_weight">9</item>
@@ -100,7 +104,7 @@
         <item name="android:imeOptions">actionUnspecified</item>
     </style>
     <style name="ExtToolbar">
-        <item name="android:orientation">@null</item>
+        <item name="android:orientation">horizontal</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
@@ -169,7 +173,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    <style name="MyTheme" parent="Theme.MaterialComponents.DayNight">
+    <style name="MyTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:statusBarColor">@color/transparent</item>

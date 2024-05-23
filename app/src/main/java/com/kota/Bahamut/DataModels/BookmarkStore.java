@@ -1,10 +1,12 @@
 package com.kota.Bahamut.DataModels;
-/**
- * 書籤清單的儲存
+/*
+  書籤清單的儲存
  */
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import androidx.annotation.NonNull;
 
 import com.kota.Bahamut.Service.TempSettings;
 
@@ -19,6 +21,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Vector;
 
 public class BookmarkStore {
@@ -41,9 +44,10 @@ public class BookmarkStore {
         TempSettings.setBookmarkStore(new BookmarkStore(context, aFilePath).load());
     }
 
+    @NonNull
     public BookmarkList getBookmarkList(String aBoardName) {
         if (this._bookmarks.containsKey(aBoardName)) {
-            return this._bookmarks.get(aBoardName);
+            return Objects.requireNonNull(this._bookmarks.get(aBoardName));
         }
         BookmarkList list = new BookmarkList(aBoardName);
         this._bookmarks.put(aBoardName, list);

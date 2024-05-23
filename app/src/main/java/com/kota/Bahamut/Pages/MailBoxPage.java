@@ -1,12 +1,10 @@
 package com.kota.Bahamut.Pages;
 
-import static android.view.View.GONE;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -16,7 +14,6 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
-import com.kota.Bahamut.Command.BahamutCommandLoadArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
 import com.kota.Bahamut.Command.BahamutCommandSendMail;
 import com.kota.Bahamut.Command.TelnetCommand;
@@ -215,7 +212,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     public void loadPreviousArticle() {
         int target_number = getLoadingItemNumber() - 1;
         if (target_number < 1) {
-            ASToast.showShortToast("已讀至列首");
+            ASToast.showShortToast(getContextString(R.string.already_to_top));
         } else {
             loadItemAtNumber(target_number);
         }
@@ -224,7 +221,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_S
     public void loadNextArticle() {
         int target_index = getLoadingItemNumber() + 1;
         if (target_index > getItemSize()) {
-            ASToast.showShortToast("已讀至列尾");
+            ASToast.showShortToast(getContextString(R.string.already_to_bottom));
         } else {
             loadItemAtNumber(target_index);
         }

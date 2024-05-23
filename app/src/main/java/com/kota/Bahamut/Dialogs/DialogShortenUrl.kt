@@ -91,7 +91,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             .url(apiUrl)
             .post(body)
             .build()
-        Thread {
+        ASRunner.runInNewThread {
             try{
                 client.newCall(request).execute().use { response->
                     val data = response.body!!.string()
@@ -125,7 +125,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             } finally {
                 ASProcessingDialog.dismissProcessingDialog()
             }
-        }.start()
+        }
     }
     /** 變更畫面上選項 */
     fun changeFrontend(shortUrl: String) {
@@ -135,12 +135,14 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     /** 擷取剪貼簿 */
-    fun catchClipBoard() {
+    private fun catchClipBoard() {
             val clipboardManager =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData = clipboardManager.primaryClip
-            if (clipData != null) {
-                editText!!.setText(clipData.getItemAt(0).text.toString())
+            if (clipData != null && clipData.itemCount>0) {
+                val clipString = clipData.getItemAt(0).text
+                if (clipString!=null)
+                    editText!!.setText(clipString.toString())
             }
     }
 

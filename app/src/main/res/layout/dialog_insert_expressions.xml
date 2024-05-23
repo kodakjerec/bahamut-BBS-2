@@ -16,7 +16,6 @@
             style="@style/TextViewLarge"
             android:textColor="@color/white"
             android:background="@color/list_page_item_arrow_background"
-            android:gravity="center"
             android:padding="2dp">
         </TextView>
 

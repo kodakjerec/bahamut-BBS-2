@@ -69,13 +69,6 @@ public class StartPage extends TelnetPage {
         super.onPageDidDisappear();
     }
 
-    public void onPageRefresh() {
-    }
-
-    public boolean onPagePreload() {
-        return true;
-    }
-
     @Override
     public void clear() {
         ASProcessingDialog.dismissProcessingDialog();

@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
@@ -37,7 +38,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ClassPage extends TelnetListPage implements View.OnClickListener, Dialog_SearchBoard_Listener {
-    private String _detail = "看板列表";
+    RelativeLayout mainLayout;
+    private final String _detail = "看板列表";
     private String _title = "";
 
     public int getPageType() {
@@ -51,12 +53,14 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
     public void onPageDidLoad() {
         super.onPageDidLoad();
 
-        ListView list_view = (ListView) findViewById(R.id.ClassPage_listView);
-        list_view.setEmptyView(findViewById(R.id.ClassPage_listEmptyView));
+        mainLayout = (RelativeLayout) findViewById(R.id.content_view);
+
+        ListView list_view = mainLayout.findViewById(R.id.ClassPage_listView);
+        list_view.setEmptyView(mainLayout.findViewById(R.id.ClassPage_listEmptyView));
         setListView(list_view);
-        findViewById(R.id.ClassPage_SearchButton).setOnClickListener(this);
-        findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
-        findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
+        mainLayout.findViewById(R.id.ClassPage_SearchButton).setOnClickListener(this);
+        mainLayout.findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
+        mainLayout.findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
@@ -85,28 +89,20 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         if (title == null || title.length() == 0) {
             title = getContextString(R.string.loading);
         }
-        String detail = this._detail;
-        if (detail == null || detail.length() == 0) {
-            detail = getContextString(R.string.loading);
-        }
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.ClassPage_headerView);
+
+        TelnetHeaderItemView header_view = mainLayout.findViewById(R.id.ClassPage_headerView);
         if (header_view != null) {
             if  (!TempSettings.lastVisitBoard.isEmpty()) {
                 String finalLastVisitBoard = TempSettings.lastVisitBoard;
                 String lastVisitBoard = finalLastVisitBoard + getContextString(R.string.toolbar_item_rr);
 
-                TextView _detail_2 = (TextView) findViewById(R.id.ClassPage_lastVisit);
+                TextView _detail_2 = mainLayout.findViewById(R.id.ClassPage_lastVisit);
                 _detail_2.setVisibility(View.VISIBLE);
                 _detail_2.bringToFront();
                 _detail_2.setText(lastVisitBoard);
-                _detail_2.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        TelnetClient.getClient().sendStringToServer("s"+ finalLastVisitBoard);
-                    }
-                });
+                _detail_2.setOnClickListener(v -> TelnetClient.getClient().sendStringToServer("s"+ finalLastVisitBoard));
             }
-            header_view.setData(title, detail, "");
+            header_view.setData(title, _detail, "");
         }
     }
 
@@ -135,24 +131,8 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         TelnetOutputBuilder.create().pushString("s" + keyword + " ").sendToServerInBackground();
     }
 
-    public void onMenuItemClicked(int itemIndex) {
-        switch (itemIndex) {
-            case 0:
-                showSearchBoardDialog();
-                return;
-            case 1:
-                TelnetClient.getClient().sendKeyboardInputToServerInBackground(99);
-                return;
-            default:
-        }
-    }
-
     public void setClassTitle(String aTitle) {
         this._title = aTitle;
-    }
-
-    public void setDetail(String aDetail) {
-        this._detail = aDetail;
     }
 
     public void onClick(View aView) {

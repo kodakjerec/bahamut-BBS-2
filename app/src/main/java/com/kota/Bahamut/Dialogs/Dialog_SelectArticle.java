@@ -6,10 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.R;
 
 import java.util.Objects;

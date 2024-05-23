@@ -10,7 +10,6 @@ import android.text.util.Linkify;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -49,12 +48,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+
 public class ArticlePage extends TelnetPage {
+    RelativeLayout mainLayout;
     private TelnetArticle _article = null;
     private TelnetView _telnet_view = null;
     private BoardMainPage _board_page = null;
     private boolean _full_screen = false;
     private boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
+    private ArticlePage_HeaderItemView articlePageHeaderItemView;
     long _action_delay = 500;
     Runnable _top_action = null;
     Runnable _bottom_action = null;
@@ -105,7 +107,7 @@ public class ArticlePage extends TelnetPage {
                     }
                     case ArticlePageItemType.Header -> {
                         itemView = new ArticlePage_HeaderItemView(getContext());
-                        itemView.setLayoutParams(new AbsListView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                        articlePageHeaderItemView = (ArticlePage_HeaderItemView) itemView;
                     }
                     case ArticlePageItemType.PostTime ->
                             itemView = new ArticlePage_TimeTimeView(getContext());
@@ -204,18 +206,18 @@ public class ArticlePage extends TelnetPage {
     AdapterView.OnItemLongClickListener _list_long_click_listener = (arg0, arg1, itemIndex, arg3) -> {
         // 沒有簽名檔直接往下走
         if (!_i_have_sign) {
-            return false;
+            return true;
         }
         // 切換模式只適用於簽名檔
         // 簽名檔一定是最後一個
         int signIndex = _article.getItemSize();
         if (itemIndex != signIndex){
-            return false;
+            return true;
         }
         // 開啟切換模式
         TelnetArticleItem item;
         if (_article == null || (item = _article.getItem(itemIndex - 1)) == null) {
-            return false;
+            return true;
         }
         int type = item.getType();
         if (type == 0) {
@@ -227,7 +229,7 @@ public class ArticlePage extends TelnetPage {
             _list_adapter.notifyDataSetChanged();
             return true;
         } else {
-            return false;
+            return true;
         }
     };
 
@@ -244,7 +246,7 @@ public class ArticlePage extends TelnetPage {
             };
             v.postDelayed(_top_action, _action_delay);
         }
-        return false;
+        return true;
     };
 
     // 上一篇
@@ -273,7 +275,7 @@ public class ArticlePage extends TelnetPage {
             };
             v.postDelayed(_bottom_action, _action_delay);
         }
-        return false;
+        return true;
     };
 
     // 下一篇
@@ -354,40 +356,40 @@ public class ArticlePage extends TelnetPage {
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
-        this._telnet_view = (TelnetView) findViewById(R.id.Article_contentTelnetView);
+        mainLayout = (RelativeLayout) findViewById(R.id.content_view);
+
+        this._telnet_view = mainLayout.findViewById(R.id.Article_contentTelnetView);
         reloadTelnetLayout();
-        View empty_view = findViewById(R.id.Article_contentEmptyView);
-        ASListView list_view = (ASListView) findViewById(R.id.Article_contentList);
-        list_view.setEmptyView(empty_view);
+        ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
         list_view.setAdapter(this._list_adapter);
         list_view.setOnItemLongClickListener(this._list_long_click_listener);
 
-        Button back_button = (Button) findViewById(R.id.Article_backButton);
+        Button back_button = mainLayout.findViewById(R.id.Article_backButton);
         back_button.setOnClickListener(this._back_listener);
 
-        Button page_up_button = (Button) findViewById(R.id.Article_pageUpButton);
+        Button page_up_button = mainLayout.findViewById(R.id.Article_pageUpButton);
         page_up_button.setOnClickListener(this._page_up_listener);
         page_up_button.setOnLongClickListener(this._page_top_listener);
 
-        Button page_down_button = (Button) findViewById(R.id.Article_pageDownButton);
+        Button page_down_button = mainLayout.findViewById(R.id.Article_pageDownButton);
         page_down_button.setOnClickListener(this._page_down_listener);
         page_down_button.setOnLongClickListener(this._page_bottom_listener);
 
-        Button do_gy_button = (Button) findViewById(R.id.do_gy);
+        Button do_gy_button = mainLayout.findViewById(R.id.do_gy);
         if (do_gy_button != null) {
             do_gy_button.setOnClickListener(this.mDoGyListener);
         }
-        Button change_mode_button = (Button) findViewById(R.id.change_mode);
+        Button change_mode_button = mainLayout.findViewById(R.id.change_mode);
         if (change_mode_button != null) {
             change_mode_button.setOnClickListener(this.mChangeModeListener);
         }
-        Button show_link_button = (Button) findViewById(R.id.show_link);
+        Button show_link_button = mainLayout.findViewById(R.id.show_link);
         if (show_link_button != null) {
             show_link_button.setOnClickListener(this.mShowLinkListener);
         }
 
-        findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
-        findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
+        mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
+        mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
         if (this._telnet_view.getFrame() == null && this._article != null) {
             this._telnet_view.setFrame(this._article.getFrame());
@@ -402,9 +404,9 @@ public class ArticlePage extends TelnetPage {
 
     // 變更工具列位置
     private void changeToolbarLocation() {
-        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
-        LinearLayout toolbarBlock = (LinearLayout)findViewById(R.id.toolbar_block);
-        ToolBarFloating toolBarFloating = (ToolBarFloating) findViewById(R.id.ToolbarFloatingComponent);
+        LinearLayout toolbar = mainLayout.findViewById(R.id.toolbar);
+        LinearLayout toolbarBlock = mainLayout.findViewById(R.id.toolbar_block);
+        ToolBarFloating toolBarFloating = mainLayout.findViewById(R.id.ToolbarFloatingComponent);
         toolBarFloating.setVisibility(View.GONE);
 
         // 最左邊最右邊
@@ -468,7 +470,7 @@ public class ArticlePage extends TelnetPage {
 
     // 反轉按鈕順序
     void changeToolbarOrder() {
-        LinearLayout toolbar = (LinearLayout) findViewById(R.id.toolbar);
+        LinearLayout toolbar = mainLayout.findViewById(R.id.toolbar);
 
         int choice_toolbar_order = UserSettings.getPropertiesToolbarOrder();
         if (choice_toolbar_order == 1) {
@@ -572,7 +574,7 @@ public class ArticlePage extends TelnetPage {
 
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return false;
+                    return true;
                 }
             }).scheduleDismissOnPageDisappear(this).show();
         }
@@ -581,7 +583,7 @@ public class ArticlePage extends TelnetPage {
     // 載入全部圖片
     private void onLoadAllImageClicked() {
         // TODO: not yet
-        ASListView list_view = (ASListView) findViewById(R.id.Article_contentList);
+        ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
         int childCount = list_view.getChildCount();
         for (int childIndex = 0; childIndex<childCount; childIndex++) {
             View view = list_view.getChildAt(childIndex);
@@ -609,7 +611,7 @@ public class ArticlePage extends TelnetPage {
             store.store();
             this._telnet_view.setFrame(this._article.getFrame());
             reloadTelnetLayout();
-            ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_contentTelnetViewBlock);
+            ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
             if (telnet_content_view != null) {
                 telnet_content_view.scrollTo(0, 0);
             }
@@ -714,8 +716,8 @@ public class ArticlePage extends TelnetPage {
     }
 
     private void reloadViewMode() {
-        ViewGroup text_content_view = (ViewGroup) findViewById(R.id.Article_TextContentView);
-        ASScrollView telnet_content_view = (ASScrollView) findViewById(R.id.Article_contentTelnetViewBlock);
+        ViewGroup text_content_view = mainLayout.findViewById(R.id.Article_TextContentView);
+        ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
         // 文字模式
         if (UserSettings.getPropertiesArticleViewMode() == 0) {
             if (text_content_view != null) {
@@ -771,7 +773,7 @@ public class ArticlePage extends TelnetPage {
         }
         System.out.println("enable:" + enable);
         System.out.println("article_mode:" + article_mode);
-        View toolbar_view = findViewById(R.id.ext_toolbar);
+        View toolbar_view = mainLayout.findViewById(R.id.ext_toolbar);
         if (toolbar_view != null) {
             toolbar_view.setVisibility(enable ? View.VISIBLE : View.GONE);
         }
@@ -796,7 +798,7 @@ public class ArticlePage extends TelnetPage {
             list_dialog.setListener(new ASListDialogItemClickListener() {
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return false;
+                    return true;
                 }
 
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
@@ -837,7 +839,7 @@ public class ArticlePage extends TelnetPage {
             ASListDialog.createDialog().addItems(names).setListener(new ASListDialogItemClickListener() {
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return false;
+                    return true;
                 }
 
                 @Override // com.kota.ASFramework.Dialog.ASListDialogItemClickListener

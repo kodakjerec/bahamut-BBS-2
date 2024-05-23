@@ -52,7 +52,7 @@ object TempSettings {
     }
 
     @JvmStatic
-    fun getBookmarkStore(): BookmarkStore? {
-        return _bookmarkStore
+    fun getBookmarkStore(): BookmarkStore {
+        return _bookmarkStore!!
     }
 }

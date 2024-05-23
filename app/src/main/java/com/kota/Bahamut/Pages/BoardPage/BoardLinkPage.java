@@ -107,8 +107,4 @@ public class BoardLinkPage extends BoardMainPage {
         PageContainer.getInstance().cleanBoardTitleLinkedPage();
         return true;
     }
-
-    protected boolean isBookmarkAvailable() {
-        return false;
-    }
 }

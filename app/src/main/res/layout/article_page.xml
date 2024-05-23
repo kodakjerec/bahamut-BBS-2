@@ -5,7 +5,10 @@
     android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical" android:id="@+id/Article_contentView" android:layout_width="match_parent" android:layout_height="match_parent">
+    <LinearLayout android:orientation="vertical"
+        android:id="@+id/Article_contentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
         <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
             <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ExtToolbarItem"/>
             <View style="@style/ToolbarDivider"/>
@@ -16,16 +19,6 @@
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <!-- 文字模式 -->
             <FrameLayout android:id="@+id/Article_TextContentView" android:layout_width="match_parent" android:layout_height="match_parent">
-                <LinearLayout android:orientation="vertical" android:id="@+id/Article_contentEmptyView" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
-                    <LinearLayout android:orientation="vertical" android:background="@color/title_bar_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
-                        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/yellow" android:id="@+id/title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/loading_" android:singleLine="false" style="@style/TextViewNormal"/>
-                        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-                            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/loading" android:singleLine="true" style="@style/TextViewSmall"/>
-                        </LinearLayout>
-                    </LinearLayout>
-                    <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading" style="@style/TextViewUltraLarge"/>
-                </LinearLayout>
                 <com.kota.ASFramework.UI.ASListView
                     android:id="@+id/Article_contentList"
                     android:scrollbars="vertical"

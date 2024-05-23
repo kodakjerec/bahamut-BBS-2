@@ -142,7 +142,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
             isUnderRecycleView = true;
             if (BookmarkManagePage.this._mode == 0) {
                 switch (actionState) {
-                    case ItemTouchHelper.ACTION_STATE_DRAG:
+                    case ItemTouchHelper.ACTION_STATE_DRAG -> {
                         // the user is dragging an item and didn't lift their finger off yet
                         isSwiped = false;
                         isDragged = true;
@@ -150,15 +150,13 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                             dragView = viewHolder.itemView;
                             dragView.setBackgroundResource(R.color.ripple_material);
                         }
-                        break;
-
-                    case ItemTouchHelper.ACTION_STATE_SWIPE:
+                    }
+                    case ItemTouchHelper.ACTION_STATE_SWIPE -> {
                         // the user is swiping an item and didn't lift their finger off yet
                         isSwiped = true;
                         isDragged = false;
-                        break;
-
-                    case ItemTouchHelper.ACTION_STATE_IDLE:
+                    }
+                    case ItemTouchHelper.ACTION_STATE_IDLE -> {
                         // the user just dropped the item (after dragging it), and lift their finger off.
                         //
                         if (isSwiped) { // The user used onSwiped()
@@ -180,10 +178,10 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                             }
                             _bookmarkStore.store();
                         }
-
                         isSwiped = false;
                         isDragged = false;
                         isUnderRecycleView = false;
+                    }
                 }
             }
         }

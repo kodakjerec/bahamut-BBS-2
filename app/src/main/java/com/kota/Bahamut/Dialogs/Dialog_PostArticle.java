@@ -1,11 +1,11 @@
 package com.kota.Bahamut.Dialogs;
 
-import android.graphics.drawable.Drawable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
 

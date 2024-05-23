@@ -24,11 +24,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Model.TelnetRow;
 import com.kota.Telnet.Reference.TelnetAnsiCode;
 import com.kota.Telnet.TelnetAnsi;
 import com.kota.Telnet.TelnetArticleItemView;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.DividerView;
 
 import java.util.Vector;
@@ -103,80 +103,106 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                 int endIndex = startIndex;
                 byte paintColor = TelnetAnsi.getDefaultTextColor();
                 boolean startCatching = false;
-                for (int i = 0; i < ss.length(); i++) {
-                    // 開始擷取
+                // 檢查整串字元內有沒有包含預設顏色, 預設要替換
+                boolean needReplaceForeColor = true;
+                for (int i = 0; i < textColor.length; i++) {
                     if (textColor[i] != paintColor) {
+                        if ((i+1)>ss.length()) {
+                            needReplaceForeColor = false;
+                        }
+                        break;
+                    }
+                }
+                // 開始替換
+                if (needReplaceForeColor) {
+                    for (int i = 0; i < ss.length(); i++) {
+                        // 開始擷取
+                        if (textColor[i] != paintColor) {
+                            if (!startCatching) {
+                                startCatching = true;
+                                startIndex = i;
+                                endIndex = i;
+                                paintColor = textColor[i];
+                            } else {
+                                startCatching = false;
+                                endIndex = i - 1;
+                            }
+                        }
+                        // 停止擷取
+                        if (i == (ss.length() - 1)) {
+                            if (startCatching) {
+                                startCatching = false;
+                                endIndex = i;
+                                paintColor = textColor[i];
+                            }
+                        }
+                        // 塗顏色
                         if (!startCatching) {
-                            startCatching = true;
+                            if (paintColor != TelnetAnsi.getDefaultTextColor()) {
+                                endIndex += 1; // index和copyOfRange定位差異
+                                ForegroundColorSpan colorSpan = new ForegroundColorSpan(TelnetAnsiCode.getTextColor(paintColor));
+                                ss.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            }
+
                             startIndex = i;
-                            endIndex = i;
                             paintColor = textColor[i];
-                        } else {
-                            startCatching = false;
-                            endIndex = i-1;
-                        }
-                    }
-                    // 停止擷取
-                    if (i == (ss.length() - 1)) {
-                        if (startCatching) {
-                            startCatching = false;
-                            endIndex = i;
-                            paintColor = textColor[i];
-                        }
-                    }
-                    // 塗顏色
-                    if (!startCatching) {
-                        if (paintColor != TelnetAnsi.getDefaultTextColor()) {
-                            endIndex+=1; // index和copyOfRange定位差異
-                            ForegroundColorSpan colorSpan = new ForegroundColorSpan(TelnetAnsiCode.getTextColor(paintColor));
-                            ss.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }
 
-                        startIndex = i;
-                        paintColor = textColor[i];
-
-                        if (textColor[i] != TelnetAnsi.getDefaultTextColor())
-                            startCatching = true;
+                            if (textColor[i] != TelnetAnsi.getDefaultTextColor())
+                                startCatching = true;
+                        }
                     }
                 }
                 byte[] backgroundColor = row.getBackgroundColor();
                 startIndex =0;
                 endIndex = startIndex;
                 paintColor = TelnetAnsi.getDefaultBackgroundColor();
-                for (int i = 0; i < ss.length(); i++) {
-                    // 開始擷取
+                // 檢查整串字元內有沒有包含預設顏色, 預設要替換
+                boolean needReplaceBackColor = true;
+                for (int i = 0; i < backgroundColor.length; i++) {
                     if (backgroundColor[i] != paintColor) {
+                        if ((i+1)>ss.length()) {
+                            needReplaceBackColor = false;
+                        }
+                        break;
+                    }
+                }
+                // 開始替換
+                if (needReplaceBackColor) {
+                    for (int i = 0; i < ss.length(); i++) {
+                        // 開始擷取
+                        if (backgroundColor[i] != paintColor) {
+                            if (!startCatching) {
+                                startCatching = true;
+                                startIndex = i;
+                                endIndex = i;
+                                paintColor = backgroundColor[i];
+                            } else {
+                                startCatching = false;
+                                endIndex = i - 1;
+                            }
+                        }
+                        // 停止擷取
+                        if (i == (ss.length() - 1)) {
+                            if (startCatching) {
+                                startCatching = false;
+                                endIndex = i;
+                                paintColor = backgroundColor[i];
+                            }
+                        }
+                        // 塗顏色
                         if (!startCatching) {
-                            startCatching = true;
+                            if (paintColor != TelnetAnsi.getDefaultBackgroundColor()) {
+                                endIndex += 1; // index和copyOfRange定位差異
+                                BackgroundColorSpan colorSpan = new BackgroundColorSpan(TelnetAnsiCode.getBackgroundColor(paintColor));
+                                ss.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            }
+
                             startIndex = i;
-                            endIndex = i;
                             paintColor = backgroundColor[i];
-                        } else {
-                            startCatching = false;
-                            endIndex = i-1;
-                        }
-                    }
-                    // 停止擷取
-                    if (i == (ss.length() - 1)) {
-                        if (startCatching) {
-                            startCatching = false;
-                            endIndex = i;
-                            paintColor = backgroundColor[i];
-                        }
-                    }
-                    // 塗顏色
-                    if (!startCatching) {
-                        if (paintColor != TelnetAnsi.getDefaultBackgroundColor()) {
-                            endIndex+=1; // index和copyOfRange定位差異
-                            BackgroundColorSpan colorSpan = new BackgroundColorSpan(TelnetAnsiCode.getBackgroundColor(paintColor));
-                            ss.setSpan(colorSpan, startIndex, endIndex, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        }
 
-                        startIndex = i;
-                        paintColor = backgroundColor[i];
-
-                        if (backgroundColor[i] != TelnetAnsi.getDefaultBackgroundColor())
-                            startCatching = true;
+                            if (backgroundColor[i] != TelnetAnsi.getDefaultBackgroundColor())
+                                startCatching = true;
+                        }
                     }
                 }
             }
@@ -214,51 +240,53 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
             if (UserSettings.getLinkAutoShow()) {
                 SpannableString originalString = (SpannableString) _content_label.getText();
                 URLSpan[] urlSpans = _content_label.getUrls();
-                int previousIndex = 0;
-                for (URLSpan urlSpan : urlSpans) {
-                    TextView textView1 = new TextView(getContext());
-                    TextView textView2 = new TextView(getContext());
+                if (urlSpans.length>0) {
+                    int previousIndex = 0;
+                    for (URLSpan urlSpan : urlSpans) {
+                        TextView textView1 = new TextView(getContext());
+                        TextView textView2 = new TextView(getContext());
 
-                    // partA
-                    int urlSpanEnd = originalString.getSpanEnd(urlSpan);
-                    CharSequence partA = originalString.subSequence(previousIndex, urlSpanEnd);
-                    textView1.setText(partA);
+                        // partA
+                        int urlSpanEnd = originalString.getSpanEnd(urlSpan);
+                        CharSequence partA = originalString.subSequence(previousIndex, urlSpanEnd);
+                        textView1.setText(partA);
 
-                    // check error
-                    if (urlSpanEnd + 1 <= originalString.length())
-                        urlSpanEnd = urlSpanEnd + 1;
+                        // check error
+                        if (urlSpanEnd + 1 <= originalString.length())
+                            urlSpanEnd = urlSpanEnd + 1;
 
-                    // partB
-                    CharSequence partB = originalString.subSequence(urlSpanEnd, originalString.length());
-                    textView2.setText(partB);
+                        // partB
+                        CharSequence partB = originalString.subSequence(urlSpanEnd, originalString.length());
+                        textView2.setText(partB);
 
-                    mainLayout.removeViewAt(originalIndex);
-                    mainLayout.addView(textView1, originalIndex);
-                    String url = urlSpan.getURL();
-                    Thumbnail_ItemView thumbnail = new Thumbnail_ItemView(getContext());
-                    thumbnail.loadUrl(url);
-                    mainLayout.addView(thumbnail, originalIndex+1);
-                    mainLayout.addView(textView2, originalIndex+2);
+                        mainLayout.removeViewAt(originalIndex);
+                        mainLayout.addView(textView1, originalIndex);
+                        String url = urlSpan.getURL();
+                        Thumbnail_ItemView thumbnail = new Thumbnail_ItemView(getContext());
+                        thumbnail.loadUrl(url);
+                        mainLayout.addView(thumbnail, originalIndex + 1);
+                        mainLayout.addView(textView2, originalIndex + 2);
 
-                    previousIndex = urlSpanEnd;
-                    originalIndex = mainLayout.indexOfChild(textView2);
-                }
+                        previousIndex = urlSpanEnd;
+                        originalIndex = mainLayout.indexOfChild(textView2);
+                    }
 
-                // 統一指定屬性
-                for (int i = 0; i < mainLayout.getChildCount(); i++) {
-                    View view = mainLayout.getChildAt(i);
-                    if (view.getClass().equals(TextView.class)) {
-                        TextView textView = (TextView) view;
-                        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-                        textView.setEnabled(true);
-                        textView.setTextIsSelectable(true);
-                        textView.setFocusable(true);
-                        textView.setLongClickable(true);
-                        if (_quote>0)
-                            textView.setTextColor(getContextColor(R.color.article_page_text_item_content1));
-                        else
-                            textView.setTextColor(getContextColor(R.color.article_page_text_item_content0));
-                        stringNewUrlSpan(textView);
+                    // 統一指定屬性
+                    for (int i = 0; i < mainLayout.getChildCount(); i++) {
+                        View view = mainLayout.getChildAt(i);
+                        if (view.getClass().equals(TextView.class)) {
+                            TextView textView = (TextView) view;
+                            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+                            textView.setEnabled(true);
+                            textView.setTextIsSelectable(true);
+                            textView.setFocusable(true);
+                            textView.setLongClickable(true);
+                            if (_quote > 0)
+                                textView.setTextColor(getContextColor(R.color.article_page_text_item_content1));
+                            else
+                                textView.setTextColor(getContextColor(R.color.article_page_text_item_content0));
+                            stringNewUrlSpan(textView);
+                        }
                     }
                 }
             } else {

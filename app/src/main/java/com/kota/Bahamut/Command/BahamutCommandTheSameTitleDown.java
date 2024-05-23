@@ -27,11 +27,11 @@ public class BahamutCommandTheSameTitleDown extends TelnetCommand {
                     }
                 }.runInMainThread();
                 setDone(true);
-                return;
+            } else {
+                TelnetOutputBuilder.create()
+                        .pushString(_article_index + "\n")
+                        .pushKey(TelnetKeyboard.DOWN_ARROW).sendToServer();
             }
-            TelnetOutputBuilder.create()
-                    .pushString(_article_index + "\n")
-                    .pushKey(TelnetKeyboard.DOWN_ARROW).sendToServer();
         } else if (_article_index > 0) {
             TelnetOutputBuilder.create()
                     .pushString(_article_index + "\n]")
@@ -43,8 +43,18 @@ public class BahamutCommandTheSameTitleDown extends TelnetCommand {
 
     public void executeFinished(final TelnetListPage aListPage, TelnetListPageBlock aPageData) {
         if (aPageData.selectedItem.isDeleted || aListPage.isItemBlocked(aPageData.selectedItem)) {
-            _article_index = aPageData.selectedItemNumber;
-            setDone(false);
+            if (_article_index == aPageData.selectedItemNumber) {
+                new ASRunner() {
+                    public void run() {
+                        ASToast.showShortToast("無下一篇同主題文章");
+                        aListPage.onLoadItemFinished();
+                    }
+                }.runInMainThread();
+                setDone(true);
+            } else {
+                _article_index = aPageData.selectedItemNumber;
+                setDone(false);
+            }
         } else if (aListPage.isItemLoadingByNumber(aPageData.selectedItemNumber)) {
             new ASRunner() {
                 public void run() {
@@ -61,6 +71,6 @@ public class BahamutCommandTheSameTitleDown extends TelnetCommand {
 
     @NonNull
     public String toString() {
-        return "[TheSameTitleUp][articleIndex=" + _article_index + "]";
+        return "[TheSameTitleDown][articleIndex=" + _article_index + "]";
     }
 }

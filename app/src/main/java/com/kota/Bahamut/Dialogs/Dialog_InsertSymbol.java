@@ -8,8 +8,8 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.Bahamut.R;
 
 import java.util.Objects;

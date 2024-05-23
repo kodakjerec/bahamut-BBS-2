@@ -125,10 +125,6 @@ public class BoardSearchPage extends BoardMainPage {
         return true;
     }
 
-    protected boolean isBookmarkAvailable() {
-        return false;
-    }
-
     public boolean isAutoLoadEnable() {
         return false;
     }

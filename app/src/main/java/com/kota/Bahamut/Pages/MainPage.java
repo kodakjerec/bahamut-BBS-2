@@ -5,24 +5,15 @@ import android.widget.Button;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
-import com.kota.Bahamut.BahamutController;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
-import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
-
-import java.io.IOException;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainPage extends TelnetPage {
     View.OnClickListener _boards_listener = v -> {
@@ -127,16 +118,11 @@ public class MainPage extends TelnetPage {
             this._save_hot_message_dialog = ASAlertDialog.createDialog().setTitle("熱訊").setMessage("本次上站熱訊處理 ").addButton("備忘錄").addButton("保留").addButton("清除").setListener((aDialog, index) -> {
                 MainPage.this._save_hot_message_dialog = null;
                 switch (index) {
-                    case 0:
-                        TelnetClient.getClient().sendStringToServerInBackground("M");
-                        return;
-                    case 1:
-                        TelnetClient.getClient().sendStringToServerInBackground("K");
-                        return;
-                    case 2:
-                        TelnetClient.getClient().sendStringToServerInBackground("C");
-                        return;
-                    default:
+                    case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
+                    case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
+                    case 2 -> TelnetClient.getClient().sendStringToServerInBackground("C");
+                    default -> {
+                    }
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {
                 TelnetClient.getClient().sendStringToServerInBackground("K\nQ");
@@ -152,15 +138,12 @@ public class MainPage extends TelnetPage {
             this._goodbye_dialog = ASAlertDialog.createDialog().setTitle("登出").setMessage("是否確定要登出?").addButton("取消").addButton("確認").setListener((aDialog, index) -> {
                 MainPage.this._goodbye_dialog = null;
                 switch (index) {
-                    case 0:
-                        // 取消
-                        TelnetClient.getClient().sendStringToServerInBackground("Q");
-                        return;
-                    case 1:
-                        // 確定
-                        TelnetClient.getClient().sendStringToServerInBackground("G");
-                        return;
-                    default:
+                    case 0 -> // 取消
+                            TelnetClient.getClient().sendStringToServerInBackground("Q");
+                    case 1 -> // 確定
+                            TelnetClient.getClient().sendStringToServerInBackground("G");
+                    default -> {
+                    }
                 }
             }).scheduleDismissOnPageDisappear(this);
             this._goodbye_dialog.show();

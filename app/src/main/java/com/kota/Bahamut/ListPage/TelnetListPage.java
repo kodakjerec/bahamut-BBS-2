@@ -19,6 +19,7 @@ import com.kota.Bahamut.Command.BahamutCommandLoadLastBlock;
 import com.kota.Bahamut.Command.BahamutCommandMoveToLastBlock;
 import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.TelnetUI.TelnetPage;
 

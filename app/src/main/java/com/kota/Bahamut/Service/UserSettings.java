@@ -3,13 +3,20 @@ package com.kota.Bahamut.Service;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.kota.ASFramework.UI.ASToast;
+import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Telnet.PropertiesOperator;
+
+import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
@@ -45,8 +52,8 @@ public class UserSettings {
     static String _blockListDefault = "guest"; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
     Context _context;
     
-    static SharedPreferences _sharedPref;
-    static SharedPreferences.Editor _editor;
+    public static SharedPreferences _sharedPref;
+    public static SharedPreferences.Editor _editor;
     static final String _articleHeadersDefault = "不加 ▼,[問題],[情報],[心得],[討論],[攻略],[秘技],[閒聊],[程設],[職場],[推廣],[手機],[平板],[新番],[電影],[新聞],[其它]";
     static final String _articleExpressions = "( >_0)b,( ;-w-)a,( -3-)y-~,ˋ(°▽ ° )ノˋ( ° ▽° )ノ,#/-_-)/~╨──╨,(||￣▽￣)a,o( -_-)=0))-3-)/,(#‵′)o,O(‵皿′)o,( T_T),(o_O ),_ψ(._. ),v(￣︶￣)y,ㄟ(￣▽￣ㄟ)...,(っ´▽`)っ,m(_ _)m,ˋ(°ω ° )ノ,◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣,( O口O)!?, ☆━━━(ﾟ∀ﾟ)━━━, *[1;33m洽特*[m";
 
@@ -227,9 +234,7 @@ public class UserSettings {
 
     // 取出所有符號
     public static String[] getArticleHeaders() {
-        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_HEADS, "");
-        if (_source.equals(""))
-            _source = _articleHeadersDefault;
+        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_HEADS, _articleHeadersDefault);
         return _source.split(",");
     }
     public static void resetArticleHeaders() {
@@ -243,9 +248,7 @@ public class UserSettings {
 
     // 取出所有表情
     public static String[] getArticleExpressions() {
-        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_EXPRESSIONS, "");
-        if (_source.equals(""))
-            _source = _articleExpressions;
+        String _source = _sharedPref.getString(PROPERTIES_ARTICLE_EXPRESSIONS, _articleExpressions);
         return _source.split(",");
     }
     public static void resetArticleExpressions() {
@@ -293,7 +296,7 @@ public class UserSettings {
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContains(String aName) {
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
-        boolean isBlocked = blockListString.contains(aName.toLowerCase());
+        boolean isBlocked = blockListString.toLowerCase().contains(aName.toLowerCase());
         return isBlocked;
     }
 
@@ -316,8 +319,8 @@ public class UserSettings {
     public static List<Float> getFloatingLocation() {
         SharedPreferences pref = _sharedPref;
         List<Float> list = new ArrayList<>();
-        list.add(pref.getFloat(floatingLocationX, -1));
-        list.add(pref.getFloat(floatingLocationY, -1));
+        list.add(pref.getFloat(floatingLocationX, (float) -1));
+        list.add(pref.getFloat(floatingLocationY, (float) -1));
         return list;
     }
 
