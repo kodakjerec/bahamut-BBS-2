@@ -1,10 +1,15 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
@@ -14,6 +19,12 @@ import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
+
+import org.json.JSONObject;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MainPage extends TelnetPage {
     View.OnClickListener _boards_listener = v -> {
@@ -63,6 +74,30 @@ public class MainPage extends TelnetPage {
         findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
         findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
+
+        String apiUrl = "https://get-imgur-token-lqeallcr2q-de.a.run.app";
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(apiUrl)
+                .get()
+                .build();
+        ASRunner.runInNewThread(()->{
+            try{
+                Response response = client.newCall(request).execute();
+                assert response.body() != null;
+                String data = response.body().string();
+                JSONObject jsonObject = new JSONObject(data);
+                String accessToken = jsonObject.getString("accessToken");
+                String albumHash = jsonObject.getString("albumHash");
+                if (!accessToken.isEmpty()) {
+                    TempSettings.setImgurToken(accessToken);
+                    TempSettings.setImgurAlbum(albumHash);
+                }
+            } catch (Exception e) {
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
+                Log.e("ShortenImage", e.toString());
+            }
+        });
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {

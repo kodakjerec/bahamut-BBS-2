@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 
 object NotificationSettings {
         private var perf: SharedPreferences? = null
-    private const val perfName:String = "notification"
+        private const val perfName:String = "notification"
         private const val propertiesShowTopBottomFunction:String = "show_top_bottom_function" // 第一次進入文章頁面的提示訊息
         private const val propertiesShowBlockList:String = "show_block_list" // 第一次進入黑名單頁面的提示訊息
         private const val propertiesShowHeader:String = "show_header" // 第一次進入標題頁面的提示訊息

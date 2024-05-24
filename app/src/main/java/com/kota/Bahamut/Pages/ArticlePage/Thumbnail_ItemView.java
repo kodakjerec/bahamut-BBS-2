@@ -42,9 +42,12 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 public class Thumbnail_ItemView extends LinearLayout {
+    LinearLayout mainLayout;
     Context _context;
     int _width;
     int _height;
@@ -102,7 +105,20 @@ public class Thumbnail_ItemView extends LinearLayout {
                     if (_url.contains("youtu")) {
                         userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0";
                     }
-                    Connection.Response resp = Jsoup.connect(_url).ignoreContentType(true).header("User-Agent", userAgent).followRedirects(true).execute();
+
+                    // cookie
+                    // Create a new Map to store cookies
+                    Map<String, String> cookies = new HashMap<>();
+                    if (_url.contains("ptt"))
+                        cookies.put("over18", "1");  // Add the over18 cookie with value 1
+
+                    Connection.Response resp = Jsoup
+                            .connect(_url)
+                            .ignoreContentType(true)
+                            .header("User-Agent", userAgent)
+                            .followRedirects(true)
+                            .cookies(cookies)
+                            .execute();
                     String contentType = resp.contentType();
 
                     if (contentType.contains("image/") || contentType.contains("video/")) {
@@ -353,19 +369,43 @@ public class Thumbnail_ItemView extends LinearLayout {
         }
     };
 
+    OnClickListener titleListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            TextView textView = (TextView) view;
+            if (textView.getMaxLines()==2)
+                textView.setMaxLines(9);
+            else
+                textView.setMaxLines(2);
+        }
+    };
+    OnClickListener descriptionListener = new OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            TextView textView = (TextView) view;
+            if (textView.getMaxLines()==1)
+                textView.setMaxLines(9);
+            else
+                textView.setMaxLines(1);
+        }
+    };
+
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.thumbnail, this);
-        _layout_default = findViewById(R.id.thumbnail_default);
+        mainLayout = findViewById(R.id.thumbnail_content_view);
+        _layout_default = mainLayout.findViewById(R.id.thumbnail_default);
 
-        _layout_pic = findViewById(R.id.thumbnail_pic);
-        _image_view_pic = findViewById(R.id.thumbnail_image_pic);
+        _layout_pic = mainLayout.findViewById(R.id.thumbnail_pic);
+        _image_view_pic = mainLayout.findViewById(R.id.thumbnail_image_pic);
         _image_view_pic.setOnClickListener(_open_url_listener);
-        _image_view_button = findViewById(R.id.thumbnail_image_button);
+        _image_view_button = mainLayout.findViewById(R.id.thumbnail_image_button);
         _image_view_button.setOnClickListener(view -> prepare_load_image());
 
-        _layout_normal = findViewById(R.id.thumbnail_normal);
-        _title_view = findViewById(R.id.thumbnail_title);
-        _description_view = findViewById(R.id.thumbnail_description);
-        _url_view = findViewById(R.id.thumbnail_url);
+        _layout_normal = mainLayout.findViewById(R.id.thumbnail_normal);
+        _title_view = mainLayout.findViewById(R.id.thumbnail_title);
+        _title_view.setOnClickListener(titleListener);
+        _description_view = mainLayout.findViewById(R.id.thumbnail_description);
+        _description_view.setOnClickListener(descriptionListener);
+        _url_view = mainLayout.findViewById(R.id.thumbnail_url);
     }
 }

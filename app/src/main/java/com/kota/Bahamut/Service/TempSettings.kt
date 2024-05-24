@@ -16,7 +16,9 @@ object TempSettings {
     @JvmField
     var lastVisitBoard = "" // 最後離開的看板
     @SuppressLint("StaticFieldLeak")
-    var _bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
+    private var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
+    private var imgurAccessToken: String = "" // 上傳 imgur 的 token
+    private var imgurAlbum: String = "" // 上傳 imgur 的 album
 
     // 清空數據但不包含 網路狀況
     @JvmStatic
@@ -48,11 +50,28 @@ object TempSettings {
 
     @JvmStatic
     fun setBookmarkStore(fromBookmarkStore: BookmarkStore?) {
-        _bookmarkStore = fromBookmarkStore
+        bookmarkStore = fromBookmarkStore
     }
 
     @JvmStatic
     fun getBookmarkStore(): BookmarkStore {
-        return _bookmarkStore!!
+        return bookmarkStore!!
+    }
+
+    @JvmStatic
+    fun getImgurToken(): String {
+        return imgurAccessToken
+    }
+    @JvmStatic
+    fun setImgurToken(token:String) {
+        imgurAccessToken = token
+    }
+    @JvmStatic
+    fun getImgurAlbum(): String {
+        return imgurAlbum
+    }
+    @JvmStatic
+    fun setImgurAlbum(album:String) {
+        imgurAlbum = album
     }
 }

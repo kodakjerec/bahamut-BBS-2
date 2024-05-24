@@ -33,6 +33,7 @@ import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
+import com.kota.Bahamut.Service.TempSettings
 import com.kota.Bahamut.Service.UserSettings
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -60,8 +61,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private var sendButton: Button? = null
     private var outputParam: String = ""
     private var sampleTextView: TextView? = null
-    private var accessToken: String = ""
-    private var albumHash: String = ""
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,29 +93,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         sendButton!!.isEnabled = false
         layout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
         layout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
-
-        val apiUrl = "https://get-imgur-token-lqeallcr2q-de.a.run.app"
-        val client = OkHttpClient()
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .get()
-            .build()
-        ASRunner.runInNewThread {
-            try{
-                client.newCall(request).execute().use { response->
-                    val data = response.body!!.string()
-                    val jsonObject = JSONObject(data)
-                    accessToken = jsonObject.getString("accessToken")
-                    albumHash = jsonObject.getString("albumHash")
-                    if (accessToken.isEmpty()){
-                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
-                    }
-                }
-            } catch (e: Exception) {
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
-                Log.e("ShortenImage", e.printStackTrace().toString())
-            }
-        }
     }
 
     /** 選擇相簿 */
@@ -185,6 +161,8 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             closeProcessingDialog()
             return@OnClickListener
         }
+        val accessToken = TempSettings.getImgurToken()
+        val albumHash = TempSettings.getImgurAlbum()
         if (accessToken.isEmpty()) {
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
             closeProcessingDialog()

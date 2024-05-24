@@ -4,9 +4,11 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import static com.kota.Bahamut.Service.MyBillingClient.checkPurchaseHistoryQuery;
 
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
@@ -17,10 +19,10 @@ import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCursor;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
@@ -78,8 +80,11 @@ public class LoginPage extends TelnetPage {
 
         // 清空暫存和執行中變數
         TempSettings.clearTempSettings(); // 清除暫存資料
-        UrlDatabase urlDatabase = new UrlDatabase(getContext()); // 清除URL資料庫
-        urlDatabase.clearDb();
+        try (UrlDatabase urlDatabase = new UrlDatabase(getContext())) { // 清除URL資料庫
+            urlDatabase.clearDb();
+        } catch (Exception e) {
+            Log.e("Bookmark", "initial fail");
+        }
 
         // check VIP
         if (!UserSettings.getPropertiesVIP()) {
@@ -190,7 +195,10 @@ public class LoginPage extends TelnetPage {
 
     void login() {
         ASProcessingDialog.showProcessingDialog("登入中");
-        new Thread(() -> TelnetClient.getClient().sendStringToServerInBackground(LoginPage.this._username)).start();
+        ASRunner.runInNewThread(() ->
+            TelnetClient.getClient()
+                    .sendStringToServerInBackground(LoginPage.this._username)
+        );
     }
 
     public void onCheckRemoveLogonUser() {

@@ -41,7 +41,8 @@ public class BookmarkStore {
     }
 
     public static void upgrade(Context context, String aFilePath) {
-        TempSettings.setBookmarkStore(new BookmarkStore(context, aFilePath).load());
+        BookmarkStore bookmarkStore = new BookmarkStore(context, aFilePath).load();
+        TempSettings.setBookmarkStore(bookmarkStore);
     }
 
     @NonNull
