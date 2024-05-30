@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="260dp"
+    android:layout_height="wrap_content"
+    android:background="@color/dialog_border_color"
+    android:orientation="vertical"
+    android:padding="3dp">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/black">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
+        <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:rowCount="7"
+                    android:columnCount="2">
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_id"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_nick"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/ToolbarItem.Grid"
+                        android:text="HP：" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_hp"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/ToolbarItem.Grid"
+                        android:text="MP：" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_mp"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_auth1"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_auth2"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/ToolbarItem.Grid"
+                        android:text="上次" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_last_time"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/ToolbarItem.Grid"
+                        android:text="來自" />
+                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        android:id="@+id/dialog_query_hero_from_ip"
+                        style="@style/ToolbarItem.Grid"
+                        android:text="@string/zero_word" />
+                </GridLayout>
+            </LinearLayout>
+        </ScrollView>
+        <LinearLayout style="@style/Toolbar">
+            <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem" android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

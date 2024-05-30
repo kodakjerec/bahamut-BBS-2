@@ -38,13 +38,18 @@ import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 
+import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Vector;
+
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class Thumbnail_ItemView extends LinearLayout {
     LinearLayout mainLayout;
@@ -85,85 +90,110 @@ public class Thumbnail_ItemView extends LinearLayout {
     // 判斷URL內容
     public void loadUrl(String url) {
         _url = url;
-        UrlDatabase urlDatabase = new UrlDatabase(getContext());
-        Vector<String> findUrl = urlDatabase.getUrl(_url);
-        _url_view.setText(_url);
 
-        // 已經有URL資料
-        if (findUrl!=null) {
-            _title = findUrl.get(1);
-            _description = findUrl.get(2);
-            _imageUrl = findUrl.get(3);
-            _isPic = !findUrl.get(4).equals("0");
-            picOrUrl_changeStatus(_isPic);
-        } else {
-            // 尋找URL資料
-            ASRunner.runInNewThread(() -> {
-                // load heads
-                try {
-                    String userAgent = System.getProperty("http.agent");
-                    if (_url.contains("youtu")) {
-                        userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36 Edg/122.0.0.0";
-                    }
+        try (UrlDatabase urlDatabase = new UrlDatabase(getContext())) {
+            Vector<String> findUrl = urlDatabase.getUrl(_url);
+            _url_view.setText(_url);
+            // 已經有URL資料
+            if (findUrl!=null) {
+                _title = findUrl.get(1);
+                _description = findUrl.get(2);
+                _imageUrl = findUrl.get(3);
+                _isPic = !findUrl.get(4).equals("0");
+                picOrUrl_changeStatus(_isPic);
+            } else {
+                String apiUrl = "https://worker-get-url-content.kodakjerec.workers.dev/";
+                OkHttpClient client = new OkHttpClient();
+                RequestBody body = new MultipartBody.Builder()
+                        .setType(MultipartBody.FORM)
+                        .addFormDataPart("url", _url)
+                        .build();
+                Request request = new Request.Builder()
+                        .url(apiUrl)
+                        .post(body)
+                        .build();
 
-                    // cookie
-                    // Create a new Map to store cookies
-                    Map<String, String> cookies = new HashMap<>();
-                    if (_url.contains("ptt"))
-                        cookies.put("over18", "1");  // Add the over18 cookie with value 1
+                // 尋找URL資料
+                ASRunner.runInNewThread(() -> {
+                    try {
+                        // load heads
+                        Response response = client.newCall(request).execute();
+                        assert response.body() != null;
+                        String data = response.body().string();
+                        JSONObject jsonObject = new JSONObject(data);
 
-                    Connection.Response resp = Jsoup
-                            .connect(_url)
-                            .ignoreContentType(true)
-                            .header("User-Agent", userAgent)
-                            .followRedirects(true)
-                            .cookies(cookies)
-                            .execute();
-                    String contentType = resp.contentType();
+                        String contentType = jsonObject.getString("contentType");
 
-                    if (contentType.contains("image/") || contentType.contains("video/")) {
-                        _isPic = true;
-                    }
-                    // 域名判斷
-                    if (url.contains("i.imgur")) {
-                        _isPic = true;
-                    }
-
-                    // 圖片處理
-                    if (_isPic) {
-                        _title = _url;
-                        _description = "";
-                        _imageUrl = _url;
-                        picOrUrl_changeStatus(true);
-                    } else {
-                        // 文字處理
-                        Document document = resp.parse();
-
-                        _title = document.title();
-                        if (_title.isEmpty())
-                            _title = document.select("meta[property=og:title]").attr("content");
-
-                        _description = document.select("meta[name=description]").attr("content");
-                        if (_description.isEmpty())
-                            _description = document.select("meta[property=og:description]").attr("content");
-
-                        _imageUrl = document.select("meta[property=og:image]").attr("content");
-                        if (_imageUrl.isEmpty())
-                            _imageUrl = document.select("meta[property=og:image]").attr("content");
-
-                        picOrUrl_changeStatus(false);
-                    }
-
-                    urlDatabase.addUrl(_url, _title, _description, _imageUrl,_isPic);
-                } catch (Exception e) {
-                    new ASRunner() {
-                        @Override // com.kota.ASFramework.Thread.ASRunner
-                        public void run() {
-                            set_fail();
+                        if (contentType.contains("image") || contentType.contains("video") || contentType.contains("audio")) {
+                            _isPic = true;
                         }
-                    }.runInMainThread();
+                        _title = jsonObject.getString("title");
+                        _description = jsonObject.getString("desc");
+                        _imageUrl = jsonObject.getString("imageUrl");
+
+                        // 非圖片類比較會有擷取問題
+                        if (!_isPic && (_title.equals("") || _description.equals(""))) {
+                            String userAgent = System.getProperty("http.agent");
+                            Connection.Response resp = Jsoup
+                                    .connect(_url)
+                                    .ignoreContentType(true)
+                                    .header("User-Agent", userAgent)
+                                    .followRedirects(true)
+                                    .execute();
+                            contentType = resp.contentType();
+
+                            if (contentType.contains("image/") || contentType.contains("video/")) {
+                                _isPic = true;
+                            }
+                            // 域名判斷
+                            if (url.contains("i.imgur")) {
+                                _isPic = true;
+                            }
+
+                            // 圖片處理
+                            if (_isPic) {
+                                _title = _url;
+                                _description = "";
+                                _imageUrl = _url;
+                            } else {
+                                // 文字處理
+                                Document document = resp.parse();
+
+                                _title = document.title();
+                                if (_title.isEmpty())
+                                    _title = document.select("meta[property=og:title]").attr("content");
+
+                                _description = document.select("meta[name=description]").attr("content");
+                                if (_description.isEmpty())
+                                    _description = document.select("meta[property=og:description]").attr("content");
+
+                                _imageUrl = document.select("meta[property=og:image]").attr("content");
+                                if (_imageUrl.isEmpty())
+                                    _imageUrl = document.select("meta[property=og:image]").attr("content");
+                            }
+                        }
+
+                        // 圖片處理
+                        picOrUrl_changeStatus(_isPic);
+
+                        urlDatabase.addUrl(_url, _title, _description, _imageUrl, _isPic);
+                    } catch (Exception e) {
+                        new ASRunner() {
+                            @Override // com.kota.ASFramework.Thread.ASRunner
+                            public void run() {
+                                set_fail();
+                            }
+                        }.runInMainThread();
+                    }
+                });
+            }
+        } catch (Exception e) {
+            new ASRunner() {
+                @Override // com.kota.ASFramework.Thread.ASRunner
+                public void run() {
+                    set_fail();
                 }
-            });
+            }.runInMainThread();
         }
     }
     // 判斷是圖片或連結, 改變顯示狀態
@@ -215,6 +245,7 @@ public class Thumbnail_ItemView extends LinearLayout {
     // 純圖片
     public void prepare_load_image() {
         if (_img_loaded) return;
+
         if (_isPic) {
             _height = _height/2;
 
@@ -326,8 +357,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                                         targetWidth = Math.min(tempWidth, targetWidth);
                                         _image_view_pic.setMinimumWidth(targetWidth);
 
-                                        if (resource instanceof GifDrawable) {
-                                            GifDrawable gifDrawable = (GifDrawable) resource;
+                                        if (resource instanceof GifDrawable gifDrawable) {
                                             gifDrawable.startFromFirstFrame();
                                             _image_view_pic.setImageDrawable(resource);
                                         } else {
@@ -369,25 +399,19 @@ public class Thumbnail_ItemView extends LinearLayout {
         }
     };
 
-    OnClickListener titleListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            TextView textView = (TextView) view;
-            if (textView.getMaxLines()==2)
-                textView.setMaxLines(9);
-            else
-                textView.setMaxLines(2);
-        }
+    OnClickListener titleListener = view -> {
+        TextView textView = (TextView) view;
+        if (textView.getMaxLines()==2)
+            textView.setMaxLines(9);
+        else
+            textView.setMaxLines(2);
     };
-    OnClickListener descriptionListener = new OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            TextView textView = (TextView) view;
-            if (textView.getMaxLines()==1)
-                textView.setMaxLines(9);
-            else
-                textView.setMaxLines(1);
-        }
+    OnClickListener descriptionListener = view -> {
+        TextView textView = (TextView) view;
+        if (textView.getMaxLines()==1)
+            textView.setMaxLines(9);
+        else
+            textView.setMaxLines(1);
     };
 
     private void init() {

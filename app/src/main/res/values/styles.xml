@@ -352,4 +352,10 @@
         <item name="android:textColor">@color/button_text_color</item>
         <item name="android:background">@drawable/button_rounded_background_2</item>
     </style>
+    <style name="DialogQueryHeroText" parent="TextViewNormal">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+    </style>
 </resources>

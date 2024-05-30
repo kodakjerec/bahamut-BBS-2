@@ -15,8 +15,6 @@
     <string name="arrow_up">▲</string>
     <string name="already_to_top">"已讀至列首"</string>
     <string name="already_to_bottom">"已讀至列尾"</string>
-    <string name="already_to_top_page">"已讀至頁首"</string>
-    <string name="already_to_bottom_page">"已讀至頁尾"</string>
     <string name="notification_article_top_bottom_function">長按上一頁/下一頁可以移至該串文章的首篇/末篇</string>
     <string name="notification_block_list">輸入ID內輸入對方帳號，按下新增加入黑名單，可阻擋對方訊息</string>
     <string name="notification_header">輸入ID內輸入標題，發文時可選擇成為預設標題</string>
@@ -307,4 +305,5 @@
     <string name="cloud_save_question2">已有雲端存檔。採用本地存檔或雲端存檔為主？</string>
     <string name="cloud_save_local">本地</string>
     <string name="cloud_save_cloud">雲端</string>
+    <string name="dialog_query_hero">查詢勇者</string>
 </resources>

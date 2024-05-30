@@ -21,6 +21,7 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
@@ -29,6 +30,7 @@ import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
+import com.kota.Bahamut.Dialogs.DialogShortenUrl;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
@@ -48,6 +50,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.Vector;
 
 public class ArticlePage extends TelnetPage {
     RelativeLayout mainLayout;
@@ -877,5 +880,20 @@ public class ArticlePage extends TelnetPage {
                         }
                     }
                 }).scheduleDismissOnPageDisappear(this).show();
+    }
+
+    public void ctrlQUser(Vector<String> fromStrings) {
+        System.out.println(fromStrings);
+        try {
+            new ASRunner() {
+                @Override
+                public void run() {
+                    DialogShortenUrl temp = new DialogShortenUrl();
+                    temp.show();
+                }
+            }.runInMainThread();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -75,7 +75,7 @@ public class MainPage extends TelnetPage {
         findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
         findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
-        String apiUrl = "https://get-imgur-token-lqeallcr2q-de.a.run.app";
+        String apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/";
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
                 .url(apiUrl)

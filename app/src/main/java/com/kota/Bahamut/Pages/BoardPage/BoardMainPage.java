@@ -60,10 +60,10 @@ import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.PostArticlePage_Listener;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
-import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TextView.TelnetTextViewLarge;
 
@@ -96,7 +96,9 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     final View.OnClickListener mPostListener = view -> BoardMainPage.this.onPostButtonClicked();
 
     // 前一頁
-    final View.OnClickListener mFirstPageClickListener = view -> BoardMainPage.this.moveToFirstPosition();
+    final View.OnClickListener mFirstPageClickListener = view -> {
+        BoardMainPage.this.moveToFirstPosition();
+    };
 
     // 下一頁
     final View.OnClickListener mLastPageClickListener = view -> {

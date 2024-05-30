@@ -51,6 +51,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
     }
 
     public void addUrl(String url, String title, String description, String imageUrl, boolean isPic) {
+        if (title.isEmpty() && description.isEmpty())
+            return;
         ContentValues values = new ContentValues();
         values.put("url", url);
         values.put("title", title);

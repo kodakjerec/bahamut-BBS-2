@@ -8,6 +8,7 @@ import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
 import com.kota.Bahamut.DataModels.AppDatabase;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
@@ -30,6 +31,7 @@ import com.kota.Telnet.TelnetStateHandler;
 import com.kota.Telnet.TelnetUtils;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
+
 import java.io.ByteArrayOutputStream;
 import java.util.Vector;
 
@@ -155,8 +157,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     // 最上層是 發文 或 看板
                     // 清除最先遇到的 BoardSearch, BoardLink, BoardMain
                     Vector<ASViewController> controllers = ASNavigationController.getCurrentController().getAllController();
-                    for(int i= controllers.size(); i>0; i--) {
-                        TelnetPage nowPage = (TelnetPage) controllers.get(i-1);
+                    for (int i = controllers.size(); i > 0; i--) {
+                        TelnetPage nowPage = (TelnetPage) controllers.get(i - 1);
 
                         if (nowPage.getClass().equals(BoardMainPage.class)) {
                             BoardMainPage page = PageContainer.getInstance().getBoardPage();
@@ -176,6 +178,14 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 return false;
             }
             TelnetClient.getClient().sendStringToServer("");
+            return false;
+        } else if (this.row_string_02.contains("HP：") && this.row_string_02.contains("MP：")) {
+            ArticlePage page = PageContainer.getInstance().getArticlePage();
+            Vector<String> userData = new Vector<>();
+            this.rows.forEach(row->{
+                userData.add(row.toString());
+            });
+            page.ctrlQUser(userData);
             return false;
         } else if (this.row_string_23.contains("要新增資料嗎？(Y/N) [N]")) {
             ASToast.showShortToast("此看板無文章");
