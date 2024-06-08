@@ -54,14 +54,16 @@ public class StartPage extends TelnetPage {
     }
 
     public void onPageWillAppear() {
-        PageContainer.getInstance().cleanLoginPage();
-        PageContainer.getInstance().cleanMainPage();
-        PageContainer.getInstance().cleanClassPage();
-        PageContainer.getInstance().cleanBoardPage();
-        PageContainer.getInstance().cleanBoardSearchPage();
-        PageContainer.getInstance().cleanBoardTitleLinkedPage();
-        PageContainer.getInstance().cleanMainBoxPage();
-        PageContainer.getInstance().cleanBillingPage();
+        PageContainer pageContainer = PageContainer.getInstance();
+        pageContainer.cleanLoginPage();
+        pageContainer.cleanMainPage();
+        pageContainer.cleanClassPage();
+        pageContainer.cleanBoardPage();
+        pageContainer.cleanBoardSearchPage();
+        pageContainer.cleanBoardTitleLinkedPage();
+        pageContainer.cleanBoardEssencePage();
+        pageContainer.cleanMainBoxPage();
+        pageContainer.cleanBillingPage();
     }
 
     public void onPageDidDisappear() {

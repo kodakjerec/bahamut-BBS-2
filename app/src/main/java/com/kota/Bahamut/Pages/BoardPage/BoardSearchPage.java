@@ -70,10 +70,12 @@ public class BoardSearchPage extends BoardMainPage {
         return true;
     }
 
+    @Override
     public int getListType() {
-        return 2;
+        return BoardPageAction.SEARCH;
     }
 
+    @Override
     public String getListIdFromListName(String aName) {
         return aName + "[Board][Search]";
     }

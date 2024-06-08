@@ -36,7 +36,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".Dialogs.DialogShortenImage"
-            android:theme="@style/Dialog.NoTitleBar"/>
+            android:theme="@style/Dialog.NoTitleBar"
+            android:configChanges="orientation|screenSize" />
         <receiver
             android:name="com.kota.ASFramework.Network.ASNetworkStateChangeReceiver"
             android:exported="true"

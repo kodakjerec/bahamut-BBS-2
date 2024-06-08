@@ -19,13 +19,13 @@ public class BahamutCommandTheSameTitleBottom extends TelnetCommand {
     }
 
     public void execute(final TelnetListPage aListPage) {
-        if (aListPage.getListType() == 1 || aListPage.getListType() == 2) {
+        if (aListPage.getListType()>0) {
             // 找出沒被block的最大index
             int maximumAvailableIndex = 1;
             int itemSize = aListPage.getItemSize();
             for(int i=itemSize-1;i>=0;i--) {
                 TelnetListPageItem item = aListPage.getItem(i);
-                if (!item.isDeleted && !aListPage.isItemBlocked(item)) {
+                if (item!=null && !item.isDeleted && !aListPage.isItemBlocked(item)) {
                     maximumAvailableIndex = (i+1);
                     break;
                 }
@@ -74,6 +74,10 @@ public class BahamutCommandTheSameTitleBottom extends TelnetCommand {
                     aListPage.onLoadItemFinished();
                 }
             }.runInMainThread();
+            setDone(true);
+        } else if (!aListPage.isEnabled(aPageData.selectedItemNumber - 1)) {
+            ASToast.showShortToast("下一篇不可使用");
+            aListPage.onLoadItemFinished();
             setDone(true);
         } else {
             aListPage.loadItemAtNumber(aPageData.selectedItemNumber);

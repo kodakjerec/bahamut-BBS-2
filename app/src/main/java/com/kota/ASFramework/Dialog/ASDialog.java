@@ -64,8 +64,7 @@ public class ASDialog extends Dialog implements ASViewControllerDisappearListene
     if (current_controller == null) {
       return 1;
     }
-    int orientation = current_controller.getCurrentOrientation();
-    return orientation;
+    return current_controller.getCurrentOrientation();
   }
 
   public String getName() {

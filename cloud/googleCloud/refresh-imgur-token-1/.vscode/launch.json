@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Deploy Cloud Function",
+      "type": "cloudcode.cloudfunctions",
+      "request": "launch",
+      "functionName": "refresh_imgur_token",
+      "region": "asia-east1",
+      "gen": "GEN_2",
+      "revision": "refresh-imgur-token-00004-kiv",
+      "entryPoint": "refresh_imgur_token",
+      "runtime": "python311",
+      "testInput": ""
+    }
+  ]
+}

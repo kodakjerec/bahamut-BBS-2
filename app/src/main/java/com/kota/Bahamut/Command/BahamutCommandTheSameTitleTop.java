@@ -6,7 +6,6 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
-import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
 
@@ -19,17 +18,9 @@ public class BahamutCommandTheSameTitleTop extends TelnetCommand {
     }
 
     public void execute(final TelnetListPage aListPage) {
-        if (aListPage.getListType() == 1 || aListPage.getListType() == 2) {
+        if (aListPage.getListType()>0) {
             // 找出沒被block的最小index
             int miniumAvailableIndex = 1;
-            int itemSize = aListPage.getItemSize();
-            for(int i=0;i< itemSize;i++) {
-                TelnetListPageItem item = aListPage.getItem(i);
-                if (!item.isDeleted && !aListPage.isItemBlocked(item)) {
-                    miniumAvailableIndex = (i+1);
-                    break;
-                }
-            }
             if (_article_index == miniumAvailableIndex) {
                 new ASRunner() {
                     public void run() {
@@ -65,7 +56,7 @@ public class BahamutCommandTheSameTitleTop extends TelnetCommand {
 //                _article_index = aPageData.selectedItemNumber;
 
                 TelnetOutputBuilder.create()
-                        .pushString("]")
+                        .pushKey(TelnetKeyboard.DOWN_ARROW)
                         .sendToServer();
                 setDone(false);
             }
@@ -76,6 +67,10 @@ public class BahamutCommandTheSameTitleTop extends TelnetCommand {
                     aListPage.onLoadItemFinished();
                 }
             }.runInMainThread();
+            setDone(true);
+        } else if (!aListPage.isEnabled(aPageData.selectedItemNumber - 1)) {
+            ASToast.showShortToast("上一篇不可使用");
+            aListPage.onLoadItemFinished();
             setDone(true);
         } else {
             aListPage.loadItemAtNumber(aPageData.selectedItemNumber);

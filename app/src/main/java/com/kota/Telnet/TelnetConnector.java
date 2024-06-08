@@ -33,6 +33,7 @@ public class TelnetConnector implements TelnetChannelListener {
         this._last_send_data_time = 0;
     }
 
+    /* 防呆 */
     private class HolderThread extends Thread {
         private boolean _run;
 
@@ -84,7 +85,7 @@ public class TelnetConnector implements TelnetChannelListener {
             }
             this._is_connecting = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.v("SocketChannel", "Connection Fail");
             clear();
         }
         if (this._is_connecting) {
@@ -193,7 +194,15 @@ public class TelnetConnector implements TelnetChannelListener {
     }
 
     private void sendHoldMessage() {
-        TelnetOutputBuilder.create().pushData((byte) 27).pushData((byte) 91).pushData((byte) 65).pushData((byte) 27).pushData((byte) 91).pushData((byte) 66).sendToServer();
+        TelnetOutputBuilder.create()
+                .pushData((byte) 0)
+//                .pushData((byte) 27)
+//                .pushData((byte) 91)
+//                .pushData((byte) 65)
+//                .pushData((byte) 27)
+//                .pushData((byte) 91)
+//                .pushData((byte) 66)
+                .sendToServer();
     }
 
     public void setListener(TelnetConnectorListener aListener) {

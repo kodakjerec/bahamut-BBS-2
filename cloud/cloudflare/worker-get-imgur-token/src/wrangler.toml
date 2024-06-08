@@ -1,0 +1,8 @@
+name = "worker-get-imgur-token"
+main = "src/index.js"
+compatibility_date = "2024-05-30"
+
+[[d1_databases]]
+name = "bahabbs"
+binding = "DATABASE"
+database_id = "5c7c9a65-7b2f-4eb9-bc21-ad42c56a7eb1"

@@ -1,0 +1,4 @@
+name = "worker-get-url-content"
+main = "src/worker.js"
+compatibility_date = "2024-05-30"
+workers_dev = true

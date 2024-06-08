@@ -357,6 +357,8 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
                 else
                     _show_history_button.performClick();
             }
+
+            mainDrawerLayout.findViewById(R.id.bookmark_tab_button).setOnClickListener( toEssencePageClickListener );
         }
 
         // 標題
@@ -391,6 +393,17 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             timer.schedule(task, 500);
         }
     }
+
+    /* 按下精華區 */
+    View.OnClickListener toEssencePageClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            _last_list_action = BoardPageAction.ESSENCE;
+            PageContainer.getInstance().pushBoardEssencePage(getListName(),_board_title);
+            getNavigationController().pushViewController(PageContainer.getInstance().getBoardEssencePage());
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.TAB);
+        }
+    };
 
     // 側邊選單的位置
     int getDrawerLayoutGravityLocation() {
@@ -516,7 +529,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     }
 
-    @Override // com.kota.Bahamut.ListPage.TelnetListPage
+    @Override
     public String getListIdFromListName(String str) {
         return str + "[Board]";
     }
@@ -646,8 +659,9 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         getNavigationController().pushViewController(new BookmarkManagePage(getListName(), this));
     }
 
+    /* 長按串接文章 */
     void onListArticle(int i) {
-        _last_list_action = BoardPageAction.LIST;
+        _last_list_action = BoardPageAction.LINK_TITLE;
         BoardLinkPage board_Linked_Title_Page = PageContainer.getInstance().getBoardLinkedTitlePage();
         board_Linked_Title_Page.clear();
         getNavigationController().pushViewController(board_Linked_Title_Page);
@@ -671,6 +685,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             return true;
     }
 
+    /* 發文 */
     protected void onPostButtonClicked() {
         PostArticlePage postArticlePage = PageContainer.getInstance().getPostArticlePage();
         postArticlePage.setBoardPage(this);
@@ -682,7 +697,6 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     public void goodLoadingArticle() {
         goodArticle(getLoadingItemNumber());
     }
-
     public void goodArticle(final int i) {
         ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.do_gy))
@@ -758,7 +772,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     }
 
     // 點下文章
-    @Override // com.kota.Bahamut.ListPage.TelnetListPage
+    @Override
     public void loadItemAtIndex(int index) {
         if (isItemCanLoadAtIndex(index)) {
             ArticlePage articlePage = PageContainer.getInstance().getArticlePage();

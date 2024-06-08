@@ -306,4 +306,6 @@
     <string name="cloud_save_local">本地</string>
     <string name="cloud_save_cloud">雲端</string>
     <string name="dialog_query_hero">查詢勇者</string>
+    <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
+    <string name="essence_page">精華</string>
 </resources>

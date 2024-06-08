@@ -3,20 +3,13 @@ package com.kota.Bahamut.Service;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.kota.ASFramework.UI.ASToast;
-import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Telnet.PropertiesOperator;
-
-import org.json.JSONObject;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
@@ -295,9 +288,11 @@ public class UserSettings {
 
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContains(String aName) {
+        if (aName.isEmpty())
+            return false;
+
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
-        boolean isBlocked = blockListString.toLowerCase().contains(aName.toLowerCase());
-        return isBlocked;
+        return blockListString.toLowerCase().contains(aName.toLowerCase());
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {

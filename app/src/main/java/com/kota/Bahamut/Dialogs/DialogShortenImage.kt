@@ -4,6 +4,7 @@ import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
@@ -13,12 +14,15 @@ import android.provider.MediaStore
 import android.util.Base64
 import android.util.Log
 import android.view.View
+import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.OnClickListener
 import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import android.widget.VideoView
 import androidx.activity.result.PickVisualMediaRequest
@@ -50,7 +54,7 @@ import java.util.Objects
 
 @Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
-    private lateinit var layout: LinearLayout
+    private lateinit var layout: RelativeLayout
     private lateinit var textView: TextView
     private lateinit var imageView: ImageView
     private lateinit var videoView: VideoView
@@ -93,6 +97,9 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         sendButton!!.isEnabled = false
         layout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
         layout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
+
+        // 預設高度
+        changeDialogHeight(resources.configuration)
     }
 
     /** 選擇相簿 */
@@ -235,15 +242,15 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     /** 清除內容 */
     private val resetListener = OnClickListener {_ ->
         middleToolbar.visibility = VISIBLE
-        middleToolbar2.visibility = INVISIBLE
+        middleToolbar2.visibility = GONE
         textView.visibility = VISIBLE
         imageView.setImageBitmap(null)
-        imageView.visibility = INVISIBLE
+        imageView.visibility = GONE
         videoView.stopPlayback()
         videoView.clearAnimation()
         videoView.suspend()
         videoView.setVideoURI(null)
-        videoView.visibility = INVISIBLE
+        videoView.visibility = GONE
         sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample)
         outputParam = ""
         selectedImageUri = null
@@ -255,11 +262,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private val intentCameraLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             try {
-                middleToolbar.visibility = INVISIBLE
+                middleToolbar.visibility = GONE
                 middleToolbar2.visibility = VISIBLE
-                textView.visibility = INVISIBLE
+                textView.visibility = GONE
                 imageView.visibility = VISIBLE
-                videoView.visibility = INVISIBLE
+                videoView.visibility = GONE
                 if (Build.VERSION.SDK_INT>=29) {
                     val source = ImageDecoder.createSource(contentResolver, selectedImageUri!!)
                     val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
@@ -281,10 +288,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private val intentVideoLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
             try {
-                middleToolbar.visibility = INVISIBLE
+                middleToolbar.visibility = GONE
                 middleToolbar2.visibility = VISIBLE
-                textView.visibility = INVISIBLE
-                imageView.visibility = INVISIBLE
+                textView.visibility = GONE
+                imageView.visibility = GONE
                 videoView.visibility = VISIBLE
                 val uri: Uri? = result.data!!.data
                 selectedVideoUri = uri
@@ -304,14 +311,14 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         if (uri != null) {
             try {
                 // Check if it's an image
-                middleToolbar.visibility = INVISIBLE
+                middleToolbar.visibility = GONE
                 middleToolbar2.visibility = VISIBLE
-                textView.visibility = INVISIBLE
+                textView.visibility = GONE
                 val uriType = contentResolver.getType(uri)
                 if (uriType?.startsWith("image/") == true) {
                     // 影像
                     imageView.visibility = VISIBLE
-                    videoView.visibility = INVISIBLE
+                    videoView.visibility = GONE
                     if (Build.VERSION.SDK_INT>= 29) {
                         val source = ImageDecoder.createSource(contentResolver, uri)
                         val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
@@ -328,7 +335,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     transferButton!!.performClick()
                 } else {
                     // 影片
-                    imageView.visibility = INVISIBLE
+                    imageView.visibility = GONE
                     videoView.visibility = VISIBLE
                     selectedVideoUri = uri
                     videoView.setVideoURI(uri)
@@ -408,5 +415,20 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         // 最上層是 發文 或 看板
         val page = PageContainer.getInstance().postArticlePage
         page.insertString(str)
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        changeDialogHeight(newConfig)
+    }
+    private fun changeDialogHeight(newConfig: Configuration) {
+        val mylayoutParams : ViewGroup.LayoutParams? = layout.layoutParams
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            mylayoutParams!!.height = ViewGroup.LayoutParams.MATCH_PARENT
+        } else {
+            val factor = applicationContext.resources.displayMetrics.density
+            mylayoutParams!!.height = (500 * factor).toInt()
+        }
+        layout.layoutParams = mylayoutParams
     }
 }

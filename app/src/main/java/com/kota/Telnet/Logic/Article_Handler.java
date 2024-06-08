@@ -242,55 +242,76 @@ public class Article_Handler {
         String author_string = row_0.getSpaceString(7, 58).trim();
         String author = "";
         String nickname = "";
-        try {
-            char[] author_words = author_string.toCharArray();
-            int author_end = 0;
-            int i = 0;
-            while (true) {
-                if (i >= author_words.length) {
-                    break;
-                } else if (author_words[i] == '(') {
-                    author_end = i;
-                    break;
-                } else {
-                    i++;
+        if (row_0.toContentString().contains("作者")) {
+            try {
+                char[] author_words = author_string.toCharArray();
+                int author_end = 0;
+                int i = 0;
+                while (true) {
+                    if (i >= author_words.length) {
+                        break;
+                    } else if (author_words[i] == '(') {
+                        author_end = i;
+                        break;
+                    } else {
+                        i++;
+                    }
                 }
-            }
-            if (author_end > 0) {
-                author = author_string.substring(0, author_end).trim();
-            }
-            int nickname_start = author_end + 1;
-            int nickname_end = nickname_start;
-            int i2 = author_words.length - 1;
-            while (true) {
-                if (i2 < 0) {
-                    break;
-                } else if (author_words[i2] == ')') {
-                    nickname_end = i2;
-                    break;
-                } else {
-                    i2--;
+                if (author_end > 0) {
+                    author = author_string.substring(0, author_end).trim();
                 }
+                int nickname_start = author_end + 1;
+                int nickname_end = nickname_start;
+                int i2 = author_words.length - 1;
+                while (true) {
+                    if (i2 < 0) {
+                        break;
+                    } else if (author_words[i2] == ')') {
+                        nickname_end = i2;
+                        break;
+                    } else {
+                        i2--;
+                    }
+                }
+                if (nickname_end > nickname_start) {
+                    nickname = author_string.substring(nickname_start, nickname_end).trim();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if (nickname_end > nickname_start) {
-                nickname = author_string.substring(nickname_start, nickname_end).trim();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         _article.Author = author;
         _article.Nickname = nickname;
-        _article.BoardName = row_0.getSpaceString(66, 78).trim();
-        String title_string = row_1.getSpaceString(7, 78).trim();
-        if (title_string.startsWith("Re: ")) {
-            _article.Title = title_string.substring(4);
-            _article.Type = 0;
-        } else {
-            _article.Title = title_string;
-            _article.Type = 0;
+
+        String boardName = "";
+        if (row_0.toContentString().contains("看板"))
+            boardName = row_0.getSpaceString(66, 78).trim();
+        _article.BoardName = boardName;
+
+        String title_string = "";
+        if (row_1.toContentString().contains("標題")) {
+            title_string = row_1.getSpaceString(7, 78).trim();
+            if (title_string.startsWith("Re: ")) {
+                _article.Title = title_string.substring(4);
+                _article.Type = 0;
+            } else {
+                _article.Title = title_string;
+                _article.Type = 0;
+            }
         }
-        _article.DateTime = row_2.getSpaceString(7, 30).trim();
-        return true;
+
+        String dateTime = "";
+        if (row_2.toContentString().contains("時間")) {
+            dateTime = row_2.getSpaceString(7, 30).trim();
+        }
+        _article.DateTime = dateTime;
+        // 只要任意一個屬性有值, 就應正常顯示
+        if (!author.isEmpty() || !nickname.isEmpty() || !boardName.isEmpty() || !title_string.isEmpty()) {
+            return true;
+        } else {
+            // 被修改過格式不正確
+            return false;
+        }
     }
 
     private void addRow(TelnetRow row, Vector<TelnetRow> rows) {

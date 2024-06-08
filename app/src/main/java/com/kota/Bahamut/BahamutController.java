@@ -18,6 +18,7 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
 import com.kota.Bahamut.DataModels.BookmarkStore;
+import com.kota.Bahamut.Pages.Model.BoardEssencePageItem;
 import com.kota.Bahamut.Pages.Model.BoardPageBlock;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
@@ -195,6 +196,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
         super.onLowMemory();
         BoardPageBlock.release();
         BoardPageItem.release();
+        BoardEssencePageItem.Companion.release();
         ClassPageBlock.release();
         ClassPageItem.release();
         MailBoxPageBlock.release();

@@ -18,6 +18,7 @@ import com.kota.Bahamut.Command.BahamutCommandLoadBlock;
 import com.kota.Bahamut.Command.BahamutCommandLoadLastBlock;
 import com.kota.Bahamut.Command.BahamutCommandMoveToLastBlock;
 import com.kota.Bahamut.Command.TelnetCommand;
+import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.TelnetUI.TelnetPage;
@@ -39,7 +40,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     private final boolean[] _page_preload_command = new boolean[1];
     private final boolean[] _page_refresh_command = new boolean[2];
     private String _list_name = null;
-    private ListView _list_view = null;
+    protected ListView _list_view = null;
     private boolean _list_loaded = false;
     private long _last_load_time = 0;
     private long _last_send_time = 0;
@@ -616,12 +617,12 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
         return false;
     }
 
-    @Override // android.widget.AdapterView.OnItemLongClickListener
+    @Override
     public boolean onItemLongClick(AdapterView<?> parentView, View view, int index, long ID) {
         return onListViewItemLongClicked(view, index);
     }
 
-    @Override // android.widget.AdapterView.OnItemClickListener
+    @Override
     public void onItemClick(AdapterView<?> parentView, View itemView, int index, long id) {
         loadItemAtIndex(index);
     }
@@ -649,7 +650,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
     }
 
     public int getListType() {
-        return 0;
+        return BoardPageAction.LIST;
     }
 
     public void setItemSize(int size) {

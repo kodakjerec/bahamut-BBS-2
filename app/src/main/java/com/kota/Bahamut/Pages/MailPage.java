@@ -1,22 +1,28 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
+import android.annotation.SuppressLint;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
+import android.widget.TextView;
+
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePageItemType;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_HeaderItemView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TimeTimeView;
-import com.kota.Bahamut.Pages.ArticlePage.ArticlePageItemType;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -25,11 +31,13 @@ import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
 public class MailPage extends TelnetPage implements ListAdapter, View.OnClickListener, SendMailPage_Listener {
+    LinearLayout mainLayout = null;
     TelnetArticle _article = null;
     Button _back_button = null;
     ASListView _list = null;
     Button _page_down_button = null;
     Button _page_up_button = null;
+    TextView _list_empty_view = null;
     TelnetView _telnet_view = null;
     ASScrollView _telnet_view_block = null;
     ArticleViewMode _view_mode = ArticleViewMode.MODE_TEXT;
@@ -53,21 +61,25 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void onPageDidLoad() {
-        _telnet_view_block = (ASScrollView) findViewById(R.id.Mail_contentTelnetViewBlock);
-        _telnet_view = (TelnetView) findViewById(R.id.Mail_contentTelnetView);
+        mainLayout = (LinearLayout) findViewById(R.id.Mail_contentView);
+
+        _telnet_view_block = mainLayout.findViewById(R.id.Mail_contentTelnetViewBlock);
+        _telnet_view = mainLayout.findViewById(R.id.Mail_contentTelnetView);
         int screen_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20.0f, getContext().getResources().getDisplayMetrics())) / 2) * 80;
         ViewGroup.LayoutParams telnet_layout = _telnet_view.getLayoutParams();
         telnet_layout.width = screen_width;
         telnet_layout.height = -2;
         _telnet_view.setLayoutParams(telnet_layout);
-        _list = (ASListView) findViewById(R.id.Mail_contentList);
-        _back_button = (Button) findViewById(R.id.Mail_backButton);
-        _page_up_button = (Button) findViewById(R.id.Mail_pageUpButton);
-        _page_down_button = (Button) findViewById(R.id.Mail_pageDownButton);
+        _list = mainLayout.findViewById(R.id.Mail_contentList);
+        _list_empty_view = mainLayout.findViewById(R.id.Mail_listEmptyView);
+        _list.setEmptyView(_list_empty_view);
+        _back_button = mainLayout.findViewById(R.id.Mail_backButton);
+        _page_up_button = mainLayout.findViewById(R.id.Mail_pageUpButton);
+        _page_down_button = mainLayout.findViewById(R.id.Mail_pageDownButton);
         _back_button.setOnClickListener(this);
         _page_up_button.setOnClickListener(this);
         _page_down_button.setOnClickListener(this);
-        findViewById(R.id.Mail_changeModeButton).setOnClickListener(this);
+        mainLayout.findViewById(R.id.Mail_changeModeButton).setOnClickListener(this);
         resetAdapter();
     }
 
@@ -290,5 +302,11 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
 
     public boolean isKeepOnOffline() {
         return true;
+    }
+
+    // 給 state handler 更改讀取進度
+    @SuppressLint("SetTextI18n")
+    public void changeLoadingPercentage(String percentage) {
+        _list_empty_view.setText(getContextString(R.string.loading_)+percentage);
     }
 }

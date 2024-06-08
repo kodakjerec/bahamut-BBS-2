@@ -1,0 +1,567 @@
+package com.kota.Bahamut.Pages.EssencePage
+
+import android.annotation.SuppressLint
+import android.content.Intent
+import android.database.DataSetObservable
+import android.database.DataSetObserver
+import android.net.Uri
+import android.text.util.Linkify
+import android.util.Log
+import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemLongClickListener
+import android.widget.BaseAdapter
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import com.kota.ASFramework.Dialog.ASAlertDialog
+import com.kota.ASFramework.Dialog.ASListDialog
+import com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+import com.kota.ASFramework.UI.ASListView
+import com.kota.ASFramework.UI.ASScrollView
+import com.kota.ASFramework.UI.ASToast
+import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.Command.BahamutCommandFSendMail
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePageItemType
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_HeaderItemView
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TelnetItemView
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TextItemView
+import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TimeTimeView
+import com.kota.Bahamut.Pages.ArticlePage.Thumbnail_ItemView
+import com.kota.Bahamut.Pages.BoardPage.BoardMainPage
+import com.kota.Bahamut.Pages.SendMailPage
+import com.kota.Bahamut.Pages.SendMailPage_Listener
+import com.kota.Bahamut.R
+import com.kota.Bahamut.Service.CommonFunctions
+import com.kota.Bahamut.Service.UserSettings
+import com.kota.Telnet.TelnetArticle
+import com.kota.Telnet.TelnetArticleItem
+import com.kota.Telnet.TelnetClient
+import com.kota.TelnetUI.TelnetPage
+import com.kota.TelnetUI.TelnetView
+
+class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_Listener {
+    var mainLayout: LinearLayout? = null
+    private var telnetArticle: TelnetArticle? = null
+    private var asListView: ASListView? = null
+    private var changeModeButton: Button? = null
+    private var pageDownButton: Button? = null
+    private var pageUpButton: Button? = null
+    private var listEmptyView: TextView? = null
+    private var telnetView: TelnetView? = null
+    private var telnetViewBlock: ASScrollView? = null
+    private var viewMode = ArticleViewMode.MODE_TEXT
+    private val mDataSetObservable = DataSetObservable()
+    private var iHaveSign = false
+    private var boardEssencePage: BoardEssencePage? = null;
+
+    enum class ArticleViewMode {
+        MODE_TEXT,
+        MODE_TELNET
+    }
+
+    private val listAdapter: BaseAdapter = object :BaseAdapter() {
+        override fun getCount(): Int {
+            return if (telnetArticle != null) {
+                telnetArticle!!.itemSize + 2
+            } else 0
+        }
+
+        override fun getItem(itemIndex: Int): TelnetArticleItem {
+            return telnetArticle!!.getItem(itemIndex - 1)
+        }
+
+        override fun getItemId(itemIndex: Int): Long {
+            return itemIndex.toLong()
+        }
+
+        override fun getView(itemIndex: Int, itemView: View?, parentView: ViewGroup): View {
+            val type: Int = getItemViewType(itemIndex)
+            var itemViewOrigin: View? = null
+            if (itemView == null) {
+                when (type) {
+                    ArticlePageItemType.Header -> itemViewOrigin = ArticlePage_HeaderItemView(context)
+                    ArticlePageItemType.Content -> itemViewOrigin = ArticlePage_TextItemView(context)
+                    ArticlePageItemType.Sign -> {
+                        itemViewOrigin = ArticlePage_TelnetItemView(context)
+                        iHaveSign = true
+                    }
+                    ArticlePageItemType.PostTime -> itemViewOrigin = ArticlePage_TimeTimeView(context)
+                }
+            } else {
+                itemViewOrigin = itemView
+            }
+
+            assert(itemViewOrigin!=null) {
+                Log.v("getView","Fail")
+            }
+
+            when (getItemViewType(itemIndex)) {
+                ArticlePageItemType.Header -> {
+                    val itemView1 = itemViewOrigin as ArticlePage_HeaderItemView
+                    var author = telnetArticle!!.Author
+                    if (telnetArticle!!.Nickname != null) {
+                        author = author + "(" + telnetArticle!!.Nickname + ")"
+                    }
+                    itemView1.setData(telnetArticle!!.Title, author, telnetArticle!!.BoardName)
+                    itemView1.setMenuButton(mMenuListener)
+                }
+
+                ArticlePageItemType.Content -> {
+                    val item = getItem(itemIndex)
+                    val itemView2 = itemViewOrigin as ArticlePage_TextItemView
+                    itemView2.setAuthor(item.author, item.nickname)
+                    itemView2.setQuote(item.quoteLevel)
+                    itemView2.setContent(item.content, item.frame.rows)
+                    if (itemIndex >= count - 2) {
+                        itemView2.setDividerHidden(true)
+                    } else {
+                        itemView2.setDividerHidden(false)
+                    }
+                }
+
+                ArticlePageItemType.Sign -> {
+                    val itemView3 = itemViewOrigin as ArticlePage_TelnetItemView
+                    itemView3.setFrame(getItem(itemIndex).frame)
+                    if (itemIndex >= count - 2) {
+                        itemView3.setDividerhidden(true)
+                    } else {
+                        itemView3.setDividerhidden(false)
+                    }
+                }
+
+                ArticlePageItemType.PostTime -> (itemViewOrigin as ArticlePage_TimeTimeView).setTime("《" + telnetArticle!!.DateTime + "》")
+            }
+            return itemViewOrigin as View
+        }
+
+
+        override fun getItemViewType(itemIndex: Int): Int {
+            if (itemIndex == 0) {
+                return 2
+            }
+            return if (itemIndex == count - 1) {
+                3
+            } else getItem(itemIndex).type
+        }
+
+        override fun getViewTypeCount(): Int {
+            return 4
+        }
+
+        override fun hasStableIds(): Boolean {
+            return false
+        }
+
+        override fun isEmpty(): Boolean {
+            return false
+        }
+
+        override fun registerDataSetObserver(observer: DataSetObserver) {
+            mDataSetObservable.registerObserver(observer)
+        }
+
+        override fun unregisterDataSetObserver(observer: DataSetObserver) {
+            mDataSetObservable.unregisterObserver(observer)
+        }
+
+        override fun areAllItemsEnabled(): Boolean {
+            return false
+        }
+
+        override fun isEnabled(itemIndex: Int): Boolean {
+            return false
+        }
+    }
+
+    override fun getPageLayout(): Int {
+        return R.layout.article_essence_page
+    }
+
+    override fun getPageType(): Int {
+        return BahamutPage.BAHAMUT_ARTICLE_ESSENCE
+    }
+
+    override fun isPopupPage(): Boolean {
+        return true
+    }
+
+    override fun onPageDidLoad() {
+        mainLayout = findViewById(R.id.Essence_contentView) as LinearLayout
+        telnetViewBlock = mainLayout!!.findViewById(R.id.Essence_contentTelnetViewBlock)
+        telnetView = mainLayout!!.findViewById(R.id.Essence_contentTelnetView)
+        if (telnetView!=null) {
+            val screenWidth = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                20.0f,
+                context.resources.displayMetrics
+            ).toInt() / 2 * 80
+            val telnetLayout = telnetView!!.layoutParams
+            telnetLayout.width = screenWidth
+            telnetLayout.height = -2
+            telnetView!!.layoutParams = telnetLayout
+        }
+        asListView = mainLayout!!.findViewById(R.id.Essence_contentList)
+        listEmptyView = mainLayout!!.findViewById(R.id.Essence_listEmptyView)
+        asListView!!.emptyView = listEmptyView
+        asListView!!.adapter = listAdapter
+        asListView!!.onItemLongClickListener = listLongClickListener
+        pageUpButton = mainLayout!!.findViewById(R.id.Essence_pageUpButton)
+        pageDownButton = mainLayout!!.findViewById(R.id.Essence_pageDownButton)
+        changeModeButton = mainLayout!!.findViewById(R.id.Essence_changeModeButton)
+        changeModeButton!!.setOnClickListener(this)
+        pageUpButton!!.setOnClickListener(this)
+        pageDownButton!!.setOnClickListener(this)
+        resetAdapter()
+    }
+
+    override fun onBackPressed(): Boolean {
+        clear()
+        return super.onBackPressed()
+    }
+
+    override fun onPageDidDisappear() {
+        pageUpButton = null
+        pageDownButton = null
+        asListView = null
+        telnetViewBlock = null
+        telnetView = null
+        super.onPageDidDisappear()
+    }
+
+    override fun onMenuButtonClicked(): Boolean {
+        changeViewMode()
+        return true
+    }
+
+    fun setArticle(aArticle: TelnetArticle?) {
+        clear()
+        telnetArticle = aArticle
+        telnetView!!.frame = telnetArticle!!.frame
+        telnetView!!.layoutParams = telnetView!!.layoutParams
+        telnetViewBlock!!.scrollTo(0, 0)
+        resetAdapter()
+    }
+
+    private fun resetAdapter() {
+        if (telnetArticle != null) {
+            asListView!!.adapter = listAdapter
+        }
+    }
+
+    override fun clear() {
+        telnetArticle = null
+    }
+
+    override fun onClick(aView: View) {
+        if (aView === changeModeButton) {
+            changeViewMode()
+        } else if (aView === pageUpButton) {
+            onPageUpButtonClicked()
+        } else if (aView === pageDownButton) {
+            onPageDownButtonClicked()
+        }
+    }
+
+    override fun onSendMailDialogSendButtonClicked(
+        aDialog: SendMailPage,
+        receiver: String,
+        title: String,
+        content: String
+    ) {
+        PageContainer.getInstance().mailBoxPage.onSendMailDialogSendButtonClicked(
+            aDialog,
+            receiver,
+            title,
+            content
+        )
+        onBackPressed()
+    }
+
+    private fun onPageUpButtonClicked() {
+        if (TelnetClient.getConnector().isConnecting) {
+            PageContainer.getInstance().boardEssencePage.loadPreviousArticle()
+        } else {
+            showConnectionClosedToast()
+        }
+    }
+
+    private fun onPageDownButtonClicked() {
+        if (TelnetClient.getConnector().isConnecting) {
+            PageContainer.getInstance().boardEssencePage.loadNextArticle()
+        } else {
+            showConnectionClosedToast()
+        }
+    }
+
+    private fun showConnectionClosedToast() {
+        ASToast.showShortToast("連線已中斷")
+    }
+
+    private fun changeViewMode() {
+        viewMode =
+            if (viewMode == ArticleViewMode.MODE_TEXT) {
+                ArticleViewMode.MODE_TELNET
+            } else {
+                ArticleViewMode.MODE_TEXT
+            }
+        if (viewMode == ArticleViewMode.MODE_TEXT) {
+            asListView!!.visibility = View.VISIBLE
+            telnetViewBlock!!.visibility = View.GONE
+            return
+        }
+        asListView!!.visibility = View.GONE
+        telnetViewBlock!!.visibility = View.VISIBLE
+        telnetViewBlock!!.invalidate()
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        if (viewMode != ArticleViewMode.MODE_TEXT) {
+            return true
+        }
+        onBackPressed()
+        return true
+    }
+
+    override fun isKeepOnOffline(): Boolean {
+        return true
+    }
+
+    // 給 state handler 更改讀取進度
+    @SuppressLint("SetTextI18n")
+    fun changeLoadingPercentage(percentage: String) {
+        listEmptyView!!.text = CommonFunctions.getContextString(R.string.loading_) + percentage
+    }
+
+
+    // 長按內文
+    private var listLongClickListener =
+        OnItemLongClickListener { _: AdapterView<*>?, _: View?, itemIndex: Int, _: Long ->
+            // 沒有簽名檔直接往下走
+            if (!iHaveSign) {
+                return@OnItemLongClickListener true
+            }
+            // 切換模式只適用於簽名檔
+            // 簽名檔一定是最後一個
+            val signIndex: Int = telnetArticle!!.itemSize
+            if (itemIndex != signIndex) {
+                return@OnItemLongClickListener true
+            }
+            // 開啟切換模式
+            val item: TelnetArticleItem?
+            if (telnetArticle == null) {
+                return@OnItemLongClickListener true
+            } else {
+                item = telnetArticle!!.getItem(itemIndex - 1)
+                if (item == null)
+                    return@OnItemLongClickListener true
+            }
+            when (item.type) {
+                0 -> {
+                    item.type = 1
+                    listAdapter.notifyDataSetChanged()
+                    return@OnItemLongClickListener true
+                }
+                1 -> {
+                    item.type = 0
+                    listAdapter.notifyDataSetChanged()
+                    return@OnItemLongClickListener true
+                }
+                else -> {
+                    return@OnItemLongClickListener true
+                }
+            }
+        }
+
+
+    private fun onMenuClicked() {
+        if (telnetArticle != null && telnetArticle!!.Author != null) {
+            ASListDialog.createDialog()
+                .addItem(CommonFunctions.getContextString(R.string.change_mode))
+                .addItem(
+                    CommonFunctions.getContextString(R.string.insert) + CommonFunctions.getContextString(
+                        R.string.system_setting_page_chapter_blocklist
+                    )
+                )
+                .addItem(CommonFunctions.getContextString(R.string.open_url))
+                .addItem(CommonFunctions.getContextString(R.string.board_page_item_long_click_1))
+                .addItem(CommonFunctions.getContextString(R.string.board_page_item_load_all_image))
+                .setListener(object : ASListDialogItemClickListener {
+                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    override fun onListDialogItemClicked(
+                        aDialog: ASListDialog,
+                        index: Int,
+                        aTitle: String
+                    ) {
+                        when (index) {
+                            0 -> changeViewMode()
+                            1 -> onAddBlockListClicked()
+                            2 -> onOpenLinkClicked()
+                            3 -> fSendMail()
+                            4 -> onLoadAllImageClicked()
+                            else -> {}
+                        }
+                    }
+
+                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    override fun onListDialogItemLongClicked(
+                        aDialog: ASListDialog,
+                        index: Int,
+                        aTitle: String
+                    ): Boolean {
+                        return true
+                    }
+                }).scheduleDismissOnPageDisappear(this).show()
+        }
+    }
+
+    fun onOpenLinkClicked() {
+        if (telnetArticle != null) {
+            // 擷取文章內的所有連結
+            val textView = TextView(context)
+            textView.text = telnetArticle!!.fullText
+            Linkify.addLinks(textView, Linkify.WEB_URLS)
+            val urls = textView.urls
+            if (urls.isEmpty()) {
+                ASToast.showShortToast(CommonFunctions.getContextString(R.string.no_url))
+                return
+            }
+            val listDialog = ASListDialog.createDialog()
+            for (urlSpan in urls) {
+                listDialog.addItem(urlSpan.url)
+            }
+            listDialog.setListener(object : ASListDialogItemClickListener {
+                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                override fun onListDialogItemLongClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ): Boolean {
+                    return true
+                }
+
+                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                override fun onListDialogItemClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ) {
+                    val url2 = urls[index].url
+                    val context2 = context
+                    if (context2 != null) {
+                        val intent = Intent("android.intent.action.VIEW", Uri.parse(url2))
+                        context2.startActivity(intent)
+                    }
+                }
+            })
+            listDialog.show()
+        }
+    }
+
+    // 加入黑名單
+    fun onAddBlockListClicked() {
+        val article: TelnetArticle = telnetArticle!!
+        val buffer: MutableSet<String> = HashSet()
+        // 作者黑名單
+        buffer.add(article.author)
+        // 內文黑名單
+        val len = article.itemSize
+        for (i in 0 until len) {
+            val item = article.getItem(i)
+            val author = item.author
+            if (author != null && !UserSettings.isBlockListContains(author)) {
+                buffer.add(author)
+            }
+        }
+        if (buffer.size == 0) {
+            ASToast.showShortToast("無可加入黑名單的ID")
+            return
+        }
+        val names = buffer.toTypedArray<String>()
+        ASListDialog.createDialog().addItems(names)
+            .setListener(object : ASListDialogItemClickListener {
+                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                override fun onListDialogItemLongClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ): Boolean {
+                    return true
+                }
+
+                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                override fun onListDialogItemClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ) {
+                    onBlockButtonClicked(names[index])
+                }
+            }).show()
+    }
+
+    fun onBlockButtonClicked(aBlockName: String) {
+        ASAlertDialog.createDialog()
+            .setTitle("加入黑名單")
+            .setMessage("是否要將\"$aBlockName\"加入黑名單?")
+            .addButton("取消")
+            .addButton("加入")
+            .setListener { _: ASAlertDialog?, index: Int ->
+                if (index == 1) {
+                    val newList =
+                        UserSettings.getBlockList()
+                    if (newList.contains(aBlockName)) {
+                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.already_have_item))
+                    } else {
+                        newList.add(aBlockName)
+                    }
+                    UserSettings.setBlockList(newList)
+                    UserSettings.notifyDataUpdated()
+                    if (UserSettings.getPropertiesBlockListEnable()) {
+                        if (aBlockName == telnetArticle!!.Author) {
+                            onBackPressed()
+                        } else {
+                            listAdapter.notifyDataSetChanged()
+                        }
+                    }
+                }
+            }.scheduleDismissOnPageDisappear(this).show()
+    }
+
+    // 載入全部圖片
+    fun onLoadAllImageClicked() {
+        // TODO: not yet
+        val listView = asListView!!
+        val childCount = listView.childCount
+        for (childIndex in 0 until childCount) {
+            val view = listView.getChildAt(childIndex)
+            if (view.javaClass == ArticlePage_TextItemView::class.java) {
+                val firstLLayout = (view as ArticlePage_TextItemView).getChildAt(0) as LinearLayout
+                val secondLLayout = firstLLayout.getChildAt(0) as LinearLayout
+                val childCount2 = secondLLayout.childCount
+                for (childIndex2 in 0 until childCount2) {
+                    val view1 = secondLLayout.getChildAt(childIndex2)
+                    if (view1.javaClass == Thumbnail_ItemView::class.java) {
+                        (view1 as Thumbnail_ItemView).prepare_load_image()
+                    }
+                }
+            }
+        }
+    }
+
+    // 選單
+    val mMenuListener =
+        View.OnClickListener { _: View? -> onMenuClicked() }
+
+    // 給其他頁面託付使用
+    fun setBoardEssencePage(aboardEssencePage: BoardEssencePage) {
+        boardEssencePage = aboardEssencePage
+    }
+    // 轉寄至信箱
+    fun fSendMail() {
+        boardEssencePage!!.pushCommand(BahamutCommandFSendMail(UserSettings.getPropertiesUsername()))
+    }
+}

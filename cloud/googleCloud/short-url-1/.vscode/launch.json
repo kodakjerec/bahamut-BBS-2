@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Deploy Cloud Function",
+      "type": "cloudcode.cloudfunctions",
+      "request": "launch",
+      "functionName": "short_url",
+      "region": "asia-east1",
+      "gen": "GEN_2",
+      "revision": "short-url-00003-vef",
+      "entryPoint": "short_url",
+      "runtime": "python311",
+      "testInput": ""
+    }
+  ]
+}

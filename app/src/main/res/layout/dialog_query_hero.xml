@@ -1,72 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="260dp"
+    android:layout_width="300dp"
     android:layout_height="wrap_content"
     android:background="@color/dialog_border_color"
-    android:orientation="vertical"
-    android:padding="3dp">
+    android:orientation="vertical">
     <LinearLayout
+        android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/black">
+        android:background="@color/black"
+        android:layout_margin="3dp">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
         <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <GridLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginBottom="5dp"
-                    android:rowCount="7"
-                    android:columnCount="2">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        android:id="@+id/dialog_query_hero_id"
-                        style="@style/ToolbarItem.Grid"
-                        android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        android:id="@+id/dialog_query_hero_nick"
-                        style="@style/ToolbarItem.Grid"
-                        android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        style="@style/ToolbarItem.Grid"
+            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="match_parent">
+                <TextView
+                    android:id="@+id/dialog_query_hero_id"
+                    style="@style/ToolbarItem.Hero"
+                    android:textColor="@color/article_page_text_item_content0"
+                    android:text="@string/zero_word" />
+                <TextView
+                    android:id="@+id/dialog_query_hero_nick"
+                    style="@style/ToolbarItem.Hero"
+                    android:textColor="@color/article_page_text_item_content0"
+                    android:text="@string/zero_word" />
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        style="@style/ToolbarItem.Hero"
                         android:text="HP：" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
                         android:id="@+id/dialog_query_hero_hp"
-                        style="@style/ToolbarItem.Grid"
-                        android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        style="@style/ToolbarItem.Grid"
+                        style="@style/ToolbarItem.Hero"
+                        android:textColor="@color/red"
+                        android:text="@string/hello_world" />
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        style="@style/ToolbarItem.Hero"
                         android:text="MP：" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="2"
                         android:id="@+id/dialog_query_hero_mp"
-                        style="@style/ToolbarItem.Grid"
-                        android:text="@string/zero_word" />
-
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                        style="@style/ToolbarItem.Hero"
+                        android:textColor="@color/ext_toolbar_background_color_focused"
+                        android:text="@string/hello_world" />
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView
+                        android:textSize="20sp"
                         android:id="@+id/dialog_query_hero_auth1"
-                        style="@style/ToolbarItem.Grid"
+                        style="@style/ToolbarItem.Hero"
+                        android:textColor="@color/article_page_text_item_content0"
                         android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <TextView
+                        android:textSize="20sp"
                         android:id="@+id/dialog_query_hero_auth2"
-                        style="@style/ToolbarItem.Grid"
+                        style="@style/ToolbarItem.Hero"
+                        android:textColor="@color/article_page_text_item_content0"
                         android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        style="@style/ToolbarItem.Grid"
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        style="@style/ToolbarItem.Hero"
                         android:text="上次" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        android:id="@+id/dialog_query_hero_last_time"
-                        style="@style/ToolbarItem.Grid"
-                        android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
-                        style="@style/ToolbarItem.Grid"
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
+                            android:id="@+id/dialog_query_hero_last_date"
+                            style="@style/ToolbarItem.Hero"
+                            android:lines="2"
+                            android:textColor="@color/article_page_text_item_content0"
+                            android:text="@string/zero_word" />
+                        <TextView
+                            android:id="@+id/dialog_query_hero_last_time"
+                            style="@style/ToolbarItem.Hero"
+                            android:lines="2"
+                            android:textColor="@color/article_page_text_item_content0"
+                            android:text="@string/zero_word" />
+                    </LinearLayout>
+                </LinearLayout>
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textSize="16sp"
+                        style="@style/ToolbarItem.Hero"
                         android:text="來自" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_weight="5"
                         android:id="@+id/dialog_query_hero_from_ip"
-                        style="@style/ToolbarItem.Grid"
+                        style="@style/ToolbarItem.Hero"
+                        android:textColor="@color/article_page_text_item_content0"
                         android:text="@string/zero_word" />
-                </GridLayout>
+                </LinearLayout>
+                <Button
+                    android:id="@+id/dialog_query_hero_show_web_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:text="@string/dialog_query_hero_show_web_view"
+                    style="@style/TextViewNormal"
+                    android:textColor="@color/article_page_text_item_content0"
+                    android:background="@color/dialog_select_article_background_color_normal"/>
+                <WebView
+                    android:id="@+id/dialog_query_hero_web_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"
+                    android:visibility="gone"/>
             </LinearLayout>
         </ScrollView>
         <LinearLayout style="@style/Toolbar">

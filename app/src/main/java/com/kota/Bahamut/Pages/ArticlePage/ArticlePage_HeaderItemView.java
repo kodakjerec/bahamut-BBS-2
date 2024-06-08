@@ -22,21 +22,6 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
 
         detailTextView1 = this.findViewById(R.id.detail_1);
         detailTextView1.setOnClickListener(authorClickListener);
-
-        // 自動隱藏文字列
-//        Timer timer = new Timer();
-//        TimerTask task = new TimerTask() {
-//            @Override
-//            public void run() {
-//                new ASRunner() {
-//                    @Override
-//                    public void run() {
-//                        titleTextView.performClick();
-//                    }
-//                }.runInMainThread();
-//            }
-//        };
-//        timer.schedule(task, 2000);
     }
 
     public int getType() {

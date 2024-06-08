@@ -2,6 +2,7 @@ package com.kota.Bahamut.Pages.ArticlePage;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -30,7 +31,7 @@ import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.TelnetCommand;
 import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
-import com.kota.Bahamut.Dialogs.DialogShortenUrl;
+import com.kota.Bahamut.Dialogs.DialogQueryHero;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
@@ -54,12 +55,12 @@ import java.util.Vector;
 
 public class ArticlePage extends TelnetPage {
     RelativeLayout mainLayout;
-    private TelnetArticle _article = null;
-    private TelnetView _telnet_view = null;
-    private BoardMainPage _board_page = null;
-    private boolean _full_screen = false;
-    private boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
-    private ArticlePage_HeaderItemView articlePageHeaderItemView;
+    TelnetArticle _article = null;
+    TelnetView _telnet_view = null;
+    TextView _list_empty_view = null;
+    BoardMainPage _board_page = null;
+    boolean _full_screen = false;
+    boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
     long _action_delay = 500;
     Runnable _top_action = null;
     Runnable _bottom_action = null;
@@ -110,10 +111,9 @@ public class ArticlePage extends TelnetPage {
                     }
                     case ArticlePageItemType.Header -> {
                         itemView = new ArticlePage_HeaderItemView(getContext());
-                        articlePageHeaderItemView = (ArticlePage_HeaderItemView) itemView;
                     }
                     case ArticlePageItemType.PostTime ->
-                            itemView = new ArticlePage_TimeTimeView(getContext());
+                        itemView = new ArticlePage_TimeTimeView(getContext());
                 }
             } else {
                 if (type == ArticlePageItemType.Content) {
@@ -317,19 +317,19 @@ public class ArticlePage extends TelnetPage {
     };
 
     // 選單
-    private final View.OnClickListener mMenuListener = v -> onMenuClicked();
+    final View.OnClickListener mMenuListener = v -> onMenuClicked();
 
     // 推薦
-    private final View.OnClickListener mDoGyListener = v -> onGYButtonClicked();
+    final View.OnClickListener mDoGyListener = v -> onGYButtonClicked();
 
     // 切換模式
-    private final View.OnClickListener mChangeModeListener = v -> {
+    final View.OnClickListener mChangeModeListener = v -> {
         changeViewMode();
         refreshExternalToolbar();
     };
 
     // 開啟連結
-    private final View.OnClickListener mShowLinkListener = v -> onOpenLinkClicked();
+    final View.OnClickListener mShowLinkListener = v -> onOpenLinkClicked();
 
     // 靠左對其
     View.OnClickListener _btnLL_listener = view -> {
@@ -361,41 +361,43 @@ public class ArticlePage extends TelnetPage {
     public void onPageDidLoad() {
         mainLayout = (RelativeLayout) findViewById(R.id.content_view);
 
-        this._telnet_view = mainLayout.findViewById(R.id.Article_contentTelnetView);
+        _telnet_view = mainLayout.findViewById(R.id.Article_contentTelnetView);
         reloadTelnetLayout();
         ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
-        list_view.setAdapter(this._list_adapter);
-        list_view.setOnItemLongClickListener(this._list_long_click_listener);
+        _list_empty_view = mainLayout.findViewById(R.id.Article_listEmptyView);
+        list_view.setEmptyView(_list_empty_view);
+        list_view.setAdapter(_list_adapter);
+        list_view.setOnItemLongClickListener(_list_long_click_listener);
 
         Button back_button = mainLayout.findViewById(R.id.Article_backButton);
-        back_button.setOnClickListener(this._back_listener);
+        back_button.setOnClickListener(_back_listener);
 
         Button page_up_button = mainLayout.findViewById(R.id.Article_pageUpButton);
-        page_up_button.setOnClickListener(this._page_up_listener);
-        page_up_button.setOnLongClickListener(this._page_top_listener);
+        page_up_button.setOnClickListener(_page_up_listener);
+        page_up_button.setOnLongClickListener(_page_top_listener);
 
         Button page_down_button = mainLayout.findViewById(R.id.Article_pageDownButton);
-        page_down_button.setOnClickListener(this._page_down_listener);
-        page_down_button.setOnLongClickListener(this._page_bottom_listener);
+        page_down_button.setOnClickListener(_page_down_listener);
+        page_down_button.setOnLongClickListener(_page_bottom_listener);
 
         Button do_gy_button = mainLayout.findViewById(R.id.do_gy);
         if (do_gy_button != null) {
-            do_gy_button.setOnClickListener(this.mDoGyListener);
+            do_gy_button.setOnClickListener(mDoGyListener);
         }
         Button change_mode_button = mainLayout.findViewById(R.id.change_mode);
         if (change_mode_button != null) {
-            change_mode_button.setOnClickListener(this.mChangeModeListener);
+            change_mode_button.setOnClickListener(mChangeModeListener);
         }
         Button show_link_button = mainLayout.findViewById(R.id.show_link);
         if (show_link_button != null) {
-            show_link_button.setOnClickListener(this.mShowLinkListener);
+            show_link_button.setOnClickListener(mShowLinkListener);
         }
 
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
-        if (this._telnet_view.getFrame() == null && this._article != null) {
-            this._telnet_view.setFrame(this._article.getFrame());
+        if (_telnet_view.getFrame() == null && _article != null) {
+            _telnet_view.setFrame(_article.getFrame());
         }
         refreshExternalToolbar();
         showNotification();
@@ -406,7 +408,7 @@ public class ArticlePage extends TelnetPage {
     }
 
     // 變更工具列位置
-    private void changeToolbarLocation() {
+    void changeToolbarLocation() {
         LinearLayout toolbar = mainLayout.findViewById(R.id.toolbar);
         LinearLayout toolbarBlock = mainLayout.findViewById(R.id.toolbar_block);
         ToolBarFloating toolBarFloating = mainLayout.findViewById(R.id.ToolbarFloatingComponent);
@@ -520,7 +522,7 @@ public class ArticlePage extends TelnetPage {
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public void onPageDidDisappear() {
-        this._telnet_view = null;
+        _telnet_view = null;
         super.onPageDidDisappear();
     }
 
@@ -538,10 +540,10 @@ public class ArticlePage extends TelnetPage {
     }
 
     void onMenuClicked() {
-        if (this._article != null && this._article.Author != null) {
-            String author = this._article.Author.toLowerCase();
+        if (_article != null && _article.Author != null) {
+            String author = _article.Author.toLowerCase();
             String logon_user = UserSettings.getPropertiesUsername().trim().toLowerCase();
-            boolean is_board = this._board_page.getPageType() == BahamutPage.BAHAMUT_BOARD;
+            boolean is_board = _board_page.getPageType() == BahamutPage.BAHAMUT_BOARD;
             boolean ext_toolbar_enable = UserSettings.getPropertiesExternalToolbarEnable();
             String external_toolbar_enable_title = ext_toolbar_enable ? getContextString(R.string.hide_toolbar) : getContextString(R.string.open_toolbar);
             ASListDialog.createDialog()
@@ -584,7 +586,7 @@ public class ArticlePage extends TelnetPage {
     }
 
     // 載入全部圖片
-    private void onLoadAllImageClicked() {
+    void onLoadAllImageClicked() {
         // TODO: not yet
         ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
         int childCount = list_view.getChildCount();
@@ -604,26 +606,7 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
-    public void setArticle(TelnetArticle aArticle) {
-        this._article = aArticle;
-        if (this._article != null) {
-            String board_name = this._board_page.getListName();
-            BookmarkStore store = TempSettings.getBookmarkStore();
-            BookmarkList bookmark_list = store.getBookmarkList(board_name);
-            bookmark_list.addHistoryBookmark(this._article.Title);
-            store.store();
-            this._telnet_view.setFrame(this._article.getFrame());
-            reloadTelnetLayout();
-            ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
-            if (telnet_content_view != null) {
-                telnet_content_view.scrollTo(0, 0);
-            }
-            this._list_adapter.notifyDataSetChanged();
-        }
-        ASProcessingDialog.dismissProcessingDialog();
-    }
-
-    private void reloadTelnetLayout() {
+    void reloadTelnetLayout() {
         int screen_width;
         int text_width = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 20.0f, getContext().getResources().getDisplayMetrics());
         int telnet_view_width = (text_width / 2) * 80;
@@ -634,46 +617,46 @@ public class ArticlePage extends TelnetPage {
         }
         if (telnet_view_width <= screen_width) {
             telnet_view_width = -1;
-            this._full_screen = true;
+            _full_screen = true;
         } else {
-            this._full_screen = false;
+            _full_screen = false;
         }
-        ViewGroup.LayoutParams telnet_layout = this._telnet_view.getLayoutParams();
+        ViewGroup.LayoutParams telnet_layout = _telnet_view.getLayoutParams();
         telnet_layout.width = telnet_view_width;
         telnet_layout.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        this._telnet_view.setLayoutParams(telnet_layout);
+        _telnet_view.setLayoutParams(telnet_layout);
     }
 
     void moveToTopArticle() {
-        if (TelnetClient.getConnector().isConnecting() && this._board_page != null) {
-            this._board_page.loadTheSameTitleTop();
+        if (TelnetClient.getConnector().isConnecting() && _board_page != null) {
+            _board_page.loadTheSameTitleTop();
         } else {
             showConnectionClosedToast();
         }
     }
 
     void moveToBottomArticle() {
-        if (TelnetClient.getConnector().isConnecting() && this._board_page != null) {
-            this._board_page.loadTheSameTitleBottom();
+        if (TelnetClient.getConnector().isConnecting() && _board_page != null) {
+            _board_page.loadTheSameTitleBottom();
         } else {
             showConnectionClosedToast();
         }
     }
 
-    private void showConnectionClosedToast() {
+    void showConnectionClosedToast() {
         ASToast.showShortToast("連線已中斷");
     }
 
-    private void onGYButtonClicked() {
-        if (this._board_page != null) {
-            this._board_page.goodLoadingArticle();
+    void onGYButtonClicked() {
+        if (_board_page != null) {
+            _board_page.goodLoadingArticle();
         }
     }
 
     // 刪除文章
     public void onDeleteButtonClicked() {
-        if (this._article != null && this._board_page != null) {
-            final int item_number = this._article.Number;
+        if (_article != null && _board_page != null) {
+            final int item_number = _article.Number;
             ASAlertDialog.createDialog()
                     .setTitle(getContextString(R.string.delete))
                     .setMessage(getContextString(R.string.del_this_article))
@@ -695,18 +678,18 @@ public class ArticlePage extends TelnetPage {
 
     // 修改文章
     public void onEditButtonClicked() {
-        if (this._article != null) {
+        if (_article != null) {
             PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-            String edit_title = this._article.generateEditTitle();
-            String edit_content = this._article.generateEditContent();
-            String edit_format = this._article.generateEditFormat();
-            page.setBoardPage(this._board_page);
-            page.setArticleNumber(String.valueOf(this._article.Number));
+            String edit_title = _article.generateEditTitle();
+            String edit_content = _article.generateEditContent();
+            String edit_format = _article.generateEditFormat();
+            page.setBoardPage(_board_page);
+            page.setArticleNumber(String.valueOf(_article.Number));
             page.setOperationMode(PostArticlePage.OperationMode.Edit);
             page.setPostTitle(edit_title);
             page.setPostContent(edit_content);
             page.setEditFormat(edit_format);
-            page.setListener(this._board_page);
+            page.setListener(_board_page);
             page.setHeaderHidden(true);
             getNavigationController().pushViewController(page);
         }
@@ -718,7 +701,7 @@ public class ArticlePage extends TelnetPage {
         reloadViewMode();
     }
 
-    private void reloadViewMode() {
+    void reloadViewMode() {
         ViewGroup text_content_view = mainLayout.findViewById(R.id.Article_TextContentView);
         ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
         // 文字模式
@@ -745,7 +728,7 @@ public class ArticlePage extends TelnetPage {
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public boolean onReceivedGestureRight() {
-        if (UserSettings.getPropertiesArticleViewMode() == 0 || this._full_screen) {
+        if (UserSettings.getPropertiesArticleViewMode() == 0 || _full_screen) {
             if (UserSettings.getPropertiesGestureOnBoardEnable())
                 onBackPressed();
             return true;
@@ -758,17 +741,13 @@ public class ArticlePage extends TelnetPage {
         return true;
     }
 
-    public void setBoardPage(BoardMainPage aBoardMainPage) {
-        this._board_page = aBoardMainPage;
-    }
-
-    public void onExternalToolbarClicked() {
+    void onExternalToolbarClicked() {
         boolean enable = UserSettings.getPropertiesExternalToolbarEnable();
         UserSettings.setPropertiesExternalToolbarEnable(!enable);
         refreshExternalToolbar();
     }
 
-    private void refreshExternalToolbar() {
+    void refreshExternalToolbar() {
         boolean enable = UserSettings.getPropertiesExternalToolbarEnable();
         int article_mode = UserSettings.getPropertiesArticleViewMode();
         if (article_mode == 1) {
@@ -782,11 +761,11 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
-    private void onOpenLinkClicked() {
-        if (this._article != null) {
+    void onOpenLinkClicked() {
+        if (_article != null) {
             // 擷取文章內的所有連結
             TextView textView = new TextView(getContext());
-            textView.setText(this._article.getFullText());
+            textView.setText(_article.getFullText());
             Linkify.addLinks(textView, Linkify.WEB_URLS);
 
             final URLSpan[] urls = textView.getUrls();
@@ -819,8 +798,8 @@ public class ArticlePage extends TelnetPage {
     }
 
     // 加入黑名單
-    public void onAddBlockListClicked() {
-        TelnetArticle article = this._article;
+    void onAddBlockListClicked() {
+        TelnetArticle article = _article;
         if (article != null) {
             Set<String> buffer = new HashSet<>();
             // 作者黑名單
@@ -853,7 +832,7 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
-    public void onBlockButtonClicked(final String aBlockName) {
+    void onBlockButtonClicked(final String aBlockName) {
         ASAlertDialog.createDialog()
                 .setTitle("加入黑名單")
                 .setMessage("是否要將\"" + aBlockName + "\"加入黑名單?")
@@ -882,14 +861,46 @@ public class ArticlePage extends TelnetPage {
                 }).scheduleDismissOnPageDisappear(this).show();
     }
 
+    // 給其他頁面託付使用
+    public void setBoardPage(BoardMainPage aBoardMainPage) {
+        _board_page = aBoardMainPage;
+    }
+
+    // 給其他網頁顯示文章使用
+    public void setArticle(TelnetArticle aArticle) {
+        _article = aArticle;
+        if (_article != null) {
+            String board_name = _board_page.getListName();
+            BookmarkStore store = TempSettings.getBookmarkStore();
+            BookmarkList bookmark_list = store.getBookmarkList(board_name);
+            bookmark_list.addHistoryBookmark(_article.Title);
+            store.store();
+            _telnet_view.setFrame(_article.getFrame());
+            reloadTelnetLayout();
+            ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
+            if (telnet_content_view != null) {
+                telnet_content_view.scrollTo(0, 0);
+            }
+            _list_adapter.notifyDataSetChanged();
+        }
+        ASProcessingDialog.dismissProcessingDialog();
+    }
+
+    // 給 state handler 更改讀取進度
+    @SuppressLint("SetTextI18n")
+    public void changeLoadingPercentage(String percentage) {
+        _list_empty_view.setText(getContextString(R.string.loading_)+percentage);
+    }
+    
+    // 查詢勇者
     public void ctrlQUser(Vector<String> fromStrings) {
-        System.out.println(fromStrings);
         try {
             new ASRunner() {
                 @Override
                 public void run() {
-                    DialogShortenUrl temp = new DialogShortenUrl();
-                    temp.show();
+                    DialogQueryHero dialogQueryHero = new DialogQueryHero();
+                    dialogQueryHero.show();
+                    dialogQueryHero.getData(fromStrings);
                 }
             }.runInMainThread();
         } catch (Exception e) {

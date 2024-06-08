@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Deploy Cloud Function",
+      "type": "cloudcode.cloudfunctions",
+      "request": "launch",
+      "functionName": "cloud_backup",
+      "region": "asia-east1",
+      "gen": "GEN_2",
+      "revision": "cloud-backup-00003-nug",
+      "entryPoint": "cloud_backup",
+      "runtime": "python311",
+      "testInput": ""
+    }
+  ]
+}

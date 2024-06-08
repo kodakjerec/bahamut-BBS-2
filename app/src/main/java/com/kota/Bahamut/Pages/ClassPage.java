@@ -50,6 +50,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         return R.layout.class_page;
     }
 
+    @Override
     public void onPageDidLoad() {
         super.onPageDidLoad();
 

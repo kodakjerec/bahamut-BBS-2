@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/BoardPage_ItemView_contentView" android:layout_width="match_parent" android:layout_height="wrap_content">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:id="@+id/BoardPage_ItemView_contentView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <LinearLayout android:orientation="vertical" android:id="@+id/BoardPage_ItemView_backgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">

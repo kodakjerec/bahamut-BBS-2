@@ -4,6 +4,7 @@ import com.kota.Bahamut.ListPage.TelnetListPage;
 import com.kota.Bahamut.ListPage.TelnetListPageBlock;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetOutputBuilder;
+import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
 
 public class BahamutCommandLoadLastBlock extends TelnetCommand {
 
@@ -22,9 +23,10 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
     private OperationMode getLoadLastBlockMode(TelnetListPage aListPage) {
 
         switch (aListPage.getListType()) {
-            case 1: // BoardLinkPage
-                return OperationMode.Left_S_End;
-            case 2: // BoardSearchPage
+//                return OperationMode.Left_S_End;
+            case BoardPageAction.LINK_TITLE: // BoardLinkPage
+            case BoardPageAction.SEARCH: // BoardSearchPage
+            case BoardPageAction.ESSENCE:
                 if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {
                     return OperationMode.End;
                 }

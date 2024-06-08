@@ -2,16 +2,18 @@ package com.kota.Bahamut.Dialogs
 
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.res.Configuration
+import android.os.Build
 import android.text.util.Linkify
 import android.util.Log
+import android.view.OrientationEventListener
+import android.view.Surface
 import android.view.View
-import android.view.View.GONE
 import android.view.View.OnClickListener
-import android.view.View.VISIBLE
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.ScrollView
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -33,6 +35,7 @@ import java.util.Objects
 import java.util.Vector
 
 class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {
+    private var mainLayout: RelativeLayout
     private var editText: EditText? = null
     private var sampleTextView: TextView? = null
     private var sendButton: Button? = null
@@ -41,6 +44,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     private var dialogShortenUrlItemViewAdapter: DialogShortenUrlItemViewAdapter? = null
     private val urlDatabase = UrlDatabase(context)
     private var isTransfer: Boolean = true
+    private var mOrientationEventListener: OrientationEventListener
 
     override fun getName(): String {
         return "BahamutShortenUrlDialog"
@@ -159,8 +163,8 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             // 從轉檔切換到紀錄
             isTransfer = false
             findViewById<Button>(R.id.dialog_shorten_url_change_mode).text = getContextString(R.string.dialog_shorten_url_transfer)
-            findViewById<ScrollView>(R.id.dialog_scrollView).visibility = GONE
-            findViewById<ScrollView>(R.id.dialog_scrollView2).visibility = VISIBLE
+            findViewById<View>(R.id.dialog_shorten_url_layout_transfer).visibility = View.GONE
+            findViewById<View>(R.id.dialog_shorten_url_layout_recycleView).visibility = View.VISIBLE
 
             val recyclerView = findViewById<RecyclerView>(R.id.dialog_shorten_url_layout_recycleView)
             recyclerView.layoutManager = LinearLayoutManager(context)
@@ -171,30 +175,53 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         } else {
             isTransfer = true
             findViewById<Button>(R.id.dialog_shorten_url_change_mode).text = getContextString(R.string.record)
-            findViewById<ScrollView>(R.id.dialog_scrollView).visibility = VISIBLE
-            findViewById<ScrollView>(R.id.dialog_scrollView2).visibility = GONE
+            findViewById<View>(R.id.dialog_shorten_url_middle_linear_layout).visibility = View.VISIBLE
+            findViewById<View>(R.id.dialog_shorten_url_layout_recycleView).visibility = View.GONE
         }
     }
 
+    private var oldOrientation: Int = 1
     init {
         val layoutId = R.layout.dialog_shorten_url
         requestWindowFeature(1)
         setContentView(layoutId)
         Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
         setTitle(context.getString(R.string.dialog_shorten_url_title))
-        val layout = findViewById<LinearLayout>(R.id.dialog_shorten_url_layout)
-        editText = layout.findViewById(R.id.dialog_shorten_url_content)
-        sampleTextView = layout.findViewById(R.id.dialog_shorten_url_sample)
+        mainLayout = findViewById(R.id.dialog_shorten_url_layout)
+        editText = mainLayout.findViewById(R.id.dialog_shorten_url_content)
+        sampleTextView = mainLayout.findViewById(R.id.dialog_shorten_url_sample)
         catchClipBoard()
 
         // 按鈕
-        layout.findViewById<Button>(R.id.dialog_shorten_url_transfer).setOnClickListener(transferListener)
-        sendButton = layout.findViewById(R.id.send)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_transfer).setOnClickListener(transferListener)
+        sendButton = mainLayout.findViewById(R.id.send)
         sendButton!!.setOnClickListener(this)
         sendButton!!.isEnabled = false
-        layout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
-        layout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
+        mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
         findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
+
+        mOrientationEventListener = object : OrientationEventListener(context) {
+            override fun onOrientationChanged(orientation: Int) {
+                val nowOrientation: Int
+
+
+                    nowOrientation = context.resources.configuration.orientation
+
+                if (nowOrientation!=oldOrientation) {
+                    val mylayoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
+                    if (nowOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        mylayoutParams!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        oldOrientation = nowOrientation
+                    } else {
+                        val factor = context.resources.displayMetrics.density
+                        mylayoutParams!!.height = (500 * factor).toInt()
+                        oldOrientation = nowOrientation
+                    }
+                    mainLayout.layoutParams = mylayoutParams
+                }
+            }
+        }
     }
 
     override fun onClick(view: View) {
@@ -211,5 +238,15 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder?) {
         val shortUrl = dialogShortenUrlItemViewAdapter!!.getItem(dialogShortenUrlItemView!!.layoutPosition).shorten_url
         changeFrontend(shortUrl)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        mOrientationEventListener.enable()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mOrientationEventListener.disable()
     }
 }

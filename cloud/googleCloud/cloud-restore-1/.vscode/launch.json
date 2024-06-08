@@ -1,0 +1,16 @@
+{
+  "configurations": [
+    {
+      "name": "Deploy Cloud Function",
+      "type": "cloudcode.cloudfunctions",
+      "request": "launch",
+      "functionName": "cloud_restore",
+      "region": "asia-east1",
+      "gen": "GEN_2",
+      "revision": "cloud-restore-00003-lig",
+      "entryPoint": "cloud_restore",
+      "runtime": "python311",
+      "testInput": ""
+    }
+  ]
+}

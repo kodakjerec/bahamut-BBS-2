@@ -65,10 +65,11 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
             if (author != null) {
                 author_buffer.append(author);
             }
-            if (nickname != null && nickname.length() > 0) {
+            if (nickname != null && !nickname.isEmpty()) {
                 author_buffer.append("(").append(nickname).append(")");
             }
-            author_buffer.append(" 說:");
+            if (author != null && !author.isEmpty())
+                author_buffer.append(" 說:");
             _author_label.setText(author_buffer.toString());
         }
     }

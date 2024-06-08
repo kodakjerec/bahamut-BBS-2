@@ -23,6 +23,11 @@ public class BoardLinkPage extends BoardMainPage {
         return R.layout.board_link_page;
     }
 
+    @Override
+    public int getListType() {
+        return BoardPageAction.LINK_TITLE;
+    }
+
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
         TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
@@ -66,10 +71,7 @@ public class BoardLinkPage extends BoardMainPage {
         return true;
     }
 
-    public int getListType() {
-        return 1;
-    }
-
+    @Override
     public String getListIdFromListName(String aName) {
         return aName + "[Board][TitleLinked]";
     }

@@ -1,69 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="300dp"
-    android:layout_height="wrap_content"
+    android:layout_height="500dp"
     android:background="@color/dialog_border_color"
     android:id="@+id/dialog_shorten_url_layout">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="match_parent"
         android:background="@color/black"
-        android:layout_margin="3.0dp">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
-            android:id="@+id/dialog_title"
-            android:textColor="@color/white"
-            android:background="#202020"
+        android:layout_margin="3dp">
+        <RelativeLayout
+            android:id="@+id/dialog_header"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:text="@string/dialog_shorten_url_title"
-            style="@style/TextViewLarge"/>
-        <Button
-            android:id="@+id/dialog_shorten_url_change_mode"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:text="@string/record"
-            android:background="@color/dialog_select_article_background_color_normal"
-            android:layout_alignParentEnd="true" />
-        <LinearLayout
-            android:id="@+id/dialog_shorten_url_middle_linear_layout"
-            android:layout_width="match_parent"
-            android:layout_height="360dp"
-            android:orientation="horizontal"
-            android:layout_below="@+id/dialog_title">
-            <ScrollView
-                android:id="@+id/dialog_scrollView"
-                android:background="@color/item_background_color"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                android:id="@+id/dialog_title"
+                android:textColor="@color/white"
+                android:background="#202020"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="40dp"
+                android:text="@string/dialog_shorten_url_title"
+                style="@style/TextViewLarge"/>
+            <Button
+                android:id="@+id/dialog_shorten_url_change_mode"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:text="@string/record"
+                android:background="@color/dialog_select_article_background_color_normal"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
+        <LinearLayout
+                android:id="@+id/dialog_shorten_url_middle_linear_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/dialog_header"
+                android:layout_above="@+id/dialog_shorten_url_sample"
+                android:orientation="horizontal">
                 <LinearLayout
                     android:id="@+id/dialog_shorten_url_layout_transfer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@color/item_background_color"
+                    android:layout_height="match_parent"
                     android:orientation="vertical">
-
                     <EditText
                         android:id="@+id/dialog_shorten_url_content"
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:background="@color/item_background_color"
-                        android:gravity="top|left"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
                         android:hint="@string/dialog_shorten_url_hint"
                         android:inputType="textMultiLine"
                         android:padding="10dp"
                         android:selectAllOnFocus="true"
                         android:textColor="@android:color/white"
-                        tools:ignore="TextFields" />
+                        tools:ignore="TextFields"
+                        android:autofillHints=""/>
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
+                        android:layout_height="60dp"
                         android:orientation="horizontal">
-
                         <Button
                             android:id="@+id/dialog_shorten_url_reset"
                             style="@style/ToolbarItem"
@@ -71,7 +68,6 @@
                             android:layout_weight="0"
                             android:background="@drawable/button_background_1"
                             android:text="@string/reset" />
-
                         <Button
                             android:id="@+id/dialog_shorten_url_transfer"
                             style="@style/ToolbarItem"
@@ -80,31 +76,23 @@
                             android:text="@string/dialog_shorten_url_transfer" />
                     </LinearLayout>
                 </LinearLayout>
-            </ScrollView>
-            <ScrollView
-                android:id="@+id/dialog_scrollView2"
-                android:visibility="invisible"
-                android:background="@color/item_background_color"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/dialog_shorten_url_layout_recycleView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </ScrollView>
-        </LinearLayout>
+                        android:id="@+id/dialog_shorten_url_layout_recycleView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+            </LinearLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewSmall
             android:id="@+id/dialog_shorten_url_sample"
             style="@style/TextViewSmall"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="40dp"
             android:gravity="center"
             android:text="@string/dialog_paint_color_sample"
-            android:layout_below="@id/dialog_shorten_url_middle_linear_layout"/>
-        <LinearLayout style="@style/Toolbar" android:layout_below="@+id/dialog_shorten_url_sample">
-            <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
-        </LinearLayout>
+            android:layout_above="@+id/dialog_toolbar"/>
+        <LinearLayout style="@style/Toolbar" android:id="@+id/dialog_toolbar" android:layout_alignParentBottom="true">
+        <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+    </LinearLayout>
     </RelativeLayout>
-</LinearLayout>
+</RelativeLayout>

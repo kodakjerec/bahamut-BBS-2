@@ -5,6 +5,8 @@ import com.kota.Bahamut.Pages.BillingPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
+import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
+import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.InstructionsPage;
 import com.kota.Bahamut.Pages.LoginPage;
@@ -21,7 +23,7 @@ public class PageContainer {
     private StartPage _start_page = null;
     private LoginPage _login_page = null;
     private MainPage _main_page = null;
-    private Stack<ClassPage> _class_page = new Stack<>();
+    private final Stack<ClassPage> _class_page = new Stack<>();
     private BoardMainPage _board_page = null;
     private BoardLinkPage _board_title_linked_page = null;
     private BoardSearchPage _board_search_page = null;
@@ -30,6 +32,9 @@ public class PageContainer {
     private BillingPage _billing_page = null;
     private PostArticlePage _post_article_page = null;
     private InstructionsPage _instruction_page = null;
+    private final BoardEssencePage _board_essence_page = null;
+    private final Stack<BoardEssencePage> _board_essence_page_list = new Stack<>();
+    private ArticleEssencePage articleEssencePage = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -105,12 +110,10 @@ public class PageContainer {
     }
 
     public void cleanClassPage() {
-        if (this._class_page != null) {
-            for (ClassPage page : this._class_page) {
-                page.clear();
-            }
-            this._class_page.clear();
+        for (ClassPage page : this._class_page) {
+            page.clear();
         }
+        this._class_page.clear();
     }
 
     public BoardMainPage getBoardPage() {
@@ -152,6 +155,46 @@ public class PageContainer {
         if (this._board_search_page != null) {
             this._board_search_page.clear();
             this._board_search_page = null;
+        }
+    }
+    public BoardEssencePage getBoardEssencePage() {
+        if (this._board_essence_page_list.size() > 0) {
+            return this._board_essence_page_list.lastElement();
+        }
+        return null;
+    }
+
+    public void cleanBoardEssencePage() {
+        for (BoardEssencePage page : this._board_essence_page_list) {
+            page.clear();
+        }
+        this._board_essence_page_list.clear();
+    }
+
+    public void pushBoardEssencePage(String aClassName, String aClassTitle) {
+        BoardEssencePage boardEssencePage = new BoardEssencePage();
+        boardEssencePage.clear();
+        boardEssencePage.setListName(aClassName);
+        boardEssencePage.setClassTitle(aClassTitle);
+        this._board_essence_page_list.push(boardEssencePage);
+    }
+
+    public void popBoardEssencePage() {
+        if (this._board_essence_page_list.size() > 0) {
+            this._board_essence_page_list.pop();
+        }
+    }
+    public ArticleEssencePage getArticleEssencePage() {
+        if (this.articleEssencePage == null) {
+            this.articleEssencePage = new ArticleEssencePage();
+        }
+        return this.articleEssencePage;
+    }
+
+    public void cleanArticleEssencePage() {
+        if (this.articleEssencePage != null) {
+            this.articleEssencePage.clear();
+            this.articleEssencePage = null;
         }
     }
 
@@ -224,4 +267,5 @@ public class PageContainer {
             this._post_article_page = null;
         }
     }
+
 }

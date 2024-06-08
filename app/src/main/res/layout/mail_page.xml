@@ -9,7 +9,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-
+            <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
             <com.kota.ASFramework.UI.ASListView
                 android:id="@+id/Mail_contentList"
                 style="@style/List"

@@ -18,7 +18,7 @@ public class BahamutCommandTheSameTitleUp extends TelnetCommand {
     }
 
     public void execute(final TelnetListPage aListPage) {
-        if (aListPage.getListType() == 1 || aListPage.getListType() == 2) {
+        if (aListPage.getListType()>0) {
             if (this._article_index == 1) {
                 new ASRunner() {
                     public void run() {
@@ -62,6 +62,10 @@ public class BahamutCommandTheSameTitleUp extends TelnetCommand {
                     aListPage.onLoadItemFinished();
                 }
             }.runInMainThread();
+            setDone(true);
+        } else if (!aListPage.isEnabled(aPageData.selectedItemNumber - 1)) {
+            ASToast.showShortToast("上一篇不可使用");
+            aListPage.onLoadItemFinished();
             setDone(true);
         } else {
             aListPage.loadItemAtNumber(aPageData.selectedItemNumber);

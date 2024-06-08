@@ -19,6 +19,7 @@
         <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <!-- 文字模式 -->
             <FrameLayout android:id="@+id/Article_TextContentView" android:layout_width="match_parent" android:layout_height="match_parent">
+                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Article_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.ASFramework.UI.ASListView
                     android:id="@+id/Article_contentList"
                     android:scrollbars="vertical"
