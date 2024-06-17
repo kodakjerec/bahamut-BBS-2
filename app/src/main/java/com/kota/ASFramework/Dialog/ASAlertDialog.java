@@ -8,8 +8,6 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.core.content.ContextCompat;
-
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.Bahamut.R;
 
@@ -31,6 +29,7 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   private TextView _title_label = null;
   
   private LinearLayout _toolbar = null;
+  private int _default_index = -1;
   
   public ASAlertDialog() {
     initial();
@@ -38,7 +37,7 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   
   public ASAlertDialog(String paramString) {
     initial();
-    this._alert_id = paramString;
+    _alert_id = paramString;
   }
   
   private View buildContentView() {
@@ -56,40 +55,40 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
     linearLayout1.setPadding(m, m, m, m);
     linearLayout1.setBackgroundColor(-16777216);
     linearLayout2.addView((View)linearLayout1);
-    this._title_label = new TextView(getContext());
-    this._title_label.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
-    this._title_label.setPadding(k, k, k, k);
-    this._title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
-    this._title_label.setTextColor(-1);
-    this._title_label.setTypeface(this._title_label.getTypeface(), Typeface.BOLD);
-    this._title_label.setVisibility(View.GONE);
-    this._title_label.setBackgroundColor(-15724528);
-    this._title_label.setSingleLine(true);
-    linearLayout1.addView((View)this._title_label);
-    this._message_label = new TextView(getContext());
-    this._message_label.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
-    this._message_label.setPadding(k, k, k, k);
-    this._message_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
-    this._message_label.setMinimumHeight(i);
-    this._message_label.setTextColor(-1);
-    this._message_label.setVisibility(View.GONE);
-    this._message_label.setBackgroundColor(-16777216);
-    linearLayout1.addView((View)this._message_label);
-    this._toolbar = new LinearLayout(getContext());
-    this._toolbar.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
-    this._toolbar.setGravity(17);
-    this._toolbar.setOrientation(LinearLayout.HORIZONTAL);
-    linearLayout1.addView((View)this._toolbar);
+    _title_label = new TextView(getContext());
+    _title_label.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
+    _title_label.setPadding(k, k, k, k);
+    _title_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeUltraLarge());
+    _title_label.setTextColor(-1);
+    _title_label.setTypeface(_title_label.getTypeface(), Typeface.BOLD);
+    _title_label.setVisibility(View.GONE);
+    _title_label.setBackgroundColor(-15724528);
+    _title_label.setSingleLine(true);
+    linearLayout1.addView((View)_title_label);
+    _message_label = new TextView(getContext());
+    _message_label.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
+    _message_label.setPadding(k, k, k, k);
+    _message_label.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
+    _message_label.setMinimumHeight(i);
+    _message_label.setTextColor(-1);
+    _message_label.setVisibility(View.GONE);
+    _message_label.setBackgroundColor(-16777216);
+    linearLayout1.addView((View)_message_label);
+    _toolbar = new LinearLayout(getContext());
+    _toolbar.setLayoutParams((ViewGroup.LayoutParams)new LinearLayout.LayoutParams(n, ViewGroup.LayoutParams.WRAP_CONTENT));
+    _toolbar.setGravity(17);
+    _toolbar.setOrientation(LinearLayout.HORIZONTAL);
+    linearLayout1.addView((View)_toolbar);
     return (View)linearLayout2;
   }
   
   private void clear() {
-    if (this._message_label != null)
-      this._message_label.setText(""); 
-    if (this._title_label != null)
-      this._title_label.setText(""); 
-    this._toolbar.removeAllViews();
-    this._item_list.clear();
+    if (_message_label != null)
+      _message_label.setText(""); 
+    if (_title_label != null)
+      _title_label.setText(""); 
+    _toolbar.removeAllViews();
+    _item_list.clear();
   }
   
   public static boolean containsAlert(String paramString) {
@@ -141,19 +140,18 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   
   public ASAlertDialog addButton(String paramString) {
     if (paramString != null) {
-      if (this._item_list.size() > 0)
-        this._toolbar.addView(createDivider()); 
+      if (_item_list.size() > 0)
+        _toolbar.addView(createDivider()); 
       Button button = createButton();
-      this._toolbar.addView((View)button);
+      _toolbar.addView((View)button);
       button.setText(paramString);
-      if (paramString != null)
-        if (paramString.length() < 4) {
-          button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
-        } else {
-          button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
-        }  
+      if (paramString.length() < 4) {
+        button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeLarge());
+      } else {
+        button.setTextSize(2, ASLayoutParams.getInstance().getTextSizeNormal());
+      }
       button.setOnClickListener(this);
-      this._item_list.add(button);
+      _item_list.add(button);
     } 
     return this;
   }
@@ -166,58 +164,73 @@ public class ASAlertDialog extends ASDialog implements View.OnClickListener {
   }
   
   public void dismiss() {
-    if (this._alert_id != null)
-      _alerts.remove(this._alert_id); 
+    if (_alert_id != null)
+      _alerts.remove(_alert_id); 
     super.dismiss();
   }
   
   public void onClick(View paramView) {
-    if (this._listener != null) {
-      int i = this._item_list.indexOf(paramView);
-      this._listener.onAlertDialogDismissWithButtonIndex(this, i);
+    if (_listener != null) {
+      int i = _item_list.indexOf(paramView);
+      _listener.onAlertDialogDismissWithButtonIndex(this, i);
     } 
     dismiss();
   }
   
   public ASAlertDialog setItemTitle(int paramInt, String paramString) {
-    if (paramInt >= 0 && paramInt < this._item_list.size())
-      ((Button)this._item_list.get(paramInt)).setText(paramString); 
+    if (paramInt >= 0 && paramInt < _item_list.size())
+      ((Button)_item_list.get(paramInt)).setText(paramString); 
     return this;
   }
   
   public ASAlertDialog setListener(ASAlertDialogListener paramASAlertDialogListener) {
-    this._listener = paramASAlertDialogListener;
+    _listener = paramASAlertDialogListener;
     return this;
   }
   
   public ASAlertDialog setMessage(String paramString) {
     if (paramString == null) {
-      this._message_label.setVisibility(View.GONE);
+      _message_label.setVisibility(View.GONE);
       return this;
     } 
-    this._message_label.setVisibility(View.VISIBLE);
-    this._message_label.setText(paramString);
+    _message_label.setVisibility(View.VISIBLE);
+    _message_label.setText(paramString);
     return this;
   }
   
   public ASAlertDialog setTitle(String paramString) {
     if (paramString == null) {
-      this._title_label.setVisibility(View.GONE);
+      _title_label.setVisibility(View.GONE);
       return this;
     } 
-    this._title_label.setVisibility(View.VISIBLE);
-    this._title_label.setText(paramString);
+    _title_label.setVisibility(View.VISIBLE);
+    _title_label.setText(paramString);
     return this;
   }
   
   public void show() {
-    if (this._alert_id != null) {
-      ASAlertDialog aSAlertDialog = _alerts.get(this._alert_id);
+    if (_alert_id != null) {
+      ASAlertDialog aSAlertDialog = _alerts.get(_alert_id);
       if (aSAlertDialog != null && aSAlertDialog.isShowing())
         aSAlertDialog.dismiss(); 
-      _alerts.put(this._alert_id, this);
+      _alerts.put(_alert_id, this);
     } 
     super.show();
+  }
+
+  // 設定都不按的時候, 是否傳回預設值
+  // 預設不傳
+  public ASAlertDialog setDefaultButtonIndex(int i) {
+    _default_index = i;
+    return this;
+  }
+
+  @Override
+  public void cancel() {
+    if (_default_index>-1) {
+      _listener.onAlertDialogDismissWithButtonIndex(this, _default_index);
+    }
+    super.cancel();
   }
 
   public static void showErrorDialog(String err_message, ASViewController bahamutController) {

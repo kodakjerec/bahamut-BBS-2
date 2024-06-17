@@ -3,11 +3,9 @@ package com.kota.Bahamut.Dialogs
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
-import android.os.Build
 import android.text.util.Linkify
 import android.util.Log
 import android.view.OrientationEventListener
-import android.view.Surface
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
@@ -209,19 +207,20 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                     nowOrientation = context.resources.configuration.orientation
 
                 if (nowOrientation!=oldOrientation) {
-                    val mylayoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
+                    val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
                     if (nowOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        mylayoutParams!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        layoutParams!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
                         oldOrientation = nowOrientation
                     } else {
                         val factor = context.resources.displayMetrics.density
-                        mylayoutParams!!.height = (500 * factor).toInt()
+                        layoutParams!!.height = (500 * factor).toInt()
                         oldOrientation = nowOrientation
                     }
-                    mainLayout.layoutParams = mylayoutParams
+                    mainLayout.layoutParams = layoutParams
                 }
             }
         }
+        setDialogWidth()
     }
 
     override fun onClick(view: View) {
@@ -248,5 +247,14 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     override fun onStop() {
         super.onStop()
         mOrientationEventListener.disable()
+    }
+
+    // 變更dialog寬度
+    private fun setDialogWidth() {
+        val screenWidth = context.resources.displayMetrics.widthPixels
+        val dialogWidth = (screenWidth * 0.7).toInt()
+        val oldLayoutParams = mainLayout.layoutParams
+        oldLayoutParams.width = dialogWidth
+        mainLayout.layoutParams = oldLayoutParams
     }
 }

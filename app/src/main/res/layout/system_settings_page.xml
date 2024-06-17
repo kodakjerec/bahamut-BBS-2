@@ -5,7 +5,8 @@
     <LinearLayout android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black">
+        android:background="@color/black"
+        android:id="@+id/content_view">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_blocklist"/>
@@ -160,6 +161,7 @@
             <CheckBox android:id="@+id/SystemSettings_enableAutoToChat" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_auto_chat_hint"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_animationEnable" style="@style/SystemSettingsItem">
+            <View style="@style/HorizontalDivider"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_page_animation" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_animationEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_animation_hint"/>
         </RelativeLayout>
@@ -187,6 +189,27 @@
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_connect_recovery" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" style="@style/SystemSettingsCheckbox"/>
         </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/SystemSettings_item_cloud_save_layout">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                style="@style/SystemSettingsChapter"
+                android:text="@string/cloud_save"/>
+            <View style="@style/HorizontalDivider"/>
+            <RelativeLayout android:id="@+id/SystemSettings_item_cloudSaveEnable" style="@style/SystemSettingsItem">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/cloud_save_setting_switch" style="@style/SystemSettingsCheckboxText"/>
+                <CheckBox android:id="@+id/SystemSettings_cloudSaveEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_cloud_save_hint" />
+            </RelativeLayout>
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                android:id="@+id/SystemSettings_cloudSaveLastTime"
+                style="@style/TextViewLarge"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/zero_word"/>
+        </LinearLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_donation"/>

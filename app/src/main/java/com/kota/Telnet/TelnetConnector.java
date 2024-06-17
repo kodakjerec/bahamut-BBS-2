@@ -48,11 +48,11 @@ public class TelnetConnector implements TelnetChannelListener {
         public void run() {
             while (this._run && TelnetConnector.this._holder_thread == this) {
                 try {
-                    sleep(30000);
+                    sleep(30 * 1000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (System.currentTimeMillis() - TelnetConnector.this._last_send_data_time > 150000 && TelnetConnector.this._holder_thread == this) {
+                if (System.currentTimeMillis() - TelnetConnector.this._last_send_data_time > 150 * 1000) {
                     TelnetConnector.this.sendHoldMessage();
                 }
             }

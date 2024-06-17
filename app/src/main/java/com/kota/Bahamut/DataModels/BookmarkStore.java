@@ -8,6 +8,8 @@ import android.content.SharedPreferences;
 
 import androidx.annotation.NonNull;
 
+import com.kota.Bahamut.Service.CloudBackup;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
 
 import org.json.JSONArray;
@@ -96,7 +98,23 @@ public class BookmarkStore {
         }
     }
 
+    /** 儲存書籤 */
     public void store() {
+        JSONObject obj;
+        System.out.println("save bookmark store to file");
+        if (this._context != null && (obj = exportToJSON()) != null) {
+            this._context.getSharedPreferences("bookmark", 0).edit().putString("save_data", obj.toString()).commit();
+        }
+
+        // 雲端備份
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.backup();
+        }
+    }
+
+    /** 儲存書籤, 但是不通知雲端 */
+    public void storeWithoutCloud() {
         JSONObject obj;
         System.out.println("save bookmark store to file");
         if (this._context != null && (obj = exportToJSON()) != null) {

@@ -21,7 +21,6 @@ public class Dialog_InsertExpression extends ASDialog {
     TextView _title_label;
     LinearLayout _item_block;
     Dialog_InsertExpression_Listener _listener;
-    private float _dialog_width = 280.0f;
     final Vector<DialogItem> _item_list = new Vector<>();
 
     private static class DialogItem {
@@ -47,6 +46,7 @@ public class Dialog_InsertExpression extends ASDialog {
         _item_block = findViewById(R.id.dialog_insert_expressions_content);
 
         findViewById(R.id.dialog_insert_expressions_setting).setOnClickListener(_setting_listener);
+        setDialogWidth();
     }
 
     public static Dialog_InsertExpression createDialog() {
@@ -133,10 +133,15 @@ public class Dialog_InsertExpression extends ASDialog {
         }
     }
 
-    public Dialog_InsertExpression setDialogWidth(float width) {
-        this._dialog_width = width;
-        int dialog_width = (((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this._dialog_width, getContext().getResources().getDisplayMetrics())) / 2) * 2;
-        this._scroll_view.setLayoutParams(new LinearLayout.LayoutParams(dialog_width, ViewGroup.LayoutParams.WRAP_CONTENT));
-        return this;
+    // 變更dialog寬度
+    void setDialogWidth() {
+        int screenHeight = getContext().getResources().getDisplayMetrics().heightPixels;
+        int screenWidth = getContext().getResources().getDisplayMetrics().widthPixels;
+        int dialog_height = (int) (screenHeight*0.7);
+        int dialog_width = (int) (screenWidth*0.7);
+        ViewGroup.LayoutParams oldLayoutParams = _scroll_view.getLayoutParams();
+        oldLayoutParams.width = dialog_width;
+        oldLayoutParams.height = dialog_height;
+        _scroll_view.setLayoutParams(oldLayoutParams);
     }
 }

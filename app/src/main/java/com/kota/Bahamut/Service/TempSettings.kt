@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Service
 
 import android.annotation.SuppressLint
+import android.content.Context
 import com.kota.Bahamut.DataModels.BookmarkStore
 
 /*
@@ -15,17 +16,23 @@ object TempSettings {
     private var _transportType = -1 // 網路狀況
     @JvmField
     var lastVisitBoard = "" // 最後離開的看板
+
     @SuppressLint("StaticFieldLeak")
     private var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
+    @SuppressLint("StaticFieldLeak")
+    private var applicationContext: Context? = null // 公開的 applicationContext
+
     private var imgurAccessToken: String = "" // 上傳 imgur 的 token
     private var imgurAlbum: String = "" // 上傳 imgur 的 album
+    private var cloudSaveLastTime: String = "" // 雲端備份最後時間
 
-    // 清空數據但不包含 網路狀況
+    // 清空數據, 不用清除的不要列進去
     @JvmStatic
     fun clearTempSettings() {
         isUnderAutoToChat = false
         isFloatingInvisible = false
         setBoardFollowTitle("")
+        setCloudSaveLastTime("")
     }
 
     @JvmStatic
@@ -57,6 +64,15 @@ object TempSettings {
     fun getBookmarkStore(): BookmarkStore {
         return bookmarkStore!!
     }
+    @JvmStatic
+    fun setApplicationContext(fromContext: Context) {
+        applicationContext = fromContext
+    }
+
+    @JvmStatic
+    fun getApplicationContext(): Context {
+        return applicationContext!!
+    }
 
     @JvmStatic
     fun getImgurToken(): String {
@@ -73,5 +89,13 @@ object TempSettings {
     @JvmStatic
     fun setImgurAlbum(album:String) {
         imgurAlbum = album
+    }
+    @JvmStatic
+    fun getCloudSaveLastTime(): String {
+        return cloudSaveLastTime
+    }
+    @JvmStatic
+    fun setCloudSaveLastTime(lastTime:String) {
+        cloudSaveLastTime = lastTime
     }
 }

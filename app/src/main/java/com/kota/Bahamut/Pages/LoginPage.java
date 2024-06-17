@@ -1,8 +1,5 @@
 package com.kota.Bahamut.Pages;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-import static com.kota.Bahamut.Service.MyBillingClient.checkPurchaseHistoryQuery;
-
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +22,6 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCursor;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
-
-import java.util.concurrent.atomic.AtomicReference;
 
 public class LoginPage extends TelnetPage {
     boolean _cache_telnet_view = false;
@@ -58,26 +53,18 @@ public class LoginPage extends TelnetPage {
     TelnetView _telnet_view = null;
     String _username = "";
 
+    @Override
     public int getPageType() {
         return BahamutPage.BAHAMUT_LOGIN;
     }
 
+    @Override
     public int getPageLayout() {
         return R.layout.login_page;
     }
 
+    @Override
     public void onPageDidLoad() {
-        // 登入
-        getNavigationController().setNavigationTitle("勇者登入");
-        findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
-        // checkbox區塊點擊
-        CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        findViewById(R.id.blockRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
-        _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
-        // 讀取預設勇者設定
-        loadLogonUser();
-        System.out.println("current  version:" + Build.VERSION.SDK_INT);
-
         // 清空暫存和執行中變數
         TempSettings.clearTempSettings(); // 清除暫存資料
         try (UrlDatabase urlDatabase = new UrlDatabase(getContext())) { // 清除URL資料庫
@@ -86,20 +73,61 @@ public class LoginPage extends TelnetPage {
             Log.e("Bookmark", "initial fail");
         }
 
-        // check VIP
-        if (!UserSettings.getPropertiesVIP()) {
-            checkPurchaseHistoryQuery();
+        // 登入
+        getNavigationController().setNavigationTitle("勇者登入");
+        findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
+        // checkbox區塊點擊
+        CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
+        findViewById(R.id.blockRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
+        _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
+
+        // 讀取預設勇者設定
+        loadLogonUser();
+        // 讀取雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.restore();
         }
+
+        System.out.println("current  version:" + Build.VERSION.SDK_INT);
     }
 
+    @Override
     public synchronized boolean onPagePreload() {
         return handleNormalState();
     }
 
+    @Override
     // 按下返回
     protected boolean onBackPressed() {
         TelnetClient.getClient().close();
         return true;
+    }
+
+    @Override
+    public void onPageDidDisappear() {
+        _telnet_view = null;
+        _remove_logon_user_dialog = null;
+        _save_unfinished_article_dialog = null;
+        clear();
+    }
+
+    @Override
+    public void onPageRefresh() {
+        if (_telnet_view != null) {
+            setFrameToTelnetView();
+        }
+    }
+
+    @Override
+    public void onPageWillDisappear() {
+        ASProcessingDialog.dismissProcessingDialog();
+    }
+
+    @Override
+    public void clear() {
+        _error_count = 0;
+        _cache_telnet_view = false;
     }
 
     boolean handleNormalState() {
@@ -148,9 +176,10 @@ public class LoginPage extends TelnetPage {
 
     void saveLogonUserToProperties() {
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
+        String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
+        String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
+
         if (login_remember.isChecked()) {
-            String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
-            String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
             UserSettings.setPropertiesUsername(username);
             UserSettings.setPropertiesPassword(password);
         } else {
@@ -161,36 +190,11 @@ public class LoginPage extends TelnetPage {
         UserSettings.notifyDataUpdated();
     }
 
-    public void onPageDidDisappear() {
-        _telnet_view = null;
-        _remove_logon_user_dialog = null;
-        _save_unfinished_article_dialog = null;
-        clear();
-    }
-
-    public void onPageRefresh() {
-        if (_telnet_view != null) {
-            setFrameToTelnetView();
-        }
-    }
-
     void setFrameToTelnetView() {
         TelnetFrame frame = TelnetClient.getModel().getFrame().clone();
         frame.removeRow(23);
         frame.removeRow(22);
         _telnet_view.setFrame(frame);
-    }
-
-    public void onPageWillDisappear() {
-        ASProcessingDialog.dismissProcessingDialog();
-        if (TempSettings.isUnderAutoToChat) {
-            ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
-        }
-    }
-
-    public void clear() {
-        _error_count = 0;
-        _cache_telnet_view = false;
     }
 
     void login() {
@@ -206,21 +210,27 @@ public class LoginPage extends TelnetPage {
             public void run() {
                 ASProcessingDialog.dismissProcessingDialog();
                 if (LoginPage.this._remove_logon_user_dialog == null) {
-                    LoginPage.this._remove_logon_user_dialog = (ASAlertDialog) ASAlertDialog.createDialog().setTitle("提示").setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是").setListener((aDialog, index) -> {
-                        if (index == 0) {
-                            TelnetClient.getClient().sendStringToServerInBackground("n");
-                        } else {
-                            TelnetClient.getClient().sendStringToServerInBackground("y");
-                        }
-                        LoginPage.this._remove_logon_user_dialog = null;
-                        ASProcessingDialog.showProcessingDialog("登入中");
-                    }).setOnBackDelegate(aDialog -> {
-                        TelnetClient.getClient().sendStringToServerInBackground("n");
-                        LoginPage.this._remove_logon_user_dialog.dismiss();
-                        LoginPage.this._remove_logon_user_dialog = null;
-                        ASProcessingDialog.showProcessingDialog("登入中");
-                        return true;
-                    });
+                    LoginPage.this._remove_logon_user_dialog =
+                            (ASAlertDialog) ASAlertDialog.createDialog()
+                                    .setTitle("提示")
+                                    .setMessage("您想刪除其他重複的登入嗎？")
+                                    .addButton("否")
+                                    .addButton("是")
+                                    .setListener((aDialog, index) -> {
+                                        if (index == 0) {
+                                            TelnetClient.getClient().sendStringToServerInBackground("n");
+                                        } else {
+                                            TelnetClient.getClient().sendStringToServerInBackground("y");
+                                        }
+                                        LoginPage.this._remove_logon_user_dialog = null;
+                                        ASProcessingDialog.showProcessingDialog("登入中");
+                                    }).setOnBackDelegate(aDialog -> {
+                                        TelnetClient.getClient().sendStringToServerInBackground("n");
+                                        LoginPage.this._remove_logon_user_dialog.dismiss();
+                                        LoginPage.this._remove_logon_user_dialog = null;
+                                        ASProcessingDialog.showProcessingDialog("登入中");
+                                        return true;
+                                    });
                 }
                 LoginPage.this._remove_logon_user_dialog.show();
             }
@@ -270,10 +280,6 @@ public class LoginPage extends TelnetPage {
         // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();
-        UserSettings.notifyDataUpdated();
-
-        // 詢問雲端
-//        askCloudSave();
     }
 
     public void onSaveArticle() {
@@ -296,50 +302,5 @@ public class LoginPage extends TelnetPage {
                 ASAlertDialog.createDialog().setTitle("警告").setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。").addButton("確定").show();
             }
         }.runInMainThread();
-    }
-
-    private void askCloudSave() {
-        final int[] cloudSaveStatus = new int[]{NotificationSettings.getShowCloudSave()};
-        switch (cloudSaveStatus[0]){
-            case 0:
-                AtomicReference<Boolean> isCloudExist = new AtomicReference<>(false);
-                // 詢問是否啟用雲端備份
-                ASAlertDialog.createDialog()
-                        .setTitle(getContextString(R.string.cloud_save))
-                        .setMessage(getContextString(R.string.cloud_save_question1))
-                        .addButton(getContextString(R.string.cancel))
-                        .addButton(getContextString(R.string.on))
-                        .setListener((aDialog, index) -> {
-                            // 決定同步, 檢查雲端存檔是否存在
-                            if (index == 1) {
-                                isCloudExist.set(CloudBackup.INSTANCE.checkCloud());
-                            } else {// 取消同步, 以本地端為主
-                                cloudSaveStatus[0] = 1;
-                                NotificationSettings.setShowCloudSave(cloudSaveStatus[0]);
-                            }
-                        }).show();
-
-                // 雲端存在, 選擇本地或雲端
-                if (isCloudExist.get()) {
-                    ASAlertDialog.createDialog()
-                            .setTitle(getContextString(R.string.cloud_save))
-                            .setMessage(getContextString(R.string.cloud_save_question2))
-                            .addButton(getContextString(R.string.cloud_save_local))
-                            .addButton(getContextString(R.string.cloud_save_cloud))
-                            .setListener((aDialog, index) -> {
-                                if (index==0) {
-                                    // 選擇本地=>覆蓋雲端
-                                    CloudBackup.INSTANCE.backup();
-                                } else {
-                                    // 選擇雲端=>覆蓋本地
-                                    CloudBackup.INSTANCE.restore();
-                                }
-                            });
-
-                }
-                break;
-            case 1, 2:
-                break;
-        }
     }
 }

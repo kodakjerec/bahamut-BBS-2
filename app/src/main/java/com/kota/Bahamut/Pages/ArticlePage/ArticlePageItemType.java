@@ -1,6 +1,6 @@
 package com.kota.Bahamut.Pages.ArticlePage;
 
-// 文章內文種類
+/** 文章區塊種類 */
 public interface ArticlePageItemType {
     int Content = 0;
     int Sign = 1;

@@ -2,14 +2,13 @@ package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.RelativeLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
-import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
@@ -20,13 +19,8 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
-import org.json.JSONObject;
-
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-
 public class MainPage extends TelnetPage {
+    RelativeLayout mainLayout;
     View.OnClickListener _boards_listener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
@@ -68,42 +62,24 @@ public class MainPage extends TelnetPage {
     }
 
     public void onPageDidLoad() {
-        findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
-        findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
-        findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
-        findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
-        findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
-        findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
-
-        String apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/";
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(apiUrl)
-                .get()
-                .build();
-        ASRunner.runInNewThread(()->{
-            try{
-                Response response = client.newCall(request).execute();
-                assert response.body() != null;
-                String data = response.body().string();
-                JSONObject jsonObject = new JSONObject(data);
-                String accessToken = jsonObject.getString("accessToken");
-                String albumHash = jsonObject.getString("albumHash");
-                if (!accessToken.isEmpty()) {
-                    TempSettings.setImgurToken(accessToken);
-                    TempSettings.setImgurAlbum(albumHash);
-                }
-            } catch (Exception e) {
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
-                Log.e("ShortenImage", e.toString());
-            }
-        });
+        mainLayout = (RelativeLayout) findViewById(R.id.content_view);
+        mainLayout.findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
+        mainLayout.findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
+        mainLayout.findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
+        mainLayout.findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
+        mainLayout.findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
+        mainLayout.findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
-            // 進入布告討論區
-            Button btn = (Button)findViewById(R.id.Main_boardsButton);
-            btn.performClick();
+            new ASRunner(){
+                @Override
+                public void run() {
+                    ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
+                    // 進入布告討論區
+                    mainLayout.findViewById(R.id.Main_boardsButton).performClick();
+                }
+            }.postDelayed(0);
         }
     }
 
@@ -112,7 +88,7 @@ public class MainPage extends TelnetPage {
     }
 
     private void setFrameToTelnetView() {
-        TelnetView telnet_view = (TelnetView) findViewById(R.id.Main_TelnetView);
+        TelnetView telnet_view = mainLayout.findViewById(R.id.Main_TelnetView);
         if (telnet_view != null) {
             if (BahamutStateHandler.getInstance().getCurrentPage() == 5) {
                 this._frame_buffer = TelnetClient.getModel().getFrame().clone();

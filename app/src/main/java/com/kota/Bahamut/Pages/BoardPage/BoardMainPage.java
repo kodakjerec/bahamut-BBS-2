@@ -92,20 +92,21 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     Button _show_bookmark_button; // 顯示書籤按鈕
     Button _show_history_button; // 顯示記錄按鈕
 
-    // 發文
+    /** 發文 */
     final View.OnClickListener mPostListener = view -> BoardMainPage.this.onPostButtonClicked();
 
-    // 前一頁
+    /** 前一頁 */
     final View.OnClickListener mFirstPageClickListener = view -> {
         BoardMainPage.this.moveToFirstPosition();
     };
 
-    // 下一頁
+    /** 下一頁 */
     final View.OnClickListener mLastPageClickListener = view -> {
         BoardMainPage.this.setManualLoadPage();
         BoardMainPage.this.moveToLastPosition();
     };
 
+    /** 彈出側邊選單 */
     final View.OnClickListener mMenuButtonListener = view -> {
         DrawerLayout drawerLayout = (DrawerLayout) BoardMainPage.this.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
@@ -132,7 +133,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             return BoardMainPage.this._bookmarkList.get(i);
         }
 
-        // 顯示側邊選單書籤
+        /** 顯示側邊選單書籤 */
         @Override // android.widget.Adapter
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
@@ -161,7 +162,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             return BoardMainPage.this._bookmarkList.get(i);
         }
 
-        // 顯示側邊選單書籤
+        /** 顯示側邊選單書籤 */
         @Override // android.widget.Adapter
         public View getView(int i, View view, ViewGroup viewGroup) {
             if (view == null) {
@@ -174,7 +175,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     };
 
-    // 側邊選單 mListener
+    /** 側邊選單 mListener */
     DrawerLayout.DrawerListener _drawer_listener = new DrawerLayout.DrawerListener() {
         @Override
         public void onDrawerSlide(@NonNull View drawerView, float slideOffset) { }
@@ -196,14 +197,14 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     };
 
-    // 點書籤
+    /** 點書籤 */
     AdapterView.OnItemClickListener _bookmark_listener = (adapterView, view, i, j) -> {
         BoardMainPage.this.closeDrawer();
         Bookmark bookmark = BoardMainPage.this._bookmarkList.get(i);
         searchArticle(bookmark.getKeyword(), bookmark.getAuthor(), bookmark.getMark(), bookmark.getGy());
     };
 
-    // 切換成書籤清單
+    /** 切換成書籤清單 */
     View.OnClickListener buttonClickListener = new View.OnClickListener() {
 
         @Override
@@ -234,38 +235,38 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     };
 
-    // 搜尋文章
+    /** 搜尋文章 */
     View.OnClickListener _search_listener = view -> {
         BoardMainPage.this.closeDrawer();
         BoardMainPage.this.showSearchArticleDialog();
     };
 
-    // 選擇文章
+    /** 選擇文章 */
     View.OnClickListener _select_listener = view -> {
         BoardMainPage.this.closeDrawer();
         BoardMainPage.this.showSelectArticleDialog();
     };
 
-    // 啟用/停用 黑名單
+    /** 啟用/停用 黑名單 */
     View.OnClickListener _enable_block_listener = view -> BoardMainPage.this.onChangeBlockStateButtonClicked();
 
-    // 修改黑名單
+    /** 修改黑名單 */
     View.OnClickListener _edit_block_listener = view -> {
         BoardMainPage.this.closeDrawer();
         BoardMainPage.this.onEditBlockListButtonClicked();
     };
 
-    // 開啟書籤管理
+    /** 開啟書籤管理 */
     View.OnClickListener _edit_bookmark_listener = view -> {
         BoardMainPage.this.closeDrawer();
         BoardMainPage.this.onBookmarkButtonClicked();
     };
-    // 靠左對其
+    /** 靠左對其 */
     View.OnClickListener _btnLL_listener = view -> {
         UserSettings.setPropertiesToolbarLocation(1);
         BoardMainPage.this.changeToolbarLocation();
     };
-    // 靠右對其
+    /** 靠右對其 */
     View.OnClickListener _btnRR_listener = view -> {
         UserSettings.setPropertiesToolbarLocation(2);
         BoardMainPage.this.changeToolbarLocation();
@@ -394,7 +395,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     }
 
-    /* 按下精華區 */
+    /** 按下精華區 */
     View.OnClickListener toEssencePageClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
@@ -405,7 +406,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     };
 
-    // 側邊選單的位置
+    /** 側邊選單的位置 */
     int getDrawerLayoutGravityLocation() {
         int location = UserSettings.getPropertiesDrawerLocation();
         if (location == 1) {
@@ -414,7 +415,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         return GravityCompat.END;
     }
 
-    // 變更工具列位置
+    /** 變更工具列位置 */
     void changeToolbarLocation() {
         LinearLayout toolbar = mainLayout.findViewById(R.id.toolbar);
         LinearLayout toolbarBlock = mainLayout.findViewById(R.id.toolbar_block);
@@ -479,7 +480,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         toolbar.setLayoutParams(layoutParams);
     }
 
-    // 反轉按鈕順序
+    /** 反轉按鈕順序 */
     void changeToolbarOrder() {
         LinearLayout toolbar = mainLayout.findViewById(R.id.toolbar);
 
@@ -659,7 +660,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         getNavigationController().pushViewController(new BookmarkManagePage(getListName(), this));
     }
 
-    /* 長按串接文章 */
+    /** 長按串接文章 */
     void onListArticle(int i) {
         _last_list_action = BoardPageAction.LINK_TITLE;
         BoardLinkPage board_Linked_Title_Page = PageContainer.getInstance().getBoardLinkedTitlePage();
@@ -685,7 +686,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             return true;
     }
 
-    /* 發文 */
+    /** 發文 */
     protected void onPostButtonClicked() {
         PostArticlePage postArticlePage = PageContainer.getInstance().getPostArticlePage();
         postArticlePage.setBoardPage(this);
@@ -710,30 +711,30 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }).scheduleDismissOnPageDisappear(this).show();
     }
 
-    // 轉寄至信箱
+    /** 轉寄至信箱 */
     public void FSendMail() {
         pushCommand(new BahamutCommandFSendMail(UserSettings.getPropertiesUsername()));
     }
 
-    // 最前篇
+    /** 最前篇 */
     public void loadTheSameTitleTop() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleTop(getLoadingItemNumber()));
     }
 
-    // 最後篇
+    /** 最後篇 */
     public void loadTheSameTitleBottom() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleBottom(getLoadingItemNumber()));
     }
 
-    // 上一篇
+    /** 上一篇 */
     public void loadTheSameTitleUp() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleUp(getLoadingItemNumber()));
     }
 
-    // 下一篇
+    /** 下一篇 */
     public void loadTheSameTitleDown() {
         onLoadItemStart();
         pushCommand(new BahamutCommandTheSameTitleDown(getLoadingItemNumber()));
@@ -756,9 +757,10 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         return _last_list_action;
     }
 
-    // 啟用/停用 黑名單
+    /** 啟用/停用 黑名單 */
     void onChangeBlockStateButtonClicked() {
         UserSettings.setPropertiesBlockListEnable(!blockListEnable);
+        UserSettings.notifyDataUpdated();
         blockListEnable = UserSettings.getPropertiesBlockListEnable();
         if (mainDrawerLayout!=null) {
             CheckBox block_enable_checkbox = mainDrawerLayout.findViewById(R.id.block_enable_button_checkbox);
@@ -771,7 +773,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         getNavigationController().pushViewController(new BlockListPage());
     }
 
-    // 點下文章
+    /** 點下文章 */
     @Override
     public void loadItemAtIndex(int index) {
         if (isItemCanLoadAtIndex(index)) {
@@ -788,7 +790,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         _initialed = false;
     }
 
-    // 書籤管理->按下書籤
+    /** 書籤管理->按下書籤 */
     @Override // com.kota.Bahamut.BookmarkPage.BoardExtendOptionalPageListener
     public void onBoardExtendOptionalPageDidSelectBookmark(Bookmark bookmark) {
         if (bookmark != null) {
@@ -838,7 +840,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     }
 
     Timer timer;
-    // 發表文章/回覆文章 訊息發出
+    /** 發表文章/回覆文章 訊息發出 */
     @Override // com.kota.Bahamut.Pages.PostArticlePage_Listener
     public void onPostDialogSendButtonClicked(PostArticlePage postArticlePage, String str, String str2, String str3, String str4, String str5, Boolean boolean6) {
         pushCommand(new BahamutCommandPostArticle(this, str, str2, str3, str4, str5, boolean6));
@@ -867,7 +869,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
 
     }
 
-    // 引言過多, 回逤發文時的設定
+    /** 引言過多, 回逤發文時的設定 */
     public void recoverPost() {
         new ASRunner() { 
             @Override 
@@ -884,7 +886,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
         ASProcessingDialog.dismissProcessingDialog();
     }
-    // 完成發文
+    /** 完成發文 */
     public void finishPost() {
         new ASRunner() { 
             @Override 
@@ -940,7 +942,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
         }
     }
 
-    // 側邊選單已開啟 或 正在開啟中
+    /** 側邊選單已開啟 或 正在開啟中 */
     boolean isDrawerOpen() {
         DrawerLayout drawerLayout = mainLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {

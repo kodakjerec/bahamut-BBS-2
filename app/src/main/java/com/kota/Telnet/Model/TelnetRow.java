@@ -1,9 +1,9 @@
 package com.kota.Telnet.Model;
 
 import androidx.annotation.NonNull;
+
 import com.kota.TextEncoder.B2UEncoder;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 public class TelnetRow {
@@ -194,7 +194,7 @@ public class TelnetRow {
         return new TelnetRow(this);
     }
 
-    // 雙字元判斷
+    /** 雙字元判斷 */
     public void reloadSpace() {
         int column = 0;
         while (column < 80) {
@@ -217,7 +217,7 @@ public class TelnetRow {
         }
     }
 
-    // 回傳對應雙字元的前景色, 單雙字元已經轉換完成
+    /** 回傳對應雙字元的前景色, 單雙字元已經轉換完成 */
     public byte[] getTextColor() {
         byte[] colors = new byte[80];
         int nowIndex = -1;
@@ -235,7 +235,7 @@ public class TelnetRow {
         nowIndex+=1; // index和copyOfRange定位差異
         return Arrays.copyOfRange(colors, 0, nowIndex);
     }
-    // 回傳對應雙字元的背景色, 單雙字元已經轉換完成
+    /** 回傳對應雙字元的背景色, 單雙字元已經轉換完成 */
     public byte[] getBackgroundColor() {
         byte[] colors= new byte[80];
         int nowIndex = -1;

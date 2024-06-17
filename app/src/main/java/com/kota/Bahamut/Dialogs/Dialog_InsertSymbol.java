@@ -30,6 +30,7 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
             list[i] = String.valueOf(this._symbols.charAt(i));
         }
         this._grid_view.setAdapter(new ArrayAdapter<>(getContext(), R.layout.simple_list_item_1, list));
+        setDialogWidth();
     }
 
     public void onItemClick(AdapterView<?> adapterView, View arg1, int index, long id) {
@@ -101,5 +102,16 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
             this._grid_view.setNumColumns(8);
         }
         super.show();
+    }
+    // 變更dialog寬度
+    void setDialogWidth() {
+        int screenHeight = getContext().getResources().getDisplayMetrics().heightPixels;
+        int screenWidth = getContext().getResources().getDisplayMetrics().widthPixels;
+        int dialog_height = (int) (screenHeight*0.7);
+        int dialog_width = (int) (screenWidth*0.7);
+        ViewGroup.LayoutParams oldLayoutParams = _grid_view.getLayoutParams();
+        oldLayoutParams.width = dialog_width;
+        oldLayoutParams.height = dialog_height;
+        _grid_view.setLayoutParams(oldLayoutParams);
     }
 }

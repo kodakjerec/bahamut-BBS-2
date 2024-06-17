@@ -34,24 +34,30 @@ public class ASDialog extends Dialog implements ASViewControllerDisappearListene
 
   @Override // android.app.Dialog, android.content.DialogInterface
   public void dismiss() {
-    if (this._controller != null) {
-      this._controller.unregisterDisappearListener(this);
-      this._controller = null;
-    }
-    this._showing = false;
-    super.dismiss();
+    try {
+      if (this._controller != null) {
+        this._controller.unregisterDisappearListener(this);
+        this._controller = null;
+      }
+      this._showing = false;
+      super.dismiss();
+    } catch (Exception ignored){}
   }
 
   @Override // android.app.Dialog
   public void show() {
-    super.show();
-    this._showing = true;
+    try {
+      super.show();
+      this._showing = true;
+    } catch (Exception ignored){}
   }
 
   @Override
   public void hide() {
-    super.hide();
-    this._showing = false;
+    try {
+      super.hide();
+      this._showing = false;
+    } catch (Exception ignored){}
   }
 
   @Override // android.app.Dialog

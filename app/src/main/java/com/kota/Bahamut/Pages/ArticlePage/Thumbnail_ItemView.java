@@ -87,7 +87,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         init();
     }
 
-    // 判斷URL內容
+    /** 判斷URL內容 */
     public void loadUrl(String url) {
         _url = url;
 
@@ -196,7 +196,8 @@ public class Thumbnail_ItemView extends LinearLayout {
             }.runInMainThread();
         }
     }
-    // 判斷是圖片或連結, 改變顯示狀態
+
+    /** 判斷是圖片或連結, 改變顯示狀態 */
     void picOrUrl_changeStatus(boolean _isPic) {
         _load_thumbnail_img = UserSettings.getLinkShowThumbnail();
         _load_only_wifi = UserSettings.getLinkShowOnlyWifi();
@@ -242,7 +243,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         }
     }
 
-    // 純圖片
+    /** 純圖片 */
     public void prepare_load_image() {
         if (_img_loaded) return;
 
@@ -257,7 +258,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         _url_view.setText(_imageUrl);
     }
 
-    // 內容網址
+    /** 內容網址 */
     private void set_normal() {
         if (!_title.isEmpty()) {
             _title_view.setText(_title);
@@ -270,7 +271,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         _url_view.setText(_url);
     }
 
-    // 意外處理
+    /** 意外處理 */
     private void set_fail() {
         _layout_default.setVisibility(GONE);
 
@@ -283,7 +284,7 @@ public class Thumbnail_ItemView extends LinearLayout {
         Log.v("Thumbnail_Fail", _imageUrl.isEmpty()?_url:_imageUrl);
     }
 
-    // 讀取圖片
+    /** 讀取圖片 */
     private void loadImage() {
         _img_loaded = true;
         new ASRunner() {

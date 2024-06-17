@@ -132,7 +132,7 @@ class BoardEssencePage : TelnetListPage() {
     // 點下文章
     // com.kota.Bahamut.ListPage.TelnetListPage
     override fun loadItemAtIndex(index: Int) {
-        val item = getItem(index) as BoardEssencePageItem
+        val item = getItem(index) as BoardEssencePageItem? ?: return
         if (!item.isBBSClickable) {
             ASToast.showShortToast("找沒有了耶...:(")
             return

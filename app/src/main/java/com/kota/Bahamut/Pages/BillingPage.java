@@ -1,26 +1,22 @@
 package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-import static com.kota.Bahamut.Service.MyBillingClient.getBillingClient;
 
 import android.app.Activity;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
 import com.android.billingclient.api.BillingFlowParams;
-import com.android.billingclient.api.BillingResult;
 import com.android.billingclient.api.ProductDetails;
-import com.android.billingclient.api.PurchaseHistoryRecord;
 import com.android.billingclient.api.QueryProductDetailsParams;
-import com.android.billingclient.api.QueryPurchaseHistoryParams;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.R;
-import com.kota.Bahamut.Service.UserSettings;
+import com.kota.Bahamut.Service.MyBillingClient;
 import com.kota.TelnetUI.TelnetPage;
-import com.kota.TelnetUI.TextView.TelnetTextViewNormal;
 
 import java.util.ArrayList;
 
@@ -48,12 +44,22 @@ public class BillingPage extends TelnetPage {
 
     @Override
     public void onPageDidLoad() {
-        billingClient = getBillingClient();
+        billingClient = MyBillingClient.billingClient;
         getProductList();
+
+        MyBillingClient.checkPurchaseHistoryQuery();
 
         // 檢查已購買
         Button button1 = (Button)findViewById(R.id.button_checkPurchaseQuery);
-        button1.setOnClickListener(view -> checkPurchaseHistoryQuery());
+        button1.setOnClickListener(view -> {
+            MyBillingClient.checkPurchaseHistoryCloud(qty -> {
+                String totalMoney = String.valueOf(qty * 90);
+                TextView textView = (TextView) findViewById(R.id.BillingPage_already_billing_value);
+                textView.setText(totalMoney);
+                return null;
+            });
+            ASToast.showShortToast(getContextString(R.string.billing_page_result_success));
+        });
         button1.performClick();
     }
 
@@ -101,7 +107,7 @@ public class BillingPage extends TelnetPage {
                                                 .build();
 
                                         // Launch the billing flow
-                                        BillingResult billingResult1 = billingClient.launchBillingFlow(activity, billingFlowParams);
+                                        billingClient.launchBillingFlow(activity, billingFlowParams);
                                     });
                                 }
                             }
@@ -110,47 +116,10 @@ public class BillingPage extends TelnetPage {
                 });
     }
 
-    // 重新確認已購買的商品, 並填入金額
-    public void checkPurchaseHistoryQuery() {
-        billingClient.queryPurchaseHistoryAsync(
-                QueryPurchaseHistoryParams.newBuilder()
-                        .setProductType(BillingClient.ProductType.INAPP)
-                        .build(),
-                (billingResult, list) -> {
-                    // 統計總金額
-                    int totalValue = 0;
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK && list != null) {
-                        // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
-                        if (list.toArray().length>0) {
-                            if (!UserSettings.getPropertiesVIP()) {
-                                UserSettings.setPropertiesVIP(true);
-                            }
-                            for(PurchaseHistoryRecord purchaseHistoryRecord: list) {
-                                String productName = purchaseHistoryRecord.getProducts().get(0);
-                                if (productName.contains("com.kota.billing.")) {
-                                    String strPrice = productName.replaceAll("com.kota.billing.", "");
-                                    Integer donatePrice = Integer.parseInt(strPrice);
-                                    Integer donateQuality = purchaseHistoryRecord.getQuantity();
-                                    totalValue += donatePrice * donateQuality;
-                                }
-                            }
-                            ASToast.showShortToast(getContextString(R.string.billing_page_result_success));
-                        }
-                    } else {
-                        ASToast.showShortToast(getContextString(R.string.billing_page_result_error_check) + billingResult.getResponseCode());
-                    }
-
-                    TelnetTextViewNormal textView = (TelnetTextViewNormal) findViewById(R.id.BillingPage_already_billing_value);
-                    textView.setText(Integer.toString(totalValue));
-                }
-        );
-    }
-
     public boolean onReceivedGestureRight() {
         onBackPressed();
         PageContainer.getInstance().cleanBillingPage();
         ASToast.showShortToast("返回");
         return true;
     }
-
 }

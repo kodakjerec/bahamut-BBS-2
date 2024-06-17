@@ -194,6 +194,7 @@
         ． 黑名單、書籤 可排序、修改\n
         ． 發文標題、表情符號 可排序、修改\n
         ． 發文快捷鍵: 縮網址(reurl)、縮圖(imgur)\n
+        ． 雲端備份\n
         (持續增加中)
         <!--        以下努力中：\n-->
         <!--        ． 備份書籤/黑名單\n-->
@@ -220,6 +221,7 @@
     <string name="system_setting_page_link_auto_show">核取方塊, 開啟連結預覽圖</string>
     <string name="system_setting_page_link_show_thumbnail">核取方塊, 顯示預覽小圖</string>
     <string name="system_setting_page_link_show_only_wifi">核取方塊, 只在Wifi下預覽</string>
+    <string name="system_setting_page_checkbox_cloud_save_hint">核取方塊, 啟動或關閉雲端備份</string>
     <string name="board_page_post_waiting_message_1">發文中</string>
     <string name="board_page_post_waiting_message_2">發文中請稍後</string>
     <string name="board_page_post_waiting_message_3">本站禁止連續快速發文\n如有異常請重新連線</string>
@@ -300,11 +302,13 @@
     <string name="dialog_shorten_image_error03">上傳失敗</string>
     <string name="dialog_shorten_image_error04">相機開啟有問題</string>
     <string name="error_under_develop">尚未完成</string>
-    <string name="cloud_save">雲端備份</string>
-    <string name="cloud_save_question1">啟用雲端存檔？</string>
-    <string name="cloud_save_question2">已有雲端存檔。採用本地存檔或雲端存檔為主？</string>
+    <string name="cloud_save">雲端</string>
+    <string name="cloud_save_setting_switch">開啟雲端備份功能</string>
+    <string name="cloud_save_question">是否啟用雲端備份？</string>
     <string name="cloud_save_local">本地</string>
     <string name="cloud_save_cloud">雲端</string>
+    <string name="cloud_save_result1">本地備份已上傳雲端</string>
+    <string name="cloud_save_result2">已下載雲端備份</string>
     <string name="dialog_query_hero">查詢勇者</string>
     <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
     <string name="essence_page">精華</string>

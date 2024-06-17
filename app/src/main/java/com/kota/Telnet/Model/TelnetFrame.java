@@ -132,7 +132,7 @@ public class TelnetFrame {
         return this.rows.remove(index);
     }
 
-    // 雙字元判斷
+    /** 雙字元判斷 */
     public void reloadSpace() {
         for (int row = 0; row < getRowSize(); row++) {
             int column = 0;

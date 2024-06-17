@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Dialogs
 
 import android.Manifest.permission.CAMERA
+import android.content.Context
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -54,7 +55,7 @@ import java.util.Objects
 
 @Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
-    private lateinit var layout: RelativeLayout
+    private lateinit var mainLayout: RelativeLayout
     private lateinit var textView: TextView
     private lateinit var imageView: ImageView
     private lateinit var videoView: VideoView
@@ -77,29 +78,30 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         requestWindowFeature(1)
         setContentView(layoutId)
         Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
-        layout = findViewById(R.id.dialog_shorten_image_layout)
-        layout.setOnClickListener { _ -> closeProcessingDialog() }
-        textView = layout.findViewById(R.id.dialog_shorten_image_hint)
-        imageView = layout.findViewById(R.id.dialog_shorten_image_image)
-        videoView = layout.findViewById(R.id.dialog_shorten_image_video)
-        middleToolbar = layout.findViewById(R.id.dialog_shorten_image_middle_toolbar)
-        middleToolbar2 = layout.findViewById(R.id.dialog_shorten_image_middle_toolbar2)
-        sampleTextView = layout.findViewById(R.id.dialog_shorten_image_sample)
-        processingDialog = layout.findViewById(R.id.dialog_shorten_image_processing_dialog)
+        mainLayout = findViewById(R.id.dialog_shorten_image_layout)
+        mainLayout.setOnClickListener { _ -> closeProcessingDialog() }
+        textView = mainLayout.findViewById(R.id.dialog_shorten_image_hint)
+        imageView = mainLayout.findViewById(R.id.dialog_shorten_image_image)
+        videoView = mainLayout.findViewById(R.id.dialog_shorten_image_video)
+        middleToolbar = mainLayout.findViewById(R.id.dialog_shorten_image_middle_toolbar)
+        middleToolbar2 = mainLayout.findViewById(R.id.dialog_shorten_image_middle_toolbar2)
+        sampleTextView = mainLayout.findViewById(R.id.dialog_shorten_image_sample)
+        processingDialog = mainLayout.findViewById(R.id.dialog_shorten_image_processing_dialog)
 
-        layout.findViewById<Button>(R.id.dialog_shorten_image_album).setOnClickListener(selectImageListener)
-        layout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
-        layout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
-        transferButton = layout.findViewById(R.id.dialog_shorten_image_transfer)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_album).setOnClickListener(selectImageListener)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
+        transferButton = mainLayout.findViewById(R.id.dialog_shorten_image_transfer)
         transferButton!!.setOnClickListener(transferListener)
-        sendButton = layout.findViewById(R.id.send)
+        sendButton = mainLayout.findViewById(R.id.send)
         sendButton!!.setOnClickListener(this)
         sendButton!!.isEnabled = false
-        layout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
-        layout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
+        mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
 
         // 預設高度
         changeDialogHeight(resources.configuration)
+        setDialogWidth()
     }
 
     /** 選擇相簿 */
@@ -422,13 +424,22 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         changeDialogHeight(newConfig)
     }
     private fun changeDialogHeight(newConfig: Configuration) {
-        val mylayoutParams : ViewGroup.LayoutParams? = layout.layoutParams
+        val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            mylayoutParams!!.height = ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams!!.height = ViewGroup.LayoutParams.MATCH_PARENT
         } else {
             val factor = applicationContext.resources.displayMetrics.density
-            mylayoutParams!!.height = (500 * factor).toInt()
+            layoutParams!!.height = (500 * factor).toInt()
         }
-        layout.layoutParams = mylayoutParams
+        mainLayout.layoutParams = layoutParams
+    }
+
+    // 變更dialog寬度
+    private fun setDialogWidth() {
+        val screenWidth = resources.displayMetrics.widthPixels
+        val dialogWidth = (screenWidth * 0.7).toInt()
+        val oldLayoutParams = mainLayout.layoutParams
+        oldLayoutParams.width = dialogWidth
+        mainLayout.layoutParams = oldLayoutParams
     }
 }

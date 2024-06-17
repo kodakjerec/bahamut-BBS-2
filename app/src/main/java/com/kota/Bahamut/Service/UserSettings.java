@@ -118,7 +118,13 @@ public class UserSettings {
         }
     }
 
+    // 通知更新
     public static void notifyDataUpdated() {
+        // 雲端備份
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.backup();
+        }
     }
 
     public static void setPropertiesDrawerLocation(int choice) {

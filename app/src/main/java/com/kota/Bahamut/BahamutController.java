@@ -27,6 +27,9 @@ import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.Pages.StartPage;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
+import com.kota.Bahamut.Service.CloudBackup;
+import com.kota.Bahamut.Service.NotificationSettings;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
@@ -73,13 +76,16 @@ public class BahamutController extends ASNavigationController implements TelnetC
         initialCFContext(this);
         initialCFActivity(ASNavigationController.getCurrentController());
         changeScreenOrientation();
+
+        // VIP
+        TempSettings.setApplicationContext(getApplicationContext());
+        initBillingClient();
     }
 
     @Override // com.kota.ASFramework.PageController.ASNavigationController
     protected void onControllerDidLoad() {
         StartPage start_page = PageContainer.getInstance().getStartPage();
         pushViewController(start_page, false);
-        initBillingClient(getApplicationContext());
     }
 
     @Override
@@ -171,6 +177,10 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 BahamutController.this.handleNormalConnectionClosed();
                 ASToast.showShortToast("連線已中斷");
                 ASProcessingDialog.dismissProcessingDialog();
+                if (NotificationSettings.getCloudSave()) {
+                  CloudBackup cloudBackup = new CloudBackup();
+                  cloudBackup.backup();
+                }
             }
         }.runInMainThread();
     }

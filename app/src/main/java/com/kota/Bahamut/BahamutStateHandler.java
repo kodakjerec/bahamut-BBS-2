@@ -8,13 +8,13 @@ import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
-import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
-import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
 import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
+import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
+import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
@@ -225,6 +225,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (getCurrentPage() < BahamutPage.BAHAMUT_MAIN) {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
         }
+
         setCurrentPage(BahamutPage.BAHAMUT_MAIN);
         MainPage page = PageContainer.getInstance().getMainPage();
         if (page.onPagePreload()) {
@@ -348,6 +349,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
             if (top_page instanceof ArticleEssencePage page) {
                 page.changeLoadingPercentage(percent);
             } else if (top_page instanceof MailPage page) {
+                page.changeLoadingPercentage(percent);
+            } else if (top_page instanceof ArticlePage page) {
                 page.changeLoadingPercentage(percent);
             }
         }

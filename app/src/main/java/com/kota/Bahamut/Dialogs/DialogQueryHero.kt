@@ -1,21 +1,20 @@
 package com.kota.Bahamut.Dialogs
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.View
 import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.ASFramework.Dialog.ASAlertDialog
 import com.kota.ASFramework.Dialog.ASDialog
-import com.kota.ASFramework.Thread.ASRunner
 import com.kota.Bahamut.R
-import org.jsoup.Jsoup
 import java.util.Vector
 
+
 class DialogQueryHero : ASDialog() {
-    private lateinit var id: String;
+    private lateinit var id: String
     @SuppressLint("SetTextI18n")
     fun getData(fromStrings: Vector<String>) {
         try{
@@ -55,7 +54,7 @@ class DialogQueryHero : ASDialog() {
                 .setTitle("錯誤")
                 .setMessage("取得勇者資料出錯")
                 .addButton("確定")
-                .setListener { aDialog: ASAlertDialog, index: Int -> aDialog.dismiss() }
+                .setListener { aDialog: ASAlertDialog, _: Int -> aDialog.dismiss() }
                 .show()
         }
     }
@@ -65,10 +64,21 @@ class DialogQueryHero : ASDialog() {
     }
 
     /* 顯示WEB資訊 */
+    @SuppressLint("SetJavaScriptEnabled")
     private val showWebViewListener: View.OnClickListener = View.OnClickListener { view ->
         val contextView = findViewById<LinearLayout>(R.id.content_view)
         val apiUrl = "https://m.gamer.com.tw/home/home.php?owner=$id"
         val webView = contextView.findViewById<WebView>(R.id.dialog_query_hero_web_view)
+        webView.settings.javaScriptEnabled = true
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView, url: String) {
+                super.onPageFinished(view, url)
+                view.evaluateJavascript("document.getElementsByClassName('download-app_box01')[0].style.display='none';", null)
+                view.evaluateJavascript("document.getElementsByClassName('bh-banner')[0].style.display='none';", null)
+                view.evaluateJavascript("document.getElementsByClassName('sidebar-navbar_rwd')[0].style.visibility='hidden';", null)
+            }
+        }
+
         webView.loadUrl(apiUrl)
         webView.visibility = View.VISIBLE
         view.visibility = View.GONE

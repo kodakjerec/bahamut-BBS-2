@@ -7,22 +7,24 @@ import android.text.Spanned;
 import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Reference.TelnetAnsiCode;
-import com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge;
 
 import java.util.Objects;
 
 public class Dialog_PaintColor extends ASDialog implements View.OnClickListener {
+    LinearLayout mainLayout;
     boolean _isRecovery = true;
     boolean _isHighlight = false;
     int _frontColor = 0;
@@ -104,40 +106,43 @@ public class Dialog_PaintColor extends ASDialog implements View.OnClickListener 
         setContentView(R.layout.dialog_paint_color);
         Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
         setTitle(getContextString(R.string.post_article_page_paint_color));
+        mainLayout = findViewById(R.id.dialog_paint_color_content_view);
 
         // 還原
-        _recovery_box = findViewById(R.id.dialog_paint_color_check_recovery);
+        _recovery_box = mainLayout.findViewById(R.id.dialog_paint_color_check_recovery);
         _recovery_box.setOnCheckedChangeListener(_recovery_listener);
-        findViewById(R.id.dialog_paint_color_check_recovery_item).setOnClickListener(view -> _recovery_box.setChecked(!_recovery_box.isChecked()));
+        mainLayout.findViewById(R.id.dialog_paint_color_check_recovery_item).setOnClickListener(view -> _recovery_box.setChecked(!_recovery_box.isChecked()));
 
         // 前景
         ArrayAdapter<String> adapter_front_color = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.dialog_paint_color_items));
         adapter_front_color.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _front_color_spinner = findViewById(R.id.post_article_page_paint_color_front_spinner);
+        _front_color_spinner = mainLayout.findViewById(R.id.post_article_page_paint_color_front_spinner);
         _front_color_spinner.setAdapter(adapter_front_color);
         _front_color_spinner.setOnItemSelectedListener(_frontColor_listener);
 
         // 背景
         ArrayAdapter<String> adapter_back_color = new ArrayAdapter<>(getContext(), R.layout.simple_spinner_item, getContext().getResources().getStringArray(R.array.dialog_paint_color_items));
         adapter_back_color.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        _back_color_spinner = findViewById(R.id.post_article_page_paint_color_back_spinner);
+        _back_color_spinner = mainLayout.findViewById(R.id.post_article_page_paint_color_back_spinner);
         _back_color_spinner.setAdapter(adapter_back_color);
         _back_color_spinner.setOnItemSelectedListener(_backColor_listener);
 
         // 亮色
-        _highlight_box = findViewById(R.id.dialog_paint_color_check_highlight);
+        _highlight_box = mainLayout.findViewById(R.id.dialog_paint_color_check_highlight);
         _highlight_box.setOnCheckedChangeListener(_highlight_listener);
-        findViewById(R.id.dialog_paint_color_check_highlight_item).setOnClickListener(view -> _highlight_box.setChecked(!_highlight_box.isChecked()));
+        mainLayout.findViewById(R.id.dialog_paint_color_check_highlight_item).setOnClickListener(view -> _highlight_box.setChecked(!_highlight_box.isChecked()));
 
         // 文字
-        _textview_param = findViewById(R.id.dialog_paint_color_param);
-        _textview_sample = findViewById(R.id.dialog_paint_color_sample);
+        _textview_param = mainLayout.findViewById(R.id.dialog_paint_color_param);
+        _textview_sample = mainLayout.findViewById(R.id.dialog_paint_color_sample);
 
         // 按鈕
-        _send_button = findViewById(R.id.send);
+        _send_button = mainLayout.findViewById(R.id.send);
         _send_button.setOnClickListener(this);
-        _cancel_button = findViewById(R.id.cancel);
+        _cancel_button = mainLayout.findViewById(R.id.cancel);
         _cancel_button.setOnClickListener(this);
+
+        setDialogWidth();
     }
 
     void generateOutputParam() {
@@ -210,5 +215,13 @@ public class Dialog_PaintColor extends ASDialog implements View.OnClickListener 
             _listener.onPaintColorDone(_outputParam);
         }
         dismiss();
+    }
+    // 變更dialog寬度
+    void setDialogWidth() {
+        int screenWidth = getContext().getResources().getDisplayMetrics().widthPixels;
+        int dialog_width = (int) (screenWidth*0.7);
+        ViewGroup.LayoutParams oldLayoutParams = mainLayout.getLayoutParams();
+        oldLayoutParams.width = dialog_width;
+        mainLayout.setLayoutParams(oldLayoutParams);
     }
 }

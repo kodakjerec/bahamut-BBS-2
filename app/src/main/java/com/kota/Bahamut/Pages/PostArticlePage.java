@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.text.Selection;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASListDialog;
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
@@ -34,13 +36,20 @@ import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.CommonFunctions;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetPage;
 
+import org.json.JSONObject;
+
 import java.util.Objects;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener {
     RelativeLayout mainLayout;
@@ -271,6 +280,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
+            getUrlToken();
             Intent intent = new Intent(CommonFunctions.getActivity(), DialogShortenImage.class);
             startActivity(intent);
         } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
@@ -613,5 +623,32 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         if (_content_field != null) {
             _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
         }
+    }
+
+    /** 取得imgur token */
+    void getUrlToken() {
+        String apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/";
+        OkHttpClient client = new OkHttpClient();
+        Request request = new Request.Builder()
+                .url(apiUrl)
+                .get()
+                .build();
+        ASRunner.runInNewThread(()->{
+            try{
+                Response response = client.newCall(request).execute();
+                assert response.body() != null;
+                String data = response.body().string();
+                JSONObject jsonObject = new JSONObject(data);
+                String accessToken = jsonObject.getString("accessToken");
+                String albumHash = jsonObject.getString("albumHash");
+                if (!accessToken.isEmpty()) {
+                    TempSettings.setImgurToken(accessToken);
+                    TempSettings.setImgurAlbum(albumHash);
+                }
+            } catch (Exception e) {
+//                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
+                Log.e("ShortenImage", e.toString());
+            }
+        });
     }
 }

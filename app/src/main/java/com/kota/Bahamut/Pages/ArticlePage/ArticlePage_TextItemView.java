@@ -74,7 +74,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         }
     }
 
-    // 設定內容
+    /** 設定內容 */
     public void setContent(String content, Vector<TelnetRow> rows) {
         if (_content_label != null) {
             // 讓內文對應顏色, 限定使用者自己發文
@@ -91,7 +91,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         }
     }
 
-    // 文章加上色彩
+    /** 文章加上色彩 */
     private CharSequence stringPaint(Vector<TelnetRow> rows) {
         SpannableStringBuilder[] finalString = new SpannableStringBuilder[rows.size()];
         for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
@@ -212,7 +212,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         return TextUtils.concat(finalString);
     }
 
-    // 客製化連結另開新視窗
+    /** 客製化連結另開新視窗 */
     private void stringNewUrlSpan(TextView target) {
         Linkify.addLinks(target,  Linkify.WEB_URLS);
         CharSequence text = target.getText();
@@ -228,7 +228,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         }
     }
 
-    // 加上預覽圖
+    /** 加上預覽圖 */
     @SuppressLint("ResourceAsColor")
     private void stringThumbnail() {
         LinearLayout mainLayout = (LinearLayout) _content_view;

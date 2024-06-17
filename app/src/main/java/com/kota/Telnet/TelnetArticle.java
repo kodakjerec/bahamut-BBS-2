@@ -117,7 +117,7 @@ public class TelnetArticle {
         return "Re: " + Title;
     }
 
-    // 設定文章標題
+    /** 設定文章標題 */
     public String generateEditFormat() {
         StringBuilder content_buffer = new StringBuilder();
         String time_string = _frame.getRow(2).toString().substring(4);
@@ -136,8 +136,8 @@ public class TelnetArticle {
         return _frame.getRow(1).toString().substring(4);
     }
 
-    // 產生 修改用的文章內容
-    // 有附上ASCII色碼
+    /** 產生 修改用的文章內容
+        有附上ASCII色碼 */
     public String generateEditContent() {
         StringBuilder content_buffer = new StringBuilder();
         byte paintTextColor = TelnetAnsi.getDefaultTextColor();
@@ -194,7 +194,7 @@ public class TelnetArticle {
         return content_buffer.toString();
     }
 
-    // 產生 回應用的文章內容
+    /** 產生 回應用的文章內容 */
     public String generateReplyContent() {
         int maximum_quote;
         StringBuilder content_builder = new StringBuilder();
