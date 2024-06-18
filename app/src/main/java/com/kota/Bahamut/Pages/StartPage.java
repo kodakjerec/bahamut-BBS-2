@@ -1,8 +1,10 @@
 package com.kota.Bahamut.Pages;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.view.View;
 
 import androidx.core.content.pm.PackageInfoCompat;
@@ -24,8 +26,9 @@ public class StartPage extends TelnetPage {
 
     /** 按下教學 */
     View.OnClickListener _instruction_listener = v -> {
-        InstructionsPage page = PageContainer.getInstance().getInstructionPage();
-        getNavigationController().pushViewController(page);
+        String url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
+        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url));
+        getContext().startActivity(intent);
     };
 
     public int getPageLayout() {

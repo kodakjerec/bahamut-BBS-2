@@ -43,6 +43,8 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
 
 import okhttp3.MultipartBody;
@@ -133,12 +135,18 @@ public class Thumbnail_ItemView extends LinearLayout {
 
                         // 非圖片類比較會有擷取問題
                         if (!_isPic && (_title.equals("") || _description.equals(""))) {
-                            String userAgent = System.getProperty("http.agent");
+                            String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0";
+
+                            // cookie
+                            // Create a new Map to store cookies
+                            Map<String, String> cookies = new HashMap<>();
+                            if (_url.contains("ptt"))
+                                cookies.put("over18", "1");  // Add the over18 cookie with value 1
+
                             Connection.Response resp = Jsoup
                                     .connect(_url)
-                                    .ignoreContentType(true)
                                     .header("User-Agent", userAgent)
-                                    .followRedirects(true)
+                                    .cookies(cookies)
                                     .execute();
                             contentType = resp.contentType();
 

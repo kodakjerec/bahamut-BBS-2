@@ -172,8 +172,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
     public void clearDb() {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM urls WHERE ROWID IN (SELECT ROWID FROM urls ORDER BY ROWID DESC LIMIT -1 OFFSET 20)");
-        db.execSQL("DELETE FROM shorten_urls WHERE ROWID IN (SELECT ROWID FROM shorten_urls ORDER BY ROWID DESC LIMIT -1 OFFSET 20)");
+        db.execSQL("DELETE FROM urls ");
+        db.execSQL("DELETE FROM shorten_urls ");
         onCreate(db);
     }
 }
