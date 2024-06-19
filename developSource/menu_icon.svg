@@ -1,0 +1,8 @@
+<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink= "http://www.w3.org/1999/xlink">
+  <circle cx="10" cy="10" r="3" fill="rgb(255,255,255)"></circle>
+  <circle cx="10" cy="20" r="3" fill="rgb(255,255,255)"></circle>
+  <circle cx="10" cy="30" r="3" fill="rgb(255,255,255)"></circle>
+  <rect x="16" y="8" width="20" height="3" fill="rgb(255,255,255)"></rect>
+  <rect x="16" y="18" width="20" height="3" fill="rgb(255,255,255)"></rect>
+  <rect x="16" y="28" width="20" height="3" fill="rgb(255,255,255)"></rect>
+</svg>

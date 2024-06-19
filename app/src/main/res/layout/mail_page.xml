@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:id="@+id/contentView"
+    android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
@@ -14,16 +14,21 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1">
-            <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
             <!-- 文字模式 -->
-            <com.kota.ASFramework.UI.ASListView
-                android:id="@+id/Mail_contentList"
-                style="@style/List"
+            <FrameLayout
+                android:id="@+id/Mail_TextContentView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:divider="@color/divider_color"
-                android:listSelector="@null"
-                android:scrollbars="vertical" />
+                android:layout_height="match_parent">
+                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                <com.kota.ASFramework.UI.ASListView
+                    android:id="@+id/Mail_contentList"
+                    style="@style/List"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@color/divider_color"
+                    android:listSelector="@null"
+                    android:scrollbars="vertical" />
+            </FrameLayout>
             <!-- telnet模式 -->
             <com.kota.ASFramework.UI.ASScrollView
                 android:id="@+id/Mail_contentTelnetViewBlock"

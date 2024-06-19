@@ -5,10 +5,11 @@
     android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <LinearLayout android:orientation="vertical"
+    <LinearLayout
         android:id="@+id/Article_contentView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
         <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
             <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ExtToolbarItem"/>
             <View style="@style/ToolbarDivider"/>
@@ -16,9 +17,15 @@
             <View style="@style/ToolbarDivider"/>
             <Button android:id="@+id/show_link" android:text="@string/open_url" style="@style/ExtToolbarItem"/>
         </LinearLayout>
-        <FrameLayout android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
             <!-- 文字模式 -->
-            <FrameLayout android:id="@+id/Article_TextContentView" android:layout_width="match_parent" android:layout_height="match_parent">
+            <FrameLayout
+                android:id="@+id/Article_TextContentView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
                 <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Article_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.ASFramework.UI.ASListView
                     android:id="@+id/Article_contentList"

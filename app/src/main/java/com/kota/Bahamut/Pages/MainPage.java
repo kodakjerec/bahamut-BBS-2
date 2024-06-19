@@ -126,13 +126,20 @@ public class MainPage extends TelnetPage {
 
     public void onProcessHotMessage() {
         if (this._save_hot_message_dialog == null) {
-            this._save_hot_message_dialog = ASAlertDialog.createDialog().setTitle("熱訊").setMessage("本次上站熱訊處理 ").addButton("備忘錄").addButton("保留").addButton("清除").setListener((aDialog, index) -> {
+            this._save_hot_message_dialog = ASAlertDialog.createDialog()
+                    .setTitle("熱訊")
+                    .setMessage("本次上站熱訊處理 ")
+                    .addButton("備忘錄")
+                    .addButton("保留")
+                    .addButton("清除")
+                    .setListener((aDialog, index) -> {
                 MainPage.this._save_hot_message_dialog = null;
                 switch (index) {
                     case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
                     case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
                     case 2 -> TelnetClient.getClient().sendStringToServerInBackground("C");
                     default -> {
+                        TelnetClient.getClient().sendStringToServerInBackground("K");
                     }
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {

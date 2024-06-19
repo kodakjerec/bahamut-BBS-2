@@ -135,7 +135,9 @@ public class Thumbnail_ItemView extends LinearLayout {
 
                         // 非圖片類比較會有擷取問題
                         if (!_isPic && (_title.equals("") || _description.equals(""))) {
-                            String userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0";
+                            String userAgent = System.getProperty("http.agent");
+                            if (_url.contains("youtu") || _url.contains("amazon"))
+                                userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0";
 
                             // cookie
                             // Create a new Map to store cookies
@@ -178,6 +180,10 @@ public class Thumbnail_ItemView extends LinearLayout {
                                 _imageUrl = document.select("meta[property=og:image]").attr("content");
                                 if (_imageUrl.isEmpty())
                                     _imageUrl = document.select("meta[property=og:image]").attr("content");
+                                if (_imageUrl.isEmpty())
+                                    _imageUrl = document.select("meta[property=og:images]").attr("content");
+                                if (_imageUrl.isEmpty())
+                                    _imageUrl = document.select("#landingImage").attr("src");
                             }
                         }
 

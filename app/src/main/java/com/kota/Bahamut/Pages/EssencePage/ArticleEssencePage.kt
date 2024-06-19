@@ -96,9 +96,10 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                         itemViewOrigin = ArticlePage_TimeTimeView(context)
                 }
             } else {
-                if (type == ArticlePageItemType.Content) {
+                if (type == ArticlePageItemType.Content)
                     itemViewOrigin = ArticlePage_TextItemView(context)
-                }
+                else
+                    itemViewOrigin = itemView
             }
 
             if (itemViewOrigin == null)
@@ -208,7 +209,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
     }
 
     override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.contentView) as RelativeLayout
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout
         telnetViewBlock = mainLayout!!.findViewById(R.id.Essence_contentTelnetViewBlock)
         telnetView = mainLayout!!.findViewById(R.id.Essence_contentTelnetView)
         reloadTelnetLayout()

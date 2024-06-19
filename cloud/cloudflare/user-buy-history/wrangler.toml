@@ -1,0 +1,9 @@
+name = "user-buy-history"
+main = "src/worker.js"
+compatibility_date = "2024-06-17"
+workers_dev = true
+
+[[d1_databases]]
+database_id = "5c7c9a65-7b2f-4eb9-bc21-ad42c56a7eb1"
+database_name = "bahabbs"
+binding = "DATABASE"

@@ -59,7 +59,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void onPageDidLoad() {
-        mainLayout = (RelativeLayout) findViewById(R.id.contentView);
+        mainLayout = (RelativeLayout) findViewById(R.id.content_view);
 
         telnetViewBlock = mainLayout.findViewById(R.id.Mail_contentTelnetViewBlock);
         telnetView = mainLayout.findViewById(R.id.Mail_contentTelnetView);
@@ -153,6 +153,11 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 case ArticlePageItemType.PostTime ->
                         itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
             }
+        } else {
+            if (type == ArticlePageItemType.Content)
+                itemViewOrigin = new ArticlePage_TextItemView(getContext());
+            else
+                itemViewOrigin = itemView;
         }
         
         if (itemViewOrigin == null)
