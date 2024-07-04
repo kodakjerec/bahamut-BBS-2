@@ -55,10 +55,23 @@ public class PageContainer {
     }
 
     public void cleanStartPage() {
-        if (this._start_page != null) {
-            this._start_page.clear();
-            this._start_page = null;
-        }
+//        if (this._start_page != null) {
+//            this._start_page.clear();
+//            this._start_page = null;
+//        }
+        cleanLoginPage();
+        cleanMainPage();
+        cleanClassPage();
+        cleanBoardPage();
+        cleanBoardTitleLinkedPage();
+        cleanBoardSearchPage();
+        cleanBoardEssencePage();
+        cleanArticleEssencePage();
+        cleanMainBoxPage();
+        cleanArticlePage();
+        cleanBillingPage();
+        cleanInstructionPage();
+        cleanPostArticlePage();
     }
 
     public LoginPage getLoginPage() {

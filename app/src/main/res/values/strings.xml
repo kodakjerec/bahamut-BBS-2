@@ -287,6 +287,7 @@
     <string name="dialog_shorten_url_transfer">縮址</string>
     <string name="dialog_shorten_url_under_transfer">轉檔中</string>
     <string name="dialog_shorten_url_same_url">網址已使用過</string>
+    <string name="dialog_shorten_url_non_id">去識別化</string>
     <string name="dialog_shorten_url_hint">1. 把網址貼到這裡面\n2. 按鈕\"縮址\"產生短網址\n3. 按鈕\"送出\"貼到文章內</string>
     <string name="post_toolbar_button_management_1">編輯</string>
     <string name="post_toolbar_button_management_2">按鈕</string>

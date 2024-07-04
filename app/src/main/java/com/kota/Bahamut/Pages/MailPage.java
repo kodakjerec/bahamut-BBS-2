@@ -271,7 +271,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     void onReplyButtonClicked() {
         SendMailPage send_mail_page = new SendMailPage();
         String reply_title = _article.generateReplyTitle();
-        String reply_content = _article.generateReplyContent();
+        String reply_content = _article.generateReplyContent(0);
         send_mail_page.setPostTitle(reply_title);
         send_mail_page.setPostContent(reply_content);
         send_mail_page.setReceiver(_article.Author);

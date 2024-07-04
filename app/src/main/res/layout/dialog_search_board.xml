@@ -6,7 +6,7 @@
             <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/input_board_name" style="@style/TextViewNormal"/>
             <View style="@style/BlockDividerHorizontal"/>
 
-            <EditText
+            <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/Bahamut_Dialog_Search_board_keyword"
                 style="@style/EditTextSingleLine"
                 android:autofillHints=""

@@ -20,6 +20,7 @@
         android:height="60dp"
         android:textSize="20sp"
         android:gravity="center_vertical"
+        android:textColor="@color/article_page_text_item_content0"
         android:visibility="gone"
         />
     <FrameLayout

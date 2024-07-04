@@ -25,6 +25,7 @@ public class BahamutCommandLoadLastBlock extends TelnetCommand {
         switch (aListPage.getListType()) {
 //                return OperationMode.Left_S_End;
             case BoardPageAction.LINK_TITLE: // BoardLinkPage
+                return OperationMode.Left_S_End;
             case BoardPageAction.SEARCH: // BoardSearchPage
             case BoardPageAction.ESSENCE:
                 if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {

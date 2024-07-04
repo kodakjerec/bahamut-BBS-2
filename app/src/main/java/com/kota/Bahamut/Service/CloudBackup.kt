@@ -150,7 +150,7 @@ class CloudBackup {
             val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
-            val apiUrl = "https://cloud-backup.kodakjerec.workers.dev/"
+            val apiUrl = "https://cloud-backup.kodakjerec.workers.devqq/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)
@@ -161,31 +161,31 @@ class CloudBackup {
                 .post(body)
                 .build()
             ASRunner.runInNewThread {
-                client.newCall(request).execute().use { response->
                     try {
-                        val data = response.body!!.string()
-                        val fromJsonObject = JSONObject(data)
-                        val error = fromJsonObject.optString("error")
-                        if (error.isNotEmpty()) {
-                            ASToast.showShortToast("雲端備份失敗：$error")
-                        } else {
-                            // 雲端備份的時間
-                            TempSettings.setCloudSaveLastTime(
-                                fromJsonObject.optString(
-                                    "lastTime",
-                                    ""
+                        client.newCall(request).execute().use { response->
+                            val data = response.body!!.string()
+                            val fromJsonObject = JSONObject(data)
+                            val error = fromJsonObject.optString("error")
+                            if (error.isNotEmpty()) {
+                                ASToast.showShortToast("雲端備份失敗：$error")
+                            } else {
+                                // 雲端備份的時間
+                                TempSettings.setCloudSaveLastTime(
+                                    fromJsonObject.optString(
+                                        "lastTime",
+                                        ""
+                                    )
                                 )
-                            )
+                            }
                         }
                     }catch (e: Exception) {
-                        Log.d("SharedPrefBackup", e.toString())
+                        Log.d("CloudBackup", e.toString())
                     } finally {
                         final()
                     }
-                }
             }
         } catch (e: Exception) {
-            Log.d("SharedPrefBackup", e.toString())
+            Log.d("CloudBackup", e.toString())
             final()
         }
     }
@@ -206,71 +206,71 @@ class CloudBackup {
                 .post(body)
                 .build()
             ASRunner.runInNewThread {
-                client.newCall(request).execute().use { response->
                     try {
-                        val data = response.body!!.string()
-                        val jsonObject = JSONObject(data)
-                        val error = jsonObject.optString("error")
-                        if (error.isNotEmpty()) {
-                            ASToast.showShortToast("雲端備份失敗：$error")
-                        } else {
-                            val gson = GsonBuilder()
-                                .registerTypeAdapter(
-                                    Double::class.java,
-                                    JsonSerializer<Double> { src, _, _ ->
-                                        if (src == 0.0) JsonPrimitive(
-                                            "0.0"
-                                        ) else JsonPrimitive(src)
-                                    })
-                                .create()
+                        client.newCall(request).execute().use { response->
+                            val data = response.body!!.string()
+                            val jsonObject = JSONObject(data)
+                            val error = jsonObject.optString("error")
+                            if (error.isNotEmpty()) {
+                                ASToast.showShortToast("雲端備份失敗：$error")
+                            } else {
+                                val gson = GsonBuilder()
+                                    .registerTypeAdapter(
+                                        Double::class.java,
+                                        JsonSerializer<Double> { src, _, _ ->
+                                            if (src == 0.0) JsonPrimitive(
+                                                "0.0"
+                                            ) else JsonPrimitive(src)
+                                        })
+                                    .create()
 
-                            // 雲端備份的時間
-                            TempSettings.setCloudSaveLastTime(jsonObject.optString("lastTime", ""))
+                                // 雲端備份的時間
+                                TempSettings.setCloudSaveLastTime(jsonObject.optString("lastTime", ""))
 
-                            val jsonDataString = jsonObject.getString("jsonData")
-                            val fromJsonObject = gson.fromJson(
-                                AESCrypt.decrypt(jsonDataString),
-                                JSONObject::class.java
-                            )
-                            val userSettings = fromJsonObject["user_settings"] as Map<*, *>
-                            // set user_settings
-                            val notRestoreKeys: List<String> =
-                                listOf("Username", "Password", "SaveLogonUser")
-                            userSettings.forEach { (keyObject, value) ->
-                                val key = keyObject.toString()
-                                if (value != null && !notRestoreKeys.contains(key)) {
-                                    when (value) {
-                                        is String ->
-                                            UserSettings._editor.putString(key, value as String)
+                                val jsonDataString = jsonObject.getString("jsonData")
+                                val fromJsonObject = gson.fromJson(
+                                    AESCrypt.decrypt(jsonDataString),
+                                    JSONObject::class.java
+                                )
+                                val userSettings = fromJsonObject["user_settings"] as Map<*, *>
+                                // set user_settings
+                                val notRestoreKeys: List<String> =
+                                    listOf("Username", "Password", "SaveLogonUser")
+                                userSettings.forEach { (keyObject, value) ->
+                                    val key = keyObject.toString()
+                                    if (value != null && !notRestoreKeys.contains(key)) {
+                                        when (value) {
+                                            is String ->
+                                                UserSettings._editor.putString(key, value as String)
 
-                                        is Float ->
-                                            UserSettings._editor.putFloat(key, (value as Float))
+                                            is Float ->
+                                                UserSettings._editor.putFloat(key, (value as Float))
 
-                                        is Int ->
-                                            UserSettings._editor.putInt(key, (value as Int))
+                                            is Int ->
+                                                UserSettings._editor.putInt(key, (value as Int))
 
-                                        is Boolean ->
-                                            UserSettings._editor.putBoolean(key, (value as Boolean))
+                                            is Boolean ->
+                                                UserSettings._editor.putBoolean(key, (value as Boolean))
 
+                                        }
                                     }
                                 }
-                            }
-                            UserSettings._editor.commit()
+                                UserSettings._editor.commit()
 
-                            // set bookmark
-                            val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
-                            getBookmarkStore().importFromJSON(bookmark)
+                                // set bookmark
+                                val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
+                                getBookmarkStore().importFromJSON(bookmark)
+                            }
                         }
                     } catch (e: Exception) {
-                        Log.d("SharedPrefBackup", e.toString())
+                        Log.d("CloudBackup", e.toString())
                     } finally {
                         final()
                     }
-                }
             }
 
         } catch (e: java.lang.Exception) {
-            Log.d("SharedPrefBackup", e.toString())
+            Log.d("CloudBackup", e.toString())
             final()
         }
     }

@@ -36,7 +36,7 @@
                 android:singleLine="true"
                 android:textColor="@color/item_background_color" />
 
-            <EditText
+            <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/ArticlePostDialog_TitleField"
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
         android:layout_below="@+id/Post_MiddleDivider"
         android:orientation="horizontal">
 
-        <EditText
+        <com.kota.Bahamut.Pages.Model.PostEditText
             android:id="@+id/ArticlePostDialog_EditField"
             style="@style/TextViewNormal"
             android:layout_width="0dp"

@@ -78,7 +78,7 @@ public class LoginPage extends TelnetPage {
         findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
         // checkbox區塊點擊
         CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        findViewById(R.id.blockRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
+        findViewById(R.id.loginRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
         _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
 
         // 讀取預設勇者設定

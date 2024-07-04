@@ -28,6 +28,7 @@
                 android:layout_width="60dp"
                 android:layout_height="40dp"
                 android:text="@string/record"
+                android:textColor="@color/white"
                 android:background="@color/dialog_select_article_background_color_normal"
                 android:layout_alignParentEnd="true"/>
         </RelativeLayout>
@@ -43,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-                    <EditText
+                    <com.kota.Bahamut.Pages.Model.PostEditText
                         android:id="@+id/dialog_shorten_url_content"
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"
@@ -56,7 +57,21 @@
                         android:textColor="@android:color/white"
                         tools:ignore="TextFields"
                         android:autofillHints=""/>
-
+                    <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+                        <CheckBox
+                            android:id="@+id/dialog_shorten_url_non_id_checkbox"
+                            style="@style/CheckboxBahamut"
+                            android:layout_centerVertical="true"/>
+                        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                            style="@style/SystemSettingsCheckboxText"
+                            android:layout_toEndOf="@+id/dialog_shorten_url_non_id_checkbox"
+                            android:id="@+id/dialog_shorten_url_non_id_label"
+                            android:layout_alignParentTop="true"
+                            android:text="@string/dialog_shorten_url_non_id" />
+                    </RelativeLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="60dp"

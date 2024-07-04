@@ -58,15 +58,7 @@ public class StartPage extends TelnetPage {
 
     public void onPageWillAppear() {
         PageContainer pageContainer = PageContainer.getInstance();
-        pageContainer.cleanLoginPage();
-        pageContainer.cleanMainPage();
-        pageContainer.cleanClassPage();
-        pageContainer.cleanBoardPage();
-        pageContainer.cleanBoardSearchPage();
-        pageContainer.cleanBoardTitleLinkedPage();
-        pageContainer.cleanBoardEssencePage();
-        pageContainer.cleanMainBoxPage();
-        pageContainer.cleanBillingPage();
+        pageContainer.cleanStartPage();
     }
 
     public void onPageDidDisappear() {

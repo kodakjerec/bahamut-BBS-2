@@ -24,6 +24,7 @@
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:text="@string/setting"
+            android:textColor="@color/white"
             android:background="@color/dialog_select_article_background_color_normal"
             android:layout_alignParentEnd="true" />
     </RelativeLayout>

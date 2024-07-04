@@ -892,7 +892,8 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
             @Override 
             public void run() {
                 PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-                page.closeArticle();
+                if (page!=null)
+                    page.closeArticle();
             }
         }.runInMainThread();
         if (timer != null) {

@@ -194,8 +194,10 @@ public class TelnetArticle {
         return content_buffer.toString();
     }
 
-    /** 產生 回應用的文章內容 */
-    public String generateReplyContent() {
+    /** 產生 回應用的文章內容
+     * selectLevel 0-兩層 1-一層 2-不保留
+     * */
+    public String generateReplyContent(int selectLevel) {
         int maximum_quote;
         StringBuilder content_builder = new StringBuilder();
         Set<Integer> level_buffer = new HashSet<>();
@@ -210,28 +212,39 @@ public class TelnetArticle {
         } else {
             maximum_quote = quote_level_list[1];
         }
-        content_builder.append(String.format("※ 引述《%s (%s)》之銘言：", Author, Nickname));
-        content_builder.append("\n");
-        for (TelnetArticleItemInfo info : _info) {
-            if (!UserSettings.isBlockListContains(info.author) && info.quoteLevel <= maximum_quote) {
-                for (int i = 0; i < info.quoteLevel; i++) {
-                    content_builder.append("> ");
-                }
-                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
-            }
-        }
-        for (TelnetArticleItem item : _main_items) {
-            if (!UserSettings.isBlockListContains(item.getAuthor()) && item.getQuoteLevel() <= maximum_quote) {
-                String[] row_strings = item.getContent().split("\n");
-                for (String append : row_strings) {
-                    for (int j = 0; j <= item.getQuoteLevel(); j++) {
+
+        if (selectLevel<2) {
+            // 只保留第一個回覆作者
+            if (selectLevel==1)
+                maximum_quote = 0;
+
+            // 第一個回覆作者
+            content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", Author, Nickname));
+
+            boolean blockListEnable = UserSettings.getPropertiesBlockListEnable();
+            // 逐行上推作者
+            for (TelnetArticleItemInfo info : _info) {
+                if (!(blockListEnable && !UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
+                    for (int i = 0; i < info.quoteLevel; i++) {
                         content_builder.append("> ");
                     }
-                    content_builder.append(append);
-                    content_builder.append("\n");
+                    content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
+                }
+            }
+            for (TelnetArticleItem item : _main_items) {
+                if (!(blockListEnable && !UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
+                    String[] row_strings = item.getContent().split("\n");
+                    for (String append : row_strings) {
+                        for (int j = 0; j <= item.getQuoteLevel(); j++) {
+                            content_builder.append("> ");
+                        }
+                        content_builder.append(append);
+                        content_builder.append("\n");
+                    }
                 }
             }
         }
+
         return content_builder.toString();
     }
 

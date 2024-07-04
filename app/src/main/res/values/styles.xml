@@ -253,15 +253,9 @@
         <item name="android:layout_marginStart">5dp</item>
         <item name="android:gravity">center</item>
     </style>
-    <style name="CheckboxBahamut" parent="BaseTouchPart">
+    <style name="CheckboxBahamut">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:layout_centerVertical">true</item>
-        <item name="android:layout_alignParentStart">true</item>
-        <item name="android:layout_marginStart">10dp</item>
-        <item name="android:gravity">center_vertical</item>
-        <item name="android:scaleX">1</item>
-        <item name="android:scaleY">1</item>
         <item name="android:buttonTint">@color/button_checkbox</item>
     </style>
     <style name="SystemSettingsCheckboxText" parent="TextViewLarge">

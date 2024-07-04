@@ -5,7 +5,7 @@
         <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign_msg" style="@style/TextViewNormal"/>
             <View style="@style/BlockDividerHorizontal"/>
-            <EditText android:id="@+id/Bahamut_Dialog_Select_Sign_Input_Field" android:text="@string/dialog_select_sign_text" android:digits="0123456789" android:inputType="number" style="@style/EditTextSingleLine" android:autofillHints="" android:labelFor="@+id/Bahamut_Dialog_Select_Sign_Input_Field"/>
+            <com.kota.Bahamut.Pages.Model.PostEditText android:id="@+id/Bahamut_Dialog_Select_Sign_Input_Field" android:text="@string/dialog_select_sign_text" android:digits="0123456789" android:inputType="number" style="@style/EditTextSingleLine" android:autofillHints="" android:labelFor="@+id/Bahamut_Dialog_Select_Sign_Input_Field"/>
         </LinearLayout>
         <View style="@style/BlockDividerHorizontal"/>
         <LinearLayout style="@style/Toolbar">

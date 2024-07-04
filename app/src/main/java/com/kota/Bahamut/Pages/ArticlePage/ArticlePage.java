@@ -247,7 +247,7 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 最前篇 */
-    View.OnLongClickListener _page_top_listener = v -> {
+    View.OnLongClickListener pageTopListener = v -> {
         if (UserSettings.getPropertiesArticleMoveEnable()) {
             if (_top_action != null) {
                 v.removeCallbacks(_top_action);
@@ -263,7 +263,7 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 上一篇 */
-    View.OnClickListener _page_up_listener = v -> {
+    View.OnClickListener pageUpListener = v -> {
         if (_top_action != null) {
             v.removeCallbacks(_top_action);
             _top_action = null;
@@ -276,7 +276,7 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 最後篇 */
-    View.OnLongClickListener _page_bottom_listener = v -> {
+    View.OnLongClickListener pageBottomListener = v -> {
         if (UserSettings.getPropertiesArticleMoveEnable()) {
             if (_bottom_action != null) {
                 v.removeCallbacks(_bottom_action);
@@ -292,7 +292,7 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 下一篇 */
-    View.OnClickListener _page_down_listener = v -> {
+    View.OnClickListener pageDownListener = v -> {
         if (_bottom_action != null) {
             v.removeCallbacks(_bottom_action);
             _bottom_action = null;
@@ -305,12 +305,12 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 回覆文章 */
-    View.OnClickListener _back_listener = v -> {
+    View.OnClickListener replyListener = v -> {
         if (TelnetClient.getConnector().isConnecting()) {
             if (_article != null) {
                 PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
                 String reply_title = _article.generateReplyTitle();
-                String reply_content = _article.generateReplyContent();
+                String reply_content = _article.generateReplyContent(0);
                 page.setBoardPage(_board_page);
                 page.setOperationMode(PostArticlePage.OperationMode.Reply);
                 page.setArticleNumber(String.valueOf(_article.Number));
@@ -380,15 +380,15 @@ public class ArticlePage extends TelnetPage {
         list_view.setOnItemLongClickListener(_list_long_click_listener);
 
         Button back_button = mainLayout.findViewById(R.id.Article_backButton);
-        back_button.setOnClickListener(_back_listener);
+        back_button.setOnClickListener(replyListener);
 
         Button page_up_button = mainLayout.findViewById(R.id.Article_pageUpButton);
-        page_up_button.setOnClickListener(_page_up_listener);
-        page_up_button.setOnLongClickListener(_page_top_listener);
+        page_up_button.setOnClickListener(pageUpListener);
+        page_up_button.setOnLongClickListener(pageTopListener);
 
         Button page_down_button = mainLayout.findViewById(R.id.Article_pageDownButton);
-        page_down_button.setOnClickListener(_page_down_listener);
-        page_down_button.setOnLongClickListener(_page_bottom_listener);
+        page_down_button.setOnClickListener(pageDownListener);
+        page_down_button.setOnLongClickListener(pageBottomListener);
 
         Button do_gy_button = mainLayout.findViewById(R.id.do_gy);
         if (do_gy_button != null) {
@@ -462,15 +462,15 @@ public class ArticlePage extends TelnetPage {
                 // 浮動工具列
                 toolBarFloating.setVisibility(View.VISIBLE);
                 // button setting
-                toolBarFloating.setOnClickListenerSetting(_back_listener);
+                toolBarFloating.setOnClickListenerSetting(replyListener);
                 toolBarFloating.setTextSetting(getContextString(R.string.reply));
                 // button 1
-                toolBarFloating.setOnClickListener1(_page_up_listener);
-                toolBarFloating.setOnLongClickListener1(_page_top_listener);
+                toolBarFloating.setOnClickListener1(pageUpListener);
+                toolBarFloating.setOnLongClickListener1(pageTopListener);
                 toolBarFloating.setText1(getContextString(R.string.prev_article));
                 // button 2
-                toolBarFloating.setOnClickListener2(_page_down_listener);
-                toolBarFloating.setOnLongClickListener2(_page_bottom_listener);
+                toolBarFloating.setOnClickListener2(pageDownListener);
+                toolBarFloating.setOnLongClickListener2(pageBottomListener);
                 toolBarFloating.setText2(getContextString(R.string.next_article));
                 break;
             default:

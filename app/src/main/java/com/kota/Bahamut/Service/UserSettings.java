@@ -37,6 +37,7 @@ public class UserSettings {
     static final String PROPERTIES_LINK_SHOW_ONLY_WIFI = "LinkShowOnlyWifi"; // 只在Wifi下顯示預覽圖
     static final String PROPERTIES_ARTICLE_HEADS = "ArticleHeaders"; // 文章標題清單
     static final String PROPERTIES_ARTICLE_EXPRESSIONS = "ArticleExpressions"; // 表情符號清單
+    static final String PROPERTIES_SHORT_URL_NON_ID = "ShortUrlNonId"; // 短網址,開啟去識別化
 
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
@@ -87,6 +88,7 @@ public class UserSettings {
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
                 int varNoVipShortenTimes = prep.getPropertiesInteger(noVipShortenTimes);
+                boolean shortUrlNonId = prep.getPropertiesBoolean(PROPERTIES_SHORT_URL_NON_ID);
 
                 _editor.putString(PROPERTIES_USERNAME, username);
                 _editor.putString(PROPERTIES_PASSWORD, password);
@@ -109,6 +111,7 @@ public class UserSettings {
                 _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, linkShowThumbnail);
                 _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, linkShowOnlyWifi);
                 _editor.putString(PROPERTIES_ARTICLE_HEADS, article_headers);
+                _editor.putBoolean(PROPERTIES_SHORT_URL_NON_ID, shortUrlNonId);
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
                 _editor.putInt(noVipShortenTimes, varNoVipShortenTimes);
@@ -294,7 +297,7 @@ public class UserSettings {
 
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContains(String aName) {
-        if (aName.isEmpty())
+        if (aName==null || aName.isEmpty())
             return false;
 
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
@@ -367,5 +370,12 @@ public class UserSettings {
     }
     public static int getPropertiesNoVipShortenTimes() {
         return _sharedPref.getInt(noVipShortenTimes, 0);
+    }
+
+    public static void setPropertiesShortUrlNonId(boolean enable) {
+        _editor.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).apply();
+    }
+    public static boolean getShortUrlNonId() {
+        return _sharedPref.getBoolean(PROPERTIES_SHORT_URL_NON_ID, true);
     }
 }

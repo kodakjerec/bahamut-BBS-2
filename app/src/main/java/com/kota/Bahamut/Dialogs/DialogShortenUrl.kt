@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Dialogs
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
@@ -10,6 +11,7 @@ import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -33,13 +35,14 @@ import java.util.Objects
 import java.util.Vector
 
 class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {
-    private var mainLayout: RelativeLayout
-    private var editText: EditText? = null
-    private var sampleTextView: TextView? = null
+    private lateinit var mainLayout: RelativeLayout
+    private var fromClipData: CharSequence = ""
+    private lateinit var editText: EditText
+    private lateinit var sampleTextView: TextView
     private var sendButton: Button? = null
-    private var outputParam: String? = null
-    private var shortenUrlListener: DialogShortenUrlListener? = null
-    private var dialogShortenUrlItemViewAdapter: DialogShortenUrlItemViewAdapter? = null
+    private var outputParam: String = ""
+    private lateinit var shortenUrlListener: DialogShortenUrlListener
+    private lateinit var dialogShortenUrlItemViewAdapter: DialogShortenUrlItemViewAdapter
     private val urlDatabase = UrlDatabase(context)
     private var isTransfer: Boolean = true
     private var mOrientationEventListener: OrientationEventListener
@@ -140,12 +143,21 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     private fun catchClipBoard() {
             val clipboardManager =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData = clipboardManager.primaryClip
+            var clipData = clipboardManager.primaryClip
             if (clipData != null && clipData.itemCount>0) {
-                val clipString = clipData.getItemAt(0).text
-                if (clipString!=null)
-                    editText!!.setText(clipString.toString())
+                fromClipData = clipData.getItemAt(0).text
+                if (fromClipData!=null) {
+                    urlRemoveId()
+                }
             }
+    }
+
+    /** 切換去識別化 */
+    private val changeNonIdListener = OnClickListener {_ ->
+        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
+        checkbox.isChecked = !checkbox.isChecked
+        UserSettings.setPropertiesShortUrlNonId(checkbox.isChecked)
+        urlRemoveId()
     }
 
     /** 清除內容 */
@@ -194,17 +206,18 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_transfer).setOnClickListener(transferListener)
         sendButton = mainLayout.findViewById(R.id.send)
         sendButton!!.setOnClickListener(this)
-        sendButton!!.isEnabled = false
         mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
-        findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
+        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
+        checkbox.isChecked = UserSettings.getShortUrlNonId()
+        checkbox.setOnClickListener(changeNonIdListener)
+        mainLayout.findViewById<TextView>(R.id.dialog_shorten_url_non_id_label).setOnClickListener(changeNonIdListener)
 
+        // 監聽轉動事件, 變更視窗大小
         mOrientationEventListener = object : OrientationEventListener(context) {
             override fun onOrientationChanged(orientation: Int) {
-                val nowOrientation: Int
-
-
-                    nowOrientation = context.resources.configuration.orientation
+                val nowOrientation: Int = context.resources.configuration.orientation
 
                 if (nowOrientation!=oldOrientation) {
                     val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
@@ -224,13 +237,16 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     override fun onClick(view: View) {
-        if (view === sendButton && shortenUrlListener != null) {
-            shortenUrlListener!!.onShortenUrlDone(outputParam)
+        if (view === sendButton) {
+            if (outputParam.isEmpty())
+                shortenUrlListener.onShortenUrlDone(editText.text.toString())
+            else
+                shortenUrlListener.onShortenUrlDone(outputParam)
         }
         dismiss()
     }
 
-    fun setListener(listener: DialogShortenUrlListener?) {
+    fun setListener(listener: DialogShortenUrlListener) {
         shortenUrlListener = listener
     }
 
@@ -249,12 +265,24 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         mOrientationEventListener.disable()
     }
 
-    // 變更dialog寬度
+    /** 變更dialog寬度 */
     private fun setDialogWidth() {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val dialogWidth = (screenWidth * 0.7).toInt()
         val oldLayoutParams = mainLayout.layoutParams
         oldLayoutParams.width = dialogWidth
         mainLayout.layoutParams = oldLayoutParams
+    }
+
+    /** 去識別化 */
+    private fun urlRemoveId() {
+        var filterString: String = ""
+        if (UserSettings.getShortUrlNonId()) {
+            filterString = fromClipData.split("?")[0].toString()
+        } else {
+            filterString = fromClipData.toString()
+        }
+
+        editText!!.setText(filterString)
     }
 }

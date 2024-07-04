@@ -26,7 +26,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/toolbar"
-        android:background="@color/item_background_color">
+        android:background="@color/item_background_color" >
 
         <LinearLayout
             android:id="@+id/Login_InputBlock"
@@ -54,7 +54,7 @@
                     android:layout_marginEnd="12dp"
                     android:text="@string/account" />
 
-                <EditText
+                <com.kota.Bahamut.Pages.Model.PostEditText
                     android:id="@+id/Login_UsernameEdit"
                     style="@style/EditTextSingleLine"
                     android:autofillHints="username"
@@ -82,7 +82,7 @@
                     android:layout_marginEnd="12dp"
                     android:text="@string/password" />
 
-                <EditText
+                <com.kota.Bahamut.Pages.Model.PostEditText
                     android:id="@+id/Login_passwordEdit"
                     style="@style/EditTextSingleLine"
                     android:maxLength="8"
@@ -96,16 +96,18 @@
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_height="60dp"
+                android:gravity="top"
                 android:layout_gravity="center"
                 android:id="@+id/blockRememberLabel">
                 <CheckBox
-                    android:id="@+id/Login_loginRememberCheckBox" style="@style/CheckboxBahamut" />
+                    android:id="@+id/Login_loginRememberCheckBox"
+                    style="@style/CheckboxBahamut" />
                 <com.kota.TelnetUI.TextView.TelnetTextViewLarge
                     style="@style/SystemSettingsCheckboxText"
-                    android:layout_marginStart="50dp"
+                    android:layout_toEndOf="@+id/Login_loginRememberCheckBox"
                     android:id="@+id/loginRememberLabel"
+                    android:layout_alignParentTop="true"
                     android:text="@string/save_data" />
             </RelativeLayout>
         </LinearLayout>

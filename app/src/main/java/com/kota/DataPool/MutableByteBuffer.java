@@ -109,14 +109,18 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
         }
         byte[] data = new byte[this._size];
         int position = 0;
-        for (ByteBuffer buffer : this) {
-            for (int i = 0; i < buffer.limit(); i++) {
-                data[position] = buffer.get(i);
-                position++;
-                if (position == this._size) {
-                    break;
+        try {
+            for (ByteBuffer buffer : this) {
+                for (int i = 0; i < buffer.limit(); i++) {
+                    data[position] = buffer.get(i);
+                    position++;
+                    if (position == this._size) {
+                        break;
+                    }
                 }
             }
+        } catch (Exception e){
+            e.printStackTrace();
         }
         return data;
     }
