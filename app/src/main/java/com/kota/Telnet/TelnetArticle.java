@@ -224,7 +224,7 @@ public class TelnetArticle {
             boolean blockListEnable = UserSettings.getPropertiesBlockListEnable();
             // 逐行上推作者
             for (TelnetArticleItemInfo info : _info) {
-                if (!(blockListEnable && !UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
+                if (!(blockListEnable && UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
                     for (int i = 0; i < info.quoteLevel; i++) {
                         content_builder.append("> ");
                     }
@@ -232,7 +232,7 @@ public class TelnetArticle {
                 }
             }
             for (TelnetArticleItem item : _main_items) {
-                if (!(blockListEnable && !UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
+                if (!(blockListEnable && UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
                     String[] row_strings = item.getContent().split("\n");
                     for (String append : row_strings) {
                         for (int j = 0; j <= item.getQuoteLevel(); j++) {
