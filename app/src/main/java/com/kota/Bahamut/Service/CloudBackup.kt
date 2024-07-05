@@ -150,7 +150,7 @@ class CloudBackup {
             val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
-            val apiUrl = "https://cloud-backup.kodakjerec.workers.devqq/"
+            val apiUrl = "https://cloud-backup.kodakjerec.workers.dev/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)
