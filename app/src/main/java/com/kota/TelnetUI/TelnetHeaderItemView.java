@@ -51,7 +51,7 @@ public class TelnetHeaderItemView extends LinearLayout {
                 View view = headerItemView.getChildAt(i);
                 alViews.add(view);
             }
-            // 刪除所有childview
+            // 刪除所有child-view
             headerItemView.removeAllViews();
             // 回填
             for (int j = 0; j < alViews.size(); j++) {

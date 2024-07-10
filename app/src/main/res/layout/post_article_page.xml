@@ -8,7 +8,7 @@
         android:id="@+id/Post_TitleBlock"
         style="@style/TouchBlock"
         android:layout_width="match_parent"
-        android:layout_height="54dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="@color/item_background_color"
         android:focusableInTouchMode="true"
@@ -34,13 +34,13 @@
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:singleLine="true"
-                android:textColor="@color/item_background_color" />
+                android:textColor="@color/item_background_color"/>
 
             <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/ArticlePostDialog_TitleField"
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:autofillHints=""
                 android:background="@color/item_background_color"
                 android:ellipsize="end"

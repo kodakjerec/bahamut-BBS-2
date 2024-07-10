@@ -51,7 +51,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener, View.OnFocusChangeListener {
+public class PostArticlePage extends TelnetPage implements View.OnClickListener, AdapterView.OnItemSelectedListener {
     RelativeLayout mainLayout;
     private String _article_number = null;
     private BoardMainPage _board_page = null;
@@ -164,6 +164,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         mainLayout = (RelativeLayout) findViewById(R.id.content_view);
 
         _title_field = mainLayout.findViewById(R.id.ArticlePostDialog_TitleField);
+        // 點標題的時候拉大編輯框
+        _title_field.setOnFocusChangeListener(titleFieldListener);
         _title_field_background = mainLayout.findViewById(R.id.ArticlePostDialog_TitleFieldBackground);
         _content_field = mainLayout.findViewById(R.id.ArticlePostDialog_EditField);
 
@@ -206,19 +208,19 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         recover = false;
     }
 
-    // 引言過多失敗存檔
+    /** 引言過多失敗存檔 */
     public void setRecover() {
         recover = true;
         saveTempArticle(9);
     }
 
-    // 設定文章標題
+    /** 設定文章標題 */
     public void setPostTitle(String aTitle) {
         _ori_title = aTitle;
         refreshTitleField();
     }
 
-    // 設定內文
+    /** 設定內文 */
     public void setPostContent(String aContent) {
         _ori_content = aContent;
         refreshContentField();
@@ -288,7 +290,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }
     }
 
-    // 發文
+    /** 發文 */
     private void post(String title, String content) {
         final String send_title;
 
@@ -358,12 +360,9 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     public void onNothingSelected(AdapterView<?> adapterView) {
     }
 
-    public void refresh() {
-        _title_block.setVisibility(View.VISIBLE);
-    }
-
-    public void onFocusChange(View v, boolean hasFocus) {
-        if (v != _title_field) {
+    /** 標題欄位取得焦點 */
+    View.OnFocusChangeListener titleFieldListener = (view, hasFocus) -> {
+        if (view != _title_field) {
             return;
         }
         if (hasFocus) {
@@ -376,14 +375,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _title_field.setTextColor(0);
         _title_field_background.setTextColor(-1);
         _title_field_background.setText(_title_field.getText().toString());
-    }
+    };
 
     public void setHeaderHidden(boolean hidden) {
         _header_hidden = hidden;
         refreshHeaderSelector();
     }
 
-    // 讀取暫存檔
+    /** 讀取暫存檔 */
     public void onFileClicked() {
         ASListDialog.createDialog()
                 .setTitle(getContextString(R.string._article))
@@ -404,6 +403,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }).show();
     }
 
+    /** 按下 讀取暫存檔 */
     private void ontLoadArticleFromTempButtonClicked() {
         ASListDialog.createDialog()
                 .setTitle(getContextString(R.string._article))
@@ -442,7 +442,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }).show();
     }
 
-    // 讀取暫存檔
+    /** 讀取暫存檔 */
     private void loadTempArticle(int index) {
         ArticleTemp article_temp = new ArticleTempStore(getContext()).articles.get(index);
         _header_selector.setSelection(getIndexOfHeader(article_temp.header));
@@ -450,7 +450,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _content_field.setText(article_temp.content);
     }
 
-    // 儲存暫存檔
+    /** 儲存暫存檔 */
     private void saveTempArticle(int index) {
         ArticleTempStore store = new ArticleTempStore(getContext());
         ArticleTemp article_temp = store.articles.get(index);
@@ -472,7 +472,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }
     }
 
-    // 從字串去回推標題定位
+    /** 從字串去回推標題定位 */
     int getIndexOfHeader(String aHeader) {
         if (aHeader == null || aHeader.length() == 0) {
             return 0;
@@ -485,7 +485,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return -1;
     }
 
-    // 從定位取出特定標題
+    /** 從定位取出特定標題 */
     String getArticleHeader(int index) {
         if (index <= 0 || index >= _headers.length) {
             return "";
@@ -493,6 +493,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return _headers[index];
     }
 
+    /** 按下 存入暫存檔 */
     private void ontSaveArticleToTempButtonClicked() {
         ASListDialog.createDialog()
                 .setTitle(getContextString(R.string._article))
@@ -521,12 +522,40 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }).show();
     }
 
-    public void setOperationMode(OperationMode aMode) {
-        _operation_mode = aMode;
+    /** 存檔時, 存入暫存檔 */
+    private void ontSaveArticleToTempAndLeaveButtonClicked() {
+        ASListDialog.createDialog()
+                .setTitle(getContextString(R.string._article))
+                .addItem(getContextString(R.string.save_to_temp)+".1")
+                .addItem(getContextString(R.string.save_to_temp)+".2")
+                .addItem(getContextString(R.string.save_to_temp)+".3")
+                .addItem(getContextString(R.string.save_to_temp)+".4")
+                .addItem(getContextString(R.string.save_to_temp)+".5")
+                .setListener(new ASListDialogItemClickListener() {
+                    public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
+                        return true;
+                    }
+
+                    public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+                        ASAlertDialog.createDialog()
+                                .setTitle(getContextString(R.string.load_temp))
+                                .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                                .addButton(getContextString(R.string.cancel))
+                                .addButton(getContextString(R.string.sure))
+                                .setListener((aDialog1, button_index) -> {
+                                    if (button_index == 0) {
+                                        PostArticlePage.this.onBackPressed();
+                                    } else {
+                                        PostArticlePage.this.saveTempArticle(index);
+                                        closeArticle();
+                                    }
+                                }).show();
+                    }
+                }).show();
     }
 
-    public OperationMode getOperationMode() {
-        return _operation_mode;
+    public void setOperationMode(OperationMode aMode) {
+        _operation_mode = aMode;
     }
 
     public void setArticleNumber(String aNumber) {
@@ -552,6 +581,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _board_page = aBoardMainPage;
     }
 
+    /** 按下 返回 */
     protected boolean onBackPressed() {
         if (_title_field.getText().toString().length() == 0 && _content_field.getText().toString().length() == 0) {
             return super.onBackPressed();
@@ -571,37 +601,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return true;
     }
 
-    private void ontSaveArticleToTempAndLeaveButtonClicked() {
-        ASListDialog.createDialog()
-            .setTitle(getContextString(R.string._article))
-            .addItem(getContextString(R.string.save_to_temp)+".1")
-            .addItem(getContextString(R.string.save_to_temp)+".2")
-            .addItem(getContextString(R.string.save_to_temp)+".3")
-            .addItem(getContextString(R.string.save_to_temp)+".4")
-            .addItem(getContextString(R.string.save_to_temp)+".5")
-            .setListener(new ASListDialogItemClickListener() {
-                public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                    return true;
-                }
-
-                public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                    ASAlertDialog.createDialog()
-                        .setTitle(getContextString(R.string.load_temp))
-                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
-                        .addButton(getContextString(R.string.cancel))
-                        .addButton(getContextString(R.string.sure))
-                        .setListener((aDialog1, button_index) -> {
-                            if (button_index == 0) {
-                                PostArticlePage.this.onBackPressed();
-                            } else {
-                                PostArticlePage.this.saveTempArticle(index);
-                                closeArticle();
-                            }
-                        }).show();
-                }
-            }).show();
-    }
-
+    /** 按下 展開/摺疊 */
     View.OnClickListener postToolbarShowOnClickListener = view -> {
         TextView thisBtn = (TextView) view;
         LinearLayout toolBar = mainLayout.findViewById(R.id.Post_Toolbar);

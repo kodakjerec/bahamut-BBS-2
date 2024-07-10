@@ -106,19 +106,16 @@ public class ArticlePage extends TelnetPage {
             // 2-標題 0-本文 1-簽名檔 3-發文時間
             if (itemView == null) {
                 switch (type) {
-                    case ArticlePageItemType.Header:
-                        itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
-                        break;
-                    case ArticlePageItemType.Content:
-                        itemViewOrigin = new ArticlePage_TextItemView(getContext());
-                        break;
-                    case ArticlePageItemType.Sign:
+                    case ArticlePageItemType.Header ->
+                            itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
+                    case ArticlePageItemType.Content ->
+                            itemViewOrigin = new ArticlePage_TextItemView(getContext());
+                    case ArticlePageItemType.Sign -> {
                         itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
                         _i_have_sign = true;
-                        break;
-                    case ArticlePageItemType.PostTime:
-                        itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
-                        break;
+                    }
+                    case ArticlePageItemType.PostTime ->
+                            itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
                 }
             } else {
                 if (type == ArticlePageItemType.Content)
@@ -132,7 +129,7 @@ public class ArticlePage extends TelnetPage {
 
 
             switch (type) {
-                case ArticlePageItemType.Content:
+                case ArticlePageItemType.Content -> {
                     ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemViewOrigin;
                     if (item != null) {
                         item_view.setAuthor(item.getAuthor(), item.getNickname());
@@ -140,30 +137,18 @@ public class ArticlePage extends TelnetPage {
                         item_view.setContent(item.getContent(), item.getFrame().rows);
                     }
                     // 分隔線
-                    if (itemIndex < getCount() - 2) {
-                        item_view.setDividerHidden(false);
-                    } else {
-                        item_view.setDividerHidden(true);
-                    }
+                    item_view.setDividerHidden(itemIndex >= getCount() - 2);
                     // 黑名單檢查
-                    if (UserSettings.getPropertiesBlockListEnable() && UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor())) {
-                        item_view.setVisible(false);
-                    } else {
-                        item_view.setVisible(true);
-                    }
-                    break;
-                case ArticlePageItemType.Sign:
+                    item_view.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
+                }
+                case ArticlePageItemType.Sign -> {
                     ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemViewOrigin;
                     if (item != null)
                         item_view2.setFrame(item.getFrame());
                     // 分隔線
-                    if (itemIndex < getCount() - 2) {
-                        item_view2.setDividerhidden(false);
-                    } else {
-                        item_view2.setDividerhidden(true);
-                    }
-                    break;
-                case ArticlePageItemType.Header:
+                    item_view2.setDividerhidden(itemIndex >= getCount() - 2);
+                }
+                case ArticlePageItemType.Header -> {
                     ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemViewOrigin;
                     String author = null;
                     String title = null;
@@ -178,12 +163,12 @@ public class ArticlePage extends TelnetPage {
                     }
                     item_view3.setData(title, author, board_name);
                     item_view3.setMenuButton(mMenuListener);
-                    break;
-            case ArticlePageItemType.PostTime:
+                }
+                case ArticlePageItemType.PostTime -> {
                     if (_article != null) {
                         ((ArticlePage_TimeTimeView) itemViewOrigin).setTime("《" + _article.DateTime + "》");
                     }
-                    break;
+                }
             }
             return itemViewOrigin;
         }
@@ -437,23 +422,23 @@ public class ArticlePage extends TelnetPage {
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolbar.getLayoutParams();
         int choice_toolbar_location = UserSettings.getPropertiesToolbarLocation(); // 0-中間 1-靠左 2-靠右 3-浮動
         switch (choice_toolbar_location) {
-            case 1:
+            case 1 -> {
                 // 底部-最左邊
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END);
                 layoutParams.addRule(RelativeLayout.ALIGN_START);
                 _btnRR.setVisibility(View.VISIBLE);
                 _btnRRDivider.setVisibility(View.VISIBLE);
-                break;
-            case 2:
+            }
+            case 2 -> {
                 // 底部-最右邊
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 layoutParams.removeRule(RelativeLayout.ALIGN_START);
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END);
                 _btnLL.setVisibility(View.VISIBLE);
                 _btnLLDivider.setVisibility(View.VISIBLE);
-                break;
-            case 3:
+            }
+            case 3 -> {
                 // 浮動
                 // 去除 原本工具列
                 toolbar.setVisibility(View.GONE);
@@ -472,12 +457,12 @@ public class ArticlePage extends TelnetPage {
                 toolBarFloating.setOnClickListener2(pageDownListener);
                 toolBarFloating.setOnLongClickListener2(pageBottomListener);
                 toolBarFloating.setText2(getContextString(R.string.next_article));
-                break;
-            default:
+            }
+            default -> {
                 // 底部-中間
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                break;
+            }
         }
 
         toolbar.setLayoutParams(layoutParams);
@@ -674,16 +659,11 @@ public class ArticlePage extends TelnetPage {
                     .addButton(getContextString(R.string.cancel))
                     .addButton(getContextString(R.string.delete))
                     .setListener((aDialog, index) -> {
-                switch (index) {
-                    case 0:
-                    default:
-                        return;
-                    case 1:
-                        TelnetCommand command = new BahamutCommandDeleteArticle(item_number);
-                        _board_page.pushCommand(command);
-                        onBackPressed();
-                        break;
-                }
+                        if (index == 1) {
+                            TelnetCommand command = new BahamutCommandDeleteArticle(item_number);
+                            _board_page.pushCommand(command);
+                            onBackPressed();
+                        }
             }).scheduleDismissOnPageDisappear(this).show();
         }
     }

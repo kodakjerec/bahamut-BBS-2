@@ -241,16 +241,16 @@ class CloudBackup {
                                     if (value != null && !notRestoreKeys.contains(key)) {
                                         when (value) {
                                             is String ->
-                                                UserSettings._editor.putString(key, value as String)
+                                                UserSettings._editor.putString(key, value)
 
                                             is Float ->
-                                                UserSettings._editor.putFloat(key, (value as Float))
+                                                UserSettings._editor.putFloat(key, value)
 
                                             is Int ->
-                                                UserSettings._editor.putInt(key, (value as Int))
+                                                UserSettings._editor.putInt(key, value)
 
                                             is Boolean ->
-                                                UserSettings._editor.putBoolean(key, (value as Boolean))
+                                                UserSettings._editor.putBoolean(key, value)
 
                                         }
                                     }

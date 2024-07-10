@@ -1,5 +1,8 @@
 package com.kota.Bahamut.Command;
 
+import static com.kota.Bahamut.Service.CommonFunctions.judgeDoubleWord;
+import static com.kota.Telnet.Model.TelnetFrame.DEFAULT_COLUMN;
+
 import androidx.annotation.NonNull;
 
 import com.kota.Bahamut.ListPage.TelnetListPage;
@@ -21,8 +24,10 @@ public class BahamutCommandPostArticle extends TelnetCommand {
     Boolean _isRecoverPost;
 
     public BahamutCommandPostArticle(TelnetListPage aListPage, String title, String content, String aTarget, String aArticleNumber, String aSign, Boolean isRecoverPost) {
-        _title = title;
-        _content = content;
+        // 標題: 第80個字元如果是雙字元則截斷
+        _title = judgeDoubleWord(title, DEFAULT_COLUMN-9).split("\n")[0];
+        // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
+        _content = judgeDoubleWord(content, DEFAULT_COLUMN-2);
         Action = PostArticle;
         _target = aTarget;
         _article_number = aArticleNumber;
@@ -61,13 +66,6 @@ public class BahamutCommandPostArticle extends TelnetCommand {
                     else
                         buffer.pushString(output);
                 }
-
-                buffer.pushKey(TelnetKeyboard.CTRL_X); // ctrl+x 存檔
-                buffer.pushString("s\n"); // S-存檔
-                if (_target.equals("M")) {
-                    buffer.pushString("Y\n\n"); // 是否自存底稿(Y/N)？[N]
-                }
-                buffer.sendToServer();
             } else {
                 buffer.pushString(_article_number + "\n"); // 指定文章編號, 按下Enter
                 buffer.pushString("y"); // y-回應
@@ -97,13 +95,13 @@ public class BahamutCommandPostArticle extends TelnetCommand {
                         buffer.pushString(output);
                 }
 
-                buffer.pushKey(TelnetKeyboard.CTRL_X); // ctrl+x 存檔
-                buffer.pushString("s\n"); // S-存檔
-                if (_target.equals("M")) {
-                    buffer.pushString("Y\n\n"); // 是否自存底稿(Y/N)？[N]
-                }
-                buffer.sendToServer();
             }
+            buffer.pushKey(TelnetKeyboard.CTRL_X); // ctrl+x 存檔
+            buffer.pushString("s\n"); // S-存檔
+            if (_target.equals("M")) {
+                buffer.pushString("Y\n\n"); // 是否自存底稿(Y/N)？[N]
+            }
+            buffer.sendToServer();
         } else {
             // New
             buffer.pushKey(TelnetKeyboard.CTRL_P); // Ctrl+P

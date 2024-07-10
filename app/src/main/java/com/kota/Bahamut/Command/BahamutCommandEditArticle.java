@@ -1,6 +1,8 @@
 package com.kota.Bahamut.Command;
 
 import static com.kota.Bahamut.Command.BahamutCommandPostArticle.convertContentToStringList;
+import static com.kota.Bahamut.Service.CommonFunctions.judgeDoubleWord;
+import static com.kota.Telnet.Model.TelnetFrame.DEFAULT_COLUMN;
 
 import androidx.annotation.NonNull;
 
@@ -11,7 +13,6 @@ import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetCommand;
 import com.kota.Telnet.TelnetOutputBuilder;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class BahamutCommandEditArticle extends com.kota.Bahamut.Command.TelnetCommand {
@@ -20,19 +21,19 @@ public class BahamutCommandEditArticle extends com.kota.Bahamut.Command.TelnetCo
     String _title;
 
     public BahamutCommandEditArticle(String aArticleNumber, String title, String content) {
-        this._article_number = aArticleNumber;
-        this._title = title;
-        this._content = content;
-        this.Action = PostArticle;
+        _article_number = aArticleNumber;
+        _title = judgeDoubleWord(title, DEFAULT_COLUMN-9).split("\n")[0];
+        _content = judgeDoubleWord(content, DEFAULT_COLUMN-2);
+        Action = PostArticle;
     }
 
     public void execute(TelnetListPage aListPage) {
-        if (this._article_number != null && this._content != null && this._content.length() > 0) {
+        if (_article_number != null && _content != null && _content.length() > 0) {
             // 將內文依照 *[ 切換成多段
             List<String> outputs = convertContentToStringList(_content);
 
             TelnetOutputBuilder builder = TelnetOutputBuilder.create()
-                    .pushString(this._article_number + "\nE")
+                    .pushString(_article_number + "\nE")
                     .pushData((byte)TelnetKeyboard.CTRL_G) // ^G 刪除目前這行之後至檔案結尾
                     .pushData((byte)TelnetKeyboard.CTRL_Y); // ^Y 刪除目前這行
             // 貼入內文
@@ -45,8 +46,8 @@ public class BahamutCommandEditArticle extends com.kota.Bahamut.Command.TelnetCo
             // 結束
             builder.pushData(TelnetCommand.TERMINAL_TYPE)
                     .pushString("S\n");
-            if (this._title != null) {
-                builder.pushString("T").pushData((byte) 25).pushString(this._title + "\nY\n");
+            if (_title != null) {
+                builder.pushString("T").pushData((byte) 25).pushString(_title + "\nY\n");
             }
             TelnetClient.getClient().sendDataToServer(builder.build());
         }
@@ -58,6 +59,6 @@ public class BahamutCommandEditArticle extends com.kota.Bahamut.Command.TelnetCo
 
     @NonNull
     public String toString() {
-        return "[EditArticle][articleIndex=" + this._article_number + " title=" + this._title + " content=" + this._content + "]";
+        return "[EditArticle][articleIndex=" + _article_number + " title=" + _title + " content=" + _content + "]";
     }
 }
