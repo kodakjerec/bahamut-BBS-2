@@ -42,6 +42,8 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
     implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
+    implementation 'androidx.activity:activity-ktx:1.9.0'
+
     // for url head
     implementation 'org.jsoup:jsoup:1.17.2'
     // for image loading

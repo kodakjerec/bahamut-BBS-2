@@ -1,5 +1,7 @@
 package com.kota.Bahamut.Dialogs;
 
+import static com.kota.Telnet.TelnetArticle.NEW;
+
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -12,8 +14,6 @@ import com.kota.Bahamut.R;
 import java.util.Objects;
 
 public class Dialog_PostArticle extends ASDialog implements View.OnClickListener {
-    public static final int NEW = 0;
-    public static final int REPLY = 1;
     Button _cancel_button;
     Dialog_PostArticle_Listener _listener = null;
     RadioGroup _post_target_group;
@@ -35,7 +35,7 @@ public class Dialog_PostArticle extends ASDialog implements View.OnClickListener
         this._cancel_button = findViewById(R.id.cancel);
         View reply_target_view = findViewById(R.id.reply_target_view);
         findViewById(R.id.sign_view);
-        if (this._target == 0) {
+        if (this._target == NEW) {
             reply_target_view.setVisibility(View.GONE);
         } else {
             reply_target_view.setVisibility(View.VISIBLE);

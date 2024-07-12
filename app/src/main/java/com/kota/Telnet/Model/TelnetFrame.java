@@ -128,8 +128,8 @@ public class TelnetFrame {
         return true;
     }
 
-    public TelnetRow removeRow(int index) {
-        return this.rows.remove(index);
+    public void removeRow(int index) {
+        this.rows.remove(index);
     }
 
     /** 雙字元判斷 */

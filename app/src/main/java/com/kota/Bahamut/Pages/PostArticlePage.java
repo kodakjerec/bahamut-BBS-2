@@ -1,6 +1,8 @@
 package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+import static com.kota.Bahamut.Service.CommonFunctions.judgeDoubleWord;
+import static com.kota.Telnet.Model.TelnetFrame.DEFAULT_COLUMN;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -566,11 +568,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _edit_format = aFormat;
     }
 
+    /** 組合修改文章內容 */
     public String getEditContent() {
         if (_edit_format == null) {
             return null;
         }
-        return String.format(_edit_format, _title_field.getText().toString(), _content_field.getText().toString());
+        String _title = judgeDoubleWord(_title_field.getText().toString(), DEFAULT_COLUMN-9).split("\n")[0];
+        String _content = _content_field.getText().toString();
+        return String.format(_edit_format, _title, _content);
     }
 
     public boolean isKeepOnOffline() {

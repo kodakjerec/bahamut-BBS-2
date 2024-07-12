@@ -55,6 +55,7 @@ public class TelnetChannel {
             for (ByteBuffer byteBuffer : this._output_buffer) {
                 this._socket_channel.write(byteBuffer);
             }
+//            printOutputBuffer();
             this._output_buffer.clear();
             return true;
         } catch (Exception e) {
@@ -99,9 +100,11 @@ public class TelnetChannel {
     private void onReceiveDataFinished() {
         if (this._listener != null) {
             this._listener.onTelnetChannelReceiveDataFinished(this);
+//            printInputBuffer();
         }
     }
 
+    /** 列印收到的資料 */
     private void printInputBuffer() {
         byte[] data = new byte[this._input_buffer.limit()];
         for (int i = 0; i < this._input_buffer.limit(); i++) {
@@ -114,6 +117,7 @@ public class TelnetChannel {
         }
     }
 
+    /** 列印送出的資料 */
     private void printOutputBuffer() {
         byte[] data = new byte[this._output_buffer.size()];
         int position = 0;

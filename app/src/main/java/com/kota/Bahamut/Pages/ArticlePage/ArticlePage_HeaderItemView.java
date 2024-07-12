@@ -25,7 +25,7 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
     }
 
     public int getType() {
-        return 2;
+        return ArticlePageItemType.Header;
     }
     OnClickListener titleClickListener = view -> {
         if (titleTextView.getMaxLines()==1)

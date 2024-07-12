@@ -13,6 +13,7 @@ import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.UI.ASListView;
 import com.kota.ASFramework.UI.ASScrollView;
 import com.kota.ASFramework.UI.ASToast;
@@ -33,12 +34,12 @@ import com.kota.TelnetUI.TelnetView;
 
 public class MailPage extends TelnetPage implements ListAdapter, View.OnClickListener, SendMailPage_Listener {
     RelativeLayout mainLayout = null;
-    TelnetArticle _article = null;
+    TelnetArticle telnetArticle = null;
     Button _back_button = null;
-    ASListView _list = null;
+    ASListView listView = null;
     Button _page_down_button = null;
     Button _page_up_button = null;
-    TextView _list_empty_view = null;
+    TextView listEmptyView = null;
     TelnetView telnetView = null;
     ASScrollView telnetViewBlock = null;
     int viewMode = ArticleViewMode.MODE_TEXT;
@@ -64,9 +65,10 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         telnetViewBlock = mainLayout.findViewById(R.id.Mail_contentTelnetViewBlock);
         telnetView = mainLayout.findViewById(R.id.Mail_contentTelnetView);
         reloadTelnetLayout();
-        _list = mainLayout.findViewById(R.id.Mail_contentList);
-        _list_empty_view = mainLayout.findViewById(R.id.Mail_listEmptyView);
-        _list.setEmptyView(_list_empty_view);
+        listView = mainLayout.findViewById(R.id.Mail_contentList);
+        listEmptyView = mainLayout.findViewById(R.id.Mail_listEmptyView);
+        listView.setEmptyView(listEmptyView);
+
         _back_button = mainLayout.findViewById(R.id.Mail_backButton);
         _page_up_button = mainLayout.findViewById(R.id.Mail_pageUpButton);
         _page_down_button = mainLayout.findViewById(R.id.Mail_pageDownButton);
@@ -86,7 +88,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         _back_button = null;
         _page_up_button = null;
         _page_down_button = null;
-        _list = null;
+        listView = null;
         telnetViewBlock = null;
         telnetView = null;
         super.onPageDidDisappear();
@@ -99,28 +101,29 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
 
     public void setArticle(TelnetArticle aArticle) {
         clear();
-        _article = aArticle;
-        telnetView.setFrame(_article.getFrame());
+        telnetArticle = aArticle;
+        telnetView.setFrame(telnetArticle.getFrame());
         telnetView.setLayoutParams(telnetView.getLayoutParams());
         telnetViewBlock.scrollTo(0, 0);
+        ASProcessingDialog.dismissProcessingDialog();
         resetAdapter();
     }
 
     public void resetAdapter() {
-        if (_article != null) {
-            _list.setAdapter(this);
+        if (telnetArticle != null) {
+            listView.setAdapter(this);
         }
     }
 
     public int getCount() {
-        if (_article != null) {
-            return _article.getItemSize() + 2;
+        if (telnetArticle != null) {
+            return telnetArticle.getItemSize() + 2;
         }
         return 0;
     }
 
     public TelnetArticleItem getItem(int itemIndex) {
-        return _article.getItem(itemIndex - 1);
+        return telnetArticle.getItem(itemIndex - 1);
     }
 
     public long getItemId(int itemIndex) {
@@ -137,64 +140,57 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         return getItem(itemIndex).getType();
     }
 
-    public View getView(int itemIndex, View itemView, ViewGroup parentView) {
+    public View getView(int itemIndex, View itemViewFrom, ViewGroup parentView) {
         int type = getItemViewType(itemIndex);
         TelnetArticleItem item = getItem(itemIndex);
-        View itemViewOrigin = null;
+        View itemViewOrigin = itemViewFrom;
 
-        if (itemView == null) {
+        if (itemViewOrigin == null) {
             switch (type) {
-                case ArticlePageItemType.Content ->
-                        itemViewOrigin = new ArticlePage_TextItemView(getContext());
-                case ArticlePageItemType.Sign ->
-                        itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
-                case ArticlePageItemType.Header ->
-                        itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
-                case ArticlePageItemType.PostTime ->
-                        itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                case ArticlePageItemType.Sign -> itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
+                case ArticlePageItemType.Header -> itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
+                case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
             }
-        } else {
-            if (type == ArticlePageItemType.Content)
-                itemViewOrigin = new ArticlePage_TextItemView(getContext());
-            else
-                itemViewOrigin = itemView;
+        }  else if (type == ArticlePageItemType.Content) {
+            itemViewOrigin = new ArticlePage_TextItemView(getContext());
         }
-        
-        if (itemViewOrigin == null)
-            return null;
 
         switch (type) {
             case ArticlePageItemType.Content -> {
-                ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemViewOrigin;
-                item_view.setAuthor(item.getAuthor(), item.getNickname());
-                item_view.setQuote(item.getQuoteLevel());
-                item_view.setContent(item.getContent(), item.getFrame().rows);
+                ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
+                itemView1.setAuthor(item.getAuthor(), item.getNickname());
+                itemView1.setQuote(item.getQuoteLevel());
+                itemView1.setContent(item.getContent(), item.getFrame().rows);
                 if (itemIndex >= getCount() - 2) {
-                    item_view.setDividerHidden(true);
+                    itemView1.setDividerHidden(true);
                 } else {
-                    item_view.setDividerHidden(false);
+                    itemView1.setDividerHidden(false);
                 }
             }
             case ArticlePageItemType.Sign -> {
-                ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemViewOrigin;
+                ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
                 if (item!=null)
-                    item_view2.setFrame(item.getFrame());
+                    itemView2.setFrame(item.getFrame());
                 if (itemIndex >= getCount() - 2) {
-                    item_view2.setDividerhidden(true);
+                    itemView2.setDividerhidden(true);
                 } else {
-                    item_view2.setDividerhidden(false);
+                    itemView2.setDividerhidden(false);
                 }
             }
             case ArticlePageItemType.Header -> {
-                ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemViewOrigin;
-                String author = _article.Author;
-                if (_article.Nickname != null) {
-                    author = author + "(" + _article.Nickname + ")";
+                ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
+                String author = telnetArticle.Author;
+                if (telnetArticle.Nickname != null) {
+                    author = author + "(" + telnetArticle.Nickname + ")";
                 }
-                item_view3.setData(_article.Title, author, _article.BoardName);
+                itemView3.setData(telnetArticle.Title, author, telnetArticle.BoardName);
             }
-            case ArticlePageItemType.PostTime ->
-                    ((ArticlePage_TimeTimeView) itemViewOrigin).setTime("《" + _article.DateTime + "》");
+            case ArticlePageItemType.PostTime -> {
+                ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
+                itemView4.setTime("《" + telnetArticle.DateTime + "》");
+                itemView4.setIP(telnetArticle.fromIP);
+            }
         }
         return itemViewOrigin;
     }
@@ -228,7 +224,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     }
 
     public void clear() {
-        _article = null;
+        telnetArticle = null;
     }
 
     public void onClick(View aView) {
@@ -270,11 +266,11 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
 
     void onReplyButtonClicked() {
         SendMailPage send_mail_page = new SendMailPage();
-        String reply_title = _article.generateReplyTitle();
-        String reply_content = _article.generateReplyContent(0);
+        String reply_title = telnetArticle.generateReplyTitle();
+        String reply_content = telnetArticle.generateReplyContent(0);
         send_mail_page.setPostTitle(reply_title);
         send_mail_page.setPostContent(reply_content);
-        send_mail_page.setReceiver(_article.Author);
+        send_mail_page.setReceiver(telnetArticle.Author);
         send_mail_page.setListener(this);
         getNavigationController().pushViewController(send_mail_page);
     }
@@ -286,11 +282,11 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
             viewMode = ArticleViewMode.MODE_TEXT;
         }
         if (viewMode == ArticleViewMode.MODE_TEXT) {
-            _list.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.VISIBLE);
             telnetViewBlock.setVisibility(View.GONE);
             return;
         }
-        _list.setVisibility(View.GONE);
+        listView.setVisibility(View.GONE);
         telnetViewBlock.setVisibility(View.VISIBLE);
         telnetViewBlock.invalidate();
     }
@@ -310,10 +306,10 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         return true;
     }
 
-    // 給 state handler 更改讀取進度
+    /** 給 state handler 更改讀取進度 */
     @SuppressLint("SetTextI18n")
     public void changeLoadingPercentage(String percentage) {
-        _list_empty_view.setText(getContextString(R.string.loading_)+percentage);
+        ASProcessingDialog.showProcessingDialog(getContextString(R.string.loading_)+"\n"+percentage);
     }
 
     // 變更telnetView大小

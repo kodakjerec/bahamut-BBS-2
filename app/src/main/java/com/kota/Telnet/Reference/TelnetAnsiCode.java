@@ -47,10 +47,10 @@ public class TelnetAnsiCode {
         public static final byte WHITE = 7;
     }
 
-    /*
-        瀏覽文章, 返回前景色
-        輸入: index
-        返回: int (color code)
+    /**
+     * 瀏覽文章, 返回前景色
+     * @param colorIndex index
+     * @return int (color code)
      */
     public static int getTextColor(byte colorIndex) {
         int color_index = colorIndex & 255;
@@ -65,10 +65,10 @@ public class TelnetAnsiCode {
         }
     }
 
-    /*
-        瀏覽文章, 返回背景色
-        輸入: index
-        返回: int (color code)
+    /**
+     * 瀏覽文章, 返回背景色
+     * @param colorIndex index
+     * @return int (color code)
      */
     public static int getBackgroundColor(byte colorIndex) {
         int color_index = colorIndex & 255;
@@ -83,10 +83,10 @@ public class TelnetAnsiCode {
         }
     }
 
-    /*
-        修改文章, 返回前景字碼
-        輸入: index
-        返回: string
+    /**
+     * 修改文章, 返回前景字碼
+     * @param colorIndex  index
+     * @return string
      */
     public static String getTextAsciiCode(byte colorIndex) {
         int color_index = colorIndex & 255;
@@ -104,10 +104,10 @@ public class TelnetAnsiCode {
         }
     }
 
-    /*
-        修改文章, 返回背景字碼
-        輸入: index
-        返回: string
+    /**
+     * 修改文章, 返回背景字碼
+     * @param colorIndex  index
+     * @return string
      */
     public static String getBackAsciiCode(byte colorIndex) {
         int color_index = colorIndex & 255;

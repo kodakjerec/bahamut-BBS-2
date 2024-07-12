@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/time_line_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/Block">
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:gravity="end" android:id="@+id/ArticleTimeItemView_Time" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-</LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Block"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/time_line_background_color">
+    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        android:id="@+id/ArticleTimeItemView_IP"
+        style="@style/TextViewSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_alignParentStart="true"
+        android:textIsSelectable="true"/>
+    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        android:id="@+id/ArticleTimeItemView_Time"
+        style="@style/TextViewSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/white"
+        android:layout_alignParentEnd="true"/>
+</RelativeLayout>

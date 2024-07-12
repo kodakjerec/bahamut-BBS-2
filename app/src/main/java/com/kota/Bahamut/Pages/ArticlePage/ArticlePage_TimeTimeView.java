@@ -9,7 +9,8 @@ import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticleItemView;
 
 public class ArticlePage_TimeTimeView extends RelativeLayout implements TelnetArticleItemView {
-    TextView _time_label = null;
+    TextView timeLabel = null;
+    TextView ipLabel = null;
 
     public ArticlePage_TimeTimeView(Context context) {
         super(context);
@@ -28,16 +29,22 @@ public class ArticlePage_TimeTimeView extends RelativeLayout implements TelnetAr
 
     public void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_time_item_view, this);
-        this._time_label = (TextView) findViewById(R.id.ArticleTimeItemView_Time);
+        timeLabel = findViewById(R.id.ArticleTimeItemView_Time);
+        ipLabel = findViewById(R.id.ArticleTimeItemView_IP);
     }
 
     public void setTime(String aTime) {
-        if (this._time_label != null) {
-            this._time_label.setText(aTime);
+        if (timeLabel != null) {
+            timeLabel.setText(aTime);
+        }
+    }
+    public void setIP(String aIP) {
+        if (ipLabel != null) {
+            ipLabel.setText(aIP);
         }
     }
 
     public int getType() {
-        return 3;
+        return ArticlePageItemType.PostTime;
     }
 }

@@ -332,7 +332,14 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     void handleArticle() {
-        setCurrentPage(BahamutPage.BAHAMUT_ARTICLE);
+        TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+        if (top_page instanceof BoardMainPage) {
+            setCurrentPage(BahamutPage.BAHAMUT_ARTICLE);
+        } else if (top_page instanceof MailBoxPage) {
+            setCurrentPage(BahamutPage.BAHAMUT_MAIL);
+        } else if (top_page instanceof BoardEssencePage) {
+            setCurrentPage(BahamutPage.BAHAMUT_ARTICLE_ESSENCE);
+        }
         if (!this._reading_article) {
             onReadArticleStart();
         }
@@ -340,11 +347,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     // 變更讀取條進度
     void handleArticlePercentage() {
-        String r = "((?<percent>\\d+)%)";
-        Pattern p = Pattern.compile(r);
-        Matcher m = p.matcher(row_string_23);
-        if (m.find()) {
-            String percent = m.toMatchResult().group(1);
+        String resourceString = "((?<percent>\\d+)%)";
+        Pattern pattern = Pattern.compile(resourceString);
+        Matcher matcher = pattern.matcher(row_string_23);
+        if (matcher.find()) {
+            String percent = matcher.toMatchResult().group(1);
             TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
             if (top_page instanceof ArticleEssencePage page) {
                 page.changeLoadingPercentage(percent);
@@ -491,29 +498,18 @@ public class BahamutStateHandler extends TelnetStateHandler {
         new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.6
             @Override // com.kota.ASFramework.Thread.ASRunner
             public void run() {
-                MailPage mail_page;
-                MailPage mail_page2;
+                MailPage mailPage;
                 try {
                     TelnetPage last_page = (TelnetPage) ASNavigationController.getCurrentController().getViewControllers().lastElement();
                     // 檢查最上層的頁面是不是 mail page
                     // 如果不是=>就把mail page推到最上層
                     if (last_page == null || last_page.getPageType() != BahamutPage.BAHAMUT_MAIL) {
-                        mail_page = null;
+                        mailPage = new MailPage();
+                        ASNavigationController.getCurrentController().pushViewController(mailPage);
                     } else {
-                        mail_page = (MailPage) last_page;
+                        mailPage = (MailPage) last_page;
                     }
-                    if (mail_page == null) {
-                        try {
-                            mail_page2 = new MailPage();
-                            ASNavigationController.getCurrentController().pushViewController(mail_page2);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return;
-                        }
-                    } else {
-                        mail_page2 = mail_page;
-                    }
-                    mail_page2.setArticle(aArticle);
+                    mailPage.setArticle(aArticle);
                 } catch (Exception ignored) {
                 }
             }
@@ -525,29 +521,18 @@ public class BahamutStateHandler extends TelnetStateHandler {
         new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.6
             @Override // com.kota.ASFramework.Thread.ASRunner
             public void run() {
-                ArticleEssencePage mail_page;
-                ArticleEssencePage mail_page2;
+                ArticleEssencePage articleEssencePage;
                 try {
-                    TelnetPage lastPage = (TelnetPage) ASNavigationController.getCurrentController().getViewControllers().lastElement();
-                    // 檢查最上層的頁面是不是 essence page
-                    // 如果不是=>就把essence page推到最上層
-                    if (lastPage == null || lastPage.getPageType() != BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
-                        mail_page = null;
+                    TelnetPage last_page = (TelnetPage) ASNavigationController.getCurrentController().getViewControllers().lastElement();
+                    // 檢查最上層的頁面是不是 mail page
+                    // 如果不是=>就把mail page推到最上層
+                    if (last_page == null || last_page.getPageType() != BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
+                        articleEssencePage = new ArticleEssencePage();
+                        ASNavigationController.getCurrentController().pushViewController(articleEssencePage);
                     } else {
-                        mail_page = (ArticleEssencePage) lastPage;
+                        articleEssencePage = (ArticleEssencePage) last_page;
                     }
-                    if (mail_page == null) {
-                        try {
-                            mail_page2 = new ArticleEssencePage();
-                            ASNavigationController.getCurrentController().pushViewController(mail_page2);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            return;
-                        }
-                    } else {
-                        mail_page2 = mail_page;
-                    }
-                    mail_page2.setArticle(aArticle);
+                    articleEssencePage.setArticle(aArticle);
                 } catch (Exception ignored) {
                 }
             }

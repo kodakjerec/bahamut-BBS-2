@@ -6,29 +6,26 @@ import com.kota.Telnet.TelnetCursor;
 import java.nio.ByteBuffer;
 import java.util.Vector;
 
-/* loaded from: classes.dex */
 public class TelnetModel {
-    private static int _count = 0;
+    private static final int _count = 0;
     private int _row;
     protected TelnetAnsi _ansi = new TelnetAnsi();
     private TelnetFrame _frame = null;
     private TelnetCursor _cursor = new TelnetCursor();
     private TelnetCursor _saved_cursor = new TelnetCursor();
     private int _pushed_data_size = 0;
-    private ByteBuffer _ansi_buffer = ByteBuffer.allocate(1024);
+    private final ByteBuffer _ansi_buffer = ByteBuffer.allocate(1024);
 
     protected void finalize() throws Throwable {
         super.finalize();
     }
 
     public TelnetModel(int row) {
-        this._row = 0;
         this._row = row;
         initialDataModel();
     }
 
     public TelnetModel() {
-        this._row = 0;
         this._row = 24;
         initialDataModel();
     }
@@ -128,7 +125,7 @@ public class TelnetModel {
         }
     }
 
-    // 給予顏色定義
+    /** 給予顏色定義 */
     private void setCursorData(byte data, TelnetAnsi ansiState) {
         if (this._cursor.row >= 0 && this._cursor.row < this._row && this._cursor.column >= 0 && this._cursor.column < 80) {
             TelnetRow row = this._frame.getRow(this._cursor.row);

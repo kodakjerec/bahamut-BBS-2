@@ -61,13 +61,13 @@
             android:orientation="horizontal">
             <Button
                 android:id="@+id/bookmark_tab_button"
-                android:layout_height="match_parent"
-                android:layout_width="wrap_content"
-                android:layout_marginEnd="1dp"
                 style="@style/RightMenuItem"
                 android:text="@string/essence_page">
             </Button>
-            <Button android:id="@+id/bookmark_edit_button" android:text="@string/bookmark_manager" style="@style/RightMenuItem" android:layout_width="0dp" android:layout_weight="1"/>
+            <Button android:id="@+id/bookmark_edit_button"
+                android:text="@string/bookmark_manager"
+                style="@style/RightMenuItem"
+                android:layout_weight="2"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall
                 style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
@@ -88,13 +88,12 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/toolbar_item_background_color">
 
             <Button
                 android:id="@+id/show_bookmark_button"
                 style="@style/RightMenuItem"
-                android:layout_width="120dp"
                 android:text="@string/bookmark" />
 
             <View
@@ -113,13 +112,12 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="wrap_content"
             android:background="@drawable/toolbar_item_background_color">
 
             <Button
                 android:id="@+id/search_article_button"
                 style="@style/RightMenuItem"
-                android:layout_width="120dp"
                 android:text="@string/search" />
 
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>

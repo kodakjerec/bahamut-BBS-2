@@ -1,7 +1,6 @@
 package com.kota.Bahamut.Dialogs
 
 import android.Manifest.permission.CAMERA
-import android.content.Context
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager

@@ -11,7 +11,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -191,7 +190,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                         picOrUrl_changeStatus(_isPic);
 
                         urlDatabase.addUrl(_url, _title, _description, _imageUrl, _isPic);
-                    } catch (Exception e) {
+                    } catch (Exception ignored) {
                         new ASRunner() {
                             @Override // com.kota.ASFramework.Thread.ASRunner
                             public void run() {
@@ -201,7 +200,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     }
                 });
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
             new ASRunner() {
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
@@ -294,8 +293,6 @@ public class Thumbnail_ItemView extends LinearLayout {
 
         // 內容
         _layout_normal.setVisibility(GONE);
-
-        Log.v("Thumbnail_Fail", _imageUrl.isEmpty()?_url:_imageUrl);
     }
 
     /** 讀取圖片 */
@@ -321,7 +318,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                     circularProgressDrawable.start();
 
                     if (_imageUrl.isEmpty()) {
-                        throw new Exception(_url);
+                        return;
                     }
 
                     _image_view_pic.setImageDrawable(circularProgressDrawable);
@@ -380,7 +377,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                                             _image_view_pic.setImageBitmap(newBitmap);
                                         }
 
-                                    } catch (Exception e) {
+                                    } catch (Exception ignored) {
                                         new ASRunner() {
                                             @Override // com.kota.ASFramework.Thread.ASRunner
                                             public void run() {
@@ -394,7 +391,7 @@ public class Thumbnail_ItemView extends LinearLayout {
                                 public void onLoadCleared(@Nullable Drawable placeholder) {
                                 }
                             });
-                } catch (Exception e) {
+                } catch (Exception ignored) {
                     new ASRunner() {
                         @Override // com.kota.ASFramework.Thread.ASRunner
                         public void run() {

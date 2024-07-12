@@ -31,7 +31,7 @@ public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetAr
     }
 
     public int getType() {
-        return 1;
+        return ArticlePageItemType.Sign;
     }
 
     public void setDividerhidden(boolean isHidden) {

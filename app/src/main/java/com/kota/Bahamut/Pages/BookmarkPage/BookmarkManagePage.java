@@ -24,8 +24,8 @@ import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkList;
 import com.kota.Bahamut.DataModels.BookmarkStore;
-import com.kota.Bahamut.Dialogs.Dialog_SearchArticle;
-import com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener;
+import com.kota.Bahamut.Dialogs.DialogSearchArticle;
+import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
@@ -41,7 +41,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
-public class BookmarkManagePage extends TelnetPage implements BookmarkClickListener, Dialog_SearchArticle_Listener {
+public class BookmarkManagePage extends TelnetPage implements BookmarkClickListener, DialogSearchArticleListener {
     public String _board_name = null;
     private final List<Bookmark> _bookmarks = new ArrayList<>();
     protected TelnetHeaderItemView _header_view = null;
@@ -357,7 +357,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
             search_options.add(bookmark.getAuthor());
             search_options.add(bookmark.getMark());
             search_options.add(bookmark.getGy());
-            Dialog_SearchArticle dialog_SearchArticle = new Dialog_SearchArticle();
+            DialogSearchArticle dialog_SearchArticle = new DialogSearchArticle();
             dialog_SearchArticle.setListener(this);
             dialog_SearchArticle.editContent(search_options);
             dialog_SearchArticle.show();

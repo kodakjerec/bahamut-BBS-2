@@ -1,6 +1,5 @@
 package com.kota.Bahamut.Dialogs
 
-import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
@@ -59,13 +58,13 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             return@OnClickListener
         }
 
-        if (editText!!.text.isEmpty()) {
+        if (editText.text.isEmpty()) {
             ASToast.showShortToast(getContextString(R.string.keyword_hint))
             return@OnClickListener
         }
         // 擷取文章內的所有連結
         val textView = TextView(context)
-        textView.text = editText!!.text
+        textView.text = editText.text
         Linkify.addLinks(textView, Linkify.WEB_URLS)
         val urls = textView.urls
         if (urls.isEmpty()) {
@@ -109,7 +108,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
                         object : ASRunner() {
                             override fun run() {
-                                editText!!.setText(targetUrl)
+                                editText.setText(targetUrl)
                                 changeFrontend(shortUrl)
                                 UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
                             }
@@ -134,8 +133,8 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
     /** 變更畫面上選項 */
     fun changeFrontend(shortUrl: String) {
-        sampleTextView!!.text = shortUrl
-        outputParam = sampleTextView!!.text.toString()
+        sampleTextView.text = shortUrl
+        outputParam = sampleTextView.text.toString()
         sendButton!!.isEnabled = true
     }
 
@@ -143,17 +142,20 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     private fun catchClipBoard() {
             val clipboardManager =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            var clipData = clipboardManager.primaryClip
+            val clipData = clipboardManager.primaryClip
             if (clipData != null && clipData.itemCount>0) {
                 fromClipData = clipData.getItemAt(0).text
-                if (fromClipData!=null) {
-                    urlRemoveId()
-                }
+                urlRemoveId()
             }
     }
 
     /** 切換去識別化 */
-    private val changeNonIdListener = OnClickListener {_ ->
+    private val changeNonIdListenerForCheckbox = OnClickListener { _ ->
+        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
+        UserSettings.setPropertiesShortUrlNonId(checkbox.isChecked)
+        urlRemoveId()
+    }
+    private val changeNonIdListenerForLabel = OnClickListener { _ ->
         val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
         checkbox.isChecked = !checkbox.isChecked
         UserSettings.setPropertiesShortUrlNonId(checkbox.isChecked)
@@ -162,8 +164,8 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
     /** 清除內容 */
     private val resetListener = OnClickListener {_ ->
-        editText!!.setText("")
-        sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample)
+        editText.setText("")
+        sampleTextView.text = getContextString(R.string.dialog_paint_color_sample)
         outputParam = ""
     }
 
@@ -181,7 +183,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
             dialogShortenUrlItemViewAdapter = DialogShortenUrlItemViewAdapter(urlDatabase.shortenUrls)
             recyclerView.adapter = dialogShortenUrlItemViewAdapter
-            dialogShortenUrlItemViewAdapter!!.setOnItemClickListener(this)
+            dialogShortenUrlItemViewAdapter.setOnItemClickListener(this)
         } else {
             isTransfer = true
             findViewById<Button>(R.id.dialog_shorten_url_change_mode).text = getContextString(R.string.record)
@@ -211,8 +213,8 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
         val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
         checkbox.isChecked = UserSettings.getShortUrlNonId()
-        checkbox.setOnClickListener(changeNonIdListener)
-        mainLayout.findViewById<TextView>(R.id.dialog_shorten_url_non_id_label).setOnClickListener(changeNonIdListener)
+        checkbox.setOnClickListener(changeNonIdListenerForCheckbox)
+        mainLayout.findViewById<TextView>(R.id.dialog_shorten_url_non_id_label).setOnClickListener(changeNonIdListenerForLabel)
 
         // 監聽轉動事件, 變更視窗大小
         mOrientationEventListener = object : OrientationEventListener(context) {
@@ -251,7 +253,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder?) {
-        val shortUrl = dialogShortenUrlItemViewAdapter!!.getItem(dialogShortenUrlItemView!!.layoutPosition).shorten_url
+        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView!!.layoutPosition).shorten_url
         changeFrontend(shortUrl)
     }
 
@@ -276,13 +278,12 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
     /** 去識別化 */
     private fun urlRemoveId() {
-        var filterString: String = ""
-        if (UserSettings.getShortUrlNonId()) {
-            filterString = fromClipData.split("?")[0].toString()
+        val filterString = if (UserSettings.getShortUrlNonId()) {
+            fromClipData.split("?")[0]
         } else {
-            filterString = fromClipData.toString()
+            fromClipData.toString()
         }
 
-        editText!!.setText(filterString)
+        editText.setText(filterString)
     }
 }

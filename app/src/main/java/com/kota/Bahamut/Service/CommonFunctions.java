@@ -101,8 +101,12 @@ public class CommonFunctions {
                         }
 
                         column++;
-                        if (!isControlCode) // 非控制碼區塊照常計算
+                        if (!isControlCode) { // 非控制碼區塊照常計算
+                            if (compareData > 127 && (cutLength)>=maxLength ) { // 截斷的剛好是雙字元第一位, 則退位
+                                column-=2;
+                            }
                             cutLength++;
+                        }
 
                         if (isControlCode){
                             // 遇到 m, 下一輪回復正常
@@ -116,7 +120,11 @@ public class CommonFunctions {
                     returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray));
                     data1 = Arrays.copyOfRange(data1, column, data1.length);
                 }
-                returnArrays.add(B2UEncoder.getInstance().encodeToString(data1));
+                // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
+                // 如果data2無資料, data1無料, 代表這是空白行
+                if (!(data2.length>0 && data1.length==0)) {
+                    returnArrays.add(B2UEncoder.getInstance().encodeToString(data1));
+                }
             }
         } catch(Exception e) {
             e.printStackTrace();

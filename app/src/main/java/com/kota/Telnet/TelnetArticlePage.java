@@ -4,7 +4,7 @@ import com.kota.Telnet.Model.TelnetRow;
 import java.util.Vector;
 
 public class TelnetArticlePage {
-    private Vector<TelnetRow> rows = new Vector<>();
+    private final Vector<TelnetRow> rows = new Vector<>();
 
     public void addRow(TelnetRow row) {
         this.rows.add(row.clone());

@@ -31,8 +31,12 @@ public class TelnetKeyboard {
         return data;
     }
 
+    /**
+     * 輸入鍵盤指令的代號，回傳 telnet command
+     * @param keyCode 鍵盤指令
+     * @return byte[] telnet command
+     * */
     public static byte[] getKeyData(int keyCode) {
-        byte[] bArr = new byte[0];
         switch (keyCode) {
             case TAB: /* tab */
                 return new byte[]{9};

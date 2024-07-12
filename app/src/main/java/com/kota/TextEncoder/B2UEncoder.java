@@ -3,7 +3,6 @@ package com.kota.TextEncoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.Vector;
 
 public class B2UEncoder {
@@ -15,6 +14,8 @@ public class B2UEncoder {
     private int _offset = 0;
     private char[] _table = null;
     private int _table_size = 0;
+
+    private String charSet = "UTF-16";
 
     private B2UEncoder(InputStream inputStream) {
         readTableFromInputStream(inputStream);
@@ -67,7 +68,7 @@ public class B2UEncoder {
 
     public String encodeToString(byte[] stringData) {
         try {
-            return new String(encodeToBytes(stringData), "unicode");
+            return new String(encodeToBytes(stringData), charSet);
         } catch (Exception e) {
             e.printStackTrace();
             return "";

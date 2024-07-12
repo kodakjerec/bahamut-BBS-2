@@ -17,7 +17,7 @@ import com.kota.Bahamut.Command.BahamutCommandDeleteArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
 import com.kota.Bahamut.Command.BahamutCommandSendMail;
 import com.kota.Bahamut.Command.TelnetCommand;
-import com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener;
+import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener;
 import com.kota.Bahamut.ListPage.TelnetListPage;
@@ -35,7 +35,7 @@ import com.kota.TelnetUI.TelnetHeaderItemView;
 import java.util.Objects;
 import java.util.Vector;
 
-public class MailBoxPage extends TelnetListPage implements ListAdapter, Dialog_SearchArticle_Listener, Dialog_SelectArticle_Listener, SendMailPage_Listener, View.OnClickListener, View.OnLongClickListener {
+public class MailBoxPage extends TelnetListPage implements ListAdapter, DialogSearchArticleListener, Dialog_SelectArticle_Listener, SendMailPage_Listener, View.OnClickListener, View.OnLongClickListener {
     Button _back_button = null;
     TelnetHeaderItemView _header_view = null;
     View _list_empty_view = null;

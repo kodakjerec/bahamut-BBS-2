@@ -19,7 +19,9 @@
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name">
+        android:label="@string/app_name"
+        android:enableOnBackInvokedCallback="false"
+        tools:targetApi="tiramisu">
         <activity
             android:name=".BahamutController"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|screenSize|smallestScreenSize|uiMode"

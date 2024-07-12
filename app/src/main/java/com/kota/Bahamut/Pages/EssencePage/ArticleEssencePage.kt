@@ -19,6 +19,7 @@ import android.widget.TextView
 import com.kota.ASFramework.Dialog.ASAlertDialog
 import com.kota.ASFramework.Dialog.ASListDialog
 import com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+import com.kota.ASFramework.Dialog.ASProcessingDialog
 import com.kota.ASFramework.UI.ASListView
 import com.kota.ASFramework.UI.ASScrollView
 import com.kota.ASFramework.UI.ASToast
@@ -56,7 +57,6 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
     private var viewMode = ArticleViewMode.MODE_TEXT
     private var isFullScreen = false
     private val mDataSetObservable = DataSetObservable()
-    private var iHaveSign = false
     private var boardEssencePage: BoardEssencePage? = null
 
     private val listAdapter: BaseAdapter = object :BaseAdapter() {
@@ -76,34 +76,26 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
             return itemIndex.toLong()
         }
 
-        override fun getView(itemIndex: Int, itemView: View?, parentView: ViewGroup): View? {
+        override fun getView(itemIndex: Int, itemView: View?, parentView: ViewGroup): View {
             val type: Int = getItemViewType(itemIndex)
             val item = getItem(itemIndex)
-            var itemViewOrigin: View? = null
+            var itemViewOrigin: View? = itemView
 
             // 2-標題 0-本文 1-簽名檔 3-發文時間
-            if (itemView == null) {
-                when (type) {
+            if (itemViewOrigin == null) {
+                itemViewOrigin = when (type) {
                     ArticlePageItemType.Header ->
-                        itemViewOrigin = ArticlePage_HeaderItemView(context)
-                    ArticlePageItemType.Content ->
-                        itemViewOrigin = ArticlePage_TextItemView(context)
-                    ArticlePageItemType.Sign -> {
-                        itemViewOrigin = ArticlePage_TelnetItemView(context)
-                        iHaveSign = true
-                    }
+                        ArticlePage_HeaderItemView(context)
+                    ArticlePageItemType.Sign ->
+                        ArticlePage_TelnetItemView(context)
                     ArticlePageItemType.PostTime ->
-                        itemViewOrigin = ArticlePage_TimeTimeView(context)
+                        ArticlePage_TimeTimeView(context)
+                    else ->
+                        ArticlePage_TextItemView(context)
                 }
-            } else {
-                if (type == ArticlePageItemType.Content)
-                    itemViewOrigin = ArticlePage_TextItemView(context)
-                else
-                    itemViewOrigin = itemView
+            } else if (type == ArticlePageItemType.Content) {
+                itemViewOrigin = ArticlePage_TextItemView(context)
             }
-
-            if (itemViewOrigin == null)
-                return null
 
             when (getItemViewType(itemIndex)) {
                 ArticlePageItemType.Header -> {
@@ -150,8 +142,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                 }
 
                 ArticlePageItemType.PostTime -> {
-                    if (telnetArticle!=null)
-                        (itemViewOrigin as ArticlePage_TimeTimeView).setTime("《" + telnetArticle!!.DateTime + "》")
+                    val itemView4 = itemViewOrigin as ArticlePage_TimeTimeView
+                    itemView4.setTime("《" + telnetArticle!!.DateTime + "》")
+                    itemView4.setIP(telnetArticle!!.fromIP)
                 }
             }
             return itemViewOrigin
@@ -160,10 +153,10 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
         override fun getItemViewType(itemIndex: Int): Int {
             if (itemIndex == 0) {
-                return 2
+                return ArticlePageItemType.Header
             }
             return if (itemIndex == count - 1) {
-                3
+                ArticlePageItemType.PostTime
             } else getItem(itemIndex)!!.type
         }
 
@@ -215,8 +208,8 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         reloadTelnetLayout()
         asListView = mainLayout!!.findViewById(R.id.Essence_contentList)
         listEmptyView = mainLayout!!.findViewById(R.id.Essence_listEmptyView)
-        asListView!!.emptyView = listEmptyView
         asListView!!.adapter = listAdapter
+        asListView!!.emptyView = listEmptyView
         asListView!!.onItemLongClickListener = listLongClickListener
         pageUpButton = mainLayout!!.findViewById(R.id.Essence_pageUpButton)
         pageDownButton = mainLayout!!.findViewById(R.id.Essence_pageDownButton)
@@ -252,6 +245,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         telnetView!!.frame = telnetArticle!!.frame
         telnetView!!.layoutParams = telnetView!!.layoutParams
         telnetViewBlock!!.scrollTo(0, 0)
+        ASProcessingDialog.dismissProcessingDialog()
         resetAdapter()
     }
 
@@ -339,50 +333,38 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         return true
     }
 
-    // 給 state handler 更改讀取進度
+    /** 給 state handler 更改讀取進度 */
     @SuppressLint("SetTextI18n")
     fun changeLoadingPercentage(percentage: String) {
-        listEmptyView!!.text = CommonFunctions.getContextString(R.string.loading_) + percentage
+        ASProcessingDialog.showProcessingDialog(CommonFunctions.getContextString(R.string.loading_) +"\n"+ percentage)
     }
 
 
     // 長按內文
     private var listLongClickListener =
-        OnItemLongClickListener { _: AdapterView<*>?, _: View?, itemIndex: Int, _: Long ->
-            // 沒有簽名檔直接往下走
-            if (!iHaveSign) {
-                return@OnItemLongClickListener true
-            }
-            // 切換模式只適用於簽名檔
-            // 簽名檔一定是最後一個
-            val signIndex: Int = telnetArticle!!.itemSize
-            if (itemIndex != signIndex) {
-                return@OnItemLongClickListener true
-            }
-            // 開啟切換模式
-            val item: TelnetArticleItem?
-            if (telnetArticle == null) {
-                return@OnItemLongClickListener true
-            } else {
-                item = telnetArticle!!.getItem(itemIndex - 1)
-                if (item == null)
-                    return@OnItemLongClickListener true
-            }
-            when (item.type) {
-                0 -> {
-                    item.type = 1
-                    listAdapter.notifyDataSetChanged()
-                    return@OnItemLongClickListener true
-                }
-                1 -> {
-                    item.type = 0
-                    listAdapter.notifyDataSetChanged()
-                    return@OnItemLongClickListener true
-                }
-                else -> {
-                    return@OnItemLongClickListener true
+        OnItemLongClickListener { _: AdapterView<*>?, view: View, itemIndex: Int, _: Long ->
+            if (view.javaClass == ArticlePage_TelnetItemView::class.java) {
+                // 開啟切換模式
+                val item: TelnetArticleItem = telnetArticle!!.getItem(itemIndex - 1)
+                when (item.type) {
+                    0 -> {
+                        item.type = 1
+                        listAdapter.notifyDataSetChanged()
+                        return@OnItemLongClickListener true
+                    }
+                    1 -> {
+                        item.type = 0
+                        listAdapter.notifyDataSetChanged()
+                        return@OnItemLongClickListener true
+                    }
+                    else -> {
+                        return@OnItemLongClickListener true
+                    }
                 }
             }
+
+            // 不是telnetView繼續往下運行事件
+            return@OnItemLongClickListener false
         }
 
 

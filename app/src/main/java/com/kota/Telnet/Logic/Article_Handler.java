@@ -1,5 +1,8 @@
 package com.kota.Telnet.Logic;
 
+import static com.kota.Telnet.TelnetArticle.NEW;
+import static com.kota.Telnet.TelnetArticle.REPLY;
+
 import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Model.TelnetRow;
 import com.kota.Telnet.TelnetArticle;
@@ -9,9 +12,12 @@ import com.kota.Telnet.TelnetArticlePage;
 import com.kota.Telnet.TelnetArticlePush;
 
 import java.util.Vector;
+import java.util.regex.MatchResult;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Article_Handler {
-    TelnetArticle _article = new TelnetArticle();
+    TelnetArticle telnetArticle = new TelnetArticle();
     TelnetArticlePage _last_page = null;
     Vector<TelnetArticlePage> _pages = new Vector<>();
 
@@ -51,24 +57,25 @@ public class Article_Handler {
     }
 
     public void clear() {
-        _article.clear();
+        telnetArticle.clear();
         _pages.clear();
         _last_page = null;
     }
 
-    // 分析每行內容
+    /** 分析每行內容 */
     public void build() {
-        _article.clear();
+        telnetArticle.clear();
         Vector<TelnetRow> rows = new Vector<>();
         buildRows(rows);
         trimRows(rows);
-        _article.setFrameData(rows);
+        telnetArticle.setFrameData(rows);
         if (loadHeader(rows)) {
             rows.subList(0, 4).clear();
         }
-        boolean main_block_did_read = false;
-        boolean end_line_did_read = false;
+        boolean main_block_did_read = false; // 讀取到主區塊
+        boolean end_line_did_read = false; // 是否讀取到最後一行
         TelnetArticleItem processing_item = null;
+        String regexEndArticle = "※ Origin: 巴哈姆特<((gamer\\.com\\.tw)|(www\\.gamer\\.com\\.tw)|(bbs\\.gamer\\.com\\.tw)|(BAHAMUT\\.ORG))> ◆ From: ((?<fromIP>.+))";
         for (TelnetRow row : rows) {
             String row_string = row.toString();
             int quoteLevel = row.getQuoteLevel();
@@ -123,30 +130,36 @@ public class Article_Handler {
                 item_info.author = author2;
                 item_info.nickname = nickname;
                 item_info.quoteLevel = quoteLevel + 1;
-                _article.addInfo(item_info);
+                telnetArticle.addInfo(item_info);
             } else if (!row_string.matches("※ 修改:.*")) {
                 if (row_string.equals("--")) {
                     main_block_did_read = true;
                     processing_item = null;
-                } else if (row_string.matches("※ Origin: 巴哈姆特<((gamer\\.com\\.tw)|(www\\.gamer\\.com\\.tw)|(bbs\\.gamer\\.com\\.tw)|(BAHAMUT\\.ORG))> ◆ From: (.+)")) {
+                } else if (row_string.matches(regexEndArticle)) {
                     end_line_did_read = true;
                     processing_item = null;
+                    Pattern pattern = Pattern.compile(regexEndArticle);
+                    Matcher matcher = pattern.matcher(row_string);
+                    if (matcher.find()) {
+                        MatchResult result = matcher.toMatchResult();
+                        telnetArticle.fromIP = result.group(matcher.groupCount());
+                    }
                 } else if (!end_line_did_read || !row_string.matches(".+：.+\\(.+\\)")) {
                     if (processing_item == null || processing_item.getQuoteLevel() != quoteLevel) {
                         processing_item = new TelnetArticleItem();
                         if (main_block_did_read) {
-                            _article.addExtendItem(processing_item);
+                            telnetArticle.addExtendItem(processing_item);
                         } else {
-                            _article.addMainItem(processing_item);
+                            telnetArticle.addMainItem(processing_item);
                         }
                         processing_item.setQuoteLevel(quoteLevel);
                         if (quoteLevel != 0) {
-                            int i4 = _article.getInfoSize() - 1;
+                            int i4 = telnetArticle.getInfoSize() - 1;
                             while (true) {
                                 if (i4 < 0) {
                                     break;
                                 }
-                                TelnetArticleItemInfo item_info2 = _article.getInfo(i4);
+                                TelnetArticleItemInfo item_info2 = telnetArticle.getInfo(i4);
                                 if (item_info2.quoteLevel == quoteLevel) {
                                     processing_item.setAuthor(item_info2.author);
                                     processing_item.setNickname(item_info2.nickname);
@@ -155,8 +168,8 @@ public class Article_Handler {
                                 i4--;
                             }
                         } else {
-                            processing_item.setAuthor(_article.Author);
-                            processing_item.setNickname(_article.Nickname);
+                            processing_item.setAuthor(telnetArticle.Author);
+                            processing_item.setNickname(telnetArticle.Nickname);
                         }
                     }
                     // 其他狀況
@@ -225,11 +238,11 @@ public class Article_Handler {
                     push.content = content;
                     push.date = date;
                     push.time = time;
-                    _article.addPush(push);
+                    telnetArticle.addPush(push);
                 }
             }
         }
-        _article.build();
+        telnetArticle.build();
     }
 
     private boolean loadHeader(Vector<TelnetRow> rows) {
@@ -280,23 +293,23 @@ public class Article_Handler {
                 e.printStackTrace();
             }
         }
-        _article.Author = author;
-        _article.Nickname = nickname;
+        telnetArticle.Author = author;
+        telnetArticle.Nickname = nickname;
 
         String boardName = "";
         if (row_0.toContentString().contains("看板"))
             boardName = row_0.getSpaceString(66, 78).trim();
-        _article.BoardName = boardName;
+        telnetArticle.BoardName = boardName;
 
         String title_string = "";
         if (row_1.toContentString().contains("標題")) {
             title_string = row_1.getSpaceString(7, 78).trim();
             if (title_string.startsWith("Re: ")) {
-                _article.Title = title_string.substring(4);
-                _article.Type = 0;
+                telnetArticle.Title = title_string.substring(4);
+                telnetArticle.Type = REPLY;
             } else {
-                _article.Title = title_string;
-                _article.Type = 0;
+                telnetArticle.Title = title_string;
+                telnetArticle.Type = NEW;
             }
         }
 
@@ -304,7 +317,7 @@ public class Article_Handler {
         if (row_2.toContentString().contains("時間")) {
             dateTime = row_2.getSpaceString(7, 30).trim();
         }
-        _article.DateTime = dateTime;
+        telnetArticle.DateTime = dateTime;
         // 只要任意一個屬性有值, 就應正常顯示
         if (!author.isEmpty() || !nickname.isEmpty() || !boardName.isEmpty() || !title_string.isEmpty()) {
             return true;
@@ -365,10 +378,10 @@ public class Article_Handler {
     }
 
     public TelnetArticle getArticle() {
-        return _article;
+        return telnetArticle;
     }
 
     public void newArticle() {
-        _article = new TelnetArticle();
+        telnetArticle = new TelnetArticle();
     }
 }

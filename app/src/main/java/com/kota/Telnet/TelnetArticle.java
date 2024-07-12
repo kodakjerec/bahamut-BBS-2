@@ -16,15 +16,16 @@ import java.util.Vector;
 
 public class TelnetArticle {
     public static final int MINIMUM_REMOVE_QUOTE = 1;
-    public static final int NORMAL = 0;
-    public static final int REPLY = 0;
+    public static final int NEW = 0;
+    public static final int REPLY = 1;
+    public String Title = "";
     public String Author = "";
     public String BoardName = "";
     public String DateTime = "";
     public String Nickname = "";
+    public String fromIP = "";
     public int Number = 0;
-    public String Title = "";
-    public int Type = 0;
+    public int Type = 0; // NEW or REPLY
     private final Vector<TelnetArticleItem> _extend_items = new Vector<>();
     private TelnetFrame _frame = null;
     private final Vector<TelnetArticleItemInfo> _info = new Vector<>();

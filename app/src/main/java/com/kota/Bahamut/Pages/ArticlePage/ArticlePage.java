@@ -55,30 +55,29 @@ import java.util.Vector;
 
 public class ArticlePage extends TelnetPage {
     RelativeLayout mainLayout;
-    TelnetArticle _article = null;
+    TelnetArticle telnetArticle = null;
     TelnetView telnetView = null;
-    TextView _list_empty_view = null;
+    TextView listEmptyView = null;
     BoardMainPage _board_page = null;
     boolean isFullScreen = false;
-    boolean _i_have_sign = false; // 本篇文章有沒有出現簽名檔
     long _action_delay = 500;
     Runnable _top_action = null;
     Runnable _bottom_action = null;
-    BaseAdapter _list_adapter = new BaseAdapter() {
+    BaseAdapter listAdapter = new BaseAdapter() {
         @Override // android.widget.Adapter
         public int getCount() {
-            if (_article != null) {
-                return _article.getItemSize() + 2;
+            if (telnetArticle != null) {
+                return telnetArticle.getItemSize() + 2;
             }
             return 0;
         }
 
         @Override // android.widget.Adapter
         public TelnetArticleItem getItem(int itemIndex) {
-            if (_article == null) {
+            if (telnetArticle == null) {
                 return null;
             }
-            return _article.getItem(itemIndex - 1);
+            return telnetArticle.getItem(itemIndex - 1);
         }
 
         @Override // android.widget.Adapter
@@ -89,85 +88,72 @@ public class ArticlePage extends TelnetPage {
         @Override // android.widget.BaseAdapter, android.widget.Adapter
         public int getItemViewType(int itemIndex) {
             if (itemIndex == 0) {
-                return 2;
+                return ArticlePageItemType.Header;
             }
-            if (itemIndex == getCount() - 1) {
-                return 3;
+            else if (itemIndex == getCount() - 1) {
+                return ArticlePageItemType.PostTime;
             }
             return Objects.requireNonNull(getItem(itemIndex)).getType();
         }
 
         @Override // android.widget.Adapter
-        public View getView(int itemIndex, View itemView, ViewGroup parentView) {
+        public View getView(int itemIndex, View itemViewFrom, ViewGroup parentView) {
             int type = getItemViewType(itemIndex);
             TelnetArticleItem item = getItem(itemIndex);
-            View itemViewOrigin = null;
-
             // 2-標題 0-本文 1-簽名檔 3-發文時間
-            if (itemView == null) {
+            View itemViewOrigin = itemViewFrom;
+
+            if (itemViewOrigin == null) {
                 switch (type) {
-                    case ArticlePageItemType.Header ->
-                            itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
-                    case ArticlePageItemType.Content ->
-                            itemViewOrigin = new ArticlePage_TextItemView(getContext());
-                    case ArticlePageItemType.Sign -> {
-                        itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
-                        _i_have_sign = true;
-                    }
-                    case ArticlePageItemType.PostTime ->
-                            itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                    case ArticlePageItemType.Sign -> itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
+                    case ArticlePageItemType.Header -> itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
+                    case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                    default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
                 }
-            } else {
-                if (type == ArticlePageItemType.Content)
-                    itemViewOrigin = new ArticlePage_TextItemView(getContext());
-                else
-                    itemViewOrigin = itemView;
+            } else if (type == ArticlePageItemType.Content) {
+                itemViewOrigin = new ArticlePage_TextItemView(getContext());
             }
-
-            if (itemViewOrigin == null)
-                return null;
-
 
             switch (type) {
                 case ArticlePageItemType.Content -> {
-                    ArticlePage_TextItemView item_view = (ArticlePage_TextItemView) itemViewOrigin;
+                    ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
                     if (item != null) {
-                        item_view.setAuthor(item.getAuthor(), item.getNickname());
-                        item_view.setQuote(item.getQuoteLevel());
-                        item_view.setContent(item.getContent(), item.getFrame().rows);
+                        itemView1.setAuthor(item.getAuthor(), item.getNickname());
+                        itemView1.setQuote(item.getQuoteLevel());
+                        itemView1.setContent(item.getContent(), item.getFrame().rows);
                     }
                     // 分隔線
-                    item_view.setDividerHidden(itemIndex >= getCount() - 2);
+                    itemView1.setDividerHidden(itemIndex >= getCount() - 2);
                     // 黑名單檢查
-                    item_view.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
+                    itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
                 }
                 case ArticlePageItemType.Sign -> {
-                    ArticlePage_TelnetItemView item_view2 = (ArticlePage_TelnetItemView) itemViewOrigin;
+                    ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
                     if (item != null)
-                        item_view2.setFrame(item.getFrame());
+                        itemView2.setFrame(item.getFrame());
                     // 分隔線
-                    item_view2.setDividerhidden(itemIndex >= getCount() - 2);
+                    itemView2.setDividerhidden(itemIndex >= getCount() - 2);
                 }
                 case ArticlePageItemType.Header -> {
-                    ArticlePage_HeaderItemView item_view3 = (ArticlePage_HeaderItemView) itemViewOrigin;
+                    ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
                     String author = null;
                     String title = null;
                     String board_name = null;
-                    if (_article != null) {
-                        author = _article.Author;
-                        title = _article.Title;
-                        board_name = _article.BoardName;
-                        if (_article.Nickname != null) {
-                            author = author + "(" + _article.Nickname + ")";
+                    if (telnetArticle != null) {
+                        author = telnetArticle.Author;
+                        title = telnetArticle.Title;
+                        board_name = telnetArticle.BoardName;
+                        if (telnetArticle.Nickname != null) {
+                            author = author + "(" + telnetArticle.Nickname + ")";
                         }
                     }
-                    item_view3.setData(title, author, board_name);
-                    item_view3.setMenuButton(mMenuListener);
+                    itemView3.setData(title, author, board_name);
+                    itemView3.setMenuButton(mMenuListener);
                 }
                 case ArticlePageItemType.PostTime -> {
-                    if (_article != null) {
-                        ((ArticlePage_TimeTimeView) itemViewOrigin).setTime("《" + _article.DateTime + "》");
-                    }
+                    ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
+                    itemView4.setTime("《" + telnetArticle.DateTime + "》");
+                    itemView4.setIP(telnetArticle.fromIP);
                 }
             }
             return itemViewOrigin;
@@ -201,34 +187,27 @@ public class ArticlePage extends TelnetPage {
     };
 
     /** 長按內文 */
-    AdapterView.OnItemLongClickListener _list_long_click_listener = (arg0, arg1, itemIndex, arg3) -> {
-        // 沒有簽名檔直接往下走
-        if (!_i_have_sign) {
-            return true;
+    AdapterView.OnItemLongClickListener listLongClickListener = (AdapterView<?> var1, View view, int itemIndex, long pressTime) -> {
+        if (view.getClass().equals(ArticlePage_TelnetItemView.class)) {
+            // 開啟切換模式
+            TelnetArticleItem item = telnetArticle.getItem(itemIndex - 1);
+
+            int viewMode = item.getType();
+            if (viewMode == 0) {
+                item.setType(1);
+                listAdapter.notifyDataSetChanged();
+                return true;
+            } else if (viewMode == 1) {
+                item.setType(0);
+                listAdapter.notifyDataSetChanged();
+                return true;
+            } else {
+                return true;
+            }
         }
-        // 切換模式只適用於簽名檔
-        // 簽名檔一定是最後一個
-        int signIndex = _article.getItemSize();
-        if (itemIndex != signIndex){
-            return true;
-        }
-        // 開啟切換模式
-        TelnetArticleItem item;
-        if (_article == null || (item = _article.getItem(itemIndex - 1)) == null) {
-            return true;
-        }
-        int type = item.getType();
-        if (type == 0) {
-            item.setType(1);
-            _list_adapter.notifyDataSetChanged();
-            return true;
-        } else if (type == 1) {
-            item.setType(0);
-            _list_adapter.notifyDataSetChanged();
-            return true;
-        } else {
-            return true;
-        }
+
+        // 不是telnetView繼續往下運行事件
+        return false;
     };
 
     /** 最前篇 */
@@ -292,13 +271,13 @@ public class ArticlePage extends TelnetPage {
     /** 回覆文章 */
     View.OnClickListener replyListener = v -> {
         if (TelnetClient.getConnector().isConnecting()) {
-            if (_article != null) {
+            if (telnetArticle != null) {
                 PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-                String reply_title = _article.generateReplyTitle();
-                String reply_content = _article.generateReplyContent(0);
+                String reply_title = telnetArticle.generateReplyTitle();
+                String reply_content = telnetArticle.generateReplyContent(0);
                 page.setBoardPage(_board_page);
                 page.setOperationMode(PostArticlePage.OperationMode.Reply);
-                page.setArticleNumber(String.valueOf(_article.Number));
+                page.setArticleNumber(String.valueOf(telnetArticle.Number));
                 page.setPostTitle(reply_title);
                 page.setPostContent(reply_content + "\n\n\n");
                 page.setListener(_board_page);
@@ -358,11 +337,11 @@ public class ArticlePage extends TelnetPage {
 
         telnetView = mainLayout.findViewById(R.id.Article_contentTelnetView);
         reloadTelnetLayout();
-        ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
-        _list_empty_view = mainLayout.findViewById(R.id.Article_listEmptyView);
-        list_view.setEmptyView(_list_empty_view);
-        list_view.setAdapter(_list_adapter);
-        list_view.setOnItemLongClickListener(_list_long_click_listener);
+        ASListView listView = mainLayout.findViewById(R.id.Article_contentList);
+        listEmptyView = mainLayout.findViewById(R.id.Article_listEmptyView);
+        listView.setAdapter(listAdapter);
+        listView.setEmptyView(listEmptyView);
+        listView.setOnItemLongClickListener(listLongClickListener);
 
         Button back_button = mainLayout.findViewById(R.id.Article_backButton);
         back_button.setOnClickListener(replyListener);
@@ -391,8 +370,8 @@ public class ArticlePage extends TelnetPage {
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
-        if (telnetView.getFrame() == null && _article != null) {
-            telnetView.setFrame(_article.getFrame());
+        if (telnetView.getFrame() == null && telnetArticle != null) {
+            telnetView.setFrame(telnetArticle.getFrame());
         }
         refreshExternalToolbar();
         showNotification();
@@ -535,8 +514,8 @@ public class ArticlePage extends TelnetPage {
     }
 
     void onMenuClicked() {
-        if (_article != null && _article.Author != null) {
-            String author = _article.Author.toLowerCase();
+        if (telnetArticle != null && telnetArticle.Author != null) {
+            String author = telnetArticle.Author.toLowerCase();
             String logon_user = UserSettings.getPropertiesUsername().trim().toLowerCase();
             boolean is_board = _board_page.getPageType() == BahamutPage.BAHAMUT_BOARD;
             boolean ext_toolbar_enable = UserSettings.getPropertiesExternalToolbarEnable();
@@ -582,7 +561,6 @@ public class ArticlePage extends TelnetPage {
 
     /** 載入全部圖片 */
     void onLoadAllImageClicked() {
-        // TODO: not yet
         ASListView list_view = mainLayout.findViewById(R.id.Article_contentList);
         int childCount = list_view.getChildCount();
         for (int childIndex = 0; childIndex<childCount; childIndex++) {
@@ -651,8 +629,8 @@ public class ArticlePage extends TelnetPage {
 
     /** 刪除文章 */
     public void onDeleteButtonClicked() {
-        if (_article != null && _board_page != null) {
-            final int item_number = _article.Number;
+        if (telnetArticle != null && _board_page != null) {
+            final int item_number = telnetArticle.Number;
             ASAlertDialog.createDialog()
                     .setTitle(getContextString(R.string.delete))
                     .setMessage(getContextString(R.string.del_this_article))
@@ -670,13 +648,13 @@ public class ArticlePage extends TelnetPage {
 
     /** 修改文章 */
     public void onEditButtonClicked() {
-        if (_article != null) {
+        if (telnetArticle != null) {
             PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-            String edit_title = _article.generateEditTitle();
-            String edit_content = _article.generateEditContent();
-            String edit_format = _article.generateEditFormat();
+            String edit_title = telnetArticle.generateEditTitle();
+            String edit_content = telnetArticle.generateEditContent();
+            String edit_format = telnetArticle.generateEditFormat();
             page.setBoardPage(_board_page);
-            page.setArticleNumber(String.valueOf(_article.Number));
+            page.setArticleNumber(String.valueOf(telnetArticle.Number));
             page.setOperationMode(PostArticlePage.OperationMode.Edit);
             page.setPostTitle(edit_title);
             page.setPostContent(edit_content);
@@ -754,10 +732,10 @@ public class ArticlePage extends TelnetPage {
     }
 
     void onOpenLinkClicked() {
-        if (_article != null) {
+        if (telnetArticle != null) {
             // 擷取文章內的所有連結
             TextView textView = new TextView(getContext());
-            textView.setText(_article.getFullText());
+            textView.setText(telnetArticle.getFullText());
             Linkify.addLinks(textView, Linkify.WEB_URLS);
 
             final URLSpan[] urls = textView.getUrls();
@@ -791,7 +769,7 @@ public class ArticlePage extends TelnetPage {
 
     /** 加入黑名單 */
     void onAddBlockListClicked() {
-        TelnetArticle article = _article;
+        TelnetArticle article = telnetArticle;
         if (article != null) {
             Set<String> buffer = new HashSet<>();
             // 作者黑名單
@@ -844,10 +822,10 @@ public class ArticlePage extends TelnetPage {
                         UserSettings.notifyDataUpdated();
 
                         if (UserSettings.getPropertiesBlockListEnable()) {
-                            if (aBlockName.equals(_article.Author)) {
+                            if (aBlockName.equals(telnetArticle.Author)) {
                                 onBackPressed();
                             } else {
-                                _list_adapter.notifyDataSetChanged();
+                                listAdapter.notifyDataSetChanged();
                             }
                         }
                     }
@@ -861,21 +839,21 @@ public class ArticlePage extends TelnetPage {
 
     /** 給其他網頁顯示文章使用 */
     public void setArticle(TelnetArticle aArticle) {
-        _article = aArticle;
-        if (_article != null) {
+        telnetArticle = aArticle;
+        if (telnetArticle != null) {
             String board_name = _board_page.getListName();
             // 加入歷史紀錄
             BookmarkStore store = TempSettings.getBookmarkStore();
             BookmarkList bookmark_list = store.getBookmarkList(board_name);
-            bookmark_list.addHistoryBookmark(_article.Title);
+            bookmark_list.addHistoryBookmark(telnetArticle.Title);
             store.storeWithoutCloud();
-            telnetView.setFrame(_article.getFrame());
+            telnetView.setFrame(telnetArticle.getFrame());
             reloadTelnetLayout();
             ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
             if (telnet_content_view != null) {
                 telnet_content_view.scrollTo(0, 0);
             }
-            _list_adapter.notifyDataSetChanged();
+            listAdapter.notifyDataSetChanged();
         }
         ASProcessingDialog.dismissProcessingDialog();
     }
@@ -883,7 +861,7 @@ public class ArticlePage extends TelnetPage {
     /** 給 state handler 更改讀取進度 */
     @SuppressLint("SetTextI18n")
     public void changeLoadingPercentage(String percentage) {
-        _list_empty_view.setText(getContextString(R.string.loading_)+percentage);
+        ASProcessingDialog.showProcessingDialog(getContextString(R.string.loading_)+"\n"+percentage);
     }
 
     /** 查詢勇者 */

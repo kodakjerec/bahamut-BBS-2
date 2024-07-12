@@ -38,8 +38,8 @@ import com.kota.Bahamut.Command.BahamutCommandTheSameTitleDown;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleTop;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleUp;
 import com.kota.Bahamut.DataModels.Bookmark;
-import com.kota.Bahamut.Dialogs.Dialog_SearchArticle;
-import com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener;
+import com.kota.Bahamut.Dialogs.DialogSearchArticle;
+import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener;
 import com.kota.Bahamut.ListPage.ListState;
@@ -74,7 +74,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticle_Listener, Dialog_SelectArticle_Listener, PostArticlePage_Listener, BoardExtendOptionalPageListener, ASListViewExtentOptionalDelegate {
+public class BoardMainPage extends TelnetListPage implements DialogSearchArticleListener, Dialog_SelectArticle_Listener, PostArticlePage_Listener, BoardExtendOptionalPageListener, ASListViewExtentOptionalDelegate {
     DrawerLayout mainDrawerLayout;
     RelativeLayout mainLayout;
     protected String _board_title = null;
@@ -607,7 +607,7 @@ public class BoardMainPage extends TelnetListPage implements Dialog_SearchArticl
     }
 
     void showSearchArticleDialog() {
-        Dialog_SearchArticle dialog_SearchArticle = new Dialog_SearchArticle();
+        DialogSearchArticle dialog_SearchArticle = new DialogSearchArticle();
         dialog_SearchArticle.setListener(this);
         dialog_SearchArticle.show();
     }

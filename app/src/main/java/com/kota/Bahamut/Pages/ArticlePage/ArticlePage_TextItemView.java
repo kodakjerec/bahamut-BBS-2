@@ -314,7 +314,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     }
 
     public int getType() {
-        return 0;
+        return ArticlePageItemType.Content;
     }
 
     public void setDividerHidden(boolean isHidden) {

@@ -59,121 +59,133 @@ public class UrlDatabase extends SQLiteOpenHelper {
         values.put("description", description);
         values.put("imageUrl", imageUrl);
         values.put("isPic", isPic);
-        SQLiteDatabase db = getWritableDatabase();
-        db.insert("urls", null, values);
-        db.close();
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            db.insert("urls", null, values);
+            db.close();
+        } catch (Exception ignored){}
     }
 
     @SuppressLint("Range")
     public Vector<String> getUrl(String url) {
-        SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {"url", "title", "description", "imageUrl", "isPic"};
-        String selection = "url = ?";
-        String[] selectionArgs = {url};
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String[] columns = {"url", "title", "description", "imageUrl", "isPic"};
+            String selection = "url = ?";
+            String[] selectionArgs = {url};
 
-        Cursor cursor = db.query("urls", columns, selection, selectionArgs, null, null, null);
+            Cursor cursor = db.query("urls", columns, selection, selectionArgs, null, null, null);
 
-        if (cursor.moveToFirst()) {
-            Vector<String> data = new Vector<>();
-            data.add(cursor.getString(cursor.getColumnIndex("url")));
-            data.add(cursor.getString(cursor.getColumnIndex("title")));
-            data.add(cursor.getString(cursor.getColumnIndex("description")));
-            data.add(cursor.getString(cursor.getColumnIndex("imageUrl")));
-            data.add(cursor.getString(cursor.getColumnIndex("isPic")));
+            if (cursor.moveToFirst()) {
+                Vector<String> data = new Vector<>();
+                data.add(cursor.getString(cursor.getColumnIndex("url")));
+                data.add(cursor.getString(cursor.getColumnIndex("title")));
+                data.add(cursor.getString(cursor.getColumnIndex("description")));
+                data.add(cursor.getString(cursor.getColumnIndex("imageUrl")));
+                data.add(cursor.getString(cursor.getColumnIndex("isPic")));
 
-            cursor.close();
-            db.close();
+                cursor.close();
+                db.close();
 
-            return data;
-        } else {
-            cursor.close();
-            db.close();
+                return data;
+            } else {
+                cursor.close();
+                db.close();
 
-            return null;
-        }
+                return null;
+            }
+        } catch (Exception ignored){ return null; }
     }
 
     public void addShortenUrl(String url, String title, String description, String shortenUrl) {
-        SQLiteDatabase db = getWritableDatabase();
+        try {
+            SQLiteDatabase db = getWritableDatabase();
 
-        ContentValues values = new ContentValues();
-        values.put("shorten_url", shortenUrl);
-        values.put("title", title);
-        values.put("description", description);
-        values.put("url", url);
-        int deletedRows = db.delete("shorten_urls", "shorten_url=?",new String[]{shortenUrl});
-        long insertId = db.insert("shorten_urls", null, values);
-        db.close();
+            ContentValues values = new ContentValues();
+            values.put("shorten_url", shortenUrl);
+            values.put("title", title);
+            values.put("description", description);
+            values.put("url", url);
+            int deletedRows = db.delete("shorten_urls", "shorten_url=?", new String[]{shortenUrl});
+            long insertId = db.insert("shorten_urls", null, values);
+            db.close();
+        } catch (Exception ignored){}
     }
 
     @SuppressLint("Range")
     public Vector<ShortenUrl> getShortenUrls() {
-        SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {"shorten_url", "title", "description", "url"};
-        String selection = "";
-        String[] selectionArgs = {""};
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String[] columns = {"shorten_url", "title", "description", "url"};
+            String selection = "";
+            String[] selectionArgs = {""};
 
-        Cursor cursor = db.query("shorten_urls", columns, selection, null, null, null, "rowid DESC");
+            Cursor cursor = db.query("shorten_urls", columns, selection, null, null, null, "rowid DESC");
 
-        if (cursor.moveToFirst()) {
-            Vector<ShortenUrl> returnList = new Vector<>();
-            do {
-                ShortenUrl data = new ShortenUrl();
-                data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")));
-                data.setTitle(cursor.getString(cursor.getColumnIndex("title")));
-                data.setDescription(cursor.getString(cursor.getColumnIndex("description")));
-                data.setUrl(cursor.getString(cursor.getColumnIndex("url")));
-                returnList.add(data);
-            } while (cursor.moveToNext());
+            if (cursor.moveToFirst()) {
+                Vector<ShortenUrl> returnList = new Vector<>();
+                do {
+                    ShortenUrl data = new ShortenUrl();
+                    data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")));
+                    data.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+                    data.setDescription(cursor.getString(cursor.getColumnIndex("description")));
+                    data.setUrl(cursor.getString(cursor.getColumnIndex("url")));
+                    returnList.add(data);
+                } while (cursor.moveToNext());
 
-            cursor.close();
-            db.close();
+                cursor.close();
+                db.close();
 
-            return returnList;
-        } else {
-            cursor.close();
-            db.close();
+                return returnList;
+            } else {
+                cursor.close();
+                db.close();
 
-            return new Vector<>();
-        }
+                return new Vector<>();
+            }
+        } catch (Exception ignored){ return new Vector<>(); }
     }
 
     @SuppressLint("Range")
     public Vector<ShortenUrl> getShortenUrl(String url) {
-        SQLiteDatabase db = getReadableDatabase();
-        String[] columns = {"shorten_url", "title", "description", "url"};
-        String selection = "url = ?";
-        String[] selectionArgs = {url};
+        try {
+            SQLiteDatabase db = getReadableDatabase();
+            String[] columns = {"shorten_url", "title", "description", "url"};
+            String selection = "url = ?";
+            String[] selectionArgs = {url};
 
-        Cursor cursor = db.query("shorten_urls", columns, selection, selectionArgs, null, null, "rowid DESC");
+            Cursor cursor = db.query("shorten_urls", columns, selection, selectionArgs, null, null, "rowid DESC");
 
-        if (cursor.moveToFirst()) {
-            Vector<ShortenUrl> returnList = new Vector<>();
-            do {
-                ShortenUrl data = new ShortenUrl();
-                data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")));
-                data.setTitle(cursor.getString(cursor.getColumnIndex("title")));
-                data.setDescription(cursor.getString(cursor.getColumnIndex("description")));
-                data.setUrl(cursor.getString(cursor.getColumnIndex("url")));
-                returnList.add(data);
-            } while (cursor.moveToNext());
+            if (cursor.moveToFirst()) {
+                Vector<ShortenUrl> returnList = new Vector<>();
+                do {
+                    ShortenUrl data = new ShortenUrl();
+                    data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")));
+                    data.setTitle(cursor.getString(cursor.getColumnIndex("title")));
+                    data.setDescription(cursor.getString(cursor.getColumnIndex("description")));
+                    data.setUrl(cursor.getString(cursor.getColumnIndex("url")));
+                    returnList.add(data);
+                } while (cursor.moveToNext());
 
-            cursor.close();
-            db.close();
+                cursor.close();
+                db.close();
 
-            return returnList;
-        } else {
-            cursor.close();
-            db.close();
+                return returnList;
+            } else {
+                cursor.close();
+                db.close();
 
-            return new Vector<>();
-        }
+                return new Vector<>();
+            }
+        } catch (Exception ignored){ return new Vector<>(); }
     }
 
     public void clearDb() {
-        SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM urls ");
-        db.execSQL("DELETE FROM shorten_urls ");
-        onCreate(db);
+        try {
+            SQLiteDatabase db = getWritableDatabase();
+            db.execSQL("DELETE FROM urls ");
+            db.execSQL("DELETE FROM shorten_urls ");
+            onCreate(db);
+        }  catch (Exception ignored){}
     }
 }
