@@ -1,6 +1,6 @@
 ![BahaBBS Icon](app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp)
 
-中文|[English](README-en.md)
+中文|[English](README.en.md)
 
 [Google Play 商店連結](https://play.google.com/store/apps/details?id=com.kota.Bahamut)
 # Bahamut-BBS-2
