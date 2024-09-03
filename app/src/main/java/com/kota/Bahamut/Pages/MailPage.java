@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TelnetItemView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TextItemView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage_TimeTimeView;
 import com.kota.Bahamut.Pages.ArticlePage.ArticleViewMode;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
@@ -77,6 +79,9 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         _page_down_button.setOnClickListener(this);
         mainLayout.findViewById(R.id.Mail_changeModeButton).setOnClickListener(this);
         resetAdapter();
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
     }
 
     protected boolean onBackPressed() {
@@ -267,7 +272,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
     void onReplyButtonClicked() {
         SendMailPage send_mail_page = new SendMailPage();
         String reply_title = telnetArticle.generateReplyTitle();
-        String reply_content = telnetArticle.generateReplyContent(0);
+        String reply_content = telnetArticle.generateReplyContent();
         send_mail_page.setPostTitle(reply_title);
         send_mail_page.setPostContent(reply_content);
         send_mail_page.setReceiver(telnetArticle.Author);

@@ -11,7 +11,7 @@
 
     <LinearLayout
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
+        style="@style/toolbar"
         android:layout_alignParentBottom="true"
         android:clickable="true"
         android:focusable="true">
@@ -64,7 +64,7 @@
                     android:labelFor="@id/Login_UsernameLabel"
                     android:maxLength="12"
                     android:singleLine="true"
-                    android:textSize="30sp" />
+                    android:textSize="28sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -91,7 +91,7 @@
                     android:inputType="textPassword"
                     android:autofillHints="password"
                     android:singleLine="true"
-                    android:textSize="30sp"/>
+                    android:textSize="28sp"/>
             </LinearLayout>
 
             <RelativeLayout

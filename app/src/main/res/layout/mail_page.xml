@@ -44,7 +44,7 @@
     </LinearLayout>
     <LinearLayout
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
+        style="@style/toolbar"
         android:layout_alignParentBottom="true">
         <Button
             android:id="@+id/Mail_backButton"

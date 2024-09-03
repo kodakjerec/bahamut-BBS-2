@@ -3,6 +3,7 @@ package com.kota.Bahamut.Pages.EssencePage
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.UI.ASListView
@@ -16,6 +17,7 @@ import com.kota.Bahamut.Pages.BoardPage.BoardPageAction
 import com.kota.Bahamut.Pages.Model.BoardEssencePageItem
 import com.kota.Bahamut.Pages.Model.BoardEssencePageItemView
 import com.kota.Bahamut.Pages.Model.BoardPageBlock
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
 import com.kota.Telnet.Logic.ItemUtils
@@ -121,6 +123,9 @@ class BoardEssencePage : TelnetListPage() {
         mainLayout.findViewById<View>(R.id.BoardPageLatestPageButton).setOnClickListener{
             moveToLastPosition()
         }
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage

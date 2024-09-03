@@ -5,15 +5,16 @@ import com.kota.Bahamut.Pages.BillingPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
+import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
 import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
-import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.InstructionsPage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.StartPage;
+import com.kota.Bahamut.Pages.Theme.ThemeManagerPage;
 
 import java.util.Stack;
 
@@ -35,6 +36,7 @@ public class PageContainer {
     private final BoardEssencePage _board_essence_page = null;
     private final Stack<BoardEssencePage> _board_essence_page_list = new Stack<>();
     private ArticleEssencePage articleEssencePage = null;
+    private ThemeManagerPage themeManagerPage = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -72,6 +74,7 @@ public class PageContainer {
         cleanBillingPage();
         cleanInstructionPage();
         cleanPostArticlePage();
+        cleanThemeManagerPage();
     }
 
     public LoginPage getLoginPage() {
@@ -280,5 +283,17 @@ public class PageContainer {
             this._post_article_page = null;
         }
     }
+    public ThemeManagerPage getThemeManagerPage() {
+        if (this.themeManagerPage == null) {
+            this.themeManagerPage = new ThemeManagerPage();
+        }
+        return this.themeManagerPage;
+    }
 
+    public void cleanThemeManagerPage() {
+        if (this.themeManagerPage != null) {
+            this.themeManagerPage.clear();
+            this.themeManagerPage = null;
+        }
+    }
 }

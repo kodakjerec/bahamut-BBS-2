@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -26,6 +27,7 @@ import com.kota.Bahamut.ListPage.TelnetListPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageHandler;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Reference.TelnetKeyboard;
@@ -68,6 +70,9 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, DialogSe
         _page_down_button.setOnLongClickListener(this);
         findViewById(R.id.Mail_SearchButton).setOnClickListener(this);
         _header_view = (TelnetHeaderItemView) findViewById(R.id.MailBox_headerView);
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
     }
 
     public void onPageDidDisappear() {

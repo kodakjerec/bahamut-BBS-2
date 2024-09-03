@@ -374,10 +374,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 handleArticle();
                 onReadArticleFinished();
                 // 2024.4.3 部分文章瀏覽到最底部按left arrow還是停留在最底部, 會有問題, 先改用其他方式看看
-                if (getCurrentPage()==BahamutPage.BAHAMUT_ARTICLE)
-                    new BahamutCommandLoadArticleEndForSearch().execute();
-                else
+                int lastPage = getCurrentPage();
+                if (lastPage==BahamutPage.BAHAMUT_ARTICLE)
                     new BahamutCommandLoadArticleEnd().execute();
+                else
+                    new BahamutCommandLoadArticleEndForSearch().execute();
             } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 handleArticle();
                 onReadArticlePage();
@@ -549,7 +550,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     top_page.requestPageRefresh();
                 }
             }.runInMainThread();
-        } else if (!top_page.isPopupPage() && aPage != null) {
+        } else if (top_page!= null && !top_page.isPopupPage() && aPage != null) {
             if (ASNavigationController.getCurrentController().containsViewController(aPage)) {
                 ASNavigationController.getCurrentController().popToViewController(aPage);
             } else {

@@ -6,8 +6,6 @@ import android.view.View;
 import androidx.core.internal.view.SupportMenu;
 import androidx.core.view.InputDeviceCompat;
 
-import com.kota.Telnet.TelnetAnsi;
-
 public class TelnetAnsiCode {
     public static final int[] BACKGROUND_COLOR_NORMAL = {View.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
     @SuppressLint("RestrictedApi")
@@ -84,24 +82,15 @@ public class TelnetAnsiCode {
     }
 
     /**
-     * 修改文章, 返回前景字碼
+     * 修改文章, 返回前景字碼, 亮色已經先處理掉
      * @param colorIndex  index
      * @return string
      */
-    public static String getTextAsciiCode(byte colorIndex) {
-        int color_index = colorIndex & 255;
-        if (color_index == TelnetAnsi.getDefaultTextColor()) {
-            return "";
-        }
+    public static String getTextAsciiCode(int colorIndex) {
         if (colorIndex < 8) {
             return "3" + colorIndex;
         }
-        try {
-            return "1;3" + (color_index - 8);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
+        return "";
     }
 
     /**
@@ -110,10 +99,6 @@ public class TelnetAnsiCode {
      * @return string
      */
     public static String getBackAsciiCode(byte colorIndex) {
-        int color_index = colorIndex & 255;
-        if (color_index == TelnetAnsi.getDefaultBackgroundColor()) {
-            return "";
-        }
         if (colorIndex < 8) {
             return "4" + colorIndex;
         }

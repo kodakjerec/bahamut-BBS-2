@@ -26,6 +26,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleHeaderListPage;
 import com.kota.Bahamut.Pages.BlockListPage.BlockListPage;
+import com.kota.Bahamut.Pages.Theme.ThemeManagerPage;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
@@ -92,8 +93,8 @@ public class SystemSettingsPage extends TelnetPage {
     View.OnClickListener _ignore_battery_listener = view -> {
         PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
         String packageName = getContext().getPackageName();
-        Intent intent = new Intent("android.intent.action.VIEW");
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
             intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
@@ -101,13 +102,20 @@ public class SystemSettingsPage extends TelnetPage {
             intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:"+packageName));
         }
-        getContext().startActivity(intent);
+        startActivity(intent);
     };
 
     /** 開啟贊助葉面 */
-    View.OnClickListener _billing_page_listener = v -> {
+    View.OnClickListener billingPageListener = v -> {
         BillingPage page = PageContainer.getInstance().getBillingPage();
-        getNavigationController().pushViewController(page);};
+        getNavigationController().pushViewController(page);
+    };
+
+    /** 開啟外觀管理 */
+    View.OnClickListener themeManagerPageListener = v->{
+        ThemeManagerPage page = PageContainer.getInstance().getThemeManagerPage();
+        getNavigationController().pushViewController(page);
+    };
 
     /** 畫面旋轉 */
     AdapterView.OnItemSelectedListener _screen_orientation_listener = new AdapterView.OnItemSelectedListener() {
@@ -372,7 +380,10 @@ public class SystemSettingsPage extends TelnetPage {
         }
 
         // billing-page
-        mainLayout.findViewById(R.id.SystemSettings_goBillingPage).setOnClickListener(this._billing_page_listener);
+        mainLayout.findViewById(R.id.SystemSettings_goBillingPage).setOnClickListener(billingPageListener);
+
+        // theme-manager-page
+        mainLayout.findViewById(R.id.SystemSettings_goThemeManagerPage).setOnClickListener(themeManagerPageListener);
     }
 
     public String getName() {

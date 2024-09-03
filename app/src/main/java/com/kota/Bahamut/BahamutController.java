@@ -30,6 +30,7 @@ import com.kota.Bahamut.Service.BahaBBSBackgroundService;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
@@ -77,9 +78,13 @@ public class BahamutController extends ASNavigationController implements TelnetC
         initialCFActivity(ASNavigationController.getCurrentController());
         changeScreenOrientation();
 
+        // 以下需等待 共用函數 設定完畢
         // VIP
         TempSettings.setApplicationContext(getApplicationContext());
         initBillingClient();
+
+        // 外觀
+        ThemeStore.INSTANCE.upgrade(this);
     }
 
     @Override // com.kota.ASFramework.PageController.ASNavigationController

@@ -14,7 +14,7 @@
                 android:hint="@string/board_name"/>
         </LinearLayout>
         <View style="@style/BlockDividerHorizontal"/>
-        <LinearLayout style="@style/Toolbar">
+        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button android:id="@+id/Bahamut_Dialog_Search_board_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem" />
             <View style="@style/ToolbarDivider"/>
             <Button android:id="@+id/Bahamut_Dialog_Search_board_Search_Button" android:text="@string/search" style="@style/DialogToolbarItem"/>

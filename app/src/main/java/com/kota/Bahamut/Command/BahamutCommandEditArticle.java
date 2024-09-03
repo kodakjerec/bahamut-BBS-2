@@ -25,7 +25,7 @@ public class BahamutCommandEditArticle extends com.kota.Bahamut.Command.TelnetCo
         // 標題: 第80個字元如果是雙字元則截斷
         _title = judgeDoubleWord(title, DEFAULT_COLUMN-9).split("\n")[0];
         // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
-        _content = judgeDoubleWord(content, DEFAULT_COLUMN-1);
+        _content = judgeDoubleWord(content, DEFAULT_COLUMN);
         Action = PostArticle;
     }
 

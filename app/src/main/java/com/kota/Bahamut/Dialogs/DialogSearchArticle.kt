@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.RadioGroup
 import com.kota.ASFramework.Dialog.ASDialog
 import com.kota.ASFramework.UI.ASToast
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
 import java.util.Objects

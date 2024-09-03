@@ -2,6 +2,7 @@ package com.kota.Bahamut.Pages.BookmarkPage;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -30,6 +31,8 @@ import com.kota.Bahamut.ListPage.ListState;
 import com.kota.Bahamut.ListPage.ListStateStore;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
+import com.kota.Bahamut.Pages.Theme.Theme;
+import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
@@ -256,6 +259,11 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
         _selected_button = _bookmark_button;
         _tab_buttons = new Button[]{_bookmark_button, _history_button, _water_ball_button};
         scale = getResource().getDisplayMetrics().scaledDensity;
+
+        if (_mode == 0)
+            _bookmark_button.performClick();
+        else
+            _history_button.performClick();
     }
 
     private void reloadList() {
@@ -278,36 +286,36 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
 
         @Override
         public void onClick(View aView) {
-            if (aView != BookmarkManagePage.this._selected_button) {
-                RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycleView);
-                if (aView == BookmarkManagePage.this._bookmark_button) {
-                    BookmarkManagePage.this._header_view.setTitle("我的書籤");
-                    BookmarkManagePage.this._mode = 0;
-                    reloadList();
-                    bookmarkAdapter = new BookmarkAdapter(_bookmarks);
-                    recyclerView.setAdapter(bookmarkAdapter);
-                    bookmarkAdapter.setOnItemClickListener(BookmarkManagePage.this);
-                } else if (aView == BookmarkManagePage.this._water_ball_button) {
-                    BookmarkManagePage.this._header_view.setTitle("水球紀錄");
-                    BookmarkManagePage.this._mode = 2;
-                    reloadList();
-                } else if (aView == BookmarkManagePage.this._history_button) {
-                    BookmarkManagePage.this._header_view.setTitle("瀏覽紀錄");
-                    BookmarkManagePage.this._mode = 1;
-                    reloadList();
-                    historyAdapter = new HistoryAdapter(_bookmarks);
-                    recyclerView.setAdapter(historyAdapter);
-                    historyAdapter.setOnItemClickListener(BookmarkManagePage.this);
-                }
-                BookmarkManagePage.this._selected_button = (Button) aView;
-                for (Button tab_button : BookmarkManagePage.this._tab_buttons) {
-                    if (tab_button == BookmarkManagePage.this._selected_button) {
-                        tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_selected));
-                        tab_button.setBackgroundResource(R.drawable.tab_item_background_color_selected);
-                    } else {
-                        tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_unselected));
-                        tab_button.setBackgroundResource(R.drawable.tab_item_background_color_unselected);
-                    }
+            RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recycleView);
+            if (aView == BookmarkManagePage.this._bookmark_button) {
+                BookmarkManagePage.this._header_view.setTitle("我的書籤");
+                BookmarkManagePage.this._mode = 0;
+                reloadList();
+                bookmarkAdapter = new BookmarkAdapter(_bookmarks);
+                recyclerView.setAdapter(bookmarkAdapter);
+                bookmarkAdapter.setOnItemClickListener(BookmarkManagePage.this);
+            } else if (aView == BookmarkManagePage.this._water_ball_button) {
+                BookmarkManagePage.this._header_view.setTitle("水球紀錄");
+                BookmarkManagePage.this._mode = 2;
+                reloadList();
+            } else if (aView == BookmarkManagePage.this._history_button) {
+                BookmarkManagePage.this._header_view.setTitle("瀏覽紀錄");
+                BookmarkManagePage.this._mode = 1;
+                reloadList();
+                historyAdapter = new HistoryAdapter(_bookmarks);
+                recyclerView.setAdapter(historyAdapter);
+                historyAdapter.setOnItemClickListener(BookmarkManagePage.this);
+            }
+
+            // 切換頁籤
+            Theme theme = ThemeStore.INSTANCE.getSelectTheme();
+            for (Button tab_button : BookmarkManagePage.this._tab_buttons) {
+                if (tab_button == aView) {
+                    tab_button.setTextColor(rgbToInt(theme.getTextColor()));
+                    tab_button.setBackgroundColor(rgbToInt(theme.getBackgroundColor()));
+                } else {
+                    tab_button.setTextColor(rgbToInt(theme.getTextColorDisabled()));
+                    tab_button.setBackgroundColor(rgbToInt(theme.getBackgroundColorDisabled()));
                 }
             }
         }

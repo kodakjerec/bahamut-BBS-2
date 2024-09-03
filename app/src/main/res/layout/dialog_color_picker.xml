@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    android:orientation="vertical"
+    android:background="@color/dialog_border_color">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/black"
+        android:layout_margin="3dp">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            android:id="@+id/dialog_title"
+            android:textColor="@color/white"
+            android:background="#202020"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="@string/theme_manager_palette"
+            style="@style/TextViewLarge"
+            android:layout_alignParentTop="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:layout_below="@id/dialog_title"
+            android:layout_margin="20dp">
+            <com.skydoves.colorpickerview.ColorPickerView
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                app:selector="@drawable/colorpickerview_wheel"
+                app:preferenceName="MyColorPicker"
+                android:id="@+id/dialog_color_picker_view"
+                android:layout_gravity="center" />
+            <com.skydoves.colorpickerview.sliders.AlphaSlideBar
+                android:id="@+id/dialog_color_picker_alpha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:borderColor_AlphaSlideBar="@android:color/darker_gray"
+                app:selector_AlphaSlideBar="@drawable/colorpickerview_wheel"
+                app:borderSize_AlphaSlideBar="3"
+                android:layout_marginTop="10dp" />
+            <com.kota.Bahamut.Pages.Model.PostEditText
+                android:id="@+id/dialog_color_picker_sample"
+                style="@style/EditTextSingleLine"
+                android:autofillHints="username"
+                android:hint=""
+                android:inputType="text"
+                android:maxLength="9"
+                android:singleLine="true"
+                android:textSize="28sp" />
+        </LinearLayout>
+        <LinearLayout style="@style/toolbar" android:id="@+id/dialog_toolbar" android:layout_alignParentBottom="true" >
+            <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+        </LinearLayout>
+</RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/dialog_border_color"
+    android:orientation="vertical"
+    android:padding="3dp"
+    android:id="@+id/dialog_search_article_layout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:padding="1dp">
+
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/TextViewLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#202020"
+            android:padding="6dp"
+            android:text="@string/dialog_reference_title"
+            android:textColor="@color/white" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@color/item_background_color">
+                <LinearLayout
+                    android:id="@+id/SearchArticleDialog_markBlock"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:minHeight="60dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:layout_margin="3dp"
+                        android:background="@color/list_page_item_arrow_background">
+
+                        <CheckBox
+                            android:id="@+id/Dialog_reference_author1"
+                            style="@style/ListDialogItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dialog_reference_author1"
+                            android:textSize="24sp" />
+
+                        <LinearLayout
+                            android:id="@+id/Dialog_reference_author1_subLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:id="@+id/Dialog_reference_author1_removeBlank"
+                                style="@style/ListDialogItem">
+
+                                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                    style="@style/SystemSettingsCheckboxText"
+                                    android:text="@string/dialog_reference_remove_blank" />
+
+                                <CheckBox
+                                    android:id="@+id/Dialog_reference_author1_removeBlank_checkbox"
+                                    style="@style/SystemSettingsCheckbox" />
+                            </RelativeLayout>
+
+                            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                style="@style/TextViewNormal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/dialog_reference_reserved_type"/>
+
+                            <RadioGroup
+                                android:id="@+id/Dialog_reference_author1_reservedType"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_0"
+                                    android:textSize="12sp" />
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_1"
+                                    android:textSize="12sp" />
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_2"
+                                    android:textSize="12sp" />
+                            </RadioGroup>
+                        </LinearLayout>
+                    </LinearLayout>
+                    <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:layout_margin="3dp"
+                    android:background="@color/list_page_item_arrow_background">
+
+                        <CheckBox
+                            android:id="@+id/Dialog_reference_author0"
+                            style="@style/ListDialogItem"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/dialog_reference_author0"
+                            android:textSize="24sp"/>
+                        <LinearLayout
+                            android:id="@+id/Dialog_reference_author0_subLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <RelativeLayout
+                                android:id="@+id/Dialog_reference_author0_removeBlank"
+                                style="@style/ListDialogItem">
+                                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                    android:text="@string/dialog_reference_remove_blank"
+                                    style="@style/SystemSettingsCheckboxText"/>
+                                <CheckBox
+                                    android:id="@+id/Dialog_reference_author0_removeBlank_checkbox"
+                                    style="@style/SystemSettingsCheckbox"/>
+                            </RelativeLayout>
+
+                            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                style="@style/TextViewNormal"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/white"
+                                android:text="@string/dialog_reference_reserved_type" />
+
+                            <RadioGroup
+                                android:id="@+id/Dialog_reference_author0_reservedType"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal">
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_0"
+                                    android:textSize="12sp" />
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_1"
+                                    android:textSize="12sp" />
+
+                                <RadioButton
+                                    style="@style/ListDialogItem"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="50dp"
+                                    android:ellipsize="none"
+                                    android:text="@string/dialog_reference_reserved_type_2"
+                                    android:textSize="12sp" />
+                            </RadioGroup>
+                        </LinearLayout>
+                    </LinearLayout>
+                    <CheckBox
+                        android:id="@+id/Dialog_reference_authorNone"
+                        style="@style/ListDialogItem"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/dialog_reference_authorNone"
+                        android:textSize="24sp"
+                        android:layout_margin="3dp"
+                        android:background="@color/list_page_item_arrow_background" />
+                </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
+
+            <Button
+                android:id="@+id/Dialog_reference_Cancel_Button"
+                style="@style/DialogToolbarItem"
+                android:text="@string/cancel" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Dialog_reference_Send_Button"
+                style="@style/DialogToolbarItem"
+                android:text="@string/send" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

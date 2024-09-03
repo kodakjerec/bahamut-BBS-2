@@ -8,6 +8,7 @@ import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
@@ -65,6 +66,9 @@ public class ToolBarFloating extends LinearLayout {
             _myView.setAlpha(_alpha);
         else
             startInvisible();
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.ToolbarFloating));
     }
 
     // 移動toolbar

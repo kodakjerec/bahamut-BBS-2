@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
@@ -12,6 +13,7 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.UrlDatabase;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
@@ -83,13 +85,12 @@ public class LoginPage extends TelnetPage {
 
         // 讀取預設勇者設定
         loadLogonUser();
-        // 讀取雲端
-        if (NotificationSettings.getCloudSave()) {
-            CloudBackup cloudBackup = new CloudBackup();
-            cloudBackup.restore();
-        }
 
         System.out.println("current  version:" + Build.VERSION.SDK_INT);
+
+        // 替換外觀
+        LinearLayout mainLayout = (LinearLayout) findViewById(R.id.toolbar);
+        new ThemeFunctions().layoutReplaceTheme(mainLayout);
     }
 
     @Override
@@ -280,6 +281,12 @@ public class LoginPage extends TelnetPage {
         // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();
+
+        // 讀取雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.restore();
+        }
     }
 
     public void onSaveArticle() {

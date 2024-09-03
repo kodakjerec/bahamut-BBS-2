@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.ASFramework.Dialog.ASAlertDialog
 import com.kota.ASFramework.Dialog.ASDialog
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import java.util.Vector
 

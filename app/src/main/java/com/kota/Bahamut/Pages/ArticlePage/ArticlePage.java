@@ -36,6 +36,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.PostArticlePage;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
@@ -268,28 +269,6 @@ public class ArticlePage extends TelnetPage {
         }
     };
 
-    /** 回覆文章 */
-    View.OnClickListener replyListener = v -> {
-        if (TelnetClient.getConnector().isConnecting()) {
-            if (telnetArticle != null) {
-                PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
-                String reply_title = telnetArticle.generateReplyTitle();
-                String reply_content = telnetArticle.generateReplyContent(0);
-                page.setBoardPage(_board_page);
-                page.setOperationMode(PostArticlePage.OperationMode.Reply);
-                page.setArticleNumber(String.valueOf(telnetArticle.Number));
-                page.setPostTitle(reply_title);
-                page.setPostContent(reply_content + "\n\n\n");
-                page.setListener(_board_page);
-                page.setHeaderHidden(true);
-                getNavigationController().pushViewController(page);
-                return;
-            }
-            return;
-        }
-        showConnectionClosedToast();
-    };
-
     /** 選單 */
     final View.OnClickListener mMenuListener = v -> onMenuClicked();
 
@@ -369,6 +348,10 @@ public class ArticlePage extends TelnetPage {
 
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.ext_toolbar));
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
 
         if (telnetView.getFrame() == null && telnetArticle != null) {
             telnetView.setFrame(telnetArticle.getFrame());
@@ -646,6 +629,29 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
+    /** 回覆文章 */
+    View.OnClickListener replyListener = v -> {
+        if (TelnetClient.getConnector().isConnecting()) {
+            if (telnetArticle != null) {
+                PostArticlePage page = PageContainer.getInstance().getPostArticlePage();
+                String reply_title = telnetArticle.generateReplyTitle();
+                String reply_content = telnetArticle.generateReplyContent();
+                page.setBoardPage(_board_page);
+                page.setOperationMode(PostArticlePage.OperationMode.Reply);
+                page.setArticleNumber(String.valueOf(telnetArticle.Number));
+                page.setPostTitle(reply_title);
+                page.setPostContent(reply_content + "\n\n\n");
+                page.setListener(_board_page);
+                page.setHeaderHidden(true);
+                page.setTelnetArticle(telnetArticle);
+                getNavigationController().pushViewController(page);
+                return;
+            }
+            return;
+        }
+        showConnectionClosedToast();
+    };
+
     /** 修改文章 */
     public void onEditButtonClicked() {
         if (telnetArticle != null) {
@@ -661,6 +667,7 @@ public class ArticlePage extends TelnetPage {
             page.setEditFormat(edit_format);
             page.setListener(_board_page);
             page.setHeaderHidden(true);
+            page.setTelnetArticle(telnetArticle);
             getNavigationController().pushViewController(page);
         }
     }
@@ -758,8 +765,9 @@ public class ArticlePage extends TelnetPage {
                     String url2 = urls[index].getURL();
                     Context context2 = getContext();
                     if (context2 != null) {
-                        Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(url2));
-                        context2.startActivity(intent);
+                        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url2));
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
                     }
                 }
             });

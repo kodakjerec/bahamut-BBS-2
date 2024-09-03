@@ -4,6 +4,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.app.Activity;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.billingclient.api.BillingClient;
@@ -14,6 +15,7 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.MyBillingClient;
 import com.kota.TelnetUI.TelnetPage;
@@ -61,6 +63,9 @@ public class BillingPage extends TelnetPage {
             ASToast.showShortToast(getContextString(R.string.billing_page_result_success));
         });
         button1.performClick();
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
     }
 
     // 取得商品清單

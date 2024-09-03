@@ -26,6 +26,8 @@ import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.ArticleTemp;
 import com.kota.Bahamut.DataModels.ArticleTempStore;
+import com.kota.Bahamut.DataModels.ReferenceAuthor;
+import com.kota.Bahamut.Dialogs.DialogReference;
 import com.kota.Bahamut.Dialogs.DialogShortenImage;
 import com.kota.Bahamut.Dialogs.DialogShortenUrl;
 import com.kota.Bahamut.Dialogs.Dialog_InsertExpression;
@@ -36,17 +38,23 @@ import com.kota.Bahamut.Dialogs.Dialog_PostArticle;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.CommonFunctions;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
+import com.kota.Telnet.TelnetArticle;
+import com.kota.Telnet.TelnetArticleItemInfo;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetPage;
 
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 import okhttp3.OkHttpClient;
@@ -75,6 +83,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     private TextView _title_field_background = null;
     String[] _headers;
     public boolean recover = false;
+    private TelnetArticle telnetArticle;
 
     private boolean isToolbarShow = false; // 是否展開工具列
 
@@ -197,6 +206,10 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         _title_block.requestFocus();
 
         mainLayout.findViewById(R.id.Post_Toolbar_Show).setOnClickListener(postToolbarShowOnClickListener);
+        mainLayout.findViewById(R.id.ArticlePostDialog_Reference).setOnClickListener(referenceClickListener);
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
     }
 
     public void clear() {
@@ -609,7 +622,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     /** 按下 展開/摺疊 */
     View.OnClickListener postToolbarShowOnClickListener = view -> {
         TextView thisBtn = (TextView) view;
-        LinearLayout toolBar = mainLayout.findViewById(R.id.Post_Toolbar);
+        LinearLayout toolBar = mainLayout.findViewById(R.id.toolbar);
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) toolBar.getLayoutParams();
         if (isToolbarShow) {
             // 從展開->摺疊
@@ -655,5 +668,162 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 Log.e("ShortenImage", e.toString());
             }
         });
+    }
+
+    /** 設定TelnetArticle, 格式按鈕會使用 */
+    public void setTelnetArticle(TelnetArticle article) {
+        telnetArticle = article;
+    }
+    /** 按下格式 */
+    View.OnClickListener referenceClickListener = view -> {
+        List<ReferenceAuthor> authors = new ArrayList<>();
+        if (telnetArticle == null) {
+            ASAlertDialog.showErrorDialog(getContextString(R.string.dialog_reference_error_1), this);
+            return;
+        }
+
+        if (_edit_format == null) {
+            // 回覆
+            // 回應作者
+            ReferenceAuthor replyAuthor = new ReferenceAuthor();
+            replyAuthor.setEnabled(true);
+            replyAuthor.setAuthorName(telnetArticle.Author);
+            authors.add(replyAuthor);
+
+            // 更上一層
+            ReferenceAuthor newAuthor = new ReferenceAuthor();
+            if (telnetArticle.getInfoSize()>0) {
+                TelnetArticleItemInfo item = telnetArticle.getInfo(0);
+                newAuthor.setEnabled(true);
+                newAuthor.setAuthorName(item.author);
+            }
+            authors.add(newAuthor);
+        } else {
+            // 修改
+            if (telnetArticle.getInfoSize()>0) {
+                for (int i = 0; i < telnetArticle.getInfoSize(); i++) {
+                    ReferenceAuthor newAuthor = new ReferenceAuthor();
+                    TelnetArticleItemInfo item = telnetArticle.getInfo(i);
+                    newAuthor.setEnabled(true);
+                    newAuthor.setAuthorName(item.author);
+                    authors.add(newAuthor);
+                }
+            }
+        }
+
+        DialogReference dialog = new DialogReference();
+        dialog.setAuthors(authors);
+        dialog.setListener(this::referenceBack);
+        dialog.show();
+    };
+
+    public void referenceBack(List<ReferenceAuthor> authors) {
+        // 找出父層內容
+        List<String> originParentContent = Arrays.asList(telnetArticle.generateReplyContent().split("\n"));
+        List<String> parentContent = new ArrayList<>();
+
+
+        // 開始篩選
+        ReferenceAuthor author0 = authors.get(0);
+        ReferenceAuthor author1 = authors.get(1);
+        int author0InsertRows = 0;
+        int author1InsertRows = 0;
+
+        // 如果有選到後三行, 計算兩個作者總行數
+        int author0TotalRows = 0;
+        int author1TotalRows = 0;
+        if (author0.getReservedType()==2 || author1.getReservedType()==2) {
+            for (int i = 0; i < originParentContent.size(); i++) {
+                String rowString = originParentContent.get(i);
+                if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+                    author1TotalRows++;
+                } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                    author0TotalRows++;
+                }
+            }
+        }
+
+        boolean needInsert;
+        for(int i=0;i<originParentContent.size();i++) {
+            String rowString = originParentContent.get(i);
+            needInsert = false;
+            if (rowString.startsWith("> ※ ")) {
+                // 前二
+                if (author1.getEnabled())
+                    needInsert = true;
+            }
+            else if (rowString.startsWith("> > ")) {
+                // 前二
+                if (author1.getEnabled()) {
+                    switch (author1.getReservedType()) {
+                        case 0 -> // 全部
+                                needInsert = true;
+                        case 1 -> { // 前三
+                            if (author1InsertRows < 3) {
+                                author1InsertRows++;
+                                needInsert = true;
+                            }
+                        }
+                        case 2 -> {  // 後三
+                            author1InsertRows++;
+                            if (author1InsertRows+3>=author1TotalRows)
+                                needInsert = true;
+                        }
+                    }
+
+                    if (needInsert && rowString.replaceAll("> > ", "").isEmpty()) {
+                        if (author1.getRemoveBlank()) {
+                            needInsert = false;
+                        }
+                    }
+                }
+            } else if (rowString.startsWith("※ ")) {
+                // 前一
+                if (author0.getEnabled())
+                    needInsert = true;
+            } else if (rowString.startsWith("> ")) {
+                // 前一
+                if (author0.getEnabled()) {
+                    switch (author0.getReservedType()) {
+                        case 0 -> // 保留
+                                needInsert = true;
+                        case 1 -> { // 前三
+                            if (author0InsertRows < 3) {
+                                author0InsertRows++;
+                                needInsert = true;
+                            }
+                        }
+                        case 2 -> { // 後三
+                            author0InsertRows++;
+                            if (author0InsertRows+3>=author0TotalRows)
+                                needInsert = true;
+                        }
+                    }
+                    if (needInsert && rowString.replaceAll("> ", "").isEmpty()) {
+                        if (author0.getRemoveBlank()) {
+                            needInsert = false;
+                        }
+                    }
+                }
+            }
+            if (needInsert) {
+                parentContent.add(originParentContent.get(i));
+            }
+        }
+        String joinedParentContent = String.join("\n", parentContent);
+
+        // 找出自己打的內容
+        List<String> originFromContent = Arrays.asList(_content_field.getText().toString().split("\n"));
+        List<String> selfContent = new ArrayList<>();
+        for(int i=0;i<originFromContent.size();i++) {
+            if (!originFromContent.get(i).startsWith("※ 引述") && !originFromContent.get(i).startsWith("> ")) {
+                selfContent.add(originFromContent.get(i));
+            }
+        }
+        // final Result
+        String joinedSelfContent = String.join("\n", selfContent);
+
+        String _rev2 = String.join("", joinedParentContent, "\n", joinedSelfContent);
+        _content_field.setText(_rev2);
     }
 }

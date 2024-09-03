@@ -92,7 +92,7 @@
 
                 <View style="@style/BlockDividerHorizontal" />
 
-                <LinearLayout style="@style/Toolbar">
+                <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
 
                     <Button
                         android:id="@+id/cancel"

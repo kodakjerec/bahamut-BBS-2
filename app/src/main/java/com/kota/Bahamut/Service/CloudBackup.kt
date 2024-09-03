@@ -38,11 +38,12 @@ class CloudBackup {
                                 .addButton(CommonFunctions.getContextString(R.string.on))
                                 .setDefaultButtonIndex(0)
                                 .setListener { _, index ->
-                                    // 決定同步, 檢查雲端存檔是否存在
                                     if (index == 1) {
+                                        // 決定同步, 檢查雲端存檔是否存在
                                         NotificationSettings.setCloudSave(true)
                                         checkCloud()
-                                    } else { // 取消同步, 以本地端為主
+                                    } else {
+                                        // 取消同步, 以本地端為主
                                         NotificationSettings.setCloudSave(false)
                                         final()
                                     }
@@ -114,14 +115,14 @@ class CloudBackup {
                 .addButton(CommonFunctions.getContextString(R.string.cloud_save_cloud))
                 .setDefaultButtonIndex(0)
                 .setListener { _: ASAlertDialog?, index: Int ->
-                    if (index == 1) {
-                        // 選擇雲端=>覆蓋本地
-                        restore()
-                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result2))
-                    } else {
+                    if (index == 0) {
                         // 選擇本地=>覆蓋雲端
                         backup()
                         ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result1))
+                    } else {
+                        // 選擇雲端=>覆蓋本地
+                        restore()
+                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result2))
                     }
                 }.show()
             }
@@ -131,6 +132,9 @@ class CloudBackup {
     // 備份所有設定
     fun backup() {
         try {
+            val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+            if (userId.isEmpty())
+                return
             val jsonObject = JSONObject()
             val gson = GsonBuilder()
                 .registerTypeAdapter(
@@ -147,7 +151,6 @@ class CloudBackup {
             // get user_settings
             jsonObject.put("user_settings", UserSettings._sharedPref.all)
             // encrypt
-            val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
             val apiUrl = "https://cloud-backup.kodakjerec.workers.dev/"
@@ -195,6 +198,8 @@ class CloudBackup {
         try {
             // encrypt
             val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+            if (userId.isEmpty())
+                return
             val apiUrl = "https://cloud-restore.kodakjerec.workers.dev/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -234,6 +239,7 @@ class CloudBackup {
                                 )
                                 val userSettings = fromJsonObject["user_settings"] as Map<*, *>
                                 // set user_settings
+                                // 不要還原的key: 使用者帳密, 在登入前的設定
                                 val notRestoreKeys: List<String> =
                                     listOf("Username", "Password", "SaveLogonUser")
                                 userSettings.forEach { (keyObject, value) ->
@@ -255,7 +261,7 @@ class CloudBackup {
                                         }
                                     }
                                 }
-                                UserSettings._editor.commit()
+                                UserSettings._editor.apply()
 
                                 // set bookmark
                                 val bookmark = JSONObject((fromJsonObject["bookmark"] as String))

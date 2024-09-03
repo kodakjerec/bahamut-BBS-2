@@ -12,7 +12,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="1dp"
-        style="@style/Toolbar">
+        style="@style/toolbar">
         <Button android:id="@+id/ToolbarFloating_setting" android:text="@string/number_1" style="@style/ToolbarItem"/>
         <View style="@style/HorizontalDivider"/>
         <Button android:id="@+id/ToolbarFloating_1" android:text="@string/number_2" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>

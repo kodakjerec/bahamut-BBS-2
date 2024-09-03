@@ -39,8 +39,8 @@
                     <View style="@style/DialogSelectArticleHorizontalDivider"/>
                 </LinearLayout>
                 <LinearLayout
-                    android:id="@+id/dialog_select_toolbar"
-                    style="@style/Toolbar">
+                    android:id="@+id/toolbar"
+                    style="@style/toolbar">
                     <Button android:id="@+id/Bahamut_Dialog_Select_Button_Cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
                     <View style="@style/ToolbarDivider"/>
                     <Button android:id="@+id/Bahamut_Dialog_Select_Button_Search" android:text="@string/search" style="@style/DialogToolbarItem"/>

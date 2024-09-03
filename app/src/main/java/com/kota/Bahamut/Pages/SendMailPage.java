@@ -4,6 +4,7 @@ import android.text.Selection;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
@@ -17,6 +18,7 @@ import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol_Listener;
 import com.kota.Bahamut.Dialogs.Dialog_PaintColor;
 import com.kota.Bahamut.Dialogs.Dialog_PaintColor_Listener;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.TelnetUI.TelnetPage;
@@ -141,6 +143,9 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         findViewById(R.id.SendMailDialog_change).setOnClickListener(this);
         _title_block = findViewById(R.id.SendMail_TitleBlock);
         refresh();
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
     }
 
     public void clear() {

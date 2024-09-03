@@ -7,6 +7,17 @@
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:id="@+id/content_view">
+
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
+            android:text="@string/theme"/>
+        <LinearLayout android:id="@+id/SystemSettings_goThemeManagerPage"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/theme_manager_page" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_blocklist"/>

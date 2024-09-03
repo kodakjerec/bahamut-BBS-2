@@ -11,11 +11,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
         <LinearLayout android:id="@+id/ext_toolbar" style="@style/ExtToolbar">
-            <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ExtToolbarItem"/>
+            <Button android:id="@+id/do_gy" android:text="@string/do_gy" style="@style/ToolbarItem.Ext"/>
             <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/change_mode" android:text="@string/change_mode" style="@style/ExtToolbarItem"/>
+            <Button android:id="@+id/change_mode" android:text="@string/change_mode" style="@style/ToolbarItem.Ext"/>
             <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/show_link" android:text="@string/open_url" style="@style/ExtToolbarItem"/>
+            <Button android:id="@+id/show_link" android:text="@string/open_url" style="@style/ToolbarItem.Ext"/>
         </LinearLayout>
         <FrameLayout
             android:layout_width="match_parent"
@@ -43,13 +43,13 @@
         </FrameLayout>
         <LinearLayout
             android:id="@+id/toolbar_block"
-            style="@style/Toolbar">
+            style="@style/toolbar">
         </LinearLayout>
     </LinearLayout>
     <!-- toolbar 0 1 2 -->
     <LinearLayout
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
+        style="@style/toolbar"
         android:layout_alignParentBottom="true"
         >
         <Button

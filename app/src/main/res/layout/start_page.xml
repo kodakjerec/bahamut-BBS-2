@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/item_background_color"
+        android:background="@color/black"
         android:layout_alignParentTop="true">
 
         <LinearLayout
@@ -41,11 +45,11 @@
 
             <com.kota.TelnetUI.TextView.TelnetTextViewNormal
                 style="@style/TextViewLarge"
+                android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
-                android:text="@string/start_msg_2"
-                android:textColor="@android:color/white" />
+                android:text="@string/start_msg_2" />
 
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
@@ -55,9 +59,42 @@
                 android:autoLink="web"
                 android:gravity="center_horizontal"
                 android:text="@string/StartPage_open_account" />
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                style="@style/TextViewSmall"
+                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:gravity="center_horizontal"
+                android:text="@string/start_connect_ip" />
+
+            <RadioGroup
+                android:id="@+id/radioButtonIP"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/radioButtonIP1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/SystemSettingsCheckbox"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp"
+                    android:text="@string/start_connect_ip1" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonIP2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="@style/SystemSettingsCheckbox"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp"
+                    android:text="@string/start_connect_ip2" />
+            </RadioGroup>
         </LinearLayout>
     </ScrollView>
-    <LinearLayout android:id="@+id/Start_Toolbar" style="@style/Toolbar" android:layout_alignParentBottom="true">
+    <LinearLayout android:id="@+id/toolbar" style="@style/toolbar" android:layout_alignParentBottom="true">
         <Button android:id="@+id/Start_exitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/Start_instructions" android:text="@string/start_page_instructions" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>

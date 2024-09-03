@@ -3,6 +3,8 @@ package com.kota.Bahamut.Dialogs
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
+import android.text.Editable
+import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.Log
 import android.view.OrientationEventListener
@@ -22,6 +24,7 @@ import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.DataModels.ShortenUrl
 import com.kota.Bahamut.DataModels.UrlDatabase
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.UserSettings
@@ -30,6 +33,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
+import java.net.URL
 import java.util.Objects
 import java.util.Vector
 
@@ -144,8 +148,11 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
             val clipData = clipboardManager.primaryClip
             if (clipData != null && clipData.itemCount>0) {
-                fromClipData = clipData.getItemAt(0).text
-                urlRemoveId()
+                val clipDataIndex0 = clipData.getItemAt(0)
+                if (clipDataIndex0 != null && clipDataIndex0.text!=null) {
+                    fromClipData = clipDataIndex0.text
+                    urlRemoveId()
+                }
             }
     }
 
@@ -165,7 +172,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     /** 清除內容 */
     private val resetListener = OnClickListener {_ ->
         editText.setText("")
-        sampleTextView.text = getContextString(R.string.dialog_paint_color_sample)
+        sampleTextView.text = getContextString(R.string.dialog_paint_color_sample_ch)
         outputParam = ""
     }
 
@@ -236,6 +243,9 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             }
         }
         setDialogWidth()
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
     }
 
     override fun onClick(view: View) {
@@ -279,9 +289,45 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     /** 去識別化 */
     private fun urlRemoveId() {
         val filterString = if (UserSettings.getShortUrlNonId()) {
-            fromClipData.split("?")[0]
+            var returnString = fromClipData
+            val textView = TextView(context)
+            textView.text = fromClipData
+            Linkify.addLinks(textView, Linkify.WEB_URLS)
+
+            val urls: Array<URLSpan> = textView.urls
+            if (urls.isNotEmpty()) {
+                val firstUrl = urls[0].url
+                val splits = firstUrl.split("?")
+                if (splits.isNotEmpty()) {
+                    returnString = splits[0]
+
+                    // www.youtube.com 例外處理
+                    // 只保留 v=1234
+                    if (splits[0].indexOf("www.youtube.com")>0) {
+                        returnString+="?"
+                        val reserveKeys = arrayOf("v")
+                        val params = splits[1].split("&")
+                        if (params.isNotEmpty()) {
+                            var isFirstParam = true
+                            for (param in params) {
+                                val paramPair = param.split("=")
+                                if (reserveKeys.contains(paramPair[0])) {
+                                    returnString+= param + if (isFirstParam) "" else "&"
+                                    isFirstParam = false
+                                }
+                            }
+                        } else {
+                            returnString += splits[1]
+                        }
+                    }
+                } else {
+                    returnString = splits[0]
+                }
+            }
+
+            returnString
         } else {
-            fromClipData.toString()
+            fromClipData
         }
 
         editText.setText(filterString)

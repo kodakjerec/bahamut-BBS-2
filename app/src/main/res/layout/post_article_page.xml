@@ -60,7 +60,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/Post_Toolbar"
+        android:layout_above="@+id/toolbar"
         android:layout_below="@+id/Post_MiddleDivider"
         android:orientation="horizontal">
 
@@ -94,14 +94,14 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/Post_Toolbar"
-        style="@style/Toolbar"
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:orientation="vertical">
 
         <GridLayout
-            style="@style/Toolbar"
+            style="@style/toolbar"
             android:columnCount="5"
             android:rowCount="2">
 
@@ -111,9 +111,9 @@
                 android:text="@string/post_toolbar_show" />
 
             <TextView
-                android:id="@+id/ArticlePostDialog_Color"
+                android:id="@+id/ArticlePostDialog_Reference"
                 style="@style/ToolbarItem.Grid"
-                android:text="@string/post_article_page_paint_color" />
+                android:text="@string/post_article_page_format" />
 
             <TextView
                 android:id="@+id/ArticlePostDialog_Cancel"
@@ -129,6 +129,11 @@
                 android:id="@+id/ArticlePostDialog_Post"
                 style="@style/ToolbarItem.Grid"
                 android:text="@string/post" />
+
+            <TextView
+                android:id="@+id/ArticlePostDialog_Color"
+                style="@style/ToolbarItem.Grid"
+                android:text="@string/post_article_page_paint_color" />
 
             <TextView
                 android:id="@+id/ArticlePostDialog_File"

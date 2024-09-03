@@ -35,6 +35,7 @@ import com.bumptech.glide.Glide
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.TempSettings
@@ -101,6 +102,9 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         // 預設高度
         changeDialogHeight(resources.configuration)
         setDialogWidth()
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
     }
 
     /** 選擇相簿 */
@@ -252,7 +256,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         videoView.suspend()
         videoView.setVideoURI(null)
         videoView.visibility = GONE
-        sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample)
+        sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample_ch)
         outputParam = ""
         selectedImageUri = null
         selectedVideoUri = null

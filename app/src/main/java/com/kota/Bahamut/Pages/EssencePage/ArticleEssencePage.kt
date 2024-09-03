@@ -35,6 +35,7 @@ import com.kota.Bahamut.Pages.ArticlePage.ArticleViewMode
 import com.kota.Bahamut.Pages.ArticlePage.Thumbnail_ItemView
 import com.kota.Bahamut.Pages.SendMailPage
 import com.kota.Bahamut.Pages.SendMailPage_Listener
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
 import com.kota.Bahamut.Service.UserSettings
@@ -218,6 +219,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         pageUpButton!!.setOnClickListener(this)
         pageDownButton!!.setOnClickListener(this)
         resetAdapter()
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
     }
 
     override fun onBackPressed(): Boolean {
@@ -443,7 +447,8 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     val url2 = urls[index].url
                     val context2 = context
                     if (context2 != null) {
-                        val intent = Intent("android.intent.action.VIEW", Uri.parse(url2))
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url2))
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         context2.startActivity(intent)
                     }
                 }

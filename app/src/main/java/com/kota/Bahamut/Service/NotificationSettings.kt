@@ -12,8 +12,10 @@ object NotificationSettings {
         private const val propertiesShowExpression:String = "show_expression" // 第一次進入表情符號頁面的提示訊息
         private const val propertiesShowCloudSave: String = "show_cloud_save" // 第一次詢問雲端備份, false-未使用 true-已問過
         private const val propertiesCloudSave: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
+        private const val connectIpAddress = "connectIpAddress" // 連線IP
 
-        @JvmStatic
+
+    @JvmStatic
         fun upgrade(activity: Activity) {
             perf = activity.getSharedPreferences(perfName, 0)
         }
@@ -76,5 +78,15 @@ object NotificationSettings {
         @JvmStatic
         fun getCloudSave(): Boolean {
             return perf!!.getBoolean(propertiesCloudSave, false)
+        }
+
+        @JvmStatic
+        fun setConnectIpAddress(ipLocation: String?) {
+            UserSettings._editor.putString(connectIpAddress, ipLocation).apply()
+        }
+
+        @JvmStatic
+        fun getConnectIpAddress(): String? {
+            return UserSettings._sharedPref.getString(connectIpAddress, "bbs.gamer.com.tw")
         }
 }

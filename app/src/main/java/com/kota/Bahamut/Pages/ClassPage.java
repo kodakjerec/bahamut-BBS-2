@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -25,6 +26,7 @@ import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageHandler;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.ItemUtils;
@@ -63,6 +65,9 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         mainLayout.findViewById(R.id.ClassPage_FirstPageButton).setOnClickListener(this);
         mainLayout.findViewById(R.id.ClassPage_LastestPageButton).setOnClickListener(this);
 
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             // 進入洽特
@@ -74,7 +79,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                 TelnetClient.getClient().sendStringToServerInBackground("sChat");
                 }
             };
-            timer.schedule(task1, 0);
+            timer.schedule(task1, 300);
         }
     }
 

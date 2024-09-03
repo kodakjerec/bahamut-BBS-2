@@ -144,62 +144,107 @@ public class TelnetArticle {
         byte paintTextColor = TelnetAnsi.getDefaultTextColor();
         byte paintBackColor = TelnetAnsi.getDefaultBackgroundColor();
 
-        for (int rowIndex = 5; rowIndex < _frame.getRowSize(); rowIndex++) {
+        int startContentRowIndex = 0;
+        // 先找出指定行"時間", 下一行是分隔線, 再下一行是內容
+        // 內容如果是空白"", 是發文時系統預設給的, 再往下找一行
+        for(int i=0; i< _frame.getRowSize();i++) {
+            TelnetRow _row = _frame.getRow(i);
+            if (_row.getRawString().contains("時間")) {
+                startContentRowIndex = i + 2;
+                if (_frame.getRow(startContentRowIndex).getRawString().isEmpty())
+                    startContentRowIndex += 1;
+                break;
+            }
+        }
+
+        for (int rowIndex = startContentRowIndex; rowIndex < _frame.getRowSize(); rowIndex++) {
             TelnetRow _row = _frame.getRow(rowIndex);
-            String contentString = _row.getRawString();
-            if (contentString != null) {
+            String rawString = _row.getRawString();
+            if (rawString != null) {
                 // 不用換顏色的內容
-                if (contentString.matches("※ .*") || contentString.matches("> .*")|| contentString.matches("--.*")) {
-                    content_buffer.append(contentString).append("\n");
+                if (rawString.matches("※ .*") || rawString.matches("> .*")|| rawString.matches("--.*")) {
+                    content_buffer.append(rawString).append("\n");
                 } else {
                     // 換顏色
-                    SpannableString ss = new SpannableString(contentString);
+                    SpannableString ss = new SpannableString(rawString);
                     StringBuilder finalString = new StringBuilder();
                     byte[] textColor = _row.getTextColor();
                     byte[] backColor = _row.getBackgroundColor();
-                    for (int i = 0; i < ss.length(); i++) {
-                        finalString.append(ss.charAt(i));
 
-                        // 有附加顏色
+                    // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
+                    boolean needReplaceForeColor = false;
+                    paintTextColor = TelnetAnsi.getDefaultTextColor();
+                    paintBackColor = TelnetAnsi.getDefaultBackgroundColor();
+                    for (int i = 0; i < textColor.length; i++) {
                         if (textColor[i] != paintTextColor || backColor[i] != paintBackColor) {
-                            String appendString = "*[";
-
-                            if (textColor[i] != paintTextColor) { // 前景不同
-                                appendString += getTextAsciiCode(textColor[i]);
-
-                                if (backColor[i] != paintBackColor) { // 背景不同
-                                    appendString += ";" + getBackAsciiCode(backColor[i]);
-                                }
-                            } else if (backColor[i] != paintBackColor) { // 背景不同
-                                appendString += getBackAsciiCode(backColor[i]);
+                            if ((i+1)<=rawString.length()) {
+                                needReplaceForeColor = true;
                             }
-                            appendString += "m";
-                            finalString.insert(finalString.length() - 1, appendString);
-
-                            // 下一輪
-                            paintTextColor = textColor[i];
-                            paintBackColor = backColor[i];
+                            break;
                         }
                     }
 
+                    if (needReplaceForeColor) {
+                        boolean isBlink = false;
+                        for (int i = 0; i < ss.length(); i++) {
+                            finalString.append(ss.charAt(i));
+
+                            // 有附加顏色
+                            if (textColor[i] != paintTextColor || backColor[i] != paintBackColor) {
+                                String appendString = "*[";
+
+                                if (!isBlink && textColor[i]>=8) {
+                                    isBlink = true;
+                                    appendString +="1;";
+                                } else if (isBlink && textColor[i]<8) {
+                                    isBlink = false;
+                                    appendString +=";";
+                                }
+
+                                // 前景代號去除亮色
+                                int noBlinkTextColor = textColor[i];
+                                if (noBlinkTextColor >=8)
+                                    noBlinkTextColor = noBlinkTextColor-8;
+                                // 舊:前景代號去除亮色
+                                int preBlinkTextColor = paintTextColor;
+                                if (preBlinkTextColor >=8)
+                                    preBlinkTextColor = preBlinkTextColor-8;
+
+                                if (noBlinkTextColor != preBlinkTextColor) { // 前景不同
+                                    appendString += getTextAsciiCode(noBlinkTextColor);
+
+                                    if (backColor[i] != paintBackColor) { // 背景不同
+                                        appendString += ";" + getBackAsciiCode(backColor[i]);
+                                    }
+                                } else if (backColor[i] != paintBackColor) { // 背景不同
+                                    appendString += getBackAsciiCode(backColor[i]);
+                                }
+                                appendString += "m";
+                                finalString.insert(finalString.length() - 1, appendString);
+
+                                // 下一輪
+                                paintTextColor = textColor[i];
+                                paintBackColor = backColor[i];
+                            }
+                        }
+                        // 有替換顏色, 該行最後面加上還原碼
+                        finalString.append("*[m");
+                    } else {
+                        finalString.append(rawString);
+                    }
                     content_buffer.append(finalString).append("\n");
                 }
             }
         }
-//        // 全部跑完後還有不同顏色
-//        if (paintTextColor != TelnetAnsi.getDefaultTextColor() || paintBackColor != TelnetAnsi.getDefaultBackgroundColor()) {
-//            content_buffer.append("*[m");
-//        }
 
 
         return content_buffer.toString();
     }
 
     /** 產生 回應用的文章內容
-     * selectLevel 0-兩層 1-一層 2-不保留
      * */
-    public String generateReplyContent(int selectLevel) {
-        int maximum_quote;
+    public String generateReplyContent() {
+        int maximum_quote; // 回應作者的階層, 0-父 1-祖父
         StringBuilder content_builder = new StringBuilder();
         Set<Integer> level_buffer = new HashSet<>();
         level_buffer.add(0);
@@ -214,34 +259,30 @@ public class TelnetArticle {
             maximum_quote = quote_level_list[1];
         }
 
-        if (selectLevel<2) {
-            // 只保留第一個回覆作者
-            if (selectLevel==1)
-                maximum_quote = 0;
-
-            // 第一個回覆作者
+        // 第一個回覆作者(一定不會被黑名單block)
+        if (maximum_quote>-1)
             content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", Author, Nickname));
 
-            boolean blockListEnable = UserSettings.getPropertiesBlockListEnable();
-            // 逐行上推作者
-            for (TelnetArticleItemInfo info : _info) {
-                if (!(blockListEnable && UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
-                    for (int i = 0; i < info.quoteLevel; i++) {
+        boolean blockListEnable = UserSettings.getPropertiesBlockListEnable();
+        // 逐行上推作者
+        for (TelnetArticleItemInfo info : _info) {
+            if (!(blockListEnable && UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
+                for (int i = 0; i < info.quoteLevel; i++) {
+                    content_builder.append("> ");
+                }
+                content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
+            }
+        }
+        // 作者內容
+        for (TelnetArticleItem item : _main_items) {
+            if (!(blockListEnable && UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
+                String[] row_strings = item.getContent().split("\n");
+                for (String append : row_strings) {
+                    for (int j = 0; j <= item.getQuoteLevel(); j++) {
                         content_builder.append("> ");
                     }
-                    content_builder.append(String.format("※ 引述《%s (%s)》之銘言：\n", info.author, info.nickname));
-                }
-            }
-            for (TelnetArticleItem item : _main_items) {
-                if (!(blockListEnable && UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
-                    String[] row_strings = item.getContent().split("\n");
-                    for (String append : row_strings) {
-                        for (int j = 0; j <= item.getQuoteLevel(); j++) {
-                            content_builder.append("> ");
-                        }
-                        content_builder.append(append);
-                        content_builder.append("\n");
-                    }
+                    content_builder.append(append);
+                    content_builder.append("\n");
                 }
             }
         }

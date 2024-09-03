@@ -406,7 +406,8 @@ public class Thumbnail_ItemView extends LinearLayout {
     OnClickListener _open_url_listener = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(_url));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(_url));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             _context.startActivity(intent);
         }
     };

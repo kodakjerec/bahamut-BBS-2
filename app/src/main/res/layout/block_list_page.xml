@@ -8,16 +8,13 @@
         android:layout_height="wrap_content"
         android:focusableInTouchMode="true">
         <Button
-            android:textSize="24sp"
-            android:textColor="@color/button_text_color_1"
-            android:gravity="center"
             android:id="@+id/BlockList_Reset"
-            android:background="@drawable/button_background_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ToolbarItem.Danger"
+            android:layout_weight="0"
+            android:minHeight="48dp"
             android:minWidth="100dp"
-            android:text="@string/reset"
-            style="@style/TouchBlock"/>
+            android:padding="6dp"
+            android:text="@string/reset"/>
         <com.kota.Bahamut.Pages.Model.PostEditText
             android:id="@+id/BlockList_Input"
             style="@style/TextViewLarge"
@@ -32,16 +29,13 @@
             android:singleLine="true"
             android:textColor="@color/white" />
         <Button
-            android:textSize="24sp"
-            android:textColor="@color/button_text_color_1"
-            android:gravity="center"
             android:id="@+id/BlockList_Add"
-            android:background="@drawable/button_background_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ToolbarItem.Danger"
+            android:layout_weight="0"
+            android:minHeight="48dp"
             android:minWidth="100dp"
-            android:text="@string/add"
-            style="@style/TouchBlock"/>
+            android:padding="6dp"
+            android:text="@string/add"/>
     </LinearLayout>
     <View style="@style/ItemViewDividerHorizontal"/>
     <View android:background="@color/divider_color" android:layout_width="match_parent" android:layout_height="5dp"/>

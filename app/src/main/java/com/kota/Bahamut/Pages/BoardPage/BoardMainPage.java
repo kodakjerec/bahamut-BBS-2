@@ -1,7 +1,7 @@
 package com.kota.Bahamut.Pages.BoardPage;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.content.Context;
 import android.view.View;
@@ -58,6 +58,9 @@ import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.PostArticlePage_Listener;
+import com.kota.Bahamut.Pages.Theme.Theme;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
+import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
@@ -223,13 +226,16 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                     _drawerListView.setOnItemClickListener(_bookmark_listener);
             }
             reloadBookmark();
+
+            // 切換頁籤
+            Theme theme = ThemeStore.INSTANCE.getSelectTheme();
             for (Button tab_button : BoardMainPage.this._tab_buttons) {
                 if (tab_button == aView) {
-                    tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_selected));
-                    tab_button.setBackgroundResource(R.drawable.tab_item_background_color_selected);
+                    tab_button.setTextColor(rgbToInt(theme.getTextColor()));
+                    tab_button.setBackgroundColor(rgbToInt(theme.getBackgroundColor()));
                 } else {
-                    tab_button.setTextColor(getContextColor(R.color.tab_item_text_color_unselected));
-                    tab_button.setBackgroundResource(R.drawable.tab_item_background_color_unselected);
+                    tab_button.setTextColor(rgbToInt(theme.getTextColorDisabled()));
+                    tab_button.setBackgroundColor(rgbToInt(theme.getBackgroundColorDisabled()));
                 }
             }
         }
@@ -312,6 +318,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
         // 側邊選單
         if (mainDrawerLayout!=null) {
+            // 替換外觀
+            new ThemeFunctions().layoutReplaceTheme(mainDrawerLayout.findViewById(R.id.menu_view));
+
             DrawerLayout drawerLayout = mainDrawerLayout.findViewById(R.id.drawer_layout);
             if (drawerLayout != null) {
                 LinearLayout menu_view = mainDrawerLayout.findViewById(R.id.menu_view);
@@ -367,6 +376,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         refreshHeaderView();
 
         blockListEnable = UserSettings.getPropertiesBlockListEnable();
+
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
 
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus

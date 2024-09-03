@@ -16,13 +16,13 @@
         </FrameLayout>
         <LinearLayout
             android:id="@+id/toolbar_block"
-            style="@style/Toolbar">
+            style="@style/toolbar">
         </LinearLayout>
     </LinearLayout>
     <!-- toolbar 0 1 2 -->
     <LinearLayout
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
+        style="@style/toolbar"
         android:layout_alignParentBottom="true"
         >
         <Button

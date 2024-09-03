@@ -14,7 +14,8 @@ public class myUrlSpan extends ClickableSpan {
     @Override
     public void onClick(View widget) {
         if (widget.getContext() != null) {
-            Intent intent = new Intent("android.intent.action.VIEW", Uri.parse(myUrl));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(myUrl));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             widget.getContext().startActivity(intent);
         }
     }

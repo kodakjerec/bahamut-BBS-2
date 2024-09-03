@@ -27,7 +27,7 @@ public class BahamutCommandPostArticle extends TelnetCommand {
         // 標題: 第80個字元如果是雙字元則截斷
         _title = judgeDoubleWord(title, DEFAULT_COLUMN-9).split("\n")[0];
         // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
-        _content = judgeDoubleWord(content, DEFAULT_COLUMN-1);
+        _content = judgeDoubleWord(content, DEFAULT_COLUMN);
         Action = PostArticle;
         _target = aTarget;
         _article_number = aArticleNumber;
@@ -71,7 +71,7 @@ public class BahamutCommandPostArticle extends TelnetCommand {
                 buffer.pushString("y"); // y-回應
                 buffer.pushString(_target + "\n"); // 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (Q)取消？[F]
                 if (_target != null && (_target.equals("F") || _target.equals("B"))) {
-                    buffer.pushString("\n");
+                    buffer.pushString("\n"); // 類別: a)問題 b)情報 c)心得 d)討論 e)攻略 f)秘技 g)閒聊 h)其它 :
                 }
                 if (_title != null) {
                     buffer.pushKey(TelnetKeyboard.CTRL_Y); // ctrl + Y

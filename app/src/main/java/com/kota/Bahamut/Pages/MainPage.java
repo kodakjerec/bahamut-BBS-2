@@ -3,6 +3,7 @@ package com.kota.Bahamut.Pages;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
@@ -12,6 +13,7 @@ import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
@@ -70,6 +72,9 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
         mainLayout.findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
 
+        // 替換外觀
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             new ASRunner(){
@@ -79,7 +84,7 @@ public class MainPage extends TelnetPage {
                     // 進入布告討論區
                     mainLayout.findViewById(R.id.Main_boardsButton).performClick();
                 }
-            }.postDelayed(0);
+            }.postDelayed(300);
         }
     }
 

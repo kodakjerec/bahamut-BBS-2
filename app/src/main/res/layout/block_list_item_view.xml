@@ -3,7 +3,7 @@
     <View android:id="@+id/BlockListPage_ItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
     <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@color/list_page_item_content_background" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:gravity="center_vertical" android:id="@+id/BlockListItemView_Name" android:padding="10dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewLarge"/>
-        <Button android:textSize="24sp" android:textColor="@color/button_text_color_2" android:gravity="center" android:id="@+id/BlockListItemView_Delete" android:background="@drawable/button_background_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="100dp" android:text="@string/delete" style="@style/TouchBlock"/>
+        <Button android:textSize="24sp" android:textColor="@color/button_text_color" android:gravity="center" android:id="@+id/BlockListItemView_Delete" android:background="@drawable/button_background_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:minWidth="100dp" android:text="@string/delete" style="@style/TouchBlock"/>
     </LinearLayout>
     <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

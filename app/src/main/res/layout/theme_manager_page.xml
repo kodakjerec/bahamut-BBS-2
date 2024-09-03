@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/black"
+    android:orientation="vertical">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/content_view">
+        <LinearLayout
+            android:id="@+id/Theme_Manager_Page_Buttons"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <Button
+                android:id="@+id/Theme_Manager_Page_Button_0"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_0" />
+            <Button
+                android:id="@+id/Theme_Manager_Page_Button_1"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_1" />
+            <Button
+                android:id="@+id/Theme_Manager_Page_Button_2"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_2" />
+            <Button
+                android:id="@+id/Theme_Manager_Page_Button_3"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_3" />
+            <Button
+                android:id="@+id/Theme_Manager_Page_Button_4"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/number_4" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                style="@style/TouchBlock"
+                android:layout_width="match_parent"
+                android:layout_height="60dp">
+
+                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+                    style="@style/TextViewUltraLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:text="@string/theme_manager_page_group0" />
+
+                <com.kota.Bahamut.Pages.Model.PostEditText
+                    android:id="@+id/Theme_Manager_Page_Toolbar_Name"
+                    style="@style/EditTextSingleLine"
+                    android:autofillHints="username"
+                    android:hint="@string/Username_hint"
+                    android:inputType="text"
+                    android:maxLength="12"
+                    android:singleLine="true"
+                    android:textSize="28sp" />
+            </LinearLayout>
+            <com.kota.TelnetUI.TextView.TelnetTextView
+                style="@style/SystemSettingsChapter"
+                android:text="@string/theme_manager_page_group1"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    style="@style/TextViewSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/dialog_paint_color_sample"/>
+                <Button
+                    android:id="@+id/Theme_Manager_Page_Toolbar_Sample_2"
+                    style="@style/ToolbarItem"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/theme_manager_page_chapter2" />
+                <Button
+                    android:id="@+id/Theme_Manager_Page_Toolbar_Sample_1"
+                    style="@style/ToolbarItem"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/theme_manager_page_chapter1" />
+                <Button
+                    android:id="@+id/Theme_Manager_Page_Toolbar_Sample_3"
+                    style="@style/ToolbarItem"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/theme_manager_page_chapter3" />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    style="@style/TextViewSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/theme_manager_page_chapter_text"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Text_Color_Pressed"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Text_Color"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Text_Color_Disabled"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    style="@style/TextViewSmall"
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="@string/theme_manager_page_chapter_back"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Back_Color_Pressed"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Back_Color"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Theme_Manager_Page_Back_Color_Disabled"
+                    style="@style/TextViewNormal"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="60dp"
+                    android:gravity="center"
+                    android:text="@string/loading"/>
+            </LinearLayout>
+        </LinearLayout>
+        <LinearLayout style="@style/toolbar" android:id="@+id/toolbar">
+            <Button
+                android:id="@+id/Theme_Manager_Page_Toolbar_Reset"
+                style="@style/ToolbarItem.Danger"
+                android:layout_weight="0"
+                android:text="@string/reset" />
+            <Button
+                android:id="@+id/Theme_Manager_Page_Toolbar_Update"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:enabled="false"
+                android:text="@string/theme_manager_page_chapter_update" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.util.Log;
 
 import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.TextEncoder.B2UEncoder;
@@ -28,47 +26,56 @@ public class CommonFunctions {
         myActivity = activity;
     }
     public static Activity getActivity() { return myActivity; }
-
+    /** 輸入 color int 回傳 顏色內容字串(#FF123456)
+     * @param intColor color int
+     * @response string
+     *  */
     public static String intToRGB(int intColor) {
-        return String.format("#%06X", (0xFFFFFF & intColor));
+        return String.format("#%08X", intColor);
+    }
+    /** 輸入 顏色內容字串(#FF123456) 回傳 color int
+     * @param stringColor color string
+     * @response int
+     *  */
+    public static int rgbToInt(String stringColor) {
+        // 移除 # 號
+        String colorString = stringColor.replace("#", "");
+
+        // 將十六進位字串轉換為整數
+        int colorA = Integer.parseInt(colorString.substring(0,2), 16);
+        int colorR = Integer.parseInt(colorString.substring(2,4), 16);
+        int colorG = Integer.parseInt(colorString.substring(4,6), 16);
+        int colorB = Integer.parseInt(colorString.substring(6,8), 16);
+
+        // 將 A、R、G、B 四個成分組合成一個 int 型的顏色值
+        int colorInt = (colorA << 24) | (colorR << 16) | (colorG << 8) | colorB;
+
+        return colorInt;
     }
 
-    /* 輸入 R.color.XX 回傳 顏色內容(int)
-    * @param R.color.XX
+    /** 輸入 R.color.XX 回傳 顏色內容(int)
+    * @param r_color_item R.color.XX
     * @response int
     *  */
     public static int getContextColor(int r_color_item) {
         return myContext.getColor(r_color_item);
     }
 
-    /* 輸入 R.string.XX 回傳 文字內容(string)
-     * @param R.string.XX
+    /** 輸入 R.string.XX 回傳 文字內容(string)
+     * @param r_string_item R.string.XX
      * @response string
      *  */
     public static String getContextString(int r_string_item) { return myContext.getString(r_string_item); }
 
-    // 調整螢幕方向
+    /** 調整螢幕方向 */
     public static void changeScreenOrientation() {
         int val = UserSettings.getPropertiesScreenOrientation();
         switch (val) {
-            case 0:
-                myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                break;
-            case 1:
-                myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-                break;
-            case 2:
-                myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                break;
+            case 0 ->
+                    myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+            case 1 -> myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            case 2 -> myActivity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         }
-    }
-    
-    public static void getColorARGB(int colorCode) {
-        int red = Color.red(colorCode);
-        int green = Color.green(colorCode);
-        int blue = Color.blue(colorCode);
-        int alpha = Color.alpha(colorCode);
-        Log.v("ColorCode","A:"+ alpha + " R:"+red+" G:"+green+" B"+blue);
     }
 
     /** 傳入字串,依照第 maxColumn 個字元分割後, 再回傳之後的字串
@@ -131,4 +138,5 @@ public class CommonFunctions {
         }
         return String.join("\n", returnArrays);
     }
+
 }

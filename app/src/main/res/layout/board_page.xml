@@ -12,13 +12,13 @@
             </FrameLayout>
             <LinearLayout
                 android:id="@+id/toolbar_block"
-                style="@style/Toolbar">
+                style="@style/toolbar">
             </LinearLayout>
         </LinearLayout>
         <!-- toolbar 0 1 2 -->
         <LinearLayout
             android:id="@+id/toolbar"
-            style="@style/Toolbar"
+            style="@style/toolbar"
             android:layout_alignParentBottom="true"
             >
             <Button
@@ -61,12 +61,12 @@
             android:orientation="horizontal">
             <Button
                 android:id="@+id/bookmark_tab_button"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:text="@string/essence_page">
             </Button>
             <Button android:id="@+id/bookmark_edit_button"
                 android:text="@string/bookmark_manager"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:layout_weight="2"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall
                 style="@style/SystemSettingsDirectoryArrow"/>
@@ -93,7 +93,7 @@
 
             <Button
                 android:id="@+id/show_bookmark_button"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:text="@string/bookmark" />
 
             <View
@@ -103,7 +103,7 @@
 
             <Button
                 android:id="@+id/show_history_button"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:text="@string/record" />
         </LinearLayout>
 
@@ -117,14 +117,14 @@
 
             <Button
                 android:id="@+id/search_article_button"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:text="@string/search" />
 
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>
 
             <Button
                 android:id="@+id/select_article_button"
-                style="@style/RightMenuItem"
+                style="@style/ToolbarItem.RightMenu"
                 android:text="@string/select" />
         </LinearLayout>
 
@@ -132,6 +132,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            style="@style/ToolbarItemOnlyTag"
             android:background="@drawable/toolbar_item_background_color">
             <CheckBox
                 android:id="@+id/block_enable_button_checkbox"
@@ -147,7 +148,7 @@
                 android:textColor="@color/white"
                 android:gravity="center_vertical"/>
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>
-            <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:layout_weight="1" android:text="@string/system_setting_page_chapter_blocklist" style="@style/RightMenuItem"/>
+            <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:layout_weight="1" android:text="@string/system_setting_page_chapter_blocklist" style="@style/ToolbarItem.RightMenu"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
     </LinearLayout>

@@ -106,7 +106,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
-                    android:minHeight="57dp"
+                    android:minHeight="60dp"
                     android:orientation="vertical">
 
                     <com.kota.TelnetUI.TextView.TelnetTextViewNormal
@@ -175,7 +175,7 @@
             </LinearLayout>
         </ScrollView>
 
-        <LinearLayout style="@style/Toolbar">
+        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
 
             <Button
                 android:id="@+id/Bahamut_Dialog_Search_Cancel_Button"

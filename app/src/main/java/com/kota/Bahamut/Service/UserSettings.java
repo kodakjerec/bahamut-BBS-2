@@ -43,6 +43,8 @@ public class UserSettings {
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
     static final String floatingLocationY = "floatingLocationY"; // 浮動工具列位置 Y
     static final String noVipShortenTimes = "noVipShortenTimes"; // 非VIP轉檔限制
+
+    // 其他設定
     static String _blockListDefault = "guest"; // 黑名單 list, 必定小寫, 字串, ex: aaa,bbb,ccc
     Context _context;
     
@@ -85,10 +87,10 @@ public class UserSettings {
                 float toolbar_idle = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_IDLE);
                 float toolbar_alpha = prep.getPropertiesFloat(PROPERTIES_TOOLBAR_ALPHA);
                 String article_headers = prep.getPropertiesString(PROPERTIES_ARTICLE_HEADS);
+                boolean shortUrlNonId = prep.getPropertiesBoolean(PROPERTIES_SHORT_URL_NON_ID);
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
                 int varNoVipShortenTimes = prep.getPropertiesInteger(noVipShortenTimes);
-                boolean shortUrlNonId = prep.getPropertiesBoolean(PROPERTIES_SHORT_URL_NON_ID);
 
                 _editor.putString(PROPERTIES_USERNAME, username);
                 _editor.putString(PROPERTIES_PASSWORD, password);

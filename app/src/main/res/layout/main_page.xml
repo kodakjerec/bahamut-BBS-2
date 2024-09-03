@@ -20,7 +20,7 @@
 
     <LinearLayout
         android:id="@+id/toolbar"
-        style="@style/Toolbar"
+        style="@style/toolbar"
         android:layout_alignParentBottom="true">
 
         <Button
@@ -66,7 +66,7 @@
                 android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_boards"
                 android:textColor="@color/button_text_color"
-                android:textSize="30sp"/>
+                android:textSize="28sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -85,7 +85,7 @@
                 android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_class"
                 android:textColor="@color/button_text_color"
-                android:textSize="30sp"/>
+                android:textSize="28sp"/>
         </LinearLayout>
 
         <LinearLayout
@@ -104,7 +104,7 @@
                 android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_favorite"
                 android:textColor="@color/button_text_color"
-                android:textSize="30sp"/>
+                android:textSize="28sp"/>
         </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

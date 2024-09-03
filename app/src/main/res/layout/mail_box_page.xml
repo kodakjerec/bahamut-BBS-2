@@ -5,7 +5,7 @@
         <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:id="@+id/MailBoxPage_listEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
         <ListView android:id="@+id/MailBoxPage_listView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
     </FrameLayout>
-    <LinearLayout android:id="@+id/toolbar" style="@style/Toolbar">
+    <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
         <Button android:id="@+id/Mail_backButton" android:text="@string/write_mail" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/Mail_SearchButton" android:text="@string/search" style="@style/ToolbarItem"/>
