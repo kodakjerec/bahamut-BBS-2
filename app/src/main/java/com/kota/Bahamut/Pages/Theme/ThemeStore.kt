@@ -45,7 +45,6 @@ object ThemeStore {
             val jsonArray = jsonObject.getJSONArray("data")
             if (jsonArray.length()==0) {
                 // 預設
-
                 addTheme(getDefaultTheme(0))
 
                 // 粉紅

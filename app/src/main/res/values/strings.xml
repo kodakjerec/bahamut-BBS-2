@@ -124,6 +124,7 @@
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="switch_connect_recovery">開啟自動連線恢復</string>
     <string name="switch_on_block_list">開啟黑名單功能</string>
+    <string name="switch_on_block_list_for_title">套用至標題</string>
     <string name="symbol">符號</string>
     <string name="title">標題</string>
     <string name="title_">標題：</string>
@@ -212,6 +213,7 @@
     <string name="drawer_button_text_disable">停用</string>
     <string name="StartPage_open_account">第一次登入請先至\n https://user.gamer.com.tw/openBBS.php \n啟用BBS權限 !</string>
     <string name="system_setting_page_checkbox_blocklist_hint">核取方塊, 啟動或關閉黑名單</string>
+    <string name="system_setting_page_checkbox_blocklistForTitle_hint">核取方塊, 啟動或關閉黑名單套用至標題</string>
     <string name="system_setting_page_checkbox_animation_hint">核取方塊, 啟動或關閉換頁動畫</string>
     <string name="system_setting_page_checkbox_article_move_hint">核取方塊, 啟動或關閉迅速跳到首頁最後頁</string>
     <string name="system_setting_page_screen_orientation_hint">下拉選單, 切換螢幕方向</string>

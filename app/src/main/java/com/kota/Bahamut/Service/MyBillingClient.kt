@@ -26,8 +26,7 @@ import okhttp3.RequestBody
 import org.json.JSONObject
 
 object MyBillingClient {
-    @JvmField
-    var billingClient: BillingClient? = null
+    lateinit var billingClient: BillingClient
 
     /** 購買結果 */
     private val purchasesUpdatedListener = PurchasesUpdatedListener { billingResult, list ->
@@ -45,7 +44,7 @@ object MyBillingClient {
     /** 確認購買交易，且程式已授予使用者商品 */
     private fun handlePurchase(purchases: Purchase) {
         if (!purchases.isAcknowledged) {
-            billingClient!!.acknowledgePurchase(
+            billingClient.acknowledgePurchase(
                 AcknowledgePurchaseParams
                     .newBuilder()
                     .setPurchaseToken(purchases.purchaseToken)
@@ -102,7 +101,7 @@ object MyBillingClient {
                     }
                 }
             }
-        billingClient!!.consumeAsync(consumeParams, consumeResponseListener)
+        billingClient.consumeAsync(consumeParams, consumeResponseListener)
     }
 
     /** 重新確認已購買的商品 */
@@ -110,7 +109,7 @@ object MyBillingClient {
     fun checkPurchaseHistoryQuery() {
         var needQueryCloud = false
         try {
-            billingClient!!.queryPurchaseHistoryAsync(
+            billingClient.queryPurchaseHistoryAsync(
                 QueryPurchaseHistoryParams.newBuilder()
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
@@ -130,7 +129,7 @@ object MyBillingClient {
                                         .addFormDataPart("userId", userId)
                                         .addFormDataPart("buyType", "history")
                                         .addFormDataPart("qty", record!!.quantity.toString())
-                                        .addFormDataPart("purchaseData", record!!.originalJson)
+                                        .addFormDataPart("purchaseData", record.originalJson)
                                         .build()
                                 val request: Request = Request.Builder()
                                     .url(apiUrl)
@@ -138,7 +137,11 @@ object MyBillingClient {
                                     .build()
 
                                 ASRunner.runInNewThread {
-                                    client.newCall(request).execute().use { _ -> }
+                                    try {
+                                        client.newCall(request).execute().use { _ -> }
+                                    } catch (e:Exception) {
+                                        needQueryCloud = true
+                                    }
                                 }
                             }
                         }
@@ -158,6 +161,7 @@ object MyBillingClient {
         }
     }
 
+    /** 檢查購買紀錄 */
     @JvmStatic
     fun checkPurchaseHistoryCloud(callback: (Int) -> Unit) {
         val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
@@ -190,7 +194,7 @@ object MyBillingClient {
     /** 處理應用程式外的購買交易 */
     @JvmStatic
     fun checkPurchase() {
-        billingClient!!.queryPurchasesAsync(
+        billingClient.queryPurchasesAsync(
             QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
                 .build()
         ) { billingResult: BillingResult, list: List<Purchase>? ->
@@ -202,6 +206,7 @@ object MyBillingClient {
         }
     }
 
+    /** 初始化 BillingClient */
     @JvmStatic
     fun initBillingClient() {
         billingClient = BillingClient.newBuilder(TempSettings.getApplicationContext())
@@ -211,7 +216,7 @@ object MyBillingClient {
 
         // 商店付款建立
         // initial
-        billingClient!!.startConnection(object : BillingClientStateListener {
+        billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingServiceDisconnected() {
                 // Try to restart the connection on the next request to
                 // Google Play by calling the startConnection() method.
@@ -226,6 +231,6 @@ object MyBillingClient {
 
     @JvmStatic
     fun closeBillingClient() {
-        billingClient!!.endConnection()
+        billingClient.endConnection()
     }
 }

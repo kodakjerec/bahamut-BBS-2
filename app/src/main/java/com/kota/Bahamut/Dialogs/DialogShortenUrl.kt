@@ -301,11 +301,12 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 if (splits.isNotEmpty()) {
                     returnString = splits[0]
 
-                    // www.youtube.com 例外處理
-                    // 只保留 v=1234
-                    if (splits[0].indexOf("www.youtube.com")>0) {
+                    // 例外處理
+                    // www.facebook.com , 只保留 fbid=1234
+                    // www.youtube.com , 只保留 v=1234
+                    if (splits[0].indexOf("www.youtube.com")>0 || splits[0].indexOf("www.facebook.com")>0) {
                         returnString+="?"
-                        val reserveKeys = arrayOf("v")
+                        val reserveKeys = arrayOf("v","fbid")
                         val params = splits[1].split("&")
                         if (params.isNotEmpty()) {
                             var isFirstParam = true

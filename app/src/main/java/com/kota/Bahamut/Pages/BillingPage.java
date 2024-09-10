@@ -121,6 +121,7 @@ public class BillingPage extends TelnetPage {
                 });
     }
 
+    @Override
     public boolean onReceivedGestureRight() {
         onBackPressed();
         PageContainer.getInstance().cleanBillingPage();

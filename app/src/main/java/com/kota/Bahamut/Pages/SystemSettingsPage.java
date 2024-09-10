@@ -49,6 +49,8 @@ public class SystemSettingsPage extends TelnetPage {
     CompoundButton.OnCheckedChangeListener _article_move_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesArticleMoveDisable(isChecked);
     /** 開啟或關閉黑名單, checkbox */
     CompoundButton.OnCheckedChangeListener _block_list_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListEnable(isChecked);
+    /** 開啟或關閉黑名單套用至標題, checkbox */
+    CompoundButton.OnCheckedChangeListener _block_list_for_title_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListForTitle(isChecked);
     /** 開啟或關閉雲端備份, checkbox */
     CompoundButton.OnCheckedChangeListener cloud_save_enable_listener = (buttonView, isChecked) -> {
         NotificationSettings.setCloudSave(isChecked);
@@ -239,6 +241,10 @@ public class SystemSettingsPage extends TelnetPage {
         block_list_enable_box.setChecked(UserSettings.getPropertiesBlockListEnable());
         block_list_enable_box.setOnCheckedChangeListener(_block_list_enable_listener);
         mainLayout.findViewById(R.id.SystemSettings_item_blockListEnable).setOnClickListener(view -> block_list_enable_box.setChecked(!block_list_enable_box.isChecked()));
+        CheckBox block_list_for_title_box = mainLayout.findViewById(R.id.SystemSettings_blockListForTitle);
+        block_list_for_title_box.setChecked(UserSettings.getPropertiesBlockListForTitle());
+        block_list_for_title_box.setOnCheckedChangeListener(_block_list_for_title_listener);
+        mainLayout.findViewById(R.id.SystemSettings_item_blockListForTitle).setOnClickListener(view -> block_list_for_title_box.setChecked(!block_list_for_title_box.isChecked()));
 
         // keep-wifi
         CheckBox keep_wifi_box = mainLayout.findViewById(R.id.SystemSettings_keepWifi);

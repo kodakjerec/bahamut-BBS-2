@@ -83,7 +83,7 @@ public class TelnetChannel {
 
     private void receiveData() throws TelnetConnectionClosedException, IOException {
         this._input_buffer.clear();
-        int read = this._socket_channel.read(this._input_buffer);
+        this._socket_channel.read(this._input_buffer);
         if (this._input_buffer.position() != 0) {
             this._input_buffer.flip();
             return;

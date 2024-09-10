@@ -86,6 +86,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     boolean _initialed = false;
     boolean _refresh_header_view = false; // 正在更新標題列
     boolean blockListEnable = false; // 是否啟用黑名單
+    boolean blockListForTitle = false; // 是否啟用黑名單套用至標題
     boolean _isDrawerOpening = false; // 側邊選單正在開啟中
     final List<Bookmark> _bookmarkList = new ArrayList<>();
     ListView _drawerListView;
@@ -376,6 +377,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         refreshHeaderView();
 
         blockListEnable = UserSettings.getPropertiesBlockListEnable();
+        blockListForTitle = UserSettings.getPropertiesBlockListForTitle();
 
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
@@ -827,8 +829,14 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         BoardPageItemView boardPageItemView = (BoardPageItemView) view;
         boardPageItemView.setItem(boardPageItem);
         boardPageItemView.setNumber(item_index);
-        if (boardPageItem != null && blockListEnable && UserSettings.isBlockListContains(boardPageItem.Author)) {
-            boardPageItemView.setVisible(false);
+        if (boardPageItem != null && blockListEnable) {
+            if (UserSettings.isBlockListContains(boardPageItem.Author)) {
+                boardPageItemView.setVisible(false);
+            } else if (blockListForTitle && UserSettings.isBlockListContains(boardPageItem.Title)) {
+                boardPageItemView.setVisible(false);
+            } else {
+                boardPageItemView.setVisible(true);
+            }
         } else {
             boardPageItemView.setVisible(true);
         }

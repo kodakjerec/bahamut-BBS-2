@@ -9,6 +9,7 @@ import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.Dialogs.DialogColorPicker
 import com.kota.Bahamut.Dialogs.DialogColorPickerListener
+import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
@@ -202,5 +203,12 @@ class ThemeManagerPage: TelnetPage() {
         mainLayout.clearFocus()
 
         ASToast.showShortToast(getContextString(R.string.theme_manager_page_msg01))
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        onBackPressed()
+        PageContainer.getInstance().cleanThemeManagerPage()
+        ASToast.showShortToast("返回")
+        return true
     }
 }

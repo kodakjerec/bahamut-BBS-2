@@ -19,6 +19,7 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
 
         titleTextView = this.findViewById(R.id.title);
         titleTextView.setOnClickListener(titleClickListener);
+        titleTextView.setOnLongClickListener(titleLongClickListener);
 
         detailTextView1 = this.findViewById(R.id.detail_1);
         detailTextView1.setOnClickListener(authorClickListener);
@@ -27,6 +28,8 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
     public int getType() {
         return ArticlePageItemType.Header;
     }
+
+    /** 點標題 */
     OnClickListener titleClickListener = view -> {
         if (titleTextView.getMaxLines()==1)
             titleTextView.setMaxLines(3);
@@ -34,6 +37,13 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
             titleTextView.setMaxLines(1);
     };
 
+    /** 長按標題 */
+    OnLongClickListener titleLongClickListener = view -> {
+
+        return false;
+    };
+
+    /** 點作者 */
     OnClickListener authorClickListener = view -> {
         TelnetClient.getClient().sendDataToServer(
             TelnetOutputBuilder.create()

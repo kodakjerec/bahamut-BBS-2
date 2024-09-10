@@ -25,7 +25,6 @@ public class TelnetConnector implements TelnetChannelListener {
             try {
                 this._socket_channel.finishConnect();
             } catch (IOException e) {
-                e.printStackTrace();
                 Log.v("SocketChannel", "IO Exception");
             }
         }

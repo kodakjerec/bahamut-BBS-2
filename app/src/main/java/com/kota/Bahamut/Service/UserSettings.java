@@ -19,6 +19,7 @@ public class UserSettings {
     static final String PROPERTIES_GESTURE_ON_BOARD = "GestureOnBoard"; // 滑動手勢
     static final String PROPERTIES_BLOCK_LIST = "BlockList"; // 黑名單 list, 字串, ex: aaa,bbb,ccc
     static final String PROPERTIES_BLOCK_LIST_ENABLE = "BlockListEnable"; // 啟用黑名單
+    static final String PROPERTIES_BLOCK_LIST_FOR_TITLE = "BlockListForTitle"; // 黑名單套用至標題
     static final String PROPERTIES_EXTRA_TOOLBAR_ENABLE = "ExtraToolbarEnable"; // 開啟工具列
     static final String PROPERTIES_KEEP_WIFI_ENABLE = "KeepWifiEnable"; // 防止Wifi因為待機而中斷
     static final String PROPERTIES_PASSWORD = "Password";
@@ -72,6 +73,7 @@ public class UserSettings {
                 int article_view_mode = prep.getPropertiesInteger(PROPERTIES_ARTICLE_VIEW_MODE);
                 String block_list = prep.getPropertiesString(PROPERTIES_BLOCK_LIST);
                 boolean block_list_enable = prep.getPropertiesBoolean(PROPERTIES_BLOCK_LIST_ENABLE);
+                boolean block_list_for_title = prep.getPropertiesBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE);
                 boolean keep_wifi = prep.getPropertiesBoolean(PROPERTIES_KEEP_WIFI_ENABLE);
                 boolean animation_disable = prep.getPropertiesBoolean(PROPERTIES_ANIMATION_DISABLE);
                 boolean extra_toolbar = prep.getPropertiesBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE);
@@ -98,6 +100,7 @@ public class UserSettings {
                 _editor.putInt(PROPERTIES_ARTICLE_VIEW_MODE, article_view_mode);
                 _editor.putString(PROPERTIES_BLOCK_LIST, block_list);
                 _editor.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, block_list_enable);
+                _editor.putBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE, block_list_for_title);
                 _editor.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, keep_wifi);
                 _editor.putBoolean(PROPERTIES_ANIMATION_DISABLE, animation_disable);
                 _editor.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extra_toolbar);
@@ -303,7 +306,17 @@ public class UserSettings {
             return false;
 
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
-        return blockListString.toLowerCase().contains(aName.toLowerCase());
+        String[] blockStrings = blockListString.split(",");
+
+        boolean containsKeyword = false;
+        for (String keyword : blockStrings) {
+            if (aName.contains(keyword)) {
+                containsKeyword = true;
+                break; // 一旦找到匹配，即可跳出迴圈
+            }
+        }
+
+        return containsKeyword;
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {
@@ -314,6 +327,13 @@ public class UserSettings {
         return _sharedPref.getBoolean(PROPERTIES_BLOCK_LIST_ENABLE, false);
     }
 
+    public static void setPropertiesBlockListForTitle(boolean enable) {
+        _editor.putBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE, enable).apply();
+    }
+
+    public static boolean getPropertiesBlockListForTitle() {
+        return _sharedPref.getBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE, false);
+    }
     public static void setPropertiesKeepWifi(boolean enable) {
         _editor.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, enable).apply();
     }

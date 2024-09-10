@@ -39,7 +39,7 @@ public class MainPage extends TelnetPage {
         TelnetClient.getClient().sendStringToServerInBackground("f");
     };
     TelnetFrame _frame_buffer = null;
-    ASDialog _goodbye_dialog = null;
+    ASDialog goodbyeDialog = null;
     View.OnClickListener _logout_listener = v -> TelnetClient.getClient().sendStringToServerInBackground("g");
     View.OnClickListener _mail_listener = v -> {
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getMailBoxPage());
@@ -118,7 +118,7 @@ public class MainPage extends TelnetPage {
     }
 
     public void onPageDidDisappear() {
-        this._goodbye_dialog = null;
+        this.goodbyeDialog = null;
         this._save_hot_message_dialog = null;
         super.onPageDidDisappear();
     }
@@ -143,9 +143,7 @@ public class MainPage extends TelnetPage {
                     case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
                     case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
                     case 2 -> TelnetClient.getClient().sendStringToServerInBackground("C");
-                    default -> {
-                        TelnetClient.getClient().sendStringToServerInBackground("K");
-                    }
+                    default -> TelnetClient.getClient().sendStringToServerInBackground("K");
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {
                 TelnetClient.getClient().sendStringToServerInBackground("K\nQ");
@@ -157,28 +155,37 @@ public class MainPage extends TelnetPage {
     }
 
     public void onCheckGoodbye() {
-        if (this._goodbye_dialog == null) {
-            this._goodbye_dialog = ASAlertDialog.createDialog().setTitle("登出").setMessage("是否確定要登出?").addButton("取消").addButton("確認").setListener((aDialog, index) -> {
-                MainPage.this._goodbye_dialog = null;
-                switch (index) {
-                    case 0 -> // 取消
-                            TelnetClient.getClient().sendStringToServerInBackground("Q");
-                    case 1 -> // 確定
+        if (this.goodbyeDialog == null) {
+            this.goodbyeDialog = ASAlertDialog.createDialog()
+                    .setTitle("登出")
+                    .setMessage("是否確定要登出?")
+                    .addButton("取消")
+                    .addButton("確認")
+                    .setListener((aDialog, index) -> {
+                        MainPage.this.goodbyeDialog = null;
+                        switch (index) {
+                            case 1 -> // 確定
+                                    TelnetClient.getClient().sendStringToServerInBackground("G");
+                            case 0 -> // 取消
+                                    TelnetClient.getClient().sendStringToServerInBackground("Q");
+                            default -> {}
+                        }
+                    })
+                    .scheduleDismissOnPageDisappear(this);
+            this.goodbyeDialog.setOnDismissListener( (dialog)-> {
+                        if (this.goodbyeDialog != null)
                             TelnetClient.getClient().sendStringToServerInBackground("G");
-                    default -> {
-                    }
-                }
-            }).scheduleDismissOnPageDisappear(this);
-            this._goodbye_dialog.show();
+                    });
         }
+        this.goodbyeDialog.show();
     }
 
     public void clear() {
-        if (this._goodbye_dialog != null) {
-            if (this._goodbye_dialog.isShowing()) {
-                this._goodbye_dialog.dismiss();
+        if (this.goodbyeDialog != null) {
+            if (this.goodbyeDialog.isShowing()) {
+                this.goodbyeDialog.dismiss();
             }
-            this._goodbye_dialog = null;
+            this.goodbyeDialog = null;
         }
         if (this._save_hot_message_dialog != null) {
             if (this._save_hot_message_dialog.isShowing()) {

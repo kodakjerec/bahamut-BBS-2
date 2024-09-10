@@ -280,8 +280,8 @@ class CloudBackup {
             final()
         }
     }
-    private var myListener: CloudBackup_Listener? = null
-    fun setListener(listener: CloudBackup_Listener): CloudBackup {
+    private var myListener: CloudBackupListener? = null
+    fun setListener(listener: CloudBackupListener): CloudBackup {
         myListener = listener
         return this
     }

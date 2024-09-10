@@ -11,8 +11,8 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 34
-        versionCode 27
-        versionName "2.6"
+        versionCode 29
+        versionName "2.6.2"
     }
 
     buildTypes {

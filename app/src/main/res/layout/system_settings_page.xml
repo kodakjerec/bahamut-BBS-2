@@ -7,10 +7,10 @@
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:id="@+id/content_view">
-
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/theme"/>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_goThemeManagerPage"
             android:clickable="true"
             style="@style/SystemSettingsItem">
@@ -21,10 +21,15 @@
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_blocklist"/>
-        <View android:visibility="gone" style="@style/HorizontalDivider"/>
+        <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_blockListEnable" style="@style/SystemSettingsItem">
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_blockListEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_blocklist_hint" />
+        </RelativeLayout>
+        <View style="@style/HorizontalDivider"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_blockListForTitle" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list_for_title" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_blockListForTitle" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_blocklistForTitle_hint" />
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_blockListSetting"
@@ -37,6 +42,7 @@
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_board_article"/>
+        <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/SystemSettingsItem">
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>
@@ -131,6 +137,7 @@
                     style="@style/SystemSettingsSpinnerItem"/>
             </LinearLayout>
         </RelativeLayout>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_ArticleHeaderSetting"
             android:clickable="true"
             style="@style/SystemSettingsItem">
@@ -138,6 +145,7 @@
             <View style="@style/ItemViewDividerVertical"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_ArticleExpressionSetting"
             android:clickable="true"
             style="@style/SystemSettingsItem">
@@ -190,6 +198,7 @@
                 android:id="@+id/SystemSettings_screen_orientation_spinner"
                 style="@style/SystemSettingsSpinnerItem"/>
         </LinearLayout>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_item_IgnoreBatteryOptimizations" style="@style/SystemSettingsItem">
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge
                 android:text="@string/system_setting_page_ignore_battery_optimizations"
@@ -224,6 +233,7 @@
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_donation"/>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_goBillingPage"
             android:clickable="true"
             style="@style/SystemSettingsItem">
