@@ -39,7 +39,6 @@ import java.util.Vector
 
 class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {
     private lateinit var mainLayout: RelativeLayout
-    private var fromClipData: CharSequence = ""
     private lateinit var editText: EditText
     private lateinit var sampleTextView: TextView
     private var sendButton: Button? = null
@@ -150,7 +149,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             if (clipData != null && clipData.itemCount>0) {
                 val clipDataIndex0 = clipData.getItemAt(0)
                 if (clipDataIndex0 != null && clipDataIndex0.text!=null) {
-                    fromClipData = clipDataIndex0.text
+                    editText.setText(clipDataIndex0.text)
                     urlRemoveId()
                 }
             }
@@ -289,16 +288,16 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     /** 去識別化 */
     private fun urlRemoveId() {
         val filterString = if (UserSettings.getShortUrlNonId()) {
-            var returnString = fromClipData
+            var returnString = editText.text.toString()
             val textView = TextView(context)
-            textView.text = fromClipData
+            textView.text = returnString
             Linkify.addLinks(textView, Linkify.WEB_URLS)
 
             val urls: Array<URLSpan> = textView.urls
             if (urls.isNotEmpty()) {
                 val firstUrl = urls[0].url
                 val splits = firstUrl.split("?")
-                if (splits.isNotEmpty()) {
+                if (splits.size>=2) {
                     returnString = splits[0]
 
                     // 例外處理
@@ -328,7 +327,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
             returnString
         } else {
-            fromClipData
+            editText.text.toString()
         }
 
         editText.setText(filterString)

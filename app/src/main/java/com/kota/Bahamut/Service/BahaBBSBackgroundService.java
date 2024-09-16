@@ -7,7 +7,6 @@ import android.util.Log;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.Telnet.TelnetClient;
 
-/* loaded from: classes.dex */
 public class BahaBBSBackgroundService extends Service {
     TelnetClient _client;
     ASNavigationController _controller;
