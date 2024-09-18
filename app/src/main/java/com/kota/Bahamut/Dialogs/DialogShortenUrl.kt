@@ -142,6 +142,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     /** 擷取剪貼簿 */
+    var fromClipData = ""
     private fun catchClipBoard() {
             val clipboardManager =
                 context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
@@ -149,7 +150,8 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             if (clipData != null && clipData.itemCount>0) {
                 val clipDataIndex0 = clipData.getItemAt(0)
                 if (clipDataIndex0 != null && clipDataIndex0.text!=null) {
-                    editText.setText(clipDataIndex0.text)
+                    fromClipData = clipDataIndex0.text.toString()
+                    editText.setText(fromClipData)
                     urlRemoveId()
                 }
             }
@@ -295,25 +297,33 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
             val urls: Array<URLSpan> = textView.urls
             if (urls.isNotEmpty()) {
+                // 針對網址處理
+
                 val firstUrl = urls[0].url
                 val splits = firstUrl.split("?")
                 if (splits.size>=2) {
+                    // 有參數
+
+                    // 先指定給前面位址
                     returnString = splits[0]
 
-                    // 例外處理
+                    // 特定網址參數例外處理
                     // www.facebook.com , 只保留 fbid=1234
                     // www.youtube.com , 只保留 v=1234
                     if (splits[0].indexOf("www.youtube.com")>0 || splits[0].indexOf("www.facebook.com")>0) {
-                        returnString+="?"
+                        var isFirstParam = true
                         val reserveKeys = arrayOf("v","fbid")
                         val params = splits[1].split("&")
                         if (params.isNotEmpty()) {
-                            var isFirstParam = true
                             for (param in params) {
                                 val paramPair = param.split("=")
                                 if (reserveKeys.contains(paramPair[0])) {
-                                    returnString+= param + if (isFirstParam) "" else "&"
-                                    isFirstParam = false
+                                    if (isFirstParam)
+                                        returnString+= "?$param"
+                                    else {
+                                        returnString += "&$param"
+                                        isFirstParam = false
+                                    }
                                 }
                             }
                         } else {
@@ -321,13 +331,15 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                         }
                     }
                 } else {
-                    returnString = splits[0]
+                    // 沒有參數
+                    returnString = firstUrl
                 }
             }
 
             returnString
         } else {
-            editText.text.toString()
+            // 不啟動去識別化
+            fromClipData
         }
 
         editText.setText(filterString)

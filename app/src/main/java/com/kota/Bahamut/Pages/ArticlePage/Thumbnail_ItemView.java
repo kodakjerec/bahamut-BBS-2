@@ -15,7 +15,6 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -23,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable;
 
+import com.github.chrisbanes.photoview.PhotoView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.DataSource;
 import com.bumptech.glide.load.engine.GlideException;
@@ -54,60 +54,60 @@ import okhttp3.Response;
 
 public class Thumbnail_ItemView extends LinearLayout {
     LinearLayout mainLayout;
-    Context _context;
-    int _width;
-    int _height;
+    Context myContext;
+    int viewWidth;
+    int viewHeight;
     // 預設圖層
-    LinearLayout _layout_default;
+    LinearLayout layoutDefault;
     // 圖片圖層
-    LinearLayout _layout_pic;
-    ImageView _image_view_pic;
-    Button _image_view_button;
+    LinearLayout layoutPic;
+    PhotoView photoViewPic;
+    Button imageViewButton;
     // 內容圖層
-    LinearLayout _layout_normal;
-    TextView _title_view;
-    TextView _description_view;
-    TextView _url_view;
-    boolean _isPic = false; // 是否為圖片
-    boolean _load_thumbnail_img = false; // 自動顯示預覽圖
-    boolean _load_only_wifi = false; // 只在wifi下預覽
-    boolean _img_loaded = false; // 已經讀取預覽圖
+    LinearLayout layoutNormal;
+    TextView titleView;
+    TextView descriptionView;
+    TextView urlView;
+    boolean isPic = false; // 是否為圖片
+    boolean loadThumbnailImg = false; // 自動顯示預覽圖
+    boolean loadOnlyWifi = false; // 只在wifi下預覽
+    boolean imgLoaded = false; // 已經讀取預覽圖
 
-    String _url = "";
-    String _title = "";
-    String _description = "";
-    String _imageUrl = "";
+    String myUrl = "";
+    String myTitle = "";
+    String myDescription = "";
+    String myImageUrl = "";
 
     public Thumbnail_ItemView(Context context) {
         super(context);
-        _context = context;
+        myContext = context;
         DisplayMetrics metrics = new DisplayMetrics();
-        ((Activity)_context).getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        _width = metrics.widthPixels;
-        _height = metrics.heightPixels;
+        ((Activity) myContext).getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        viewWidth = metrics.widthPixels;
+        viewHeight = metrics.heightPixels;
         init();
     }
 
     /** 判斷URL內容 */
     public void loadUrl(String url) {
-        _url = url;
+        myUrl = url;
 
         try (UrlDatabase urlDatabase = new UrlDatabase(getContext())) {
-            Vector<String> findUrl = urlDatabase.getUrl(_url);
-            _url_view.setText(_url);
+            Vector<String> findUrl = urlDatabase.getUrl(myUrl);
+            urlView.setText(myUrl);
             // 已經有URL資料
             if (findUrl!=null) {
-                _title = findUrl.get(1);
-                _description = findUrl.get(2);
-                _imageUrl = findUrl.get(3);
-                _isPic = !findUrl.get(4).equals("0");
-                picOrUrl_changeStatus(_isPic);
+                myTitle = findUrl.get(1);
+                myDescription = findUrl.get(2);
+                myImageUrl = findUrl.get(3);
+                isPic = !findUrl.get(4).equals("0");
+                picOrUrl_changeStatus(isPic);
             } else {
                 String apiUrl = "https://worker-get-url-content.kodakjerec.workers.dev/";
                 OkHttpClient client = new OkHttpClient();
                 RequestBody body = new MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
-                        .addFormDataPart("url", _url)
+                        .addFormDataPart("url", myUrl)
                         .build();
                 Request request = new Request.Builder()
                         .url(apiUrl)
@@ -126,70 +126,70 @@ public class Thumbnail_ItemView extends LinearLayout {
                         String contentType = jsonObject.getString("contentType");
 
                         if (contentType.contains("image") || contentType.contains("video") || contentType.contains("audio")) {
-                            _isPic = true;
+                            isPic = true;
                         }
-                        _title = jsonObject.getString("title");
-                        _description = jsonObject.getString("desc");
-                        _imageUrl = jsonObject.getString("imageUrl");
+                        myTitle = jsonObject.getString("title");
+                        myDescription = jsonObject.getString("desc");
+                        myImageUrl = jsonObject.getString("imageUrl");
 
                         // 非圖片類比較會有擷取問題
-                        if (!_isPic && (_title.equals("") || _description.equals(""))) {
+                        if (!isPic && (myTitle.equals("") || myDescription.equals(""))) {
                             String userAgent = System.getProperty("http.agent");
-                            if (_url.contains("youtu") || _url.contains("amazon"))
+                            if (myUrl.contains("youtu") || myUrl.contains("amazon"))
                                 userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0";
 
                             // cookie
                             // Create a new Map to store cookies
                             Map<String, String> cookies = new HashMap<>();
-                            if (_url.contains("ptt"))
+                            if (myUrl.contains("ptt"))
                                 cookies.put("over18", "1");  // Add the over18 cookie with value 1
 
                             Connection.Response resp = Jsoup
-                                    .connect(_url)
+                                    .connect(myUrl)
                                     .header("User-Agent", userAgent)
                                     .cookies(cookies)
                                     .execute();
                             contentType = resp.contentType();
 
                             if (contentType.contains("image/") || contentType.contains("video/")) {
-                                _isPic = true;
+                                isPic = true;
                             }
                             // 域名判斷
                             if (url.contains("i.imgur")) {
-                                _isPic = true;
+                                isPic = true;
                             }
 
                             // 圖片處理
-                            if (_isPic) {
-                                _title = _url;
-                                _description = "";
-                                _imageUrl = _url;
+                            if (isPic) {
+                                myTitle = myUrl;
+                                myDescription = "";
+                                myImageUrl = myUrl;
                             } else {
                                 // 文字處理
                                 Document document = resp.parse();
 
-                                _title = document.title();
-                                if (_title.isEmpty())
-                                    _title = document.select("meta[property=og:title]").attr("content");
+                                myTitle = document.title();
+                                if (myTitle.isEmpty())
+                                    myTitle = document.select("meta[property=og:title]").attr("content");
 
-                                _description = document.select("meta[name=description]").attr("content");
-                                if (_description.isEmpty())
-                                    _description = document.select("meta[property=og:description]").attr("content");
+                                myDescription = document.select("meta[name=description]").attr("content");
+                                if (myDescription.isEmpty())
+                                    myDescription = document.select("meta[property=og:description]").attr("content");
 
-                                _imageUrl = document.select("meta[property=og:image]").attr("content");
-                                if (_imageUrl.isEmpty())
-                                    _imageUrl = document.select("meta[property=og:image]").attr("content");
-                                if (_imageUrl.isEmpty())
-                                    _imageUrl = document.select("meta[property=og:images]").attr("content");
-                                if (_imageUrl.isEmpty())
-                                    _imageUrl = document.select("#landingImage").attr("src");
+                                myImageUrl = document.select("meta[property=og:image]").attr("content");
+                                if (myImageUrl.isEmpty())
+                                    myImageUrl = document.select("meta[property=og:image]").attr("content");
+                                if (myImageUrl.isEmpty())
+                                    myImageUrl = document.select("meta[property=og:images]").attr("content");
+                                if (myImageUrl.isEmpty())
+                                    myImageUrl = document.select("#landingImage").attr("src");
                             }
                         }
 
                         // 圖片處理
-                        picOrUrl_changeStatus(_isPic);
+                        picOrUrl_changeStatus(isPic);
 
-                        urlDatabase.addUrl(_url, _title, _description, _imageUrl, _isPic);
+                        urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic);
                     } catch (Exception ignored) {
                         new ASRunner() {
                             @Override // com.kota.ASFramework.Thread.ASRunner
@@ -212,44 +212,44 @@ public class Thumbnail_ItemView extends LinearLayout {
 
     /** 判斷是圖片或連結, 改變顯示狀態 */
     void picOrUrl_changeStatus(boolean _isPic) {
-        _load_thumbnail_img = UserSettings.getLinkShowThumbnail();
-        _load_only_wifi = UserSettings.getLinkShowOnlyWifi();
+        loadThumbnailImg = UserSettings.getLinkShowThumbnail();
+        loadOnlyWifi = UserSettings.getLinkShowOnlyWifi();
         int _transportType = TempSettings.getTransportType();
 
         if (_isPic) { // 純圖片
             new ASRunner() {
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    _layout_default.setVisibility(GONE);
+                    layoutDefault.setVisibility(GONE);
 
                     // 圖片
-                    _layout_pic.setVisibility(VISIBLE);
-                    if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
+                    layoutPic.setVisibility(VISIBLE);
+                    if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image();
-                    } else if (_imageUrl.equals("")) {
-                        _image_view_button.setVisibility(GONE);
+                    } else if (myImageUrl.equals("")) {
+                        imageViewButton.setVisibility(GONE);
                     }
 
                     // 內容
-                    _layout_normal.setVisibility(GONE);
+                    layoutNormal.setVisibility(GONE);
                 }
             }.runInMainThread();
         } else { // 內容網址
             new ASRunner() {
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    _layout_default.setVisibility(GONE);
+                    layoutDefault.setVisibility(GONE);
 
                     // 圖片
-                    _layout_pic.setVisibility(VISIBLE);
-                    if (_load_thumbnail_img && (!_load_only_wifi || _transportType == 1)) {
+                    layoutPic.setVisibility(VISIBLE);
+                    if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image();
-                    } else if (_imageUrl.equals("")) {
-                        _image_view_button.setVisibility(GONE);
+                    } else if (myImageUrl.equals("")) {
+                        imageViewButton.setVisibility(GONE);
                     }
 
                     // 內容
-                    _layout_normal.setVisibility(VISIBLE);
+                    layoutNormal.setVisibility(VISIBLE);
                     set_normal();
                 }
             }.runInMainThread();
@@ -258,53 +258,53 @@ public class Thumbnail_ItemView extends LinearLayout {
 
     /** 純圖片 */
     public void prepare_load_image() {
-        if (_img_loaded) return;
+        if (imgLoaded) return;
 
-        if (_isPic) {
-            _height = _height/2;
+        if (isPic) {
+            viewHeight = viewHeight /2;
 
         } else {
-            _height = _height/4;
+            viewHeight = viewHeight /4;
         }
-        _image_view_pic.setMinimumHeight(_height);
+        photoViewPic.setMinimumHeight(viewHeight);
         loadImage();
-        _url_view.setText(_imageUrl);
+        urlView.setText(myImageUrl);
     }
 
     /** 內容網址 */
     private void set_normal() {
-        if (!_title.isEmpty()) {
-            _title_view.setText(_title);
-            _title_view.setVisibility(VISIBLE);
+        if (!myTitle.isEmpty()) {
+            titleView.setText(myTitle);
+            titleView.setVisibility(VISIBLE);
         }
-        if (!_description.isEmpty()) {
-            _description_view.setText(_description);
-            _description_view.setVisibility(VISIBLE);
+        if (!myDescription.isEmpty()) {
+            descriptionView.setText(myDescription);
+            descriptionView.setVisibility(VISIBLE);
         }
-        _url_view.setText(_url);
+        urlView.setText(myUrl);
     }
 
     /** 意外處理 */
     private void set_fail() {
-        _layout_default.setVisibility(GONE);
+        layoutDefault.setVisibility(GONE);
 
         // 圖片
-        _layout_pic.setVisibility(GONE);
+        layoutPic.setVisibility(GONE);
 
         // 內容
-        _layout_normal.setVisibility(GONE);
+        layoutNormal.setVisibility(GONE);
     }
 
     /** 讀取圖片 */
     private void loadImage() {
-        _img_loaded = true;
+        imgLoaded = true;
         new ASRunner() {
             @SuppressLint("ResourceType")
             @Override
             public void run() {
-                _image_view_button.setVisibility(GONE);
-                _image_view_pic.setVisibility(VISIBLE);
-                _image_view_pic.setContentDescription(_description);
+                imageViewButton.setVisibility(GONE);
+                photoViewPic.setVisibility(VISIBLE);
+                photoViewPic.setContentDescription(myDescription);
                 try {
                     CircularProgressDrawable circularProgressDrawable = new CircularProgressDrawable(getContext());
                     circularProgressDrawable.setStrokeWidth(10f);
@@ -317,14 +317,14 @@ public class Thumbnail_ItemView extends LinearLayout {
                     // progress bar start
                     circularProgressDrawable.start();
 
-                    if (_imageUrl.isEmpty()) {
+                    if (myImageUrl.isEmpty()) {
                         return;
                     }
 
-                    _image_view_pic.setImageDrawable(circularProgressDrawable);
+                    photoViewPic.setImageDrawable(circularProgressDrawable);
 
                     Glide.with(Thumbnail_ItemView.this)
-                            .load(_imageUrl)
+                            .load(myImageUrl)
                             .listener(new RequestListener<>() {
                                 @Override
                                 public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model, @NonNull Target<Drawable> target, boolean isFirstResource) {
@@ -353,8 +353,8 @@ public class Thumbnail_ItemView extends LinearLayout {
                                             bitmap = ((BitmapDrawable)resource).getBitmap();
                                         int picHeight = bitmap.getHeight();
                                         int picWidth = bitmap.getWidth();
-                                        int targetHeight = _height;
-                                        int targetWidth = _width;
+                                        int targetHeight = viewHeight;
+                                        int targetWidth = viewWidth;
 
                                         float scaleWidth = (float) targetWidth / picWidth;
                                         float scaleHeight = (float) targetHeight / picHeight;
@@ -363,18 +363,18 @@ public class Thumbnail_ItemView extends LinearLayout {
 
                                         int tempHeight = (int) (picHeight * scale);
                                         targetHeight = Math.min(tempHeight, targetHeight);
-                                        _image_view_pic.setMinimumHeight(targetHeight);
+                                        photoViewPic.setMinimumHeight(targetHeight);
 
                                         int tempWidth = (int) (picWidth * scale);
                                         targetWidth = Math.min(tempWidth, targetWidth);
-                                        _image_view_pic.setMinimumWidth(targetWidth);
+                                        photoViewPic.setMinimumWidth(targetWidth);
 
                                         if (resource instanceof GifDrawable gifDrawable) {
                                             gifDrawable.startFromFirstFrame();
-                                            _image_view_pic.setImageDrawable(resource);
+                                            photoViewPic.setImageDrawable(resource);
                                         } else {
                                             Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, targetWidth, targetHeight, true);
-                                            _image_view_pic.setImageBitmap(newBitmap);
+                                            photoViewPic.setImageBitmap(newBitmap);
                                         }
 
                                     } catch (Exception ignored) {
@@ -403,12 +403,12 @@ public class Thumbnail_ItemView extends LinearLayout {
         }.runInMainThread();
     }
 
-    OnClickListener _open_url_listener = new OnClickListener() {
+    OnClickListener openUrlListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(_url));
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(myUrl));
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            _context.startActivity(intent);
+            myContext.startActivity(intent);
         }
     };
 
@@ -430,19 +430,22 @@ public class Thumbnail_ItemView extends LinearLayout {
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.thumbnail, this);
         mainLayout = findViewById(R.id.thumbnail_content_view);
-        _layout_default = mainLayout.findViewById(R.id.thumbnail_default);
+        layoutDefault = mainLayout.findViewById(R.id.thumbnail_default);
 
-        _layout_pic = mainLayout.findViewById(R.id.thumbnail_pic);
-        _image_view_pic = mainLayout.findViewById(R.id.thumbnail_image_pic);
-        _image_view_pic.setOnClickListener(_open_url_listener);
-        _image_view_button = mainLayout.findViewById(R.id.thumbnail_image_button);
-        _image_view_button.setOnClickListener(view -> prepare_load_image());
+        layoutPic = mainLayout.findViewById(R.id.thumbnail_pic);
+        photoViewPic = mainLayout.findViewById(R.id.thumbnail_image_pic);
+        photoViewPic.setOnClickListener(openUrlListener);
+        photoViewPic.setMaximumScale(20.0f);
+        photoViewPic.setMediumScale(3.0f);
 
-        _layout_normal = mainLayout.findViewById(R.id.thumbnail_normal);
-        _title_view = mainLayout.findViewById(R.id.thumbnail_title);
-        _title_view.setOnClickListener(titleListener);
-        _description_view = mainLayout.findViewById(R.id.thumbnail_description);
-        _description_view.setOnClickListener(descriptionListener);
-        _url_view = mainLayout.findViewById(R.id.thumbnail_url);
+        imageViewButton = mainLayout.findViewById(R.id.thumbnail_image_button);
+        imageViewButton.setOnClickListener(view -> prepare_load_image());
+
+        layoutNormal = mainLayout.findViewById(R.id.thumbnail_normal);
+        titleView = mainLayout.findViewById(R.id.thumbnail_title);
+        titleView.setOnClickListener(titleListener);
+        descriptionView = mainLayout.findViewById(R.id.thumbnail_description);
+        descriptionView.setOnClickListener(descriptionListener);
+        urlView = mainLayout.findViewById(R.id.thumbnail_url);
     }
 }
