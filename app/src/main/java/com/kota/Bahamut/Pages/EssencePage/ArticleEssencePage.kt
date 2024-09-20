@@ -136,9 +136,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                         itemView3.setFrame(item.frame)
                     }
                     if (itemIndex >= count - 2) {
-                        itemView3.setDividerhidden(true)
+                        itemView3.setDividerHidden(true)
                     } else {
-                        itemView3.setDividerhidden(false)
+                        itemView3.setDividerHidden(false)
                     }
                 }
 

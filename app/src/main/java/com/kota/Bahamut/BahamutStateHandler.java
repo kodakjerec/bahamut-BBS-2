@@ -23,6 +23,7 @@ import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
+import com.kota.Bahamut.Pages.UserPage;
 import com.kota.Telnet.Logic.Article_Handler;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Model.TelnetRow;
@@ -336,6 +337,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
     }
 
+    /** 頁面: 個人設定  */
+    void handleUserPage() {
+        setCurrentPage(BahamutPage.BAHAMUT_USER_PAGE);
+
+        // 傳給個人設定, 頁面更新資料
+        UserPage page = PageContainer.getInstance().getUserPage();
+        if (page.onPagePreload()) {
+            page.updateUserPageContent(rows);
+        }
+    }
+
     void handleArticle() {
         TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
         if (top_page instanceof BoardMainPage) {
@@ -424,7 +436,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 handleBoardEssencePage();
             } else if (this.row_string_00.contains("【板主：")) {
                 handleBoardPage();
-            } else if (this.row_string_23.contains("您要刪除上述記錄嗎")) {
+            } else if (this.row_string_00.contains("【個人設定】")) {
+                handleUserPage();
+            }else if (this.row_string_23.contains("您要刪除上述記錄嗎")) {
                 TelnetClient.getClient().sendStringToServer("n");
             } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);

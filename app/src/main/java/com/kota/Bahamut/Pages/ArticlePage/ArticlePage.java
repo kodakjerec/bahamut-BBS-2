@@ -99,7 +99,6 @@ public class ArticlePage extends TelnetPage {
 
         @Override // android.widget.Adapter
         public View getView(int itemIndex, View itemViewFrom, ViewGroup parentView) {
-            boolean isNewView = false;
             int type = getItemViewType(itemIndex);
             TelnetArticleItem item = getItem(itemIndex);
             // 2-標題 0-本文 1-簽名檔 3-發文時間
@@ -112,54 +111,50 @@ public class ArticlePage extends TelnetPage {
                     case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
                     default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
                 }
-                isNewView = true;
             } else if (type == ArticlePageItemType.Content) {
                 itemViewOrigin = new ArticlePage_TextItemView(getContext());
-                isNewView = true;
             }
 
-            if (isNewView) {
-                switch (type) {
-                    case ArticlePageItemType.Content -> {
-                        ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
-                        if (item != null) {
-                            itemView1.setAuthor(item.getAuthor(), item.getNickname());
-                            itemView1.setQuote(item.getQuoteLevel());
-                            itemView1.setContent(item.getContent(), item.getFrame().rows);
+            switch (type) {
+                case ArticlePageItemType.Content -> {
+                    ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
+                    if (item != null) {
+                        itemView1.setAuthor(item.getAuthor(), item.getNickname());
+                        itemView1.setQuote(item.getQuoteLevel());
+                        itemView1.setContent(item.getContent(), item.getFrame().rows);
+                    }
+                    // 分隔線
+                    itemView1.setDividerHidden(itemIndex >= getCount() - 2);
+                    // 黑名單檢查
+                    itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
+                }
+                case ArticlePageItemType.Sign -> {
+                    ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
+                    if (item != null)
+                        itemView2.setFrame(item.getFrame());
+                    // 分隔線
+                    itemView2.setDividerHidden(itemIndex >= getCount() - 2);
+                }
+                case ArticlePageItemType.Header -> {
+                    ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
+                    String author = null;
+                    String title = null;
+                    String board_name = null;
+                    if (telnetArticle != null) {
+                        author = telnetArticle.Author;
+                        title = telnetArticle.Title;
+                        board_name = telnetArticle.BoardName;
+                        if (telnetArticle.Nickname != null) {
+                            author = author + "(" + telnetArticle.Nickname + ")";
                         }
-                        // 分隔線
-                        itemView1.setDividerHidden(itemIndex >= getCount() - 2);
-                        // 黑名單檢查
-                        itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
                     }
-                    case ArticlePageItemType.Sign -> {
-                        ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
-                        if (item != null)
-                            itemView2.setFrame(item.getFrame());
-                        // 分隔線
-                        itemView2.setDividerhidden(itemIndex >= getCount() - 2);
-                    }
-                    case ArticlePageItemType.Header -> {
-                        ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
-                        String author = null;
-                        String title = null;
-                        String board_name = null;
-                        if (telnetArticle != null) {
-                            author = telnetArticle.Author;
-                            title = telnetArticle.Title;
-                            board_name = telnetArticle.BoardName;
-                            if (telnetArticle.Nickname != null) {
-                                author = author + "(" + telnetArticle.Nickname + ")";
-                            }
-                        }
-                        itemView3.setData(title, author, board_name);
-                        itemView3.setMenuButton(mMenuListener);
-                    }
-                    case ArticlePageItemType.PostTime -> {
-                        ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
-                        itemView4.setTime("《" + telnetArticle.DateTime + "》");
-                        itemView4.setIP(telnetArticle.fromIP);
-                    }
+                    itemView3.setData(title, author, board_name);
+                    itemView3.setMenuButton(mMenuListener);
+                }
+                case ArticlePageItemType.PostTime -> {
+                    ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
+                    itemView4.setTime("《" + telnetArticle.DateTime + "》");
+                    itemView4.setIP(telnetArticle.fromIP);
                 }
             }
             return itemViewOrigin;

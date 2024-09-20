@@ -23,30 +23,34 @@ import com.kota.TelnetUI.TelnetView;
 
 public class MainPage extends TelnetPage {
     RelativeLayout mainLayout;
-    View.OnClickListener _boards_listener = v -> {
+    View.OnClickListener userListener = v -> {
+        MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserPage());
+        TelnetClient.getClient().sendStringToServerInBackground("u");
+    };
+    View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
         TelnetClient.getClient().sendStringToServerInBackground("b");
     };
-    View.OnClickListener _class_listener = v -> {
+    View.OnClickListener classListener = v -> {
         PageContainer.getInstance().pushClassPage("Class", "分組討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
         TelnetClient.getClient().sendStringToServerInBackground("c");
     };
-    View.OnClickListener _favorite_listener = v -> {
+    View.OnClickListener favoriteListener = v -> {
         PageContainer.getInstance().pushClassPage("Favorite", "我的最愛");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
         TelnetClient.getClient().sendStringToServerInBackground("f");
     };
     TelnetFrame _frame_buffer = null;
     ASDialog goodbyeDialog = null;
-    View.OnClickListener _logout_listener = v -> TelnetClient.getClient().sendStringToServerInBackground("g");
-    View.OnClickListener _mail_listener = v -> {
+    View.OnClickListener logoutListener = v -> TelnetClient.getClient().sendStringToServerInBackground("g");
+    View.OnClickListener mailListener = v -> {
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getMailBoxPage());
         TelnetClient.getClient().sendStringToServerInBackground("m\nr");
     };
     ASDialog _save_hot_message_dialog = null;
-    View.OnClickListener _system_setting_listener = v -> MainPage.this.getNavigationController().pushViewController(new SystemSettingsPage());
+    View.OnClickListener systemSettingListener = v -> MainPage.this.getNavigationController().pushViewController(new SystemSettingsPage());
 
     private enum LastLoadClass {
         Unload,
@@ -65,12 +69,13 @@ public class MainPage extends TelnetPage {
 
     public void onPageDidLoad() {
         mainLayout = (RelativeLayout) findViewById(R.id.content_view);
-        mainLayout.findViewById(R.id.Main_boardsButton).setOnClickListener(this._boards_listener);
-        mainLayout.findViewById(R.id.Main_classButton).setOnClickListener(this._class_listener);
-        mainLayout.findViewById(R.id.Main_FavoriteButton).setOnClickListener(this._favorite_listener);
-        mainLayout.findViewById(R.id.Main_logoutButton).setOnClickListener(this._logout_listener);
-        mainLayout.findViewById(R.id.Main_mailButton).setOnClickListener(this._mail_listener);
-        mainLayout.findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this._system_setting_listener);
+        mainLayout.findViewById(R.id.Main_userButton).setOnClickListener(this.userListener);
+        mainLayout.findViewById(R.id.Main_boardsButton).setOnClickListener(this.boardsListener);
+        mainLayout.findViewById(R.id.Main_classButton).setOnClickListener(this.classListener);
+        mainLayout.findViewById(R.id.Main_FavoriteButton).setOnClickListener(this.favoriteListener);
+        mainLayout.findViewById(R.id.Main_logoutButton).setOnClickListener(this.logoutListener);
+        mainLayout.findViewById(R.id.Main_mailButton).setOnClickListener(this.mailListener);
+        mainLayout.findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this.systemSettingListener);
 
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
@@ -125,7 +130,7 @@ public class MainPage extends TelnetPage {
 
     /* access modifiers changed from: protected */
     public boolean onBackPressed() {
-        this._logout_listener.onClick(null);
+        this.logoutListener.onClick(null);
         return true;
     }
 

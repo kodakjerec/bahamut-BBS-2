@@ -59,6 +59,24 @@
             <View style="@style/HorizontalDivider" />
 
             <Button
+                android:id="@+id/Main_userButton"
+                style="@style/MainItem"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:drawable/list_selector_background"
+                android:text="@string/folder_user"
+                android:textColor="@color/button_text_color"
+                android:textSize="28sp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <View style="@style/HorizontalDivider" />
+
+            <Button
                 android:id="@+id/Main_boardsButton"
                 style="@style/MainItem"
                 android:layout_width="match_parent"

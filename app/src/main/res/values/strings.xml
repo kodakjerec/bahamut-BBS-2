@@ -55,6 +55,7 @@
     <string name="last_page">最後頁</string>
     <string name="prev_article">上一篇</string>
     <string name="next_article">下一篇</string>
+    <string name="folder_user">個人設定</string>
     <string name="folder_boards">佈告討論區</string>
     <string name="folder_class">分組討論區</string>
     <string name="folder_favorite">我的最愛</string>
@@ -347,4 +348,9 @@
     <string name="theme_manager_page_chapter_hint">顯示現在設定的JSON，可以複製並分享給別人</string>
     <string name="theme_manager_page_msg01">外觀套用新設定完畢</string>
     <string name="theme_manager_page_msg02">外觀還原設定</string>
+    <string name="user_info">個人資料</string>
+    <string name="user_info_nick_name">暱稱</string>
+    <string name="user_info_real_name">真實姓名</string>
+    <string name="user_info_address">居住地址</string>
+    <string name="user_info_msg01">個人資料套用新設定完畢</string>
 </resources>

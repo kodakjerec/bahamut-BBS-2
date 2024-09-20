@@ -34,11 +34,11 @@ import com.kota.TelnetUI.DividerView;
 import java.util.Vector;
 
 public class ArticlePage_TextItemView extends LinearLayout implements TelnetArticleItemView {
-    TextView _author_label = null;
-    TextView _content_label = null;
-    ViewGroup _content_view = null;
-    DividerView _divider_view = null;
-    int _quote = 0;
+    TextView authorLabel = null;
+    TextView contentLabel = null;
+    ViewGroup contentView = null;
+    DividerView dividerView = null;
+    int myQuote = 0;
 
     public ArticlePage_TextItemView(Context context) {
         super(context);
@@ -52,15 +52,15 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
 
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
-        _author_label = findViewById(R.id.ArticleTextItemView_Title);
-        _content_label = findViewById(R.id.ArticleTextItemView_content);
-        _divider_view = findViewById(R.id.ArticleTextItemView_DividerView);
-        _content_view = findViewById(R.id.ArticleTextItemView_contentView);
+        authorLabel = findViewById(R.id.ArticleTextItemView_Title);
+        contentLabel = findViewById(R.id.ArticleTextItemView_content);
+        dividerView = findViewById(R.id.ArticleTextItemView_DividerView);
+        contentView = findViewById(R.id.ArticleTextItemView_contentView);
         setBackgroundResource(R.color.transparent);
     }
 
     public void setAuthor(String author, String nickname) {
-        if (_author_label != null) {
+        if (authorLabel != null) {
             StringBuilder author_buffer = new StringBuilder();
             if (author != null) {
                 author_buffer.append(author);
@@ -70,21 +70,21 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
             }
             if (author != null && !author.isEmpty())
                 author_buffer.append(" 說:");
-            _author_label.setText(author_buffer.toString());
+            authorLabel.setText(author_buffer.toString());
         }
     }
 
     /** 設定內容 */
     public void setContent(String content, Vector<TelnetRow> rows) {
-        if (_content_label != null) {
+        if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
-            if (_quote>0) {
-                _content_label.setText(content);
-                stringNewUrlSpan(_content_label);
+            if (myQuote >0) {
+                contentLabel.setText(content);
+                stringNewUrlSpan(contentLabel);
             } else {
                 // 塗顏色
                 CharSequence colorfulText = stringPaint(rows);
-                _content_label.setText(colorfulText);
+                contentLabel.setText(colorfulText);
             }
             // 預覽圖
             stringThumbnail();
@@ -232,16 +232,16 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     /** 加上預覽圖 */
     @SuppressLint("ResourceAsColor")
     private void stringThumbnail() {
-        LinearLayout mainLayout = (LinearLayout) _content_view;
+        LinearLayout mainLayout = (LinearLayout) contentView;
 
-        int originalIndex = mainLayout.indexOfChild(_content_label);
-        Linkify.addLinks(_content_label,  Linkify.WEB_URLS);
+        int originalIndex = mainLayout.indexOfChild(contentLabel);
+        Linkify.addLinks(contentLabel,  Linkify.WEB_URLS);
 
         if (originalIndex>0) {
             // 使用預覽圖
             if (UserSettings.getLinkAutoShow()) {
-                SpannableString originalString = (SpannableString) _content_label.getText();
-                URLSpan[] urlSpans = _content_label.getUrls();
+                SpannableString originalString = (SpannableString) contentLabel.getText();
+                URLSpan[] urlSpans = contentLabel.getUrls();
                 if (urlSpans.length>0) {
                     int previousIndex = 0;
                     for (URLSpan urlSpan : urlSpans) {
@@ -287,7 +287,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                             textView.setTextIsSelectable(true);
                             textView.setFocusable(true);
                             textView.setLongClickable(true);
-                            if (_quote > 0)
+                            if (myQuote > 0)
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content1));
                             else
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content0));
@@ -296,21 +296,21 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                     }
                 }
             } else {
-                stringNewUrlSpan(_content_label);
+                stringNewUrlSpan(contentLabel);
             }
         }
     }
 
     public void setQuote(int quote) {
-        _quote = quote;
+        myQuote = quote;
         // 之前的引用文章
-        if (_quote > 0) {
-            _author_label.setTextColor(getContextColor(R.color.article_page_text_item_author1));
-            _content_label.setTextColor(getContextColor(R.color.article_page_text_item_content1));
+        if (myQuote > 0) {
+            authorLabel.setTextColor(getContextColor(R.color.article_page_text_item_author1));
+            contentLabel.setTextColor(getContextColor(R.color.article_page_text_item_content1));
         } else {
             // 使用者回文
-            _author_label.setTextColor(getContextColor(R.color.article_page_text_item_author0));
-            _content_label.setTextColor(getContextColor(R.color.article_page_text_item_content0));
+            authorLabel.setTextColor(getContextColor(R.color.article_page_text_item_author0));
+            contentLabel.setTextColor(getContextColor(R.color.article_page_text_item_content0));
         }
     }
 
@@ -324,17 +324,17 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
 
     public void setDividerHidden(boolean isHidden) {
         if (isHidden) {
-            _divider_view.setVisibility(View.GONE);
+            dividerView.setVisibility(View.GONE);
         } else {
-            _divider_view.setVisibility(View.VISIBLE);
+            dividerView.setVisibility(View.VISIBLE);
         }
     }
 
     public void setVisible(boolean visible) {
         if (visible) {
-            _content_view.setVisibility(View.VISIBLE);
+            contentView.setVisibility(View.VISIBLE);
         } else {
-            _content_view.setVisibility(View.GONE);
+            contentView.setVisibility(View.GONE);
         }
     }
 }

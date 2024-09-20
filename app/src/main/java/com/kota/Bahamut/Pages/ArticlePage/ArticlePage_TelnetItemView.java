@@ -11,8 +11,8 @@ import com.kota.TelnetUI.DividerView;
 import com.kota.TelnetUI.TelnetView;
 
 public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetArticleItemView {
-    DividerView _divider_view = null;
-    TelnetView _telnet_view = null;
+    DividerView dividerView = null;
+    TelnetView telnetView = null;
 
     public ArticlePage_TelnetItemView(Context context) {
         super(context);
@@ -21,24 +21,24 @@ public class ArticlePage_TelnetItemView extends LinearLayout implements TelnetAr
 
     private void init(Context context) {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_telnet_item_view, this);
-        this._telnet_view = findViewById(R.id.ArticlePage_TelnetItemView_TelnetView);
-        this._divider_view = findViewById(R.id.ArticlePage_TelnetItemView_DividerView);
+        telnetView = findViewById(R.id.ArticlePage_TelnetItemView_TelnetView);
+        dividerView = findViewById(R.id.ArticlePage_TelnetItemView_DividerView);
         setBackgroundResource(android.R.color.transparent);
     }
 
     public void setFrame(TelnetFrame aFrame) {
-        this._telnet_view.setFrame(aFrame);
+        telnetView.setFrame(aFrame);
     }
 
     public int getType() {
         return ArticlePageItemType.Sign;
     }
 
-    public void setDividerhidden(boolean isHidden) {
+    public void setDividerHidden(boolean isHidden) {
         if (isHidden) {
-            this._divider_view.setVisibility(View.GONE);
+            dividerView.setVisibility(View.GONE);
         } else {
-            this._divider_view.setVisibility(View.VISIBLE);
+            dividerView.setVisibility(View.VISIBLE);
         }
     }
 }

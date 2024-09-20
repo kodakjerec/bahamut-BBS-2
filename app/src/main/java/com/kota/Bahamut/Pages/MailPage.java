@@ -178,9 +178,9 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
                 if (item!=null)
                     itemView2.setFrame(item.getFrame());
                 if (itemIndex >= getCount() - 2) {
-                    itemView2.setDividerhidden(true);
+                    itemView2.setDividerHidden(true);
                 } else {
-                    itemView2.setDividerhidden(false);
+                    itemView2.setDividerHidden(false);
                 }
             }
             case ArticlePageItemType.Header -> {
