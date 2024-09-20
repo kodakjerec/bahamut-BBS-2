@@ -12,6 +12,7 @@ import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
+import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
@@ -49,7 +50,7 @@ public class MainPage extends TelnetPage {
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getMailBoxPage());
         TelnetClient.getClient().sendStringToServerInBackground("m\nr");
     };
-    ASDialog _save_hot_message_dialog = null;
+    ASDialog saveHotMessageDialog = null;
     View.OnClickListener systemSettingListener = v -> MainPage.this.getNavigationController().pushViewController(new SystemSettingsPage());
 
     private enum LastLoadClass {
@@ -124,7 +125,7 @@ public class MainPage extends TelnetPage {
 
     public void onPageDidDisappear() {
         this.goodbyeDialog = null;
-        this._save_hot_message_dialog = null;
+        this.saveHotMessageDialog = null;
         super.onPageDidDisappear();
     }
 
@@ -135,15 +136,15 @@ public class MainPage extends TelnetPage {
     }
 
     public void onProcessHotMessage() {
-        if (this._save_hot_message_dialog == null) {
-            this._save_hot_message_dialog = ASAlertDialog.createDialog()
+        if (this.saveHotMessageDialog == null) {
+            this.saveHotMessageDialog = ASAlertDialog.createDialog()
                     .setTitle("熱訊")
                     .setMessage("本次上站熱訊處理 ")
                     .addButton("備忘錄")
                     .addButton("保留")
                     .addButton("清除")
                     .setListener((aDialog, index) -> {
-                MainPage.this._save_hot_message_dialog = null;
+                MainPage.this.saveHotMessageDialog = null;
                 switch (index) {
                     case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
                     case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
@@ -152,25 +153,31 @@ public class MainPage extends TelnetPage {
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {
                 TelnetClient.getClient().sendStringToServerInBackground("K\nQ");
-                MainPage.this._save_hot_message_dialog = null;
+                MainPage.this.saveHotMessageDialog = null;
                 return false;
             });
-            this._save_hot_message_dialog.show();
+            this.saveHotMessageDialog.show();
         }
     }
 
     public void onCheckGoodbye() {
         if (this.goodbyeDialog == null) {
             this.goodbyeDialog = ASAlertDialog.createDialog()
-                    .setTitle("登出")
+                    .setTitle(getContextString(R.string.logout))
                     .setMessage("是否確定要登出?")
-                    .addButton("取消")
-                    .addButton("確認")
+                    .addButton(getContextString(R.string.cancel))
+                    .addButton(getContextString(R.string.main_hero_step))
+                    .addButton(getContextString(R.string.confirm))
                     .setListener((aDialog, index) -> {
                         MainPage.this.goodbyeDialog = null;
                         switch (index) {
-                            case 1 -> // 確定
+                            case 2 -> // 確定
                                     TelnetClient.getClient().sendStringToServerInBackground("G");
+                            case 1 -> {// 勇者足跡
+                                TelnetClient.getClient().sendStringToServerInBackground("N");
+                                DialogHeroStep dialogHeroStep = new DialogHeroStep();
+                                dialogHeroStep.show();
+                            }
                             case 0 -> // 取消
                                     TelnetClient.getClient().sendStringToServerInBackground("Q");
                             default -> {}
@@ -179,7 +186,7 @@ public class MainPage extends TelnetPage {
                     .scheduleDismissOnPageDisappear(this);
             this.goodbyeDialog.setOnDismissListener( (dialog)-> {
                         if (this.goodbyeDialog != null)
-                            TelnetClient.getClient().sendStringToServerInBackground("G");
+                            TelnetClient.getClient().sendStringToServerInBackground("Q");
                     });
         }
         this.goodbyeDialog.show();
@@ -192,11 +199,11 @@ public class MainPage extends TelnetPage {
             }
             this.goodbyeDialog = null;
         }
-        if (this._save_hot_message_dialog != null) {
-            if (this._save_hot_message_dialog.isShowing()) {
-                this._save_hot_message_dialog.dismiss();
+        if (this.saveHotMessageDialog != null) {
+            if (this.saveHotMessageDialog.isShowing()) {
+                this.saveHotMessageDialog.dismiss();
             }
-            this._save_hot_message_dialog = null;
+            this.saveHotMessageDialog = null;
         }
     }
 }

@@ -353,4 +353,7 @@
     <string name="user_info_real_name">真實姓名</string>
     <string name="user_info_address">居住地址</string>
     <string name="user_info_msg01">個人資料套用新設定完畢</string>
+    <string name="main_hero_step">勇者足跡</string>
+    <string name="main_hero_step_msg01">請留言 (至多三行)</string>
+    <string name="main_hero_success01">成功留下過路足跡</string>
 </resources>
