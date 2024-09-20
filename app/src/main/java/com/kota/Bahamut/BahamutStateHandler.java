@@ -1,5 +1,8 @@
 package com.kota.Bahamut;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
+import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -32,6 +35,8 @@ import com.kota.Telnet.TelnetStateHandler;
 import com.kota.Telnet.TelnetUtils;
 import com.kota.TelnetUI.TelnetPage;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -340,6 +345,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
         } else if (top_page instanceof BoardEssencePage) {
             setCurrentPage(BahamutPage.BAHAMUT_ARTICLE_ESSENCE);
         }
+        myAsRunner.cancel();
+        myAsRunner.postDelayed(5000);
+
         if (!this.duringReadingArticle) {
             onReadArticleStart();
         }
@@ -447,19 +455,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 if (this.lastHeader.equals("●請") || this.lastHeader.equals("請按")) {
                     TelnetClient.getClient().sendStringToServer("");
                 }
-            } else if (duringReadingArticle) {
-                boolean isAllCommandsBlank = true;
-                for (int i=0;i<rows.size();i++) {
-                    if (!rows.get(i).getRawString().isEmpty()) {
-                        isAllCommandsBlank = false;
-                        break;
-                    }
-                }
-                // 經過前面所有判斷, 而且處於讀取文章中狀態, 且24行內容不為全部空白 => 判斷進入讀取文章bug, 強制塞入文章讀取完畢
-                if (!isAllCommandsBlank) {
-                    onReadArticleFinished();
-                    new BahamutCommandLoadArticleEnd().execute();
-                }
             }
         }
     }
@@ -479,7 +474,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this.articleHandler.build();
         TelnetArticle article = this.articleHandler.getArticle();
         this.articleHandler.newArticle();
-//        PageContainer.getInstance().getBoardPage();
+
         if (this.articleNumber != null) {
             article.Number = Integer.parseInt(this.articleNumber);
         }
@@ -491,7 +486,21 @@ public class BahamutStateHandler extends TelnetStateHandler {
             showArticle(article);
         }
         this.duringReadingArticle = false;
+        myAsRunner.cancel();
     }
+    // 強制進入讀取完畢
+    ASRunner myAsRunner = new ASRunner(){
+        @Override
+        public void run() {
+            onReadArticleFinished();
+            // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
+            int lastPage = getCurrentPage();
+            if (lastPage==BahamutPage.BAHAMUT_ARTICLE)
+                new BahamutCommandLoadArticleEnd().execute();
+            else
+                new BahamutCommandLoadArticleEndForSearch().execute();
+        }
+    };
 
     // 顯示文章內文
     void showArticle(final TelnetArticle aArticle) {
