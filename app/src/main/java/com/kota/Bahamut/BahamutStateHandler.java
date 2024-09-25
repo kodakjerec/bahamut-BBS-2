@@ -1,8 +1,5 @@
 package com.kota.Bahamut;
 
-import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
-
-import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -24,6 +21,8 @@ import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.UserPage;
+import com.kota.Bahamut.Service.HeroStep;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.Article_Handler;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
 import com.kota.Telnet.Model.TelnetRow;
@@ -36,13 +35,10 @@ import com.kota.Telnet.TelnetStateHandler;
 import com.kota.Telnet.TelnetUtils;
 import com.kota.TelnetUI.TelnetPage;
 
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/* loaded from: classes.dex */
 public class BahamutStateHandler extends TelnetStateHandler {
     static final int STEP_CONNECTING = 0;
     static final int STEP_WORKING = 1;
@@ -141,6 +137,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
      */
 
+    /** 處理非切換主頁面的需求 */
     boolean pass_1() {
         boolean run_pass_2 = true;
         if (this.row_string_23.contains("您有一篇文章尚未完成")) {
@@ -207,14 +204,66 @@ public class BahamutStateHandler extends TelnetStateHandler {
             } else if (this.row_string_02.contains("HP：") && this.row_string_02.contains("MP：")) {
                 ArticlePage page = PageContainer.getInstance().getArticlePage();
                 Vector<String> userData = new Vector<>();
-                this.rows.forEach(row-> userData.add(row.toString()));
+                this.rows.forEach(row -> userData.add(row.toString()));
                 page.ctrlQUser(userData);
+            } else if (this.row_string_00.contains("過  路  勇  者  的  足  跡")) {
+                // 逐行塞入勇者足跡
+                insertHeroSteps();
             }
 
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
             return false;
+        } else if (this.row_string_23.contains("請按 [SPACE] 繼續觀賞") && this.row_string_00.contains("過  路  勇  者  的  足  跡")) {
+            // 逐行塞入勇者足跡
+            insertHeroSteps();
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
+            return false;
         } else {
             return run_pass_2;
+        }
+    }
+
+    /** 逐行塞入勇者足跡 */
+    void insertHeroSteps() {
+        boolean startCatching = false;
+        HeroStep heroStep = null;
+        int countRows = 0;
+        for (int i = 0; i < rows.size(); i++) {
+            TelnetRow fromRow = rows.get(i);
+            if (startCatching) {
+                // 開始擷取本文
+                if (fromRow.isEmpty()) {
+                    // 擷取完畢
+                    startCatching = false;
+                    countRows = 0;
+                    TempSettings.setHeroStep(heroStep);
+                } else {
+                    countRows++;
+                    String oldContent = heroStep.getContent();
+                    // 第二行開始才加入換行
+                    if (!oldContent.isEmpty())
+                        oldContent+="\n";
+                    // 塞入本行內容
+                    heroStep.setContent(oldContent+fromRow.toContentString());
+                    if (countRows>=3) {
+                        // 最多留言三行, 強制結束
+                        startCatching = false;
+                        countRows = 0;
+                        TempSettings.setHeroStep(heroStep);
+                    }
+                }
+            } else {
+                if (fromRow.getRawString().contains("(")) {
+                    // 開始擷取
+                    startCatching = true;
+                    countRows = 0;
+                    String rawString = fromRow.getRawString();
+                    int nameLastIndex = rawString.indexOf(")");
+                    String authorName = rawString.substring(0, nameLastIndex+1).trim();
+                    String datetime = rawString.substring(nameLastIndex+2).trim();
+                    heroStep = new HeroStep(authorName, datetime, "");
+                }
+            }
         }
     }
 
@@ -228,6 +277,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     void handleMainPage() {
         this.nowStep = STEP_WORKING;
+
         if (getCurrentPage() < BahamutPage.BAHAMUT_MAIN) {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
         }
@@ -237,6 +287,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (page.onPagePreload()) {
             showPage(page);
         }
+
         if (this.lastHeader.equals("本次")) {
             new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.1
                 @Override // com.kota.ASFramework.Thread.ASRunner
@@ -257,6 +308,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     }
                 }
             }.runInMainThread();
+        } else if (this.lastHeader.startsWith("[")) {
+            // 紀錄線上人數
+            page.setOnlinePeople(this.row_string_23.substring(22,27).trim());
         }
     }
 

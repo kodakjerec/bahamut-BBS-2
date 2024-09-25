@@ -32,6 +32,7 @@ import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
+import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TextView.TelnetTextViewSmall;
 
@@ -114,9 +115,14 @@ public class SystemSettingsPage extends TelnetPage {
     };
 
     /** 開啟外觀管理 */
-    View.OnClickListener themeManagerPageListener = v->{
+    View.OnClickListener themeManagerPageListener = v -> {
         ThemeManagerPage page = PageContainer.getInstance().getThemeManagerPage();
         getNavigationController().pushViewController(page);
+    };
+    /** 開啟BBS個人資料 */
+    View.OnClickListener bbsUserInfoListener = v -> {
+        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserPage());
+        TelnetClient.getClient().sendStringToServerInBackground("u");
     };
 
     /** 畫面旋轉 */
@@ -390,6 +396,9 @@ public class SystemSettingsPage extends TelnetPage {
 
         // theme-manager-page
         mainLayout.findViewById(R.id.SystemSettings_goThemeManagerPage).setOnClickListener(themeManagerPageListener);
+
+        // bbs-user-page
+        mainLayout.findViewById(R.id.SystemSettings_goBBSUserInfo).setOnClickListener(bbsUserInfoListener);
     }
 
     public String getName() {

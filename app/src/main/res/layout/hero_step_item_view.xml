@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:background="@color/black"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/BaseTouchPart"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.kota.TelnetUI.TextView.TelnetTextView
+                android:id="@+id/HeroStep_ItemView_Name"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                style="@style/TextViewSmall"
+                android:textColor="@color/white"
+                android:background="@color/time_line_background_color"
+                android:text="@string/main_page_hero_step_author"/>
+            <com.kota.TelnetUI.TextView.TelnetTextView
+                android:id="@+id/HeroStep_ItemView_Datetime"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                style="@style/TextViewSmall"
+                android:gravity="right"
+                android:textColor="@color/time_line_background_color"
+                android:background="@color/article_page_text_item_content0"
+                android:text="@string/main_page_hero_step_datetime"/>
+        </LinearLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextView
+            android:textColor="@color/white"
+            android:id="@+id/HeroStep_ItemView_Content"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            style="@style/TextViewSmall"
+            android:text="@string/main_page_hero_step_content"/>
+    </LinearLayout>
+    <View android:id="@+id/HeroStep_ItemView_DividerBottom"
+        style="@style/ItemViewDividerHorizontal"/>
+</LinearLayout>

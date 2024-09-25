@@ -4,6 +4,12 @@ import android.annotation.SuppressLint
 import android.content.Context
 import com.kota.Bahamut.DataModels.BookmarkStore
 
+data class HeroStep (
+    var authorNickname: String,
+    var datetime: String,
+    var content: String
+)
+
 /*
 * 此處存放app執行階段使用的變數, 存放於記憶體, 關閉就消失
 * */
@@ -25,6 +31,7 @@ object TempSettings {
     private var imgurAccessToken: String = "" // 上傳 imgur 的 token
     private var imgurAlbum: String = "" // 上傳 imgur 的 album
     private var cloudSaveLastTime: String = "" // 雲端備份最後時間
+    private var heroStepList: MutableList<HeroStep> = mutableListOf()
 
     // 清空數據, 不用清除的不要列進去
     @JvmStatic
@@ -33,6 +40,7 @@ object TempSettings {
         isFloatingInvisible = false
         setBoardFollowTitle("")
         setCloudSaveLastTime("")
+        heroStepList = mutableListOf()
     }
 
     @JvmStatic
@@ -97,5 +105,15 @@ object TempSettings {
     @JvmStatic
     fun setCloudSaveLastTime(lastTime:String) {
         cloudSaveLastTime = lastTime
+    }
+
+    @JvmStatic
+    fun getHeroStepList(): List<HeroStep> {
+        return heroStepList
+    }
+
+    @JvmStatic
+    fun setHeroStep(heroStep: HeroStep) {
+        heroStepList.add(heroStep)
     }
 }

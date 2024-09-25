@@ -16,3 +16,5 @@ local.properties
 /bin
 .idea
 local.properties
+/app/release
+/app/debug

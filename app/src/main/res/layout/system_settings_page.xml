@@ -9,6 +9,17 @@
         android:id="@+id/content_view">
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
+            android:text="@string/system_setting_page_chapter_bbs"/>
+        <View style="@style/HorizontalDivider"/>
+        <LinearLayout android:id="@+id/SystemSettings_goBBSUserInfo"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/user_info" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            style="@style/SystemSettingsChapter"
             android:text="@string/theme"/>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_goThemeManagerPage"

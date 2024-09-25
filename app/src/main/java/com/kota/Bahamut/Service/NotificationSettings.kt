@@ -13,6 +13,7 @@ object NotificationSettings {
         private const val propertiesShowCloudSave: String = "show_cloud_save" // 第一次詢問雲端備份, false-未使用 true-已問過
         private const val propertiesCloudSave: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
         private const val connectIpAddress = "connectIpAddress" // 連線IP
+        private const val showHeroStep = "showHeroStep" // 顯示勇者足跡
 
 
     @JvmStatic
@@ -81,12 +82,22 @@ object NotificationSettings {
         }
 
         @JvmStatic
-        fun setConnectIpAddress(ipLocation: String?) {
+        fun setConnectIpAddress(ipLocation: String) {
             UserSettings._editor.putString(connectIpAddress, ipLocation).apply()
         }
 
         @JvmStatic
         fun getConnectIpAddress(): String? {
             return UserSettings._sharedPref.getString(connectIpAddress, "bbs.gamer.com.tw")
+        }
+
+        @JvmStatic
+        fun setShowHeroStep(show: Boolean) {
+            UserSettings._editor.putBoolean(showHeroStep, show).apply()
+        }
+
+        @JvmStatic
+        fun getShowHeroStep(): Boolean {
+            return UserSettings._sharedPref.getBoolean(showHeroStep, true)
         }
 }

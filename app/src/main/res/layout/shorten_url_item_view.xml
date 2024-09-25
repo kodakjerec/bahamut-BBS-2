@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <View android:id="@+id/BlockListPage_ItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
     <LinearLayout android:gravity="center_vertical" android:orientation="vertical" android:background="@color/list_page_item_content_background" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
         <TextView
             android:id="@+id/thumbnail_title"

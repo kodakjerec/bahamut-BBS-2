@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.kota.Bahamut.R;
 
 public class BlockListViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-    private final View _divider_top;
     private final TextView _name_label;
     public int index = 0;
     public BlockListClickListener mListener;
@@ -23,7 +22,6 @@ public class BlockListViewHolder extends RecyclerView.ViewHolder implements View
             if (mListener!=null)
                 mListener.onBlockListPage_ItemView_delete_clicked(BlockListViewHolder.this);
         });
-        _divider_top = view.findViewById(R.id.BlockListPage_ItemView_DividerTop);
 
         this.mListener = listener;
         view.setOnClickListener(this);

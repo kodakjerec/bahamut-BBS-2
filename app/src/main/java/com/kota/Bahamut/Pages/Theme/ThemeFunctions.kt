@@ -36,13 +36,14 @@ class ThemeFunctions {
                 // 避免共用bug, 每次獨立產生
                 // 文字
                 val colorStateList = ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf()), // States
-                    intArrayOf(rgbToInt(theme.textColorPressed), rgbToInt(theme.textColor)) // Colors for each state
+                    arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()), // States
+                    intArrayOf(rgbToInt(theme.textColorPressed), rgbToInt(theme.textColor), rgbToInt(theme.textColorDisabled)) // Colors for each state
                 )
                 // 背景
                 val backgroundDrawable = StateListDrawable()
                 backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), ColorDrawable(rgbToInt(theme.backgroundColorPressed)))
-                backgroundDrawable.addState(intArrayOf(), ColorDrawable(rgbToInt(theme.backgroundColor)))
+                backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), ColorDrawable(rgbToInt(theme.backgroundColor)))
+                backgroundDrawable.addState(intArrayOf(), ColorDrawable(rgbToInt(theme.backgroundColorDisabled)))
 
                 if (childView.javaClass == Button::class.java) {
                     val button = childView as Button

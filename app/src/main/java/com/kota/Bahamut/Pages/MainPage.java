@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
@@ -16,18 +17,19 @@ import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
+import com.kota.Bahamut.Service.HeroStep;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
 
+import java.util.List;
+
 public class MainPage extends TelnetPage {
+    public String onlinePeople = "";
     RelativeLayout mainLayout;
-    View.OnClickListener userListener = v -> {
-        MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserPage());
-        TelnetClient.getClient().sendStringToServerInBackground("u");
-    };
     View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
@@ -53,6 +55,15 @@ public class MainPage extends TelnetPage {
     ASDialog saveHotMessageDialog = null;
     View.OnClickListener systemSettingListener = v -> MainPage.this.getNavigationController().pushViewController(new SystemSettingsPage());
 
+    /** 顯示勇者足跡 */
+    View.OnClickListener showHeroStepListener = v-> {
+        // 切換顯示
+        boolean isShowHeroStep = NotificationSettings.getShowHeroStep();
+        isShowHeroStep = !isShowHeroStep;
+        NotificationSettings.setShowHeroStep(isShowHeroStep);
+        mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
+    };
+
     private enum LastLoadClass {
         Unload,
         Boards,
@@ -70,13 +81,29 @@ public class MainPage extends TelnetPage {
 
     public void onPageDidLoad() {
         mainLayout = (RelativeLayout) findViewById(R.id.content_view);
-        mainLayout.findViewById(R.id.Main_userButton).setOnClickListener(this.userListener);
-        mainLayout.findViewById(R.id.Main_boardsButton).setOnClickListener(this.boardsListener);
-        mainLayout.findViewById(R.id.Main_classButton).setOnClickListener(this.classListener);
+        mainLayout.findViewById(R.id.Main_BoardsButton).setOnClickListener(this.boardsListener);
+        mainLayout.findViewById(R.id.Main_ClassButton).setOnClickListener(this.classListener);
         mainLayout.findViewById(R.id.Main_FavoriteButton).setOnClickListener(this.favoriteListener);
-        mainLayout.findViewById(R.id.Main_logoutButton).setOnClickListener(this.logoutListener);
-        mainLayout.findViewById(R.id.Main_mailButton).setOnClickListener(this.mailListener);
-        mainLayout.findViewById(R.id.Main_systemSettingsButton).setOnClickListener(this.systemSettingListener);
+        mainLayout.findViewById(R.id.Main_LogoutButton).setOnClickListener(this.logoutListener);
+        mainLayout.findViewById(R.id.Main_MailButton).setOnClickListener(this.mailListener);
+        mainLayout.findViewById(R.id.Main_SystemSettingsButton).setOnClickListener(this.systemSettingListener);
+        ((TextView)mainLayout.findViewById(R.id.Main_OnlinePeople)).setText(onlinePeople); // 線上人數
+
+        // 顯示勇者足跡
+        List<HeroStep> heroStepList = TempSettings.getHeroStepList();
+        LinearLayout heroStepListLayout = mainLayout.findViewById(R.id.Main_HeroStepList);
+        for (HeroStep heroStep : heroStepList) {
+            HeroStepItemView itemView = new HeroStepItemView(getContext());
+            itemView.setItem(heroStep);
+            heroStepListLayout.addView(itemView);
+        }
+        // 沒資料不顯示
+        if (heroStepList.size()==0) {
+            NotificationSettings.setShowHeroStep(false);
+        }
+        boolean isShowHeroStep = NotificationSettings.getShowHeroStep();
+        mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
+        mainLayout.findViewById(R.id.Main_HeroStepButton).setOnClickListener(this.showHeroStepListener);
 
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
@@ -88,7 +115,7 @@ public class MainPage extends TelnetPage {
                 public void run() {
                     ASProcessingDialog.showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat));
                     // 進入布告討論區
-                    mainLayout.findViewById(R.id.Main_boardsButton).performClick();
+                    mainLayout.findViewById(R.id.Main_BoardsButton).performClick();
                 }
             }.postDelayed(300);
         }
@@ -205,5 +232,10 @@ public class MainPage extends TelnetPage {
             }
             this.saveHotMessageDialog = null;
         }
+    }
+
+    /** 設定線上人數 */
+    public void setOnlinePeople(String peoples) {
+        onlinePeople = peoples;
     }
 }

@@ -131,15 +131,7 @@ class ThemeManagerPage: TelnetPage() {
     }
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
-        val selectedTheme = ThemeStore.getSelectTheme()
         btnUpdate.isEnabled = enabled
-        if (enabled) {
-            btnUpdate.setTextColor(CommonFunctions.rgbToInt(selectedTheme.textColor))
-            btnUpdate.setBackgroundColor(CommonFunctions.rgbToInt(selectedTheme.backgroundColor))
-        } else {
-            btnUpdate.setTextColor(CommonFunctions.rgbToInt(selectedTheme.textColorDisabled))
-            btnUpdate.setBackgroundColor(CommonFunctions.rgbToInt(selectedTheme.backgroundColorDisabled))
-        }
     }
 
     /** 按下顏色文字跳出調色盤 */

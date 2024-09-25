@@ -55,7 +55,6 @@
     <string name="last_page">最後頁</string>
     <string name="prev_article">上一篇</string>
     <string name="next_article">下一篇</string>
-    <string name="folder_user">個人設定</string>
     <string name="folder_boards">佈告討論區</string>
     <string name="folder_class">分組討論區</string>
     <string name="folder_favorite">我的最愛</string>
@@ -228,6 +227,7 @@
     <string name="board_page_post_waiting_message_1">發文中</string>
     <string name="board_page_post_waiting_message_2">發文中請稍後</string>
     <string name="board_page_post_waiting_message_3">本站禁止連續快速發文\n如有異常請重新連線</string>
+    <string name="system_setting_page_chapter_bbs">BBS個人設定</string>
     <string name="system_setting_page_chapter_blocklist">黑名單</string>
     <string name="system_setting_page_chapter_board_article">看板/文章</string>
     <string name="system_setting_page_chapter_preference">偏好設定</string>
@@ -356,4 +356,8 @@
     <string name="main_hero_step">勇者足跡</string>
     <string name="main_hero_step_msg01">請留言 (至多三行)</string>
     <string name="main_hero_success01">成功留下過路足跡</string>
+    <string name="main_online_people">線上人數</string>
+    <string name="main_page_hero_step_author">作者</string>
+    <string name="main_page_hero_step_datetime">時間</string>
+    <string name="main_page_hero_step_content">內容</string>
 </resources>

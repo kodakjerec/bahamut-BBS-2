@@ -5,8 +5,6 @@
     android:orientation="vertical"
     android:id="@+id/content_view">
 
-    <View style="@style/HorizontalDivider" />
-
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -19,28 +17,23 @@
         android:layout_centerHorizontal="true" />
 
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
-        android:layout_alignParentBottom="true">
-
-        <Button
-            android:id="@+id/Main_logoutButton"
-            style="@style/ToolbarItem"
-            android:text="@string/logout" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/Main_mailButton"
-            style="@style/ToolbarItem"
-            android:text="@string/mailbox" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/Main_systemSettingsButton"
-            style="@style/ToolbarItem"
-            android:text="@string/setting" />
+        android:id="@+id/Main_Block_HeroStepList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_above="@+id/Main_ItemBlock"
+        android:background="@color/divider_color">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="144dp"
+            android:padding="3dp"
+            >
+            <LinearLayout
+                android:id="@+id/Main_HeroStepList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+        </ScrollView>
     </LinearLayout>
 
     <LinearLayout
@@ -53,31 +46,47 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <View style="@style/HorizontalDivider" />
-
+            android:orientation="horizontal">
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    style="@style/TextViewNormal"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:gravity="center_horizontal"
+                    android:text="@string/main_online_people"/>
+                <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Main_OnlinePeople"
+                    style="@style/TextViewNormal"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:gravity="center"
+                    android:textColor="@color/red"
+                    android:text="@string/main_online_people"/>
+            </LinearLayout>
             <Button
-                android:id="@+id/Main_userButton"
-                style="@style/MainItem"
-                android:layout_width="match_parent"
+                android:id="@+id/Main_HeroStepButton"
+                style="@style/ToolbarItem"
+                android:layout_width="0dp"
+                android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:background="@android:drawable/list_selector_background"
-                android:text="@string/folder_user"
+                android:text="@string/main_hero_step"
                 android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <View style="@style/HorizontalDivider" />
 
             <Button
-                android:id="@+id/Main_boardsButton"
+                android:id="@+id/Main_BoardsButton"
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -90,13 +99,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <View style="@style/HorizontalDivider" />
 
             <Button
-                android:id="@+id/Main_classButton"
+                android:id="@+id/Main_ClassButton"
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -109,7 +117,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="72dp"
-            android:layout_weight="1"
             android:orientation="vertical">
 
             <View style="@style/HorizontalDivider" />
@@ -124,5 +131,30 @@
                 android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/Main_LogoutButton"
+            style="@style/ToolbarItem"
+            android:text="@string/logout" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/Main_MailButton"
+            style="@style/ToolbarItem"
+            android:text="@string/mailbox" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/Main_SystemSettingsButton"
+            style="@style/ToolbarItem"
+            android:text="@string/setting" />
     </LinearLayout>
 </RelativeLayout>

@@ -11,7 +11,6 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
-import com.kota.Bahamut.Pages.Theme.ThemeStore
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
 import com.kota.Bahamut.Service.UserSettings
@@ -28,7 +27,7 @@ class UserPage: TelnetPage() {
     private lateinit var btnUpdate: Button
 
     override fun getPageLayout(): Int {
-        return R.layout.user_page
+        return R.layout.bbs_user_page
     }
 
     override fun getPageType(): Int {
@@ -89,7 +88,6 @@ class UserPage: TelnetPage() {
             // 返回
             TelnetClient.getClient().sendStringToServer("N")
         }
-        println(rows)
     }
 
     /** 套用新設定 */
@@ -113,14 +111,6 @@ class UserPage: TelnetPage() {
 
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
-        val selectedTheme = ThemeStore.getSelectTheme()
         btnUpdate.isEnabled = enabled
-        if (enabled) {
-            btnUpdate.setTextColor(CommonFunctions.rgbToInt(selectedTheme.textColor))
-            btnUpdate.setBackgroundColor(CommonFunctions.rgbToInt(selectedTheme.backgroundColor))
-        } else {
-            btnUpdate.setTextColor(CommonFunctions.rgbToInt(selectedTheme.textColorDisabled))
-            btnUpdate.setBackgroundColor(CommonFunctions.rgbToInt(selectedTheme.backgroundColorDisabled))
-        }
     }
 }
