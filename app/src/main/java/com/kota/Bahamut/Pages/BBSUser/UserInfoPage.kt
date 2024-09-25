@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Pages
+package com.kota.Bahamut.Pages.BBSUser
 
 import android.view.View.OnClickListener
 import android.widget.Button
@@ -21,22 +21,22 @@ import com.kota.Telnet.TelnetOutputBuilder
 import com.kota.TelnetUI.TelnetPage
 import java.util.Vector
 
-class UserPage: TelnetPage() {
+class UserInfoPage: TelnetPage() {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var txnNickName: PostEditText
     private lateinit var btnUpdate: Button
 
     override fun getPageLayout(): Int {
-        return R.layout.bbs_user_page
+        return R.layout.bbs_user_info_page
     }
 
     override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_USER_PAGE
+        return BahamutPage.BAHAMUT_USER_INFO_PAGE
     }
 
     override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.getInstance().popClassPage()
+        PageContainer.getInstance().cleanUserInfoPage()
         navigationController.popViewController()
         TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
@@ -50,11 +50,11 @@ class UserPage: TelnetPage() {
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
-        txnNickName = mainLayout.findViewById(R.id.User_Page_Nick_Name)
-        mainLayout.findViewById<Button>(R.id.User_Page_Reset).setOnClickListener { _->
+        txnNickName = mainLayout.findViewById(R.id.User_Info_Page_Nick_Name)
+        mainLayout.findViewById<Button>(R.id.User_Info_Page_Reset).setOnClickListener { _->
             onBackPressed()
         }
-        btnUpdate = mainLayout.findViewById(R.id.User_Page_Update)
+        btnUpdate = mainLayout.findViewById(R.id.User_Info_Page_Update)
         btnUpdate.setOnClickListener(btnUpdateOnClickListener)
 
         // 替換外觀
@@ -69,12 +69,12 @@ class UserPage: TelnetPage() {
 
     /** 收到回傳的資料內容 */
     fun updateUserPageContent(rows: Vector<TelnetRow>) {
-        val row_string_23: String = rows[23].toContentString();
-        if (row_string_23.contains("修改資料(Y/N)?[N]")) {
-            val row_string_4 = rows[4].toContentString();
+        val rowString23: String = rows[23].toContentString();
+        if (rowString23.contains("修改資料(Y/N)?[N]")) {
+            val rowString4 = rows[4].toContentString();
             object : ASRunner() {
                 override fun run() {
-                    txnNickName.setText(row_string_4.replace("暱    稱：", ""))
+                    txnNickName.setText(rowString4.replace("暱    稱：", ""))
 
                     txnNickName.doOnTextChanged { content, _, _, _ ->
                         if (content!!.trim().isEmpty())

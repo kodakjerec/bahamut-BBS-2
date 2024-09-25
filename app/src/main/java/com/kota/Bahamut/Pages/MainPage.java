@@ -212,9 +212,11 @@ public class MainPage extends TelnetPage {
                     })
                     .scheduleDismissOnPageDisappear(this);
             this.goodbyeDialog.setOnDismissListener( (dialog)-> {
-                        if (this.goodbyeDialog != null)
-                            TelnetClient.getClient().sendStringToServerInBackground("Q");
-                    });
+                // 預設離開
+                if (this.goodbyeDialog != null) {
+                    TelnetClient.getClient().sendStringToServerInBackground("G");
+                }
+            });
         }
         this.goodbyeDialog.show();
     }

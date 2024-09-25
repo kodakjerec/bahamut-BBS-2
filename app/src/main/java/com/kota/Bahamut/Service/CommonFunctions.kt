@@ -81,7 +81,7 @@ object CommonFunctions {
     fun changeScreenOrientation() {
         when (UserSettings.getPropertiesScreenOrientation()) {
             0 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            1 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            1 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             2 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
     }

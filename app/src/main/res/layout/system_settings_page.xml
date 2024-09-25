@@ -18,6 +18,14 @@
             <View style="@style/ItemViewDividerVertical"/>
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
+        <View style="@style/HorizontalDivider"/>
+        <LinearLayout android:id="@+id/SystemSettings_goBBSUserConfig"
+            android:clickable="true"
+            style="@style/SystemSettingsItem">
+            <TextView android:text="@string/user_config" style="@style/SystemSettingsDirectoryText"/>
+            <View style="@style/ItemViewDividerVertical"/>
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+        </LinearLayout>
         <com.kota.TelnetUI.TextView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/theme"/>

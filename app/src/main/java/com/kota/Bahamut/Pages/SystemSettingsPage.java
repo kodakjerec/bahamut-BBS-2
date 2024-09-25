@@ -121,7 +121,7 @@ public class SystemSettingsPage extends TelnetPage {
     };
     /** 開啟BBS個人資料 */
     View.OnClickListener bbsUserInfoListener = v -> {
-        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserPage());
+        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserInfoPage());
         TelnetClient.getClient().sendStringToServerInBackground("u");
     };
 

@@ -15,7 +15,7 @@ import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.StartPage;
 import com.kota.Bahamut.Pages.Theme.ThemeManagerPage;
-import com.kota.Bahamut.Pages.UserPage;
+import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 
 import java.util.Stack;
 
@@ -38,7 +38,7 @@ public class PageContainer {
     private final Stack<BoardEssencePage> _board_essence_page_list = new Stack<>();
     private ArticleEssencePage articleEssencePage = null;
     private ThemeManagerPage themeManagerPage = null;
-    private UserPage userPage = null;
+    private UserInfoPage userInfoPage = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -73,7 +73,7 @@ public class PageContainer {
         cleanInstructionPage();
         cleanPostArticlePage();
         cleanThemeManagerPage();
-        cleanUserPage();
+        cleanUserInfoPage();
     }
 
     public LoginPage getLoginPage() {
@@ -295,17 +295,17 @@ public class PageContainer {
             this.themeManagerPage = null;
         }
     }
-    public UserPage getUserPage() {
-        if (this.userPage == null) {
-            this.userPage = new UserPage();
+    public UserInfoPage getUserInfoPage() {
+        if (this.userInfoPage == null) {
+            this.userInfoPage = new UserInfoPage();
         }
-        return this.userPage;
+        return this.userInfoPage;
     }
 
-    public void cleanUserPage() {
-        if (this.userPage != null) {
-            this.userPage.clear();
-            this.userPage = null;
+    public void cleanUserInfoPage() {
+        if (this.userInfoPage != null) {
+            this.userInfoPage.clear();
+            this.userInfoPage = null;
         }
     }
 }

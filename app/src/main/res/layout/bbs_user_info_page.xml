@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/User_Main_Layout">
+        android:id="@+id/User_Info_Main_Layout">
 
         <com.kota.TelnetUI.TextView.TelnetTextView
             style="@style/SystemSettingsChapter"
@@ -28,7 +28,7 @@
                 android:text="@string/user_info_nick_name"/>
             <com.kota.Bahamut.Pages.Model.PostEditText
                 style="@style/EditTextSingleLine"
-                android:id="@+id/User_Page_Nick_Name"
+                android:id="@+id/User_Info_Page_Nick_Name"
                 android:layout_width="0dp"
                 android:layout_weight="3"
                 android:singleLine="true"
@@ -38,14 +38,14 @@
     </LinearLayout>
     <LinearLayout style="@style/toolbar"
         android:id="@+id/toolbar"
-        android:layout_below="@+id/User_Main_Layout">
+        android:layout_below="@+id/User_Info_Main_Layout">
         <Button
-            android:id="@+id/User_Page_Reset"
+            android:id="@+id/User_Info_Page_Reset"
             style="@style/ToolbarItem.Danger"
             android:layout_weight="0"
-            android:text="@string/cancel" />
+            android:text="@string/_back" />
         <Button
-            android:id="@+id/User_Page_Update"
+            android:id="@+id/User_Info_Page_Update"
             style="@style/ToolbarItem"
             android:layout_width="wrap_content"
             android:layout_weight="1"

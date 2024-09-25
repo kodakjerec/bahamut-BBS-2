@@ -20,7 +20,7 @@ import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.PostArticlePage;
-import com.kota.Bahamut.Pages.UserPage;
+import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Service.HeroStep;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.Article_Handler;
@@ -393,10 +393,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     /** 頁面: 個人設定  */
     void handleUserPage() {
-        setCurrentPage(BahamutPage.BAHAMUT_USER_PAGE);
+        setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);
 
         // 傳給個人設定, 頁面更新資料
-        UserPage page = PageContainer.getInstance().getUserPage();
+        UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
         if (page.onPagePreload()) {
             page.updateUserPageContent(rows);
         }
