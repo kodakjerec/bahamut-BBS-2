@@ -8,7 +8,6 @@ import androidx.core.widget.doOnTextChanged
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
@@ -35,11 +34,8 @@ class UserInfoPage: TelnetPage() {
     }
 
     override fun onBackPressed(): Boolean {
-        clear()
-        PageContainer.getInstance().cleanUserInfoPage()
-        navigationController.popViewController()
         TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
-        return true
+        return super.onBackPressed()
     }
 
     override fun onReceivedGestureRight(): Boolean {
