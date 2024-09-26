@@ -48,14 +48,15 @@
                     style="@style/TextViewSmall"
                     android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
-                    android:text="@string/post_toolbar_show"
+                    android:text="@string/post_toolbar_collapse"
                     tools:ignore="RelativeOverlap" />
             </RelativeLayout>
             <LinearLayout
                 android:id="@+id/User_Config_Layout_Cant_Expand_Layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:visibility="gone">
                 <RelativeLayout android:id="@+id/User_Config_Item_0" style="@style/SystemSettingsItem">
                     <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_0" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_0_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />

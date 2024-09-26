@@ -367,6 +367,7 @@
     <string name="user_config_9">簡化進站畫面</string>
     <string name="user_config_A">不顯示推薦文章</string>
     <string name="user_config_B">公開自己的認證及年資</string>
+    <string name="user_config_msg01">設定已變更，登出才能完整生效</string>
     <string name="main_hero_step">勇者足跡</string>
     <string name="main_hero_step_msg01">請留言 (至多三行)</string>
     <string name="main_hero_success01">成功留下過路足跡</string>

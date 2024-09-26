@@ -1,7 +1,7 @@
 package com.kota.Telnet;
 
 import android.util.Log;
-
+import com.kota.Bahamut.BuildConfig;
 import com.kota.Telnet.Model.TelnetModel;
 import java.io.IOException;
 
@@ -71,6 +71,9 @@ public class TelnetReceiverThread extends Thread {
             }
 
         } catch (Exception e) {
+            if (BuildConfig.DEBUG)
+                e.printStackTrace();
+
             Log.v("SocketChannel", "receiveData Exception");
             result = false;
             if (this._connector != null && this._connector.isConnecting()) {
