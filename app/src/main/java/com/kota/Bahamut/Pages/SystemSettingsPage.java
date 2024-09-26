@@ -124,6 +124,10 @@ public class SystemSettingsPage extends TelnetPage {
         SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserInfoPage());
         TelnetClient.getClient().sendStringToServerInBackground("u");
     };
+    View.OnClickListener bbsUserConfigListener = v -> {
+        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserConfigPage());
+        TelnetClient.getClient().sendStringToServerInBackground("u");
+    };
 
     /** 畫面旋轉 */
     AdapterView.OnItemSelectedListener _screen_orientation_listener = new AdapterView.OnItemSelectedListener() {
@@ -397,8 +401,11 @@ public class SystemSettingsPage extends TelnetPage {
         // theme-manager-page
         mainLayout.findViewById(R.id.SystemSettings_goThemeManagerPage).setOnClickListener(themeManagerPageListener);
 
-        // bbs-user-page
+        // bbs-user-info-page
         mainLayout.findViewById(R.id.SystemSettings_goBBSUserInfo).setOnClickListener(bbsUserInfoListener);
+
+        // bbs-user-page
+        mainLayout.findViewById(R.id.SystemSettings_goBBSUserConfig).setOnClickListener(bbsUserConfigListener);
     }
 
     public String getName() {

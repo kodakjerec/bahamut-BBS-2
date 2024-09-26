@@ -8,6 +8,7 @@ import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
+import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
@@ -396,9 +397,18 @@ public class BahamutStateHandler extends TelnetStateHandler {
         setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);
 
         // 傳給個人設定, 頁面更新資料
-        UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
-        if (page.onPagePreload()) {
-            page.updateUserPageContent(rows);
+        if (this.row_string_23.contains("修改資料(Y/N)?[N]")) {
+            // 個人資料
+            UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
+            if (page.onPagePreload()) {
+                page.updateUserInfoPageContent(rows);
+            }
+        } else if (this.row_string_23.contains("請按鍵切換設定，或按")) {
+            // 操作模式
+            UserConfigPage page = PageContainer.getInstance().getUserConfigPage();
+            if (page.onPagePreload()) {
+                page.updateUserConfigPageContent(rows);
+            }
         }
     }
 
@@ -509,6 +519,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
             } else if (this.row_string_23.contains("★ 請閱讀最新公告")) {
                 TelnetClient.getClient().sendStringToServer("");
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader.equals("--")) {
+                // TODO: 不知道甚麼狀況
                 setCurrentPage(BahamutPage.BAHAMUT_INSTRUCTIONS);
                 if (this.lastHeader.equals("●請") || this.lastHeader.equals("請按")) {
                     TelnetClient.getClient().sendStringToServer("");

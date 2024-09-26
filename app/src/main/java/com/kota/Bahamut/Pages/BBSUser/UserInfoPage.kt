@@ -64,26 +64,23 @@ class UserInfoPage: TelnetPage() {
     }
 
     /** 收到回傳的資料內容 */
-    fun updateUserPageContent(rows: Vector<TelnetRow>) {
-        val rowString23: String = rows[23].toContentString();
-        if (rowString23.contains("修改資料(Y/N)?[N]")) {
-            val rowString4 = rows[4].toContentString();
-            object : ASRunner() {
-                override fun run() {
-                    txnNickName.setText(rowString4.replace("暱    稱：", ""))
+    fun updateUserInfoPageContent(rows: Vector<TelnetRow>) {
+        val rowString4 = rows[4].toContentString();
+        object : ASRunner() {
+            override fun run() {
+                txnNickName.setText(rowString4.replace("暱    稱：", ""))
 
-                    txnNickName.doOnTextChanged { content, _, _, _ ->
-                        if (content!!.trim().isEmpty())
-                            paintBtnUpdate(false)
-                        else
-                            paintBtnUpdate(true)
-                    }
+                txnNickName.doOnTextChanged { content, _, _, _ ->
+                    if (content!!.trim().isEmpty())
+                        paintBtnUpdate(false)
+                    else
+                        paintBtnUpdate(true)
                 }
-            }.runInMainThread()
+            }
+        }.runInMainThread()
 
-            // 返回
-            TelnetClient.getClient().sendStringToServer("N")
-        }
+        // 返回
+        TelnetClient.getClient().sendStringToServer("N")
     }
 
     /** 套用新設定 */

@@ -1,6 +1,7 @@
 package com.kota.Bahamut;
 
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
+import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
 import com.kota.Bahamut.Pages.BillingPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardMainPage;
@@ -8,7 +9,6 @@ import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
 import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
-import com.kota.Bahamut.Pages.InstructionsPage;
 import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
@@ -33,12 +33,11 @@ public class PageContainer {
     private ArticlePage _article_page = null;
     private BillingPage _billing_page = null;
     private PostArticlePage _post_article_page = null;
-    private InstructionsPage _instruction_page = null;
-    private final BoardEssencePage _board_essence_page = null;
     private final Stack<BoardEssencePage> _board_essence_page_list = new Stack<>();
     private ArticleEssencePage articleEssencePage = null;
     private ThemeManagerPage themeManagerPage = null;
     private UserInfoPage userInfoPage = null;
+    private UserConfigPage userConfigPage = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -70,10 +69,10 @@ public class PageContainer {
         cleanMainBoxPage();
         cleanArticlePage();
         cleanBillingPage();
-        cleanInstructionPage();
         cleanPostArticlePage();
         cleanThemeManagerPage();
         cleanUserInfoPage();
+        cleanUserConfigPage();
     }
 
     public LoginPage getLoginPage() {
@@ -255,20 +254,6 @@ public class PageContainer {
         }
     }
 
-    public InstructionsPage getInstructionPage() {
-        if (this._instruction_page == null) {
-            this._instruction_page = new InstructionsPage();
-        }
-        return this._instruction_page;
-    }
-
-    public void cleanInstructionPage() {
-        if (this._instruction_page != null) {
-            this._instruction_page.clear();
-            this._instruction_page = null;
-        }
-    }
-
     public PostArticlePage getPostArticlePage() {
         if (this._post_article_page == null) {
             this._post_article_page = new PostArticlePage();
@@ -306,6 +291,20 @@ public class PageContainer {
         if (this.userInfoPage != null) {
             this.userInfoPage.clear();
             this.userInfoPage = null;
+        }
+    }
+
+    public UserConfigPage getUserConfigPage() {
+        if (this.userConfigPage == null) {
+            this.userConfigPage = new UserConfigPage();
+        }
+        return this.userConfigPage;
+    }
+
+    public void cleanUserConfigPage() {
+        if (this.userConfigPage != null) {
+            this.userConfigPage.clear();
+            this.userConfigPage = null;
         }
     }
 }
