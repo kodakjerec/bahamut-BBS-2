@@ -129,18 +129,21 @@ object CommonFunctions {
                         }
                     }
                     val newCharArray = Arrays.copyOfRange(data1, 0, column)
-                    returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray))
+                    if (column>=maxLength) // 剛剛好符合長度的換行, 不要加"\n"
+                        returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray))
+                    else
+                        returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray)+"\n")
                     data1 = Arrays.copyOfRange(data1, column, data1.size)
                 }
                 // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
                 // 如果data2無資料, data1無料, 代表這是空白行
                 if (!(data2.isNotEmpty() && data1.isEmpty())) {
-                    returnArrays.add(B2UEncoder.getInstance().encodeToString(data1))
+                    returnArrays.add(B2UEncoder.getInstance().encodeToString(data1)+"\n")
                 }
             }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-        return java.lang.String.join("\n", returnArrays)
+        return java.lang.String.join("", returnArrays)
     }
 }
