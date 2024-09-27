@@ -8,6 +8,7 @@ import androidx.core.widget.doOnTextChanged
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
@@ -33,7 +34,12 @@ class UserInfoPage: TelnetPage() {
         return BahamutPage.BAHAMUT_USER_INFO_PAGE
     }
 
+    override fun isPopupPage(): Boolean {
+        return true
+    }
+
     override fun onBackPressed(): Boolean {
+        // 返回
         TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return super.onBackPressed()
     }
@@ -56,11 +62,6 @@ class UserInfoPage: TelnetPage() {
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
         paintBtnUpdate(false)
-    }
-
-    override fun onPageDidAppear() {
-        // 取得暱稱資料
-        TelnetClient.getClient().sendStringToServer("I")
     }
 
     /** 收到回傳的資料內容 */

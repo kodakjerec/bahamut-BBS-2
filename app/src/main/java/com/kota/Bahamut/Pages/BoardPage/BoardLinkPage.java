@@ -11,6 +11,7 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetHeaderItemView;
 
@@ -105,7 +106,7 @@ public class BoardLinkPage extends BoardMainPage {
     protected boolean onBackPressed() {
         clear();
         getNavigationController().popViewController();
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
+        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1);
         PageContainer.getInstance().cleanBoardTitleLinkedPage();
         return true;
     }

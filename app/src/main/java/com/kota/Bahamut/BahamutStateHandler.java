@@ -3,10 +3,12 @@ package com.kota.Bahamut;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASSnackBar;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
+import com.kota.Bahamut.Pages.Messages.MessageDatabase;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
 import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage;
@@ -35,7 +37,9 @@ import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.Telnet.TelnetStateHandler;
 import com.kota.Telnet.TelnetUtils;
 import com.kota.TelnetUI.TelnetPage;
+import com.kota.TextEncoder.B2UEncoder;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -94,9 +98,13 @@ public class BahamutStateHandler extends TelnetStateHandler {
         System.out.println("cursor:" + TelnetClient.getModel().getCursor().toString());
         System.out.println("^********************************************************************************^");
     }
+     */
 
-    boolean detectMessage() {
-        try {
+    /**
+     * 接收到訊息
+     */
+    void detectMessage() {
+        try (MessageDatabase db = new MessageDatabase(MyApplication.getInstance())) {
             int column = this.telnetCursor.column;
             TelnetRow row = TelnetClient.getModel().getRow(23);
             ByteArrayOutputStream name_buffer = new ByteArrayOutputStream(80);
@@ -125,18 +133,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 if (end_point == column && name.startsWith("★")) {
                     String name2 = name.substring(1, name.length() - 1);
                     String msg2 = msg.substring(1);
-                    AppDatabase db = new AppDatabase(MyApplication.getInstance());
-                    db.saveMessage(name2, msg2);
-                    db.loadMessages();
-                    return true;
+                    db.receiveMessage(name2, msg2);
+
+                    // 顯示訊息
+                    MainPage page = PageContainer.getInstance().getMainPage();
+                    ASSnackBar.show(page.getPageView(),name2+" "+msg2,name2);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
     }
-     */
 
     /** 處理非切換主頁面的需求 */
     boolean pass_1() {
@@ -218,6 +225,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
             // 逐行塞入勇者足跡
             insertHeroSteps();
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
+            return false;
+        } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+            detectMessage();
             return false;
         } else {
             return run_pass_2;
@@ -309,9 +319,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     }
                 }
             }.runInMainThread();
-        } else if (this.lastHeader.startsWith("[")) {
+        }
+        if (this.row_string_23.contains("[訪客]")) {
             // 紀錄線上人數
-            page.setOnlinePeople(this.row_string_23.substring(22,27).trim());
+            int startIndex = row_string_23.indexOf("[訪客] ")+4;
+            int endIndex = row_string_23.indexOf(" 人");
+            page.setOnlinePeople(this.row_string_23.substring(startIndex, endIndex).trim());
         }
     }
 
@@ -394,21 +407,18 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     /** 頁面: 個人設定  */
     void handleUserPage() {
-        setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);
 
         // 傳給個人設定, 頁面更新資料
         if (this.row_string_23.contains("修改資料(Y/N)?[N]")) {
+            setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);
             // 個人資料
             UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
-            if (page.onPagePreload()) {
-                page.updateUserInfoPageContent(rows);
-            }
+            page.updateUserInfoPageContent(rows);
         } else if (this.row_string_23.contains("請按鍵切換設定，或按")) {
+            setCurrentPage(BahamutPage.BAHAMUT_USER_CONFIG_PAGE);
             // 操作模式
             UserConfigPage page = PageContainer.getInstance().getUserConfigPage();
-            if (page.onPagePreload()) {
-                page.updateUserConfigPageContent(rows);
-            }
+            page.updateUserConfigPageContent(rows);
         }
     }
 

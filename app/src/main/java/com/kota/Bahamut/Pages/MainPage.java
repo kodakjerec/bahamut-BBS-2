@@ -15,6 +15,8 @@ import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Messages.MessageDatabase;
+import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.HeroStep;
@@ -30,6 +32,7 @@ import java.util.List;
 public class MainPage extends TelnetPage {
     public String onlinePeople = "";
     RelativeLayout mainLayout;
+    public MessageSmall messageSmall; // 訊息小視窗
     View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
@@ -119,6 +122,13 @@ public class MainPage extends TelnetPage {
                 }
             }.postDelayed(300);
         }
+
+        // 統計訊息數量
+        try(MessageDatabase db = new MessageDatabase(getContext())) {
+            db.getAllAndNewestMessage();
+        }
+        messageSmall = new MessageSmall(getContext());
+        getNavigationController().addForeverView(messageSmall);
     }
 
     public void onPageRefresh() {
@@ -148,6 +158,7 @@ public class MainPage extends TelnetPage {
 
     public void onPageWillDisappear() {
         clear();
+        getNavigationController().removeForeverView(messageSmall);
     }
 
     public void onPageDidDisappear() {
@@ -175,7 +186,12 @@ public class MainPage extends TelnetPage {
                 switch (index) {
                     case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
                     case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
-                    case 2 -> TelnetClient.getClient().sendStringToServerInBackground("C");
+                    case 2 -> {
+                        TelnetClient.getClient().sendStringToServerInBackground("C");
+                        try(MessageDatabase db = new MessageDatabase(getContext())) {
+                            db.clearDb();
+                        }
+                    }
                     default -> TelnetClient.getClient().sendStringToServerInBackground("K");
                 }
             }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {

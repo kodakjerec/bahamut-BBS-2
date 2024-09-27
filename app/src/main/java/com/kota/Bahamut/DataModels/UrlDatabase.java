@@ -77,6 +77,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
             Cursor cursor = db.query("urls", columns, selection, selectionArgs, null, null, null);
 
             if (cursor.moveToFirst()) {
+                // 新資料
                 Vector<String> data = new Vector<>();
                 data.add(cursor.getString(cursor.getColumnIndex("url")));
                 data.add(cursor.getString(cursor.getColumnIndex("title")));
@@ -89,6 +90,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
                 return data;
             } else {
+                // 已有
                 cursor.close();
                 db.close();
 

@@ -5,8 +5,10 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.Service.NotificationSettings;
@@ -581,5 +583,16 @@ public class ASNavigationController extends Activity {
     }
     this._temp_controllers.clear();
     executePageCommand();
+  }
+
+  /** 加入畫面上永遠存在的View */
+  public void addForeverView(View view) {
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    addContentView(view, layoutParams);
+  }
+  /** 移除畫面上永遠存在的View */
+  public void removeForeverView(View view) {
+    ViewGroup parentViewGroup = (ViewGroup) view.getParent();
+    parentViewGroup.removeView(view);
   }
 }

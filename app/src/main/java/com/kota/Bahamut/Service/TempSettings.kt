@@ -3,6 +3,7 @@ package com.kota.Bahamut.Service
 import android.annotation.SuppressLint
 import android.content.Context
 import com.kota.Bahamut.DataModels.BookmarkStore
+import com.kota.Bahamut.PageContainer
 
 data class HeroStep (
     var authorNickname: String,
@@ -32,6 +33,7 @@ object TempSettings {
     private var imgurAlbum: String = "" // 上傳 imgur 的 album
     private var cloudSaveLastTime: String = "" // 雲端備份最後時間
     private var heroStepList: MutableList<HeroStep> = mutableListOf()
+    private var notReadMessageCount: Int = 0 // 尚未讀取的訊息量
 
     // 清空數據, 不用清除的不要列進去
     @JvmStatic
@@ -115,5 +117,18 @@ object TempSettings {
     @JvmStatic
     fun setHeroStep(heroStep: HeroStep) {
         heroStepList.add(heroStep)
+    }
+
+    @JvmStatic
+    fun getNotReadMessageCount(): Int {
+        return notReadMessageCount
+    }
+
+    @JvmStatic
+    fun setNotReadMessageCount(aCount: Int) {
+        notReadMessageCount = aCount
+
+        val page = PageContainer.getInstance().mainPage
+        page.messageSmall.updateBadge(notReadMessageCount.toString())
     }
 }

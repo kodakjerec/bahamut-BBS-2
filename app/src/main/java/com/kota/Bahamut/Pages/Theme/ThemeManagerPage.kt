@@ -197,9 +197,13 @@ class ThemeManagerPage: TelnetPage() {
         ASToast.showShortToast(getContextString(R.string.theme_manager_page_msg01))
     }
 
+    override fun onBackPressed(): Boolean {
+        PageContainer.getInstance().cleanThemeManagerPage()
+        return super.onBackPressed()
+    }
+
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        PageContainer.getInstance().cleanThemeManagerPage()
         ASToast.showShortToast("返回")
         return true
     }

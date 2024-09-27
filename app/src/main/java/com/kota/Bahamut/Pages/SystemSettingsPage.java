@@ -23,6 +23,8 @@ import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
+import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleHeaderListPage;
 import com.kota.Bahamut.Pages.BlockListPage.BlockListPage;
@@ -121,12 +123,14 @@ public class SystemSettingsPage extends TelnetPage {
     };
     /** 開啟BBS個人資料 */
     View.OnClickListener bbsUserInfoListener = v -> {
-        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserInfoPage());
-        TelnetClient.getClient().sendStringToServerInBackground("u");
+        TelnetClient.getClient().sendStringToServerInBackground("u\ni");
+        UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
+        getNavigationController().pushViewController(page);
     };
     View.OnClickListener bbsUserConfigListener = v -> {
-        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserConfigPage());
-        TelnetClient.getClient().sendStringToServerInBackground("u");
+        TelnetClient.getClient().sendStringToServerInBackground("u\nc");
+        UserConfigPage page = PageContainer.getInstance().getUserConfigPage();
+        getNavigationController().pushViewController(page);
     };
 
     /** 畫面旋轉 */

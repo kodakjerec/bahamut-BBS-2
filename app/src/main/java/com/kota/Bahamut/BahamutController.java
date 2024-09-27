@@ -8,6 +8,8 @@ import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -25,6 +27,7 @@ import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
+import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.StartPage;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
 import com.kota.Bahamut.Service.CloudBackup;
