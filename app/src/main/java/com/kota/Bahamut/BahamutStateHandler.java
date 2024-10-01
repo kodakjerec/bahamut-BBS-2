@@ -107,53 +107,53 @@ public class BahamutStateHandler extends TelnetStateHandler {
      * 接收到訊息
      */
     void detectMessage() {
-        try (MessageDatabase db = new MessageDatabase(MyApplication.getInstance())) {
-            int column = this.telnetCursor.column;
-            TelnetRow row = TelnetClient.getModel().getRow(23);
-            ByteArrayOutputStream name_buffer = new ByteArrayOutputStream(80);
-            ByteArrayOutputStream msg_buffer = new ByteArrayOutputStream(80);
-            int end_point = -1;
-            int i = 0;
-            while (true) {
-                if (i >= row.data.length) {
-                    break;
-                }
-                byte background_color = row.backgroundColor[i];
-                byte data = row.data[i];
-                if (background_color == 6) {
-                    name_buffer.write(data);
-                } else if (background_color == 5) {
-                    msg_buffer.write(data);
-                } else {
-                    end_point = i;
-                    break;
-                }
-                i++;
+        int column = this.telnetCursor.column;
+        TelnetRow row = TelnetClient.getModel().getRow(23);
+        ByteArrayOutputStream name_buffer = new ByteArrayOutputStream(80);
+        ByteArrayOutputStream msg_buffer = new ByteArrayOutputStream(80);
+        int end_point = -1;
+        int i = 0;
+        while (true) {
+            if (i >= row.data.length) {
+                break;
             }
-            if (name_buffer.size() > 0 && msg_buffer.size() > 0) {
-                String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
-                String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
-                if (end_point == column && name.startsWith("★")) {
-                    String name2 = name.substring(1, name.length() - 1);
-                    String msg2 = msg.substring(1);
-                    // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
-                    if (!Objects.equals(lastReceivedMessage, name2+msg2)) {
-                        // 更新未讀取訊息
-                        int totalUnreadCount = TempSettings.getNotReadMessageCount();
-                        totalUnreadCount++;
-                        TempSettings.setNotReadMessageCount(totalUnreadCount);
+            byte background_color = row.backgroundColor[i];
+            byte data = row.data[i];
+            if (background_color == 6) {
+                name_buffer.write(data);
+            } else if (background_color == 5) {
+                msg_buffer.write(data);
+            } else {
+                end_point = i;
+                break;
+            }
+            i++;
+        }
+        if (name_buffer.size() > 0 && msg_buffer.size() > 0) {
+            String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
+            String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
+            if (end_point == column && name.startsWith("★")) {
+                String name2 = name.substring(1, name.length() - 1);
+                String msg2 = msg.substring(1);
+                // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
+                if (!Objects.equals(lastReceivedMessage, name2+msg2)) {
+                    // 更新未讀取訊息
+                    int totalUnreadCount = TempSettings.getNotReadMessageCount();
+                    totalUnreadCount++;
+                    TempSettings.setNotReadMessageCount(totalUnreadCount);
 
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
                         // 紀錄訊息
                         db.receiveMessage(name2, msg2);
-
-                        // 顯示訊息
-                        ASSnackBar.show(name2, msg2);
-                        lastReceivedMessage = name2+msg2;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
+
+                    // 顯示訊息
+                    ASSnackBar.show(name2, msg2);
+                    lastReceivedMessage = name2+msg2;
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
     }
 
@@ -308,10 +308,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
             if (TempSettings.getMyContext() != null) {
                 if (TempSettings.getMessageSmall() == null) {
                     // 統計訊息數量
-                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
-                        db.getAllAndNewestMessage();
-                    }
                     MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
+                    messageSmall.afterInit();
                     TempSettings.setMessageSmall(messageSmall);
                     new ASRunner() {
 
@@ -320,6 +318,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
                             ASNavigationController.getCurrentController().addForeverView(messageSmall);
                         }
                     }.runInMainThread();
+
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                        db.getAllAndNewestMessage();
+                    }
                 }
             }
         }

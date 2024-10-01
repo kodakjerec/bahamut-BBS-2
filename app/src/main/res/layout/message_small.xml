@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
+    android:id="@+id/Message_Main_Layout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="48dp"
     android:layout_height="48dp">
@@ -10,9 +11,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginStart="3dp"
-        android:layout_marginTop="3dp"
+        android:layout_marginTop="-3dp"
         android:layout_marginEnd="3dp"
         android:layout_marginBottom="3dp"
+        android:textSize="18sp"
         android:text="@string/message_small_text" />
     <TextView
         android:id="@+id/Message_Small_Badge"

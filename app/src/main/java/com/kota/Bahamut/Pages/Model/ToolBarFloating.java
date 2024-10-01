@@ -40,7 +40,7 @@ public class ToolBarFloating extends LinearLayout {
         inflate(context, R.layout.toolbar_floating, this);
         scale = getContext().getResources().getDisplayMetrics().density;
 
-        mainLayout = (LinearLayout) findViewById(R.id.ToolbarFloating);
+        mainLayout = findViewById(R.id.ToolbarFloating);
         // 取得上次紀錄
         List<Float> list = UserSettings.getFloatingLocation();
         if (list.size()>0 && list.get(0)>=0.0f) {
@@ -54,11 +54,11 @@ public class ToolBarFloating extends LinearLayout {
             updateLayout(screenWidth, screenHeight / 2, false);
         }
 
-        btnSetting = (Button) mainLayout.findViewById(R.id.ToolbarFloating_setting);
+        btnSetting = mainLayout.findViewById(R.id.ToolbarFloating_setting);
         btnSetting.setOnTouchListener(onTouchListener);
 
-        btn1 = (Button) mainLayout.findViewById(R.id.ToolbarFloating_1);
-        btn2 = (Button) mainLayout.findViewById(R.id.ToolbarFloating_2);
+        btn1 = mainLayout.findViewById(R.id.ToolbarFloating_1);
+        btn2 = mainLayout.findViewById(R.id.ToolbarFloating_2);
 
         // 啟用定時隱藏
         // 如果之前已經隱藏就不要再讓他顯現出來
@@ -68,7 +68,7 @@ public class ToolBarFloating extends LinearLayout {
             startInvisible();
 
         // 替換外觀
-        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.ToolbarFloating));
+        new ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ToolbarFloating));
     }
 
     // 移動toolbar

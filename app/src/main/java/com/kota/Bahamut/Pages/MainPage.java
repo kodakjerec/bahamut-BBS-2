@@ -16,7 +16,6 @@ import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Messages.MessageDatabase;
-import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.HeroStep;
@@ -66,6 +65,13 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
     };
 
+    /** 顯示聊天小視窗 */
+    View.OnClickListener showMessageWindowListener = v-> {
+        if (TempSettings.getMessageSmall()!=null) {
+            TempSettings.getMessageSmall().show();
+        }
+    };
+
     private enum LastLoadClass {
         Unload,
         Boards,
@@ -89,7 +95,9 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_LogoutButton).setOnClickListener(this.logoutListener);
         mainLayout.findViewById(R.id.Main_MailButton).setOnClickListener(this.mailListener);
         mainLayout.findViewById(R.id.Main_SystemSettingsButton).setOnClickListener(this.systemSettingListener);
-        ((TextView)mainLayout.findViewById(R.id.Main_OnlinePeople)).setText(onlinePeople); // 線上人數
+        TextView mainOnlinePeople = mainLayout.findViewById(R.id.Main_OnlinePeople);
+        mainOnlinePeople.setText(onlinePeople); // 線上人數
+        mainOnlinePeople.setOnClickListener(showMessageWindowListener);
 
         // 顯示勇者足跡
         List<HeroStep> heroStepList = TempSettings.getHeroStepList();
@@ -120,16 +128,6 @@ public class MainPage extends TelnetPage {
                     mainLayout.findViewById(R.id.Main_BoardsButton).performClick();
                 }
             }.postDelayed(300);
-        }
-
-        if (TempSettings.getMessageSmall() == null) {
-            // 統計訊息數量
-            try (MessageDatabase db = new MessageDatabase(getContext())) {
-                db.getAllAndNewestMessage();
-            }
-            MessageSmall messageSmall = new MessageSmall(getContext());
-            getNavigationController().addForeverView(messageSmall);
-            TempSettings.setMessageSmall(messageSmall);
         }
     }
 

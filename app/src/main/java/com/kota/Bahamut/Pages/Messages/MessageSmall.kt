@@ -1,20 +1,38 @@
 package com.kota.Bahamut.Pages.Messages
 
-import android.widget.LinearLayout
-import com.kota.Bahamut.R
+import android.annotation.SuppressLint
 import android.content.Context
+import android.view.MotionEvent
+import android.view.View
+import android.view.View.OnTouchListener
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.ASFramework.Thread.ASRunner
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
+import com.kota.Bahamut.R
 
 class MessageSmall(context: Context): LinearLayout(context) {
+    private var mainLayout: RelativeLayout
     private var badgeView: TextView
     private var iconView: TextView
+    private var scale = 0f // 畫面精度
 
     init {
         inflate(context, R.layout.message_small, this)
+        scale = getContext().resources.displayMetrics.density
 
-        badgeView = findViewById(R.id.Message_Small_Badge)
-        iconView = findViewById(R.id.Message_Small_Icon)
+        mainLayout = findViewById(R.id.Message_Main_Layout)
+        badgeView = mainLayout.findViewById(R.id.Message_Small_Badge)
+        iconView = mainLayout.findViewById(R.id.Message_Small_Icon)
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    fun afterInit() {
+        iconView.setOnTouchListener(onTouchListener)
     }
 
     /** 更新Badge */
@@ -30,5 +48,78 @@ class MessageSmall(context: Context): LinearLayout(context) {
                 }
             }
         }.runInMainThread()
+    }
+
+    fun show() {
+        mainLayout.visibility = VISIBLE
+    }
+    fun hide() {
+        mainLayout.visibility = GONE
+    }
+
+    // 移動toolbar
+    @SuppressLint("ClickableViewAccessibility")
+    private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent ->
+        val duration = event.eventTime - event.downTime
+        var pointX = event.rawX
+        var pointY = event.rawY
+        // 微調手指中心點
+        pointX -= scale * 30
+        pointY -= scale * 60
+
+        // 彈出視窗位置
+        val location = IntArray(2)
+        rootView.getLocationOnScreen(location)
+        pointX -= location[0].toFloat()
+        pointY -= location[1].toFloat()
+        when (event.action) {
+            MotionEvent.ACTION_UP -> {
+                if (duration < 200) { // click
+                    //btnSetting.performClick()
+                } else { // 将LinearLayout的位置更新到最终的位置
+                    updateLayout(pointX, pointY, false)
+                }
+            }
+
+            MotionEvent.ACTION_MOVE ->                 // 更新LinearLayout的位置
+                updateLayout(pointX, pointY, true)
+        }
+        true
+    }
+
+    // 更新toolbar位置
+    @SuppressLint("InternalInsetResource", "DiscouragedApi")
+    private fun updateLayout(deltaX: Float, deltaY: Float, dragging: Boolean) {
+        // 获取 Layout 的LayoutParams
+        var deltaX = deltaX
+        var deltaY = deltaY
+        val barWidth: Int = mainLayout.layoutParams.width
+        val barHeight: Int = mainLayout.layoutParams.height
+        val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
+        var screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
+        val resourceId: Int = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        val navigationBarHeight = context.resources.getDimensionPixelSize(resourceId)
+        screenHeight -= navigationBarHeight
+        
+        // X軸錯誤處理
+        if (deltaX < 0) {
+            deltaX = 0f
+        } else if (deltaX + barWidth > screenWidth) {
+            deltaX = screenWidth - barWidth
+        }
+
+        // Y軸錯誤處理
+        if (deltaY < 0) {
+            deltaY = 0f
+        } else if (deltaY + barHeight > screenHeight) {
+            deltaY = screenHeight - barHeight
+        }
+
+        val params = mainLayout.layoutParams as LayoutParams
+        // 更新LayoutParams中的leftMargin和topMargin
+        params.leftMargin = deltaX.toInt()
+        params.topMargin = deltaY.toInt()
+        // 应用新的LayoutParams
+        mainLayout.layoutParams = params
     }
 }
