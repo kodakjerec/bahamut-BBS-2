@@ -298,7 +298,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
             getUrlToken();
-            Intent intent = new Intent(CommonFunctions.getActivity(), DialogShortenImage.class);
+            Intent intent = new Intent(TempSettings.getActivity(), DialogShortenImage.class);
             startActivity(intent);
         } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
             ASToast.showShortToast(getContextString(R.string.error_under_develop));

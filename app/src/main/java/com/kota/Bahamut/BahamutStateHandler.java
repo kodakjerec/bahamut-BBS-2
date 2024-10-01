@@ -22,6 +22,7 @@ import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
+import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Service.HeroStep;
@@ -302,6 +303,25 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
         if (getCurrentPage() < BahamutPage.BAHAMUT_MAIN) {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
+
+            // 開啟訊息小視窗
+            if (TempSettings.getMyContext() != null) {
+                if (TempSettings.getMessageSmall() == null) {
+                    // 統計訊息數量
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                        db.getAllAndNewestMessage();
+                    }
+                    MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
+                    TempSettings.setMessageSmall(messageSmall);
+                    new ASRunner() {
+
+                        @Override
+                        public void run() {
+                            ASNavigationController.getCurrentController().addForeverView(messageSmall);
+                        }
+                    }.runInMainThread();
+                }
+            }
         }
 
         setCurrentPage(BahamutPage.BAHAMUT_MAIN);

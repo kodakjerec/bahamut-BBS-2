@@ -4,6 +4,7 @@ import android.widget.LinearLayout
 import com.kota.Bahamut.R
 import android.content.Context
 import android.widget.TextView
+import com.kota.ASFramework.Thread.ASRunner
 
 class MessageSmall(context: Context): LinearLayout(context) {
     private var badgeView: TextView
@@ -18,12 +19,16 @@ class MessageSmall(context: Context): LinearLayout(context) {
 
     /** 更新Badge */
     fun updateBadge(aNumber: String) {
-        if (aNumber.isNotEmpty() || aNumber!="0") {
-            badgeView.text = aNumber
-            badgeView.visibility = VISIBLE
-        } else {
-            badgeView.text = ""
-            badgeView.visibility = GONE
-        }
+        object : ASRunner() {
+            override fun run() {
+                if (aNumber != "0") {
+                    badgeView.text = aNumber
+                    badgeView.visibility = VISIBLE
+                } else {
+                    badgeView.text = ""
+                    badgeView.visibility = GONE
+                }
+            }
+        }.runInMainThread()
     }
 }

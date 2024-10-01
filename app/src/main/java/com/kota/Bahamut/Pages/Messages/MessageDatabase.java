@@ -47,10 +47,6 @@ public class MessageDatabase extends SQLiteOpenHelper {
 
     /** 收到訊息 */
     public void receiveMessage(String aSenderName, String aMessage) {
-        int totalUnreadCount = TempSettings.getNotReadMessageCount();
-        totalUnreadCount++;
-        TempSettings.setNotReadMessageCount(totalUnreadCount);
-
         ContentValues values = new ContentValues();
         values.put("sender_name", aSenderName);
         values.put("message", aMessage);
@@ -90,6 +86,8 @@ public class MessageDatabase extends SQLiteOpenHelper {
     /** 列出各ID最新的訊息 */
     @SuppressLint("Range")
     public List<BahaMessageList> getAllAndNewestMessage() {
+        List<BahaMessageList> returnList = new ArrayList<>();
+
         try {
             SQLiteDatabase db = getReadableDatabase();
             String subQuery = "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY received_date DESC LIMIT 1)";
@@ -106,7 +104,6 @@ public class MessageDatabase extends SQLiteOpenHelper {
 
             if (cursor.moveToFirst()) {
                 int totalUnreadCount = 0;
-                List<BahaMessageList> returnList = new ArrayList<>();
                 do {
                     BahaMessageList data = new BahaMessageList();
                     data.setSenderName(cursor.getString(cursor.getColumnIndex("sender_name")));
@@ -121,15 +118,13 @@ public class MessageDatabase extends SQLiteOpenHelper {
 
                 cursor.close();
                 db.close();
-
-                return returnList;
             } else {
                 cursor.close();
                 db.close();
-
-                return new ArrayList<>();
             }
-        } catch (Exception ignored){ return new ArrayList<>(); }
+        } catch (Exception ignored){ }
+
+        return returnList;
     }
 
     /** 列出指定ID最新的訊息 */

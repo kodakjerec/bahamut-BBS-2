@@ -1,9 +1,11 @@
 package com.kota.Bahamut.Service
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import com.kota.Bahamut.DataModels.BookmarkStore
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.Messages.MessageSmall
 
 data class HeroStep (
     var authorNickname: String,
@@ -14,21 +16,42 @@ data class HeroStep (
 /*
 * 此處存放app執行階段使用的變數, 存放於記憶體, 關閉就消失
 * */
+@SuppressLint("StaticFieldLeak")
 object TempSettings {
     @JvmField
     var isUnderAutoToChat = false // 正在自動登入ing
     @JvmField
     var isFloatingInvisible = false // 浮動工具列是否正處於隱藏狀態
-    private var boardFollowTitle = "" // 正在看的討論串標題
-    private var _transportType = -1 // 網路狀況
     @JvmField
     var lastVisitBoard = "" // 最後離開的看板
 
-    @SuppressLint("StaticFieldLeak")
     private var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
-    @SuppressLint("StaticFieldLeak")
     private var applicationContext: Context? = null // 公開的 applicationContext
+    private var myContext: Context? = null
+    private var myActivity: Activity? = null
+    private var messageSmall: MessageSmall? = null // 聊天小視窗
 
+    @JvmStatic
+    fun initialCFContext(fromContext: Context) {
+        myContext = fromContext
+    }
+    @JvmStatic
+    fun getMyContext(): Context? {
+        return myContext
+    }
+
+    @JvmStatic
+    fun initialCFActivity(fromActivity: Activity) {
+        myActivity = fromActivity
+    }
+
+    @JvmStatic
+    fun getActivity(): Activity? {
+        return myActivity
+    }
+
+    private var boardFollowTitle = "" // 正在看的討論串標題
+    private var _transportType = -1 // 網路狀況
     private var imgurAccessToken: String = "" // 上傳 imgur 的 token
     private var imgurAlbum: String = "" // 上傳 imgur 的 album
     private var cloudSaveLastTime: String = "" // 雲端備份最後時間
@@ -128,7 +151,16 @@ object TempSettings {
     fun setNotReadMessageCount(aCount: Int) {
         notReadMessageCount = aCount
 
-        val page = PageContainer.getInstance().mainPage
-        page.messageSmall.updateBadge(notReadMessageCount.toString())
+        messageSmall?.updateBadge(notReadMessageCount.toString())
+    }
+
+    /** 聊天小視窗 */
+    @JvmStatic
+    fun setMessageSmall(view: MessageSmall?) {
+        messageSmall = view
+    }
+    @JvmStatic
+    fun getMessageSmall(): MessageSmall? {
+        return messageSmall
     }
 }

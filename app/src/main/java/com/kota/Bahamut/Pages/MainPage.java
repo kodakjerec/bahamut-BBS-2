@@ -32,7 +32,6 @@ import java.util.List;
 public class MainPage extends TelnetPage {
     public String onlinePeople = "";
     RelativeLayout mainLayout;
-    public MessageSmall messageSmall; // 訊息小視窗
     View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
         MainPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getClassPage());
@@ -123,12 +122,15 @@ public class MainPage extends TelnetPage {
             }.postDelayed(300);
         }
 
-        // 統計訊息數量
-        try(MessageDatabase db = new MessageDatabase(getContext())) {
-            db.getAllAndNewestMessage();
+        if (TempSettings.getMessageSmall() == null) {
+            // 統計訊息數量
+            try (MessageDatabase db = new MessageDatabase(getContext())) {
+                db.getAllAndNewestMessage();
+            }
+            MessageSmall messageSmall = new MessageSmall(getContext());
+            getNavigationController().addForeverView(messageSmall);
+            TempSettings.setMessageSmall(messageSmall);
         }
-        messageSmall = new MessageSmall(getContext());
-        getNavigationController().addForeverView(messageSmall);
     }
 
     public void onPageRefresh() {
@@ -158,7 +160,6 @@ public class MainPage extends TelnetPage {
 
     public void onPageWillDisappear() {
         clear();
-        getNavigationController().removeForeverView(messageSmall);
     }
 
     public void onPageDidDisappear() {

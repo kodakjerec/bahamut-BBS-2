@@ -11,25 +11,6 @@ import java.util.Arrays
 
 @SuppressLint("StaticFieldLeak")
 object CommonFunctions {
-    private lateinit var myContext: Context
-
-    private lateinit var myActivity: Activity
-
-    @JvmStatic
-    fun initialCFContext(fromContext: Context) {
-        myContext = fromContext
-    }
-
-    @JvmStatic
-    fun initialCFActivity(fromActivity: Activity) {
-        myActivity = fromActivity
-    }
-
-    @JvmStatic
-    fun getActivity(): Activity {
-        return myActivity
-    }
-
     /** 輸入 color int 回傳 顏色內容字串(#FF123456)
      * @param intColor color int
      * @response string
@@ -64,7 +45,7 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextColor(rColorItem: Int): Int {
-        return myContext.getColor(rColorItem)
+        return TempSettings.getMyContext()?.getColor(rColorItem) ?:0
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)
@@ -73,16 +54,16 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextString(rStringItem: Int): String {
-        return myContext.getString(rStringItem)
+        return TempSettings.getMyContext()?.getString(rStringItem) ?:""
     }
 
     /** 調整螢幕方向  */
     @JvmStatic
     fun changeScreenOrientation() {
         when (UserSettings.getPropertiesScreenOrientation()) {
-            0 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            1 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            2 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            0 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            1 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            2 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
     }
 

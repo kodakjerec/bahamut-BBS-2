@@ -1,15 +1,11 @@
 package com.kota.Bahamut;
 
 import static com.kota.Bahamut.Service.CommonFunctions.changeScreenOrientation;
-import static com.kota.Bahamut.Service.CommonFunctions.initialCFActivity;
-import static com.kota.Bahamut.Service.CommonFunctions.initialCFContext;
 import static com.kota.Bahamut.Service.MyBillingClient.checkPurchase;
 import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -27,13 +23,12 @@ import com.kota.Bahamut.Pages.Model.ClassPageBlock;
 import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
-import com.kota.Bahamut.Pages.Model.ToolBarFloating;
 import com.kota.Bahamut.Pages.StartPage;
+import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
-import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
@@ -77,8 +72,8 @@ public class BahamutController extends ASNavigationController implements TelnetC
         }
 
         // 共用函數
-        initialCFContext(this);
-        initialCFActivity(ASNavigationController.getCurrentController());
+        TempSettings.initialCFContext(this);
+        TempSettings.initialCFActivity(ASNavigationController.getCurrentController());
         changeScreenOrientation();
 
         // 以下需等待 共用函數 設定完畢
@@ -182,12 +177,21 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
                 String time_string = date_format.format(new Date());
                 System.out.println("BahaBBS connection close:" + time_string);
+
                 BahamutController.this.handleNormalConnectionClosed();
+
                 ASToast.showShortToast("連線已中斷");
+
                 ASProcessingDialog.dismissProcessingDialog();
+
                 if (NotificationSettings.getCloudSave()) {
                   CloudBackup cloudBackup = new CloudBackup();
                   cloudBackup.backup();
+                }
+
+                if (TempSettings.getMessageSmall()!=null) {
+                    getCurrentController().removeForeverView(TempSettings.getMessageSmall());
+                    TempSettings.setMessageSmall(null);
                 }
             }
         }.runInMainThread();
