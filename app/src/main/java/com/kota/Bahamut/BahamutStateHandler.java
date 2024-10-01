@@ -40,6 +40,7 @@ import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Objects;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,6 +101,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
      */
 
+    private String lastReceivedMessage = "";
     /**
      * 接收到訊息
      */
@@ -133,11 +135,20 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 if (end_point == column && name.startsWith("★")) {
                     String name2 = name.substring(1, name.length() - 1);
                     String msg2 = msg.substring(1);
-                    db.receiveMessage(name2, msg2);
+                    // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
+                    if (!Objects.equals(lastReceivedMessage, name2+msg2)) {
+                        // 更新未讀取訊息
+                        int totalUnreadCount = TempSettings.getNotReadMessageCount();
+                        totalUnreadCount++;
+                        TempSettings.setNotReadMessageCount(totalUnreadCount);
 
-                    // 顯示訊息
-                    MainPage page = PageContainer.getInstance().getMainPage();
-                    ASSnackBar.show(page.getPageView(),name2+" "+msg2,name2);
+                        // 紀錄訊息
+                        db.receiveMessage(name2, msg2);
+
+                        // 顯示訊息
+                        ASSnackBar.show(name2, msg2);
+                        lastReceivedMessage = name2+msg2;
+                    }
                 }
             }
         } catch (Exception e) {
