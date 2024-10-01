@@ -1,8 +1,10 @@
 package com.kota.Bahamut.Pages;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
@@ -32,10 +34,10 @@ public class StartPage extends TelnetPage {
 
     /** 按下教學 */
     View.OnClickListener _instruction_listener = v -> {
-//        String url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
-//        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(intent);
+        String url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     };
 
     /** 切換IP */
