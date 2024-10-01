@@ -173,6 +173,7 @@ public class MainPage extends TelnetPage {
         return true;
     }
 
+    /** 給其他頁面呼叫訊息 */
     public void onProcessHotMessage() {
         if (this.saveHotMessageDialog == null) {
             this.saveHotMessageDialog = ASAlertDialog.createDialog()
@@ -194,15 +195,18 @@ public class MainPage extends TelnetPage {
                     }
                     default -> TelnetClient.getClient().sendStringToServerInBackground("K");
                 }
-            }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {
-                TelnetClient.getClient().sendStringToServerInBackground("K\nQ");
-                MainPage.this.saveHotMessageDialog = null;
-                return false;
+            });
+            this.saveHotMessageDialog.setOnDismissListener( (dialog)-> {
+                // 預設離開
+                if (this.saveHotMessageDialog != null) {
+                    TelnetClient.getClient().sendStringToServerInBackground("K");
+                }
             });
             this.saveHotMessageDialog.show();
         }
     }
 
+    /** 給其他頁面呼叫離開 */
     public void onCheckGoodbye() {
         if (this.goodbyeDialog == null) {
             this.goodbyeDialog = ASAlertDialog.createDialog()
