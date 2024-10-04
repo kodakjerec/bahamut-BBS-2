@@ -252,6 +252,10 @@ class CloudBackup {
                                         is Float ->
                                             UserSettings._editor.putFloat(key, value)
 
+                                        is Double -> {
+                                            val insertValue: Int = value.toInt()
+                                            UserSettings._editor.putInt(key, insertValue)
+                                        }
                                         is Int ->
                                             UserSettings._editor.putInt(key, value)
 

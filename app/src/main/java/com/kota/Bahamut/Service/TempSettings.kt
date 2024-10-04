@@ -13,7 +13,7 @@ data class HeroStep (
     var content: String
 )
 
-/*
+/**
 * 此處存放app執行階段使用的變數, 存放於記憶體, 關閉就消失
 * */
 @SuppressLint("StaticFieldLeak")

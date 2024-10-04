@@ -345,8 +345,15 @@ public class UserSettings {
     public static List<Float> getFloatingLocation() {
         SharedPreferences pref = _sharedPref;
         List<Float> list = new ArrayList<>();
-        list.add(pref.getFloat(floatingLocationX, (float) -1));
-        list.add(pref.getFloat(floatingLocationY, (float) -1));
+        try {
+            list.add(pref.getFloat(floatingLocationX, (float) -1));
+            list.add(pref.getFloat(floatingLocationY, (float) -1));
+        } catch (Exception ignored) {
+            Integer tempX = pref.getInt(floatingLocationX, -1);
+            list.add(tempX.floatValue());
+            Integer tempY = pref.getInt(floatingLocationY, -1);
+            list.add(tempY.floatValue());
+        }
         return list;
     }
 

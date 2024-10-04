@@ -3,6 +3,9 @@ package com.kota.Bahamut.Service
 import android.app.Activity
 import android.content.SharedPreferences
 
+/**
+ * 此處存放app第一次使用的變數, 或者要存檔但不做雲端的參數
+ * */
 object NotificationSettings {
         private var perf: SharedPreferences? = null
         private const val perfName:String = "notification"
