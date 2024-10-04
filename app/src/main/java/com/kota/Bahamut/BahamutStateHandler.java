@@ -1,5 +1,7 @@
 package com.kota.Bahamut;
 
+import android.view.View;
+
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -26,6 +28,7 @@ import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Service.HeroStep;
+import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Logic.Article_Handler;
 import com.kota.Telnet.Logic.SearchBoard_Handler;
@@ -305,25 +308,30 @@ public class BahamutStateHandler extends TelnetStateHandler {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
 
             // 開啟訊息小視窗
-            if (TempSettings.getMyContext() != null) {
-                if (TempSettings.getMessageSmall() == null) {
-                    // 統計訊息數量
-                    MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
-                    messageSmall.afterInit();
-                    TempSettings.setMessageSmall(messageSmall);
-                    new ASRunner() {
+                if (TempSettings.getMyContext() != null) {
+                    if (TempSettings.getMessageSmall() == null) {
+                        // 統計訊息數量
+                        MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
+                        messageSmall.afterInit();
+                        TempSettings.setMessageSmall(messageSmall);
+                        new ASRunner() {
+                            @Override
+                            public void run() {
+                                ASNavigationController.getCurrentController().addForeverView(messageSmall);
 
-                        @Override
-                        public void run() {
-                            ASNavigationController.getCurrentController().addForeverView(messageSmall);
+                                if (NotificationSettings.getShowMessageFloating()) {
+                                    messageSmall.show();
+                                } else {
+                                    messageSmall.hide();
+                                }
+                            }
+                        }.runInMainThread();
+
+                        try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                            db.getAllAndNewestMessage();
                         }
-                    }.runInMainThread();
-
-                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
-                        db.getAllAndNewestMessage();
                     }
                 }
-            }
         }
 
         setCurrentPage(BahamutPage.BAHAMUT_MAIN);

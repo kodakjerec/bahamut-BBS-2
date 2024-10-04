@@ -51,10 +51,10 @@ class MessageSmall(context: Context): LinearLayout(context) {
     }
 
     fun show() {
-        mainLayout.visibility = VISIBLE
+        this.visibility = VISIBLE
     }
     fun hide() {
-        mainLayout.visibility = GONE
+        this.visibility = GONE
     }
 
     // 移動toolbar

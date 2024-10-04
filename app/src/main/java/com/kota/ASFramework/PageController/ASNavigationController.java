@@ -11,8 +11,11 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Service.NotificationSettings;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
+import com.kota.TelnetUI.TelnetPage;
 
 import java.util.Vector;
 
@@ -424,6 +427,8 @@ public class ASNavigationController extends Activity {
         } else {
           ASNavigationController.this.animatedPushViewController(source_controller, target_controller, animated);
         }
+        // 檢查顯示訊息小視窗
+        checkMessageFloatingShow();
       }
     }.runInMainThread();
   }
@@ -594,5 +599,29 @@ public class ASNavigationController extends Activity {
   public void removeForeverView(View view) {
     ViewGroup parentViewGroup = (ViewGroup) view.getParent();
     parentViewGroup.removeView(view);
+  }
+
+  /** 根據最上層頁面決定是否顯示訊息小視窗 */
+  private void checkMessageFloatingShow() {
+    // 如果是PopupPage, 隱藏訊息
+    TelnetPage top_page = (TelnetPage) this.getTopController();
+    if (top_page!= null)
+      if (top_page.isPopupPage()) {
+        // 已經顯示就隱藏
+        if (TempSettings.getMessageSmall()!=null) {
+          MessageSmall messageSmall = TempSettings.getMessageSmall();
+          if (messageSmall.getVisibility()== View.VISIBLE) {
+            messageSmall.hide();
+          }
+        }
+      } else {
+        // 已經隱藏則看設定決定顯示
+        if (NotificationSettings.getShowMessageFloating()) {
+          if (TempSettings.getMessageSmall()!=null) {
+            MessageSmall messageSmall = TempSettings.getMessageSmall();
+            messageSmall.show();
+          }
+        }
+      }
   }
 }

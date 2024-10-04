@@ -17,6 +17,7 @@ object NotificationSettings {
         private const val propertiesCloudSave: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
         private const val connectIpAddress = "connectIpAddress" // 連線IP
         private const val showHeroStep = "showHeroStep" // 顯示勇者足跡
+        private const val showMessageFloating = "showMessageFloating" // 顯示訊息浮動按紐
 
 
     @JvmStatic
@@ -86,21 +87,31 @@ object NotificationSettings {
 
         @JvmStatic
         fun setConnectIpAddress(ipLocation: String) {
-            UserSettings._editor.putString(connectIpAddress, ipLocation).apply()
+            perf!!.edit().putString(connectIpAddress, ipLocation).apply()
         }
 
         @JvmStatic
         fun getConnectIpAddress(): String? {
-            return UserSettings._sharedPref.getString(connectIpAddress, "bbs.gamer.com.tw")
+            return perf!!.getString(connectIpAddress, "bbs.gamer.com.tw")
         }
 
         @JvmStatic
         fun setShowHeroStep(show: Boolean) {
-            UserSettings._editor.putBoolean(showHeroStep, show).apply()
+            perf!!.edit().putBoolean(showHeroStep, show).apply()
         }
 
         @JvmStatic
         fun getShowHeroStep(): Boolean {
-            return UserSettings._sharedPref.getBoolean(showHeroStep, true)
+            return perf!!.getBoolean(showHeroStep, true)
+        }
+
+        @JvmStatic
+        fun setShowMessageFloating(show: Boolean) {
+            perf!!.edit().putBoolean(showMessageFloating, show).apply()
+        }
+
+        @JvmStatic
+        fun getShowMessageFloating(): Boolean {
+            return perf!!.getBoolean(showMessageFloating, true)
         }
 }

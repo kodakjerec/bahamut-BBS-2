@@ -106,6 +106,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return BahamutPage.BAHAMUT_POST_ARTICLE;
     }
 
+    @Override
     public boolean isPopupPage() {
         return true;
     }

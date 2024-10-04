@@ -16,6 +16,7 @@ import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Messages.MessageDatabase;
+import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.HeroStep;
@@ -68,7 +69,14 @@ public class MainPage extends TelnetPage {
     /** 顯示聊天小視窗 */
     View.OnClickListener showMessageWindowListener = v-> {
         if (TempSettings.getMessageSmall()!=null) {
-            TempSettings.getMessageSmall().show();
+            MessageSmall messageSmall = TempSettings.getMessageSmall();
+            if (messageSmall.getVisibility()==View.VISIBLE) {
+                messageSmall.hide();
+                NotificationSettings.setShowMessageFloating(false);
+            } else {
+                TempSettings.getMessageSmall().show();
+                NotificationSettings.setShowMessageFloating(true);
+            }
         }
     };
 

@@ -376,6 +376,5 @@
     <string name="main_page_hero_step_author">作者</string>
     <string name="main_page_hero_step_datetime">時間</string>
     <string name="main_page_hero_step_content">內容</string>
-    <string name="message_small_text">聊</string>
-    <string name="message_small_close">X</string>
+    <string name="message_small_hide_float1">隱藏浮動</string>
 </resources>

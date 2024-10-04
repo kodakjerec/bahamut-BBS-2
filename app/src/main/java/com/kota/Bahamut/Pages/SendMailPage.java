@@ -59,6 +59,7 @@ public class SendMailPage extends TelnetPage implements View.OnClickListener, Vi
         return BahamutPage.BAHAMUT_SEND_MAIL;
     }
 
+    @Override
     public boolean isPopupPage() {
         return true;
     }

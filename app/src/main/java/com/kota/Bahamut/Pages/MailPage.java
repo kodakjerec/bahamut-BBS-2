@@ -57,6 +57,7 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
         return BahamutPage.BAHAMUT_MAIL;
     }
 
+    @Override
     public boolean isPopupPage() {
         return true;
     }
