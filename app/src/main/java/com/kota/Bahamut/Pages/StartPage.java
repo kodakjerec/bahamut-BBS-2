@@ -14,7 +14,6 @@ import androidx.core.content.pm.PackageInfoCompat;
 
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
-import com.kota.ASFramework.UI.ASSnackBar;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
@@ -33,12 +32,24 @@ public class StartPage extends TelnetPage {
     View.OnClickListener _exit_listener = v -> StartPage.this.onExitButtonClicked();
 
     /** 按下教學 */
-    View.OnClickListener _instruction_listener = v -> {
-        String url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+    View.OnClickListener urlClickListener = v -> {
+        int id = v.getId();
+        String url = "";
+        if (id == R.id.Start_instructions) url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
+        if (id == R.id.Start_Icon_Discord) url = "https://discord.gg/YP8dthZ";
+        if (id == R.id.Start_Icon_Facebook) url = "https://www.facebook.com/groups/264144897071532";
+        if (id == R.id.Start_Icon_Reddit) url = "https://www.reddit.com/r/bahachat";
+        if (id == R.id.Start_Icon_Steam) url = "https://steamcommunity.com/groups/BAHACHAT";
+        if (id == R.id.Start_Icon_Telegram) url = "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A";
+
+        if (!url.isEmpty()) {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
     };
+    /** 避難所 */
+
 
     /** 切換IP */
     RadioGroup.OnCheckedChangeListener radioGroupCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
@@ -62,7 +73,13 @@ public class StartPage extends TelnetPage {
         getNavigationController().setNavigationTitle("勇者入口");
         findViewById(R.id.Start_exitButton).setOnClickListener(_exit_listener);
         findViewById(R.id.Start_connectButton).setOnClickListener(_connect_listener);
-        findViewById(R.id.Start_instructions).setOnClickListener(_instruction_listener);
+        findViewById(R.id.Start_instructions).setOnClickListener(urlClickListener);
+        
+        findViewById(R.id.Start_Icon_Discord).setOnClickListener(urlClickListener);
+        findViewById(R.id.Start_Icon_Facebook).setOnClickListener(urlClickListener);
+        findViewById(R.id.Start_Icon_Reddit).setOnClickListener(urlClickListener);
+        findViewById(R.id.Start_Icon_Steam).setOnClickListener(urlClickListener);
+        findViewById(R.id.Start_Icon_Telegram).setOnClickListener(urlClickListener);
         // ip位置
         RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioButtonIP);
         RadioButton radioButton1 = (RadioButton) findViewById(R.id.radioButtonIP1);
