@@ -52,9 +52,6 @@ class UserConfigPage: TelnetPage() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
         cantExpandLayout = mainLayout.findViewById(R.id.User_Config_Layout_Cant_Expand_Layout)
         mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Layout_Cant).setOnClickListener(showExpandLayoutListener)
-        mainLayout.findViewById<Button>(R.id.User_Config_Page_Reset).setOnClickListener { _->
-            onBackPressed()
-        }
         // 給予操作模式變更的 onCheckListener
         mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_5).setOnClickListener { _-> changeOperationMode(5) }
         mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_6).setOnClickListener { _-> changeOperationMode(6) }

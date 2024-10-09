@@ -24,6 +24,7 @@ import com.kota.Bahamut.Pages.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
+import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
@@ -67,10 +68,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
     final Article_Handler articleHandler = new Article_Handler();
     boolean duringReadingArticle = false; // 正在讀取文章
 
+    /** 設定文章編號 */
     public void setArticleNumber(String aArticleNumber) {
         this.articleNumber = aArticleNumber;
     }
 
+    /** 回傳instance給其他頁面使用 */
     public static BahamutStateHandler getInstance() {
         if (instance == null) {
             instance = new BahamutStateHandler();
@@ -147,7 +150,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
                     try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
                         // 紀錄訊息
-                        db.receiveMessage(name2, msg2);
+                        db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -162,12 +165,13 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     /** 處理非切換主頁面的需求 */
     boolean pass_1() {
+        // 本文
         boolean run_pass_2 = true;
         if (this.row_string_23.contains("您有一篇文章尚未完成")) {
             TelnetClient.getClient().sendStringToServer("S\n1\n");
             run_pass_2 = false;
         }
-        if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != 1) {
+        if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
             String continue_message = cutOffContinueMessage(this.row_string_23);
             if (continue_message.length() > 0) {
                 ASToast.showShortToast(continue_message);
@@ -308,30 +312,30 @@ public class BahamutStateHandler extends TelnetStateHandler {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
 
             // 開啟訊息小視窗
-                if (TempSettings.getMyContext() != null) {
-                    if (TempSettings.getMessageSmall() == null) {
-                        // 統計訊息數量
-                        MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
-                        messageSmall.afterInit();
-                        TempSettings.setMessageSmall(messageSmall);
-                        new ASRunner() {
-                            @Override
-                            public void run() {
-                                ASNavigationController.getCurrentController().addForeverView(messageSmall);
+            if (TempSettings.getMyContext() != null) {
+                if (TempSettings.getMessageSmall() == null) {
+                    // 統計訊息數量
+                    MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
+                    messageSmall.afterInit();
+                    TempSettings.setMessageSmall(messageSmall);
+                    new ASRunner() {
+                        @Override
+                        public void run() {
+                            ASNavigationController.getCurrentController().addForeverView(messageSmall);
 
-                                if (NotificationSettings.getShowMessageFloating()) {
-                                    messageSmall.show();
-                                } else {
-                                    messageSmall.hide();
-                                }
+                            if (NotificationSettings.getShowMessageFloating()) {
+                                messageSmall.show();
+                            } else {
+                                messageSmall.hide();
                             }
-                        }.runInMainThread();
-
-                        try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
-                            db.getAllAndNewestMessage();
                         }
+                    }.runInMainThread();
+
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                        db.getAllAndNewestMessage();
                     }
                 }
+            }
         }
 
         setCurrentPage(BahamutPage.BAHAMUT_MAIN);
@@ -366,6 +370,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
             int startIndex = row_string_23.indexOf("[訪客] ")+4;
             int endIndex = row_string_23.indexOf(" 人");
             page.setOnlinePeople(this.row_string_23.substring(startIndex, endIndex).trim());
+
+            // 紀錄呼叫器
+            startIndex = row_string_23.indexOf("[呼叫器]")+5;
+            endIndex = startIndex+3;
+            page.setBBCall(this.row_string_23.substring(startIndex, endIndex).trim());
+
         }
     }
 
@@ -502,6 +512,29 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleState() {
         loadState();
         this.telnetCursor = TelnetClient.getModel().getCursor();
+
+        // 狀況：正在重整訊息
+        if (getCurrentPage()==BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE) {
+            MessageMain aPage = PageContainer.getInstance().getMessageMain();
+            if (this.row_string_23.contains("瀏覽 P.")) {
+                // 正在瀏覽訊息
+                aPage.receiveSync(rows);
+                new BahamutCommandLoadMoreArticle().execute();
+            } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
+                // 訊息最後一頁, 還有回到原本的那頁
+                aPage.receiveSync(rows);
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
+
+                new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
+                    @Override // com.kota.ASFramework.Thread.ASRunner
+                    public void run() {
+                        aPage.loadMessageList();
+                    }
+                }.runInMainThread();
+            }
+            return;
+        }
+
         if (pass_1()) {
             if (getCurrentPage() == BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 new BahamutCommandLoadMoreArticle().execute();

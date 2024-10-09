@@ -16,6 +16,7 @@ import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Messages.MessageDatabase;
+import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
@@ -30,7 +31,8 @@ import com.kota.TelnetUI.TelnetView;
 import java.util.List;
 
 public class MainPage extends TelnetPage {
-    public String onlinePeople = "";
+    public String onlinePeople = ""; // 線上人數
+    public String bbCallStatus = ""; // 呼叫器
     RelativeLayout mainLayout;
     View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
@@ -65,19 +67,14 @@ public class MainPage extends TelnetPage {
         NotificationSettings.setShowHeroStep(isShowHeroStep);
         mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
     };
+    /** 顯示聊天main */
+    View.OnClickListener showMessageMainListener = v -> {
+        MessageMain aPage = PageContainer.getInstance().getMessageMain();
+        MainPage.this.getNavigationController().pushViewController(aPage);
 
-    /** 顯示聊天小視窗 */
-    View.OnClickListener showMessageWindowListener = v-> {
-        if (TempSettings.getMessageSmall()!=null) {
-            MessageSmall messageSmall = TempSettings.getMessageSmall();
-            if (messageSmall.getVisibility()==View.VISIBLE) {
-                messageSmall.hide();
-                NotificationSettings.setShowMessageFloating(false);
-            } else {
-                TempSettings.getMessageSmall().show();
-                NotificationSettings.setShowMessageFloating(true);
-            }
-        }
+        // 隱藏小視窗
+        if (TempSettings.getMessageSmall() != null)
+            TempSettings.getMessageSmall().hide();
     };
 
     private enum LastLoadClass {
@@ -105,7 +102,6 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_SystemSettingsButton).setOnClickListener(this.systemSettingListener);
         TextView mainOnlinePeople = mainLayout.findViewById(R.id.Main_OnlinePeople);
         mainOnlinePeople.setText(onlinePeople); // 線上人數
-        mainOnlinePeople.setOnClickListener(showMessageWindowListener);
 
         // 顯示勇者足跡
         List<HeroStep> heroStepList = TempSettings.getHeroStepList();
@@ -122,6 +118,11 @@ public class MainPage extends TelnetPage {
         boolean isShowHeroStep = NotificationSettings.getShowHeroStep();
         mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
         mainLayout.findViewById(R.id.Main_HeroStepButton).setOnClickListener(this.showHeroStepListener);
+
+        // 顯示呼叫器
+        TextView txtBBCall = mainLayout.findViewById(R.id.Main_BBCall);
+        txtBBCall.setText(bbCallStatus);
+        mainLayout.findViewById(R.id.Main_BBCall_Layout).setOnClickListener(showMessageMainListener);
 
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
@@ -146,7 +147,7 @@ public class MainPage extends TelnetPage {
     private void setFrameToTelnetView() {
         TelnetView telnet_view = mainLayout.findViewById(R.id.Main_TelnetView);
         if (telnet_view != null) {
-            if (BahamutStateHandler.getInstance().getCurrentPage() == 5) {
+            if (BahamutStateHandler.getInstance().getCurrentPage() == BahamutPage.BAHAMUT_MAIN) {
                 this._frame_buffer = TelnetClient.getModel().getFrame().clone();
                 for (int i = 12; i < 24; i++) {
                     this._frame_buffer.removeRow(12);
@@ -266,5 +267,10 @@ public class MainPage extends TelnetPage {
     /** 設定線上人數 */
     public void setOnlinePeople(String peoples) {
         onlinePeople = peoples;
+    }
+
+    /** 設定呼叫器 */
+    public void setBBCall(String status) {
+        bbCallStatus = status;
     }
 }

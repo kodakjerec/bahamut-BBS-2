@@ -25,7 +25,8 @@ public interface BahamutPage {
     public static final int BAHAMUT_THEME_MANAGER_PAGE = 21;
     public static final int BAHAMUT_USER_INFO_PAGE = 22;
     public static final int BAHAMUT_USER_CONFIG_PAGE = 23;
-    public static final int MANUAL = 24;
+    public static final int BAHAMUT_MESSAGE_MAIN_PAGE = 24;
+    public static final int MANUAL = 25;
     public static final int START = 0;
     public static final int UNKNOWN = -1;
 }

@@ -16,6 +16,7 @@ public class TelnetKeyboard {
     public static final int CTRL_G = 7;
     public static final int CTRL_P = 16;
     public static final int CTRL_Q = 17;
+    public static final int CTRL_R = 18;
     public static final int CTRL_U = 21;
     public static final int CTRL_X = 24;
     public static final int CTRL_Y = 25;

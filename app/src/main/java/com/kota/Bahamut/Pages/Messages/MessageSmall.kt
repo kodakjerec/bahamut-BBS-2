@@ -8,9 +8,15 @@ import android.view.View.OnTouchListener
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.Thread.ASRunner
+import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
+import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
+import com.kota.Bahamut.Service.NotificationSettings
+import com.kota.Bahamut.Service.TempSettings.getMessageSmall
 
 class MessageSmall(context: Context): LinearLayout(context) {
     private var mainLayout: RelativeLayout
@@ -51,7 +57,9 @@ class MessageSmall(context: Context): LinearLayout(context) {
     }
 
     fun show() {
-        this.visibility = VISIBLE
+        // 設定內有允許顯示, 才會顯示
+        if (NotificationSettings.getShowMessageFloating())
+            this.visibility = VISIBLE
     }
     fun hide() {
         this.visibility = GONE
@@ -75,7 +83,13 @@ class MessageSmall(context: Context): LinearLayout(context) {
         when (event.action) {
             MotionEvent.ACTION_UP -> {
                 if (duration < 200) { // click
-                    //btnSetting.performClick()
+                    val aPage = PageContainer.getInstance().messageMain
+                    ASNavigationController.getCurrentController().pushViewController(aPage)
+                    BahamutStateHandler.getInstance().currentPage =
+                        BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
+
+                    // 隱藏小視窗
+                    if (getMessageSmall() != null) getMessageSmall()!!.hide()
                 } else { // 将LinearLayout的位置更新到最终的位置
                     updateLayout(pointX, pointY, false)
                 }

@@ -13,10 +13,12 @@ import android.widget.RadioGroup;
 import androidx.core.content.pm.PackageInfoCompat;
 
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.NotificationSettings;
@@ -74,7 +76,7 @@ public class StartPage extends TelnetPage {
         findViewById(R.id.Start_exitButton).setOnClickListener(_exit_listener);
         findViewById(R.id.Start_connectButton).setOnClickListener(_connect_listener);
         findViewById(R.id.Start_instructions).setOnClickListener(urlClickListener);
-        
+        // url
         findViewById(R.id.Start_Icon_Discord).setOnClickListener(urlClickListener);
         findViewById(R.id.Start_Icon_Facebook).setOnClickListener(urlClickListener);
         findViewById(R.id.Start_Icon_Reddit).setOnClickListener(urlClickListener);

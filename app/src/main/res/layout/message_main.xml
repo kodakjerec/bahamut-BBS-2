@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:textSize="24sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/TextViewLarge"
             android:text="@string/_back"/>
 
         <LinearLayout
@@ -28,18 +29,23 @@
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/message_small_hide_float1"
-                android:textSize="11sp"
+                android:text="@string/message_small_show_float"
+                style="@style/TextViewVerySmall"
                 tools:ignore="RelativeOverlap" />
             <CheckBox
                 android:id="@+id/Message_Main_Checkbox"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/CheckboxBahamut"
                 android:layout_gravity="center"/>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <View style="@style/HorizontalDivider"/>
     <ScrollView
-        android:id="@+id/Message_Main_Scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/Message_Main_Scroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+    </ScrollView>
 </LinearLayout>

@@ -91,15 +91,5 @@
                 </RelativeLayout>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout style="@style/toolbar"
-            android:id="@+id/toolbar"
-            android:layout_below="@+id/User_Config_Main_Layout"
-            android:orientation="vertical">
-            <Button
-                android:id="@+id/User_Config_Page_Reset"
-                style="@style/ToolbarItem.Danger"
-                android:layout_width="match_parent"
-                android:text="@string/_back" />
-        </LinearLayout>
     </RelativeLayout>
 </ScrollView>

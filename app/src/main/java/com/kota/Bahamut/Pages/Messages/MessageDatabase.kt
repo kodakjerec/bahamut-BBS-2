@@ -37,20 +37,34 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 收到訊息  */
-    fun receiveMessage(aSenderName: String?, aMessage: String?) {
+    fun receiveMessage(aSenderName: String?, aMessage: String?, iType: Int) {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
-        values.put("type", 0)
+        values.put("type", iType)
         try {
             val db = writableDatabase
             db.insert("messages", null, values)
             db.close()
-        } catch (ignored: Exception) {}
+        } catch (ignored: Exception) { }
     }
 
     /** 更新讀取日期  */
+    fun updateReceiveMessage() {
+        try {
+            val db = writableDatabase
+            db.execSQL(
+                "UPDATE messages SET read_date = ? WHERE read_date is null",
+                arrayOf<Any>(
+                    Date().time
+                )
+            )
+            db.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
     private fun updateReceiveMessage(aSenderName: String) {
         try {
             val db = writableDatabase
@@ -84,12 +98,12 @@ class MessageDatabase(context: Context?) :
 
     /** 列出各ID最新的訊息  */
     @SuppressLint("Range")
-    fun getAllAndNewestMessage(): List<BahaMessageList> {
-            val returnList: MutableList<BahaMessageList> = ArrayList()
+    fun getAllAndNewestMessage(): List<BahaMessageSummarize> {
+            val returnList: MutableList<BahaMessageSummarize> = ArrayList()
             try {
                 val db = readableDatabase
                 val subQuery =
-                    "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY received_date DESC LIMIT 1)"
+                    "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY message_id DESC LIMIT 1)"
                 val columns = arrayOf(
                     "sender_name",
                     "MAX(received_date) AS latest_received_date",
@@ -98,17 +112,17 @@ class MessageDatabase(context: Context?) :
                 )
                 val selection = ""
                 val groupBy = "sender_name"
-                val orderBy = "MAX(received_date) DESC"
+                val orderBy = "MAX(message_id) DESC"
                 val cursor =
                     db.query("messages AS m1", columns, selection, null, groupBy, null, orderBy)
                 if (cursor.moveToFirst()) {
                     var totalUnreadCount = 0
                     do {
-                        val data = BahaMessageList()
+                        val data = BahaMessageSummarize()
                         data.senderName = cursor.getString(cursor.getColumnIndex("sender_name"))
                         data.message = cursor.getString(cursor.getColumnIndex("latest_message"))
                         data.receivedDate =
-                            cursor.getInt(cursor.getColumnIndex("latest_received_date"))
+                            cursor.getLong(cursor.getColumnIndex("latest_received_date"))
                         val unreadCount = cursor.getInt(cursor.getColumnIndex("unread_count"))
                         data.unReadCount = unreadCount
                         totalUnreadCount += unreadCount
@@ -132,10 +146,10 @@ class MessageDatabase(context: Context?) :
     fun getIdMessage(aSenderName: String): List<BahaMessage> {
         return try {
             val db = readableDatabase
-            val columns = arrayOf("sender_name", "message", "received_date", "read_date", "type")
+            val columns = arrayOf("message_id","sender_name", "message", "received_date", "read_date", "type")
             val selection = "sender_name=?"
             val selectionArgs = arrayOf(aSenderName)
-            val orderBy = "received_date ASC"
+            val orderBy = "message_id ASC"
             val cursor =
                 db.query("messages", columns, selection, selectionArgs, null, null, orderBy)
             if (cursor.moveToFirst()) {
@@ -144,8 +158,8 @@ class MessageDatabase(context: Context?) :
                     val data = BahaMessage()
                     data.senderName = cursor.getString(cursor.getColumnIndex("sender_name"))
                     data.message = cursor.getString(cursor.getColumnIndex("message"))
-                    data.receivedDate = cursor.getInt(cursor.getColumnIndex("received_date"))
-                    data.readDate = cursor.getInt(cursor.getColumnIndex("read_date"))
+                    data.receivedDate = cursor.getLong(cursor.getColumnIndex("received_date"))
+                    data.readDate = cursor.getLong(cursor.getColumnIndex("read_date"))
                     data.type = cursor.getInt(cursor.getColumnIndex("type"))
                     returnList.add(data)
                 } while (cursor.moveToNext())
