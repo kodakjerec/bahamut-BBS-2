@@ -53,14 +53,16 @@ class UserConfigPage: TelnetPage() {
         cantExpandLayout = mainLayout.findViewById(R.id.User_Config_Layout_Cant_Expand_Layout)
         mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Layout_Cant).setOnClickListener(showExpandLayoutListener)
         // 給予操作模式變更的 onCheckListener
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_5).setOnClickListener { _-> changeOperationMode(5) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_6).setOnClickListener { _-> changeOperationMode(6) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_8).setOnClickListener { _-> changeOperationMode(8) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_9).setOnClickListener { _-> changeOperationMode(9) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).setOnClickListener { _-> changeOperationMode(5) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).setOnClickListener { _-> changeOperationMode(6) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode(8) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode(9) }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_5).setOnClickListener { _-> changeOperationMode("5") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_6).setOnClickListener { _-> changeOperationMode("6") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_8).setOnClickListener { _-> changeOperationMode("8") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_9).setOnClickListener { _-> changeOperationMode("9") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_A).setOnClickListener { _-> changeOperationMode("A") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).setOnClickListener { _-> changeOperationMode("5") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).setOnClickListener { _-> changeOperationMode("6") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode("8") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode("9") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_A_Enable).setOnClickListener { _-> changeOperationMode("A") }
     }
 
     /** 收到回傳的資料內容 */
@@ -99,8 +101,8 @@ class UserConfigPage: TelnetPage() {
     }
 
     /** 切換操作模式選項 */
-    private fun changeOperationMode(mode: Int) {
-        TelnetClient.getClient().sendStringToServerInBackground(mode.toString())
+    private fun changeOperationMode(mode: String) {
+        TelnetClient.getClient().sendStringToServerInBackground(mode)
         ASToast.showShortToast(CommonFunctions.getContextString(R.string.user_config_msg01))
     }
 }
