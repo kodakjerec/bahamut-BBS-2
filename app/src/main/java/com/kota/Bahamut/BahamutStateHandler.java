@@ -367,7 +367,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
         if (this.row_string_23.contains("[訪客]")) {
             // 紀錄線上人數
-            int startIndex = row_string_23.indexOf("[訪客] ")+4;
+            int startIndex = row_string_23.indexOf("[訪客]")+4;
             int endIndex = row_string_23.indexOf(" 人");
             page.setOnlinePeople(this.row_string_23.substring(startIndex, endIndex).trim());
 

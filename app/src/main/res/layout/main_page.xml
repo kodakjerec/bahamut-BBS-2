@@ -56,10 +56,10 @@
                 android:orientation="vertical">
 
                 <com.kota.TelnetUI.TextView.TelnetTextView
-                    style="@style/TextViewNormal"
+                    style="@style/TextViewSmall"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
-                    android:gravity="center_horizontal"
+                    android:gravity="center"
                     android:text="@string/main_online_people" />
 
                 <com.kota.TelnetUI.TextView.TelnetTextView
@@ -79,22 +79,25 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical">
                 <com.kota.TelnetUI.TextView.TelnetTextView
+                    android:id="@+id/Main_BBCall_Layout_text"
                     style="@style/TextViewSmall"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="30dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentStart="true"
+                    android:gravity="center_vertical"
                     android:text="@string/main_bb_call"/>
+
                 <Button
                     android:layout_width="36dp"
-                    android:layout_height="28dp"
-                    android:drawableStart="@drawable/icon_comment"
-                    android:drawableTint="@color/halfWhite"
-                    android:background="@color/transparent"
+                    android:layout_height="30dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:scaleX="0.5"
-                    android:scaleY="0.5"
+                    android:background="@color/transparent"
+                    android:drawableStart="@drawable/icon_comment"
+                    android:drawableTint="@color/halfWhite"
+                    android:scaleX="0.4"
+                    android:scaleY="0.4"
                     tools:ignore="RelativeOverlap" />
                 <com.kota.TelnetUI.TextView.TelnetTextView
                     android:id="@+id/Main_BBCall"
