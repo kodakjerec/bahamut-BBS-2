@@ -31,9 +31,6 @@ class MessageSmall(context: Context): LinearLayout(context) {
         mainLayout = findViewById(R.id.Message_Main_Layout)
         badgeView = mainLayout.findViewById(R.id.Message_Small_Badge)
         iconView = mainLayout.findViewById(R.id.Message_Small_Icon)
-
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
     }
 
     @SuppressLint("ClickableViewAccessibility")

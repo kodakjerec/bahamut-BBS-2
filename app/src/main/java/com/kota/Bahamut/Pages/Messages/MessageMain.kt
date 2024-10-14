@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages.Messages
 
+import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
@@ -48,6 +49,10 @@ class MessageMain:TelnetPage() {
         lastViewPage = BahamutStateHandler.getInstance().currentPage
         BahamutStateHandler.getInstance().currentPage = BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
 
+        // 重置
+        val btnReset: Button = mainLayout.findViewById(R.id.Message_Main_Sync)
+        btnReset.setOnClickListener { _-> sendSync() }
+
         loadMessageList()
     }
 
@@ -61,20 +66,23 @@ class MessageMain:TelnetPage() {
         return super.onBackPressed()
     }
 
+    /** 顯示訊息清單 */
     fun loadMessageList() {
+        val db = MessageDatabase(context)
         try {
             scrollViewLayout.removeAllViews()
-            MessageDatabase(TempSettings.getMyContext()).use { db ->
-                // 紀錄訊息
-                val messageList = db.getAllAndNewestMessage()
-                messageList.forEach { item:BahaMessageSummarize->
-                    val messageMainItem = MessageMainItem(TempSettings.getMyContext()!!)
-                    messageMainItem.setContent(item)
-                    scrollViewLayout.addView(messageMainItem)
-                }
+
+            // 紀錄訊息
+            val messageList = db.getAllAndNewestMessage()
+            messageList.forEach { item: BahaMessageSummarize ->
+                val messageMainItem = MessageMainItem(TempSettings.getMyContext()!!)
+                messageMainItem.setContent(item)
+                scrollViewLayout.addView(messageMainItem)
             }
         } catch (e: Exception) {
             e.printStackTrace()
+        } finally {
+            db.close()
         }
     }
 
@@ -87,12 +95,18 @@ class MessageMain:TelnetPage() {
     /** 同步BBS訊息到DB */
     private fun sendSync() {
         // 清空資料庫
-        MessageDatabase(context).use { db -> db.clearDb() }
+        val db = MessageDatabase(context)
+        try {
+            db.clearDb()
+        } finally {
+            db.close()
+        }
         // 送出查詢指令
         TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
     }
     fun receiveSync(rows: Vector<TelnetRow>) {
-        MessageDatabase(context).use { db ->
+        val db = MessageDatabase(context)
+        try {
             rows.forEach { row->
                 val rawString = row.rawString
                 var senderName = ""
@@ -121,6 +135,8 @@ class MessageMain:TelnetPage() {
                 }
             }
             db.updateReceiveMessage()
+        } finally {
+            db.close()
         }
     }
 }

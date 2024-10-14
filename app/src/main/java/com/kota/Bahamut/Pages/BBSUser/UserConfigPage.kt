@@ -62,7 +62,7 @@ class UserConfigPage: TelnetPage() {
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).setOnClickListener { _-> changeOperationMode("6") }
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode("8") }
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode("9") }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_A_Enable).setOnClickListener { _-> changeOperationMode("A") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_A_Enable).setOnClickListener { _-> changeOperationMode("A") }
     }
 
     /** 收到回傳的資料內容 */

@@ -32,5 +32,10 @@ class MessageMainItem(context: Context): LinearLayout(context) {
         val date = Date(fromObject.receivedDate)
         txtReceivedDate.text = sdf.format(date)
         txtUnReadCount.text = fromObject.unReadCount.toString()
+        if (fromObject.unReadCount == 0) {
+            txtUnReadCount.visibility = GONE
+        } else {
+            txtUnReadCount.visibility = VISIBLE
+        }
     }
 }

@@ -378,4 +378,5 @@
     <string name="main_page_hero_step_datetime">時間</string>
     <string name="main_page_hero_step_content">內容</string>
     <string name="message_small_show_float">小視窗</string>
+    <string name="message_small_sync">同步</string>
 </resources>
