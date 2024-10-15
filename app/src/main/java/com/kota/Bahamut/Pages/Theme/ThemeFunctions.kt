@@ -10,6 +10,7 @@ import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.kota.Bahamut.Service.CommonFunctions.rgbToInt
 import com.kota.TelnetUI.TextView.TelnetTextView
 import com.kota.TelnetUI.TextView.TelnetTextViewLarge
@@ -58,7 +59,8 @@ class ThemeFunctions {
             // 如果有子元件, 繼續往下
             if (childView.javaClass==LinearLayout::class.java
                 || childView.javaClass==RelativeLayout::class.java
-                || childView.javaClass==GridLayout::class.java) {
+                || childView.javaClass==GridLayout::class.java
+                || childView.javaClass==ConstraintLayout::class.java) {
                 val tempChildView:ViewGroup = childView as ViewGroup
                 if (tempChildView.childCount>0) {
                     recursiveReplace(tempChildView)

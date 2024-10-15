@@ -128,6 +128,7 @@
     <string name="symbol">符號</string>
     <string name="title">標題</string>
     <string name="title_">標題：</string>
+    <string name="_warning">警告</string>
     <string name="un_input">未輸入</string>
     <string name="un_limit">不限定</string>
     <string name="no_assign">未指定</string>
@@ -379,4 +380,6 @@
     <string name="main_page_hero_step_content">內容</string>
     <string name="message_small_show_float">小視窗</string>
     <string name="message_small_sync">同步</string>
+    <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
+    <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
 </resources>

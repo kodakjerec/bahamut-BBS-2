@@ -2,6 +2,12 @@ package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -126,6 +132,9 @@ public class MainPage extends TelnetPage {
 
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+
+        // 檢查不斷線掛網
+        checkBatteryLife();
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
@@ -273,4 +282,22 @@ public class MainPage extends TelnetPage {
     public void setBBCall(String status) {
         bbCallStatus = status;
     }
+
+    /** 不受電池最佳化限制 */
+    @SuppressLint("BatteryLife")
+    private void checkBatteryLife() {
+        if (!NotificationSettings.getAlarmIgnoreBatteryOptimizations()) {
+            PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+            String packageName = getContext().getPackageName();
+
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string._warning))
+                        .setMessage(getContextString(R.string.ignoreBattery_msg01))
+                        .addButton(getContextString(R.string.sure))
+                        .show();
+            }
+            NotificationSettings.setAlarmIgnoreBatteryOptimizations(true);
+        }
+    };
 }

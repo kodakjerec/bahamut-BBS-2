@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.changeScreenOrientation;
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -102,12 +103,13 @@ public class SystemSettingsPage extends TelnetPage {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
-            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+//            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            ASToast.showLongToast(getContextString(R.string.ignoreBattery_msg02));
         } else {
             intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:"+packageName));
+            startActivity(intent);
         }
-        startActivity(intent);
     };
 
     /** 開啟贊助葉面 */

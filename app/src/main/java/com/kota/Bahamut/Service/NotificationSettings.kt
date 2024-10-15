@@ -17,6 +17,7 @@ object NotificationSettings {
         private const val propertiesCloudSave: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
         private const val connectIpAddress = "connectIpAddress" // 連線IP
         private const val showHeroStep = "showHeroStep" // 顯示勇者足跡
+        private const val notAlarmIgnoreBatteryOptimizations = "notAlarmIgnoreBatteryOptimizations" // 跳出掛網提醒視窗
         private const val showMessageFloating = "showMessageFloating" // 顯示訊息浮動按紐
 
 
@@ -113,5 +114,15 @@ object NotificationSettings {
         @JvmStatic
         fun getShowMessageFloating(): Boolean {
             return perf!!.getBoolean(showMessageFloating, true)
+        }
+
+        @JvmStatic
+        fun setAlarmIgnoreBatteryOptimizations(show: Boolean) {
+            perf!!.edit().putBoolean(notAlarmIgnoreBatteryOptimizations, show).apply()
+        }
+
+        @JvmStatic
+        fun getAlarmIgnoreBatteryOptimizations(): Boolean {
+            return perf!!.getBoolean(notAlarmIgnoreBatteryOptimizations, false)
         }
 }
