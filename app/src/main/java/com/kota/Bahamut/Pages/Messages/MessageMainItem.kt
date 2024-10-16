@@ -1,9 +1,14 @@
 package com.kota.Bahamut.Pages.Messages
 
 import android.content.Context
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.kota.ASFramework.PageController.ASNavigationController
+import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
+import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23,7 +28,10 @@ class MessageMainItem(context: Context): LinearLayout(context) {
         txtUnReadCount = mainLayout.findViewById(R.id.mmiUnReadCount)
     }
 
+    /** 設定內容 */
+    private var myObject:BahaMessageSummarize = BahaMessageSummarize()
     fun setContent(fromObject: BahaMessageSummarize) {
+        myObject = fromObject
         txtSenderName.text = fromObject.senderName
         txtMessage.text = fromObject.message
         // 設定日期格式
@@ -37,5 +45,19 @@ class MessageMainItem(context: Context): LinearLayout(context) {
         } else {
             txtUnReadCount.visibility = VISIBLE
         }
+        mainLayout.setOnClickListener(itemClickListener)
+    }
+    /** 取得內容 */
+    fun getContent():BahaMessageSummarize {
+        return myObject
+    }
+
+    private val itemClickListener = OnClickListener { _->
+        val aPage = PageContainer.getInstance().messageSub
+        ASNavigationController.getCurrentController().pushViewController(aPage)
+        BahamutStateHandler.getInstance().currentPage =
+            BahamutPage.BAHAMUT_MESSAGE_SUB_PAGE
+
+        aPage.setSenderName(txtSenderName.text.toString())
     }
 }

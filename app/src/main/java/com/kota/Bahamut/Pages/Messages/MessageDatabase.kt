@@ -37,17 +37,25 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 收到訊息  */
-    fun receiveMessage(aSenderName: String?, aMessage: String?, iType: Int) {
+    fun receiveMessage(aSenderName: String?, aMessage: String?, iType: Int): BahaMessage {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
+
         try {
             val db = writableDatabase
             db.insert("messages", null, values)
             db.close()
         } catch (ignored: Exception) { }
+
+        val messageObj = BahaMessage()
+        messageObj.senderName = aSenderName.toString()
+        messageObj.message = aMessage.toString()
+        messageObj.receivedDate = Date().time
+        messageObj.type = iType
+        return messageObj
     }
 
     /** 更新讀取日期  */
@@ -65,7 +73,7 @@ class MessageDatabase(context: Context?) :
             e.printStackTrace()
         }
     }
-    private fun updateReceiveMessage(aSenderName: String) {
+    fun updateReceiveMessage(aSenderName: String) {
         try {
             val db = writableDatabase
             db.execSQL(
@@ -140,7 +148,45 @@ class MessageDatabase(context: Context?) :
             }
             return returnList
         }
-
+    @SuppressLint("Range")
+    fun getIdNewestMessage(aSenderName: String): BahaMessageSummarize {
+        val returnObject: BahaMessageSummarize = BahaMessageSummarize()
+        try {
+            val db = readableDatabase
+            val subQuery =
+                "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY message_id DESC LIMIT 1)"
+            val columns = arrayOf(
+                "sender_name",
+                "MAX(received_date) AS latest_received_date",
+                "$subQuery AS latest_message",
+                "COUNT(CASE WHEN read_date IS NULL THEN 1 END) AS unread_count"
+            )
+            val selection = "sender_name=?"
+            val selectionArgs = arrayOf(aSenderName)
+            val groupBy = "sender_name"
+            val orderBy = "MAX(message_id) DESC"
+            val cursor =
+                db.query("messages AS m1", columns, selection, selectionArgs, groupBy, null, orderBy)
+            if (cursor.moveToFirst()) {
+                do {
+                    returnObject.senderName = cursor.getString(cursor.getColumnIndex("sender_name"))
+                    returnObject.message = cursor.getString(cursor.getColumnIndex("latest_message"))
+                    returnObject.receivedDate =
+                        cursor.getLong(cursor.getColumnIndex("latest_received_date"))
+                    val unreadCount = cursor.getInt(cursor.getColumnIndex("unread_count"))
+                    returnObject.unReadCount = unreadCount
+                } while (cursor.moveToNext())
+                cursor.close()
+                db.close()
+            } else {
+                cursor.close()
+                db.close()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return returnObject
+    }
     /** 列出指定ID最新的訊息  */
     @SuppressLint("Range")
     fun getIdMessage(aSenderName: String): List<BahaMessage> {

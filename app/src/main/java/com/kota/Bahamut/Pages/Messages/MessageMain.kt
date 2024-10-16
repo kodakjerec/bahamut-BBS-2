@@ -5,9 +5,11 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.children
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
+import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.NotificationSettings
 import com.kota.Bahamut.Service.TempSettings
@@ -21,8 +23,13 @@ class MessageMain:TelnetPage() {
     private lateinit var mainLayout: LinearLayout
     private lateinit var scrollViewLayout: LinearLayout
     private var lastViewPage: Int = 0 // 前端目前畫面
+
     override fun getPageLayout(): Int {
         return R.layout.message_main
+    }
+
+    override fun isPopupPage(): Boolean {
+        return true
     }
 
     /** 顯示聊天小視窗  */
@@ -51,9 +58,12 @@ class MessageMain:TelnetPage() {
 
         // 重置
         val btnReset: Button = mainLayout.findViewById(R.id.Message_Main_Sync)
-        btnReset.setOnClickListener { _-> sendSync() }
+        btnReset.setOnClickListener { _-> sendSyncCommand() }
 
         loadMessageList()
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
     }
 
     override fun onBackPressed(): Boolean {
@@ -85,6 +95,23 @@ class MessageMain:TelnetPage() {
             db.close()
         }
     }
+    fun loadMessageList(item:BahaMessage) {
+        for (i in 0 until scrollViewLayout.childCount) {
+            val view = scrollViewLayout.getChildAt(i)
+            if (view is MessageMainItem) {
+                val subView:MessageMainItem = view
+                if (subView.getContent().senderName==item.senderName) {
+                    val db = MessageDatabase(context)
+                    try {
+                        val itemSummary = db.getIdNewestMessage(item.senderName)
+                        subView.setContent(itemSummary)
+                    } finally {
+                        db.close()
+                    }
+                }
+            }
+        }
+    }
 
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
@@ -93,7 +120,7 @@ class MessageMain:TelnetPage() {
     }
 
     /** 同步BBS訊息到DB */
-    private fun sendSync() {
+    private fun sendSyncCommand() {
         // 清空資料庫
         val db = MessageDatabase(context)
         try {
@@ -104,7 +131,7 @@ class MessageMain:TelnetPage() {
         // 送出查詢指令
         TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
     }
-    fun receiveSync(rows: Vector<TelnetRow>) {
+    fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         val db = MessageDatabase(context)
         try {
             rows.forEach { row->

@@ -1,7 +1,5 @@
 package com.kota.Bahamut;
 
-import android.view.View;
-
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -10,6 +8,7 @@ import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
 import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle;
+import com.kota.Bahamut.Pages.Messages.BahaMessage;
 import com.kota.Bahamut.Pages.Messages.MessageDatabase;
 import com.kota.Bahamut.Pages.ArticlePage.ArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
@@ -26,6 +25,7 @@ import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Messages.MessageSmall;
+import com.kota.Bahamut.Pages.Messages.MessageSub;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Service.HeroStep;
@@ -148,15 +148,30 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     totalUnreadCount++;
                     TempSettings.setNotReadMessageCount(totalUnreadCount);
 
+                    BahaMessage bahaMessage = null;
                     try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
                         // 紀錄訊息
-                        db.receiveMessage(name2, msg2, 0);
+                        bahaMessage = db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    // 顯示訊息
-                    ASSnackBar.show(name2, msg2);
+                    if (bahaMessage!=null) {
+                        TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+                        if (top_page instanceof MessageMain) {
+                            // 顯示訊息
+                            ASSnackBar.show(name2, msg2);
+                            MessageMain aPage = (MessageMain) top_page;
+                            aPage.loadMessageList(bahaMessage);
+                        } else if (top_page instanceof MessageSub) {
+                            MessageSub aPage = (MessageSub) top_page;
+                            aPage.insertMessage(bahaMessage);
+                        } else {
+                            // 如果是其他頁面:顯示訊息
+                            ASSnackBar.show(name2, msg2);
+                        }
+                    }
+
                     lastReceivedMessage = name2+msg2;
                 }
             }
@@ -518,11 +533,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
             MessageMain aPage = PageContainer.getInstance().getMessageMain();
             if (this.row_string_23.contains("瀏覽 P.")) {
                 // 正在瀏覽訊息
-                aPage.receiveSync(rows);
+                aPage.receiveSyncCommand(rows);
                 new BahamutCommandLoadMoreArticle().execute();
             } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
                 // 訊息最後一頁, 還有回到原本的那頁
-                aPage.receiveSync(rows);
+                aPage.receiveSyncCommand(rows);
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
 
                 new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4

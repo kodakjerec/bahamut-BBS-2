@@ -8,7 +8,7 @@
     android:id="@+id/content_view">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="60dp">
         <TextView
             android:id="@+id/Message_Main_Back"
             android:layout_width="wrap_content"
@@ -16,12 +16,11 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/TextViewLarge"
+            style="@style/TextViewNormal"
             android:text="@string/_back"/>
         <Button
             android:id="@+id/Message_Main_Sync"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/ToolbarItem"
             android:text="@string/message_small_sync"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"

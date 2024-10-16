@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp">
+    <TextView
+        android:id="@+id/Message_Sub_Sender_Content"
+        style="@style/TextViewNormal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:background="@color/toolbar_background_color_focused"
+        android:textColor="@color/black"
+        android:textIsSelectable="true"
+        android:paddingTop="5dp"
+        android:paddingStart="10dp"
+        android:paddingBottom="5dp"
+        android:paddingEnd="5dp"
+        />
+    <TextView
+        android:id="@+id/Message_Sub_Sender_Time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/Message_Sub_Sender_Content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="5dp"
+        style="@style/TextViewVerySmall"
+        />
+</RelativeLayout>

@@ -77,20 +77,6 @@
             android:inputType="textMultiLine"
             android:padding="10dp"
             android:textColor="@android:color/white" />
-
-        <View
-            android:id="@+id/Post_SymbolDivider"
-            style="@style/VerticalDivider"
-            android:visibility="gone" />
-
-        <LinearLayout
-            android:id="@+id/Post_SymbolList"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="2"
-            android:background="@color/item_background_color"
-            android:orientation="vertical"
-            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout
