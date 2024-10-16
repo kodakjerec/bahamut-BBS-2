@@ -380,6 +380,7 @@
     <string name="main_page_hero_step_content">內容</string>
     <string name="message_small_show_float">小視窗</string>
     <string name="message_small_sync">同步</string>
+    <string name="message_small_sync_msg01">同步中，請稍後</string>
     <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
     <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
 </resources>

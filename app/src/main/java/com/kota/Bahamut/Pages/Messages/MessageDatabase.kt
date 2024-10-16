@@ -58,6 +58,33 @@ class MessageDatabase(context: Context?) :
         return messageObj
     }
 
+    /** 更新訊息 */
+    fun syncMessage(aSenderName: String?, aMessage: String?, iType: Int) {
+        val values = ContentValues()
+        values.put("sender_name", aSenderName)
+        values.put("message", aMessage)
+        values.put("received_date", Date().time)
+        values.put("type", iType)
+
+        try {
+            val db = writableDatabase
+            val selection = "sender_name = ? AND message = ?"
+            val selectionArgs = arrayOf(aSenderName, aMessage)
+            // 查詢是否存在
+            val cursor = db.query("messages", null, selection, selectionArgs, null, null, null)
+
+            if (cursor.moveToFirst()) {
+                // 存在，跳過
+            } else {
+                // 不存在，執行插入
+                db.insert("messages", null, values)
+            }
+
+            cursor.close()
+            db.close()
+        } catch (ignored: Exception) { }
+    }
+
     /** 更新讀取日期  */
     fun updateReceiveMessage() {
         try {

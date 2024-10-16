@@ -139,8 +139,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
             String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
             String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
             if (end_point == column && name.startsWith("★")) {
-                String name2 = name.substring(1, name.length() - 1);
-                String msg2 = msg.substring(1);
+                String name2 = name.substring(1, name.length() - 1).trim();
+                String msg2 = msg.substring(1).trim();
                 // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
                 if (!Objects.equals(lastReceivedMessage, name2+msg2)) {
                     // 更新未讀取訊息
@@ -528,7 +528,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         loadState();
         this.telnetCursor = TelnetClient.getModel().getCursor();
 
-        // 狀況：正在重整訊息
+        // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
         if (getCurrentPage()==BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE) {
             MessageMain aPage = PageContainer.getInstance().getMessageMain();
             if (this.row_string_23.contains("瀏覽 P.")) {
@@ -546,6 +546,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         aPage.loadMessageList();
                     }
                 }.runInMainThread();
+            } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+                detectMessage();
             }
             return;
         }

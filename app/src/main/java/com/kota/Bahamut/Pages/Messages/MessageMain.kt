@@ -5,12 +5,14 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.children
+import com.kota.ASFramework.Dialog.ASProcessingDialog
+import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
+import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.NotificationSettings
 import com.kota.Bahamut.Service.TempSettings
 import com.kota.Telnet.Model.TelnetRow
@@ -104,7 +106,11 @@ class MessageMain:TelnetPage() {
                     val db = MessageDatabase(context)
                     try {
                         val itemSummary = db.getIdNewestMessage(item.senderName)
-                        subView.setContent(itemSummary)
+                        object: ASRunner(){
+                            override fun run() {
+                                subView.setContent(itemSummary)
+                            }
+                        }.runInMainThread()
                     } finally {
                         db.close()
                     }
@@ -123,13 +129,10 @@ class MessageMain:TelnetPage() {
     private fun sendSyncCommand() {
         // 清空資料庫
         val db = MessageDatabase(context)
-        try {
-            db.clearDb()
-        } finally {
-            db.close()
-        }
         // 送出查詢指令
         TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
+
+        ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         val db = MessageDatabase(context)
@@ -148,7 +151,7 @@ class MessageMain:TelnetPage() {
                     startIndex = rawString.indexOf("：")+1
                     message = rawString.substring(startIndex).trim()
 
-                    db.receiveMessage(senderName, message, 1)
+                    db.syncMessage(senderName, message, 1)
                 } else if (rawString.startsWith("★")) {
                     // receive
                     var startIndex = 1
@@ -158,12 +161,14 @@ class MessageMain:TelnetPage() {
                     startIndex = rawString.indexOf("：")+1
                     message = rawString.substring(startIndex).trim()
 
-                    db.receiveMessage(senderName, message, 0)
+                    db.syncMessage(senderName, message, 0)
                 }
             }
             db.updateReceiveMessage()
         } finally {
             db.close()
+
+            ASProcessingDialog.dismissProcessingDialog()
         }
     }
 }
