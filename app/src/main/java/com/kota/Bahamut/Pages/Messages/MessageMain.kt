@@ -62,7 +62,12 @@ class MessageMain:TelnetPage() {
         val btnReset: Button = mainLayout.findViewById(R.id.Message_Main_Sync)
         btnReset.setOnClickListener { _-> sendSyncCommand() }
 
-        loadMessageList()
+        // 每次登入開啟訊息主視窗先同步一次
+        if (TempSettings.isSyncMessageMain) {
+            loadMessageList()
+        } else {
+            sendSyncCommand()
+        }
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(mainLayout)
@@ -80,6 +85,7 @@ class MessageMain:TelnetPage() {
 
     /** 顯示訊息清單 */
     fun loadMessageList() {
+        ASProcessingDialog.dismissProcessingDialog()
         val db = MessageDatabase(context)
         try {
             scrollViewLayout.removeAllViews()
@@ -164,11 +170,8 @@ class MessageMain:TelnetPage() {
                     db.syncMessage(senderName, message, 0)
                 }
             }
-            db.updateReceiveMessage()
         } finally {
             db.close()
-
-            ASProcessingDialog.dismissProcessingDialog()
         }
     }
 }

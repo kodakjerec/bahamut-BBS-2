@@ -108,7 +108,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
      */
 
-    private String lastReceivedMessage = "";
     /**
      * 接收到訊息
      */
@@ -142,7 +141,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 String name2 = name.substring(1, name.length() - 1).trim();
                 String msg2 = msg.substring(1).trim();
                 // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
-                if (!Objects.equals(lastReceivedMessage, name2+msg2)) {
+                if (!Objects.equals(TempSettings.lastReceivedMessage, name2+msg2)) {
                     // 更新未讀取訊息
                     int totalUnreadCount = TempSettings.getNotReadMessageCount();
                     totalUnreadCount++;
@@ -172,7 +171,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         }
                     }
 
-                    lastReceivedMessage = name2+msg2;
+                    TempSettings.lastReceivedMessage = name2+msg2;
                 }
             }
         }
@@ -388,9 +387,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
             // 紀錄呼叫器
             startIndex = row_string_23.indexOf("[呼叫器]")+5;
-            endIndex = startIndex+3;
+            endIndex = startIndex+5;
             page.setBBCall(this.row_string_23.substring(startIndex, endIndex).trim());
-
         }
     }
 

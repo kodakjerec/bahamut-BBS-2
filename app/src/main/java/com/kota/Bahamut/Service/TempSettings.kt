@@ -24,6 +24,10 @@ object TempSettings {
     var isFloatingInvisible = false // 浮動工具列是否正處於隱藏狀態
     @JvmField
     var lastVisitBoard = "" // 最後離開的看板
+    @JvmField
+    var lastReceivedMessage = "" // 最後收到的訊息
+    @JvmField
+    var isSyncMessageMain = false // 是否已經同步訊息
 
     private var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
     private var applicationContext: Context? = null // 公開的 applicationContext
@@ -63,6 +67,7 @@ object TempSettings {
     fun clearTempSettings() {
         isUnderAutoToChat = false
         isFloatingInvisible = false
+        lastReceivedMessage = ""
         setBoardFollowTitle("")
         setCloudSaveLastTime("")
         heroStepList = mutableListOf()
