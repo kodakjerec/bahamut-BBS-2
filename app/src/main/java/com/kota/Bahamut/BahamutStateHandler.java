@@ -387,7 +387,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
             // 紀錄呼叫器
             startIndex = row_string_23.indexOf("[呼叫器]")+5;
-            endIndex = startIndex+5;
+            endIndex = row_string_23.length();
             page.setBBCall(this.row_string_23.substring(startIndex, endIndex).trim());
         }
     }
