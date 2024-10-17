@@ -86,6 +86,8 @@ class MessageMain:TelnetPage() {
     /** 顯示訊息清單 */
     fun loadMessageList() {
         ASProcessingDialog.dismissProcessingDialog()
+        TempSettings.isSyncMessageMain = true
+
         val db = MessageDatabase(context)
         try {
             scrollViewLayout.removeAllViews()
@@ -93,7 +95,7 @@ class MessageMain:TelnetPage() {
             // 紀錄訊息
             val messageList = db.getAllAndNewestMessage()
             messageList.forEach { item: BahaMessageSummarize ->
-                val messageMainItem = MessageMainItem(TempSettings.getMyContext()!!)
+                val messageMainItem = MessageMainItem(TempSettings.myContext!!)
                 messageMainItem.setContent(item)
                 scrollViewLayout.addView(messageMainItem)
             }

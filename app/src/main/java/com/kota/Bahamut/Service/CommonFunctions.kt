@@ -45,7 +45,7 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextColor(rColorItem: Int): Int {
-        return TempSettings.getMyContext()?.getColor(rColorItem) ?:0
+        return TempSettings.myContext?.getColor(rColorItem) ?:0
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)
@@ -54,16 +54,16 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextString(rStringItem: Int): String {
-        return TempSettings.getMyContext()?.getString(rStringItem) ?:""
+        return TempSettings.myContext?.getString(rStringItem) ?:""
     }
 
     /** 調整螢幕方向  */
     @JvmStatic
     fun changeScreenOrientation() {
         when (UserSettings.getPropertiesScreenOrientation()) {
-            0 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            1 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            2 -> TempSettings.getActivity()?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            0 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            1 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            2 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
     }
 

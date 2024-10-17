@@ -72,13 +72,13 @@ public class BahamutController extends ASNavigationController implements TelnetC
         }
 
         // 共用函數
-        TempSettings.initialCFContext(this);
-        TempSettings.initialCFActivity(ASNavigationController.getCurrentController());
+        TempSettings.myContext = this;
+        TempSettings.myActivity = ASNavigationController.getCurrentController();
         changeScreenOrientation();
 
         // 以下需等待 共用函數 設定完畢
         // VIP
-        TempSettings.setApplicationContext(getApplicationContext());
+        TempSettings.applicationContext = getApplicationContext();
         initBillingClient();
 
         // 外觀

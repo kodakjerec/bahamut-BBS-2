@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import com.kota.Bahamut.DataModels.BookmarkStore
-import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Messages.MessageSmall
 
 data class HeroStep (
@@ -28,37 +27,25 @@ object TempSettings {
     var lastReceivedMessage = "" // 最後收到的訊息
     @JvmField
     var isSyncMessageMain = false // 是否已經同步訊息
+    @JvmField
+    var boardFollowTitle = "" // 正在看的討論串標題
+    @JvmField
+    var cloudSaveLastTime: String = "" // 雲端備份最後時間
+    @JvmField
+    var transportType = -1 // 網路狀況
+    @JvmField
+    var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
+    @JvmField
+    var applicationContext: Context? = null // 公開的 applicationContext
+    @JvmField
+    var myContext: Context? = null
+    @JvmField
+    var myActivity: Activity? = null
 
-    private var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
-    private var applicationContext: Context? = null // 公開的 applicationContext
-    private var myContext: Context? = null
-    private var myActivity: Activity? = null
+    // 比較少用到的變數, 不影響效能
     private var messageSmall: MessageSmall? = null // 聊天小視窗
-
-    @JvmStatic
-    fun initialCFContext(fromContext: Context) {
-        myContext = fromContext
-    }
-    @JvmStatic
-    fun getMyContext(): Context? {
-        return myContext
-    }
-
-    @JvmStatic
-    fun initialCFActivity(fromActivity: Activity) {
-        myActivity = fromActivity
-    }
-
-    @JvmStatic
-    fun getActivity(): Activity? {
-        return myActivity
-    }
-
-    private var boardFollowTitle = "" // 正在看的討論串標題
-    private var _transportType = -1 // 網路狀況
     private var imgurAccessToken: String = "" // 上傳 imgur 的 token
     private var imgurAlbum: String = "" // 上傳 imgur 的 album
-    private var cloudSaveLastTime: String = "" // 雲端備份最後時間
     private var heroStepList: MutableList<HeroStep> = mutableListOf()
     private var notReadMessageCount: Int = 0 // 尚未讀取的訊息量
 
@@ -67,49 +54,16 @@ object TempSettings {
     fun clearTempSettings() {
         isUnderAutoToChat = false
         isFloatingInvisible = false
+        isSyncMessageMain = false
         lastReceivedMessage = ""
-        setBoardFollowTitle("")
-        setCloudSaveLastTime("")
+        boardFollowTitle = ""
+        cloudSaveLastTime = ""
         heroStepList = mutableListOf()
-    }
-
-    @JvmStatic
-    fun setBoardFollowTitle(title: String) {
-        boardFollowTitle = title
     }
 
     @JvmStatic
     fun isBoardFollowTitle(readTitle: String): Boolean {
         return boardFollowTitle == readTitle
-    }
-
-    @JvmStatic
-    fun setTransportType(fromTransportType: Int) {
-        _transportType = fromTransportType
-    }
-
-    @JvmStatic
-    fun getTransportType(): Int {
-        return _transportType
-    }
-
-    @JvmStatic
-    fun setBookmarkStore(fromBookmarkStore: BookmarkStore?) {
-        bookmarkStore = fromBookmarkStore
-    }
-
-    @JvmStatic
-    fun getBookmarkStore(): BookmarkStore {
-        return bookmarkStore!!
-    }
-    @JvmStatic
-    fun setApplicationContext(fromContext: Context) {
-        applicationContext = fromContext
-    }
-
-    @JvmStatic
-    fun getApplicationContext(): Context {
-        return applicationContext!!
     }
 
     @JvmStatic
@@ -127,14 +81,6 @@ object TempSettings {
     @JvmStatic
     fun setImgurAlbum(album:String) {
         imgurAlbum = album
-    }
-    @JvmStatic
-    fun getCloudSaveLastTime(): String {
-        return cloudSaveLastTime
-    }
-    @JvmStatic
-    fun setCloudSaveLastTime(lastTime:String) {
-        cloudSaveLastTime = lastTime
     }
 
     @JvmStatic

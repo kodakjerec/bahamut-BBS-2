@@ -1,7 +1,5 @@
 package com.kota.ASFramework.UI;
 
-import static com.kota.Bahamut.Service.TempSettings.getActivity;
-
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.SpannableString;
@@ -19,7 +17,7 @@ import com.google.android.material.snackbar.Snackbar;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.R;
-import com.kota.Telnet.Reference.TelnetAnsiCode;
+import com.kota.Bahamut.Service.TempSettings;
 
 import java.util.Objects;
 
@@ -63,7 +61,7 @@ public class ASSnackBar {
                 View view = previous_snack_bar.getView();
                 FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
                 params.gravity = Gravity.TOP;
-                view.setBackgroundColor(ContextCompat.getColor(Objects.requireNonNull(getActivity()), R.color.list_page_item_arrow_background));
+                view.setBackgroundColor(ContextCompat.getColor(Objects.requireNonNull(TempSettings.myActivity), R.color.list_page_item_arrow_background));
                 view.setLayoutParams(params);
 
                 previous_snack_bar.show();

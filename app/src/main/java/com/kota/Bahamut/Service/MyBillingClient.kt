@@ -35,9 +35,9 @@ object MyBillingClient {
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_cancel))
+            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_cancel))
         } else {
-            ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_error))
+            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_error))
         }
     }
 
@@ -78,7 +78,7 @@ object MyBillingClient {
                     if (!UserSettings.getPropertiesVIP()) {
                         UserSettings.setPropertiesVIP(true)
                     }
-                    ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_success))
+                    ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_success))
                     // 將購買結果塞入雲端
                     if (UserSettings.getPropertiesUsername().isNotEmpty()) {
                         val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
@@ -209,7 +209,7 @@ object MyBillingClient {
     /** 初始化 BillingClient */
     @JvmStatic
     fun initBillingClient() {
-        billingClient = BillingClient.newBuilder(TempSettings.getApplicationContext())
+        billingClient = BillingClient.newBuilder(TempSettings.applicationContext!!)
             .setListener(purchasesUpdatedListener)
             .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
             .build()

@@ -38,6 +38,7 @@ import com.kota.Bahamut.Command.BahamutCommandTheSameTitleDown;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleTop;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleUp;
 import com.kota.Bahamut.DataModels.Bookmark;
+import com.kota.Bahamut.DataModels.BookmarkStore;
 import com.kota.Bahamut.Dialogs.DialogSearchArticle;
 import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
@@ -576,7 +577,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         BoardPageItem boardPageItem = (BoardPageItem) getItem(i);
         if (boardPageItem != null){
             // 紀錄正在看的討論串標題
-            TempSettings.setBoardFollowTitle(boardPageItem.Title);
+            TempSettings.boardFollowTitle = boardPageItem.Title;
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
             return true;
@@ -936,15 +937,18 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         if (context == null) {
             return;
         }
-        if (_mode ==0) {
-            TempSettings.getBookmarkStore().getBookmarkList(listName).loadBookmarkList(_bookmarkList);
-            if (isPageAppeared()) {
-                _bookmark_adapter.notifyDataSetChanged();
-            }
-        } else {
-            TempSettings.getBookmarkStore().getBookmarkList(listName).loadHistoryList(_bookmarkList);
-            if (isPageAppeared()) {
-                _history_adapter.notifyDataSetChanged();
+        BookmarkStore store = TempSettings.bookmarkStore;
+        if (store!=null) {
+            if (_mode == 0) {
+                store.getBookmarkList(listName).loadBookmarkList(_bookmarkList);
+                if (isPageAppeared()) {
+                    _bookmark_adapter.notifyDataSetChanged();
+                }
+            } else {
+                store.getBookmarkList(listName).loadHistoryList(_bookmarkList);
+                if (isPageAppeared()) {
+                    _history_adapter.notifyDataSetChanged();
+                }
             }
         }
         if (_bookmarkList.size()==0) {

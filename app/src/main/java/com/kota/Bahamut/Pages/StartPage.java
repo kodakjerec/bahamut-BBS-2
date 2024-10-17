@@ -13,12 +13,10 @@ import android.widget.RadioGroup;
 import androidx.core.content.pm.PackageInfoCompat;
 
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
-import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
-import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.NotificationSettings;
@@ -147,7 +145,7 @@ public class StartPage extends TelnetPage {
     /** 連線 */
     public void connect() {
         int _transportType = getNavigationController().getDeviceController().isNetworkAvailable();
-        TempSettings.setTransportType(_transportType);
+        TempSettings.transportType = _transportType;
         if (_transportType>-1) {
             ASProcessingDialog.showProcessingDialog("連線中", aDialog -> {
                 TelnetClient.getClient().close();

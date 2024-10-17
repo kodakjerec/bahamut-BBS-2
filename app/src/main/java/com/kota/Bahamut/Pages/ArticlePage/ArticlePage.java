@@ -851,10 +851,12 @@ public class ArticlePage extends TelnetPage {
         if (telnetArticle != null) {
             String board_name = _board_page.getListName();
             // 加入歷史紀錄
-            BookmarkStore store = TempSettings.getBookmarkStore();
-            BookmarkList bookmark_list = store.getBookmarkList(board_name);
-            bookmark_list.addHistoryBookmark(telnetArticle.Title);
-            store.storeWithoutCloud();
+            BookmarkStore store = TempSettings.bookmarkStore;
+            if (store!=null) {
+                BookmarkList bookmark_list = store.getBookmarkList(board_name);
+                bookmark_list.addHistoryBookmark(telnetArticle.Title);
+                store.storeWithoutCloud();
+            }
             telnetView.setFrame(telnetArticle.getFrame());
             reloadTelnetLayout();
             ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);

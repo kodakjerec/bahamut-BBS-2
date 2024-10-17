@@ -62,9 +62,11 @@ public class BoardSearchPage extends BoardMainPage {
                             bookmark.setBoard(BoardSearchPage.this.getListName());
                             bookmark.setKeyword(item.Title);
                             bookmark.setTitle(bookmark.generateTitle());
-                            BookmarkStore store = TempSettings.getBookmarkStore();
-                            store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
-                            store.store();
+                            BookmarkStore store = TempSettings.bookmarkStore;
+                            if (store!=null) {
+                                store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
+                                store.store();
+                            }
                         }
                     }).scheduleDismissOnPageDisappear(this).show();
         }
@@ -97,9 +99,11 @@ public class BoardSearchPage extends BoardMainPage {
                 bookmark.setMark(BoardSearchPage.this._mark);
                 bookmark.setGy(BoardSearchPage.this._gy);
                 bookmark.setTitle(bookmark.generateTitle());
-                BookmarkStore store = TempSettings.getBookmarkStore();
-                store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
-                store.store();
+                BookmarkStore store = TempSettings.bookmarkStore;
+                if (store!=null) {
+                    store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
+                    store.store();
+                }
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }

@@ -57,7 +57,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private final BoardExtendOptionalPageListener _listener;
     BookmarkAdapter bookmarkAdapter;
     HistoryAdapter historyAdapter;
-    BookmarkStore _bookmarkStore = TempSettings.getBookmarkStore();
+    BookmarkStore _bookmarkStore = TempSettings.bookmarkStore;
     private boolean isUnderRecycleView = false;
     private float scale;
     public int getPageLayout() {

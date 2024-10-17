@@ -148,7 +148,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     TempSettings.setNotReadMessageCount(totalUnreadCount);
 
                     BahaMessage bahaMessage = null;
-                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.myContext)) {
                         // 紀錄訊息
                         bahaMessage = db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
@@ -326,10 +326,10 @@ public class BahamutStateHandler extends TelnetStateHandler {
             PageContainer.getInstance().getLoginPage().onLoginSuccess();
 
             // 開啟訊息小視窗
-            if (TempSettings.getMyContext() != null) {
+            if (TempSettings.myContext != null) {
                 if (TempSettings.getMessageSmall() == null) {
                     // 統計訊息數量
-                    MessageSmall messageSmall = new MessageSmall(TempSettings.getMyContext());
+                    MessageSmall messageSmall = new MessageSmall(TempSettings.myContext);
                     messageSmall.afterInit();
                     TempSettings.setMessageSmall(messageSmall);
                     new ASRunner() {
@@ -345,7 +345,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         }
                     }.runInMainThread();
 
-                    try (MessageDatabase db = new MessageDatabase(TempSettings.getMyContext())) {
+                    try (MessageDatabase db = new MessageDatabase(TempSettings.myContext)) {
                         db.getAllAndNewestMessage();
                     }
                 }

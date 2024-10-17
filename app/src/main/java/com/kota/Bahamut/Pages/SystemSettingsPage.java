@@ -384,7 +384,7 @@ public class SystemSettingsPage extends TelnetPage {
             cloud_save_enable_box.setOnCheckedChangeListener(cloud_save_enable_listener);
             mainLayout.findViewById(R.id.SystemSettings_item_cloudSaveEnable).setOnClickListener(view -> cloud_save_enable_box.setChecked(!cloud_save_enable_box.isChecked()));
             TextView cloud_save_last_time = mainLayout.findViewById(R.id.SystemSettings_cloudSaveLastTime);
-            String lastTime = TempSettings.getCloudSaveLastTime();
+            String lastTime = TempSettings.cloudSaveLastTime;
             if (lastTime.isEmpty()) {
                 cloud_save_last_time.setVisibility(View.GONE);
             } else {
