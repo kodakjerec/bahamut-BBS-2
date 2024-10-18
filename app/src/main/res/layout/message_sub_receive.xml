@@ -5,25 +5,31 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp">
-    <TextView
-        android:id="@+id/Message_Sub_Receive_Content"
-        style="@style/TextViewNormal"
+    <LinearLayout
+        android:id="@+id/Message_Sub_Receive_Content_Parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:textColor="@color/article_page_text_item_content0"
-        android:background="@color/list_page_item_arrow_background"
-        android:textIsSelectable="true"
-        android:paddingTop="5dp"
-        android:paddingStart="5dp"
-        android:paddingBottom="5dp"
-        android:paddingEnd="10dp"
-        />
+        android:orientation="vertical"
+        android:layout_alignParentStart="true">
+        <TextView
+            android:id="@+id/Message_Sub_Receive_Content"
+            style="@style/TextViewNormal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/article_page_text_item_content0"
+            android:background="@color/list_page_item_arrow_background"
+            android:textIsSelectable="true"
+            android:paddingTop="5dp"
+            android:paddingStart="5dp"
+            android:paddingBottom="5dp"
+            android:paddingEnd="10dp"
+            />
+    </LinearLayout>
     <TextView
         android:id="@+id/Message_Sub_Receive_Time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@+id/Message_Sub_Receive_Content"
+        android:layout_toEndOf="@+id/Message_Sub_Receive_Content_Parent"
         android:layout_alignParentBottom="true"
         android:layout_marginStart="5dp"
         style="@style/TextViewVerySmall"
