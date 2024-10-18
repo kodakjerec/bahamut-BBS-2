@@ -23,7 +23,8 @@ class MessageDatabase(context: Context?) :
                     "message TEXT NOT NULL, " +
                     "received_date INTEGER, " +
                     "read_date INTEGER," +
-                    "type INTEGER" +
+                    "type INTEGER," +
+                    "old_string TEXT" +
                     ")"
             aDatabase.execSQL(createTableQuery)
         } catch (e: SQLException) {
@@ -37,12 +38,13 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 收到訊息  */
-    fun receiveMessage(aSenderName: String?, aMessage: String?, iType: Int): BahaMessage {
+    fun receiveMessage(aSenderName: String, aMessage: String, iType: Int, oldString:String): BahaMessage {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
+        values.put("old_string", oldString)
 
         try {
             val db = writableDatabase
@@ -51,25 +53,26 @@ class MessageDatabase(context: Context?) :
         } catch (ignored: Exception) { }
 
         val messageObj = BahaMessage()
-        messageObj.senderName = aSenderName.toString()
-        messageObj.message = aMessage.toString()
+        messageObj.senderName = aSenderName
+        messageObj.message = aMessage
         messageObj.receivedDate = Date().time
         messageObj.type = iType
         return messageObj
     }
 
     /** 更新訊息 */
-    fun syncMessage(aSenderName: String?, aMessage: String?, iType: Int) {
+    fun syncMessage(aSenderName: String, aMessage: String, iType: Int, oldString:String) {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
+        values.put("old_string", oldString)
 
         try {
             val db = writableDatabase
-            val selection = "sender_name = ? AND message = ?"
-            val selectionArgs = arrayOf(aSenderName, aMessage)
+            val selection = "sender_name = ? AND message = ? AND old_string=?"
+            val selectionArgs = arrayOf(aSenderName, aMessage, oldString)
             // 查詢是否存在
             val cursor = db.query("messages", null, selection, selectionArgs, null, null, null)
 

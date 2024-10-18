@@ -3,7 +3,9 @@ package com.kota.Bahamut.Pages.BoardPage;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -96,6 +98,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     Button[] _tab_buttons;
     Button _show_bookmark_button; // 顯示書籤按鈕
     Button _show_history_button; // 顯示記錄按鈕
+    int drawerLocation = GravityCompat.END; // 抽屜最後位置
 
     /** 發文 */
     final View.OnClickListener mPostListener = view -> BoardMainPage.this.onPostButtonClicked();
@@ -115,10 +118,10 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     final View.OnClickListener mMenuButtonListener = view -> {
         DrawerLayout drawerLayout = (DrawerLayout) BoardMainPage.this.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            if (drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation())) {
+            if (drawerLayout.isDrawerOpen(drawerLocation)) {
                 drawerLayout.closeDrawers();
             } else {
-                drawerLayout.openDrawer(getDrawerLayoutGravityLocation(), true);
+                drawerLayout.openDrawer(drawerLocation, true);
             }
         }
     };
@@ -300,6 +303,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         return false;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
     public void onPageDidLoad() {
         super.onPageDidLoad();
@@ -327,9 +331,19 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             if (drawerLayout != null) {
                 LinearLayout menu_view = mainDrawerLayout.findViewById(R.id.menu_view);
                 DrawerLayout.LayoutParams layoutParams_drawer = (DrawerLayout.LayoutParams) menu_view.getLayoutParams();
-                layoutParams_drawer.gravity = getDrawerLayoutGravityLocation();
+                layoutParams_drawer.gravity = drawerLocation;
                 menu_view.setLayoutParams(layoutParams_drawer);
                 drawerLayout.addDrawerListener(_drawer_listener);
+                aSListView.setOnTouchListener((view, motionEvent) -> {
+                    if (motionEvent.getX()<700)
+                        layoutParams_drawer.gravity = GravityCompat.START;
+                    else
+                        layoutParams_drawer.gravity = GravityCompat.END;
+                    drawerLocation = layoutParams_drawer.gravity;
+                    menu_view.setLayoutParams(layoutParams_drawer);
+                    return false;
+                });
+
             }
             View search_article_button = mainDrawerLayout.findViewById(R.id.search_article_button);
             if (search_article_button != null) {
@@ -420,15 +434,6 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.TAB);
         }
     };
-
-    /** 側邊選單的位置 */
-    int getDrawerLayoutGravityLocation() {
-        int location = UserSettings.getPropertiesDrawerLocation();
-        if (location == 1) {
-            return GravityCompat.START;
-        }
-        return GravityCompat.END;
-    }
 
     /** 變更工具列位置 */
     void changeToolbarLocation() {
@@ -598,8 +603,8 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     @Override // com.kota.ASFramework.PageController.ASViewController
     protected boolean onBackPressed() {
         DrawerLayout drawerLayout = mainLayout.findViewById(R.id.drawer_layout);
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation())) {
-            drawerLayout.closeDrawer(getDrawerLayoutGravityLocation());
+        if (drawerLayout != null && drawerLayout.isDrawerOpen(drawerLocation)) {
+            drawerLayout.closeDrawer(drawerLocation);
             return true;
         }
         clear();
@@ -638,7 +643,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         searchArticle(vector.get(0), vector.get(1), Objects.equals(vector.get(2), "YES") ? "y" : "n", vector.get(3));
     }
 
-    // 搜尋文章
+    /** 搜尋文章 */
     void searchArticle(String _keyword, String _author, String _mark, String _gy) {
         _last_list_action = BoardPageAction.SEARCH;
         BoardSearchPage board_Search_Page = PageContainer.getInstance().getBoardSearchPage();
@@ -656,7 +661,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         pushCommand(new BahamutCommandSearchArticle(_keyword, _author, _mark, _gy));
     }
 
-    // 選擇文章
+    /** 選擇文章 */
     @Override // com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener
     public void onSelectDialogDismissWIthIndex(String str) {
         int i;
@@ -691,14 +696,14 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
     @Override // com.kota.ASFramework.PageController.ASViewController
     public boolean onReceivedGestureRight() {
-            if (UserSettings.getPropertiesGestureOnBoardEnable()) {
-                if (isDrawerOpen() || _isDrawerOpening) {
-                    return false;
-                }
-                onBackPressed();
-                return true;
+        if (UserSettings.getPropertiesGestureOnBoardEnable()) {
+            if (isDrawerOpen() || _isDrawerOpening) {
+                return false;
             }
+            onBackPressed();
             return true;
+        }
+        return true;
     }
 
     /** 發文 */
@@ -709,7 +714,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         getNavigationController().pushViewController(postArticlePage);
     }
 
-    // 按下推薦文章
+    /** 按下推薦文章 */
     public void goodLoadingArticle() {
         goodArticle(getLoadingItemNumber());
     }
@@ -971,7 +976,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     boolean isDrawerOpen() {
         DrawerLayout drawerLayout = mainLayout.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
-            return drawerLayout.isDrawerOpen(getDrawerLayoutGravityLocation());
+            return drawerLayout.isDrawerOpen(drawerLocation);
         }
         return false;
     }

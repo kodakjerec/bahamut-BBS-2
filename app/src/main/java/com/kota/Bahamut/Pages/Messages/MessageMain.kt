@@ -145,31 +145,27 @@ class MessageMain:TelnetPage() {
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         val db = MessageDatabase(context)
         try {
+            var senderName = ""
+            var message = ""
+
+            var startIndex = 0
+            var endIndex = 0
             rows.forEach { row->
                 val rawString = row.rawString
-                var senderName = ""
-                var message = ""
+
+                startIndex = 1
+                endIndex = rawString.indexOf("(")
+                senderName = rawString.substring(startIndex, endIndex).trim()
+
+                startIndex = rawString.indexOf("：")+1
+                message = rawString.substring(startIndex).trim()
 
                 if (rawString.startsWith("☆")) {
                     // send
-                    var startIndex = 1
-                    var endIndex = rawString.indexOf("(")
-                    senderName = rawString.substring(startIndex, endIndex).trim()
-
-                    startIndex = rawString.indexOf("：")+1
-                    message = rawString.substring(startIndex).trim()
-
-                    db.syncMessage(senderName, message, 1)
+                    db.syncMessage(senderName, message, 1, rawString)
                 } else if (rawString.startsWith("★")) {
                     // receive
-                    var startIndex = 1
-                    var endIndex = rawString.indexOf("(")
-                    senderName = rawString.substring(startIndex, endIndex).trim()
-
-                    startIndex = rawString.indexOf("：")+1
-                    message = rawString.substring(startIndex).trim()
-
-                    db.syncMessage(senderName, message, 0)
+                    db.syncMessage(senderName, message, 0, rawString)
                 }
             }
         } finally {

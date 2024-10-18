@@ -150,7 +150,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     BahaMessage bahaMessage = null;
                     try (MessageDatabase db = new MessageDatabase(TempSettings.myContext)) {
                         // 紀錄訊息
-                        bahaMessage = db.receiveMessage(name2, msg2, 0);
+                        bahaMessage = db.receiveMessage(name2, msg2, 0, row.getRawString());
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
