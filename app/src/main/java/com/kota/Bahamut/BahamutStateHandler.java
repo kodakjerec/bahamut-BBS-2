@@ -135,9 +135,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
             i++;
         }
         if (name_buffer.size() > 0 && msg_buffer.size() > 0) {
+            String rawString = row.getRawString();
             String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
             String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
             if (end_point == column && name.startsWith("★")) {
+                if (rawString.contains("對方關掉呼叫器了")) {
+                    ASToast.showLongToast("對方關掉呼叫器了");
+                    return;
+                } else if (rawString.contains("對方已經離去")) {
+                    ASToast.showLongToast("對方已經離去");
+                    return;
+                }
                 String name2 = name.substring(1, name.length() - 1).trim();
                 String msg2 = msg.substring(1).trim();
                 // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
@@ -150,7 +158,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     BahaMessage bahaMessage = null;
                     try (MessageDatabase db = new MessageDatabase(TempSettings.myContext)) {
                         // 紀錄訊息
-                        bahaMessage = db.receiveMessage(name2, msg2, 0, row.getRawString());
+                        bahaMessage = db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }

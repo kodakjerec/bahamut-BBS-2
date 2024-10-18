@@ -53,6 +53,7 @@
         android:importantForAutofill="no"
         android:padding="10dp"
         android:maxLength="59"
+        android:singleLine="true"
         android:textColor="@android:color/white" />
     <LinearLayout
         android:id="@+id/toolbar"

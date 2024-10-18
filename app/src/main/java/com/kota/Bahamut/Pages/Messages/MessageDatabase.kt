@@ -23,8 +23,7 @@ class MessageDatabase(context: Context?) :
                     "message TEXT NOT NULL, " +
                     "received_date INTEGER, " +
                     "read_date INTEGER," +
-                    "type INTEGER," +
-                    "old_string TEXT" +
+                    "type INTEGER" +
                     ")"
             aDatabase.execSQL(createTableQuery)
         } catch (e: SQLException) {
@@ -38,13 +37,12 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 收到訊息  */
-    fun receiveMessage(aSenderName: String, aMessage: String, iType: Int, oldString:String): BahaMessage {
+    fun receiveMessage(aSenderName: String, aMessage: String, iType: Int): BahaMessage {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
-        values.put("old_string", oldString)
 
         try {
             val db = writableDatabase
@@ -61,18 +59,17 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 更新訊息 */
-    fun syncMessage(aSenderName: String, aMessage: String, iType: Int, oldString:String) {
+    fun syncMessage(aSenderName: String, aMessage: String, iType: Int) {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
-        values.put("old_string", oldString)
 
         try {
             val db = writableDatabase
-            val selection = "sender_name = ? AND message = ? AND old_string=?"
-            val selectionArgs = arrayOf(aSenderName, aMessage, oldString)
+            val selection = "sender_name = ? AND message = ?"
+            val selectionArgs = arrayOf(aSenderName, aMessage)
             // 查詢是否存在
             val cursor = db.query("messages", null, selection, selectionArgs, null, null, null)
 
@@ -89,20 +86,6 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 更新讀取日期  */
-    fun updateReceiveMessage() {
-        try {
-            val db = writableDatabase
-            db.execSQL(
-                "UPDATE messages SET read_date = ? WHERE read_date is null",
-                arrayOf<Any>(
-                    Date().time
-                )
-            )
-            db.close()
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-    }
     fun updateReceiveMessage(aSenderName: String) {
         try {
             val db = writableDatabase
@@ -119,7 +102,7 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 送出訊息  */
-    fun sendMessage(aSenderName: String?, aMessage: String?) {
+    fun sendMessage(aSenderName: String, aMessage: String): BahaMessage {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
@@ -130,8 +113,14 @@ class MessageDatabase(context: Context?) :
             val db = writableDatabase
             db.insert("messages", null, values)
             db.close()
-        } catch (ignored: Exception) {
-        }
+        } catch (ignored: Exception) { }
+
+        val messageObj = BahaMessage()
+        messageObj.senderName = aSenderName
+        messageObj.message = aMessage
+        messageObj.receivedDate = Date().time
+        messageObj.type = 1
+        return messageObj
     }
 
     /** 列出各ID最新的訊息  */
@@ -180,7 +169,7 @@ class MessageDatabase(context: Context?) :
         }
     @SuppressLint("Range")
     fun getIdNewestMessage(aSenderName: String): BahaMessageSummarize {
-        val returnObject: BahaMessageSummarize = BahaMessageSummarize()
+        val returnObject = BahaMessageSummarize()
         try {
             val db = readableDatabase
             val subQuery =

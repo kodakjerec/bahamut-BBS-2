@@ -153,19 +153,26 @@ class MessageMain:TelnetPage() {
             rows.forEach { row->
                 val rawString = row.rawString
 
-                startIndex = 1
-                endIndex = rawString.indexOf("(")
-                senderName = rawString.substring(startIndex, endIndex).trim()
-
-                startIndex = rawString.indexOf("：")+1
-                message = rawString.substring(startIndex).trim()
-
                 if (rawString.startsWith("☆")) {
                     // send
-                    db.syncMessage(senderName, message, 1, rawString)
+                    startIndex = 1
+                    endIndex = rawString.indexOf("(")
+                    senderName = rawString.substring(startIndex, endIndex).trim()
+
+                    startIndex = rawString.indexOf("：")+1
+                    message = rawString.substring(startIndex).trim()
+
+                    db.syncMessage(senderName, message, 1)
                 } else if (rawString.startsWith("★")) {
                     // receive
-                    db.syncMessage(senderName, message, 0, rawString)
+                    startIndex = 1
+                    endIndex = rawString.indexOf("(")
+                    senderName = rawString.substring(startIndex, endIndex).trim()
+
+                    startIndex = rawString.indexOf("：")+1
+                    message = rawString.substring(startIndex).trim()
+
+                    db.syncMessage(senderName, message, 0)
                 }
             }
         } finally {
