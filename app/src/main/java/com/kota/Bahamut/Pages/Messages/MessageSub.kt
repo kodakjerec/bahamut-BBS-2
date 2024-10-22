@@ -33,6 +33,7 @@ import org.json.JSONObject
 class MessageSub: TelnetPage(), View.OnClickListener {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var scrollViewLayout: LinearLayout
+    private lateinit var senderNameField: TextView
     private lateinit var contentField:PostEditText
 
     override fun getPageLayout(): Int {
@@ -60,6 +61,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
         val txtEsc = mainLayout.findViewById<TextView>(R.id.Message_Sub_Back)
         txtEsc.setOnClickListener{ _-> onBackPressed() }
+        senderNameField = mainLayout.findViewById(R.id.Message_Sub_Sender)
         contentField = mainLayout.findViewById(R.id.Message_Sub_EditField)
 
         mainLayout.findViewById<TextView>(R.id.Message_Sub_Cancel).setOnClickListener(this)
@@ -71,9 +73,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
     /** 設定內容 */
     fun setSenderName(senderName: String) {
-
-        val txtSenderName: TextView = mainLayout.findViewById(R.id.Message_Sub_Sender)
-        txtSenderName.text = senderName
+        senderNameField.text = senderName
 
         // 讀取訊息
         val db = MessageDatabase(context)
@@ -104,8 +104,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
     /** 臨時插入一個訊息 */
     fun insertMessage(item:BahaMessage) {
-        val txtSenderName: TextView = mainLayout.findViewById(R.id.Message_Sub_Sender)
-        if (item.senderName == txtSenderName.text) {
+        if (item.senderName == senderNameField.text) {
             // 更新為已讀取
             val db = MessageDatabase(context)
             try {
@@ -138,8 +137,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
     // 按下畫面上的按鈕
     override fun onClick(view: View) {
-        val viewId = view.id
-        when (viewId) {
+        when (view.id) {
             R.id.Message_Sub_Cancel -> {
                 // 符號
                 val dialog = Dialog_InsertSymbol()
@@ -170,7 +168,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                 val dialog = DialogShortenUrl()
                 dialog.setListener(object: DialogShortenUrlListener {
                     override fun onShortenUrlDone(str: String?) {
-                        insertString(str)
+                        insertString(str!!)
                     }
                 })
                 dialog.show()
@@ -184,25 +182,9 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             R.id.Message_Sub_Post -> {
                 // 發表
                 if (contentField.text!!.isNotEmpty()) {
-                    val txtSenderName: TextView = mainLayout.findViewById(R.id.Message_Sub_Sender)
-                    val aSenderName = txtSenderName.text.toString().trim()
-                    val aMessage = contentField.text.toString().trim()
                     // 送出水球指令
-                    val builder = TelnetOutputBuilder.create()
-                        .pushKey(TelnetKeyboard.CTRL_S) // 準備送水球
-                        .pushString("$aSenderName\n")
-                        .pushString("$aMessage\n")
-                        .build()
-                    TelnetClient.getClient().sendDataToServer(builder)
+                    sendMessagePart1()
 
-                    // 更新畫面上的送出
-                    val db = MessageDatabase(context)
-                    try {
-                        val bahaMessage = db.sendMessage(aSenderName, aMessage)
-                        insertMessage(bahaMessage)
-                    } finally {
-                        db.close()
-                    }
 
                     // 預設送出完畢
                     contentField.setText("")
@@ -210,13 +192,67 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
         }
     }
+    private fun sendMessagePart1() {
+        val aSenderName = senderNameField.text.toString().trim()
+        val aMessage = contentField.text.toString().trim()
+        val builder = TelnetOutputBuilder.create()
+            .pushKey(TelnetKeyboard.CTRL_S) // 準備送水球
+            .pushString("$aSenderName\n")
+            .build()
+        TelnetClient.getClient().sendDataToServer(builder)
 
-    private fun insertString(str: String?) {
+        // 更新畫面上的送出
+        val db = MessageDatabase(context)
+        try {
+            val bahaMessage = db.sendMessage(aSenderName, aMessage)
+            insertMessage(bahaMessage)
+        } finally {
+            db.close()
+        }
+    }
+    fun sendMessagePart2() {
+        val aSenderName = senderNameField.text.toString().trim()
+        val aMessage = contentField.text.toString().trim()
+
+        val builder = TelnetOutputBuilder.create()
+            .pushString("$aMessage\n")
+            .build()
+        TelnetClient.getClient().sendDataToServer(builder)
+
+        // 更新畫面上的送出:成功
+        val db = MessageDatabase(context)
+        try {
+            val bahaMessage = db.updateSendMessage(aSenderName, aMessage, 1)
+            insertMessage(bahaMessage)
+        } finally {
+            db.close()
+        }
+    }
+    fun sendMessageFail() {
+        val aSenderName = senderNameField.text.toString().trim()
+        val aMessage = contentField.text.toString().trim()
+
+        // 更新畫面上的送出:失敗
+        val db = MessageDatabase(context)
+        try {
+            val bahaMessage = db.updateSendMessage(aSenderName, aMessage, 0)
+            insertMessage(bahaMessage)
+        } finally {
+            db.close()
+        }
+    }
+
+    fun insertString(str: String) {
         contentField.editableText.insert(contentField.selectionStart, str)
     }
 
     /** 取得imgur token  */
     private fun getUrlToken() {
+        val checkAccessToken = TempSettings.getImgurToken()
+        val checkAlbumHash = TempSettings.getImgurAlbum()
+        if (checkAccessToken.isNotEmpty() && checkAlbumHash.isNotEmpty())
+            return
+
         val apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/"
         val client = OkHttpClient()
         val request: Request = Request.Builder()
@@ -239,6 +275,14 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 //                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
                 Log.e("ShortenImage", e.toString())
             }
+        }
+    }
+
+
+    // 強制發送水球進入失敗
+    var messageAsRunner: ASRunner = object : ASRunner() {
+        override fun run() {
+            sendMessageFail()
         }
     }
 }
