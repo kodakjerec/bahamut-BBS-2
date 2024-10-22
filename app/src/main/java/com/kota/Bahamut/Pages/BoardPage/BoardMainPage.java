@@ -334,8 +334,10 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 layoutParams_drawer.gravity = drawerLocation;
                 menu_view.setLayoutParams(layoutParams_drawer);
                 drawerLayout.addDrawerListener(_drawer_listener);
+                // 根據手指位置設定側邊選單位置
                 aSListView.setOnTouchListener((view, motionEvent) -> {
-                    if (motionEvent.getX()<700)
+                    int screenWidth = getContext().getResources().getDisplayMetrics().widthPixels/2;
+                    if (motionEvent.getX()<screenWidth)
                         layoutParams_drawer.gravity = GravityCompat.START;
                     else
                         layoutParams_drawer.gravity = GravityCompat.END;
