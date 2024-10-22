@@ -85,6 +85,8 @@ class MessageMain:TelnetPage() {
 
     /** 顯示訊息清單 */
     fun loadMessageList() {
+        messageAsRunner.cancel()
+
         ASProcessingDialog.dismissProcessingDialog()
         TempSettings.isSyncMessageMain = true
 
@@ -141,8 +143,13 @@ class MessageMain:TelnetPage() {
         TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
+
+        messageAsRunner.postDelayed(5000)
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
+        messageAsRunner.cancel()
+        messageAsRunner.postDelayed(5000)
+
         val db = MessageDatabase(context)
         try {
             var senderName = ""
@@ -177,6 +184,13 @@ class MessageMain:TelnetPage() {
             }
         } finally {
             db.close()
+        }
+    }
+
+    // 強制讀取水球進入讀取完畢
+    var messageAsRunner: ASRunner = object : ASRunner() {
+        override fun run() {
+            loadMessageList()
         }
     }
 }
