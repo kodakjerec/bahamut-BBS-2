@@ -4,10 +4,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.PowerManager;
-import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -23,7 +20,6 @@ import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Messages.MessageDatabase;
 import com.kota.Bahamut.Pages.Messages.MessageMain;
-import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.HeroStep;
@@ -82,13 +78,6 @@ public class MainPage extends TelnetPage {
         if (TempSettings.getMessageSmall() != null)
             TempSettings.getMessageSmall().hide();
     };
-
-    private enum LastLoadClass {
-        Unload,
-        Boards,
-        Class,
-        Favorite
-    }
 
     public int getPageLayout() {
         return R.layout.main_page;
@@ -167,11 +156,6 @@ public class MainPage extends TelnetPage {
                 telnet_view.setFrame(this._frame_buffer);
             }
         }
-    }
-
-    public boolean onPagePreload() {
-        LastLoadClass _last_load_class = LastLoadClass.Unload;
-        return true;
     }
 
     public void onPageWillDisappear() {

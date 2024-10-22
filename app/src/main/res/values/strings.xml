@@ -71,7 +71,7 @@
     <string name="limit">限定</string>
     <string name="list_empty">這個列表是空的喔\n( ´ ▽ ` )ノ</string>
     <string name="loading">讀取中</string>
-    <string name="loading_">讀取中...</string>
+    <string name="loading_">讀取中…</string>
     <string name="login">登入</string>
     <string name="logout">登出</string>
     <string name="mailbox">信箱</string>
@@ -383,4 +383,8 @@
     <string name="message_small_sync_msg01">同步中，請稍後</string>
     <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
     <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
+    <string name="board_main_read_all">全部已讀</string>
+    <string name="board_main_unread_all">全部未讀</string>
+    <string name="board_main_read_all_msg01">全部已讀，請重新進入看板</string>
+    <string name="board_main_unread_all_msg01">全部未讀，請重新進入看板</string>
 </resources>

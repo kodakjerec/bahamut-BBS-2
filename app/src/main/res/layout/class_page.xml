@@ -10,19 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"/>
-    <TextView
-        android:id="@+id/ClassPage_lastVisit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:minWidth="60dp"
-        android:height="60dp"
-        android:textSize="20sp"
-        android:gravity="center_vertical"
-        android:textColor="@color/article_page_text_item_content0"
-        android:visibility="gone"
-        />
     <FrameLayout
         android:id="@+id/ClassPage_listViewBlock"
         android:layout_width="match_parent"
@@ -50,6 +37,18 @@
             android:dividerHeight="0dp" />
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/ClassPage_lastVisit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/toolbar"
+        android:layout_alignParentEnd="true"
+        android:minWidth="60dp"
+        android:height="60dp"
+        android:textSize="20sp"
+        android:gravity="center_vertical"
+        android:textColor="@color/article_page_text_item_content0"
+        android:visibility="gone" />
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar"

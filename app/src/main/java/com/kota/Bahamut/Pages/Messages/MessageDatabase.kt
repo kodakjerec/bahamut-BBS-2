@@ -126,47 +126,47 @@ class MessageDatabase(context: Context?) :
     /** 列出各ID最新的訊息  */
     @SuppressLint("Range")
     fun getAllAndNewestMessage(): List<BahaMessageSummarize> {
-            val returnList: MutableList<BahaMessageSummarize> = ArrayList()
-            try {
-                val db = readableDatabase
-                val subQuery =
-                    "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY message_id DESC LIMIT 1)"
-                val columns = arrayOf(
-                    "sender_name",
-                    "MAX(received_date) AS latest_received_date",
-                    "$subQuery AS latest_message",
-                    "COUNT(CASE WHEN read_date IS NULL THEN 1 END) AS unread_count"
-                )
-                val selection = ""
-                val groupBy = "sender_name"
-                val orderBy = "MAX(message_id) DESC"
-                val cursor =
-                    db.query("messages AS m1", columns, selection, null, groupBy, null, orderBy)
-                if (cursor.moveToFirst()) {
-                    var totalUnreadCount = 0
-                    do {
-                        val data = BahaMessageSummarize()
-                        data.senderName = cursor.getString(cursor.getColumnIndex("sender_name"))
-                        data.message = cursor.getString(cursor.getColumnIndex("latest_message"))
-                        data.receivedDate =
-                            cursor.getLong(cursor.getColumnIndex("latest_received_date"))
-                        val unreadCount = cursor.getInt(cursor.getColumnIndex("unread_count"))
-                        data.unReadCount = unreadCount
-                        totalUnreadCount += unreadCount
-                        returnList.add(data)
-                    } while (cursor.moveToNext())
-                    setNotReadMessageCount(totalUnreadCount)
-                    cursor.close()
-                    db.close()
-                } else {
-                    cursor.close()
-                    db.close()
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
+        var totalUnreadCount = 0
+        val returnList: MutableList<BahaMessageSummarize> = ArrayList()
+        try {
+            val db = readableDatabase
+            val subQuery =
+                "(SELECT message FROM messages m2 WHERE m2.sender_name = m1.sender_name ORDER BY message_id DESC LIMIT 1)"
+            val columns = arrayOf(
+                "sender_name",
+                "MAX(received_date) AS latest_received_date",
+                "$subQuery AS latest_message",
+                "COUNT(CASE WHEN read_date IS NULL THEN 1 END) AS unread_count"
+            )
+            val selection = ""
+            val groupBy = "sender_name"
+            val orderBy = "MAX(message_id) DESC"
+            val cursor =
+                db.query("messages AS m1", columns, selection, null, groupBy, null, orderBy)
+            if (cursor.moveToFirst()) {
+                do {
+                    val data = BahaMessageSummarize()
+                    data.senderName = cursor.getString(cursor.getColumnIndex("sender_name"))
+                    data.message = cursor.getString(cursor.getColumnIndex("latest_message"))
+                    data.receivedDate =
+                        cursor.getLong(cursor.getColumnIndex("latest_received_date"))
+                    val unreadCount = cursor.getInt(cursor.getColumnIndex("unread_count"))
+                    data.unReadCount = unreadCount
+                    totalUnreadCount += unreadCount
+                    returnList.add(data)
+                } while (cursor.moveToNext())
+                cursor.close()
+                db.close()
+            } else {
+                cursor.close()
+                db.close()
             }
-            return returnList
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
+        setNotReadMessageCount(totalUnreadCount)
+        return returnList
+    }
     @SuppressLint("Range")
     fun getIdNewestMessage(aSenderName: String): BahaMessageSummarize {
         val returnObject = BahaMessageSummarize()

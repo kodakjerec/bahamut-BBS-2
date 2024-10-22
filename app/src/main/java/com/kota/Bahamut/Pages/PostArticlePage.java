@@ -401,22 +401,22 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     /** 讀取暫存檔 */
     public void onFileClicked() {
         ASListDialog.createDialog()
-                .setTitle(getContextString(R.string._article))
-                .addItem(getContextString(R.string.load_temp))
-                .addItem(getContextString(R.string.save_to_temp))
-                .setListener(new ASListDialogItemClickListener() {
-                    public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                        return true;
-                    }
-        
-                    public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                        if (Objects.equals(aTitle, getContextString(R.string.load_temp))) {
-                            PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
-                        } else if (Objects.equals(aTitle, getContextString(R.string.save_to_temp))) {
-                            PostArticlePage.this.ontSaveArticleToTempButtonClicked();
-                        }
-                    }
-                }).show();
+        .setTitle(getContextString(R.string._article))
+        .addItem(getContextString(R.string.load_temp))
+        .addItem(getContextString(R.string.save_to_temp))
+        .setListener(new ASListDialogItemClickListener() {
+            public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
+                return true;
+            }
+
+            public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+                if (Objects.equals(aTitle, getContextString(R.string.load_temp))) {
+                    PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
+                } else if (Objects.equals(aTitle, getContextString(R.string.save_to_temp))) {
+                    PostArticlePage.this.ontSaveArticleToTempButtonClicked();
+                }
+            }
+        }).show();
     }
 
     /** 按下 讀取暫存檔 */

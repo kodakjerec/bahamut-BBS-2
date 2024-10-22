@@ -113,7 +113,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                         boardName = telnetArticle!!.BoardName
                     }
                     itemView1.setData(title, author, boardName)
-                    itemView1.setMenuButton(mMenuListener)
+                    itemView1.setMenuButtonClickListener(mMenuListener)
                 }
 
                 ArticlePageItemType.Content -> {

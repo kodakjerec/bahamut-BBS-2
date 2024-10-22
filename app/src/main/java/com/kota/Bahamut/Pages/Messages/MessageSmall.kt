@@ -13,10 +13,8 @@ import com.kota.ASFramework.Thread.ASRunner
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.NotificationSettings
-import com.kota.Bahamut.Service.TempSettings.getMessageSmall
 
 class MessageSmall(context: Context): LinearLayout(context) {
     private var mainLayout: RelativeLayout
@@ -28,13 +26,15 @@ class MessageSmall(context: Context): LinearLayout(context) {
         inflate(context, R.layout.message_small, this)
         scale = getContext().resources.displayMetrics.density
 
-        mainLayout = findViewById(R.id.Message_Main_Layout)
+        mainLayout = findViewById(R.id.Message_Small_Layout)
         badgeView = mainLayout.findViewById(R.id.Message_Small_Badge)
         iconView = mainLayout.findViewById(R.id.Message_Small_Icon)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     fun afterInit() {
+        val myLayout:LayoutParams = mainLayout.layoutParams as LayoutParams
+        myLayout.leftMargin = context.resources.displayMetrics.widthPixels/2
         iconView.setOnTouchListener(onTouchListener)
     }
 

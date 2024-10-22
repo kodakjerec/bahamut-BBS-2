@@ -149,7 +149,7 @@ public class ArticlePage extends TelnetPage {
                         }
                     }
                     itemView3.setData(title, author, board_name);
-                    itemView3.setMenuButton(mMenuListener);
+                    itemView3.setMenuButtonClickListener(mMenuListener);
                 }
                 case ArticlePageItemType.PostTime -> {
                     ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
