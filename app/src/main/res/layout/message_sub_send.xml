@@ -23,6 +23,7 @@
             android:paddingStart="10dp"
             android:paddingBottom="5dp"
             android:paddingEnd="5dp"
+            android:textColorLink="@color/text_color_link"
             />
     </LinearLayout>
     <TextView

@@ -1,58 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:id="@+id/content_view">
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
+        android:id="@+id/Message_Main_Header"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
-        <TextView
-            android:id="@+id/Message_Main_Back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            style="@style/TextViewNormal"
-            android:text="@string/_back"/>
-        <Button
-            android:id="@+id/Message_Main_Sync"
-            style="@style/ToolbarItem"
-            android:text="@string/message_small_sync"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            />
-        <LinearLayout
-            android:id="@+id/Message_Main_CheckboxLayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+            <TextView
+                android:id="@+id/Message_Main_Back"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/message_small_show_float"
-                style="@style/TextViewVerySmall"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                style="@style/TextViewNormal"
+                android:text="@string/_back"/>
+            <Button
+                android:id="@+id/Message_Main_Sync"
+                style="@style/ToolbarItem"
+                android:text="@string/message_small_sync"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                />
+            <LinearLayout
+                android:id="@+id/Message_Main_CheckboxLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/message_small_show_float"
+                    style="@style/TextViewVerySmall"
+                    tools:ignore="RelativeOverlap" />
+                <CheckBox
+                    android:id="@+id/Message_Main_Checkbox"
+                    style="@style/CheckboxBahamut"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+        <View style="@style/HorizontalDivider" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.kota.Bahamut.Pages.Model.PostEditText
+                android:id="@+id/Message_Main_Search"
+                style="@style/EditTextSingleLine"
+                android:autofillHints="username"
+                android:digits="@string/account_digits"
+                android:hint="@string/search"
+                android:inputType="text"
+                android:maxLength="12"
+                android:singleLine="true"
+                android:textSize="28sp"
+                android:background="@color/black"
+                android:textColor="@color/halfWhite"/>
+            <TextView
+                android:id="@+id/Message_Main_Search_Clear"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/message_main_search_clear"
+                android:layout_alignParentEnd="true"
+                android:layout_centerInParent="true"
+                android:textColor="@color/halfWhite"
                 tools:ignore="RelativeOverlap" />
-            <CheckBox
-                android:id="@+id/Message_Main_Checkbox"
-                style="@style/CheckboxBahamut"
-                android:layout_gravity="center"/>
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-    <View style="@style/HorizontalDivider"/>
+        </RelativeLayout>
+    </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Message_Main_Header">
         <LinearLayout
             android:id="@+id/Message_Main_Scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"/>
     </ScrollView>
-</LinearLayout>
+    <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
+        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/Message_Main_Button_Chat" android:background="@drawable/tab_item_background_color_selected" android:text="@string/message_main_tab_chat" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/Message_Main_Button_List" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/message_main_tab_list" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/ToolbarItem" android:contentDescription="@string/no_use"/>
+    </LinearLayout>
+</RelativeLayout>

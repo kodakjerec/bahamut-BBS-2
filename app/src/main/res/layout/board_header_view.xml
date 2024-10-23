@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/header_item_view">
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="@color/title_bar_background_color"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        style="@style/TouchBlock">
+        <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+            android:textColor="@color/yellow"
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/TextViewNormal"
+            android:textIsSelectable="true"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/relativeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                android:id="@+id/detail_1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/white"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                android:id="@+id/detail_vV"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/board_main_vV"
+                android:textColor="@color/halfWhite"
+                app:layout_constraintStart_toEndOf="@+id/detail_1"
+                app:layout_constraintTop_toTopOf="parent"
+                android:visibility="gone"/>
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                android:id="@+id/detail_2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:textColor="@color/article_page_header_board"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+    <View android:id="@+id/menu_divider" android:visibility="gone" style="@style/ItemViewDividerVertical"/>
+    <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="@color/title_bar_menu_icon_background_color" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
+</LinearLayout>

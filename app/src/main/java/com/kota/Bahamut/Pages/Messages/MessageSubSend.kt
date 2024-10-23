@@ -68,7 +68,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
         var originalIndex = mainLayout.indexOfChild(txtMessage)
 
         // 先取得原本的寬度,顏色
-        val txtMessageBackgroundColor = getContextColor(R.color.toolbar_background_color_normal)
+        val txtMessageBackgroundColor = txtMessage.background
         val txtMessageMaxWidth = txtMessage.maxWidth
 
         Linkify.addLinks(txtMessage, Linkify.WEB_URLS)
@@ -86,6 +86,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                     var urlSpanEnd = originalString.getSpanEnd(urlSpan)
                     val partA = originalString.subSequence(previousIndex, urlSpanEnd)
                     textView1.text = partA
+                    textView1.setLinkTextColor(getContextColor(R.color.text_color_link))
 
                     // check error
                     if (urlSpanEnd + 1 <= originalString.length) urlSpanEnd += 1
@@ -120,7 +121,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                         textView.setTextIsSelectable(true)
                         textView.isFocusable = true
                         textView.isLongClickable = true
-                        textView.setBackgroundColor(txtMessageBackgroundColor)
+                        textView.background = txtMessageBackgroundColor
                         textView.maxWidth = txtMessageMaxWidth
                         stringNewUrlSpan(textView)
                     } else if (view.javaClass == Thumbnail_ItemView::class.java) {

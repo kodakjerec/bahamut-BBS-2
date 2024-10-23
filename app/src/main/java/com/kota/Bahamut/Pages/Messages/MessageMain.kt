@@ -1,18 +1,26 @@
 package com.kota.Bahamut.Pages.Messages
 
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.ASFramework.Dialog.ASProcessingDialog
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
+import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
+import com.kota.Bahamut.Pages.Theme.ThemeStore.getSelectTheme
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
+import com.kota.Bahamut.Service.CommonFunctions.rgbToInt
 import com.kota.Bahamut.Service.NotificationSettings
 import com.kota.Bahamut.Service.TempSettings
 import com.kota.Telnet.Model.TelnetRow
@@ -22,8 +30,11 @@ import com.kota.TelnetUI.TelnetPage
 import java.util.Vector
 
 class MessageMain:TelnetPage() {
-    private lateinit var mainLayout: LinearLayout
+    private lateinit var mainLayout: RelativeLayout
     private lateinit var scrollViewLayout: LinearLayout
+    private lateinit var searchWord: PostEditText
+    private lateinit var tabButtons: Array<Button>
+
     private var lastViewPage: Int = 0 // 前端目前畫面
 
     override fun getPageLayout(): Int {
@@ -38,10 +49,70 @@ class MessageMain:TelnetPage() {
     private val showHideFloating = CompoundButton.OnCheckedChangeListener {
         _: CompoundButton?, isChecked: Boolean ->
         NotificationSettings.setShowMessageFloating(isChecked)
+    }
+
+    /** 搜尋聊天 */
+    private val handleSearchListener = TextView.OnEditorActionListener { textView, actionId, keyEvent ->
+        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+            handleSearchChats(textView.text.toString())
+            return@OnEditorActionListener true
         }
+        false
+    }
+    private fun handleSearchChats(searchWord: String) {
+        for (i in 0 until scrollViewLayout.childCount) {
+            val view = scrollViewLayout.getChildAt(i)
+            if (view is MessageMainItem) {
+                val subView:MessageMainItem = view
+                if (subView.getContent().senderName.contains(searchWord)) {
+                    subView.visibility = VISIBLE
+                } else {
+                    subView.visibility = GONE
+                }
+            }
+        }
+    }
+
+    /** 切換分頁 */
+    private val tabClickListener = View.OnClickListener { aView ->
+        // 切換頁籤
+        val theme = getSelectTheme()
+        for (tabButton in tabButtons) {
+            if (tabButton == aView) {
+                tabButton.setTextColor(rgbToInt(theme.textColor))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColor))
+            } else {
+                tabButton.setTextColor(rgbToInt(theme.textColorDisabled))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
+            }
+        }
+    }
 
     override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as LinearLayout
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout
+
+        // 替換外觀
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
+
+        // 分頁
+        val btnChat = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Chat)
+        val btnList = mainLayout.findViewById<Button>(R.id.Message_Main_Button_List)
+        btnChat.setOnClickListener(tabClickListener)
+        btnList.setOnClickListener(tabClickListener)
+        tabButtons = arrayOf(btnChat, btnList)
+        btnChat.performClick()
+
+        // 查詢
+        searchWord = mainLayout.findViewById(R.id.Message_Main_Search)
+        searchWord.imeOptions = EditorInfo.IME_ACTION_SEARCH
+        searchWord.setOnEditorActionListener(handleSearchListener)
+        // 清空查詢
+        val searchWordClear:TextView = mainLayout.findViewById(R.id.Message_Main_Search_Clear)
+        searchWordClear.setOnClickListener { _->
+            searchWord.setText("")
+            handleSearchChats("")
+        }
+
         // 切換浮動隱藏
         val checkBox = mainLayout.findViewById<CheckBox>(R.id.Message_Main_Checkbox)
         checkBox.isChecked = NotificationSettings.getShowMessageFloating()
@@ -68,9 +139,6 @@ class MessageMain:TelnetPage() {
         } else {
             sendSyncCommand()
         }
-
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
     }
 
     override fun onBackPressed(): Boolean {

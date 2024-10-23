@@ -47,7 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_above="@+id/toolbar"
-        android:background="@color/item_background_color"
+        android:background="@color/black"
         android:gravity="top|start|center_vertical|center_horizontal|center"
         android:hint="@string/input_content_here"
         android:importantForAutofill="no"

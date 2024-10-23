@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -72,7 +73,6 @@ import com.kota.Telnet.Logic.ItemUtils;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
-import com.kota.TelnetUI.TelnetHeaderItemView;
 import com.kota.TelnetUI.TextView.TelnetTextViewLarge;
 
 import java.util.ArrayList;
@@ -119,7 +119,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         DrawerLayout drawerLayout = (DrawerLayout) BoardMainPage.this.findViewById(R.id.drawer_layout);
         if (drawerLayout != null) {
             if (drawerLayout.isDrawerOpen(drawerLocation)) {
-                drawerLayout.closeDrawers();
+                drawerLayout.closeDrawer(drawerLocation);
             } else {
                 drawerLayout.openDrawer(drawerLocation, UserSettings.getPropertiesAnimationEnable());
             }
@@ -423,12 +423,11 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 else
                     _show_history_button.performClick();
             }
-            resetDrawerLocation();
             mainDrawerLayout.findViewById(R.id.bookmark_tab_button).setOnClickListener( toEssencePageClickListener );
         }
 
         // 標題
-        TelnetHeaderItemView boardPageHeaderView = mainLayout.findViewById(R.id.BoardPage_HeaderView);
+        BoardHeaderView boardPageHeaderView = mainLayout.findViewById(R.id.BoardPage_HeaderView);
         if (getPageType()==BahamutPage.BAHAMUT_BOARD) {
             boardPageHeaderView.setMenuButtonClickListener(mMenuButtonListener);
             boardPageHeaderView.setDetail1ClickListener(mReadAllListener);
@@ -589,7 +588,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         String board_manager = _board_manager;
         board_manager = (board_manager == null || board_manager.length() == 0) ? getContextString(R.string.loading) : board_manager;
         String board_name = getListName();
-        TelnetHeaderItemView header_view = mainLayout.findViewById(R.id.BoardPage_HeaderView);
+        BoardHeaderView header_view = mainLayout.findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             header_view.setData(board_title, board_name, board_manager);
         }

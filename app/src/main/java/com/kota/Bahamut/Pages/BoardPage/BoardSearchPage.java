@@ -13,7 +13,6 @@ import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
-import com.kota.TelnetUI.TelnetHeaderItemView;
 
 public class BoardSearchPage extends BoardMainPage {
     private String _author = null;
@@ -31,7 +30,7 @@ public class BoardSearchPage extends BoardMainPage {
 
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        BoardHeaderView header_view = (BoardHeaderView) findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             String board_name = getListName();
             if (board_name == null) {
