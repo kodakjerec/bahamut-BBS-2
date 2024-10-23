@@ -23,7 +23,8 @@ class MessageDatabase(context: Context?) :
                     "message TEXT NOT NULL, " +
                     "received_date INTEGER, " +
                     "read_date INTEGER," +
-                    "type INTEGER" +
+                    "type INTEGER," +
+                    "status INTEGER"+
                     ")"
             aDatabase.execSQL(createTableQuery)
         } catch (e: SQLException) {
@@ -43,6 +44,7 @@ class MessageDatabase(context: Context?) :
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
+        values.put("status",1)
 
         try {
             val db = writableDatabase
@@ -65,6 +67,7 @@ class MessageDatabase(context: Context?) :
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
+        values.put("status", 1)
 
         try {
             val db = writableDatabase
@@ -120,7 +123,18 @@ class MessageDatabase(context: Context?) :
         messageObj.message = aMessage
         messageObj.receivedDate = Date().time
         messageObj.type = 1
+        messageObj.status = -1
         return messageObj
+    }
+    /** 更新送出後的結果 */
+    fun updateSendMessage(aSenderName: String, aMessage: String, status: Int): BahaMessage {
+        val db = writableDatabase
+        db.execSQL(
+            "UPDATE messages SET status = ? WHERE message_id = (SELECT message_id FROM messages WHERE sender_name = ? AND message = ? ORDER BY receive_date DESC)",
+            arrayOf<Any>(
+                status, aSenderName, aMessage
+            )
+        )
     }
 
     /** 列出各ID最新的訊息  */
@@ -211,7 +225,7 @@ class MessageDatabase(context: Context?) :
     fun getIdMessage(aSenderName: String): List<BahaMessage> {
         return try {
             val db = readableDatabase
-            val columns = arrayOf("message_id","sender_name", "message", "received_date", "read_date", "type")
+            val columns = arrayOf("message_id","sender_name", "message", "received_date", "read_date", "type", "status")
             val selection = "sender_name=?"
             val selectionArgs = arrayOf(aSenderName)
             val orderBy = "message_id ASC"
@@ -226,6 +240,7 @@ class MessageDatabase(context: Context?) :
                     data.receivedDate = cursor.getLong(cursor.getColumnIndex("received_date"))
                     data.readDate = cursor.getLong(cursor.getColumnIndex("read_date"))
                     data.type = cursor.getInt(cursor.getColumnIndex("type"))
+                    data.status = cursor.getInt(cursor.getColumnIndex("status"))
                     returnList.add(data)
                 } while (cursor.moveToNext())
                 cursor.close()

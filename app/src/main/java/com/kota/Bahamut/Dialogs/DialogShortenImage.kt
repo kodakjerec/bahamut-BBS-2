@@ -32,9 +32,12 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
+import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.Messages.MessageSub
+import com.kota.Bahamut.Pages.PostArticlePage
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
@@ -418,8 +421,14 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
     private fun postUrl(str:String) {
         // 最上層是 發文 或 看板
-        val page = PageContainer.getInstance().postArticlePage
-        page.insertString(str)
+        val topPage = ASNavigationController.getCurrentController().topController
+        if (topPage.javaClass == PostArticlePage::class.java) {
+            val aPage = PageContainer.getInstance().postArticlePage
+            aPage.insertString(str)
+        } else if (topPage.javaClass == MessageSub::class.java) {
+            val aPage = PageContainer.getInstance().messageSub
+            aPage.insertString(str)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

@@ -139,13 +139,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
             String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
             String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
             if (end_point == column && name.startsWith("★")) {
-                if (rawString.contains("對方關掉呼叫器了")) {
-                    ASToast.showLongToast("對方關掉呼叫器了");
-                    return;
-                } else if (rawString.contains("對方已經離去")) {
-                    ASToast.showLongToast("對方已經離去");
-                    return;
-                }
                 String name2 = name.substring(1, name.length() - 1).trim();
                 String msg2 = msg.substring(1).trim();
                 // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
@@ -556,6 +549,22 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 detectMessage();
             }
             return;
+        }
+
+        // 狀況: 正在發送訊息
+        if (getCurrentPage()==BahamutPage.BAHAMUT_MESSAGE_SUB_PAGE) {
+            MessageSub aPage = PageContainer.getInstance().getMessageSub();
+            if (this.row_string_23.contains("對方關掉呼叫器了")) {
+                aPage.sendMessageFail();
+                ASToast.showLongToast("對方關掉呼叫器了");
+                return;
+            } else if (this.row_string_23.contains("對方已經離去")) {
+                aPage.sendMessageFail();
+                ASToast.showLongToast("對方已經離去");
+                return;
+            } else if (this.row_string_23.contains("熱訊：")) {
+                aPage.sendMessagePart2();
+            }
         }
 
         if (pass_1()) {

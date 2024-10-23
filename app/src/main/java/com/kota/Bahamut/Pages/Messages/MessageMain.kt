@@ -212,11 +212,11 @@ class MessageMain:TelnetPage() {
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
-        messageAsRunner.postDelayed(5000)
+        messageAsRunner.postDelayed(3000)
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         messageAsRunner.cancel()
-        messageAsRunner.postDelayed(5000)
+        messageAsRunner.postDelayed(3000)
 
         val db = MessageDatabase(context)
         try {
