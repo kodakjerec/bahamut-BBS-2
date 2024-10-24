@@ -721,7 +721,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     public void referenceBack(List<ReferenceAuthor> authors) {
         // 找出父層內容
         List<String> originParentContent = Arrays.asList(telnetArticle.generateReplyContent().split("\n"));
-        List<String> parentContent = new ArrayList<>();
+        List<String> tempParentContent = new ArrayList<>();
+        List<String> finalParentContent = new ArrayList<>();
 
 
         // 開始篩選
@@ -733,20 +734,24 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         // 如果有選到後三行, 計算兩個作者總行數
         int author0TotalRows = 0;
         int author1TotalRows = 0;
-        if (author0.getReservedType()==2 || author1.getReservedType()==2) {
-            for (int i = 0; i < originParentContent.size(); i++) {
-                String rowString = originParentContent.get(i);
-                if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+        for (int i = 0; i < originParentContent.size(); i++) {
+            String rowString = originParentContent.get(i);
+            if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+                if (!(author1.getRemoveBlank() && rowString.replaceAll("> > ", "").isEmpty())) {
+                    tempParentContent.add(rowString);
                     author1TotalRows++;
-                } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                }
+            } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                if (!(author0.getRemoveBlank() && rowString.replaceAll("> ", "").isEmpty())) {
+                    tempParentContent.add(rowString);
                     author0TotalRows++;
                 }
             }
         }
 
         boolean needInsert;
-        for(int i=0;i<originParentContent.size();i++) {
-            String rowString = originParentContent.get(i);
+        for(int i=0;i<tempParentContent.size();i++) {
+            String rowString = tempParentContent.get(i);
             needInsert = false;
             if (rowString.startsWith("> ※ ")) {
                 // 前二
@@ -771,18 +776,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 needInsert = true;
                         }
                     }
-
-                    if (needInsert && rowString.replaceAll("> > ", "").isEmpty()) {
-                        if (author1.getRemoveBlank()) {
-                            needInsert = false;
-                        }
-                    }
                 }
-            } else if (rowString.startsWith("※ ")) {
+            }
+            else if (rowString.startsWith("※ ")) {
                 // 前一
                 if (author0.getEnabled())
                     needInsert = true;
-            } else if (rowString.startsWith("> ")) {
+            }
+            else if (rowString.startsWith("> ")) {
                 // 前一
                 if (author0.getEnabled()) {
                     switch (author0.getReservedType()) {
@@ -800,18 +801,13 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 needInsert = true;
                         }
                     }
-                    if (needInsert && rowString.replaceAll("> ", "").isEmpty()) {
-                        if (author0.getRemoveBlank()) {
-                            needInsert = false;
-                        }
-                    }
                 }
             }
             if (needInsert) {
-                parentContent.add(originParentContent.get(i));
+                finalParentContent.add(rowString);
             }
         }
-        String joinedParentContent = String.join("\n", parentContent);
+        String joinedParentContent = String.join("\n", finalParentContent);
 
         // 找出自己打的內容
         List<String> originFromContent = Arrays.asList(_content_field.getText().toString().split("\n"));
