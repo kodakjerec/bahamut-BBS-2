@@ -72,13 +72,20 @@ object CommonFunctions {
      * @param maxLength 一行最多幾個字元
      */
     @JvmStatic
-    fun judgeDoubleWord(fromContent: String, maxLength: Int): String {
+    fun judgeDoubleWord(fromContent: String, fromMaxLength: Int): String {
+        var oldLineAuthorChar = "" // 記錄前一行開頭是不是引用, 如果本行不是引用擇要加分行
         val returnArrays: MutableList<String> = ArrayList()
         // 分割成字串陣列
         try {
             val arrays = fromContent.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
             for (array in arrays) {
+                var maxLength = fromMaxLength
+                // 遇到回應文章, 拉寬限制
+                if (array.startsWith("> > "))
+                    maxLength+=4
+                else if (array.startsWith("> "))
+                    maxLength+=2
                 val data2 = array.toByteArray(charset(TelnetDefs.CHARSET))
                 var data1 = U2BEncoder.getInstance().encodeToBytes(data2, 0)
                 while (data1.size >= maxLength) {
@@ -110,16 +117,18 @@ object CommonFunctions {
                         }
                     }
                     val newCharArray = Arrays.copyOfRange(data1, 0, column)
-                    if (column>=maxLength) // 剛剛好符合長度的換行, 不要加"\n"
-                        returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray))
-                    else
-                        returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray)+"\n")
+                    var inputString = B2UEncoder.getInstance().encodeToString(newCharArray)
+
+                    inputString+="\n"
+                    returnArrays.add(inputString)
+
                     data1 = Arrays.copyOfRange(data1, column, data1.size)
                 }
                 // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
                 // 如果data2無資料, data1無料, 代表這是空白行
                 if (!(data2.isNotEmpty() && data1.isEmpty())) {
-                    returnArrays.add(B2UEncoder.getInstance().encodeToString(data1)+"\n")
+                    val inputString = B2UEncoder.getInstance().encodeToString(data1)
+                    returnArrays.add(inputString+"\n")
                 }
             }
         } catch (e: Exception) {
