@@ -136,7 +136,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
             i++;
         }
         if (name_buffer.size() > 0 && msg_buffer.size() > 0) {
-            String rawString = row.getRawString();
             String name = B2UEncoder.getInstance().encodeToString(name_buffer.toByteArray());
             String msg = B2UEncoder.getInstance().encodeToString(msg_buffer.toByteArray());
             if (end_point == column && name.startsWith("★")) {
@@ -565,6 +564,8 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 return;
             } else if (getRowString(22).trim().contains("熱訊：")) {
                 page.sendMessagePart2();
+            } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+                detectMessage();
             }
         }
         // 其他

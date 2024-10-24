@@ -33,7 +33,7 @@ public class TelnetConnector implements TelnetChannelListener {
         this._last_send_data_time = 0;
     }
 
-    /* 防呆 */
+    /* 防呆,掛網 */
     private class HolderThread extends Thread {
         private boolean _run;
 
