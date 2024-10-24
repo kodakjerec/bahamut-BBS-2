@@ -27,6 +27,15 @@
             />
     </LinearLayout>
     <TextView
+        android:id="@+id/Message_Sub_Sender_Status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toStartOf="@+id/Message_Sub_Sender_Content_Parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="5dp"
+        style="@style/TextViewVerySmall"
+        />
+    <TextView
         android:id="@+id/Message_Sub_Sender_Time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

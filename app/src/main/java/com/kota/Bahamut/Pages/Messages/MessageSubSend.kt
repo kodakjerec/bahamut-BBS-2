@@ -10,6 +10,7 @@ import android.util.TypedValue
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.kota.ASFramework.Thread.ASRunner
 import com.kota.Bahamut.Pages.ArticlePage.Thumbnail_ItemView
 import com.kota.Bahamut.Pages.ArticlePage.myUrlSpan
 import com.kota.Bahamut.R
@@ -21,25 +22,46 @@ import java.util.Date
 class MessageSubSend(context: Context): RelativeLayout(context) {
     private var txtMessage: TextView
     private var txtSendDate: TextView
+    private var txtSendStatus: TextView
+    lateinit var myBahaMessage: BahaMessage
     init {
         inflate(context, R.layout.message_sub_send, this)
         txtMessage = findViewById(R.id.Message_Sub_Sender_Content)
         txtSendDate = findViewById(R.id.Message_Sub_Sender_Time)
+        txtSendStatus = findViewById(R.id.Message_Sub_Sender_Status)
     }
 
     fun setContent(fromObject: BahaMessage) {
-        txtMessage.text = fromObject.message
+        myBahaMessage = fromObject
+        txtMessage.text = myBahaMessage.message
         // 設定日期格式
         val sdf = SimpleDateFormat("yyyy:MM:dd HH:mm")
         // 將時間戳轉換為 Date 物件
-        val date = Date(fromObject.receivedDate)
+        val date = Date(myBahaMessage.receivedDate)
         txtSendDate.text = sdf.format(date).substring(11)
         val wordWidth:Int = (txtSendDate.paint.measureText(txtSendDate.text.toString())*1.2).toInt()
         val screenWidth = context.resources.displayMetrics.widthPixels
         txtMessage.maxWidth = screenWidth - wordWidth
+        setStatus(myBahaMessage.status)
 
         // 預覽圖
         stringThumbnail()
+    }
+
+    fun setStatus(status: MessageStatus) {
+        val txtStatus = when(status) {
+            MessageStatus.Default -> "" // default
+            MessageStatus.Success -> "已讀" // 成功
+            MessageStatus.CloseBBCall -> "閉關" // 關閉呼叫器
+            MessageStatus.Escape -> "離去" // 對方已經離去
+            MessageStatus.Offline -> "離線" // 沒上線
+            else -> "未知"
+        }
+        object : ASRunner() {
+            override fun run() {
+                txtSendStatus.text = txtStatus
+            }
+        }.runInMainThread()
     }
 
 

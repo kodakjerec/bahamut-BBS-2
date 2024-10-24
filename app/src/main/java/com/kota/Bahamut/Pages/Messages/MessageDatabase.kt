@@ -37,6 +37,17 @@ class MessageDatabase(context: Context?) :
         onCreate(db)
     }
 
+    private fun stringToStatus(fromString: String): MessageStatus {
+        return when(fromString) {
+            "Default" -> MessageStatus.Default
+            "Success" -> MessageStatus.Success
+            "CloseBBCall" -> MessageStatus.CloseBBCall
+            "Escape" -> MessageStatus.Escape
+            "Offline" -> MessageStatus.Offline
+            else -> MessageStatus.Unknown
+        }
+    }
+
     /** 收到訊息  */
     fun receiveMessage(aSenderName: String, aMessage: String, iType: Int): BahaMessage {
         val values = ContentValues()
@@ -44,7 +55,7 @@ class MessageDatabase(context: Context?) :
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
-        values.put("status",1)
+        values.put("status", MessageStatus.Success.toString() )
 
         try {
             val db = writableDatabase
@@ -67,7 +78,7 @@ class MessageDatabase(context: Context?) :
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("type", iType)
-        values.put("status", 1)
+        values.put("status", MessageStatus.Success.toString())
 
         try {
             val db = writableDatabase
@@ -105,36 +116,41 @@ class MessageDatabase(context: Context?) :
     }
 
     /** 送出訊息  */
-    fun sendMessage(aSenderName: String, aMessage: String): BahaMessage {
+    fun sendMessage(aSenderName: String, aMessage: String): BahaMessage? {
         val values = ContentValues()
         values.put("sender_name", aSenderName)
         values.put("message", aMessage)
         values.put("received_date", Date().time)
         values.put("read_date", Date().time)
         values.put("type", 1)
-        try {
-            val db = writableDatabase
-            db.insert("messages", null, values)
-            db.close()
-        } catch (ignored: Exception) { }
 
         val messageObj = BahaMessage()
         messageObj.senderName = aSenderName
         messageObj.message = aMessage
         messageObj.receivedDate = Date().time
         messageObj.type = 1
-        messageObj.status = -1
+
+        try {
+            val db = writableDatabase
+            messageObj.id = db.insert("messages", null, values)
+            db.close()
+        } catch (ignored: Exception) { return null }
+
         return messageObj
     }
     /** 更新送出後的結果 */
-    fun updateSendMessage(aSenderName: String, aMessage: String, status: Int): BahaMessage {
-        val db = writableDatabase
-        db.execSQL(
-            "UPDATE messages SET status = ? WHERE message_id = (SELECT message_id FROM messages WHERE sender_name = ? AND message = ? ORDER BY receive_date DESC)",
-            arrayOf<Any>(
-                status, aSenderName, aMessage
+    fun updateSendMessage(aMessage: BahaMessage) {
+        try {
+            val db = writableDatabase
+            db.execSQL(
+                "UPDATE messages SET status = ? WHERE message_id = ?",
+                arrayOf<Any>(
+                    aMessage.status, aMessage.id
+                )
             )
-        )
+        } catch (ignored: Exception) {
+            ignored.printStackTrace()
+        }
     }
 
     /** 列出各ID最新的訊息  */
@@ -240,7 +256,7 @@ class MessageDatabase(context: Context?) :
                     data.receivedDate = cursor.getLong(cursor.getColumnIndex("received_date"))
                     data.readDate = cursor.getLong(cursor.getColumnIndex("read_date"))
                     data.type = cursor.getInt(cursor.getColumnIndex("type"))
-                    data.status = cursor.getInt(cursor.getColumnIndex("status"))
+                    data.status = stringToStatus(cursor.getString(cursor.getColumnIndex("status")))
                     returnList.add(data)
                 } while (cursor.moveToNext())
                 cursor.close()

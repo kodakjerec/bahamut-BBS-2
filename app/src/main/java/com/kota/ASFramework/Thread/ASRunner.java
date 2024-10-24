@@ -52,9 +52,7 @@ public abstract class ASRunner {
 
   /** 延遲執行 */
   public void postDelayed(int delayMillis) {
-    if (runnable == null)
-      runnable = ASRunner.this::run;
-    // Call the actual run method after delay
+    runnable = this::run;
     _main_handler.postDelayed(runnable, delayMillis);
   }
   /** 取消執行 */

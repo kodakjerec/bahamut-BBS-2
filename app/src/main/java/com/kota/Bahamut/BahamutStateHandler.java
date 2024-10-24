@@ -25,6 +25,7 @@ import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;
 import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Messages.MessageSmall;
+import com.kota.Bahamut.Pages.Messages.MessageStatus;
 import com.kota.Bahamut.Pages.Messages.MessageSub;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
@@ -157,14 +158,14 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     }
 
                     if (bahaMessage!=null) {
-                        TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                        if (top_page instanceof MessageMain) {
+                        TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+                        if (topPage instanceof MessageMain) {
                             // 顯示訊息
                             ASSnackBar.show(name2, msg2);
-                            MessageMain aPage = (MessageMain) top_page;
+                            MessageMain aPage = (MessageMain) topPage;
                             aPage.loadMessageList(bahaMessage);
-                        } else if (top_page instanceof MessageSub) {
-                            MessageSub aPage = (MessageSub) top_page;
+                        } else if (topPage instanceof MessageSub) {
+                            MessageSub aPage = (MessageSub) topPage;
                             aPage.insertMessage(bahaMessage);
                         } else {
                             // 如果是其他頁面:顯示訊息
@@ -197,11 +198,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         .pushKey(TelnetKeyboard.SPACE)
                         .build();
                 TelnetClient.getClient().sendDataToServer(data);
-                TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof MailBoxPage) {
+                TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+                if (topPage instanceof MailBoxPage) {
                     MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
                     page2.recoverPost();
-                } else if (top_page instanceof PostArticlePage) {
+                } else if (topPage instanceof PostArticlePage) {
                     // 最上層是 發文 或 看板
                     // 清除最先遇到的 BoardSearch, BoardLink, BoardMain
                     Vector<ASViewController> controllers = ASNavigationController.getCurrentController().getAllController();
@@ -234,12 +235,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
         } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
             if (this.row_string_00.contains("順利貼出佈告")) {
                 // 順利貼出佈告, 請按任意鍵繼續
-                TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-                if (top_page instanceof PostArticlePage || top_page instanceof BoardMainPage) {
+                TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+                if (topPage instanceof PostArticlePage || topPage instanceof BoardMainPage) {
                     // 最上層是 發文 或 看板
                     BoardMainPage page = PageContainer.getInstance().getBoardPage();
                     page.finishPost();
-                } else if (top_page instanceof MailBoxPage) {
+                } else if (topPage instanceof MailBoxPage) {
                     MailBoxPage page2 = PageContainer.getInstance().getMailBoxPage();
                     page2.finishPost();
                 }
@@ -488,16 +489,16 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     void handleArticle() {
-        TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-        if (top_page instanceof BoardMainPage) {
+        TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+        if (topPage instanceof BoardMainPage) {
             setCurrentPage(BahamutPage.BAHAMUT_ARTICLE);
-        } else if (top_page instanceof MailBoxPage) {
+        } else if (topPage instanceof MailBoxPage) {
             setCurrentPage(BahamutPage.BAHAMUT_MAIL);
-        } else if (top_page instanceof BoardEssencePage) {
+        } else if (topPage instanceof BoardEssencePage) {
             setCurrentPage(BahamutPage.BAHAMUT_ARTICLE_ESSENCE);
         }
         myAsRunner.cancel();
-        myAsRunner.postDelayed(5000);
+        myAsRunner.postDelayed(3000);
 
         if (!this.duringReadingArticle) {
             onReadArticleStart();
@@ -511,12 +512,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
         Matcher matcher = pattern.matcher(row_string_23);
         if (matcher.find()) {
             String percent = matcher.toMatchResult().group(1);
-            TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-            if (top_page instanceof ArticleEssencePage page) {
+            TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+            if (topPage instanceof ArticleEssencePage page) {
                 page.changeLoadingPercentage(percent);
-            } else if (top_page instanceof MailPage page) {
+            } else if (topPage instanceof MailPage page) {
                 page.changeLoadingPercentage(percent);
-            } else if (top_page instanceof ArticlePage page) {
+            } else if (topPage instanceof ArticlePage page) {
                 page.changeLoadingPercentage(percent);
             }
         }
@@ -526,48 +527,48 @@ public class BahamutStateHandler extends TelnetStateHandler {
     public void handleState() {
         loadState();
         this.telnetCursor = TelnetClient.getModel().getCursor();
+        TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+
 
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
-        if (getCurrentPage()==BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE) {
-            MessageMain aPage = PageContainer.getInstance().getMessageMain();
+        if (topPage instanceof MessageMain page) {
             if (this.row_string_23.contains("瀏覽 P.")) {
                 // 正在瀏覽訊息
-                aPage.receiveSyncCommand(rows);
+                page.receiveSyncCommand(rows);
                 new BahamutCommandLoadMoreArticle().execute();
             } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
                 // 訊息最後一頁, 還有回到原本的那頁
-                aPage.receiveSyncCommand(rows);
+                page.receiveSyncCommand(rows);
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
 
                 new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
                     @Override // com.kota.ASFramework.Thread.ASRunner
                     public void run() {
-                        aPage.loadMessageList();
+                        page.loadMessageList();
                     }
                 }.runInMainThread();
             } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
                 detectMessage();
             }
-            return;
         }
-
         // 狀況: 正在發送訊息
-        if (getCurrentPage()==BahamutPage.BAHAMUT_MESSAGE_SUB_PAGE) {
-            MessageSub aPage = PageContainer.getInstance().getMessageSub();
+        else if (topPage instanceof MessageSub page) {
             if (this.row_string_23.contains("對方關掉呼叫器了")) {
-                aPage.sendMessageFail();
+                page.sendMessageFail(MessageStatus.CloseBBCall);
                 ASToast.showLongToast("對方關掉呼叫器了");
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
                 return;
             } else if (this.row_string_23.contains("對方已經離去")) {
-                aPage.sendMessageFail();
+                page.sendMessageFail(MessageStatus.Escape);
                 ASToast.showLongToast("對方已經離去");
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
                 return;
-            } else if (this.row_string_23.contains("熱訊：")) {
-                aPage.sendMessagePart2();
+            } else if (getRowString(22).trim().contains("熱訊：")) {
+                page.sendMessagePart2();
             }
         }
-
-        if (pass_1()) {
+        // 其他
+        else if (pass_1()) {
             if (getCurrentPage() == BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
                 new BahamutCommandLoadMoreArticle().execute();
             } else if (getCurrentPage() > BahamutPage.BAHAMUT_MAIL_BOX && this.row_string_23.contains("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
@@ -759,15 +760,15 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     // 通用顯示頁面
     void showPage(TelnetPage aPage) {
-        final TelnetPage top_page = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
-        if (aPage == top_page) {
+        final TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
+        if (aPage == topPage) {
             new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.7
                 @Override // com.kota.ASFramework.Thread.ASRunner
                 public void run() {
-                    top_page.requestPageRefresh();
+                    topPage.requestPageRefresh();
                 }
             }.runInMainThread();
-        } else if (top_page!= null && !top_page.isPopupPage() && aPage != null) {
+        } else if (topPage!= null && !topPage.isPopupPage() && aPage != null) {
             if (ASNavigationController.getCurrentController().containsViewController(aPage)) {
                 ASNavigationController.getCurrentController().popToViewController(aPage);
             } else {

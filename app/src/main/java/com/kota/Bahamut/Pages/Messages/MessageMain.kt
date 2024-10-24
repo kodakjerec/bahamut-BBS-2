@@ -15,6 +15,7 @@ import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
+import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.Pages.Theme.ThemeStore.getSelectTheme
@@ -34,8 +35,6 @@ class MessageMain:TelnetPage() {
     private lateinit var scrollViewLayout: LinearLayout
     private lateinit var searchWord: PostEditText
     private lateinit var tabButtons: Array<Button>
-
-    private var lastViewPage: Int = 0 // 前端目前畫面
 
     override fun getPageLayout(): Int {
         return R.layout.message_main
@@ -125,10 +124,6 @@ class MessageMain:TelnetPage() {
 
         scrollViewLayout = mainLayout.findViewById(R.id.Message_Main_Scroll)
 
-        // 指定目前畫面
-        lastViewPage = BahamutStateHandler.getInstance().currentPage
-        BahamutStateHandler.getInstance().currentPage = BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
-
         // 重置
         val btnReset: Button = mainLayout.findViewById(R.id.Message_Main_Sync)
         btnReset.setOnClickListener { _-> sendSyncCommand() }
@@ -142,8 +137,6 @@ class MessageMain:TelnetPage() {
     }
 
     override fun onBackPressed(): Boolean {
-        // 還原目前畫面
-        BahamutStateHandler.getInstance().currentPage = lastViewPage
         // 顯示小視窗
         if (TempSettings.getMessageSmall() != null)
             TempSettings.getMessageSmall()!!.show()
@@ -175,6 +168,7 @@ class MessageMain:TelnetPage() {
             db.close()
         }
     }
+    /** 收到訊息, 只更新特定人物的最新訊息 */
     fun loadMessageList(item:BahaMessage) {
         for (i in 0 until scrollViewLayout.childCount) {
             val view = scrollViewLayout.getChildAt(i)
@@ -256,7 +250,7 @@ class MessageMain:TelnetPage() {
     }
 
     // 強制讀取水球進入讀取完畢
-    var messageAsRunner: ASRunner = object : ASRunner() {
+    private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
             loadMessageList()
         }

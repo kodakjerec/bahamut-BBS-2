@@ -55,8 +55,6 @@ class MessageMainItem(context: Context): LinearLayout(context) {
     private val itemClickListener = OnClickListener { _->
         val aPage = PageContainer.getInstance().messageSub
         ASNavigationController.getCurrentController().pushViewController(aPage)
-        BahamutStateHandler.getInstance().currentPage =
-            BahamutPage.BAHAMUT_MESSAGE_SUB_PAGE
 
         aPage.setSenderName(txtSenderName.text.toString())
     }

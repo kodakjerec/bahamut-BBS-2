@@ -7,8 +7,11 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.view.children
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
+import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.Dialogs.DialogShortenImage
 import com.kota.Bahamut.Dialogs.DialogShortenUrl
 import com.kota.Bahamut.Dialogs.DialogShortenUrlListener
@@ -192,6 +195,9 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
         }
     }
+
+    var tempMessage: BahaMessage? = null
+    /** 送出訊息-1 先密對方 */
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
@@ -201,44 +207,80 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             .build()
         TelnetClient.getClient().sendDataToServer(builder)
 
-        // 更新畫面上的送出
+        // 更新db
         val db = MessageDatabase(context)
         try {
             val bahaMessage = db.sendMessage(aSenderName, aMessage)
-            insertMessage(bahaMessage)
+            if (bahaMessage!=null) {
+                tempMessage = bahaMessage
+                // 更新畫面
+                insertMessage(bahaMessage)
+            }
         } finally {
             db.close()
         }
+
+        messageAsRunner.cancel()
+        messageAsRunner.postDelayed(3000)
     }
+    /** 送出訊息-2 更新訊息 */
     fun sendMessagePart2() {
-        val aSenderName = senderNameField.text.toString().trim()
-        val aMessage = contentField.text.toString().trim()
+        messageAsRunner.cancel()
 
-        val builder = TelnetOutputBuilder.create()
-            .pushString("$aMessage\n")
-            .build()
-        TelnetClient.getClient().sendDataToServer(builder)
+        if (tempMessage!=null) {
+            tempMessage!!.status = MessageStatus.Success
+            val aMessage = tempMessage!!.message
 
-        // 更新畫面上的送出:成功
-        val db = MessageDatabase(context)
-        try {
-            val bahaMessage = db.updateSendMessage(aSenderName, aMessage, 1)
-            insertMessage(bahaMessage)
-        } finally {
-            db.close()
+            val builder = TelnetOutputBuilder.create()
+                .pushString("$aMessage\n")
+                .build()
+            TelnetClient.getClient().sendDataToServer(builder)
+
+            // 更新db
+            val db = MessageDatabase(context)
+            try {
+                db.updateSendMessage(tempMessage!!)
+                // 更新畫面
+                for (i in scrollViewLayout.childCount - 1 downTo 0) {
+                    val view = scrollViewLayout.getChildAt(i)
+                    if (view.javaClass == MessageSubSend::class.java) {
+                        val item:MessageSubSend = view as MessageSubSend
+                        if (item.myBahaMessage.id == tempMessage!!.id) {
+                            item.setStatus(tempMessage!!.status)
+                            break
+                        }
+                    }
+                }
+            } finally {
+                db.close()
+            }
+            tempMessage = null
         }
     }
-    fun sendMessageFail() {
-        val aSenderName = senderNameField.text.toString().trim()
-        val aMessage = contentField.text.toString().trim()
+    fun sendMessageFail(status:MessageStatus) {
+        messageAsRunner.cancel()
 
-        // 更新畫面上的送出:失敗
-        val db = MessageDatabase(context)
-        try {
-            val bahaMessage = db.updateSendMessage(aSenderName, aMessage, 0)
-            insertMessage(bahaMessage)
-        } finally {
-            db.close()
+        if (tempMessage!=null) {
+            tempMessage!!.status = status
+            // 更新db
+            val db = MessageDatabase(context)
+            try {
+                db.updateSendMessage(tempMessage!!)
+                // 更新畫面
+                for (i in scrollViewLayout.childCount - 1 downTo 0) {
+                    val view = scrollViewLayout.getChildAt(i)
+                    if (view.javaClass == MessageSubSend::class.java) {
+                        val item:MessageSubSend = view as MessageSubSend
+                        if (item.myBahaMessage.id == tempMessage!!.id) {
+                            item.setStatus(tempMessage!!.status)
+                            break
+                        }
+                    }
+                }
+            } finally {
+                db.close()
+            }
+            tempMessage = null
         }
     }
 
@@ -272,7 +314,6 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                     setImgurAlbum(albumHash)
                 }
             } catch (e: Exception) {
-//                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
                 Log.e("ShortenImage", e.toString())
             }
         }
@@ -280,9 +321,10 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
 
     // 強制發送水球進入失敗
-    var messageAsRunner: ASRunner = object : ASRunner() {
+    private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
-            sendMessageFail()
+            sendMessageFail(MessageStatus.Offline)
+            ASToast.showLongToast("丟水球無反應，對方可能不在線上")
         }
     }
 }
