@@ -6,4 +6,6 @@ public interface ArticlePageItemType {
     int Sign = 1;
     int Header = 2;
     int PostTime = 3;
+
+    int Push = 4;
 }

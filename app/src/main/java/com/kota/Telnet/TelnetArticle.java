@@ -321,5 +321,8 @@ public class TelnetArticle {
         return Author;
     }
 
-    public Vector<TelnetArticlePush> getPushs() { return _push; }
+    public int getPushSize() {
+        return _push.size();
+    }
+    public TelnetArticlePush getPush(int index) { return _push.get(index); }
 }

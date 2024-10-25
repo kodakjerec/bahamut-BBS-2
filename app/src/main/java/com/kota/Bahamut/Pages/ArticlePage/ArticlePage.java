@@ -43,6 +43,7 @@ import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
+import com.kota.Telnet.TelnetArticlePush;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
@@ -65,11 +66,13 @@ public class ArticlePage extends TelnetPage {
     Runnable _top_action = null;
     Runnable _bottom_action = null;
     BaseAdapter listAdapter = new BaseAdapter() {
+        private int pushLength = 0;
         @Override // android.widget.Adapter
         public int getCount() {
             if (telnetArticle != null) {
-                // 內文個數 + header + PostTime + pushs
-                return telnetArticle.getItemSize() + 2 + telnetArticle.getPushs().size();
+                pushLength = telnetArticle.getPushSize();
+                // 內文個數 + header + PostTime + push
+                return telnetArticle.getItemSize() + 2 + pushLength;
             }
             return 0;
         }
@@ -87,17 +90,21 @@ public class ArticlePage extends TelnetPage {
             return itemIndex;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public int getItemViewType(int itemIndex) {
             if (itemIndex == 0) {
+                // header
                 return ArticlePageItemType.Header;
             }
-            else if (itemIndex == getCount() - 1 - telnetArticle.getPushs().size()) {
+            else if (itemIndex == getCount() - 1 - pushLength) {
+                // postTime
                 return ArticlePageItemType.PostTime;
             }
-            else if (itemIndex >= getCount() - telnetArticle.getPushs().size()) {
-                return
+            else if (itemIndex >= getCount() - pushLength) {
+                // push
+                return ArticlePageItemType.Push;
             }
+            // content
             return Objects.requireNonNull(getItem(itemIndex)).getType();
         }
 
@@ -105,7 +112,7 @@ public class ArticlePage extends TelnetPage {
         public View getView(int itemIndex, View itemViewFrom, ViewGroup parentView) {
             int type = getItemViewType(itemIndex);
             TelnetArticleItem item = getItem(itemIndex);
-            // 2-標題 0-本文 1-簽名檔 3-發文時間
+            // 2-標題 0-本文 1-簽名檔 3-發文時間 4-推文
             View itemViewOrigin = itemViewFrom;
 
             if (itemViewOrigin == null) {
@@ -113,6 +120,7 @@ public class ArticlePage extends TelnetPage {
                     case ArticlePageItemType.Sign -> itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
                     case ArticlePageItemType.Header -> itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
                     case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                    case ArticlePageItemType.Push -> itemViewOrigin = new ArticlePagePushItemView(getContext());
                     default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
                 }
             } else if (type == ArticlePageItemType.Content) {
@@ -160,31 +168,40 @@ public class ArticlePage extends TelnetPage {
                     itemView4.setTime("《" + telnetArticle.DateTime + "》");
                     itemView4.setIP(telnetArticle.fromIP);
                 }
+                case ArticlePageItemType.Push -> {
+                    ArticlePagePushItemView itemView5 = (ArticlePagePushItemView) itemViewOrigin;
+                    int tempIndex = itemIndex - pushLength;
+                    TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
+                    itemView5.setContent(itemPush);
+                    itemView5.setFloor(tempIndex+1);
+                    System.out.println();
+                }
             }
             return itemViewOrigin;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        /** 一共有多少种不同的视图类型 */
+        @Override 
         public int getViewTypeCount() {
-            return 4;
+            return 5;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public boolean hasStableIds() {
             return false;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public boolean isEmpty() {
             return getCount() == 0;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
+        @Override 
         public boolean areAllItemsEnabled() {
             return false;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
+        @Override 
         public boolean isEnabled(int itemIndex) {
             int type = getItemViewType(itemIndex);
             return type == 0 || type == 1;
