@@ -1,6 +1,7 @@
 package com.kota.ASFramework.Thread;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -11,8 +12,8 @@ public abstract class ASRunner {
   static Looper mainLooper = Looper.getMainLooper();
   static Thread _main_thread = null;
   static Handler mainHandler = null;
-
   static Runnable runnable;
+  private String token = "token";
 
   public abstract void run();
 
@@ -53,13 +54,16 @@ public abstract class ASRunner {
   /** 延遲執行 */
   public void postDelayed(int delayMillis) {
     runnable = this::run;
-    mainHandler.postDelayed(runnable, delayMillis);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      mainHandler.postDelayed(runnable, token, delayMillis);
+    } else {
+      mainHandler.postDelayed(runnable, delayMillis);
+    }
   }
   /** 取消執行 */
   public void cancel() {
     if (runnable!=null) {
-      mainHandler.removeCallbacks(runnable);
-      mainHandler.removeCallbacksAndMessages(null);
+      mainHandler.removeCallbacks(runnable, token);
     }
   }
 }
