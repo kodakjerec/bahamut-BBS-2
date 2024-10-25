@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 public abstract class ASRunner {
   static Looper mainLooper = Looper.getMainLooper();
   static Thread _main_thread = null;
-  static Handler _main_handler = null;
+  static Handler mainHandler = null;
 
   static Runnable runnable;
 
@@ -19,7 +19,7 @@ public abstract class ASRunner {
   @SuppressLint("HandlerLeak")
   public static void construct() {
     _main_thread = Thread.currentThread();
-    _main_handler = new Handler(mainLooper) {
+    mainHandler = new Handler(mainLooper) {
       @Override // android.os.Handler
       public void handleMessage(@NonNull Message message) {
         ASRunner runner = (ASRunner) message.obj;
@@ -39,7 +39,7 @@ public abstract class ASRunner {
     } else {
       Message message = new Message();
       message.obj = this;
-      _main_handler.sendMessage(message);
+      mainHandler.sendMessage(message);
     }
     return this;
   }
@@ -53,11 +53,13 @@ public abstract class ASRunner {
   /** 延遲執行 */
   public void postDelayed(int delayMillis) {
     runnable = this::run;
-    _main_handler.postDelayed(runnable, delayMillis);
+    mainHandler.postDelayed(runnable, delayMillis);
   }
   /** 取消執行 */
   public void cancel() {
-    if (runnable!=null)
-      _main_handler.removeCallbacks(runnable);
+    if (runnable!=null) {
+      mainHandler.removeCallbacks(runnable);
+      mainHandler.removeCallbacksAndMessages(null);
+    }
   }
 }
