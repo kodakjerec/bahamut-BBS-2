@@ -68,7 +68,8 @@ public class ArticlePage extends TelnetPage {
         @Override // android.widget.Adapter
         public int getCount() {
             if (telnetArticle != null) {
-                return telnetArticle.getItemSize() + 2;
+                // 內文個數 + header + PostTime + pushs
+                return telnetArticle.getItemSize() + 2 + telnetArticle.getPushs().size();
             }
             return 0;
         }
@@ -91,8 +92,11 @@ public class ArticlePage extends TelnetPage {
             if (itemIndex == 0) {
                 return ArticlePageItemType.Header;
             }
-            else if (itemIndex == getCount() - 1) {
+            else if (itemIndex == getCount() - 1 - telnetArticle.getPushs().size()) {
                 return ArticlePageItemType.PostTime;
+            }
+            else if (itemIndex >= getCount() - telnetArticle.getPushs().size()) {
+                return
             }
             return Objects.requireNonNull(getItem(itemIndex)).getType();
         }
