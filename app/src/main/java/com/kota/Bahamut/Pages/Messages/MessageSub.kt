@@ -7,11 +7,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.core.view.children
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
-import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.Dialogs.DialogShortenImage
 import com.kota.Bahamut.Dialogs.DialogShortenUrl
 import com.kota.Bahamut.Dialogs.DialogShortenUrlListener
@@ -185,7 +182,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             R.id.Message_Sub_Post -> {
                 // 發表
                 if (contentField.text!!.isNotEmpty()) {
-                    // 送出水球指令
+                    // 送出訊息指令
                     sendMessagePart1()
 
 
@@ -197,15 +194,11 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
     var tempMessage: BahaMessage? = null
-    /** 送出訊息-1 先密對方 */
+    /** 送出訊息-1 試著啟動訊息 */
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
-        val builder = TelnetOutputBuilder.create()
-            .pushKey(TelnetKeyboard.CTRL_S) // 準備送水球
-            .pushString("$aSenderName\n")
-            .build()
-        TelnetClient.getClient().sendDataToServer(builder)
+        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         // 更新db
         val db = MessageDatabase(context)
@@ -223,8 +216,23 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         messageAsRunner.cancel()
         messageAsRunner.postDelayed(3000)
     }
-    /** 送出訊息-2 更新訊息 */
+    /** 送出訊息-2 送出對方id */
     fun sendMessagePart2() {
+        messageAsRunner.cancel()
+
+        if (tempMessage!=null) {
+            val aSenderName = tempMessage!!.senderName
+
+            val builder = TelnetOutputBuilder.create()
+                .pushString("$aSenderName\n")
+                .build()
+            TelnetClient.getClient().sendDataToServer(builder)
+        }
+
+        messageAsRunner.postDelayed(3000)
+    }
+    /** 送出訊息-3 更新訊息 */
+    fun sendMessagePart3() {
         messageAsRunner.cancel()
 
         if (tempMessage!=null) {
@@ -320,7 +328,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
 
-    // 強制發送水球進入失敗
+    // 強制發送訊息進入失敗
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
             sendMessageFail(MessageStatus.Offline)

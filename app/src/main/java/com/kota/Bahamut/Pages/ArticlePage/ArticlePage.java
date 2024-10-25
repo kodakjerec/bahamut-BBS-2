@@ -672,6 +672,7 @@ public class ArticlePage extends TelnetPage {
         }
     }
 
+    /** 切換 text <-> telnet */
     public void changeViewMode() {
         UserSettings.exchangeArticleViewMode();
         UserSettings.notifyDataUpdated();
