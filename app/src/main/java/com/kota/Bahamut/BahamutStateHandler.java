@@ -556,14 +556,22 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 page.sendMessageFail(MessageStatus.CloseBBCall);
                 ASToast.showLongToast("對方關掉呼叫器了");
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
-                return;
             } else if (this.row_string_23.contains("對方已經離去")) {
                 page.sendMessageFail(MessageStatus.Escape);
                 ASToast.showLongToast("對方已經離去");
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
-                return;
-            } else if (getRowString(22).trim().contains("熱訊：")) {
+            } else if (getRowString(22).trim().startsWith("★熱訊：")) {
+                // 送出給對方的訊息
+                // 一定要在"傳訊給"判斷之前, 因為這兩個判斷會同時出現
+                page.sendMessagePart3();
+            } else if (this.row_string_01.startsWith("傳訊給")) {
+                // 送出對方id
+                // 一定要在"熱訊回應"判斷之前, 因為這兩個判斷會同時出現
                 page.sendMessagePart2();
+            } else if (getRowString(22).trim().contains("熱訊回應")) {
+                // 我方發出ctrl+S, 但是被熱訊回應卡住, 送出Enter指令接傳訊給對方id
+                TelnetClient.getClient().sendStringToServer("");
+
             } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
                 detectMessage();
             }

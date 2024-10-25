@@ -249,7 +249,7 @@ class MessageMain:TelnetPage() {
         }
     }
 
-    // 強制讀取水球進入讀取完畢
+    // 強制讀取訊息進入讀取完畢
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
             loadMessageList()
