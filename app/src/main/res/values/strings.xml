@@ -39,6 +39,7 @@
     <string name="insert">加入</string>
     <string name="do_gy">推薦</string>
     <string name="do_gy_">推薦：</string>
+    <string name="do_push">推文</string>
     <string name="load_temp">讀取暫存檔</string>
     <string name="save_to_temp">存入暫存檔</string>
     <string name="give_up_post_article">是否要放棄此編輯內容？</string>

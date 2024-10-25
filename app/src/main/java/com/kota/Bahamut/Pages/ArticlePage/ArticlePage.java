@@ -526,6 +526,7 @@ public class ArticlePage extends TelnetPage {
             String external_toolbar_enable_title = ext_toolbar_enable ? getContextString(R.string.hide_toolbar) : getContextString(R.string.open_toolbar);
             ASListDialog.createDialog()
                     .addItem(getContextString(R.string.do_gy))
+                    .addItem(getContextString(R.string.do_push))
                     .addItem(getContextString(R.string.change_mode))
                     .addItem((is_board && author.equals(logon_user)) ? getContextString(R.string.edit_article) : null)
                     .addItem(author.equals(logon_user) ? getContextString(R.string.delete_article) : null)
@@ -539,17 +540,18 @@ public class ArticlePage extends TelnetPage {
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                     switch (index) {
                         case 0 -> onGYButtonClicked();
-                        case 1 -> {
+                        case 1 -> onPushArticleButtonClicked();
+                        case 2 -> {
                             changeViewMode();
                             refreshExternalToolbar();
                         }
-                        case 2 -> onEditButtonClicked();
-                        case 3 -> onDeleteButtonClicked();
-                        case 4 -> onExternalToolbarClicked();
-                        case 5 -> onAddBlockListClicked();
-                        case 6 -> onOpenLinkClicked();
-                        case 7 -> _board_page.FSendMail();
-                        case 8 -> onLoadAllImageClicked();
+                        case 3 -> onEditButtonClicked();
+                        case 4 -> onDeleteButtonClicked();
+                        case 5 -> onExternalToolbarClicked();
+                        case 6 -> onAddBlockListClicked();
+                        case 7 -> onOpenLinkClicked();
+                        case 8 -> _board_page.FSendMail();
+                        case 9 -> onLoadAllImageClicked();
                         default -> {
                         }
                     }
@@ -625,9 +627,16 @@ public class ArticlePage extends TelnetPage {
         ASToast.showShortToast("連線已中斷");
     }
 
+    /** 推薦 */
     void onGYButtonClicked() {
         if (_board_page != null) {
             _board_page.goodLoadingArticle();
+        }
+    }
+    /** 推文 */
+    void onPushArticleButtonClicked() {
+        if (_board_page != null) {
+            _board_page.pushArticle();
         }
     }
 

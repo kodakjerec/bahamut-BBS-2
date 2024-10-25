@@ -328,7 +328,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
 
-    // 強制發送訊息進入失敗
+    /** 強制發送訊息進入失敗 */
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
             sendMessageFail(MessageStatus.Offline)

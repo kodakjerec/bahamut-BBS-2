@@ -35,7 +35,10 @@ import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandFSendMail;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
+import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
+import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandPostArticle;
+import com.kota.Bahamut.Command.BahamutCommandPushArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleBottom;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleDown;
@@ -760,9 +763,6 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
     /** 按下推薦文章 */
     public void goodLoadingArticle() {
-        goodArticle(getLoadingItemNumber());
-    }
-    public void goodArticle(final int i) {
         ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.do_gy))
                 .setMessage(getContextString(R.string.gy_this_article))
@@ -770,10 +770,29 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 .addButton(getContextString(R.string.do_gy))
                 .setListener((aSAlertDialog, i2) -> {
                     if (i2 == 1) {
-                        BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(i));
+                        BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(getLoadingItemNumber()));
                     }
-        }).scheduleDismissOnPageDisappear(this).show();
+                }).scheduleDismissOnPageDisappear(this).show();
     }
+
+    /** 按下推文 */
+    public void pushArticle() {
+        BoardMainPage.this.pushCommand(new BahamutCommandPushArticle(getLoadingItemNumber()));
+
+        pushArticleAsRunner.cancel();
+        pushArticleAsRunner.postDelayed(3000);
+    }
+    /** 開啟推文小視窗 */
+    public void openPushArticleDialog() {
+        pushArticleAsRunner.cancel();
+    }
+    /** 沒有開啟推文小視窗, 視為沒開放功能 */
+    ASRunner pushArticleAsRunner = new ASRunner(){
+        @Override
+        public void run() {
+            ASToast.showLongToast("沒反應，看板未開放推文");
+        }
+    };
 
     /** 轉寄至信箱 */
     public void FSendMail() {

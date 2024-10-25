@@ -660,6 +660,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 if (this.lastHeader.equals("●請") || this.lastHeader.equals("請按")) {
                     TelnetClient.getClient().sendStringToServer("");
                 }
+            } else if (row_string_23.startsWith("推文(系統測試中)：")) {
+                // 呼叫推文訊息視窗
+                PageContainer.getInstance().getBoardPage().openPushArticleDialog();
             }
         }
     }
