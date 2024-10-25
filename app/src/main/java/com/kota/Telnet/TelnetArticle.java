@@ -320,4 +320,6 @@ public class TelnetArticle {
     public String getAuthor() {
         return Author;
     }
+
+    public Vector<TelnetArticlePush> getPushs() { return _push; }
 }
