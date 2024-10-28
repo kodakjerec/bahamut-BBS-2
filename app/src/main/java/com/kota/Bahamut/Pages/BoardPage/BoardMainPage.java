@@ -46,6 +46,7 @@ import com.kota.Bahamut.Command.BahamutCommandTheSameTitleTop;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleUp;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkStore;
+import com.kota.Bahamut.Dialogs.DialogPushArticle;
 import com.kota.Bahamut.Dialogs.DialogSearchArticle;
 import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
@@ -785,6 +786,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     /** 開啟推文小視窗 */
     public void openPushArticleDialog() {
         pushArticleAsRunner.cancel();
+
+        DialogPushArticle dialog = new DialogPushArticle();
+        dialog.show();
     }
     /** 沒有開啟推文小視窗, 視為沒開放功能 */
     ASRunner pushArticleAsRunner = new ASRunner(){
@@ -793,6 +797,10 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             ASToast.showLongToast("沒反應，看板未開放推文");
         }
     };
+    /** 提供給 stateHandler 的取消介面 */
+    public void cancelRunner() {
+        pushArticleAsRunner.cancel();
+    }
 
     /** 轉寄至信箱 */
     public void FSendMail() {

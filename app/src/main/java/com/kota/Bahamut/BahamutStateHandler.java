@@ -189,6 +189,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
             String continue_message = cutOffContinueMessage(this.row_string_23);
             if (continue_message.length() > 0) {
+                if (continue_message.contains("推文")) {
+                    PageContainer.getInstance().getBoardPage().cancelRunner();
+                }
                 ASToast.showShortToast(continue_message);
             }
             if (this.row_string_23.contains("★ 引言太多")) {
@@ -624,7 +627,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 }
             } else if (this.row_string_00.contains("【精華文章】")) {
                 handleBoardEssencePage();
-            } else if (this.row_string_00.contains("【板主：")) {
+            } else if (this.row_string_00.startsWith("【板主：") && this.row_string_00.contains("看板《")) {
+                if (row_string_23.startsWith("推文(系統測試中)：")) {
+                    // 呼叫推文訊息視窗
+                    new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
+                        @Override // com.kota.ASFramework.Thread.ASRunner
+                        public void run() {
+                            PageContainer.getInstance().getBoardPage().openPushArticleDialog();
+                        }
+                    };
+                    return;
+                }
                 handleBoardPage();
             } else if (this.row_string_00.contains("【個人設定】")) {
                 handleUserPage();
@@ -660,9 +673,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 if (this.lastHeader.equals("●請") || this.lastHeader.equals("請按")) {
                     TelnetClient.getClient().sendStringToServer("");
                 }
-            } else if (row_string_23.startsWith("推文(系統測試中)：")) {
-                // 呼叫推文訊息視窗
-                PageContainer.getInstance().getBoardPage().openPushArticleDialog();
             }
         }
     }

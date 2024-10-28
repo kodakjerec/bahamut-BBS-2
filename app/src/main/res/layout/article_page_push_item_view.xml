@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Block"
     android:layout_width="match_parent"
-    android:layout_height="60dp">
+    android:layout_height="wrap_content">
     <com.kota.TelnetUI.TextView.TelnetTextViewSmall
         android:id="@+id/ArticlePushItemView_Author"
         style="@style/TextViewSmall"
@@ -20,7 +20,7 @@
         android:textColor="@color/board_item_follow_other_read"
         android:textIsSelectable="true"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@+id/ArticlePushItemView_Author"/>
     <com.kota.TelnetUI.TextView.TelnetTextViewSmall
         android:id="@+id/ArticlePushItemView_Floor"
         style="@style/TextViewSmall"

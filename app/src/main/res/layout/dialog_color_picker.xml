@@ -49,7 +49,6 @@
                 android:hint=""
                 android:inputType="text"
                 android:maxLength="9"
-                android:singleLine="true"
                 android:textSize="28sp" />
         </LinearLayout>
         <LinearLayout style="@style/toolbar" android:id="@+id/dialog_toolbar" android:layout_alignParentBottom="true" >

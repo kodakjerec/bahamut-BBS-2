@@ -16,7 +16,7 @@ public class BahamutCommandPushArticle extends TelnetCommand {
 
     public void execute(TelnetListPage aListPage) {
         if (this._article_index > 0) {
-            TelnetClient.getClient().sendStringToServer(this._article_index + "\ngx\n");
+            TelnetClient.getClient().sendStringToServer(this._article_index + "\ngx");
         }
     }
 

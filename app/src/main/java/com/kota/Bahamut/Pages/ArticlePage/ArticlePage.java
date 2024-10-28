@@ -66,7 +66,7 @@ public class ArticlePage extends TelnetPage {
     Runnable _top_action = null;
     Runnable _bottom_action = null;
     BaseAdapter listAdapter = new BaseAdapter() {
-        private int pushLength = 0;
+        private int pushLength = 0; // 推文長度
         @Override // android.widget.Adapter
         public int getCount() {
             if (telnetArticle != null) {
@@ -170,11 +170,10 @@ public class ArticlePage extends TelnetPage {
                 }
                 case ArticlePageItemType.Push -> {
                     ArticlePagePushItemView itemView5 = (ArticlePagePushItemView) itemViewOrigin;
-                    int tempIndex = itemIndex - pushLength;
+                    int tempIndex = itemIndex - (getCount() - pushLength); // itemIndex - 本文長度
                     TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
                     itemView5.setContent(itemPush);
                     itemView5.setFloor(tempIndex+1);
-                    System.out.println();
                 }
             }
             return itemViewOrigin;

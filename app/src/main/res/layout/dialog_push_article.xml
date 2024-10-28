@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="@color/black" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/content_view">
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/do_push" style="@style/TextViewLarge"/>
+        <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <View style="@style/BlockDividerHorizontal"/>
+            <com.kota.Bahamut.Pages.Model.PostEditText
+                android:id="@+id/Dialog_push_article_content1"
+                android:text="@string/zero_word"
+                android:hint="@string/main_push_article_msg01"
+                android:maxLength="48"
+                style="@style/EditTextSingleLine"
+                android:autofillHints="" />
+        </LinearLayout>
+        <View style="@style/BlockDividerHorizontal"/>
+        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
+            <Button android:id="@+id/Dialog_push_article_cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:id="@+id/Dialog_push_article_send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
