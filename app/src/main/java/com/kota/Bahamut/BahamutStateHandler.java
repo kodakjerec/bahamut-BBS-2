@@ -635,7 +635,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         public void run() {
                             PageContainer.getInstance().getBoardPage().openPushArticleDialog();
                         }
-                    };
+                    }.runInMainThread();
                     return;
                 }
                 handleBoardPage();

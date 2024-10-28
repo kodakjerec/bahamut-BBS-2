@@ -114,6 +114,7 @@
     <string name="delete_article">刪除文章</string>
     <string name="search">搜尋</string>
     <string name="search_board">搜尋看板</string>
+    <string name="search_id">搜尋ID</string>
     <string name="search_menu_title">Search</string>
     <string name="select">選擇</string>
     <string name="select_sign">選擇簽名檔：</string>
@@ -387,6 +388,8 @@
     <string name="message_main_search_clear">清除</string>
     <string name="message_main_tab_chat">聊天</string>
     <string name="message_main_tab_list">名單</string>
+    <string name="message_main_setting01">同步</string>
+    <string name="message_main_setting02">清暫存並同步</string>
     <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
     <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
     <string name="board_main_vV"> vV</string>

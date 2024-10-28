@@ -96,7 +96,9 @@ class MessageDatabase(context: Context?) :
 
             cursor.close()
             db.close()
-        } catch (ignored: Exception) { }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     /** 更新讀取日期  */
