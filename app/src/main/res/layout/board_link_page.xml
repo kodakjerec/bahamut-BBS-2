@@ -39,7 +39,7 @@
         <Button
             android:id="@+id/BoardPageFirstPageButton"
             style="@style/ToolbarItem"
-            android:text="@string/first_page" />
+            android:text="@string/prev_page" />
         <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
         <Button
             android:id="@+id/BoardPageLatestPageButton"

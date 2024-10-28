@@ -110,8 +110,18 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     /** 發文 */
     final View.OnClickListener mPostListener = view -> BoardMainPage.this.onPostButtonClicked();
 
+    /** 最前頁 */
+    final View.OnLongClickListener mFirstPageClickListener = view -> {
+        BoardMainPage.this.moveToFirstPosition();
+        return true;
+    };
     /** 前一頁 */
-    final View.OnClickListener mFirstPageClickListener = view -> BoardMainPage.this.moveToFirstPosition();
+    final View.OnClickListener mPrevPageClickListener = view -> {
+        int nowIndex = _list_view.getFirstVisiblePosition();
+        nowIndex-=20;
+        if (nowIndex>0)
+            setListViewSelection(nowIndex);
+    };
 
     /** 下一頁 */
     final View.OnClickListener mLastPageClickListener = view -> {
@@ -359,7 +369,8 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         setListView(aSListView);
 
         mainLayout.findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
-        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
+        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mPrevPageClickListener);
+        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnLongClickListener(mFirstPageClickListener);
         mainLayout.findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
@@ -531,7 +542,8 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 Button OriginalBtn = mainLayout.findViewById(R.id.BoardPagePostButton);
                 toolBarFloating.setTextSetting(OriginalBtn.getText().toString());
                 // button 1
-                toolBarFloating.setOnClickListener1(mFirstPageClickListener);
+                toolBarFloating.setOnClickListener1(mPrevPageClickListener);
+                toolBarFloating.setOnLongClickListener(mFirstPageClickListener);
                 toolBarFloating.setText1(getContextString(R.string.first_page));
                 // button 2
                 toolBarFloating.setOnClickListener2(mLastPageClickListener);

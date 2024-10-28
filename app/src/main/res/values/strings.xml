@@ -54,6 +54,7 @@
     <string name="file">檔案</string>
     <string name="first_page">最前頁</string>
     <string name="last_page">最後頁</string>
+    <string name="prev_page">上一頁</string>
     <string name="prev_article">上一篇</string>
     <string name="next_article">下一篇</string>
     <string name="folder_boards">佈告討論區</string>
