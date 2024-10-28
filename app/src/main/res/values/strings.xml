@@ -319,6 +319,7 @@
     <string name="cloud_save_result1">本地備份已上傳雲端</string>
     <string name="cloud_save_result2">已下載雲端備份</string>
     <string name="dialog_query_hero">查詢勇者</string>
+    <string name="dialog_query_hero_msg01">想做甚麼？</string>
     <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
     <string name="essence_page">精華</string>
     <string name="start_connect_ip">連線位址</string>
@@ -390,6 +391,7 @@
     <string name="message_main_tab_list">名單</string>
     <string name="message_main_setting01">同步</string>
     <string name="message_main_setting02">清暫存並同步</string>
+    <string name="message_sub_send_hero">私訊勇者</string>
     <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
     <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
     <string name="board_main_vV"> vV</string>

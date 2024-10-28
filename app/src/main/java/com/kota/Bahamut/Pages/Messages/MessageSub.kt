@@ -207,6 +207,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         }
 
         messageAsRunner.postDelayed(3000)
+        // telnet會連續觸發這段兩次
+        if (!isPostDelayedSuccess)
         isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */
@@ -313,7 +315,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         override fun run() {
             if (!isPostDelayedSuccess) {
                 sendMessageFail(MessageStatus.Offline)
-                ASToast.showLongToast("丟水球無反應，對方可能不在線上")
+                ASToast.showLongToast("私訊無反應，對方可能不在線上")
             }
         }
     }

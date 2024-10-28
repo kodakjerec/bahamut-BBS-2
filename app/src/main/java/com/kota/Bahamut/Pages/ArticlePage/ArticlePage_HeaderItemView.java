@@ -1,14 +1,24 @@
 package com.kota.Bahamut.Pages.ArticlePage;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.content.Context;
 import android.widget.TextView;
 
+import com.kota.ASFramework.Dialog.ASListDialog;
+import com.kota.ASFramework.Dialog.ASListDialogItemClickListener;
+import com.kota.ASFramework.PageController.ASNavigationController;
+import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Messages.MessageSub;
+import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetArticleItemView;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetOutputBuilder;
 import com.kota.TelnetUI.TelnetHeaderItemView;
+
+import java.util.Objects;
 
 public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements TelnetArticleItemView {
     TextView titleTextView;
@@ -45,9 +55,30 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
 
     /** 點作者 */
     OnClickListener authorClickListener = view -> {
-        TelnetClient.getClient().sendDataToServer(
-            TelnetOutputBuilder.create()
-                    .pushKey(TelnetKeyboard.CTRL_Q)
-                    .build());
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string.dialog_query_hero_msg01))
+            .addItem(getContextString(R.string.dialog_query_hero))
+            .addItem(getContextString(R.string.message_sub_send_hero))
+            .setListener(new ASListDialogItemClickListener() {
+                public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
+                    return true;
+                }
+
+                public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+                    if (Objects.equals(aTitle, getContextString(R.string.dialog_query_hero))) {
+                        TelnetClient.getClient().sendDataToServer(
+                                TelnetOutputBuilder.create()
+                                        .pushKey(TelnetKeyboard.CTRL_Q)
+                                        .build());
+                    } else if (Objects.equals(aTitle, getContextString(R.string.message_sub_send_hero))) {
+                        MessageSub aPage = PageContainer.getInstance().getMessageSub();
+                        ASNavigationController.getCurrentController().pushViewController(aPage);
+                        String authorId = detailTextView1.getText().toString();
+                        if (authorId.contains("("))
+                            authorId = authorId.substring(0, authorId.indexOf("("));
+                        aPage.setSenderName(authorId);
+                    }
+                }
+            }).show();
     };
 }
