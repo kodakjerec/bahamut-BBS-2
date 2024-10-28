@@ -8,6 +8,7 @@ import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import com.kota.ASFramework.Thread.ASRunner
+import com.kota.ASFramework.UI.ASListView
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.Dialogs.DialogShortenImage
 import com.kota.Bahamut.Dialogs.DialogShortenUrl
@@ -32,9 +33,10 @@ import org.json.JSONObject
 
 class MessageSub: TelnetPage(), View.OnClickListener {
     private lateinit var mainLayout: RelativeLayout
-    private lateinit var scrollViewLayout: LinearLayout
+    private lateinit var listView: ASListView
     private lateinit var senderNameField: TextView
     private lateinit var contentField:PostEditText
+    private var isPostDelayedSuccess = false
 
     override fun getPageLayout(): Int {
         return R.layout.message_sub
@@ -57,7 +59,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        scrollViewLayout = mainLayout.findViewById(R.id.Message_Sub_Scroll)
+        listView = mainLayout.findViewById(R.id.Message_Sub_Scroll)
 
         val txtEsc = mainLayout.findViewById<TextView>(R.id.Message_Sub_Back)
         txtEsc.setOnClickListener{ _-> onBackPressed() }
@@ -78,27 +80,15 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         // 讀取訊息
         val db = MessageDatabase(context)
         try {
-            scrollViewLayout.removeAllViews()
+            listView.adapter = null
 
             val messageList = db.getIdMessage(senderName)
-            messageList.forEach { item: BahaMessage ->
-                if (item.type == 0) {
-                    val messageSubReceive = MessageSubReceive(context)
-                    messageSubReceive.setContent(item)
-                    scrollViewLayout.addView(messageSubReceive)
-                } else {
-                    val messageSend = MessageSubSend(context)
-                    messageSend.setContent(item)
-                    scrollViewLayout.addView(messageSend)
-                }
-            }
+            val myAdapter = MessageSubAdapter(messageList)
+            listView.adapter = myAdapter
+            // 移到最下方
+            listView.setSelection(myAdapter.count-1)
         } finally {
             db.close()
-            // 滾動到最下方
-            val scrollview: ScrollView = scrollViewLayout.parent as ScrollView
-            scrollview.post {
-                scrollview.fullScroll(ScrollView.FOCUS_DOWN)
-            }
         }
     }
 
@@ -112,24 +102,10 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             } finally {
                 db.close()
             }
-
-            // 插入到Scrollview
             object: ASRunner(){
                 override fun run() {
-                    if (item.type == 0) {
-                        val messageSubReceive = MessageSubReceive(context)
-                        messageSubReceive.setContent(item)
-                        scrollViewLayout.addView(messageSubReceive)
-                    } else {
-                        val messageSend = MessageSubSend(context)
-                        messageSend.setContent(item)
-                        scrollViewLayout.addView(messageSend)
-                    }
-                    // 滾動到最下方
-                    val scrollview:ScrollView = scrollViewLayout.parent as ScrollView
-                    scrollview.post {
-                        scrollview.fullScroll(ScrollView.FOCUS_DOWN)
-                    }
+                    val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
+                    myAdapter.addItem(item)
                 }
             }.runInMainThread()
         }
@@ -215,6 +191,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
         messageAsRunner.cancel()
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
     }
     /** 送出訊息-2 送出對方id */
     fun sendMessagePart2() {
@@ -230,10 +207,12 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         }
 
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */
     fun sendMessagePart3() {
         messageAsRunner.cancel()
+        isPostDelayedSuccess = true
 
         if (tempMessage!=null) {
             tempMessage!!.status = MessageStatus.Success
@@ -249,8 +228,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             try {
                 db.updateSendMessage(tempMessage!!)
                 // 更新畫面
-                for (i in scrollViewLayout.childCount - 1 downTo 0) {
-                    val view = scrollViewLayout.getChildAt(i)
+                for (i in listView.childCount - 1 downTo 0) {
+                    val view = listView.getChildAt(i)
                     if (view.javaClass == MessageSubSend::class.java) {
                         val item:MessageSubSend = view as MessageSubSend
                         if (item.myBahaMessage.id == tempMessage!!.id) {
@@ -267,6 +246,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
     fun sendMessageFail(status:MessageStatus) {
         messageAsRunner.cancel()
+        isPostDelayedSuccess = false
 
         if (tempMessage!=null) {
             tempMessage!!.status = status
@@ -275,8 +255,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             try {
                 db.updateSendMessage(tempMessage!!)
                 // 更新畫面
-                for (i in scrollViewLayout.childCount - 1 downTo 0) {
-                    val view = scrollViewLayout.getChildAt(i)
+                for (i in listView.childCount - 1 downTo 0) {
+                    val view = listView.getChildAt(i)
                     if (view.javaClass == MessageSubSend::class.java) {
                         val item:MessageSubSend = view as MessageSubSend
                         if (item.myBahaMessage.id == tempMessage!!.id) {
@@ -331,8 +311,10 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     /** 強制發送訊息進入失敗 */
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
-            sendMessageFail(MessageStatus.Offline)
-            ASToast.showLongToast("丟水球無反應，對方可能不在線上")
+            if (!isPostDelayedSuccess) {
+                sendMessageFail(MessageStatus.Offline)
+                ASToast.showLongToast("丟水球無反應，對方可能不在線上")
+            }
         }
     }
 }

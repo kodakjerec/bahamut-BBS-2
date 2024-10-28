@@ -3,10 +3,10 @@ package com.kota.Bahamut.Pages.Messages
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import com.kota.Bahamut.Service.TempSettings
+import com.kota.Bahamut.Service.TempSettings.myContext
 
-class MessageMainAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter() {
-    private var myList: MutableList<BahaMessageSummarize> = ArrayList()
+class MessageSubAdapter(list: MutableList<BahaMessage>): BaseAdapter() {
+    private var myList: MutableList<BahaMessage> = ArrayList()
 
     init {
         myList = list
@@ -16,7 +16,7 @@ class MessageMainAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter()
         return myList.size
     }
 
-    override fun getItem(index: Int): BahaMessageSummarize {
+    override fun getItem(index: Int): BahaMessage {
         return myList[index]
     }
 
@@ -26,15 +26,20 @@ class MessageMainAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter()
 
     override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
         var myView: View? = convertView
-
-        myView = MessageMainItem(TempSettings.myContext!!)
-        myView.setContent(getItem(index))
+        val item = getItem(index)
+        if (item.type==0) {
+            myView = MessageSubReceive(myContext!!)
+            myView.setContent(item)
+        } else {
+            myView = MessageSubSend(myContext!!)
+            myView.setContent(item)
+        }
 
         return myView
     }
 
     // 新增資料
-    fun addItem(item:BahaMessageSummarize) {
+    fun addItem(item:BahaMessage) {
         myList.add(item)
         notifyDataSetChanged()
     }

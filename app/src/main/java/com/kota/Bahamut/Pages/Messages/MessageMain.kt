@@ -35,6 +35,7 @@ class MessageMain:TelnetPage() {
     private lateinit var listView: ASListView
     private lateinit var searchWord: PostEditText
     private lateinit var tabButtons: Array<Button>
+    private var isPostDelayedSuccess = false
 
     override fun getPageLayout(): Int {
         return R.layout.message_main
@@ -183,6 +184,7 @@ class MessageMain:TelnetPage() {
     /** 顯示訊息清單 */
     fun loadMessageList() {
         messageAsRunner.cancel()
+        isPostDelayedSuccess = true
 
         ASProcessingDialog.dismissProcessingDialog()
         TempSettings.isSyncMessageMain = true
@@ -203,24 +205,34 @@ class MessageMain:TelnetPage() {
     }
     /** 收到訊息, 只更新特定人物的最新訊息 */
     fun loadMessageList(item:BahaMessage) {
+        var findSender = false
+        var senderView = MessageMainItem(context)
         for (i in 0 until listView.childCount) {
             val view = listView.getChildAt(i)
             if (view is MessageMainItem) {
-                val subView:MessageMainItem = view
-                if (subView.getContent().senderName==item.senderName) {
-                    val db = MessageDatabase(context)
-                    try {
-                        val itemSummary = db.getIdNewestMessage(item.senderName)
-                        object: ASRunner(){
-                            override fun run() {
-                                subView.setContent(itemSummary)
-                            }
-                        }.runInMainThread()
-                    } finally {
-                        db.close()
-                    }
+                if (view.getContent().senderName==item.senderName) {
+                    findSender = true
+                    senderView = view
                 }
             }
+        }
+
+        val db = MessageDatabase(context)
+        try {
+            val itemSummary = db.getIdNewestMessage(item.senderName)
+            object: ASRunner(){
+                override fun run() {
+                    // 找到同名人物
+                    if (findSender) {
+                        senderView.setContent(itemSummary)
+                    } else {
+                        val myAdapter:MessageMainAdapter = listView.adapter as MessageMainAdapter
+                        myAdapter.addItem(itemSummary)
+                    }
+                }
+            }.runInMainThread()
+        } finally {
+            db.close()
         }
     }
 
@@ -238,10 +250,12 @@ class MessageMain:TelnetPage() {
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         messageAsRunner.cancel()
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
 
         val db = MessageDatabase(context)
         try {
@@ -283,7 +297,8 @@ class MessageMain:TelnetPage() {
     // 強制讀取訊息進入讀取完畢
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
-            loadMessageList()
+            if (!isPostDelayedSuccess)
+                loadMessageList()
         }
     }
 }

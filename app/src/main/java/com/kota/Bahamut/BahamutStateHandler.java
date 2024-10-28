@@ -68,6 +68,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     TelnetCursor telnetCursor = null;
     final Article_Handler articleHandler = new Article_Handler();
     boolean duringReadingArticle = false; // 正在讀取文章
+    private boolean isPostDelayedSuccess = false;
 
     /** 設定文章編號 */
     public void setArticleNumber(String aArticleNumber) {
@@ -501,6 +502,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
         myAsRunner.cancel();
         myAsRunner.postDelayed(3000);
+        isPostDelayedSuccess = false;
 
         if (!this.duringReadingArticle) {
             onReadArticleStart();
@@ -705,18 +707,21 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
         this.duringReadingArticle = false;
         myAsRunner.cancel();
+        isPostDelayedSuccess = true;
     }
     // 強制進入讀取完畢
     ASRunner myAsRunner = new ASRunner(){
         @Override
         public void run() {
-            onReadArticleFinished();
-            // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
-            int lastPage = getCurrentPage();
-            if (lastPage==BahamutPage.BAHAMUT_ARTICLE)
-                new BahamutCommandLoadArticleEnd().execute();
-            else
-                new BahamutCommandLoadArticleEndForSearch().execute();
+            if (!isPostDelayedSuccess) {
+                onReadArticleFinished();
+                // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
+                int lastPage = getCurrentPage();
+                if (lastPage == BahamutPage.BAHAMUT_ARTICLE)
+                    new BahamutCommandLoadArticleEnd().execute();
+                else
+                    new BahamutCommandLoadArticleEndForSearch().execute();
+            }
         }
     };
 

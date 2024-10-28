@@ -157,7 +157,7 @@ class MessageDatabase(context: Context?) :
 
     /** 列出各ID最新的訊息  */
     @SuppressLint("Range")
-    fun getAllAndNewestMessage(): List<BahaMessageSummarize> {
+    fun getAllAndNewestMessage(): MutableList<BahaMessageSummarize> {
         var totalUnreadCount = 0
         val returnList: MutableList<BahaMessageSummarize> = ArrayList()
         try {
@@ -193,9 +193,7 @@ class MessageDatabase(context: Context?) :
                 cursor.close()
                 db.close()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        } catch (ignored: Exception) { }
         setNotReadMessageCount(totalUnreadCount)
         return returnList
     }
@@ -240,7 +238,7 @@ class MessageDatabase(context: Context?) :
     }
     /** 列出指定ID最新的訊息  */
     @SuppressLint("Range")
-    fun getIdMessage(aSenderName: String): List<BahaMessage> {
+    fun getIdMessage(aSenderName: String): MutableList<BahaMessage> {
         return try {
             val db = readableDatabase
             val columns = arrayOf("message_id","sender_name", "message", "received_date", "read_date", "type", "status")
