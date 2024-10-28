@@ -5,7 +5,6 @@ import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -35,8 +34,6 @@ import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandFSendMail;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
-import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd;
-import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch;
 import com.kota.Bahamut.Command.BahamutCommandPostArticle;
 import com.kota.Bahamut.Command.BahamutCommandPushArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
@@ -544,7 +541,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 // button 1
                 toolBarFloating.setOnClickListener1(mPrevPageClickListener);
                 toolBarFloating.setOnLongClickListener(mFirstPageClickListener);
-                toolBarFloating.setText1(getContextString(R.string.first_page));
+                toolBarFloating.setText1(getContextString(R.string.prev_page));
                 // button 2
                 toolBarFloating.setOnClickListener2(mLastPageClickListener);
                 toolBarFloating.setText2(getContextString(R.string.last_page));

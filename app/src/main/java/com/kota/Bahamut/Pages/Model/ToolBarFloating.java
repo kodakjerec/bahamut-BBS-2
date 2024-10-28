@@ -55,10 +55,11 @@ public class ToolBarFloating extends LinearLayout {
         }
 
         btnSetting = mainLayout.findViewById(R.id.ToolbarFloating_setting);
-        btnSetting.setOnTouchListener(onTouchListener);
-
         btn1 = mainLayout.findViewById(R.id.ToolbarFloating_1);
         btn2 = mainLayout.findViewById(R.id.ToolbarFloating_2);
+        btnSetting.setOnTouchListener(onTouchListener);
+        btn1.setOnTouchListener(onTouchListener);
+        btn2.setOnTouchListener(onTouchListener);
 
         // 啟用定時隱藏
         // 如果之前已經隱藏就不要再讓他顯現出來
