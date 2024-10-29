@@ -321,7 +321,6 @@
     <string name="cloud_save_result1">本地備份已上傳雲端</string>
     <string name="cloud_save_result2">已下載雲端備份</string>
     <string name="dialog_query_hero">查詢勇者</string>
-    <string name="dialog_query_hero_msg01">想做甚麼？</string>
     <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
     <string name="essence_page">精華</string>
     <string name="start_connect_ip">連線位址</string>

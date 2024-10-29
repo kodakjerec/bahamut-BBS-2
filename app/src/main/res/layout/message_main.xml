@@ -22,14 +22,6 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 style="@style/TextViewNormal"
                 android:text="@string/_back"/>
-            <Button
-                android:id="@+id/Message_Main_Settings"
-                style="@style/ToolbarItem"
-                android:text="@string/setting"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                />
             <LinearLayout
                 android:id="@+id/Message_Main_CheckboxLayout"
                 android:layout_width="wrap_content"
@@ -96,6 +88,6 @@
         <View style="@style/ToolbarDivider"/>
         <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/Message_Main_Button_List" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/message_main_tab_list" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/ToolbarItem" android:contentDescription="@string/no_use"/>
+        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/Message_Main_Settings" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/setting" style="@style/ToolbarItem"/>
     </LinearLayout>
 </RelativeLayout>

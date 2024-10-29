@@ -2,6 +2,7 @@ package com.kota.Bahamut.Pages.Messages
 
 import android.view.View
 import android.view.View.GONE
+import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
@@ -27,6 +28,7 @@ import com.kota.Bahamut.Service.TempSettings
 import com.kota.Telnet.Model.TelnetRow
 import com.kota.Telnet.Reference.TelnetKeyboard
 import com.kota.Telnet.TelnetClient
+import com.kota.Telnet.TelnetOutputBuilder
 import com.kota.TelnetUI.TelnetPage
 import com.kota.TextEncoder.B2UEncoder
 import java.util.Arrays
@@ -38,6 +40,7 @@ class MessageMain:TelnetPage() {
     private lateinit var searchWord: PostEditText
     private lateinit var tabButtons: Array<Button>
     private lateinit var toolbarList: LinearLayout
+    private lateinit var btnSettings: Button
     private var isPostDelayedSuccess = false // 同步用 postDelay
     private var isUnderList = false // 是否正在查詢名單
 
@@ -58,7 +61,17 @@ class MessageMain:TelnetPage() {
     /** 搜尋聊天 */
     private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            handleSearchChats(textView.text.toString().lowercase())
+            if (isUnderList) {
+                TelnetClient.getClient().sendDataToServer(
+                    TelnetOutputBuilder.create()
+                        .pushString("/") // 請輸入勇者代號：
+                        .pushKey(TelnetKeyboard.CTRL_Y) // 清除資料
+                        .pushString(textView.text.toString().lowercase()+"\n")
+                        .build()
+                )
+            } else {
+                handleSearchChats(textView.text.toString().lowercase())
+            }
             return@OnEditorActionListener true
         }
         false
@@ -80,9 +93,11 @@ class MessageMain:TelnetPage() {
     /** 切換分頁 */
     private val tabClickListener = View.OnClickListener { aView ->
         if (aView.id == R.id.Message_Main_Button_Chat) {
+            btnSettings.visibility = VISIBLE
             toolbarList.visibility = GONE
             loadMessageList()
         } else {
+            btnSettings.visibility = INVISIBLE
             toolbarList.visibility = VISIBLE
             // 送出查詢指令
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
@@ -198,7 +213,7 @@ class MessageMain:TelnetPage() {
         toolbarList = mainLayout.findViewById(R.id.toolbar_List)
 
         // 重置
-        val btnSettings: Button = mainLayout.findViewById(R.id.Message_Main_Settings)
+        btnSettings = mainLayout.findViewById(R.id.Message_Main_Settings)
         btnSettings.setOnClickListener { _-> openSettings() }
 
         // 每次登入開啟訊息主視窗先同步一次

@@ -535,28 +535,35 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
 
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
-        if (topPage instanceof MessageMain page) {
-            if (this.row_string_00.startsWith("【網友列表】")) {
+        if (topPage instanceof MessageMain mPage) {
+            // HP:MP:會跟網友列表同時發生, 所以判斷要在之前
+            if (this.row_string_02.contains("HP：") && this.row_string_02.contains("MP：")) {
+                ArticlePage page = PageContainer.getInstance().getArticlePage();
+                Vector<String> userData = new Vector<>();
+                this.rows.forEach(row -> userData.add(row.toString()));
+                page.ctrlQUser(userData);
+                TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
+            } else if (this.row_string_00.startsWith("【網友列表】")) {
                 // 載入名單
                 new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
                     @Override // com.kota.ASFramework.Thread.ASRunner
                     public void run() {
-                        page.loadUserList(rows);
+                        mPage.loadUserList(rows);
                     }
                 }.runInMainThread();
             } else if (this.row_string_23.contains("瀏覽 P.")) {
                 // 正在瀏覽訊息
-                page.receiveSyncCommand(rows);
+                mPage.receiveSyncCommand(rows);
                 new BahamutCommandLoadMoreArticle().execute();
             } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
                 // 訊息最後一頁, 還有回到原本的那頁
-                page.receiveSyncCommand(rows);
+                mPage.receiveSyncCommand(rows);
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
 
                 new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
                     @Override // com.kota.ASFramework.Thread.ASRunner
                     public void run() {
-                        page.loadMessageList();
+                        mPage.loadMessageList();
                     }
                 }.runInMainThread();
             } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {

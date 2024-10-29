@@ -56,7 +56,7 @@ public class ArticlePage_HeaderItemView extends TelnetHeaderItemView implements 
     /** 點作者 */
     OnClickListener authorClickListener = view -> {
         ASListDialog.createDialog()
-            .setTitle(getContextString(R.string.dialog_query_hero_msg01))
+            .setTitle(detailTextView1.getText().toString())
             .addItem(getContextString(R.string.dialog_query_hero))
             .addItem(getContextString(R.string.message_sub_send_hero))
             .setListener(new ASListDialogItemClickListener() {
