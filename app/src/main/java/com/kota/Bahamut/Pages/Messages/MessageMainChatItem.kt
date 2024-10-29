@@ -1,26 +1,23 @@
 package com.kota.Bahamut.Pages.Messages
 
 import android.content.Context
-import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.kota.ASFramework.PageController.ASNavigationController
-import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class MessageMainItem(context: Context): LinearLayout(context) {
+class MessageMainChatItem(context: Context): LinearLayout(context) {
     private var mainLayout: ConstraintLayout
     private var txtSenderName: TextView
     private var txtMessage: TextView
     private var txtReceivedDate: TextView
     private var txtUnReadCount: TextView
     init {
-        inflate(context, R.layout.message_main_item, this)
+        inflate(context, R.layout.message_main_chat_item, this)
         mainLayout = findViewById(R.id.content_view)
         txtSenderName = mainLayout.findViewById(R.id.mmiSenderName)
         txtMessage = mainLayout.findViewById(R.id.mmiMessage)

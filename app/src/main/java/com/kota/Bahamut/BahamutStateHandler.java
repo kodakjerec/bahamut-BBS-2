@@ -536,7 +536,15 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
         if (topPage instanceof MessageMain page) {
-            if (this.row_string_23.contains("瀏覽 P.")) {
+            if (this.row_string_00.startsWith("【網友列表】")) {
+                // 載入名單
+                new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
+                    @Override // com.kota.ASFramework.Thread.ASRunner
+                    public void run() {
+                        page.loadUserList(rows);
+                    }
+                }.runInMainThread();
+            } else if (this.row_string_23.contains("瀏覽 P.")) {
                 // 正在瀏覽訊息
                 page.receiveSyncCommand(rows);
                 new BahamutCommandLoadMoreArticle().execute();

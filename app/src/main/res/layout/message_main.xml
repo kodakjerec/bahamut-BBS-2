@@ -80,9 +80,17 @@
     </LinearLayout>
     <com.kota.ASFramework.UI.ASListView
         android:layout_below="@+id/Message_Main_Header"
+        android:layout_above="@+id/toolbar_List"
         android:id="@+id/Message_Main_Scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
+    <LinearLayout android:id="@+id/toolbar_List" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_above="@+id/toolbar" android:visibility="gone">
+        <Button android:text="@string/zero_word" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button  android:id="@+id/Message_Main_Button_Prev" android:text="@string/prev_page" style="@style/ToolbarItem"/>
+        <View style="@style/ToolbarDivider"/>
+        <Button  android:id="@+id/Message_Main_Button_Next" android:text="@string/next_page" style="@style/ToolbarItem"/>
+    </LinearLayout>
     <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
         <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/Message_Main_Button_Chat" android:background="@drawable/tab_item_background_color_selected" android:text="@string/message_main_tab_chat" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>

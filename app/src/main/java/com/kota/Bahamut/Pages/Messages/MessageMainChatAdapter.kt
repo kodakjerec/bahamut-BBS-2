@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import com.kota.Bahamut.Service.TempSettings
 
-class MessageMainAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter() {
+class MessageMainChatAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter() {
     private var myList: MutableList<BahaMessageSummarize> = ArrayList()
 
     init {
@@ -27,7 +27,7 @@ class MessageMainAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter()
     override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
         var myView: View? = convertView
 
-        myView = MessageMainItem(TempSettings.myContext!!)
+        myView = MessageMainChatItem(TempSettings.myContext!!)
         myView.setContent(getItem(index))
 
         return myView

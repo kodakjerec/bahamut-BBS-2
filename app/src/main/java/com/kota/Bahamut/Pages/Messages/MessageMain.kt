@@ -28,6 +28,8 @@ import com.kota.Telnet.Model.TelnetRow
 import com.kota.Telnet.Reference.TelnetKeyboard
 import com.kota.Telnet.TelnetClient
 import com.kota.TelnetUI.TelnetPage
+import com.kota.TextEncoder.B2UEncoder
+import java.util.Arrays
 import java.util.Vector
 
 class MessageMain:TelnetPage() {
@@ -35,7 +37,9 @@ class MessageMain:TelnetPage() {
     private lateinit var listView: ASListView
     private lateinit var searchWord: PostEditText
     private lateinit var tabButtons: Array<Button>
-    private var isPostDelayedSuccess = false
+    private lateinit var toolbarList: LinearLayout
+    private var isPostDelayedSuccess = false // 同步用 postDelay
+    private var isUnderList = false // 是否正在查詢名單
 
     override fun getPageLayout(): Int {
         return R.layout.message_main
@@ -62,8 +66,8 @@ class MessageMain:TelnetPage() {
     private fun handleSearchChats(searchWord: String) {
         for (i in 0 until listView.childCount) {
             val view = listView.getChildAt(i)
-            if (view is MessageMainItem) {
-                val subView:MessageMainItem = view
+            if (view is MessageMainChatItem) {
+                val subView:MessageMainChatItem = view
                 if (subView.getContent().senderName.lowercase().contains(searchWord)) {
                     subView.visibility = VISIBLE
                 } else {
@@ -75,6 +79,14 @@ class MessageMain:TelnetPage() {
 
     /** 切換分頁 */
     private val tabClickListener = View.OnClickListener { aView ->
+        if (aView.id == R.id.Message_Main_Button_Chat) {
+            toolbarList.visibility = GONE
+            loadMessageList()
+        } else {
+            toolbarList.visibility = VISIBLE
+            // 送出查詢指令
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
+        }
         // 切換頁籤
         val theme = getSelectTheme()
         for (tabButton in tabButtons) {
@@ -86,6 +98,24 @@ class MessageMain:TelnetPage() {
                 tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
             }
         }
+    }
+    /** 上一頁 */
+    private val prevPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
+        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
+    }
+    /** 下一頁 */
+    private val nextPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
+        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
+    }
+    /** 最前頁 */
+    private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
+        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.HOME)
+        return@OnLongClickListener true
+    }
+    /** 最後頁 */
+    private val endPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
+        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.END)
+        return@OnLongClickListener true
     }
 
     /** 設定選單 */
@@ -137,7 +167,12 @@ class MessageMain:TelnetPage() {
         btnChat.setOnClickListener(tabClickListener)
         btnList.setOnClickListener(tabClickListener)
         tabButtons = arrayOf(btnChat, btnList)
-        btnChat.performClick()
+        val btnPrevPage = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Prev)
+        val btnNextPage = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Next)
+        btnPrevPage.setOnClickListener(prevPageClickListener)
+        btnPrevPage.setOnLongClickListener(firstPageClickListener)
+        btnNextPage.setOnClickListener(nextPageClickListener)
+        btnNextPage.setOnLongClickListener(endPageClickListener)
 
         // 查詢
         searchWord = mainLayout.findViewById(R.id.Message_Main_Search)
@@ -160,6 +195,7 @@ class MessageMain:TelnetPage() {
         txtEsc.setOnClickListener{ _-> onBackPressed() }
 
         listView = mainLayout.findViewById(R.id.Message_Main_Scroll)
+        toolbarList = mainLayout.findViewById(R.id.toolbar_List)
 
         // 重置
         val btnSettings: Button = mainLayout.findViewById(R.id.Message_Main_Settings)
@@ -171,9 +207,16 @@ class MessageMain:TelnetPage() {
         } else {
             sendSyncCommand()
         }
+
+        btnChat.performClick()
     }
 
     override fun onBackPressed(): Boolean {
+        // 離開名單
+        if (isUnderList) {
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+        }
+
         // 顯示小視窗
         if (TempSettings.getMessageSmall() != null)
             TempSettings.getMessageSmall()!!.show()
@@ -183,6 +226,11 @@ class MessageMain:TelnetPage() {
 
     /** 顯示訊息清單 */
     fun loadMessageList() {
+        // 離開名單
+        if (isUnderList) {
+            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+        }
+
         messageAsRunner.cancel()
         isPostDelayedSuccess = true
 
@@ -195,7 +243,7 @@ class MessageMain:TelnetPage() {
 
             // 紀錄訊息
             val messageList = db.getAllAndNewestMessage()
-            val myAdapter = MessageMainAdapter(messageList)
+            val myAdapter = MessageMainChatAdapter(messageList)
             listView.adapter = myAdapter
         } catch (e: Exception) {
             e.printStackTrace()
@@ -206,10 +254,10 @@ class MessageMain:TelnetPage() {
     /** 收到訊息, 只更新特定人物的最新訊息 */
     fun loadMessageList(item:BahaMessage) {
         var findSender = false
-        var senderView = MessageMainItem(context)
+        var senderView = MessageMainChatItem(context)
         for (i in 0 until listView.childCount) {
             val view = listView.getChildAt(i)
-            if (view is MessageMainItem) {
+            if (view is MessageMainChatItem) {
                 if (view.getContent().senderName==item.senderName) {
                     findSender = true
                     senderView = view
@@ -226,7 +274,7 @@ class MessageMain:TelnetPage() {
                     if (findSender) {
                         senderView.setContent(itemSummary)
                     } else {
-                        val myAdapter:MessageMainAdapter = listView.adapter as MessageMainAdapter
+                        val myAdapter:MessageMainChatAdapter = listView.adapter as MessageMainChatAdapter
                         myAdapter.addItem(itemSummary)
                     }
                 }
@@ -234,6 +282,25 @@ class MessageMain:TelnetPage() {
         } finally {
             db.close()
         }
+    }
+
+    /** 顯示線上名單 */
+    fun loadUserList(rows:List<TelnetRow>) {
+        isUnderList = true
+        val userList:MutableList<MessageMainListItemStructure> = ArrayList();
+        for (i in 3 until rows.size step 1) {
+            val row = rows[i]
+            val item = MessageMainListItemStructure()
+            val bytes = row.data
+            item.index =  B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,1,5))
+            item.senderName = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,8,19))
+            item.nickname = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,21,37))
+            item.ip = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,39,56))
+            item.status = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,58,70))
+            userList.add(item)
+        }
+        val myAdapter = MessageMainListAdapter(userList)
+        listView.adapter = myAdapter
     }
 
     override fun onReceivedGestureRight(): Boolean {

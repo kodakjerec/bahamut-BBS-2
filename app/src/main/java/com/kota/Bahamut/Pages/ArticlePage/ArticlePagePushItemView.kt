@@ -67,10 +67,6 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
         val mainLayout = txtContent.parent as LinearLayout
         var originalIndex = mainLayout.indexOfChild(txtContent)
 
-        // 先取得原本的寬度,顏色
-        val txtContentBackgroundColor = txtContent.background
-        val txtContentMaxWidth = txtContent.maxWidth
-
         Linkify.addLinks(txtContent, Linkify.WEB_URLS)
         // 使用預覽圖
         if (UserSettings.getLinkAutoShow()) {
@@ -120,12 +116,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
                         textView.setTextIsSelectable(true)
                         textView.isFocusable = true
                         textView.isLongClickable = true
-                        textView.background = txtContentBackgroundColor
-                        textView.maxWidth = txtContentMaxWidth
                         stringNewUrlSpan(textView)
-                    } else if (view.javaClass == Thumbnail_ItemView::class.java) {
-                        val thumbnail = view as Thumbnail_ItemView
-                        thumbnail.layoutParams.width = txtContentMaxWidth
                     }
                 }
             }
