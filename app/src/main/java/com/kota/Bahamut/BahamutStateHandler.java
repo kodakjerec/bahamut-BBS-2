@@ -190,7 +190,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
             String continue_message = cutOffContinueMessage(this.row_string_23);
             if (continue_message.length() > 0) {
-                if (continue_message.contains("推文")) {
+                if (continue_message.contains("推文") || continue_message.contains("請稍後片刻")) {
                     PageContainer.getInstance().getBoardPage().cancelRunner();
                 }
                 ASToast.showShortToast(continue_message);

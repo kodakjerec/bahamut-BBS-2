@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Block"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="120dp">
     <com.kota.TelnetUI.TextView.TelnetTextViewSmall
         android:id="@+id/ArticlePushItemView_Author"
         style="@style/TextViewSmall"

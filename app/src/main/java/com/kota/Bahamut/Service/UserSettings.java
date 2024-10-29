@@ -381,13 +381,13 @@ public class UserSettings {
     public static boolean getLinkAutoShow() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_AUTO_SHOW, true);
     }
-    public static void setPropertiesLinkShowThumbnail(boolean enable) {
+    public static void setLinkShowThumbnail(boolean enable) {
         _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, enable).apply();
     }
     public static boolean getLinkShowThumbnail() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, false);
     }
-    public static void setPropertiesLinkShowOnlyWifi(boolean enable) {
+    public static void setLinkShowOnlyWifi(boolean enable) {
         _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, enable).apply();
     }
     public static boolean getLinkShowOnlyWifi() {

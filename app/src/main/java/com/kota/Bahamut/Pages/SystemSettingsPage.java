@@ -209,7 +209,7 @@ public class SystemSettingsPage extends TelnetPage {
             ((CheckBox) mainLayout.findViewById(R.id.SystemSettings_enableLinkShowThumbnail)).setChecked(UserSettings.getLinkShowThumbnail());
             changeLinkOnlyWifiStatus(UserSettings.getLinkShowThumbnail());
         } else {
-            UserSettings.setPropertiesLinkShowThumbnail(false);
+            UserSettings.setLinkShowThumbnail(false);
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.GONE);
             changeLinkOnlyWifiStatus(false);
         }
@@ -217,7 +217,7 @@ public class SystemSettingsPage extends TelnetPage {
 
     /** 顯示預覽圖 */
     CompoundButton.OnCheckedChangeListener _link_show_thumbnail_listener = (buttonView, isChecked) -> {
-        UserSettings.setPropertiesLinkShowThumbnail(isChecked);
+        UserSettings.setLinkShowThumbnail(isChecked);
         changeLinkOnlyWifiStatus(isChecked);
     };
     void changeLinkOnlyWifiStatus(boolean enable) {
@@ -225,12 +225,12 @@ public class SystemSettingsPage extends TelnetPage {
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.VISIBLE);
             ((CheckBox) mainLayout.findViewById(R.id.SystemSettings_enableLinkShowOnlyWifi)).setChecked(UserSettings.getLinkShowOnlyWifi());
         } else {
-            UserSettings.setPropertiesLinkShowOnlyWifi(false);
+            UserSettings.setLinkShowOnlyWifi(false);
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.GONE);
         }
     }
     /** 只在Wifi下預覽 */
-    CompoundButton.OnCheckedChangeListener _link_show_only_wifi_listener = (buttonView, isChecked) -> UserSettings.setPropertiesLinkShowOnlyWifi(isChecked);
+    CompoundButton.OnCheckedChangeListener _link_show_only_wifi_listener = (buttonView, isChecked) -> UserSettings.setLinkShowOnlyWifi(isChecked);
 
     @Override
     public int getPageLayout() {

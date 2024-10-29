@@ -10,6 +10,8 @@
                 android:hint="@string/main_push_article_msg01"
                 android:maxLength="48"
                 style="@style/EditTextSingleLine"
+                android:textSize="20sp"
+                android:lines="3"
                 android:autofillHints="" />
         </LinearLayout>
         <View style="@style/BlockDividerHorizontal"/>
