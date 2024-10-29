@@ -5,7 +5,6 @@ import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -36,6 +35,7 @@ import com.kota.Bahamut.Command.BahamutCommandFSendMail;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
 import com.kota.Bahamut.Command.BahamutCommandPostArticle;
+import com.kota.Bahamut.Command.BahamutCommandPushArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleBottom;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleDown;
@@ -43,6 +43,7 @@ import com.kota.Bahamut.Command.BahamutCommandTheSameTitleTop;
 import com.kota.Bahamut.Command.BahamutCommandTheSameTitleUp;
 import com.kota.Bahamut.DataModels.Bookmark;
 import com.kota.Bahamut.DataModels.BookmarkStore;
+import com.kota.Bahamut.Dialogs.DialogPushArticle;
 import com.kota.Bahamut.Dialogs.DialogSearchArticle;
 import com.kota.Bahamut.Dialogs.DialogSearchArticleListener;
 import com.kota.Bahamut.Dialogs.Dialog_SelectArticle;
@@ -101,12 +102,23 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     Button _show_bookmark_button; // 顯示書籤按鈕
     Button _show_history_button; // 顯示記錄按鈕
     int drawerLocation = GravityCompat.END; // 抽屜最後位置
+    private boolean isPostDelayedSuccess = false;
 
     /** 發文 */
     final View.OnClickListener mPostListener = view -> BoardMainPage.this.onPostButtonClicked();
 
+    /** 最前頁 */
+    final View.OnLongClickListener mFirstPageClickListener = view -> {
+        BoardMainPage.this.moveToFirstPosition();
+        return true;
+    };
     /** 前一頁 */
-    final View.OnClickListener mFirstPageClickListener = view -> BoardMainPage.this.moveToFirstPosition();
+    final View.OnClickListener mPrevPageClickListener = view -> {
+        int nowIndex = _list_view.getFirstVisiblePosition();
+        nowIndex-=20;
+        if (nowIndex>0)
+            setListViewSelection(nowIndex);
+    };
 
     /** 下一頁 */
     final View.OnClickListener mLastPageClickListener = view -> {
@@ -354,7 +366,8 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         setListView(aSListView);
 
         mainLayout.findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
-        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mFirstPageClickListener);
+        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mPrevPageClickListener);
+        mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnLongClickListener(mFirstPageClickListener);
         mainLayout.findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
@@ -526,8 +539,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 Button OriginalBtn = mainLayout.findViewById(R.id.BoardPagePostButton);
                 toolBarFloating.setTextSetting(OriginalBtn.getText().toString());
                 // button 1
-                toolBarFloating.setOnClickListener1(mFirstPageClickListener);
-                toolBarFloating.setText1(getContextString(R.string.first_page));
+                toolBarFloating.setOnClickListener1(mPrevPageClickListener);
+                toolBarFloating.setOnLongClickListener(mFirstPageClickListener);
+                toolBarFloating.setText1(getContextString(R.string.prev_page));
                 // button 2
                 toolBarFloating.setOnClickListener2(mLastPageClickListener);
                 toolBarFloating.setText2(getContextString(R.string.last_page));
@@ -760,9 +774,6 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
     /** 按下推薦文章 */
     public void goodLoadingArticle() {
-        goodArticle(getLoadingItemNumber());
-    }
-    public void goodArticle(final int i) {
         ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.do_gy))
                 .setMessage(getContextString(R.string.gy_this_article))
@@ -770,9 +781,39 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 .addButton(getContextString(R.string.do_gy))
                 .setListener((aSAlertDialog, i2) -> {
                     if (i2 == 1) {
-                        BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(i));
+                        BoardMainPage.this.pushCommand(new BahamutCommandGoodArticle(getLoadingItemNumber()));
                     }
-        }).scheduleDismissOnPageDisappear(this).show();
+                }).scheduleDismissOnPageDisappear(this).show();
+    }
+
+    /** 按下推文 */
+    public void pushArticle() {
+        BoardMainPage.this.pushCommand(new BahamutCommandPushArticle(getLoadingItemNumber()));
+
+        pushArticleAsRunner.cancel();
+        pushArticleAsRunner.postDelayed(3000);
+        isPostDelayedSuccess = false;
+    }
+    /** 開啟推文小視窗 */
+    public void openPushArticleDialog() {
+        pushArticleAsRunner.cancel();
+        isPostDelayedSuccess = true;
+
+        DialogPushArticle dialog = new DialogPushArticle();
+        dialog.show();
+    }
+    /** 沒有開啟推文小視窗, 視為沒開放功能 */
+    ASRunner pushArticleAsRunner = new ASRunner(){
+        @Override
+        public void run() {
+            if (!isPostDelayedSuccess)
+                ASToast.showLongToast("沒反應，看板未開放推文");
+        }
+    };
+    /** 提供給 stateHandler 的取消介面 */
+    public void cancelRunner() {
+        pushArticleAsRunner.cancel();
+        isPostDelayedSuccess = true;
     }
 
     /** 轉寄至信箱 */

@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:id="@+id/content_view">
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/Message_Sub_Header"
@@ -30,31 +29,30 @@
             android:textColor="@color/article_page_text_item_author0"
             style="@style/TextViewNormal"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_below="@+id/Message_Sub_Header"
-        android:layout_above="@id/Message_Sub_EditField">
-        <LinearLayout
+        android:layout_above="@+id/Message_Sub_EditField">
+        <com.kota.ASFramework.UI.ASListView
             android:id="@+id/Message_Sub_Scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"/>
-    </ScrollView>
+            android:divider="@null"/>
+    </LinearLayout>
     <com.kota.Bahamut.Pages.Model.PostEditText
         android:id="@+id/Message_Sub_EditField"
-        style="@style/TextViewNormal"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
+        style="@style/EditTextSingleLine"
         android:layout_above="@+id/toolbar"
-        android:background="@color/black"
         android:gravity="top|start|center_vertical|center_horizontal|center"
         android:hint="@string/input_content_here"
+        android:inputType="text"
         android:importantForAutofill="no"
-        android:padding="10dp"
         android:maxLength="59"
-        android:singleLine="true"
-        android:textColor="@android:color/white" />
+        android:textSize="20sp"
+        android:background="@color/black"
+        android:textColor="@color/white" />
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar"

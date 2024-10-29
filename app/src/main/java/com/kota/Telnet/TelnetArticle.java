@@ -320,4 +320,9 @@ public class TelnetArticle {
     public String getAuthor() {
         return Author;
     }
+
+    public int getPushSize() {
+        return _push.size();
+    }
+    public TelnetArticlePush getPush(int index) { return _push.get(index); }
 }

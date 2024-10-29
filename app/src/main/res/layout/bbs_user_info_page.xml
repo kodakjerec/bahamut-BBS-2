@@ -31,7 +31,6 @@
                 android:id="@+id/User_Info_Page_Nick_Name"
                 android:layout_width="0dp"
                 android:layout_weight="3"
-                android:singleLine="true"
                 android:layout_gravity="center"
                 android:text="@string/user_info_nick_name"/>
         </LinearLayout>

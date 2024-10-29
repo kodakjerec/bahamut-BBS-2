@@ -68,6 +68,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     TelnetCursor telnetCursor = null;
     final Article_Handler articleHandler = new Article_Handler();
     boolean duringReadingArticle = false; // 正在讀取文章
+    private boolean isPostDelayedSuccess = false;
 
     /** 設定文章編號 */
     public void setArticleNumber(String aArticleNumber) {
@@ -189,6 +190,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
             String continue_message = cutOffContinueMessage(this.row_string_23);
             if (continue_message.length() > 0) {
+                if (continue_message.contains("推文") || continue_message.contains("請稍後片刻")) {
+                    PageContainer.getInstance().getBoardPage().cancelRunner();
+                }
                 ASToast.showShortToast(continue_message);
             }
             if (this.row_string_23.contains("★ 引言太多")) {
@@ -498,6 +502,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
         myAsRunner.cancel();
         myAsRunner.postDelayed(3000);
+        isPostDelayedSuccess = false;
 
         if (!this.duringReadingArticle) {
             onReadArticleStart();
@@ -624,7 +629,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 }
             } else if (this.row_string_00.contains("【精華文章】")) {
                 handleBoardEssencePage();
-            } else if (this.row_string_00.contains("【板主：")) {
+            } else if (this.row_string_00.startsWith("【板主：") && this.row_string_00.contains("看板《")) {
+                if (row_string_23.startsWith("推文(系統測試中)：")) {
+                    // 呼叫推文訊息視窗
+                    new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
+                        @Override // com.kota.ASFramework.Thread.ASRunner
+                        public void run() {
+                            PageContainer.getInstance().getBoardPage().openPushArticleDialog();
+                        }
+                    }.runInMainThread();
+                    return;
+                }
                 handleBoardPage();
             } else if (this.row_string_00.contains("【個人設定】")) {
                 handleUserPage();
@@ -692,18 +707,21 @@ public class BahamutStateHandler extends TelnetStateHandler {
         }
         this.duringReadingArticle = false;
         myAsRunner.cancel();
+        isPostDelayedSuccess = true;
     }
     // 強制進入讀取完畢
     ASRunner myAsRunner = new ASRunner(){
         @Override
         public void run() {
-            onReadArticleFinished();
-            // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
-            int lastPage = getCurrentPage();
-            if (lastPage==BahamutPage.BAHAMUT_ARTICLE)
-                new BahamutCommandLoadArticleEnd().execute();
-            else
-                new BahamutCommandLoadArticleEndForSearch().execute();
+            if (!isPostDelayedSuccess) {
+                onReadArticleFinished();
+                // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
+                int lastPage = getCurrentPage();
+                if (lastPage == BahamutPage.BAHAMUT_ARTICLE)
+                    new BahamutCommandLoadArticleEnd().execute();
+                else
+                    new BahamutCommandLoadArticleEndForSearch().execute();
+            }
         }
     };
 

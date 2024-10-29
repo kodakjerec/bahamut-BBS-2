@@ -10,12 +10,12 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.kota.ASFramework.Dialog.ASListDialog
+import com.kota.ASFramework.Dialog.ASListDialogItemClickListener
 import com.kota.ASFramework.Dialog.ASProcessingDialog
 import com.kota.ASFramework.Thread.ASRunner
+import com.kota.ASFramework.UI.ASListView
 import com.kota.ASFramework.UI.ASToast
-import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BahamutStateHandler
-import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.Pages.Theme.ThemeStore.getSelectTheme
@@ -32,9 +32,10 @@ import java.util.Vector
 
 class MessageMain:TelnetPage() {
     private lateinit var mainLayout: RelativeLayout
-    private lateinit var scrollViewLayout: LinearLayout
+    private lateinit var listView: ASListView
     private lateinit var searchWord: PostEditText
     private lateinit var tabButtons: Array<Button>
+    private var isPostDelayedSuccess = false
 
     override fun getPageLayout(): Int {
         return R.layout.message_main
@@ -51,19 +52,19 @@ class MessageMain:TelnetPage() {
     }
 
     /** 搜尋聊天 */
-    private val handleSearchListener = TextView.OnEditorActionListener { textView, actionId, keyEvent ->
+    private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            handleSearchChats(textView.text.toString())
+            handleSearchChats(textView.text.toString().lowercase())
             return@OnEditorActionListener true
         }
         false
     }
     private fun handleSearchChats(searchWord: String) {
-        for (i in 0 until scrollViewLayout.childCount) {
-            val view = scrollViewLayout.getChildAt(i)
+        for (i in 0 until listView.childCount) {
+            val view = listView.getChildAt(i)
             if (view is MessageMainItem) {
                 val subView:MessageMainItem = view
-                if (subView.getContent().senderName.contains(searchWord)) {
+                if (subView.getContent().senderName.lowercase().contains(searchWord)) {
                     subView.visibility = VISIBLE
                 } else {
                     subView.visibility = GONE
@@ -87,6 +88,43 @@ class MessageMain:TelnetPage() {
         }
     }
 
+    /** 設定選單 */
+    private fun openSettings() {
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string.setting))
+            .addItem(getContextString(R.string.message_main_setting01))
+            .addItem(getContextString(R.string.message_main_setting02))
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ): Boolean {
+                    return true
+                }
+
+                override fun onListDialogItemClicked(
+                    aDialog: ASListDialog,
+                    index: Int,
+                    aTitle: String
+                ) {
+                    if (aTitle == getContextString(R.string.message_main_setting01)) {
+                        sendSyncCommand()
+                    } else if (aTitle == getContextString(R.string.message_main_setting02)) {
+                        val db = MessageDatabase(context)
+                        try {
+                            db.clearDb()
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        } finally {
+                            db.close()
+                        }
+                        sendSyncCommand()
+                    }
+                }
+            }).show()
+    }
+
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
@@ -103,8 +141,7 @@ class MessageMain:TelnetPage() {
 
         // 查詢
         searchWord = mainLayout.findViewById(R.id.Message_Main_Search)
-        searchWord.imeOptions = EditorInfo.IME_ACTION_SEARCH
-        searchWord.setOnEditorActionListener(handleSearchListener)
+        searchWord.setOnEditorActionListener(handleSearchWatcher)
         // 清空查詢
         val searchWordClear:TextView = mainLayout.findViewById(R.id.Message_Main_Search_Clear)
         searchWordClear.setOnClickListener { _->
@@ -122,11 +159,11 @@ class MessageMain:TelnetPage() {
         val txtEsc = mainLayout.findViewById<TextView>(R.id.Message_Main_Back)
         txtEsc.setOnClickListener{ _-> onBackPressed() }
 
-        scrollViewLayout = mainLayout.findViewById(R.id.Message_Main_Scroll)
+        listView = mainLayout.findViewById(R.id.Message_Main_Scroll)
 
         // 重置
-        val btnReset: Button = mainLayout.findViewById(R.id.Message_Main_Sync)
-        btnReset.setOnClickListener { _-> sendSyncCommand() }
+        val btnSettings: Button = mainLayout.findViewById(R.id.Message_Main_Settings)
+        btnSettings.setOnClickListener { _-> openSettings() }
 
         // 每次登入開啟訊息主視窗先同步一次
         if (TempSettings.isSyncMessageMain) {
@@ -147,21 +184,19 @@ class MessageMain:TelnetPage() {
     /** 顯示訊息清單 */
     fun loadMessageList() {
         messageAsRunner.cancel()
+        isPostDelayedSuccess = true
 
         ASProcessingDialog.dismissProcessingDialog()
         TempSettings.isSyncMessageMain = true
 
         val db = MessageDatabase(context)
         try {
-            scrollViewLayout.removeAllViews()
+            listView.adapter = null
 
             // 紀錄訊息
             val messageList = db.getAllAndNewestMessage()
-            messageList.forEach { item: BahaMessageSummarize ->
-                val messageMainItem = MessageMainItem(TempSettings.myContext!!)
-                messageMainItem.setContent(item)
-                scrollViewLayout.addView(messageMainItem)
-            }
+            val myAdapter = MessageMainAdapter(messageList)
+            listView.adapter = myAdapter
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
@@ -170,24 +205,34 @@ class MessageMain:TelnetPage() {
     }
     /** 收到訊息, 只更新特定人物的最新訊息 */
     fun loadMessageList(item:BahaMessage) {
-        for (i in 0 until scrollViewLayout.childCount) {
-            val view = scrollViewLayout.getChildAt(i)
+        var findSender = false
+        var senderView = MessageMainItem(context)
+        for (i in 0 until listView.childCount) {
+            val view = listView.getChildAt(i)
             if (view is MessageMainItem) {
-                val subView:MessageMainItem = view
-                if (subView.getContent().senderName==item.senderName) {
-                    val db = MessageDatabase(context)
-                    try {
-                        val itemSummary = db.getIdNewestMessage(item.senderName)
-                        object: ASRunner(){
-                            override fun run() {
-                                subView.setContent(itemSummary)
-                            }
-                        }.runInMainThread()
-                    } finally {
-                        db.close()
-                    }
+                if (view.getContent().senderName==item.senderName) {
+                    findSender = true
+                    senderView = view
                 }
             }
+        }
+
+        val db = MessageDatabase(context)
+        try {
+            val itemSummary = db.getIdNewestMessage(item.senderName)
+            object: ASRunner(){
+                override fun run() {
+                    // 找到同名人物
+                    if (findSender) {
+                        senderView.setContent(itemSummary)
+                    } else {
+                        val myAdapter:MessageMainAdapter = listView.adapter as MessageMainAdapter
+                        myAdapter.addItem(itemSummary)
+                    }
+                }
+            }.runInMainThread()
+        } finally {
+            db.close()
         }
     }
 
@@ -199,26 +244,26 @@ class MessageMain:TelnetPage() {
 
     /** 同步BBS訊息到DB */
     private fun sendSyncCommand() {
-        // 清空資料庫
-        val db = MessageDatabase(context)
         // 送出查詢指令
         TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         messageAsRunner.cancel()
         messageAsRunner.postDelayed(3000)
+        isPostDelayedSuccess = false
 
         val db = MessageDatabase(context)
         try {
-            var senderName = ""
-            var message = ""
+            var senderName: String
+            var message: String
 
-            var startIndex = 0
-            var endIndex = 0
+            var startIndex: Int
+            var endIndex: Int
             rows.forEach { row->
                 val rawString = row.rawString
 
@@ -252,7 +297,8 @@ class MessageMain:TelnetPage() {
     // 強制讀取訊息進入讀取完畢
     private var messageAsRunner: ASRunner = object : ASRunner() {
         override fun run() {
-            loadMessageList()
+            if (!isPostDelayedSuccess)
+                loadMessageList()
         }
     }
 }

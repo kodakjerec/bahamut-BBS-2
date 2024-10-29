@@ -63,7 +63,6 @@
                     android:inputType="text"
                     android:labelFor="@id/Login_UsernameLabel"
                     android:maxLength="12"
-                    android:singleLine="true"
                     android:textSize="28sp" />
             </LinearLayout>
 
@@ -90,7 +89,6 @@
                     android:labelFor="@id/Login_passwordLabel"
                     android:inputType="textPassword"
                     android:autofillHints="password"
-                    android:singleLine="true"
                     android:textSize="28sp"/>
             </LinearLayout>
 

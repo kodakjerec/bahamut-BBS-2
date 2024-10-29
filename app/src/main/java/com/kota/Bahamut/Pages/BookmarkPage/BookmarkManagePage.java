@@ -295,7 +295,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                 recyclerView.setAdapter(bookmarkAdapter);
                 bookmarkAdapter.setOnItemClickListener(BookmarkManagePage.this);
             } else if (aView == BookmarkManagePage.this._water_ball_button) {
-                BookmarkManagePage.this._header_view.setTitle("水球紀錄");
+                BookmarkManagePage.this._header_view.setTitle("訊息紀錄");
                 BookmarkManagePage.this._mode = 2;
                 reloadList();
             } else if (aView == BookmarkManagePage.this._history_button) {

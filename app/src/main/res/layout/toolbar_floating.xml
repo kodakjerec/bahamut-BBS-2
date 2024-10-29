@@ -15,7 +15,7 @@
         style="@style/toolbar">
         <Button android:id="@+id/ToolbarFloating_setting" android:text="@string/post" style="@style/ToolbarItem"/>
         <View style="@style/HorizontalDivider"/>
-        <Button android:id="@+id/ToolbarFloating_1" android:text="@string/first_page" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>
+        <Button android:id="@+id/ToolbarFloating_1" android:text="@string/prev_page" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>
         <View style="@style/HorizontalDivider"/>
         <Button android:id="@+id/ToolbarFloating_2" android:text="@string/last_page" style="@style/ToolbarItem"/>
     </LinearLayout>

@@ -43,6 +43,7 @@ import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetArticle;
 import com.kota.Telnet.TelnetArticleItem;
+import com.kota.Telnet.TelnetArticlePush;
 import com.kota.Telnet.TelnetClient;
 import com.kota.TelnetUI.TelnetPage;
 import com.kota.TelnetUI.TelnetView;
@@ -65,10 +66,13 @@ public class ArticlePage extends TelnetPage {
     Runnable _top_action = null;
     Runnable _bottom_action = null;
     BaseAdapter listAdapter = new BaseAdapter() {
+        private int pushLength = 0; // 推文長度
         @Override // android.widget.Adapter
         public int getCount() {
             if (telnetArticle != null) {
-                return telnetArticle.getItemSize() + 2;
+                pushLength = telnetArticle.getPushSize();
+                // 內文個數 + header + PostTime + push
+                return telnetArticle.getItemSize() + 2 + pushLength;
             }
             return 0;
         }
@@ -86,14 +90,21 @@ public class ArticlePage extends TelnetPage {
             return itemIndex;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public int getItemViewType(int itemIndex) {
             if (itemIndex == 0) {
+                // header
                 return ArticlePageItemType.Header;
             }
-            else if (itemIndex == getCount() - 1) {
+            else if (itemIndex == getCount() - 1 - pushLength) {
+                // postTime
                 return ArticlePageItemType.PostTime;
             }
+            else if (itemIndex >= getCount() - pushLength) {
+                // push
+                return ArticlePageItemType.Push;
+            }
+            // content
             return Objects.requireNonNull(getItem(itemIndex)).getType();
         }
 
@@ -101,7 +112,7 @@ public class ArticlePage extends TelnetPage {
         public View getView(int itemIndex, View itemViewFrom, ViewGroup parentView) {
             int type = getItemViewType(itemIndex);
             TelnetArticleItem item = getItem(itemIndex);
-            // 2-標題 0-本文 1-簽名檔 3-發文時間
+            // 2-標題 0-本文 1-簽名檔 3-發文時間 4-推文
             View itemViewOrigin = itemViewFrom;
 
             if (itemViewOrigin == null) {
@@ -109,6 +120,7 @@ public class ArticlePage extends TelnetPage {
                     case ArticlePageItemType.Sign -> itemViewOrigin = new ArticlePage_TelnetItemView(getContext());
                     case ArticlePageItemType.Header -> itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
                     case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
+                    case ArticlePageItemType.Push -> itemViewOrigin = new ArticlePagePushItemView(getContext());
                     default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
                 }
             } else if (type == ArticlePageItemType.Content) {
@@ -156,31 +168,39 @@ public class ArticlePage extends TelnetPage {
                     itemView4.setTime("《" + telnetArticle.DateTime + "》");
                     itemView4.setIP(telnetArticle.fromIP);
                 }
+                case ArticlePageItemType.Push -> {
+                    ArticlePagePushItemView itemView5 = (ArticlePagePushItemView) itemViewOrigin;
+                    int tempIndex = itemIndex - (getCount() - pushLength); // itemIndex - 本文長度
+                    TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
+                    itemView5.setContent(itemPush);
+                    itemView5.setFloor(tempIndex+1);
+                }
             }
             return itemViewOrigin;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        /** 一共有多少种不同的视图类型 */
+        @Override 
         public int getViewTypeCount() {
-            return 4;
+            return 5;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public boolean hasStableIds() {
             return false;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.Adapter
+        @Override 
         public boolean isEmpty() {
             return getCount() == 0;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
+        @Override 
         public boolean areAllItemsEnabled() {
             return false;
         }
 
-        @Override // android.widget.BaseAdapter, android.widget.ListAdapter
+        @Override 
         public boolean isEnabled(int itemIndex) {
             int type = getItemViewType(itemIndex);
             return type == 0 || type == 1;
@@ -505,6 +525,7 @@ public class ArticlePage extends TelnetPage {
             String external_toolbar_enable_title = ext_toolbar_enable ? getContextString(R.string.hide_toolbar) : getContextString(R.string.open_toolbar);
             ASListDialog.createDialog()
                     .addItem(getContextString(R.string.do_gy))
+                    .addItem(getContextString(R.string.do_push))
                     .addItem(getContextString(R.string.change_mode))
                     .addItem((is_board && author.equals(logon_user)) ? getContextString(R.string.edit_article) : null)
                     .addItem(author.equals(logon_user) ? getContextString(R.string.delete_article) : null)
@@ -518,17 +539,18 @@ public class ArticlePage extends TelnetPage {
                 public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
                     switch (index) {
                         case 0 -> onGYButtonClicked();
-                        case 1 -> {
+                        case 1 -> onPushArticleButtonClicked();
+                        case 2 -> {
                             changeViewMode();
                             refreshExternalToolbar();
                         }
-                        case 2 -> onEditButtonClicked();
-                        case 3 -> onDeleteButtonClicked();
-                        case 4 -> onExternalToolbarClicked();
-                        case 5 -> onAddBlockListClicked();
-                        case 6 -> onOpenLinkClicked();
-                        case 7 -> _board_page.FSendMail();
-                        case 8 -> onLoadAllImageClicked();
+                        case 3 -> onEditButtonClicked();
+                        case 4 -> onDeleteButtonClicked();
+                        case 5 -> onExternalToolbarClicked();
+                        case 6 -> onAddBlockListClicked();
+                        case 7 -> onOpenLinkClicked();
+                        case 8 -> _board_page.FSendMail();
+                        case 9 -> onLoadAllImageClicked();
                         default -> {
                         }
                     }
@@ -604,9 +626,16 @@ public class ArticlePage extends TelnetPage {
         ASToast.showShortToast("連線已中斷");
     }
 
+    /** 推薦 */
     void onGYButtonClicked() {
         if (_board_page != null) {
             _board_page.goodLoadingArticle();
+        }
+    }
+    /** 推文 */
+    void onPushArticleButtonClicked() {
+        if (_board_page != null) {
+            _board_page.pushArticle();
         }
     }
 

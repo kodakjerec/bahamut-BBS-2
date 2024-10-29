@@ -39,6 +39,7 @@
     <string name="insert">加入</string>
     <string name="do_gy">推薦</string>
     <string name="do_gy_">推薦：</string>
+    <string name="do_push">推文</string>
     <string name="load_temp">讀取暫存檔</string>
     <string name="save_to_temp">存入暫存檔</string>
     <string name="give_up_post_article">是否要放棄此編輯內容？</string>
@@ -53,6 +54,7 @@
     <string name="file">檔案</string>
     <string name="first_page">最前頁</string>
     <string name="last_page">最後頁</string>
+    <string name="prev_page">上一頁</string>
     <string name="prev_article">上一篇</string>
     <string name="next_article">下一篇</string>
     <string name="folder_boards">佈告討論區</string>
@@ -113,6 +115,7 @@
     <string name="delete_article">刪除文章</string>
     <string name="search">搜尋</string>
     <string name="search_board">搜尋看板</string>
+    <string name="search_id">搜尋ID</string>
     <string name="search_menu_title">Search</string>
     <string name="select">選擇</string>
     <string name="select_sign">選擇簽名檔：</string>
@@ -317,6 +320,7 @@
     <string name="cloud_save_result1">本地備份已上傳雲端</string>
     <string name="cloud_save_result2">已下載雲端備份</string>
     <string name="dialog_query_hero">查詢勇者</string>
+    <string name="dialog_query_hero_msg01">想做甚麼？</string>
     <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
     <string name="essence_page">精華</string>
     <string name="start_connect_ip">連線位址</string>
@@ -373,6 +377,8 @@
     <string name="main_hero_step">勇者足跡</string>
     <string name="main_hero_step_msg01">請留言 (至多三行)</string>
     <string name="main_hero_success01">成功留下過路足跡</string>
+    <string name="main_push_article_msg01">請留言</string>
+    <string name="main_push_article_success01">成功推文</string>
     <string name="main_online_people">線上人數</string>
     <string name="main_bb_call">呼叫器</string>
     <string name="main_page_hero_step_author">作者</string>
@@ -384,6 +390,9 @@
     <string name="message_main_search_clear">清除</string>
     <string name="message_main_tab_chat">聊天</string>
     <string name="message_main_tab_list">名單</string>
+    <string name="message_main_setting01">同步</string>
+    <string name="message_main_setting02">清暫存並同步</string>
+    <string name="message_sub_send_hero">私訊勇者</string>
     <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
     <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
     <string name="board_main_vV"> vV</string>
