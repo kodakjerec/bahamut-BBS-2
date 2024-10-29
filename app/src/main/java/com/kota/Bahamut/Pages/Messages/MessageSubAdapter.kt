@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages.Messages
 
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
@@ -30,9 +31,11 @@ class MessageSubAdapter(list: MutableList<BahaMessage>): BaseAdapter() {
         if (item.type==0) {
             myView = MessageSubReceive(myContext!!)
             myView.setContent(item)
+            myView.gravity = Gravity.START
         } else {
             myView = MessageSubSend(myContext!!)
             myView.setContent(item)
+            myView.gravity = Gravity.END
         }
 
         return myView

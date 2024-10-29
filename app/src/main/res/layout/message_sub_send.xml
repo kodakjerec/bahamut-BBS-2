@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginTop="5dp"
     android:layout_marginBottom="5dp">
     <LinearLayout
         android:id="@+id/Message_Sub_Sender_Content_Parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_alignParentEnd="true">
+        android:orientation="vertical">
         <TextView
             android:id="@+id/Message_Sub_Sender_Content"
             style="@style/TextViewNormal"
@@ -28,20 +29,20 @@
     </LinearLayout>
     <TextView
         android:id="@+id/Message_Sub_Sender_Status"
+        app:layout_constraintEnd_toStartOf="@+id/Message_Sub_Sender_Content_Parent"
+        app:layout_constraintBottom_toTopOf="@+id/Message_Sub_Sender_Time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/Message_Sub_Sender_Content_Parent"
-        android:layout_alignParentTop="true"
         android:layout_marginEnd="5dp"
         style="@style/TextViewVerySmall"
         />
     <TextView
         android:id="@+id/Message_Sub_Sender_Time"
+        app:layout_constraintEnd_toStartOf="@+id/Message_Sub_Sender_Content_Parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toStartOf="@+id/Message_Sub_Sender_Content_Parent"
-        android:layout_alignParentBottom="true"
         android:layout_marginEnd="5dp"
         style="@style/TextViewVerySmall"
         />
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

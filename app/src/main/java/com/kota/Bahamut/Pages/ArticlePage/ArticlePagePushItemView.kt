@@ -64,7 +64,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
     /** 加上預覽圖  */
     @SuppressLint("ResourceAsColor")
     private fun stringThumbnail() {
-        val mainLayout = txtContent.parent as ConstraintLayout
+        val mainLayout = txtContent.parent as LinearLayout
         var originalIndex = mainLayout.indexOfChild(txtContent)
 
         // 先取得原本的寬度,顏色

@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Block"
     android:layout_width="match_parent"
-    android:layout_height="120dp">
+    android:layout_height="wrap_content">
     <com.kota.TelnetUI.TextView.TelnetTextViewSmall
         android:id="@+id/ArticlePushItemView_Author"
         style="@style/TextViewSmall"
@@ -12,15 +12,20 @@
         android:textColor="@color/halfWhite"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
-        android:id="@+id/ArticlePushItemView_Content"
-        style="@style/TextViewSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/board_item_follow_other_read"
-        android:textIsSelectable="true"
+    <LinearLayout
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/ArticlePushItemView_Author"/>
+        app:layout_constraintTop_toBottomOf="@+id/ArticlePushItemView_Author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            android:id="@+id/ArticlePushItemView_Content"
+            style="@style/TextViewSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/board_item_follow_other_read"
+            android:textIsSelectable="true"/>
+    </LinearLayout>
     <com.kota.TelnetUI.TextView.TelnetTextViewSmall
         android:id="@+id/ArticlePushItemView_Floor"
         style="@style/TextViewSmall"

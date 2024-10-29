@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.TypedValue
+import android.view.Gravity
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
