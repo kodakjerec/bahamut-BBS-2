@@ -378,7 +378,7 @@
     <string name="main_hero_step_msg01">請留言 (至多三行)</string>
     <string name="main_hero_success01">成功留下過路足跡</string>
     <string name="main_push_article_msg01">請留言</string>
-    <string name="main_push_article_success01">成功推文</string>
+    <string name="main_push_article_success01">成功推文，請重新整理文章</string>
     <string name="main_online_people">線上人數</string>
     <string name="main_bb_call">呼叫器</string>
     <string name="main_page_hero_step_author">作者</string>

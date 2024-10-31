@@ -64,6 +64,8 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
     /** 加上預覽圖  */
     @SuppressLint("ResourceAsColor")
     private fun stringThumbnail() {
+        if (txtMessage.parent ==null)
+            return
         val mainLayout = txtMessage.parent as LinearLayout
         var originalIndex = mainLayout.indexOfChild(txtMessage)
 

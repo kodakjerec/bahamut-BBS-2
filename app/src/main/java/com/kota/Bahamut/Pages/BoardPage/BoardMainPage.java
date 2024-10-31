@@ -114,10 +114,12 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     };
     /** 前一頁 */
     final View.OnClickListener mPrevPageClickListener = view -> {
-        int nowIndex = _list_view.getFirstVisiblePosition();
-        nowIndex-=20;
-        if (nowIndex>0)
-            setListViewSelection(nowIndex);
+        int firstIndex = _list_view.getFirstVisiblePosition();
+        int endIndex = _list_view.getLastVisiblePosition();
+        int moveIndex = Math.abs(endIndex-firstIndex);
+        firstIndex -= moveIndex;
+        if (firstIndex>0)
+            setListViewSelection(firstIndex);
     };
 
     /** 下一頁 */
@@ -137,14 +139,6 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             }
         }
     };
-    /** 重置側邊選單位置 */
-    private void resetDrawerLocation() {
-        int location = UserSettings.getPropertiesDrawerLocation();
-        if (location==1)
-            drawerLocation = GravityCompat.START;
-        else
-            drawerLocation = GravityCompat.END;
-    }
     /** 跳出小視窗 全部已讀/全部未讀 */
     final View.OnClickListener mReadAllListener = view -> {
         ASListDialog.createDialog()
