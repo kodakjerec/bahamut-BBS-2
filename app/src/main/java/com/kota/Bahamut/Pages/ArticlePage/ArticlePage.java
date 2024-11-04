@@ -172,8 +172,10 @@ public class ArticlePage extends TelnetPage {
                     ArticlePagePushItemView itemView5 = (ArticlePagePushItemView) itemViewOrigin;
                     int tempIndex = itemIndex - (getCount() - pushLength); // itemIndex - 本文長度
                     TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
-                    itemView5.setContent(itemPush);
-                    itemView5.setFloor(tempIndex+1);
+                    if (itemPush!=null) {
+                        itemView5.setContent(itemPush);
+                        itemView5.setFloor(tempIndex + 1);
+                    }
                 }
             }
             return itemViewOrigin;
