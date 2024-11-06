@@ -116,8 +116,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     final View.OnClickListener mPrevPageClickListener = view -> {
         int nowIndex = _list_view.getFirstVisiblePosition();
         nowIndex-=20;
-        if (nowIndex>0)
-            setListViewSelection(nowIndex);
+        if (nowIndex<0)
+            nowIndex = 0;
+        setListViewSelection(nowIndex);
     };
 
     /** 下一頁 */
