@@ -30,11 +30,6 @@ public class ClassPageItemView extends LinearLayout {
         init();
     }
 
-    /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     private void init() {
         ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.class_page_item_view, this);
         this._board_title_label = findViewById(R.id.ClassPage_ItemView_classTitle);

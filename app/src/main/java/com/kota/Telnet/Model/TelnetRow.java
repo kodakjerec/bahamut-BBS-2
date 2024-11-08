@@ -19,10 +19,6 @@ public class TelnetRow {
     public boolean[] italic;
     public byte[] textColor;
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public TelnetRow() {
         data = new byte[80];
         textColor = new byte[80];

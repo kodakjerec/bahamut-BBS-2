@@ -11,10 +11,6 @@ public class TelnetFrame {
     public static final int DEFAULT_ROW = 24;
     public Vector<TelnetRow> rows = new Vector<>();
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public TelnetFrame() {
         initialData(DEFAULT_ROW);
         clear();

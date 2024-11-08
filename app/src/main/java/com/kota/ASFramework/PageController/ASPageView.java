@@ -10,10 +10,6 @@ public class ASPageView extends FrameLayout {
   private static int _count = 0;
   private ASViewController _owner_controller;
 
-  protected void finalize() throws Throwable {
-    super.finalize();
-  }
-
   public ASPageView(Context context) {
     super(context);
     this._owner_controller = null;

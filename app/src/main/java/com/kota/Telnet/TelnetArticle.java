@@ -324,5 +324,11 @@ public class TelnetArticle {
     public int getPushSize() {
         return _push.size();
     }
-    public TelnetArticlePush getPush(int index) { return _push.get(index); }
+    public TelnetArticlePush getPush(int index) {
+        try {
+            return _push.get(index);
+        } catch (Exception e ) {
+            return null;
+        }
+    }
 }

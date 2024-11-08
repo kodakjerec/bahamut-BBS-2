@@ -8,10 +8,6 @@ public class TelnetData {
     public boolean blink = false;
     public boolean italic = false;
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public TelnetData() {
     }
 
