@@ -31,14 +31,14 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_below="@+id/Message_Sub_Header"
         android:layout_above="@+id/Message_Sub_EditField">
         <com.kota.ASFramework.UI.ASListView
             android:id="@+id/Message_Sub_Scroll"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:divider="@null"/>
     </LinearLayout>
     <com.kota.Bahamut.Pages.Model.PostEditText

@@ -118,8 +118,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         int endIndex = _list_view.getLastVisiblePosition();
         int moveIndex = Math.abs(endIndex-firstIndex);
         firstIndex -= moveIndex;
-        if (firstIndex>0)
-            setListViewSelection(firstIndex);
+        if (firstIndex < 0)
+            firstIndex = 0;
+        setListViewSelection(firstIndex);
     };
 
     /** 下一頁 */

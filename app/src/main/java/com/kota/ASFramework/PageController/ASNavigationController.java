@@ -598,7 +598,8 @@ public class ASNavigationController extends Activity {
   /** 移除畫面上永遠存在的View */
   public void removeForeverView(View view) {
     ViewGroup parentViewGroup = (ViewGroup) view.getParent();
-    parentViewGroup.removeView(view);
+    if (parentViewGroup != null)
+      parentViewGroup.removeView(view);
   }
 
   /** 根據最上層頁面決定是否顯示訊息小視窗 */
