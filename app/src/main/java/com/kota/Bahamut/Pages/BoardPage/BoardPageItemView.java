@@ -41,10 +41,6 @@ public class BoardPageItemView extends LinearLayout {
         init();
     }
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public void setItem(BoardPageItem aItem) {
         if (aItem != null) {
             setTitle(aItem.Title);

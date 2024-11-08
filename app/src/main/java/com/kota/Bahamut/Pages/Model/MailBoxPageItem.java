@@ -53,11 +53,6 @@ public class MailBoxPageItem extends TelnetListPageItem {
         this.Title = null;
     }
 
-    /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public void set(TelnetListPageItem item) {
         super.set(item);
         if (item != null) {
