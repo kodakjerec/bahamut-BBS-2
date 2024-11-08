@@ -889,7 +889,9 @@ public class ArticlePage extends TelnetPage {
                 bookmark_list.addHistoryBookmark(telnetArticle.Title);
                 store.storeWithoutCloud();
             }
-            telnetView.setFrame(telnetArticle.getFrame());
+            if (telnetView.getFrame() == null && telnetArticle != null) {
+                telnetView.setFrame(telnetArticle.getFrame());
+            }
             reloadTelnetLayout();
             ASScrollView telnet_content_view = mainLayout.findViewById(R.id.Article_contentTelnetViewBlock);
             if (telnet_content_view != null) {

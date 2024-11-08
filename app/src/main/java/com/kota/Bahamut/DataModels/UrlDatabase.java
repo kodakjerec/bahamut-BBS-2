@@ -61,7 +61,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
         values.put("isPic", isPic);
         try {
             SQLiteDatabase db = getWritableDatabase();
-            db.insert("urls", null, values);
+            db.insertWithOnConflict("urls", null, values, SQLiteDatabase.CONFLICT_IGNORE);
             db.close();
         } catch (Exception ignored){}
     }
@@ -108,8 +108,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
             values.put("title", title);
             values.put("description", description);
             values.put("url", url);
-            int deletedRows = db.delete("shorten_urls", "shorten_url=?", new String[]{shortenUrl});
-            long insertId = db.insert("shorten_urls", null, values);
+            db.delete("shorten_urls", "shorten_url=?", new String[]{shortenUrl});
+            db.insertWithOnConflict("shorten_urls", null, values, SQLiteDatabase.CONFLICT_IGNORE);
             db.close();
         } catch (Exception ignored){}
     }
