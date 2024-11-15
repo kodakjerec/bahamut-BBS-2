@@ -46,6 +46,8 @@ import com.kota.TelnetUI.TelnetPage;
 import com.kota.TextEncoder.B2UEncoder;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -91,7 +93,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this.row_string_01 = getRowString(1).trim();
         this.row_string_02 = getRowString(2).trim();
         this.row_string_23 = getRowString(23).trim();
-        this.rows = getRows();
+        rows.addAll((Collection<? extends TelnetRow>) getRows().clone());
         this.firstHeader = TelnetUtils.getHeader(this.row_string_00);
         this.lastHeader = TelnetUtils.getHeader(this.row_string_23);
     }
@@ -476,7 +478,6 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
     /** 頁面: 個人設定  */
     void handleUserPage() {
-
         // 傳給個人設定, 頁面更新資料
         if (this.row_string_23.contains("修改資料(Y/N)?[N]")) {
             setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);

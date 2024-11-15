@@ -1,9 +1,11 @@
 package com.kota.Bahamut.Pages.BBSUser
 
+import android.annotation.SuppressLint
 import android.view.View.OnClickListener
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
@@ -25,6 +27,7 @@ class UserInfoPage: TelnetPage() {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var txnNickName: PostEditText
     private lateinit var btnUpdate: Button
+    private lateinit var txnOthers: TextView
 
     override fun getPageLayout(): Int {
         return R.layout.bbs_user_info_page
@@ -58,6 +61,7 @@ class UserInfoPage: TelnetPage() {
         }
         btnUpdate = mainLayout.findViewById(R.id.User_Info_Page_Update)
         btnUpdate.setOnClickListener(btnUpdateOnClickListener)
+        txnOthers = mainLayout.findViewById(R.id.User_Info_Others)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
@@ -67,15 +71,31 @@ class UserInfoPage: TelnetPage() {
     /** 收到回傳的資料內容 */
     fun updateUserInfoPageContent(rows: Vector<TelnetRow>) {
         val rowString4 = rows[4].toContentString();
+        val realName = rows[5].toContentString()
+        val address = rows[6].toContentString()
+        val eMail = rows[7].toContentString()
+        val registerTime = rows[8].toContentString()
+        val lastVisitTime = rows[9].toContentString()
+        val hp = rows[10].toContentString()
+        val mp = rows[11].toContentString()
+        val mailCount = rows[12].toContentString()
+        val certificateTime = rows[13].toContentString()
+        val stayTime = rows[14].toContentString()
         object : ASRunner() {
+            @SuppressLint("SetTextI18n")
             override fun run() {
-                txnNickName.setText(rowString4.replace("暱    稱：", ""))
+                if (rowString4.contains("暱    稱：")) {
+                    txnNickName.setText(rowString4.replace("暱    稱：", ""))
+                    txnOthers.text =
+                        "$realName\n$address\n$eMail\n$registerTime\n$lastVisitTime\n$hp\n$mp\n$mailCount\n$certificateTime\n$stayTime\n"
 
-                txnNickName.doOnTextChanged { content, _, _, _ ->
-                    if (content!!.trim().isEmpty())
-                        paintBtnUpdate(false)
-                    else
-                        paintBtnUpdate(true)
+
+                    txnNickName.doOnTextChanged { content, _, _, _ ->
+                        if (content!!.trim().isEmpty())
+                            paintBtnUpdate(false)
+                        else
+                            paintBtnUpdate(true)
+                    }
                 }
             }
         }.runInMainThread()

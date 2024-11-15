@@ -51,4 +51,10 @@
             android:enabled="false"
             android:text="@string/theme_manager_page_chapter_update" />
     </LinearLayout>
+
+    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        android:id="@+id/User_Info_Others"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar" />
 </RelativeLayout>

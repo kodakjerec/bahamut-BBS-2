@@ -300,7 +300,7 @@ class MessageMain:TelnetPage() {
     }
 
     /** 顯示線上名單 */
-    fun loadUserList(rows:List<TelnetRow>) {
+    fun loadUserList(rows:Vector<TelnetRow>) {
         isUnderList = true
         val userList:MutableList<MessageMainListItemStructure> = ArrayList();
         for (i in 3 until rows.size step 1) {

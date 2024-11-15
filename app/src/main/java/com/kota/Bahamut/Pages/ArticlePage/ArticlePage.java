@@ -121,7 +121,10 @@ public class ArticlePage extends TelnetPage {
                     case ArticlePageItemType.Header -> itemViewOrigin = new ArticlePage_HeaderItemView(getContext());
                     case ArticlePageItemType.PostTime -> itemViewOrigin = new ArticlePage_TimeTimeView(getContext());
                     case ArticlePageItemType.Push -> itemViewOrigin = new ArticlePagePushItemView(getContext());
-                    default -> itemViewOrigin = new ArticlePage_TextItemView(getContext());
+                    default -> {
+                        type = ArticlePageItemType.Content;
+                        itemViewOrigin = new ArticlePage_TextItemView(getContext());
+                    }
                 }
             } else if (type == ArticlePageItemType.Content) {
                 itemViewOrigin = new ArticlePage_TextItemView(getContext());

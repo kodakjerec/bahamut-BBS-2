@@ -227,8 +227,10 @@ public class LoginPage extends TelnetPage {
                                         ASProcessingDialog.showProcessingDialog("登入中");
                                     }).setOnBackDelegate(aDialog -> {
                                         TelnetClient.getClient().sendStringToServerInBackground("n");
-                                        LoginPage.this._remove_logon_user_dialog.dismiss();
-                                        LoginPage.this._remove_logon_user_dialog = null;
+                                        if (LoginPage.this._remove_logon_user_dialog!=null) {
+                                            LoginPage.this._remove_logon_user_dialog.dismiss();
+                                            LoginPage.this._remove_logon_user_dialog = null;
+                                        }
                                         ASProcessingDialog.showProcessingDialog("登入中");
                                         return true;
                                     });
