@@ -95,7 +95,9 @@ public class ToolBarFloating extends LinearLayout {
                 break;
             case MotionEvent.ACTION_UP:
                 if (duration < 200) { // click
-                    btnSetting.performClick();
+                    if (view instanceof Button btn) {
+                        btn.performClick();
+                    }
                 } else { // 将LinearLayout的位置更新到最终的位置
                     updateLayout(pointX, pointY , false);
                 }
