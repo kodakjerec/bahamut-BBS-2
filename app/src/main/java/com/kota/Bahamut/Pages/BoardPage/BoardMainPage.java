@@ -102,6 +102,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     Button _show_bookmark_button; // 顯示書籤按鈕
     Button _show_history_button; // 顯示記錄按鈕
     int drawerLocation = GravityCompat.END; // 抽屜最後位置
+    private BahamutCommandPushArticle pushArticleObj = null;
     private boolean isPostDelayedSuccess = false;
 
     /** 發文 */
@@ -783,7 +784,8 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
     /** 按下推文 */
     public void pushArticle() {
-        BoardMainPage.this.pushCommand(new BahamutCommandPushArticle(getLoadingItemNumber()));
+        pushArticleObj = new BahamutCommandPushArticle(getLoadingItemNumber());
+        BoardMainPage.this.pushCommand(pushArticleObj);
 
         pushArticleAsRunner.cancel();
         pushArticleAsRunner.postDelayed(3000);
@@ -801,8 +803,13 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     ASRunner pushArticleAsRunner = new ASRunner(){
         @Override
         public void run() {
-            if (!isPostDelayedSuccess)
+            if (!isPostDelayedSuccess) {
+                if (pushArticleObj!=null) {
+                    pushArticleObj.setDone(true);
+                    pushArticleObj = null;
+                }
                 ASToast.showLongToast("沒反應，看板未開放推文");
+            }
         }
     };
     /** 提供給 stateHandler 的取消介面 */

@@ -93,6 +93,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this.row_string_01 = getRowString(1).trim();
         this.row_string_02 = getRowString(2).trim();
         this.row_string_23 = getRowString(23).trim();
+        rows.clear();
         rows.addAll((Collection<? extends TelnetRow>) getRows().clone());
         this.firstHeader = TelnetUtils.getHeader(this.row_string_00);
         this.lastHeader = TelnetUtils.getHeader(this.row_string_23);
