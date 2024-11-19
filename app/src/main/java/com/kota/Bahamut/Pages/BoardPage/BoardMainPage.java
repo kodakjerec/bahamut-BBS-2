@@ -102,7 +102,6 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     Button _show_bookmark_button; // 顯示書籤按鈕
     Button _show_history_button; // 顯示記錄按鈕
     int drawerLocation = GravityCompat.END; // 抽屜最後位置
-    private BahamutCommandPushArticle pushArticleObj = null;
     private boolean isPostDelayedSuccess = false;
 
     /** 發文 */
@@ -594,9 +593,9 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
     /** 更新headerView */
     void refreshHeaderView() {
         String board_title = _board_title;
-        board_title = (board_title == null || board_title.length() == 0) ? getContextString(R.string.loading) : board_title;
+        board_title = (board_title == null || board_title.isEmpty()) ? getContextString(R.string.loading) : board_title;
         String board_manager = _board_manager;
-        board_manager = (board_manager == null || board_manager.length() == 0) ? getContextString(R.string.loading) : board_manager;
+        board_manager = (board_manager == null || board_manager.isEmpty()) ? getContextString(R.string.loading) : board_manager;
         String board_name = getListName();
         BoardHeaderView header_view = mainLayout.findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
@@ -784,11 +783,10 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
     /** 按下推文 */
     public void pushArticle() {
-        pushArticleObj = new BahamutCommandPushArticle(getLoadingItemNumber());
-        BoardMainPage.this.pushCommand(pushArticleObj);
+        BoardMainPage.this.pushCommand(new BahamutCommandPushArticle(getLoadingItemNumber()));
 
         pushArticleAsRunner.cancel();
-        pushArticleAsRunner.postDelayed(3000);
+        pushArticleAsRunner.postDelayed(2000);
         isPostDelayedSuccess = false;
     }
     /** 開啟推文小視窗 */
@@ -804,10 +802,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         @Override
         public void run() {
             if (!isPostDelayedSuccess) {
-                if (pushArticleObj!=null) {
-                    pushArticleObj.setDone(true);
-                    pushArticleObj = null;
-                }
+                onPagePreload();
                 ASToast.showLongToast("沒反應，看板未開放推文");
             }
         }
