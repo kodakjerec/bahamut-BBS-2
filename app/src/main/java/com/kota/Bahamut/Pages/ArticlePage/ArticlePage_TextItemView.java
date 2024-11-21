@@ -1,9 +1,12 @@
 package com.kota.Bahamut.Pages.ArticlePage;
 
+import static androidx.core.content.ContextCompat.startActivity;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
@@ -15,14 +18,19 @@ import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Model.TelnetRow;
@@ -31,6 +39,7 @@ import com.kota.Telnet.TelnetAnsi;
 import com.kota.Telnet.TelnetArticleItemView;
 import com.kota.TelnetUI.DividerView;
 
+import java.util.Locale;
 import java.util.Vector;
 
 public class ArticlePage_TextItemView extends LinearLayout implements TelnetArticleItemView {
@@ -291,14 +300,66 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content1));
                             else
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content0));
+
+                            addMenuItemSearch(textView);
                             stringNewUrlSpan(textView);
                         }
                     }
+                } else {
+                    addMenuItemSearch(contentLabel);
                 }
             } else {
+                addMenuItemSearch(contentLabel);
                 stringNewUrlSpan(contentLabel);
             }
         }
+    }
+
+    /** 加上右鍵選單 */
+    private void addMenuItemSearch(TextView target) {
+        int selfDefineId = 100;
+
+        // 自定義右鍵選單
+        ActionMode.Callback selfMenu = new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                menu.add(Menu.NONE, selfDefineId, Menu.NONE, "*搜尋*");
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                String selectedText = target.getText().toString().substring(
+                        target.getSelectionStart(),
+                        target.getSelectionEnd()
+                );
+
+                if (menuItem.getItemId() == selfDefineId) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                        intent.putExtra(SearchManager.QUERY, selectedText);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        getContext().startActivity(intent);
+                    } catch (Exception e) {
+                        ASToast.showShortToast("無法開啟此網址");
+                    }
+                    actionMode.finish();
+                }
+
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+        };
+        target.setCustomSelectionActionModeCallback(selfMenu);
     }
 
     public void setQuote(int quote) {

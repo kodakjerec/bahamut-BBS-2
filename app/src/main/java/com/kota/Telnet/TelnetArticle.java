@@ -94,7 +94,7 @@ public class TelnetArticle {
             _extend_items.remove(remove_item);
         }
         remove_items.clear();
-        if (_extend_items.size() > 0) {
+        if (!_extend_items.isEmpty()) {
             _extend_items.lastElement().setType(1);
         }
         _items.clear();
@@ -123,7 +123,7 @@ public class TelnetArticle {
         StringBuilder content_buffer = new StringBuilder();
         String time_string = _frame.getRow(2).toString().substring(4);
         content_buffer.append("作者: ").append(Author);
-        if (Nickname != null && Nickname.length() > 0) {
+        if (Nickname != null && !Nickname.isEmpty()) {
             content_buffer.append("(").append(Nickname).append(")");
         }
         content_buffer.append(" 看板: ").append(BoardName).append("\n");

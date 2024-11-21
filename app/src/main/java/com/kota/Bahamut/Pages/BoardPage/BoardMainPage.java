@@ -136,6 +136,15 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             if (drawerLayout.isDrawerOpen(drawerLocation)) {
                 drawerLayout.closeDrawer(drawerLocation);
             } else {
+                if (UserSettings.getPropertiesDrawerLocation() == 0) {
+                    drawerLocation = GravityCompat.END;
+                } else {
+                    drawerLocation = GravityCompat.START;
+                }
+                LinearLayout menu_view = mainDrawerLayout.findViewById(R.id.menu_view);
+                DrawerLayout.LayoutParams layoutParams_drawer = (DrawerLayout.LayoutParams) menu_view.getLayoutParams();
+                layoutParams_drawer.gravity = drawerLocation;
+                menu_view.setLayoutParams(layoutParams_drawer);
                 drawerLayout.openDrawer(drawerLocation, UserSettings.getPropertiesAnimationEnable());
             }
         }
@@ -535,7 +544,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 toolBarFloating.setTextSetting(OriginalBtn.getText().toString());
                 // button 1
                 toolBarFloating.setOnClickListener1(mPrevPageClickListener);
-                toolBarFloating.setOnLongClickListener(mFirstPageClickListener);
+                toolBarFloating.setOnLongClickListener1(mFirstPageClickListener);
                 toolBarFloating.setText1(getContextString(R.string.prev_page));
                 // button 2
                 toolBarFloating.setOnClickListener2(mLastPageClickListener);
