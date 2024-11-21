@@ -130,55 +130,48 @@ public class ArticlePage extends TelnetPage {
                 itemViewOrigin = new ArticlePage_TextItemView(getContext());
             }
 
-            switch (type) {
-                case ArticlePageItemType.Content -> {
-                    ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
-                    if (item != null) {
-                        itemView1.setAuthor(item.getAuthor(), item.getNickname());
-                        itemView1.setQuote(item.getQuoteLevel());
-                        itemView1.setContent(item.getContent(), item.getFrame().rows);
+            if (itemViewOrigin instanceof ArticlePage_TextItemView itemView1) {
+                if (item != null) {
+                    itemView1.setAuthor(item.getAuthor(), item.getNickname());
+                    itemView1.setQuote(item.getQuoteLevel());
+                    itemView1.setContent(item.getContent(), item.getFrame().rows);
+                }
+                // 分隔線
+                itemView1.setDividerHidden(itemIndex >= getCount() - 2);
+                // 黑名單檢查
+                itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
+            }
+            else if (itemViewOrigin instanceof ArticlePage_TelnetItemView itemView2) {
+                if (item != null)
+                    itemView2.setFrame(item.getFrame());
+                // 分隔線
+                itemView2.setDividerHidden(itemIndex >= getCount() - 2);
+            }
+            else if (itemViewOrigin instanceof ArticlePage_HeaderItemView itemView3) {
+                String author = null;
+                String title = null;
+                String board_name = null;
+                if (telnetArticle != null) {
+                    author = telnetArticle.Author;
+                    title = telnetArticle.Title;
+                    board_name = telnetArticle.BoardName;
+                    if (telnetArticle.Nickname != null) {
+                        author = author + "(" + telnetArticle.Nickname + ")";
                     }
-                    // 分隔線
-                    itemView1.setDividerHidden(itemIndex >= getCount() - 2);
-                    // 黑名單檢查
-                    itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
                 }
-                case ArticlePageItemType.Sign -> {
-                    ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
-                    if (item != null)
-                        itemView2.setFrame(item.getFrame());
-                    // 分隔線
-                    itemView2.setDividerHidden(itemIndex >= getCount() - 2);
-                }
-                case ArticlePageItemType.Header -> {
-                    ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
-                    String author = null;
-                    String title = null;
-                    String board_name = null;
-                    if (telnetArticle != null) {
-                        author = telnetArticle.Author;
-                        title = telnetArticle.Title;
-                        board_name = telnetArticle.BoardName;
-                        if (telnetArticle.Nickname != null) {
-                            author = author + "(" + telnetArticle.Nickname + ")";
-                        }
-                    }
-                    itemView3.setData(title, author, board_name);
-                    itemView3.setMenuButtonClickListener(mMenuListener);
-                }
-                case ArticlePageItemType.PostTime -> {
-                    ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
-                    itemView4.setTime("《" + telnetArticle.DateTime + "》");
-                    itemView4.setIP(telnetArticle.fromIP);
-                }
-                case ArticlePageItemType.Push -> {
-                    ArticlePagePushItemView itemView5 = (ArticlePagePushItemView) itemViewOrigin;
-                    int tempIndex = itemIndex - (getCount() - pushLength); // itemIndex - 本文長度
-                    TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
-                    if (itemPush!=null) {
-                        itemView5.setContent(itemPush);
-                        itemView5.setFloor(tempIndex + 1);
-                    }
+                itemView3.setData(title, author, board_name);
+                itemView3.setMenuButtonClickListener(mMenuListener);
+            }
+            else if (itemViewOrigin instanceof ArticlePage_TimeTimeView itemView4) {
+                itemView4.setTime("《" + telnetArticle.DateTime + "》");
+                itemView4.setIP(telnetArticle.fromIP);
+            }
+            else if (itemViewOrigin instanceof ArticlePagePushItemView itemView5) {
+                int tempIndex = itemIndex - (getCount() - pushLength); // itemIndex - 本文長度
+                TelnetArticlePush itemPush = telnetArticle.getPush(tempIndex);
+                if (itemPush!=null) {
+                    itemView5.setContent(itemPush);
+                    itemView5.setFloor(tempIndex + 1);
                 }
             }
             return itemViewOrigin;

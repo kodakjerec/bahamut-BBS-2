@@ -162,41 +162,35 @@ public class MailPage extends TelnetPage implements ListAdapter, View.OnClickLis
             itemViewOrigin = new ArticlePage_TextItemView(getContext());
         }
 
-        switch (type) {
-            case ArticlePageItemType.Content -> {
-                ArticlePage_TextItemView itemView1 = (ArticlePage_TextItemView) itemViewOrigin;
-                itemView1.setAuthor(item.getAuthor(), item.getNickname());
-                itemView1.setQuote(item.getQuoteLevel());
-                itemView1.setContent(item.getContent(), item.getFrame().rows);
-                if (itemIndex >= getCount() - 2) {
-                    itemView1.setDividerHidden(true);
-                } else {
-                    itemView1.setDividerHidden(false);
-                }
+        if (itemViewOrigin instanceof ArticlePage_TextItemView itemView1) {
+            itemView1.setAuthor(item.getAuthor(), item.getNickname());
+            itemView1.setQuote(item.getQuoteLevel());
+            itemView1.setContent(item.getContent(), item.getFrame().rows);
+            if (itemIndex >= getCount() - 2) {
+                itemView1.setDividerHidden(true);
+            } else {
+                itemView1.setDividerHidden(false);
             }
-            case ArticlePageItemType.Sign -> {
-                ArticlePage_TelnetItemView itemView2 = (ArticlePage_TelnetItemView) itemViewOrigin;
-                if (item!=null)
-                    itemView2.setFrame(item.getFrame());
-                if (itemIndex >= getCount() - 2) {
-                    itemView2.setDividerHidden(true);
-                } else {
-                    itemView2.setDividerHidden(false);
-                }
+        }
+        else if (itemViewOrigin instanceof ArticlePage_TelnetItemView itemView2) {
+            if (item!=null)
+                itemView2.setFrame(item.getFrame());
+            if (itemIndex >= getCount() - 2) {
+                itemView2.setDividerHidden(true);
+            } else {
+                itemView2.setDividerHidden(false);
             }
-            case ArticlePageItemType.Header -> {
-                ArticlePage_HeaderItemView itemView3 = (ArticlePage_HeaderItemView) itemViewOrigin;
-                String author = telnetArticle.Author;
-                if (telnetArticle.Nickname != null) {
-                    author = author + "(" + telnetArticle.Nickname + ")";
-                }
-                itemView3.setData(telnetArticle.Title, author, telnetArticle.BoardName);
+        }
+        else if (itemViewOrigin instanceof ArticlePage_HeaderItemView itemView3) {
+            String author = telnetArticle.Author;
+            if (telnetArticle.Nickname != null) {
+                author = author + "(" + telnetArticle.Nickname + ")";
             }
-            case ArticlePageItemType.PostTime -> {
-                ArticlePage_TimeTimeView itemView4 = (ArticlePage_TimeTimeView) itemViewOrigin;
-                itemView4.setTime("《" + telnetArticle.DateTime + "》");
-                itemView4.setIP(telnetArticle.fromIP);
-            }
+            itemView3.setData(telnetArticle.Title, author, telnetArticle.BoardName);
+        }
+        else if (itemViewOrigin instanceof ArticlePage_TimeTimeView itemView4) {
+            itemView4.setTime("《" + telnetArticle.DateTime + "》");
+            itemView4.setIP(telnetArticle.fromIP);
         }
         return itemViewOrigin;
     }

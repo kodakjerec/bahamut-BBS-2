@@ -38,7 +38,7 @@ class HeroStepItemView : LinearLayout {
             Objects.requireNonNullElse(author, getContextString(R.string.loading_))
     }
 
-    fun setDatetime(dateTime: String?) {
+    private fun setDatetime(dateTime: String?) {
         txtViewDatetime.text =
             Objects.requireNonNullElse(dateTime, getContextString(R.string.loading))
     }
