@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.text.style.URLSpan;
 import android.text.util.Linkify;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -916,7 +917,7 @@ public class ArticlePage extends TelnetPage {
                 }
             }.runInMainThread();
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
     }
 }

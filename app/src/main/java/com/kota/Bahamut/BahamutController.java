@@ -6,6 +6,7 @@ import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -38,6 +39,7 @@ import com.kota.TextEncoder.U2BEncoder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -49,7 +51,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u));
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";

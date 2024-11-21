@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.rgbToInt;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -730,7 +731,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         try {
             i = Integer.parseInt(str) - 1;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
             i = -1;
         }
         if (i >= 0) {

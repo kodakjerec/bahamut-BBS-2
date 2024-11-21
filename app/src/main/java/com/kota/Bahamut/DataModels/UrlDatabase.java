@@ -7,8 +7,11 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.kota.Telnet.TelnetClient;
+
+import java.util.Objects;
 import java.util.Vector;
 
 public class UrlDatabase extends SQLiteOpenHelper {
@@ -36,7 +39,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
             aDatabase.execSQL(CREATE_TABLE_QUERY);
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
     }
 

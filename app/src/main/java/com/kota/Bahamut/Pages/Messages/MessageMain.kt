@@ -1,5 +1,6 @@
 package com.kota.Bahamut.Pages.Messages
 
+import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.INVISIBLE
@@ -32,6 +33,7 @@ import com.kota.Telnet.TelnetOutputBuilder
 import com.kota.TelnetUI.TelnetPage
 import com.kota.TextEncoder.B2UEncoder
 import java.util.Arrays
+import java.util.Objects
 import java.util.Vector
 
 class MessageMain:TelnetPage() {
@@ -160,7 +162,7 @@ class MessageMain:TelnetPage() {
                         try {
                             db.clearDb()
                         } catch (e: Exception) {
-                            e.printStackTrace()
+                            Log.e(javaClass.simpleName, e.message.toString())
                         } finally {
                             db.close()
                         }
@@ -261,7 +263,7 @@ class MessageMain:TelnetPage() {
             val myAdapter = MessageMainChatAdapter(messageList)
             listView.adapter = myAdapter
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         } finally {
             db.close()
         }

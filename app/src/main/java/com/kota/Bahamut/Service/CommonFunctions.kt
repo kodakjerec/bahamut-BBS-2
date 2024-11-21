@@ -1,13 +1,13 @@
 package com.kota.Bahamut.Service
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
 import android.content.pm.ActivityInfo
+import android.util.Log
 import com.kota.Telnet.Reference.TelnetDefs
 import com.kota.TextEncoder.B2UEncoder
 import com.kota.TextEncoder.U2BEncoder
 import java.util.Arrays
+import java.util.Objects
 
 @SuppressLint("StaticFieldLeak")
 object CommonFunctions {
@@ -132,7 +132,7 @@ object CommonFunctions {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
         return java.lang.String.join("", returnArrays)
     }

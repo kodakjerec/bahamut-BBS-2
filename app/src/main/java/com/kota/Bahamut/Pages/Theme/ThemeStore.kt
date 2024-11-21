@@ -2,8 +2,10 @@ package com.kota.Bahamut.Pages.Theme
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.Objects
 
 object ThemeStore {
     private lateinit var perf: SharedPreferences
@@ -74,7 +76,7 @@ object ThemeStore {
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 
@@ -88,7 +90,7 @@ object ThemeStore {
             obj.put("data", jsonArray)
             perf.edit().putString("themeStore", obj.toString()).apply()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 

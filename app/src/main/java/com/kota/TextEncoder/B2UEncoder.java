@@ -1,8 +1,11 @@
 package com.kota.TextEncoder;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.Vector;
 
 public class B2UEncoder {
@@ -46,7 +49,7 @@ public class B2UEncoder {
             inputStream.close();
             result = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         if (result) {
             System.out.println("read B2U encode data success");
@@ -70,7 +73,7 @@ public class B2UEncoder {
         try {
             return new String(encodeToBytes(stringData), charSet);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
             return "";
         }
     }

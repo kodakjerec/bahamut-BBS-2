@@ -3,6 +3,7 @@ package com.kota.Telnet;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class TelnetConnector implements TelnetChannelListener {
     private TelnetChannel[] _channel = new TelnetChannel[2];
@@ -50,7 +51,7 @@ public class TelnetConnector implements TelnetChannelListener {
                 try {
                     sleep(30 * 1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
                 }
                 if (System.currentTimeMillis() - TelnetConnector.this._last_send_data_time > 150 * 1000) {
                     TelnetConnector.this.sendHoldMessage();

@@ -6,6 +6,7 @@ import android.content.Context
 import android.database.SQLException
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.kota.Bahamut.Service.TempSettings.setNotReadMessageCount
 import com.kota.Telnet.TelnetClient
 import java.util.Date
@@ -28,7 +29,7 @@ class MessageDatabase(context: Context?) :
                     ")"
             aDatabase.execSQL(createTableQuery)
         } catch (e: SQLException) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 
@@ -97,7 +98,7 @@ class MessageDatabase(context: Context?) :
             cursor.close()
             db.close()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 
@@ -113,7 +114,7 @@ class MessageDatabase(context: Context?) :
             )
             db.close()
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 
@@ -232,7 +233,7 @@ class MessageDatabase(context: Context?) :
                 db.close()
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
         return returnObject
     }

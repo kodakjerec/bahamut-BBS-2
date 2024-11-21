@@ -1,10 +1,13 @@
 package com.kota.Telnet;
 
+import android.util.Log;
+
 import com.kota.DataPool.MutableByteBuffer;
 import com.kota.TextEncoder.B2UEncoder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class TelnetChannel {
     public static int BUFFER_SIZE = 2048;
@@ -59,7 +62,7 @@ public class TelnetChannel {
             this._output_buffer.clear();
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
             return false;
         }
     }
@@ -113,7 +116,7 @@ public class TelnetChannel {
         try {
             System.out.println("receive data:" + B2UEncoder.getInstance().encodeToString(data));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
     }
 
@@ -135,7 +138,7 @@ public class TelnetChannel {
             }
             System.out.println("send hex data:\n" + hex_data.substring(1));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
     }
 

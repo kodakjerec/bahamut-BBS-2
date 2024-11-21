@@ -1,10 +1,14 @@
 package com.kota.Telnet;
 
+import android.util.Log;
+
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.DataPool.MutableByteBuffer;
 import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.TextEncoder.U2BEncoder;
+
+import java.util.Objects;
 
 public class TelnetOutputBuilder {
     private MutableByteBuffer _buffer = MutableByteBuffer.createMutableByteBuffer();
@@ -60,7 +64,7 @@ public class TelnetOutputBuilder {
         try {
             pushData(U2BEncoder.getInstance().encodeToBytes(str.getBytes(TelnetDefs.CHARSET), 0));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         return this;
     }

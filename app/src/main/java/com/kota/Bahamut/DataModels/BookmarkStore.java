@@ -5,6 +5,7 @@ package com.kota.Bahamut.DataModels;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -139,7 +140,7 @@ public class BookmarkStore {
                     input_stream.close();
                     file_input_stream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
                 }
                 file.delete();
                 load_file = true;
@@ -180,7 +181,7 @@ public class BookmarkStore {
                 addBookmark(new Bookmark(data.getJSONObject(i)));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         sortBookmarks();
         System.out.println("load " + getTotalBookmarkList().size() + " bookmarks.");
@@ -204,7 +205,7 @@ public class BookmarkStore {
             }
             obj.put("data", data);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         return obj;
     }

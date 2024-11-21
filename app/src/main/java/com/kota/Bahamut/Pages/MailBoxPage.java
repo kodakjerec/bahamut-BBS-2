@@ -2,6 +2,7 @@ package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -133,7 +134,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, DialogSe
         try {
             item_index = Integer.parseInt(aIndexString) - 1;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
         }
         if (item_index >= 0) {
             setListViewSelection(item_index);

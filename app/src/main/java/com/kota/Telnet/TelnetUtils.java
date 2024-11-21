@@ -1,6 +1,10 @@
 package com.kota.Telnet;
 
+import android.util.Log;
+
 import com.kota.Telnet.Model.TelnetRow;
+
+import java.util.Objects;
 
 public class TelnetUtils {
     public static int hashCode(byte[] aData) {
@@ -21,7 +25,7 @@ public class TelnetUtils {
             }
             return 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TelnetUtils.class.getSimpleName(), Objects.requireNonNull(e.getMessage()));
             return 0;
         }
     }

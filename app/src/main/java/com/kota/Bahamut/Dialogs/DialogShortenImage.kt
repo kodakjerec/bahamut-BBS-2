@@ -230,7 +230,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                             try {
                                 client.newCall(requestAlbum).execute().use { }
                             } catch (e: Exception) {
-                                Log.e("ShortenImage", e.printStackTrace().toString())
+                                Log.e("ShortenImage", e.message.toString())
                             }
                         }
                     } else {
@@ -240,7 +240,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 }
             } catch (e: Exception) {
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
-                Log.e("ShortenImage", e.printStackTrace().toString())
+                Log.e("ShortenImage", e.message.toString())
             } finally {
                 closeProcessingDialog()
             }
@@ -288,7 +288,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 }
                 transferButton!!.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.printStackTrace().toString())
+                Log.d("DialogShortenImage", e.message.toString())
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
             }
         }
@@ -308,7 +308,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 videoView.requestFocus()
                 transferButton!!.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.printStackTrace().toString())
+                Log.d("DialogShortenImage", e.message.toString())
             }
         }
     }
@@ -352,7 +352,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     transferButton!!.performClick()
                 }
             } catch (e: IOException) {
-                Log.e("PhotoPicker", "Error loading image/video", e)
+                Log.e("PhotoPicker", "Error loading image/video")
             }
         } else {
             Log.d("PhotoPicker", "No media selected")
@@ -393,7 +393,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
             }
         } catch (e: Exception) {
-            Log.d("DialogShortenImage", e.printStackTrace().toString())
+            Log.d("DialogShortenImage", e.message.toString())
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error04))
             return
         }

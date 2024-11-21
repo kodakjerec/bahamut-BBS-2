@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.kota.Telnet.Model.TelnetFrame;
 import com.kota.TextEncoder.B2UEncoder;
 import java.lang.reflect.Array;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Vector;
 
 /* loaded from: classes.dex */
@@ -136,7 +138,7 @@ public class TelnetView extends View {
                         TelnetView.this._handler.sendEmptyMessage(0);
                     }
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
                     return;
                 }
             }

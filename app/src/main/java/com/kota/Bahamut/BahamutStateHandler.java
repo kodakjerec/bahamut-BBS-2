@@ -1,5 +1,7 @@
 package com.kota.Bahamut;
 
+import android.util.Log;
+
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
 import com.kota.ASFramework.Thread.ASRunner;
@@ -47,7 +49,6 @@ import com.kota.TextEncoder.B2UEncoder;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Collection;
-import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
 import java.util.regex.Matcher;
@@ -64,7 +65,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     String row_string_00 = "";
     String row_string_01 = "";
     String row_string_02 = "";
-    String row_string_23 = "";
+    String row_string_final = "";
     String firstHeader = "";
     String lastHeader = "";
     TelnetCursor telnetCursor = null;
@@ -92,11 +93,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
         this.row_string_00 = getRowString(0).trim();
         this.row_string_01 = getRowString(1).trim();
         this.row_string_02 = getRowString(2).trim();
-        this.row_string_23 = getRowString(23).trim();
+        // 隨然是取row 23, 但是偶爾遇到排版不正確情況, 取row 22, 以此類推
+        // row 2 已經有使用, 當作界線
+        for (int i = 23; i>2; i--) {
+            this.row_string_final = getRowString(i).trim();
+            if (!this.row_string_final.isEmpty())
+                i=0;
+        }
         rows.clear();
         rows.addAll((Collection<? extends TelnetRow>) getRows().clone());
         this.firstHeader = TelnetUtils.getHeader(this.row_string_00);
-        this.lastHeader = TelnetUtils.getHeader(this.row_string_23);
+        this.lastHeader = TelnetUtils.getHeader(this.row_string_final);
     }
 
     /*
@@ -157,7 +164,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         // 紀錄訊息
                         bahaMessage = db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
                     }
 
                     if (bahaMessage!=null) {
@@ -186,19 +193,19 @@ public class BahamutStateHandler extends TelnetStateHandler {
     boolean pass_1() {
         // 本文
         boolean run_pass_2 = true;
-        if (this.row_string_23.contains("您有一篇文章尚未完成")) {
+        if (this.row_string_final.contains("您有一篇文章尚未完成")) {
             TelnetClient.getClient().sendStringToServer("S\n1\n");
             run_pass_2 = false;
         }
-        if (run_pass_2 && this.row_string_23.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
-            String continue_message = cutOffContinueMessage(this.row_string_23);
-            if (continue_message.length() > 0) {
+        if (run_pass_2 && this.row_string_final.contains("[請按任意鍵繼續]") && getCurrentPage() != BahamutPage.BAHAMUT_LOGIN) {
+            String continue_message = cutOffContinueMessage(this.row_string_final);
+            if (!continue_message.isEmpty()) {
                 if (continue_message.contains("推文") || continue_message.contains("請稍後片刻")) {
                     PageContainer.getInstance().getBoardPage().cancelRunner();
                 }
                 ASToast.showShortToast(continue_message);
             }
-            if (this.row_string_23.contains("★ 引言太多")) {
+            if (this.row_string_final.contains("★ 引言太多")) {
                 // 放棄此次編輯內容
                 byte[] data = TelnetOutputBuilder.create()
                         .pushKey(TelnetKeyboard.SPACE)
@@ -234,11 +241,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
             }
             TelnetClient.getClient().sendStringToServer("");
             return false;
-        } else if (this.row_string_23.contains("要新增資料嗎？(Y/N) [N]")) {
+        } else if (this.row_string_final.contains("要新增資料嗎？(Y/N) [N]")) {
             ASToast.showShortToast("此看板無文章");
             TelnetClient.getClient().sendStringToServer("N");
             return false;
-        } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
+        } else if (this.row_string_final.contains("● 請按任意鍵繼續 ●")) {
             if (this.row_string_00.contains("順利貼出佈告")) {
                 // 順利貼出佈告, 請按任意鍵繼續
                 TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
@@ -262,12 +269,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
 
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
             return false;
-        } else if (this.row_string_23.contains("請按 [SPACE] 繼續觀賞") && this.row_string_00.contains("過  路  勇  者  的  足  跡")) {
+        } else if (this.row_string_final.contains("請按 [SPACE] 繼續觀賞") && this.row_string_00.contains("過  路  勇  者  的  足  跡")) {
             // 逐行塞入勇者足跡
             insertHeroSteps();
             TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
             return false;
-        } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+        } else if (this.row_string_final.startsWith("★") && !this.row_string_final.substring(1,2).isEmpty()) {
             detectMessage();
             return false;
         } else {
@@ -387,16 +394,16 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 }
             }.runInMainThread();
         }
-        if (this.row_string_23.contains("[訪客]")) {
+        if (this.row_string_final.contains("[訪客]")) {
             // 紀錄線上人數
-            int startIndex = row_string_23.indexOf("[訪客]")+4;
-            int endIndex = row_string_23.indexOf(" 人");
-            page.setOnlinePeople(this.row_string_23.substring(startIndex, endIndex).trim());
+            int startIndex = row_string_final.indexOf("[訪客]")+4;
+            int endIndex = row_string_final.indexOf(" 人");
+            page.setOnlinePeople(this.row_string_final.substring(startIndex, endIndex).trim());
 
             // 紀錄呼叫器
-            startIndex = row_string_23.indexOf("[呼叫器]")+5;
-            endIndex = row_string_23.length();
-            page.setBBCall(this.row_string_23.substring(startIndex, endIndex).trim());
+            startIndex = row_string_final.indexOf("[呼叫器]")+5;
+            endIndex = row_string_final.length();
+            page.setBBCall(this.row_string_final.substring(startIndex, endIndex).trim());
         }
     }
 
@@ -411,7 +418,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     }
 
     void handleSearchBoard() {
-        if (this.row_string_23.startsWith("★ 列表") && this.telnetCursor.equals(23, 29)) {
+        if (this.row_string_final.startsWith("★ 列表") && this.telnetCursor.equals(23, 29)) {
             SearchBoard_Handler.getInstance().read();
             TelnetClient.getClient().sendKeyboardInputToServer(67);
         } else if (this.telnetCursor.row == 1) {
@@ -480,12 +487,12 @@ public class BahamutStateHandler extends TelnetStateHandler {
     /** 頁面: 個人設定  */
     void handleUserPage() {
         // 傳給個人設定, 頁面更新資料
-        if (this.row_string_23.contains("修改資料(Y/N)?[N]")) {
+        if (this.row_string_final.contains("修改資料(Y/N)?[N]")) {
             setCurrentPage(BahamutPage.BAHAMUT_USER_INFO_PAGE);
             // 個人資料
             UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
             page.updateUserInfoPageContent(rows);
-        } else if (this.row_string_23.contains("請按鍵切換設定，或按")) {
+        } else if (this.row_string_final.contains("請按鍵切換設定，或按")) {
             setCurrentPage(BahamutPage.BAHAMUT_USER_CONFIG_PAGE);
             // 操作模式
             UserConfigPage page = PageContainer.getInstance().getUserConfigPage();
@@ -503,7 +510,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
             setCurrentPage(BahamutPage.BAHAMUT_ARTICLE_ESSENCE);
         }
         myAsRunner.cancel();
-        myAsRunner.postDelayed(3000);
+        myAsRunner.postDelayed(6000);
         isPostDelayedSuccess = false;
 
         if (!this.duringReadingArticle) {
@@ -515,7 +522,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
     void handleArticlePercentage() {
         String resourceString = "((?<percent>\\d+)%)";
         Pattern pattern = Pattern.compile(resourceString);
-        Matcher matcher = pattern.matcher(row_string_23);
+        Matcher matcher = pattern.matcher(row_string_final);
         if (matcher.find()) {
             String percent = matcher.toMatchResult().group(1);
             TelnetPage topPage = (TelnetPage) ASNavigationController.getCurrentController().getTopController();
@@ -553,11 +560,11 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         mPage.loadUserList(rows);
                     }
                 }.runInMainThread();
-            } else if (this.row_string_23.contains("瀏覽 P.")) {
+            } else if (this.row_string_final.contains("瀏覽 P.")) {
                 // 正在瀏覽訊息
                 mPage.receiveSyncCommand(rows);
                 new BahamutCommandLoadMoreArticle().execute();
-            } else if (this.row_string_23.contains("● 請按任意鍵繼續 ●")) {
+            } else if (this.row_string_final.contains("● 請按任意鍵繼續 ●")) {
                 // 訊息最後一頁, 還有回到原本的那頁
                 mPage.receiveSyncCommand(rows);
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
@@ -568,17 +575,17 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         mPage.loadMessageList();
                     }
                 }.runInMainThread();
-            } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+            } else if (this.row_string_final.startsWith("★") && !this.row_string_final.substring(1,2).isEmpty()) {
                 detectMessage();
             }
         }
         // 狀況: 正在發送訊息
         else if (topPage instanceof MessageSub page) {
-            if (this.row_string_23.contains("對方關掉呼叫器了")) {
+            if (this.row_string_final.contains("對方關掉呼叫器了")) {
                 page.sendMessageFail(MessageStatus.CloseBBCall);
                 ASToast.showLongToast("對方關掉呼叫器了");
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
-            } else if (this.row_string_23.contains("對方已經離去")) {
+            } else if (this.row_string_final.contains("對方已經離去")) {
                 page.sendMessageFail(MessageStatus.Escape);
                 ASToast.showLongToast("對方已經離去");
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
@@ -594,15 +601,15 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 // 我方發出ctrl+S, 但是被熱訊回應卡住, 送出Enter指令接傳訊給對方id
                 TelnetClient.getClient().sendStringToServer("");
 
-            } else if (this.row_string_23.startsWith("★") && !this.row_string_23.substring(1,2).isEmpty()) {
+            } else if (this.row_string_final.startsWith("★") && !this.row_string_final.substring(1,2).isEmpty()) {
                 detectMessage();
             }
         }
         // 其他
         else if (pass_1()) {
-            if (getCurrentPage() == BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+            if (getCurrentPage() == BahamutPage.BAHAMUT_CLASS && this.row_string_final.contains("瀏覽 P.") && this.row_string_final.endsWith("結束")) {
                 new BahamutCommandLoadMoreArticle().execute();
-            } else if (getCurrentPage() > BahamutPage.BAHAMUT_MAIL_BOX && this.row_string_23.contains("文章選讀") && this.row_string_23.endsWith("搜尋作者")) {
+            } else if (getCurrentPage() > BahamutPage.BAHAMUT_MAIL_BOX && this.row_string_final.contains("文章選讀") && this.row_string_final.endsWith("搜尋作者")) {
                 handleArticle();
                 onReadArticleFinished();
                 // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
@@ -611,16 +618,16 @@ public class BahamutStateHandler extends TelnetStateHandler {
                     new BahamutCommandLoadArticleEnd().execute();
                 else
                     new BahamutCommandLoadArticleEndForSearch().execute();
-            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("瀏覽 P.") && this.row_string_23.endsWith("結束")) {
+            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_final.contains("瀏覽 P.") && this.row_string_final.endsWith("結束")) {
                 handleArticle();
                 onReadArticlePage();
                 handleArticlePercentage();
                 new BahamutCommandLoadMoreArticle().execute();
-            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("魚雁往返") && this.row_string_23.endsWith("標記")) {
+            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_final.contains("魚雁往返") && this.row_string_final.endsWith("標記")) {
                 handleArticle();
                 onReadArticleFinished();
                 new BahamutCommandLoadArticleEnd().execute();
-            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_23.contains("閱讀精華") && this.row_string_23.trim().endsWith("離開")) {
+            } else if (getCurrentPage() > BahamutPage.BAHAMUT_CLASS && this.row_string_final.contains("閱讀精華") && this.row_string_final.trim().endsWith("離開")) {
                 handleArticle();
                 onReadArticleFinished();
                 new BahamutCommandLoadArticleEnd().execute();
@@ -647,7 +654,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
             } else if (this.row_string_00.contains("【精華文章】")) {
                 handleBoardEssencePage();
             } else if (this.row_string_00.startsWith("【板主：") && this.row_string_00.contains("看板《")) {
-                if (row_string_23.startsWith("推文(系統測試中)：")) {
+                if (row_string_final.startsWith("推文(系統測試中)：")) {
                     // 呼叫推文訊息視窗
                     new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
                         @Override // com.kota.ASFramework.Thread.ASRunner
@@ -660,9 +667,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 handleBoardPage();
             } else if (this.row_string_00.contains("【個人設定】")) {
                 handleUserPage();
-            }else if (this.row_string_23.contains("您要刪除上述記錄嗎")) {
+            }else if (this.row_string_final.contains("您要刪除上述記錄嗎")) {
                 TelnetClient.getClient().sendStringToServer("n");
-            } else if (this.row_string_23.equals("● 請按任意鍵繼續 ●")) {
+            } else if (this.row_string_final.equals("● 請按任意鍵繼續 ●")) {
                 TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.SPACE);
             } else if (this.lastHeader.equals("您想")) {
                 new ASRunner() { // from class: com.kota.Bahamut.BahamutStateHandler.4
@@ -674,7 +681,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         }
                     }
                 }.runInMainThread();
-            } else if (this.row_string_23.contains("★ 請閱讀最新公告")) {
+            } else if (this.row_string_final.contains("★ 請閱讀最新公告")) {
                 TelnetClient.getClient().sendStringToServer("");
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader.equals("--")) {
                 // TODO: 不知道甚麼狀況
@@ -715,9 +722,9 @@ public class BahamutStateHandler extends TelnetStateHandler {
         if (this.articleNumber != null) {
             article.Number = Integer.parseInt(this.articleNumber);
         }
-        if (this.row_string_23.contains("魚雁往返")) {
+        if (this.row_string_final.contains("魚雁往返")) {
             showMail(article);
-        } else if (this.row_string_23.contains("閱讀精華")) {
+        } else if (this.row_string_final.contains("閱讀精華")) {
             showEssence(article);
         } else {
             showArticle(article);
@@ -731,6 +738,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
         @Override
         public void run() {
             if (!isPostDelayedSuccess) {
+                System.out.println("Force reading completed");
                 onReadArticleFinished();
                 // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
                 int lastPage = getCurrentPage();
@@ -750,7 +758,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 try {
                     PageContainer.getInstance().getArticlePage().setArticle(aArticle);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
                 }
             }
         }.runInMainThread();

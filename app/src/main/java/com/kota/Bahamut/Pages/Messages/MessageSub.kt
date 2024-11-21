@@ -304,7 +304,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                     setImgurAlbum(albumHash)
                 }
             } catch (e: Exception) {
-                Log.e("ShortenImage", e.toString())
+                Log.e("ShortenImage", e.message.toString())
             }
         }
     }
