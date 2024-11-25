@@ -56,7 +56,11 @@ public abstract class ASRunner {
 
   /** 延遲執行 */
   public void postDelayed(int delayMillis) {
+    // 先取消之前的任務
+    cancel();
+
     token = tokenGenerator.incrementAndGet();
+
     runnable = this::run;
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       mainHandler.postDelayed(runnable, token, delayMillis);
@@ -69,5 +73,11 @@ public abstract class ASRunner {
     if (runnable!=null) {
       mainHandler.removeCallbacks(runnable, token);
     }
+    runnable = null;
+  }
+
+  /** 釋放資源 */
+  public void release() {
+    cancel();
   }
 }
