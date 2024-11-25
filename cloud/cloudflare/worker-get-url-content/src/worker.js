@@ -32,6 +32,7 @@ export default {
         });
       }
     }
+    // twitter 轉址
     const twitterKeywords = ["x.com", "twitter"];
     twitterKeywords.forEach((keyword) => {
       if (urlStructure.hostname.indexOf(keyword) > -1) {
@@ -39,6 +40,7 @@ export default {
         isTwitter = true;
       }
     });
+    // ptt 加變數
     if (urlStructure.hostname.indexOf("ptt") > -1) {
       headers.cookie = "over18=1";
     }
@@ -49,8 +51,10 @@ export default {
         redirect: "follow"
       });
       contentType = responseFrom.headers.get("content-type");
+      // 指定 charset
       if (contentType.indexOf("charset=") > -1)
         charset = contentType.substring(contentType.indexOf("charset=") + 8).trim().replaceAll("'", "").replaceAll('"', "").toLowerCase();
+      // 特例: shift jis
       if (charset === "windows-31j")
         charset = "shift_jis";
       if (responseFrom.headers.get("target")) {
@@ -61,7 +65,8 @@ export default {
         const html = await responseFrom.json();
         title = html.user_name + " @" + html.user_screen_name;
         desc = html.text;
-        imageUrl = html.media_extended[0].thumbnail_url;
+        if (html.mediaURLs && html.mediaURLs.length > 0)
+          imageUrl = html.mediaURLs[0];
       } else {
         if (contentType.indexOf("text") > -1) {
           let decoder = new TextDecoder(charset);
