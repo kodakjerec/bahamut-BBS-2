@@ -188,8 +188,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
     public void clearDb() {
         try {
             SQLiteDatabase db = getWritableDatabase();
-            db.execSQL("DELETE FROM urls ");
-            db.execSQL("DELETE FROM shorten_urls ");
+            db.execSQL("DELETE FROM urls WHERE rowid NOT IN (SELECT rowid FROM urls ORDER BY rowid DESC LIMIT 100) ");
+            db.execSQL("DELETE FROM shorten_urls WHERE rowid NOT IN (SELECT rowid FROM shorten_urls ORDER BY rowid DESC LIMIT 100) ");
             onCreate(db);
         }  catch (Exception ignored){}
     }
