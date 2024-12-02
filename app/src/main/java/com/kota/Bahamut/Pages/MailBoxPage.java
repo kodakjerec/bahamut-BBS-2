@@ -134,7 +134,7 @@ public class MailBoxPage extends TelnetListPage implements ListAdapter, DialogSe
         try {
             item_index = Integer.parseInt(aIndexString) - 1;
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (item_index >= 0) {
             setListViewSelection(item_index);

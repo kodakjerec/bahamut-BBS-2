@@ -73,7 +73,7 @@ public class TelnetReceiverThread extends Thread {
 
         } catch (Exception e) {
             if (BuildConfig.DEBUG)
-                Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
 
             Log.v("SocketChannel", "receiveData Exception");
             result = false;

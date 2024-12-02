@@ -61,7 +61,8 @@ public class ASSnackBar {
                 View view = previous_snack_bar.getView();
                 FrameLayout.LayoutParams params =(FrameLayout.LayoutParams)view.getLayoutParams();
                 params.gravity = Gravity.TOP;
-                view.setBackgroundColor(ContextCompat.getColor(Objects.requireNonNull(TempSettings.myActivity), R.color.list_page_item_arrow_background));
+                if (TempSettings.myActivity!=null)
+                    view.setBackgroundColor(ContextCompat.getColor(TempSettings.myActivity, R.color.list_page_item_arrow_background));
                 view.setLayoutParams(params);
 
                 previous_snack_bar.show();

@@ -28,7 +28,8 @@ public class Dialog_PostArticle extends ASDialog implements View.OnClickListener
     public Dialog_PostArticle(int aTarget) {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_post_article);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         this._target = aTarget;
         this._post_target_group = findViewById(R.id.post_target);
         this._send_button = findViewById(R.id.send);

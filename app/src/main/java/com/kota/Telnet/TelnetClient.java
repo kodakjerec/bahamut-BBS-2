@@ -68,7 +68,7 @@ public class TelnetClient implements TelnetConnectorListener {
         try {
             _connector.close(); // 關閉連線
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 
@@ -88,7 +88,7 @@ public class TelnetClient implements TelnetConnectorListener {
             data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (encode_success) {
             sendDataToServer(data, channel);
@@ -107,7 +107,7 @@ public class TelnetClient implements TelnetConnectorListener {
             data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (encode_success) {
             sendDataToServerInBackground(data, channel);

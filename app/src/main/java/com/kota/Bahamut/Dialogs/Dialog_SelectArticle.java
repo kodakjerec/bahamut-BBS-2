@@ -37,7 +37,8 @@ public class Dialog_SelectArticle extends ASDialog implements View.OnClickListen
     public Dialog_SelectArticle() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_select_article);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         this._content = findViewById(R.id.Bahamut_Dialog_Select_content_Label);
         this._button_0_p = findViewById(R.id.Bahamut_Dialog_Select_Button_0_p);
         this._button_1_p = findViewById(R.id.Bahamut_Dialog_Select_Button_1_p);

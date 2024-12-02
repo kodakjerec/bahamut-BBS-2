@@ -25,7 +25,7 @@ public class TelnetUtils {
             }
             return 0;
         } catch (Exception e) {
-            Log.e(TelnetUtils.class.getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(TelnetUtils.class.getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return 0;
         }
     }

@@ -106,7 +106,11 @@ public class ArticlePage extends TelnetPage {
                 return ArticlePageItemType.Push;
             }
             // content
-            return Objects.requireNonNull(getItem(itemIndex)).getType();
+            TelnetArticleItem returnItem = getItem(itemIndex);
+            if (returnItem!=null)
+                return returnItem.getType();
+            else
+                return ArticlePageItemType.Content;
         }
 
         @Override // android.widget.Adapter
@@ -136,11 +140,11 @@ public class ArticlePage extends TelnetPage {
                     itemView1.setAuthor(item.getAuthor(), item.getNickname());
                     itemView1.setQuote(item.getQuoteLevel());
                     itemView1.setContent(item.getContent(), item.getFrame().rows);
+                    // 分隔線
+                    itemView1.setDividerHidden(itemIndex >= getCount() - 2);
+                    // 黑名單檢查
+                    itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(item.getAuthor()));
                 }
-                // 分隔線
-                itemView1.setDividerHidden(itemIndex >= getCount() - 2);
-                // 黑名單檢查
-                itemView1.setVisible(!UserSettings.getPropertiesBlockListEnable() || !UserSettings.isBlockListContains(Objects.requireNonNull(item).getAuthor()));
             }
             else if (itemViewOrigin instanceof ArticlePage_TelnetItemView itemView2) {
                 if (item != null)
@@ -918,7 +922,7 @@ public class ArticlePage extends TelnetPage {
                 }
             }.runInMainThread();
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 }

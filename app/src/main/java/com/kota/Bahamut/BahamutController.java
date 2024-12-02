@@ -51,7 +51,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u));
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";

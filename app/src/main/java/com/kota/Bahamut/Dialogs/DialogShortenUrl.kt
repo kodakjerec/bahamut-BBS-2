@@ -205,7 +205,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         val layoutId = R.layout.dialog_shorten_url
         requestWindowFeature(1)
         setContentView(layoutId)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
         setTitle(context.getString(R.string.dialog_shorten_url_title))
         mainLayout = findViewById(R.id.dialog_shorten_url_layout)
         editText = mainLayout.findViewById(R.id.dialog_shorten_url_content)

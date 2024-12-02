@@ -22,7 +22,8 @@ public class Dialog_SearchBoard extends ASDialog implements View.OnClickListener
     public Dialog_SearchBoard() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_search_board);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         setTitle("搜尋看板");
         this._keyword_label = findViewById(R.id.Bahamut_Dialog_Search_board_keyword);
         this._search_button = findViewById(R.id.Bahamut_Dialog_Search_board_Search_Button);

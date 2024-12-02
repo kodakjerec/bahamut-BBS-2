@@ -731,7 +731,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         try {
             i = Integer.parseInt(str) - 1;
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             i = -1;
         }
         if (i >= 0) {

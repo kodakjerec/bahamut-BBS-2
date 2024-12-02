@@ -22,7 +22,8 @@ public class Dialog_InsertSymbol extends ASDialog implements AdapterView.OnItemC
     public Dialog_InsertSymbol() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_insert_symbol);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         this._grid_view = findViewById(R.id.SymbolDialog_GridView);
         this._grid_view.setOnItemClickListener(this);
         String[] list = new String[this._symbols.length()];

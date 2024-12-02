@@ -138,7 +138,7 @@ public class TelnetView extends View {
                         TelnetView.this._handler.sendEmptyMessage(0);
                     }
                 } catch (InterruptedException e) {
-                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                     return;
                 }
             }

@@ -24,7 +24,7 @@ class DialogHeroStep:ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_hero_step)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
 
         mainLayout = findViewById(R.id.content_view)
         content1 = mainLayout.findViewById(R.id.Dialog_hero_step_content1)

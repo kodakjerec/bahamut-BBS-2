@@ -49,7 +49,7 @@ public class B2UEncoder {
             inputStream.close();
             result = true;
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (result) {
             System.out.println("read B2U encode data success");
@@ -73,7 +73,7 @@ public class B2UEncoder {
         try {
             return new String(encodeToBytes(stringData), charSet);
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return "";
         }
     }

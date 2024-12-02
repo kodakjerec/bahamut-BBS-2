@@ -30,7 +30,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_reference)
-        Objects.requireNonNull(window)?.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
         mainLayout = findViewById<LinearLayout>(R.id.dialog_search_article_layout)
 
         sendButton = mainLayout.findViewById(R.id.Dialog_reference_Send_Button)

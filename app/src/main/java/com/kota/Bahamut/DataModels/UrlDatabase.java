@@ -39,7 +39,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
             aDatabase.execSQL(CREATE_TABLE_QUERY);
         } catch (SQLException e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 

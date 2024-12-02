@@ -65,7 +65,7 @@ public class ArticleTempStore {
                     file.delete();
                     load_from_file = true;
                 } catch (IOException e) {
-                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 }
             }
         }
@@ -90,7 +90,7 @@ public class ArticleTempStore {
                 SharedPreferences perf = this._context.getSharedPreferences("article_temp", 0);
                 perf.edit().putString("save_data", exportToJSON().toString()).commit();
             } catch (Exception e) {
-                Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             }
         }
     }
