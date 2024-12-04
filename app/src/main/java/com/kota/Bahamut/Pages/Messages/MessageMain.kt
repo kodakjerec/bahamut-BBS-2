@@ -302,20 +302,30 @@ class MessageMain:TelnetPage() {
     }
 
     /** 顯示線上名單 */
-    fun loadUserList(rows:Vector<TelnetRow>) {
+    fun loadUserList(fromRows:Vector<TelnetRow>) {
         isUnderList = true
-        val userList:MutableList<MessageMainListItemStructure> = ArrayList();
+        val userList:MutableList<MessageMainListItemStructure> = ArrayList()
+
+        // 创建一个新的列表，并复制传入的 rows 的内容
+        val rows: Vector<TelnetRow> = Vector(fromRows)
+
+        rows.forEach { row -> println(row) }
         for (i in 3 until rows.size step 1) {
             val row = rows[i]
             val item = MessageMainListItemStructure()
             val bytes = row.data
-            item.index =  B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,1,5))
-            item.senderName = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,8,19))
-            item.nickname = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,21,37))
-            item.ip = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,39,56))
-            item.status = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes,58,70))
+            item.index =
+                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 1, 5))
+            item.senderName =
+                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 8, 19))
+            item.nickname =
+                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 21, 37))
+            item.ip = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 39, 56))
+            item.status =
+                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 58, 70))
             userList.add(item)
         }
+
         val myAdapter = MessageMainListAdapter(userList)
         listView.adapter = myAdapter
     }
