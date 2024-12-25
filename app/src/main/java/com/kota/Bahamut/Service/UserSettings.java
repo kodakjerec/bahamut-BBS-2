@@ -366,13 +366,23 @@ public class UserSettings {
         _editor.putFloat(PROPERTIES_TOOLBAR_IDLE, idle).apply();
     }
     public static float getToolbarIdle() {
-        return _sharedPref.getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
+        try {
+            return _sharedPref.getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
+        } catch (ClassCastException e) {
+            int value = _sharedPref.getInt(PROPERTIES_TOOLBAR_IDLE, 2);
+            return (float) value;
+        }
     }
     public static void setToolbarAlpha(float alpha) {
         _editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, alpha).apply();
     }
     public static float getToolbarAlpha() {
-        return _sharedPref.getFloat(PROPERTIES_TOOLBAR_ALPHA, 20);
+        try {
+            return _sharedPref.getFloat(PROPERTIES_TOOLBAR_ALPHA, 20.0f);
+        } catch (ClassCastException e) {
+            int value = _sharedPref.getInt(PROPERTIES_TOOLBAR_ALPHA, 20);
+            return (float) value;
+        }
     }
     
     public static void setPropertiesLinkAutoShow(boolean enable) {
