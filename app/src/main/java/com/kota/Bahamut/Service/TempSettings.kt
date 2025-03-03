@@ -34,7 +34,7 @@ object TempSettings {
     @JvmField
     var transportType = -1 // 網路狀況
     @JvmField
-    var bookmarkStore: BookmarkStore? = null // 公用的bookmarkStore
+    var bookmarkStore: BookmarkStore? = null // 公用的 bookmarkStore
     @JvmField
     var applicationContext: Context? = null // 公開的 applicationContext
     @JvmField
