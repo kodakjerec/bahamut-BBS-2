@@ -61,7 +61,7 @@ public class TelnetAnsiCode {
         try {
             return COLOR_BRIGHT[color_index - 8];
         } catch (Exception e) {
-            Log.e(TelnetAnsiCode.class.getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(TelnetAnsiCode.class.getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return -4144960;
         }
     }
@@ -79,7 +79,7 @@ public class TelnetAnsiCode {
         try {
             return COLOR_BRIGHT[color_index - 8];
         } catch (Exception e) {
-            Log.e(TelnetAnsiCode.class.getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(TelnetAnsiCode.class.getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return -4144960;
         }
     }

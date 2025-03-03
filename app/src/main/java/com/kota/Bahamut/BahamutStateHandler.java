@@ -163,7 +163,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                         // 紀錄訊息
                         bahaMessage = db.receiveMessage(name2, msg2, 0);
                     } catch (Exception e) {
-                        Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                        Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                     }
 
                     if (bahaMessage!=null) {
@@ -736,7 +736,7 @@ public class BahamutStateHandler extends TelnetStateHandler {
                 try {
                     PageContainer.getInstance().getArticlePage().setArticle(aArticle);
                 } catch (Exception e) {
-                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 }
             }
         }.runInMainThread();

@@ -51,7 +51,7 @@ public class TelnetConnector implements TelnetChannelListener {
                 try {
                     sleep(30 * 1000);
                 } catch (InterruptedException e) {
-                    Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 }
                 if (System.currentTimeMillis() - TelnetConnector.this._last_send_data_time > 150 * 1000) {
                     TelnetConnector.this.sendHoldMessage();

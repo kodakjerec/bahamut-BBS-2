@@ -666,7 +666,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                 }
             } catch (Exception e) {
 //                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
-                Log.e("ShortenImage", Objects.requireNonNull(e.getMessage()));
+                Log.e("ShortenImage", e.getMessage()!=null?e.getMessage():"");
             }
         });
     }

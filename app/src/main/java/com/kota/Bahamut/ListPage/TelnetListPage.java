@@ -116,7 +116,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
                     sleep(1000L);
                 }
             } catch (Exception e) {
-                Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+                Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 run = false;
             }
         }

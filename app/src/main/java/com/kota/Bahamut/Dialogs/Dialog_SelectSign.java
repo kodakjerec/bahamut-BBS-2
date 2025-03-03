@@ -22,7 +22,8 @@ public class Dialog_SelectSign extends ASDialog implements View.OnClickListener 
     public Dialog_SelectSign() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_select_sign);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         setTitle(getContext().getString(R.string.select_sign));
         this._sign_field = findViewById(R.id.Bahamut_Dialog_Select_Sign_Input_Field);
         this._confirm_button = findViewById(R.id.Bahamut_Dialog_Select_Sign_confirm_Button);

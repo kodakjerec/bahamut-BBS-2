@@ -62,7 +62,7 @@ public class TelnetChannel {
             this._output_buffer.clear();
             return true;
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return false;
         }
     }
@@ -116,7 +116,7 @@ public class TelnetChannel {
         try {
             System.out.println("receive data:" + B2UEncoder.getInstance().encodeToString(data));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 
@@ -138,7 +138,7 @@ public class TelnetChannel {
             }
             System.out.println("send hex data:\n" + hex_data.substring(1));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 

@@ -80,7 +80,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         val layoutId = R.layout.dialog_shorten_image
         requestWindowFeature(1)
         setContentView(layoutId)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
         mainLayout = findViewById(R.id.dialog_shorten_image_layout)
         mainLayout.setOnClickListener { _ -> closeProcessingDialog() }
         textView = mainLayout.findViewById(R.id.dialog_shorten_image_hint)

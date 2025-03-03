@@ -51,7 +51,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u));
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";
@@ -101,7 +101,18 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override
     protected void onDestroy() {
+        // 關閉VIP
         closeBillingClient();
+
+        // 備份雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.backup();
+        }
+
+        // 強制關閉連線
+        TelnetClient.getClient().close();
+
         super.onDestroy();
     }
 

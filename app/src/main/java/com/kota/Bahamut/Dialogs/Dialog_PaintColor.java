@@ -104,7 +104,8 @@ public class Dialog_PaintColor extends ASDialog implements View.OnClickListener 
     public Dialog_PaintColor() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_paint_color);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
         setTitle(getContextString(R.string.post_article_page_paint_color));
         mainLayout = findViewById(R.id.dialog_paint_color_content_view);
 

@@ -64,7 +64,7 @@ public class TelnetOutputBuilder {
         try {
             pushData(U2BEncoder.getInstance().encodeToBytes(str.getBytes(TelnetDefs.CHARSET), 0));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), Objects.requireNonNull(e.getMessage()));
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         return this;
     }

@@ -149,6 +149,7 @@
     <string name="open_toolbar">開啟工具列</string>
     <string name="system_setting_page_keep_wifi_on_sleep">防止Wifi因為待機中斷</string>
     <string name="system_setting_page_keep_wake">保持螢幕開啟</string>
+    <string name="system_setting_page_enable_board_move">看板\"最後頁\"改為\"下一頁\"</string>
     <string name="system_setting_page_enable_article_move">使用文章首篇/末篇功能</string>
     <string name="system_setting_page_enable_page_animation">使用換頁動畫</string>
     <string name="system_setting_page_screen_orientation">螢幕方向</string>
@@ -220,6 +221,7 @@
     <string name="system_setting_page_checkbox_blocklist_hint">核取方塊, 啟動或關閉黑名單</string>
     <string name="system_setting_page_checkbox_blocklistForTitle_hint">核取方塊, 啟動或關閉黑名單套用至標題</string>
     <string name="system_setting_page_checkbox_animation_hint">核取方塊, 啟動或關閉換頁動畫</string>
+    <string name="system_setting_page_checkbox_board_move_hint">核取方塊, 啟動或關閉看板上一頁/下一頁</string>
     <string name="system_setting_page_checkbox_article_move_hint">核取方塊, 啟動或關閉迅速跳到首頁最後頁</string>
     <string name="system_setting_page_screen_orientation_hint">下拉選單, 切換螢幕方向</string>
     <string name="system_setting_page_checkbox_gesture_hint">核取方塊, 啟動或關閉滑動手勢在看板和閱讀文章</string>

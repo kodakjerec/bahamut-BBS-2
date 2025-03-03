@@ -39,7 +39,8 @@ public class Dialog_InsertExpression extends ASDialog {
     public Dialog_InsertExpression() {
         requestWindowFeature(1);
         setContentView(R.layout.dialog_insert_expressions);
-        Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+        if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
 
         _scroll_view = findViewById(R.id.dialog_insert_expressions_scrollView);
         _title_label = findViewById(R.id.dialog_insert_expressions_title);

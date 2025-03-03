@@ -22,7 +22,7 @@ class DialogPushArticle:ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_push_article)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
 
         mainLayout = findViewById(R.id.content_view)
         content1 = mainLayout.findViewById(R.id.Dialog_push_article_content1)
