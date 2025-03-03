@@ -35,6 +35,7 @@ import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandFSendMail;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
+import com.kota.Bahamut.Command.BahamutCommandLoadArticle;
 import com.kota.Bahamut.Command.BahamutCommandPostArticle;
 import com.kota.Bahamut.Command.BahamutCommandPushArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
@@ -472,18 +473,29 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
+
             // 任務完成
             // 關閉"正在自動登入"
             TempSettings.isUnderAutoToChat = false;
 
             Timer timer = new Timer();
-            TimerTask task = new TimerTask() {
+            TimerTask task1 = new TimerTask() {
                 @Override
                 public void run() {
                     ASProcessingDialog.dismissProcessingDialog();
                 }
             };
-            timer.schedule(task, 500);
+            TimerTask task2 = new TimerTask() {
+                @Override
+                public void run() {
+                    // 跳到指定文章編號
+                    if (TempSettings.lastVisitArticleNumber>0) {
+                        onSelectDialogDismissWIthIndex(String.valueOf(TempSettings.lastVisitArticleNumber));
+                    }
+                }
+            };
+            timer.schedule(task1, 500);
+            timer.schedule(task2, 500);
         }
     }
 
@@ -646,6 +658,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         if (boardPageItem != null){
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.Title;
+            TempSettings.lastVisitArticleNumber = boardPageItem.Number;
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
             return true;

@@ -24,6 +24,8 @@ object TempSettings {
     @JvmField
     var lastVisitBoard = "" // 最後離開的看板
     @JvmField
+    var lastVisitArticleNumber = 0 // 最後離開的文章編號
+    @JvmField
     var lastReceivedMessage = "" // 最後收到的訊息
     @JvmField
     var isSyncMessageMain = false // 是否已經同步訊息
