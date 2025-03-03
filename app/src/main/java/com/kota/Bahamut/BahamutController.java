@@ -110,6 +110,9 @@ public class BahamutController extends ASNavigationController implements TelnetC
             cloudBackup.backup();
         }
 
+        // 強制關閉連線
+        TelnetClient.getClient().close();
+
         super.onDestroy();
     }
 
