@@ -124,11 +124,24 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             firstIndex = 0;
         setListViewSelection(firstIndex);
     };
-
     /** 下一頁 */
+    final View.OnClickListener mNextPageClickListener = view -> {
+        int firstIndex = _list_view.getFirstVisiblePosition();
+        int endIndex = _list_view.getLastVisiblePosition();
+        int moveIndex = Math.abs(endIndex-firstIndex);
+        firstIndex += moveIndex;
+        setListViewSelection(firstIndex);
+    };
+
+    /** 最後頁 */
     final View.OnClickListener mLastPageClickListener = view -> {
         BoardMainPage.this.setManualLoadPage();
         BoardMainPage.this.moveToLastPosition();
+    };
+    final View.OnLongClickListener mLastPageLongClickListener = view -> {
+        BoardMainPage.this.setManualLoadPage();
+        BoardMainPage.this.moveToLastPosition();
+        return true;
     };
 
     /** 彈出側邊選單 */
@@ -374,7 +387,15 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         mainLayout.findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
         mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mPrevPageClickListener);
         mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnLongClickListener(mFirstPageClickListener);
-        mainLayout.findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
+        // 下一頁
+        Button boardPageLatestPageButton = mainLayout.findViewById(R.id.BoardPageLatestPageButton);
+        if (UserSettings.getPropertiesBoardMoveEnable()>0) {
+            boardPageLatestPageButton.setText(getContextString(R.string.next_page));
+            boardPageLatestPageButton.setOnClickListener(mNextPageClickListener);
+            boardPageLatestPageButton.setOnLongClickListener(mLastPageLongClickListener);
+        } else {
+            boardPageLatestPageButton.setOnClickListener(mLastPageClickListener);
+        }
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
@@ -560,8 +581,14 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 toolBarFloating.setOnLongClickListener1(mFirstPageClickListener);
                 toolBarFloating.setText1(getContextString(R.string.prev_page));
                 // button 2
-                toolBarFloating.setOnClickListener2(mLastPageClickListener);
-                toolBarFloating.setText2(getContextString(R.string.last_page));
+                if (UserSettings.getPropertiesBoardMoveEnable()>0) {
+                    toolBarFloating.setOnClickListener2(mNextPageClickListener);
+                    toolBarFloating.setOnLongClickListener2(mLastPageLongClickListener);
+                    toolBarFloating.setText2(getContextString(R.string.next_page));
+                } else {
+                    toolBarFloating.setOnClickListener2(mLastPageClickListener);
+                    toolBarFloating.setText2(getContextString(R.string.last_page));
+                }
             }
             default -> {
                 // 底部-中間

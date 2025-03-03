@@ -62,6 +62,10 @@
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_board_article"/>
         <View style="@style/HorizontalDivider"/>
+        <RelativeLayout android:id="@+id/SystemSettings_item_enableBoardMove" style="@style/SystemSettingsItem">
+            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_board_move" style="@style/SystemSettingsCheckboxText"/>
+            <CheckBox android:id="@+id/SystemSettings_enableBoardMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_board_move_hint"/>
+        </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/SystemSettingsItem">
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>

@@ -50,6 +50,8 @@ public class SystemSettingsPage extends TelnetPage {
         UserSettings.setPropertiesAnimationEnable(isChecked);
         ASNavigationController.getCurrentController().setAnimationEnable(UserSettings.getPropertiesAnimationEnable());
     };
+    CompoundButton.OnCheckedChangeListener _article_move_enable_board_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBoardMoveDisable(isChecked?1:0);
+    /** 開啟或關閉文章首篇/末篇, checkbox */
     CompoundButton.OnCheckedChangeListener _article_move_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesArticleMoveDisable(isChecked);
     /** 開啟或關閉黑名單, checkbox */
     CompoundButton.OnCheckedChangeListener _block_list_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListEnable(isChecked);
@@ -273,6 +275,13 @@ public class SystemSettingsPage extends TelnetPage {
         animation_enable_box.setChecked(UserSettings.getPropertiesAnimationEnable());
         animation_enable_box.setOnCheckedChangeListener(_animation_enable_listener);
         mainLayout.findViewById(R.id.SystemSettings_item_animationEnable).setOnClickListener(view -> animation_enable_box.setChecked(!animation_enable_box.isChecked()));
+
+        // 看板上一頁/下一頁
+        CheckBox article_move_enable_board_box = mainLayout.findViewById(R.id.SystemSettings_enableBoardMove);
+        article_move_enable_board_box.setChecked((UserSettings.getPropertiesBoardMoveEnable() > 0));
+        article_move_enable_board_box.setOnCheckedChangeListener(_article_move_enable_board_listener);
+        mainLayout.findViewById(R.id.SystemSettings_item_enableBoardMove).setOnClickListener(view -> article_move_enable_board_box.setChecked(!article_move_enable_board_box.isChecked()));
+
 
         // 文章首篇/末篇
         CheckBox article_move_enable_box = mainLayout.findViewById(R.id.SystemSettings_enableArticleMove);

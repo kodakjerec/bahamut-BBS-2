@@ -14,6 +14,7 @@ import java.util.List;
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
     static final String PROPERTIES_ANIMATION_DISABLE = "AnimationDisable"; // 換頁動畫
+    static  final String PROPERTIES_BOARD_MOVE_DISABLE = "BoardMoveDisable"; // 看板上一頁/下一頁
     static final String PROPERTIES_ARTICLE_MOVE_DISABLE = "ArticleModeDisable"; // 文章首篇/末篇
     static final String PROPERTIES_ARTICLE_VIEW_MODE = "ArticleViewMode"; // 0-文字模式 1-telnet模式
     static final String PROPERTIES_GESTURE_ON_BOARD = "GestureOnBoard"; // 滑動手勢
@@ -221,6 +222,15 @@ public class UserSettings {
         return _sharedPref.getBoolean(PROPERTIES_ANIMATION_DISABLE, true);
     }
 
+    /** 看板上一頁/下一頁 */
+    public static void setPropertiesBoardMoveDisable(int isDisable) {
+        _editor.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).apply();
+    }
+    public static int getPropertiesBoardMoveEnable() {
+        return _sharedPref.getInt(PROPERTIES_BOARD_MOVE_DISABLE, 0);
+    }
+
+    /** 文章首篇/末篇 */
     public static void setPropertiesArticleMoveDisable(boolean isDisable) {
         _editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply();
     }
