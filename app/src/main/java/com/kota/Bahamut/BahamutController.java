@@ -101,7 +101,15 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override
     protected void onDestroy() {
+        // 關閉VIP
         closeBillingClient();
+
+        // 備份雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.backup();
+        }
+
         super.onDestroy();
     }
 
