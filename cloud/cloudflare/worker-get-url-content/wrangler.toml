@@ -5,3 +5,8 @@ workers_dev = true
 # wrangler.toml (wrangler v3.88.0^)
 [observability.logs]
 enabled = true
+
+[[d1_databases]]
+database_id = "b7399778-37e1-486a-b329-bdb44966fdd7"
+database_name = "urlhistory"
+binding = "DATABASE"

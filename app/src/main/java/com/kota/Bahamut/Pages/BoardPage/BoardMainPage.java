@@ -35,6 +35,7 @@ import com.kota.Bahamut.Command.BahamutCommandEditArticle;
 import com.kota.Bahamut.Command.BahamutCommandFSendMail;
 import com.kota.Bahamut.Command.BahamutCommandGoodArticle;
 import com.kota.Bahamut.Command.BahamutCommandListArticle;
+import com.kota.Bahamut.Command.BahamutCommandLoadArticle;
 import com.kota.Bahamut.Command.BahamutCommandPostArticle;
 import com.kota.Bahamut.Command.BahamutCommandPushArticle;
 import com.kota.Bahamut.Command.BahamutCommandSearchArticle;
@@ -123,11 +124,24 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
             firstIndex = 0;
         setListViewSelection(firstIndex);
     };
-
     /** 下一頁 */
+    final View.OnClickListener mNextPageClickListener = view -> {
+        int firstIndex = _list_view.getFirstVisiblePosition();
+        int endIndex = _list_view.getLastVisiblePosition();
+        int moveIndex = Math.abs(endIndex-firstIndex);
+        firstIndex += moveIndex;
+        setListViewSelection(firstIndex);
+    };
+
+    /** 最後頁 */
     final View.OnClickListener mLastPageClickListener = view -> {
         BoardMainPage.this.setManualLoadPage();
         BoardMainPage.this.moveToLastPosition();
+    };
+    final View.OnLongClickListener mLastPageLongClickListener = view -> {
+        BoardMainPage.this.setManualLoadPage();
+        BoardMainPage.this.moveToLastPosition();
+        return true;
     };
 
     /** 彈出側邊選單 */
@@ -373,7 +387,15 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         mainLayout.findViewById(R.id.BoardPagePostButton).setOnClickListener(mPostListener);
         mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnClickListener(mPrevPageClickListener);
         mainLayout.findViewById(R.id.BoardPageFirstPageButton).setOnLongClickListener(mFirstPageClickListener);
-        mainLayout.findViewById(R.id.BoardPageLatestPageButton).setOnClickListener(mLastPageClickListener);
+        // 下一頁
+        Button boardPageLatestPageButton = mainLayout.findViewById(R.id.BoardPageLatestPageButton);
+        if (UserSettings.getPropertiesBoardMoveEnable()>0) {
+            boardPageLatestPageButton.setText(getContextString(R.string.next_page));
+            boardPageLatestPageButton.setOnClickListener(mNextPageClickListener);
+            boardPageLatestPageButton.setOnLongClickListener(mLastPageLongClickListener);
+        } else {
+            boardPageLatestPageButton.setOnClickListener(mLastPageClickListener);
+        }
         mainLayout.findViewById(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener);
         mainLayout.findViewById(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener);
 
@@ -472,18 +494,29 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
+
             // 任務完成
             // 關閉"正在自動登入"
             TempSettings.isUnderAutoToChat = false;
 
             Timer timer = new Timer();
-            TimerTask task = new TimerTask() {
+            TimerTask task1 = new TimerTask() {
                 @Override
                 public void run() {
                     ASProcessingDialog.dismissProcessingDialog();
                 }
             };
-            timer.schedule(task, 500);
+            TimerTask task2 = new TimerTask() {
+                @Override
+                public void run() {
+                    // 跳到指定文章編號
+                    if (TempSettings.lastVisitArticleNumber>0) {
+                        onSelectDialogDismissWIthIndex(String.valueOf(TempSettings.lastVisitArticleNumber));
+                    }
+                }
+            };
+            timer.schedule(task1, 500);
+            timer.schedule(task2, 500);
         }
     }
 
@@ -548,8 +581,14 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
                 toolBarFloating.setOnLongClickListener1(mFirstPageClickListener);
                 toolBarFloating.setText1(getContextString(R.string.prev_page));
                 // button 2
-                toolBarFloating.setOnClickListener2(mLastPageClickListener);
-                toolBarFloating.setText2(getContextString(R.string.last_page));
+                if (UserSettings.getPropertiesBoardMoveEnable()>0) {
+                    toolBarFloating.setOnClickListener2(mNextPageClickListener);
+                    toolBarFloating.setOnLongClickListener2(mLastPageLongClickListener);
+                    toolBarFloating.setText2(getContextString(R.string.next_page));
+                } else {
+                    toolBarFloating.setOnClickListener2(mLastPageClickListener);
+                    toolBarFloating.setText2(getContextString(R.string.last_page));
+                }
             }
             default -> {
                 // 底部-中間
@@ -646,6 +685,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         if (boardPageItem != null){
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.Title;
+            TempSettings.lastVisitArticleNumber = boardPageItem.Number;
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
             return true;

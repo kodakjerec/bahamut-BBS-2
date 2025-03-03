@@ -8,13 +8,11 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.RelativeLayout
 import androidx.core.view.forEachIndexed
 import com.kota.ASFramework.Dialog.ASDialog
 import com.kota.Bahamut.DataModels.ReferenceAuthor
-import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
-import java.util.Objects
+import com.kota.Bahamut.Service.NotificationSettings
 
 class DialogReference : ASDialog(), View.OnClickListener {
     var mainLayout: LinearLayout
@@ -31,7 +29,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_reference)
         window?.setBackgroundDrawable(null)
-        mainLayout = findViewById<LinearLayout>(R.id.dialog_search_article_layout)
+        mainLayout = findViewById(R.id.dialog_reference_layout)
 
         sendButton = mainLayout.findViewById(R.id.Dialog_reference_Send_Button)
         cancelButton = mainLayout.findViewById(R.id.Dialog_reference_Cancel_Button)
@@ -39,6 +37,52 @@ class DialogReference : ASDialog(), View.OnClickListener {
         cancelButton.setOnClickListener(this)
 
         setDialogWidth()
+
+        readOldSettings()
+    }
+
+    /**
+     * 讀取暫存設定
+     * - 讀取先前的 RemoveBlank 和 ReservedType 設定
+     */
+    private fun readOldSettings() {
+        // 讀取先前設定
+        val checkBoxAuthor0: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
+        val checkBoxAuthor1: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
+        val rbs0: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
+        val rbs1: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
+
+        checkBoxAuthor0.isChecked = NotificationSettings.getDialogReferenceAuthor0RemoveBlank()
+        rbs0.check(rbs0.getChildAt(NotificationSettings.getDialogReferenceAuthor0ReservedType()).id)
+        checkBoxAuthor1.isChecked = NotificationSettings.getDialogReferenceAuthor1RemoveBlank()
+        rbs1.check(rbs1.getChildAt(NotificationSettings.getDialogReferenceAuthor1ReservedType()).id)
+    }
+
+    /**
+     * 儲存暫存設定
+     * - 儲存 RemoveBlank 和 ReservedType 設定
+     */
+    private fun saveSettings() {
+        // 儲存設定
+        val checkBoxAuthor0: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
+        val checkBoxAuthor1: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
+        val rbs0: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
+        val rbs1: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
+
+        NotificationSettings.setDialogReferenceAuthor0RemoveBlank(checkBoxAuthor0.isChecked)
+        NotificationSettings.setDialogReferenceAuthor1RemoveBlank(checkBoxAuthor1.isChecked)
+
+        // Get selected radio button index
+        rbs0.forEachIndexed { index, view ->
+            if (view is RadioButton && view.isChecked) {
+                NotificationSettings.setDialogReferenceAuthor0ReservedType(index)
+            }
+        }
+        rbs1.forEachIndexed { index, view ->
+            if (view is RadioButton && view.isChecked) {
+                NotificationSettings.setDialogReferenceAuthor1ReservedType(index)
+            }
+        }
     }
 
     // 變更dialog寬度
@@ -92,12 +136,13 @@ class DialogReference : ASDialog(), View.OnClickListener {
 
             dialogReferenceListener!!.onSelectAuthor(myAuthors)
         }
+        saveSettings()
         dismiss()
     }
 
     @SuppressLint("SetTextI18n")
     fun setAuthors(authors:List<ReferenceAuthor>) {
-        myAuthors = authors;
+        myAuthors = authors
         val checkBoxAuthor0:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0)
         val checkBoxAuthor0Layout:LinearLayout = mainLayout.findViewById(R.id.Dialog_reference_author0_subLayout)
         val checkBoxAuthor1:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1)
@@ -116,16 +161,6 @@ class DialogReference : ASDialog(), View.OnClickListener {
             checkBoxAuthor0.visibility = View.VISIBLE
             checkBoxAuthor0Layout.visibility = View.VISIBLE
 
-            // 去除空白行
-            val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
-            checkboxRemoveBlank.isChecked = author.removeBlank
-            val checkBoxLayout:RelativeLayout = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank)
-            checkBoxLayout.setOnClickListener{ _->
-                checkboxRemoveBlank.isChecked = !checkboxRemoveBlank.isChecked
-            }
-            // 保留行數
-            val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
-            rbs.check(rbs.getChildAt(author.reservedType).id)
             // 作者名稱
             checkBoxAuthor0.text = checkBoxAuthor0.text.toString() + author.authorName
             checkBoxAuthor0.isChecked = author.enabled
@@ -147,16 +182,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
             val author:ReferenceAuthor = myAuthors[1]
             checkBoxAuthor1.visibility = View.VISIBLE
             checkBoxAuthor1Layout.visibility = View.VISIBLE
-            // 去除空白行
-            val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
-            checkboxRemoveBlank.isChecked = author.removeBlank
-            val checkBoxLayout:RelativeLayout = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank)
-            checkBoxLayout.setOnClickListener{ _->
-                checkboxRemoveBlank.isChecked = !checkboxRemoveBlank.isChecked
-            }
-            // 保留行數
-            val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
-            rbs.check(rbs.getChildAt(author.reservedType).id)
+
             // 作者名稱
             checkBoxAuthor1.text = checkBoxAuthor1.text.toString() + author.authorName
             checkBoxAuthor1.isChecked = author.enabled

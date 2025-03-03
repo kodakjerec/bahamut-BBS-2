@@ -19,7 +19,10 @@ object NotificationSettings {
     private const val showHeroStep = "showHeroStep" // 顯示勇者足跡
     private const val notAlarmIgnoreBatteryOptimizations = "notAlarmIgnoreBatteryOptimizations" // 跳出掛網提醒視窗
     private const val showMessageFloating = "showMessageFloating" // 顯示訊息浮動按紐
-
+    private const val dialogReferenceAuthor0RemoveBlank = "dialogReferenceAuthor0RemoveBlank"
+    private const val dialogReferenceAuthor0ReservedType = "dialogReferenceAuthor0ReservedType"
+    private const val dialogReferenceAuthor1RemoveBlank = "dialogReferenceAuthor1RemoveBlank"
+    private const val dialogReferenceAuthor1ReservedType = "dialogReferenceAuthor1ReservedType"
 
     @JvmStatic
     fun upgrade(activity: Activity) {
@@ -124,5 +127,45 @@ object NotificationSettings {
     @JvmStatic
     fun getAlarmIgnoreBatteryOptimizations(): Boolean {
         return perf!!.getBoolean(notAlarmIgnoreBatteryOptimizations, false)
+    }
+
+    @JvmStatic
+    fun getDialogReferenceAuthor0RemoveBlank(): Boolean {
+        return perf!!.getBoolean(dialogReferenceAuthor0RemoveBlank, true)
+    }
+
+    @JvmStatic
+    fun setDialogReferenceAuthor0RemoveBlank(isEnable: Boolean) {
+        perf!!.edit().putBoolean(dialogReferenceAuthor0RemoveBlank, isEnable).apply()
+    }
+
+    @JvmStatic
+    fun getDialogReferenceAuthor0ReservedType(): Int {
+        return perf!!.getInt(dialogReferenceAuthor0ReservedType, 0)
+    }
+
+    @JvmStatic
+    fun setDialogReferenceAuthor0ReservedType(index: Int) {
+        perf!!.edit().putInt(dialogReferenceAuthor0ReservedType, index).apply()
+    }
+
+    @JvmStatic
+    fun getDialogReferenceAuthor1RemoveBlank(): Boolean {
+        return perf!!.getBoolean(dialogReferenceAuthor1RemoveBlank, true)
+    }
+
+    @JvmStatic
+    fun setDialogReferenceAuthor1RemoveBlank(isEnable: Boolean) {
+        perf!!.edit().putBoolean(dialogReferenceAuthor1RemoveBlank, isEnable).apply()
+    }
+
+    @JvmStatic
+    fun getDialogReferenceAuthor1ReservedType(): Int {
+        return perf!!.getInt(dialogReferenceAuthor1ReservedType, 0)
+    }
+
+    @JvmStatic
+    fun setDialogReferenceAuthor1ReservedType(index: Int) {
+        perf!!.edit().putInt(dialogReferenceAuthor1ReservedType, index).apply()
     }
 }

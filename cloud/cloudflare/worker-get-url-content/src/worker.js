@@ -8,6 +8,10 @@ export default {
     } catch {
       return Response.json({ "error": "No url " });
     }
+
+    // 連接 D1 資料庫
+    const { DATABASE } = env;
+
     let urlStructure = new URL(url);
     let isTwitter = false;
     let title = "";
@@ -20,6 +24,19 @@ export default {
       "Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-HK;q=0.5",
       "Accept-Charset": "utf-8"
     };
+
+    // 檢查是否有相同 URL 的資料
+    const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
+    const {results } = await stmt.all();
+    if (results && results.length > 0) {
+      return Response.json({
+        title: results[0].title,
+        desc: results[0].desc,
+        imageUrl: results[0].imageUrl,
+        contentType: results[0].contentType
+      });
+    }
+
     const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu"];
     for (let i = 0; i < siteKeywords.length; i++) {
       const keyword = siteKeywords[i];
@@ -108,23 +125,26 @@ export default {
           imageUrl = url;
         }
       }
+
+      // 修改儲存邏輯，使用 UPSERT 語法
+      await DATABASE.prepare(`
+        INSERT INTO urls VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET 
+          title = excluded.title,
+          desc = excluded.desc,
+          imageUrl = excluded.imageUrl,
+          contentType = excluded.contentType
+      `).bind(url, title, desc, imageUrl, contentType).run();
+
+      return Response.json({
+        title,
+        desc,
+        imageUrl,
+        contentType
+      });
     } catch (e) {
       console.log(e);
       return Response.json({ "error": " Something got error " });
     }
-    if (title === null || title === void 0)
-      title = "";
-    if (desc === null || desc === void 0)
-      desc = "";
-    if (imageUrl === null || imageUrl === void 0)
-      imageUrl = "";
-    if (contentType === null || contentType === void 0)
-      contentType = "";
-    return Response.json({
-      title,
-      desc,
-      imageUrl,
-      contentType
-    });
   }
 };
