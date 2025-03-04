@@ -10,8 +10,8 @@ android {
     defaultConfig {
         applicationId "com.kota.Bahamut"
         minSdk 26
-        targetSdk 35
-        versionCode 40
+        targetSdk 34
+        versionCode 41
         versionName "2.8"
     }
 
