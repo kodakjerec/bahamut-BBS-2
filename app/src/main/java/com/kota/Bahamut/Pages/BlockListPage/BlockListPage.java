@@ -176,7 +176,7 @@ public class BlockListPage extends TelnetPage implements BlockListClickListener 
     }
 
     public void onPageDidDisappear() {
-        _blockList = null;
+        _blockList = new ArrayList<>();
         super.onPageDidDisappear();
     }
 
