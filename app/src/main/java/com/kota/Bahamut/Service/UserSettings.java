@@ -11,6 +11,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
@@ -318,6 +319,10 @@ public class UserSettings {
     private static void updateBlockListCache() {
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
         String[] blockStrings = blockListString.split(",");
+
+        Set<String> acSets = Set.of(blockStrings);
+        ac = new AhoCorasick(acSets);
+
         blockListCache = new HashSet<>();
         for (String s : blockStrings) {
             if (!s.isEmpty()) {
@@ -328,6 +333,7 @@ public class UserSettings {
 
     // 加入黑名單緩存
     private static HashSet<String> blockListCache = null;
+    private static AhoCorasick ac;
 
     // 檢查是否在黑名單中, 精確比對
     @SuppressLint({"DefaultLocale"})
@@ -340,14 +346,10 @@ public class UserSettings {
             updateBlockListCache();
         }
 
-        // 使用緩存的 HashSet 來檢查
-        for (String keyword : blockListCache) {
-            if (aName.equals(keyword)) {
-                return true;
-            }
-        }
-        return false;
+        // 比對
+        return blockListCache.contains(aName);
     }
+
     // 模糊比對
     @SuppressLint({"DefaultLocale"})
     public static boolean isBlockListContainsFuzzy(String aName) {
@@ -355,17 +357,13 @@ public class UserSettings {
             return false;
 
         // 初始化緩存
-        if (blockListCache == null) {
+        if (ac == null) {
             updateBlockListCache();
         }
 
-        // 使用緩存的 HashSet 來檢查
-        for (String keyword : blockListCache) {
-            if (aName.contains(keyword)) {
-                return true;
-            }
-        }
-        return false;
+        // 比對
+        List<String> matches = ac.search(aName);
+        return matches.size() > 0;
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {

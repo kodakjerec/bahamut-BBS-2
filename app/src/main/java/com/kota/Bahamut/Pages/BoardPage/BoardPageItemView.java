@@ -195,4 +195,8 @@ public class BoardPageItemView extends LinearLayout {
             _content_view.setVisibility(View.GONE);
         }
     }
+
+    public boolean getVisible() {
+        return _content_view.getVisibility() == View.VISIBLE;
+    }
 }

@@ -967,17 +967,22 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         BoardPageItemView boardPageItemView = (BoardPageItemView) view;
         boardPageItemView.setItem(boardPageItem);
         boardPageItemView.setNumber(item_index);
+
         if (boardPageItem != null && blockListEnable) {
-            if (UserSettings.isBlockListContains(boardPageItem.Author)) {
-                boardPageItemView.setVisible(false);
-            } else if (blockListForTitle && UserSettings.isBlockListContainsFuzzy(boardPageItem.Title)) {
-                boardPageItemView.setVisible(false);
-            } else {
-                boardPageItemView.setVisible(true);
-            }
+                if (UserSettings.isBlockListContains(boardPageItem.Author)) {
+                    boardPageItem.isBlocked = true;
+                } else if (blockListForTitle && UserSettings.isBlockListContainsFuzzy(boardPageItem.Title)) {
+                    boardPageItem.isBlocked = true;
+                } else {
+                    boardPageItem.isBlocked = false;
+                }
+
+                if (boardPageItem.isBlocked)
+                    boardPageItemView.setVisible(false);
         } else {
             boardPageItemView.setVisible(true);
         }
+
         return view;
     }
 
