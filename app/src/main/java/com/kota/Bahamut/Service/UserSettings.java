@@ -9,6 +9,7 @@ import com.kota.Telnet.PropertiesOperator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class UserSettings {
@@ -295,7 +296,7 @@ public class UserSettings {
     public static void resetBlockList() {
         _editor.putString(PROPERTIES_BLOCK_LIST, _blockListDefault).apply();
     }
-    // 更新黑名單
+    // 更新黑名單時同時更新緩存
     public static void setBlockList(List<String> aList) {
         StringBuilder list_string = new StringBuilder();
         if (aList == null || aList.size() == 0) {
@@ -308,25 +309,63 @@ public class UserSettings {
         }
         
         _editor.putString(PROPERTIES_BLOCK_LIST, list_string.toString()).apply();
+        
+        // 更新緩存
+        updateBlockListCache();
     }
 
-    @SuppressLint({"DefaultLocale"})
-    public static boolean isBlockListContains(String aName) {
-        if (aName==null || aName.isEmpty())
-            return false;
-
+    // 更新緩存的輔助方法
+    private static void updateBlockListCache() {
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
         String[] blockStrings = blockListString.split(",");
-
-        boolean containsKeyword = false;
-        for (String keyword : blockStrings) {
-            if (aName.contains(keyword)) {
-                containsKeyword = true;
-                break; // 一旦找到匹配，即可跳出迴圈
+        blockListCache = new HashSet<>();
+        for (String s : blockStrings) {
+            if (!s.isEmpty()) {
+                blockListCache.add(s);
             }
         }
+    }
 
-        return containsKeyword;
+    // 加入黑名單緩存
+    private static HashSet<String> blockListCache = null;
+
+    // 檢查是否在黑名單中, 精確比對
+    @SuppressLint({"DefaultLocale"})
+    public static boolean isBlockListContains(String aName) {
+        if (aName == null || aName.isEmpty())
+            return false;
+
+        // 初始化緩存
+        if (blockListCache == null) {
+            updateBlockListCache();
+        }
+
+        // 使用緩存的 HashSet 來檢查
+        for (String keyword : blockListCache) {
+            if (aName.equals(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    // 模糊比對
+    @SuppressLint({"DefaultLocale"})
+    public static boolean isBlockListContainsFuzzy(String aName) {
+        if (aName == null || aName.isEmpty())
+            return false;
+
+        // 初始化緩存
+        if (blockListCache == null) {
+            updateBlockListCache();
+        }
+
+        // 使用緩存的 HashSet 來檢查
+        for (String keyword : blockListCache) {
+            if (aName.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {
