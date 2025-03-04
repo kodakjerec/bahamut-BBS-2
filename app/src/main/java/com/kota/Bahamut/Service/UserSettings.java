@@ -296,6 +296,7 @@ public class UserSettings {
     // 重置黑名單
     public static void resetBlockList() {
         _editor.putString(PROPERTIES_BLOCK_LIST, _blockListDefault).apply();
+        setBlockList(getBlockList());
     }
     // 更新黑名單時同時更新緩存
     public static void setBlockList(List<String> aList) {
