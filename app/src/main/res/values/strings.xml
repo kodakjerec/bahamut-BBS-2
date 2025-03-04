@@ -77,7 +77,6 @@
     <string name="loading_">讀取中…</string>
     <string name="login">登入</string>
     <string name="logout">登出</string>
-    <string name="mailbox">信箱</string>
     <string name="mark_n">不限定</string>
     <string name="mark_y">限定</string>
     <string name="mark_only">限定有m標記的文章？</string>
@@ -103,11 +102,14 @@
     <string name="post">發表</string>
     <string name="post_to_board">版上</string>
     <string name="post_to_both">兩者皆是</string>
+    <string name="mailbox">信箱</string>
     <string name="post_to_mail">作者信箱</string>
+    <string name="reply_mail">回信</string>
+    <string name="write_mail">寫信</string>
+    <string name="mainbox_no_mail">您沒有信件</string>
     <string name="receiver_">收件人：</string>
     <string name="record">紀錄</string>
     <string name="reply">回覆</string>
-    <string name="reply_mail">回信</string>
     <string name="save_data">記住我的資料</string>
     <string name="_article">文章</string>
     <string name="search_article">搜尋文章</string>
@@ -138,7 +140,6 @@
     <string name="no_assign">未指定</string>
     <string name="word_m">M</string>
     <string name="word_r">R</string>
-    <string name="write_mail">寫信</string>
     <string name="zero_word" />
     <string name="board_name">看板名稱</string>
     <string name="GY_hint">GY</string>
