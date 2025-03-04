@@ -22,6 +22,8 @@ public class AhoCorasick {
         root = new TrieNode();
         // construct the trie
         for (String word : dictionary) {
+            if (word == null || word.isEmpty())
+                continue; // empty strings are not allowed
             insert(word);
         }
         // construct the fail links
@@ -85,6 +87,7 @@ public class AhoCorasick {
             while (temp != root) {
                 if (temp.isEndOfWord) {
                     found.add(temp.word);
+                    return found;
                 }
                 temp = temp.fail;
             }
