@@ -970,7 +970,7 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         if (boardPageItem != null && blockListEnable) {
             if (UserSettings.isBlockListContains(boardPageItem.Author)) {
                 boardPageItemView.setVisible(false);
-            } else if (blockListForTitle && UserSettings.isBlockListContains(boardPageItem.Title)) {
+            } else if (blockListForTitle && UserSettings.isBlockListContainsFuzzy(boardPageItem.Title)) {
                 boardPageItemView.setVisible(false);
             } else {
                 boardPageItemView.setVisible(true);
