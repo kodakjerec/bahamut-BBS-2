@@ -125,11 +125,34 @@ public class BoardMainPage extends TelnetListPage implements DialogSearchArticle
         setListViewSelection(firstIndex);
     };
     /** 下一頁 */
+    private final int[] lastEndIndexes = new int[3]; // 最後頁的結束位置
+    private int endIndexCheckCount = 0; // 結束位置檢查次數
     final View.OnClickListener mNextPageClickListener = view -> {
         int firstIndex = _list_view.getFirstVisiblePosition();
         int endIndex = _list_view.getLastVisiblePosition();
         int moveIndex = Math.abs(endIndex-firstIndex);
         firstIndex += moveIndex;
+
+        if (endIndexCheckCount > 0 && endIndex == lastEndIndexes[endIndexCheckCount - 1]) {
+            lastEndIndexes[endIndexCheckCount] = endIndex;
+            endIndexCheckCount++;
+
+            if (endIndexCheckCount >= 3) {
+                // Reset counter
+                endIndexCheckCount = 0;
+                // Move to last position
+                BoardMainPage.this.setManualLoadPage();
+                BoardMainPage.this.moveToLastPosition();
+                return;
+            }
+        } else {
+            // Reset counter if endIndex changed
+            endIndexCheckCount = 1;
+        }
+
+        // Store current endIndex
+        lastEndIndexes[0] = endIndex;
+
         setListViewSelection(firstIndex);
     };
 
