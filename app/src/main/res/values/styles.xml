@@ -187,6 +187,7 @@
         <item name="android:statusBarColor">@color/transparent</item>
         <item name="android:textColorHint">@android:color/tab_indicator_text</item>
     </style>
+    <style name="MyTheme.WindowOptOutEdgeToEdge"></style>
     <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
