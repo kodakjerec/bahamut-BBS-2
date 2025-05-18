@@ -3,7 +3,6 @@ package com.kota.Bahamut.Dialogs
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Configuration
-import android.text.Editable
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.Log
@@ -33,8 +32,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
-import java.net.URL
-import java.util.Objects
 import java.util.Vector
 
 class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {

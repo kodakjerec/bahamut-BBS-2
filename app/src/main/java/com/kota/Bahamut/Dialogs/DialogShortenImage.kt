@@ -54,7 +54,6 @@ import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Objects
 
 @Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
@@ -160,90 +159,18 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             closeProcessingDialog()
             return@OnClickListener
         }
-        val inputStream = contentResolver.openInputStream(finalUri)
-        BufferedReader(inputStream!!.reader())
-        val buffer = ByteArray(1024)
-        var len: Int
-        while ((inputStream.read(buffer).also { len = it }) !=-1) {
-            byteArrayOutputStream.write(buffer, 0, len)
-        }
-        val byteArray = byteArrayOutputStream.toByteArray()
-        encodedBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-        // error handle
-        if (encodedBase64.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
+        try {
+            val gifyu = GifyuUploader()
+            val credential = gifyu.getCredential()
+            // 本地檔案上傳
+            val result = gifyu.postImage(credential, finalUri.toString(), filename = "", description = "")
+            println(result.toString(2))
+        } catch (e: Exception) {
+            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
+            Log.e("ShortenImage", e.message.toString())
+        } finally {
             closeProcessingDialog()
-            return@OnClickListener
-        }
-        val accessToken = TempSettings.getImgurToken()
-        val albumHash = TempSettings.getImgurAlbum()
-        if (accessToken.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
-            closeProcessingDialog()
-            return@OnClickListener
-        }
-
-        val apiUrl = "https://api.imgur.com/3/image"
-        val client = OkHttpClient()
-        val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-            .addFormDataPart("image", encodedBase64)
-            .addFormDataPart("type", "base64")
-            .addFormDataPart("title", "bahamutBBS Upload " + SimpleDateFormat("yyyy-MM-dd").format(Date()))
-            .addFormDataPart("description", UserSettings.getPropertiesUsername())
-            .build()
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .addHeader("Authorization", "Bearer $accessToken")
-            .post(body)
-            .build()
-        ASRunner.runInNewThread {
-            try {
-                client.newCall(request).execute().use { response ->
-                    val data = response.body!!.string()
-                    val jsonObject = JSONObject(data)
-                    val status = jsonObject.getInt("status")
-                    if (status == 200) {
-                        val link = jsonObject.getJSONObject("data").getString("link")
-                        val imageHash = jsonObject.getJSONObject("data").getString("id")
-                        object : ASRunner() {
-                            override fun run() {
-                                sampleTextView!!.text = link
-                                outputParam = sampleTextView!!.text.toString()
-                                sendButton!!.isEnabled = true
-                                transferButton!!.isEnabled = false
-                                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
-                            }
-                        }.runInMainThread()
-
-                        // 把圖片加進相簿
-                        val apiUrlAlbum = "https://api.imgur.com/3/album/$albumHash/add"
-                        val bodyAlbum: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-                            .addFormDataPart("ids[]", imageHash)
-                            .build()
-                        val requestAlbum: Request = Request.Builder()
-                            .url(apiUrlAlbum)
-                            .addHeader("Authorization", "Bearer $accessToken")
-                            .post(bodyAlbum)
-                            .build()
-                        ASRunner.runInNewThread {
-                            try {
-                                client.newCall(requestAlbum).execute().use { }
-                            } catch (e: Exception) {
-                                Log.e("ShortenImage", e.message.toString())
-                            }
-                        }
-                    } else {
-                        val error = jsonObject.getJSONObject("data").getString("error")
-                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + error)
-                    }
-                }
-            } catch (e: Exception) {
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
-                Log.e("ShortenImage", e.message.toString())
-            } finally {
-                closeProcessingDialog()
-            }
         }
     }
 
