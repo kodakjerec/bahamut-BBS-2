@@ -1,6 +1,5 @@
 package com.kota.Bahamut.Service
 
-import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -16,9 +15,6 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.TempSettings.setImgurAlbum
-import com.kota.Bahamut.Service.TempSettings.setImgurToken
-import okhttp3.Callback
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request

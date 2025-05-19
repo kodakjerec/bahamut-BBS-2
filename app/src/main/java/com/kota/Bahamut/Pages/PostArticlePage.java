@@ -298,7 +298,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
-            getUrlToken();
             Intent intent = new Intent(TempSettings.myActivity, DialogShortenImage.class);
             startActivity(intent);
         } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
@@ -642,33 +641,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         if (_content_field != null) {
             _content_field.getEditableText().insert(_content_field.getSelectionStart(), str);
         }
-    }
-
-    /** 取得imgur token */
-    void getUrlToken() {
-        String apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/";
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(apiUrl)
-                .get()
-                .build();
-        ASRunner.runInNewThread(()->{
-            try{
-                Response response = client.newCall(request).execute();
-                assert response.body() != null;
-                String data = response.body().string();
-                JSONObject jsonObject = new JSONObject(data);
-                String accessToken = jsonObject.getString("accessToken");
-                String albumHash = jsonObject.getString("albumHash");
-                if (!accessToken.isEmpty()) {
-                    TempSettings.setImgurToken(accessToken);
-                    TempSettings.setImgurAlbum(albumHash);
-                }
-            } catch (Exception e) {
-//                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
-                Log.e("ShortenImage", e.getMessage()!=null?e.getMessage():"");
-            }
-        });
     }
 
     /** 設定TelnetArticle, 格式按鈕會使用 */

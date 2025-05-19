@@ -20,8 +20,6 @@ import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.TempSettings
-import com.kota.Bahamut.Service.TempSettings.setImgurAlbum
-import com.kota.Bahamut.Service.TempSettings.setImgurToken
 import com.kota.Bahamut.Service.UserSettings
 import com.kota.Telnet.Reference.TelnetKeyboard
 import com.kota.Telnet.TelnetClient
@@ -151,7 +149,6 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
             R.id.Message_Sub_ShortenImage -> {
                 // 縮圖
-                getUrlToken()
                 val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
                 startActivity(intent)
             }
@@ -277,38 +274,6 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     fun insertString(str: String) {
         contentField.editableText.insert(contentField.selectionStart, str)
     }
-
-    /** 取得imgur token  */
-    private fun getUrlToken() {
-        val checkAccessToken = TempSettings.getImgurToken()
-        val checkAlbumHash = TempSettings.getImgurAlbum()
-        if (checkAccessToken.isNotEmpty() && checkAlbumHash.isNotEmpty())
-            return
-
-        val apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/"
-        val client = OkHttpClient()
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .get()
-            .build()
-        ASRunner.runInNewThread {
-            try {
-                val response = client.newCall(request).execute()
-                assert(response.body != null)
-                val data = response.body!!.string()
-                val jsonObject = JSONObject(data)
-                val accessToken = jsonObject.getString("accessToken")
-                val albumHash = jsonObject.getString("albumHash")
-                if (accessToken.isNotEmpty()) {
-                    setImgurToken(accessToken)
-                    setImgurAlbum(albumHash)
-                }
-            } catch (e: Exception) {
-                Log.e("ShortenImage", e.message.toString())
-            }
-        }
-    }
-
 
     /** 強制發送訊息進入失敗 */
     private var messageAsRunner: ASRunner = object : ASRunner() {

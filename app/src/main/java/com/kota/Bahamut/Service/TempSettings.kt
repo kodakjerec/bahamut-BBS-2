@@ -46,8 +46,6 @@ object TempSettings {
 
     // 比較少用到的變數, 不影響效能
     private var messageSmall: MessageSmall? = null // 聊天小視窗
-    private var imgurAccessToken: String = "" // 上傳 imgur 的 token
-    private var imgurAlbum: String = "" // 上傳 imgur 的 album
     private var heroStepList: MutableList<HeroStep> = mutableListOf()
     private var notReadMessageCount: Int = 0 // 尚未讀取的訊息量
 
@@ -66,23 +64,6 @@ object TempSettings {
     @JvmStatic
     fun isBoardFollowTitle(readTitle: String): Boolean {
         return boardFollowTitle == readTitle
-    }
-
-    @JvmStatic
-    fun getImgurToken(): String {
-        return imgurAccessToken
-    }
-    @JvmStatic
-    fun setImgurToken(token:String) {
-        imgurAccessToken = token
-    }
-    @JvmStatic
-    fun getImgurAlbum(): String {
-        return imgurAlbum
-    }
-    @JvmStatic
-    fun setImgurAlbum(album:String) {
-        imgurAlbum = album
     }
 
     @JvmStatic

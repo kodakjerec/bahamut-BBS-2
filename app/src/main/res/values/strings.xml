@@ -201,7 +201,7 @@
         ． 側邊選單位置(看板)\n
         ． 黑名單、書籤 可排序、修改\n
         ． 發文標題、表情符號 可排序、修改\n
-        ． 發文快捷鍵: 縮網址(reurl)、縮圖(imgur)\n
+        ． 發文快捷鍵: 縮網址(reurl)、縮圖(catbox)\n
         ． 雲端備份\n
         (持續增加中)
         <!--        以下努力中：\n-->
@@ -310,8 +310,7 @@
     <string name="dialog_shorten_image_album">相簿</string>
     <string name="dialog_shorten_image_camera_shot">拍照</string>
     <string name="dialog_shorten_image_camera_video">錄影</string>
-    <string name="dialog_shorten_image_hint">1. 選擇從\"相簿\"選取圖片或影片，或者\"拍照\"\"錄影\"取得圖片或影片\n2. 按鈕\"縮圖\"產生imgur短網址\n3. 按鈕\"送出\"貼到文章內</string>
-    <string name="dialog_shorten_image_error01">取得imgur權限失敗</string>
+    <string name="dialog_shorten_image_hint">1. 選擇從\"相簿\"選取圖片或影片，或者\"拍照\"\"錄影\"取得圖片或影片\n2. 按鈕\"縮圖\"產生catbox短網址\n3. 按鈕\"送出\"貼到文章內</string>
     <string name="dialog_shorten_image_error02">圖片轉檔有問題，無法上傳</string>
     <string name="dialog_shorten_image_error03">上傳失敗</string>
     <string name="dialog_shorten_image_error04">相機開啟有問題</string>
