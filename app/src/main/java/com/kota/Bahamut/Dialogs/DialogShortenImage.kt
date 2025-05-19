@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.View.GONE
@@ -41,21 +40,12 @@ import com.kota.Bahamut.Pages.PostArticlePage
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
-import com.kota.Bahamut.Service.TempSettings
 import com.kota.Bahamut.Service.UserSettings
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-@Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var textView: TextView
@@ -146,8 +136,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
         showProcessingDialog()
 
-        val encodedBase64: String
-        val byteArrayOutputStream = ByteArrayOutputStream()
         var finalUri: Uri? = null
         if (selectedImageUri != null) {
             finalUri = selectedImageUri
@@ -160,17 +148,30 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             return@OnClickListener
         }
 
-        try {
-            val gifyu = GifyuUploader()
-            val credential = gifyu.getCredential()
-            // 本地檔案上傳
-            val result = gifyu.postImage(credential, finalUri.toString(), filename = "", description = "")
-            println(result.toString(2))
-        } catch (e: Exception) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
-            Log.e("ShortenImage", e.message.toString())
-        } finally {
-            closeProcessingDialog()
+        ASRunner.runInNewThread {
+            try {
+                val uploaderObj = UploaderLitterCatBox()
+                // 本地檔案上傳
+                val link = uploaderObj.postImage( finalUri )
+                if (link.startsWith("http")) {
+                    object : ASRunner() {
+                        override fun run() {
+                            sampleTextView!!.text = link
+                            outputParam = sampleTextView!!.text.toString()
+                            sendButton!!.isEnabled = true
+                            transferButton!!.isEnabled = false
+                            UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+                        }
+                    }.runInMainThread()
+                } else {
+                    throw Exception("")
+                }
+            } catch (e: Exception) {
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + e.message)
+                Log.e("ShortenImage", e.message.toString())
+            } finally {
+                closeProcessingDialog()
+            }
         }
     }
 
