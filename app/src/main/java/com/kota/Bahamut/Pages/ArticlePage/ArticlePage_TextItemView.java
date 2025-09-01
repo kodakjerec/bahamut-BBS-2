@@ -244,13 +244,14 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         LinearLayout mainLayout = (LinearLayout) contentView;
 
         int originalIndex = mainLayout.indexOfChild(contentLabel);
-        Linkify.addLinks(contentLabel,  Linkify.WEB_URLS);
-
         if (originalIndex>0) {
             // 使用預覽圖
             if (UserSettings.getLinkAutoShow()) {
-                SpannableString originalString = (SpannableString) contentLabel.getText();
-                URLSpan[] urlSpans = contentLabel.getUrls();
+                String originalText = contentLabel.getText().toString().replace("\n", "");
+                SpannableString originalString = new SpannableString(originalText);
+
+                Linkify.addLinks(originalString,  Linkify.WEB_URLS);
+                URLSpan[] urlSpans = originalString.getSpans(0, originalString.length(), URLSpan.class);
                 if (urlSpans.length>0) {
                     int previousIndex = 0;
                     for (URLSpan urlSpan : urlSpans) {
