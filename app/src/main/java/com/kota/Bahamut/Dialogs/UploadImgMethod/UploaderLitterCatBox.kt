@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Dialogs
+package com.kota.Bahamut.Dialogs.UploadImgMethod
 
 import android.annotation.SuppressLint
 import android.net.Uri

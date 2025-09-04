@@ -2,6 +2,7 @@ package com.kota.Bahamut.Dialogs
 
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -30,10 +31,13 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
+import com.kota.Bahamut.Dialogs.UploadImgMethod.UploaderLitterCatBox
+import com.kota.Bahamut.Dialogs.UploadImgMethod.UploaderPostimageorg
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.Pages.Messages.MessageSub
 import com.kota.Bahamut.Pages.PostArticlePage
@@ -41,6 +45,7 @@ import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.UserSettings
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -148,6 +153,19 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             return@OnClickListener
         }
 
+//        val uploaderObj = UploaderPostimageorg(this)
+//        lifecycleScope.launch {
+//            val link = uploaderObj.postImage(finalUri!!)
+//            // 後續處理 link
+//            if (!link.isEmpty()) {
+//                sampleTextView!!.text = link
+//                outputParam = sampleTextView!!.text.toString()
+//                sendButton!!.isEnabled = true
+//                transferButton!!.isEnabled = false
+//                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+//            }
+//            closeProcessingDialog()
+//        }
         ASRunner.runInNewThread {
             try {
                 val uploaderObj = UploaderLitterCatBox()

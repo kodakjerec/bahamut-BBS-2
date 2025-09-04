@@ -8,6 +8,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -60,7 +61,8 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.article_page_text_item_view, this);
         authorLabel = findViewById(R.id.ArticleTextItemView_Title);
         contentLabel = findViewById(R.id.ArticleTextItemView_content);
         dividerView = findViewById(R.id.ArticleTextItemView_DividerView);
@@ -87,7 +89,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     public void setContent(String content, Vector<TelnetRow> rows) {
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
-            if (myQuote >0) {
+            if (myQuote > 0) {
                 contentLabel.setText(content);
                 stringNewUrlSpan(contentLabel);
             } else {
@@ -117,7 +119,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                 boolean needReplaceTextColor = false;
                 for (int i = 0; i < textColor.length; i++) {
                     if (textColor[i] != paintTextColor) {
-                        if ((i+1)<=ssRawString.length()) {
+                        if ((i + 1) <= ssRawString.length()) {
                             needReplaceTextColor = true;
                         }
                         break;
@@ -149,8 +151,10 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                         // 塗顏色
                         if (!startCatching) {
                             if (paintTextColor != TelnetAnsi.getDefaultTextColor()) {
-                                ForegroundColorSpan colorSpan = new ForegroundColorSpan(TelnetAnsiCode.getTextColor(paintTextColor));
-                                ssRawString.setSpan(colorSpan, startIndex, endIndex+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                ForegroundColorSpan colorSpan = new ForegroundColorSpan(
+                                        TelnetAnsiCode.getTextColor(paintTextColor));
+                                ssRawString.setSpan(colorSpan, startIndex, endIndex + 1,
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
 
                             startIndex = i;
@@ -162,7 +166,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                     }
                 }
                 byte[] backgroundColor = row.getBackgroundColor();
-                startIndex =0;
+                startIndex = 0;
                 endIndex = startIndex;
                 startCatching = false;
                 byte paintBackColor = TelnetAnsi.getDefaultBackgroundColor();
@@ -170,7 +174,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                 boolean needReplaceBackColor = false;
                 for (int i = 0; i < backgroundColor.length; i++) {
                     if (backgroundColor[i] != paintBackColor) {
-                        if ((i+1)<=ssRawString.length()) {
+                        if ((i + 1) <= ssRawString.length()) {
                             needReplaceBackColor = true;
                         }
                         break;
@@ -202,8 +206,10 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                         // 塗顏色
                         if (!startCatching) {
                             if (paintBackColor != TelnetAnsi.getDefaultBackgroundColor()) {
-                                BackgroundColorSpan colorSpan = new BackgroundColorSpan(TelnetAnsiCode.getBackgroundColor(paintBackColor));
-                                ssRawString.setSpan(colorSpan, startIndex, endIndex+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                BackgroundColorSpan colorSpan = new BackgroundColorSpan(
+                                        TelnetAnsiCode.getBackgroundColor(paintBackColor));
+                                ssRawString.setSpan(colorSpan, startIndex, endIndex + 1,
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
 
                             startIndex = i;
@@ -220,13 +226,14 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         return TextUtils.concat(finalString);
     }
 
-    /** 客製化連結另開新視窗
-     *  替換掉 linkify 原本的連結
-     * */
+    /**
+     * 客製化連結另開新視窗
+     * 替換掉 linkify 原本的連結
+     */
     private void stringNewUrlSpan(TextView target) {
-        Linkify.addLinks(target,  Linkify.WEB_URLS);
+        Linkify.addLinks(target, Linkify.WEB_URLS);
         CharSequence text = target.getText();
-        if (text.length()>0) {
+        if (text.length() > 0) {
             SpannableString ss = (SpannableString) target.getText();
             URLSpan[] spans = target.getUrls();
             for (URLSpan span : spans) {
@@ -244,38 +251,40 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         LinearLayout mainLayout = (LinearLayout) contentView;
 
         int originalIndex = mainLayout.indexOfChild(contentLabel);
-        if (originalIndex>0) {
+        if (originalIndex > 0) {
             // 使用預覽圖
             if (UserSettings.getLinkAutoShow()) {
-                String originalText = contentLabel.getText().toString().replace("\n", "");
-                SpannableString originalString = new SpannableString(originalText);
+                // 修正：先處理網址中的 \n
+                String rawText = contentLabel.getText().toString();
+                String fixedText = fixUrlNewlines(rawText);
+                Spannable spannableText = new SpannableString(fixedText);
 
-                Linkify.addLinks(originalString,  Linkify.WEB_URLS);
-                URLSpan[] urlSpans = originalString.getSpans(0, originalString.length(), URLSpan.class);
-                if (urlSpans.length>0) {
+                Linkify.addLinks(spannableText, Linkify.WEB_URLS);
+                URLSpan[] urlSpans = spannableText.getSpans(0, spannableText.length(), URLSpan.class);
+                if (urlSpans.length > 0) {
                     int previousIndex = 0;
                     for (URLSpan urlSpan : urlSpans) {
                         TextView textView1 = new TextView(getContext());
                         TextView textView2 = new TextView(getContext());
 
                         // partA
-                        int urlSpanEnd = originalString.getSpanEnd(urlSpan);
-                        CharSequence partA = originalString.subSequence(previousIndex, urlSpanEnd);
+                        int urlSpanEnd = spannableText.getSpanEnd(urlSpan);
+                        CharSequence partA = spannableText.subSequence(previousIndex, urlSpanEnd);
                         textView1.setText(partA);
 
                         // check error
-                        if (urlSpanEnd + 1 <= originalString.length())
+                        if (urlSpanEnd + 1 <= spannableText.length())
                             urlSpanEnd = urlSpanEnd + 1;
 
                         // partB
-                        CharSequence partB = originalString.subSequence(urlSpanEnd, originalString.length());
+                        CharSequence partB = spannableText.subSequence(urlSpanEnd, spannableText.length());
                         textView2.setText(partB);
 
                         // 移除原本的文字
                         mainLayout.removeViewAt(originalIndex);
                         // 塞入連結前半段文字, 純文字
                         mainLayout.addView(textView1, originalIndex);
-                        String url = urlSpan.getURL();
+                        String url = urlSpan.getURL().replace("\n", "");
                         Thumbnail_ItemView thumbnail = new Thumbnail_ItemView(getContext());
                         thumbnail.loadUrl(url);
                         // 塞入截圖
@@ -316,6 +325,20 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         }
     }
 
+    private String fixUrlNewlines(String text) {
+        // 支援 http/https，允許網址中間出現多個 \n
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
+                "https?://[\\w\\-\\.\\/%\\?=&#\\n]+?\\.html");
+        java.util.regex.Matcher matcher = pattern.matcher(text);
+        StringBuffer sb = new StringBuffer();
+        while (matcher.find()) {
+            String url = matcher.group().replace("\n", "");
+            matcher.appendReplacement(sb, url);
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
+    }
+
     /** 加上右鍵選單 */
     private void addMenuItemSearch(TextView target) {
         int selfDefineId = 100;
@@ -337,8 +360,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
             public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
                 String selectedText = target.getText().toString().substring(
                         target.getSelectionStart(),
-                        target.getSelectionEnd()
-                );
+                        target.getSelectionEnd());
 
                 if (menuItem.getItemId() == selfDefineId) {
                     try {
