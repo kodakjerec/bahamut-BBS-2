@@ -1,0 +1,225 @@
+package com.kota.Bahamut.Pages.Login
+
+import android.annotation.SuppressLint
+import android.app.Dialog
+import android.content.Context
+import android.webkit.JavascriptInterface
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import com.kota.ASFramework.Thread.ASRunner
+import com.kota.Bahamut.Service.UserSettings
+
+class LoginWeb(private val context: Context) {
+    
+    private var currentWebView: WebView? = null
+
+    @SuppressLint("SetJavaScriptEnabled")
+    fun init() {
+        try {
+            // 建立 Dialog 來顯示 WebView
+            val dialog = object : Dialog(context) {
+                override fun dismiss() {
+
+                    // 調用WebView登入（如果需要的話）
+                    object : ASRunner() {
+                        override fun run() {
+                            // 在 dismiss 之前執行清理操作
+                            currentWebView?.let { webView ->
+                                webView.stopLoading()
+                                webView.clearHistory()
+                                webView.clearCache(true)
+                                webView.loadUrl("about:blank")
+                            }
+                        }
+                    }.runInMainThread()
+
+                    // 然後執行原本的 dismiss
+                    super.dismiss()
+                }
+            }
+            
+            // 使用Activity context來創建WebView
+            val webView = WebView(context)
+            currentWebView = webView
+        
+            // WebView設定
+            val webSettings: WebSettings = webView.settings
+            webSettings.javaScriptEnabled = true
+            
+            // 添加 JavaScript 接口
+            webView.addJavascriptInterface(WebAppInterface(dialog), "Android")
+            
+            dialog.setContentView(webView)
+            dialog.setCancelable(true)
+            dialog.setTitle("巴哈姆特登入")
+
+            // 設定Dialog大小
+            val window = dialog.window
+            window?.setLayout(
+                (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
+                (context.resources.displayMetrics.heightPixels * 0.8).toInt()
+            )
+
+            dialog.show()
+
+            // 設定WebViewClient
+            webView.webViewClient = object : WebViewClient() {
+                override fun onPageFinished(view: WebView?, url: String?) {
+                    super.onPageFinished(view, url)
+
+                    // 頁面載入完成後，根據URL執行不同的腳本
+                    when {
+                        url?.contains("login.php") == true -> {
+                            // 在登入頁面，注入登入腳本
+                            injectLoginScript(view)
+                        }
+                        url?.contains("logout.php") == true -> {
+                            // 在登出頁面，注入登出腳本
+                            injectLogoutScript(view)
+                        }
+                        url?.contains("gamer.com.tw") == true -> {
+                            // 在其他巴哈頁面，檢查登入狀態
+                            injectLoginScript(view)
+                        }
+                    }
+                }
+
+                override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+                    return false
+                }
+            }
+
+            // 載入巴哈姆特網站
+            webView.loadUrl("https://user.gamer.com.tw/login.php")
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    
+    private fun injectLoginScript(webView: WebView?) {
+        val script = """
+            javascript:(function() {
+                // 檢查 sessionStorage 是否已經執行過腳本
+                if (sessionStorage.getItem('bahamutLoginScriptExecuted')) {
+                    console.log('登入腳本已經執行過，跳過重複執行');
+                    Android.onLoginSuccess();
+                    return;
+                }
+                
+                // 標記腳本已執行到 sessionStorage
+                sessionStorage.setItem('bahamutLoginScriptExecuted', 'true');
+                console.log('開始注入登入腳本');
+                
+                // 等待元素出現的函數
+                function waitForElement(selector, callback, timeout = 10000) {
+                    var startTime = Date.now();
+                    function check() {
+                        var element = document.querySelector(selector);
+                        if (element) {
+                            callback(element);
+                        } else if (Date.now() - startTime < timeout) {
+                            setTimeout(check, 500);
+                        } else {
+                            console.log('等待元素超時: ' + selector);
+                        }
+                    }
+                    check();
+                }
+                
+                // 設置登入表單
+                function setupLoginForm() {
+                    console.log('開始設置登入表單');
+                    
+                    // 等待用戶名輸入框
+                    waitForElement('input[name="userid"]', function(useridInput) {
+                        console.log('找到用戶名輸入框');
+                        useridInput.value = '${UserSettings.getPropertiesUsername()}';
+                        
+                        // 等待密碼輸入框
+                        waitForElement('input[name="password"]', function(passwordInput) {
+                            console.log('找到密碼輸入框');
+                            passwordInput.value = '${UserSettings.getPropertiesPassword()}';
+                            
+                            // 等待登入按鈕
+                            waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
+                                console.log('自動點擊登入按鈕');
+                                loginButton.click();
+                            });
+                        });
+                    });
+                }
+                
+                // 檢查是否已經在登入頁面
+                var loginForm = document.querySelector('input[name="userid"]');
+                if (loginForm) {
+                    console.log('已經在登入頁面');
+                    setupLoginForm();
+                } else {
+                    console.log('不在登入頁面，跳轉到登出頁面');
+                    // 跳轉到登出頁面
+                    window.location.href = 'https://user.gamer.com.tw/logout.php';
+                }
+            })();
+        """.trimIndent()
+        
+        webView?.evaluateJavascript(script, null)
+    }
+    
+    private fun injectLogoutScript(webView: WebView?) {
+        val script = """
+            javascript:(function() {
+                // 檢查 sessionStorage 是否已經執行過登出腳本
+                if (sessionStorage.getItem('bahamutLogoutScriptExecuted')) {
+                    console.log('登出腳本已經執行過，跳過重複執行');
+                    Android.onLoginSuccess();
+                    return;
+                }
+                
+                // 標記登出腳本已執行到 sessionStorage
+                sessionStorage.setItem('bahamutLogoutScriptExecuted', 'true');
+                console.log('開始注入登出腳本');
+                
+                // 等待元素出現的函數
+                function waitForElement(selector, callback, timeout = 10000) {
+                    var startTime = Date.now();
+                    function check() {
+                        var element = document.querySelector(selector);
+                        if (element) {
+                            callback(element);
+                        } else if (Date.now() - startTime < timeout) {
+                            setTimeout(check, 500);
+                        } else {
+                            console.log('等待元素超時: ' + selector);
+                        }
+                    }
+                    check();
+                }
+                
+                // 等待並點擊登出確定按鈕
+                waitForElement('button.btn.btn--primary[onclick="logout();"]', function(logoutButton) {
+                    console.log('找到登出確定按鈕，點擊登出');
+                    logoutButton.click();
+                    
+                    setTimeout(()=>{
+                    Android.onLoginSuccess();
+                    }, 3000);
+                });
+            })();
+        """.trimIndent()
+        
+        webView?.evaluateJavascript(script, null)
+    }
+    
+    // JavaScript接口類
+    inner class WebAppInterface(
+        private val dialog: Dialog
+    ) {
+        @JavascriptInterface
+        fun onLoginSuccess() {
+            println("執行完畢！")
+
+            dialog.dismiss()
+        }
+    }
+}

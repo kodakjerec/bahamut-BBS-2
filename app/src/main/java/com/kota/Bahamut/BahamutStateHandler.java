@@ -21,7 +21,7 @@ import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
 import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
-import com.kota.Bahamut.Pages.LoginPage;
+import com.kota.Bahamut.Pages.Login.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MailPage;
 import com.kota.Bahamut.Pages.MainPage;

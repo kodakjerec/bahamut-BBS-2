@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Pages;
+package com.kota.Bahamut.Pages.Login;
 
 import android.os.Build;
 import android.util.Log;
@@ -280,6 +280,14 @@ public class LoginPage extends TelnetPage {
     }
 
     public void onLoginSuccess() {
+        // 調用WebView登入（如果需要的話）
+        new ASRunner() {
+            public void run() {
+                LoginWeb example = new LoginWeb(getContext());
+                example.init();
+            }
+        }.runInMainThread();
+        
         // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();

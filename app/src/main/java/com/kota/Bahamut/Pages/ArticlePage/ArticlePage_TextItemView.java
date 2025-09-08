@@ -326,17 +326,65 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     }
 
     private String fixUrlNewlines(String text) {
-        // 支援 http/https，允許網址中間出現多個 \n
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
-                "https?://[\\w\\-\\.\\/%\\?=&#\\n]+?\\.html");
-        java.util.regex.Matcher matcher = pattern.matcher(text);
-        StringBuffer sb = new StringBuffer();
-        while (matcher.find()) {
-            String url = matcher.group().replace("\n", "");
-            matcher.appendReplacement(sb, url);
+        StringBuilder result = new StringBuilder();
+        String[] lines = text.split("\n");
+        StringBuilder urlBuffer = new StringBuilder();
+        boolean inUrl = false;
+
+        for (String line : lines) {
+            if (inUrl) {
+                if (line.length() < 78 ) {
+                    urlBuffer.append(line);
+                    result.append(urlBuffer).append("\n");
+                    urlBuffer.setLength(0);
+                    inUrl = false;
+                } else {
+                    urlBuffer.append(line);
+                }
+            } else {
+                if ( line.contains("http://") || line.contains("https://") ) {
+                    inUrl = true;
+                    // 如果是以 http/https 開頭，直接加入 urlBuffer
+                    if (line.startsWith("http://") || line.startsWith("https://")) {
+                        urlBuffer.append(line);
+                        if (line.length() < 78 ) {
+                            result.append(urlBuffer).append("\n");
+                            urlBuffer.setLength(0);
+                            inUrl = false;
+                        }
+                    } else {
+                        // 如果是在中間，先將前面部分加入 result，再從 http/https 開始加入 urlBuffer
+                        int httpIndex = line.indexOf("http://");
+                        int httpsIndex = line.indexOf("https://");
+                        int urlStartIndex = -1;
+                        
+                        if (httpIndex != -1 && httpsIndex != -1) {
+                            urlStartIndex = Math.min(httpIndex, httpsIndex);
+                        } else if (httpIndex != -1) {
+                            urlStartIndex = httpIndex;
+                        } else if (httpsIndex != -1) {
+                            urlStartIndex = httpsIndex;
+                        }
+                        
+                        if (urlStartIndex > 0) {
+                            result.append(line.substring(0, urlStartIndex)).append("\n");
+                            urlBuffer.append(line.substring(urlStartIndex));
+                        } else {
+                            urlBuffer.append(line);
+                        }
+                    }
+                } else {
+                    result.append(line).append("\n");
+                }
+            }
         }
-        matcher.appendTail(sb);
-        return sb.toString();
+
+        // 如果循環結束時，urlBuffer中還有內容，表示最後一個URL沒有達到78字符或明確結束
+        if (urlBuffer.length() > 0) {
+            result.append(urlBuffer).append("\n");
+        }
+
+        return result.toString();
     }
 
     /** 加上右鍵選單 */
