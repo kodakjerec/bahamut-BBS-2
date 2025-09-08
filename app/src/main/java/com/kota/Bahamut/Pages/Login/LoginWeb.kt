@@ -46,7 +46,21 @@ class LoginWeb(private val context: Context) {
             // WebView設定
             val webSettings: WebSettings = webView.settings
             webSettings.javaScriptEnabled = true
-            
+
+            // 禁用圖片載入
+            webSettings.loadsImagesAutomatically = false
+            webSettings.blockNetworkImage = true
+                        
+            // 禁用影片和媒體自動播放
+            webSettings.mediaPlaybackRequiresUserGesture = true
+
+            // 禁用不必要的功能來提升載入速度
+            webSettings.builtInZoomControls = false
+            webSettings.displayZoomControls = false
+            webSettings.allowFileAccess = false  // 禁用檔案存取
+            webSettings.allowContentAccess = false  // 禁用內容存取
+            webSettings.domStorageEnabled = true  // 保留DOM存儲（登入可能需要）
+
             // 添加 JavaScript 接口
             webView.addJavascriptInterface(WebAppInterface(dialog), "Android")
             
