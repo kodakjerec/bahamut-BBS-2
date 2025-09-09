@@ -287,7 +287,7 @@ public class LoginPage extends TelnetPage {
                 example.init();
             }
         }.runInMainThread();
-        
+
         // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);
         saveLogonUserToProperties();

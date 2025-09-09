@@ -170,9 +170,41 @@ class LoginWeb(private val context: Context) {
                     console.log('已經在登入頁面');
                     setupLoginForm();
                 } else {
-                    console.log('不在登入頁面，跳轉到登出頁面');
-                    // 跳轉到登出頁面
-                    window.location.href = 'https://user.gamer.com.tw/logout.php';
+                    console.log('不在登入頁面，5秒後跳轉到登出頁面');
+                    
+                    console.log('開始檢測簽到對話框...');
+                    
+                    Signin.mobile();
+
+                    var startTime = Date.now();
+                    var timeout = 5000; // 5秒超時
+                    
+                    function checkDialog() {
+                        var signDialog = document.querySelector('dialog#dialogify_1.dialogify.fixed.popup-dailybox');
+                        if (signDialog) {
+                            console.log('找到簽到對話框，呼叫 signSuccess，跳轉登出');
+                            Android.signSuccess();
+                            setTimeout(()=>{
+                                window.location.href = 'https://user.gamer.com.tw/logout.php';
+                            }, 3000);
+                            return;
+                        }
+                        
+                        // 檢查是否超時
+                        if (Date.now() - startTime >= timeout) {
+                            console.log('5秒內未找到簽到對話框，跳轉登出');
+                            // 跳轉到登出頁面
+                            setTimeout(()=>{
+                                window.location.href = 'https://user.gamer.com.tw/logout.php';
+                            }, 3000);
+                            return;
+                        }
+                        
+                        // 繼續檢查
+                        setTimeout(checkDialog, 500);
+                    }
+                    
+                    checkDialog();
                 }
             })();
         """.trimIndent()
@@ -234,6 +266,11 @@ class LoginWeb(private val context: Context) {
             println("執行完畢！")
 
             dialog.dismiss()
+        }
+
+        @JavascriptInterface
+        fun signSuccess() {
+            println("檢測到簽到對話框！")
         }
     }
 }
