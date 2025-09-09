@@ -2,6 +2,7 @@ package com.kota.Telnet;
 
 import android.util.Log;
 import com.kota.ASFramework.PageController.ASDeviceController;
+import com.kota.Bahamut.Service.NotificationSettings;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -109,6 +110,17 @@ public class TelnetConnector implements TelnetChannelListener {
     }
 
     public void connect(String serverIp, int serverPort) {
+        // 使用設定中的連線方式
+        String connectMethod = NotificationSettings.getConnectMethod();
+        if ("webSocket".equals(connectMethod)) {
+            connectWebSocket(serverIp, serverPort);
+        } else {
+            connectTelnet(serverIp, serverPort);
+        }
+    }
+
+    // 原本的 Telnet 連線方法
+    private void connectTelnet(String serverIp, int serverPort) {
         if (isConnecting()) {
             close();
         }
@@ -123,7 +135,7 @@ public class TelnetConnector implements TelnetChannelListener {
         }
         this._is_connecting = false;
         try {
-            System.out.println("Connect to " + serverIp + ":" + serverPort);
+            System.out.println("Connect to Telnet " + serverIp + ":" + serverPort);
             this._socket_channel = new TelnetDefaultSocketChannel(serverIp, serverPort);
             synchronized (this) {
                 this._channel[0] = new TelnetChannel(this._socket_channel);
@@ -135,7 +147,7 @@ public class TelnetConnector implements TelnetChannelListener {
             // 初始化最後發送時間
             this._last_send_data_time = System.currentTimeMillis();
         } catch (IOException e) {
-            Log.e("TelnetConnector", "Connection failed: " + e.getMessage());
+            Log.e("TelnetConnector", "Telnet connection failed: " + e.getMessage());
             // 連線失敗時釋放鎖定
             if (this._device_controller != null) {
                 this._device_controller.unlockWifi();
@@ -148,7 +160,56 @@ public class TelnetConnector implements TelnetChannelListener {
             }
             this._holder_thread = new HolderThread();
             this._holder_thread.start();
-            Log.d("TelnetConnector", "Connection established, HolderThread started");
+            Log.d("TelnetConnector", "Telnet connection established, HolderThread started");
+        } else if (this._listener != null) {
+            this._listener.onTelnetConnectorConnectFail(this);
+        }
+    }
+
+    // 新的 WebSocket 連線方法
+    private void connectWebSocket(String serverIp, int serverPort) {
+        if (isConnecting()) {
+            close();
+        }
+        
+        // 連線前先鎖定 WiFi 和 CPU
+        if (this._device_controller != null) {
+            this._device_controller.lockWifi();
+        }
+        
+        if (this._listener != null) {
+            this._listener.onTelnetConnectorConnectStart(this);
+        }
+        this._is_connecting = false;
+        try {
+            // 構建 WebSocket URL - 使用巴哈姆特的實際 WebSocket 端點
+            String wsUrl = "wss://term.gamer.com.tw/bbs";
+            System.out.println("Connect to WebSocket " + wsUrl);
+            this._socket_channel = new TelnetWebSocketChannel(wsUrl);
+            synchronized (this) {
+                this._channel[0] = new TelnetChannel(this._socket_channel);
+                this._channel[0].setListener(this);
+                this._channel[1] = new TelnetChannel(this._socket_channel);
+                this._channel[1].setListener(this);
+            }
+            this._is_connecting = true;
+            // 初始化最後發送時間
+            this._last_send_data_time = System.currentTimeMillis();
+        } catch (IOException e) {
+            Log.e("TelnetConnector", "WebSocket connection failed: " + e.getMessage());
+            // 連線失敗時釋放鎖定
+            if (this._device_controller != null) {
+                this._device_controller.unlockWifi();
+            }
+            clear();
+        }
+        if (this._is_connecting) {
+            if (this._listener != null) {
+                this._listener.onTelnetConnectorConnectSuccess(this);
+            }
+            this._holder_thread = new HolderThread();
+            this._holder_thread.start();
+            Log.d("TelnetConnector", "WebSocket connection established, HolderThread started");
         } else if (this._listener != null) {
             this._listener.onTelnetConnectorConnectFail(this);
         }
