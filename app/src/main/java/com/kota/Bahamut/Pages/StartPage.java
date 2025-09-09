@@ -9,9 +9,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-
 import androidx.core.content.pm.PackageInfoCompat;
-
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
@@ -50,16 +48,6 @@ public class StartPage extends TelnetPage {
     };
     /** 避難所 */
 
-
-    /** 切換IP */
-    RadioGroup.OnCheckedChangeListener radioGroupCheckedChangeListener = new RadioGroup.OnCheckedChangeListener() {
-        @Override
-        public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-            RadioButton rb = (RadioButton) findViewById(checkedId);
-            NotificationSettings.setConnectIpAddress(rb.getText().toString());
-        }
-    };
-
     public int getPageLayout() {
         return R.layout.start_page;
     }
@@ -92,7 +80,27 @@ public class StartPage extends TelnetPage {
         } else {
             radioButton2.setChecked(true);
         }
-        radioGroup.setOnCheckedChangeListener(radioGroupCheckedChangeListener);
+        radioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton rb = (RadioButton) findViewById(checkedId);
+            NotificationSettings.setConnectIpAddress(rb.getText().toString());
+        });
+
+        // 連線方式
+        RadioGroup connectMethodGroup = (RadioGroup) findViewById(R.id.radioButtonConnectMethod);
+        RadioButton connectMethodButton1 = (RadioButton) findViewById(R.id.radioButtonConnectMethod1);
+        RadioButton connectMethodButton2 = (RadioButton) findViewById(R.id.radioButtonConnectMethod2);
+
+        String connectMethod = NotificationSettings.getConnectMethod();
+        assert connectMethod != null;
+        if (connectMethod.equals(connectMethodButton1.getText().toString())) {
+            connectMethodButton1.setChecked(true);
+        } else {
+            connectMethodButton2.setChecked(true);
+        }
+        connectMethodGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            RadioButton rb = (RadioButton) findViewById(checkedId);
+            NotificationSettings.setConnectMethod(rb.getText().toString());
+        });
 
         PackageInfo packageInfo;
         try {

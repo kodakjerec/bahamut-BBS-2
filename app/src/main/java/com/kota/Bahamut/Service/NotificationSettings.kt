@@ -16,6 +16,7 @@ object NotificationSettings {
     private const val propertiesShowCloudSave: String = "show_cloud_save" // 第一次詢問雲端備份, false-未使用 true-已問過
     private const val propertiesCloudSave: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
     private const val connectIpAddress = "connectIpAddress" // 連線IP
+    private const val connectMethod = "connectMethod" // 連線方式
     private const val showHeroStep = "showHeroStep" // 顯示勇者足跡
     private const val notAlarmIgnoreBatteryOptimizations = "notAlarmIgnoreBatteryOptimizations" // 跳出掛網提醒視窗
     private const val showMessageFloating = "showMessageFloating" // 顯示訊息浮動按紐
@@ -99,6 +100,15 @@ object NotificationSettings {
         return perf!!.getString(connectIpAddress, "bbs.gamer.com.tw")
     }
 
+    @JvmStatic
+    fun setConnectMethod(method: String) {
+        perf!!.edit().putString(connectMethod, method).apply()
+    }
+
+    @JvmStatic
+    fun getConnectMethod(): String? {
+        return perf!!.getString(connectMethod, "telnet")
+    }
     @JvmStatic
     fun setShowHeroStep(show: Boolean) {
         perf!!.edit().putBoolean(showHeroStep, show).apply()

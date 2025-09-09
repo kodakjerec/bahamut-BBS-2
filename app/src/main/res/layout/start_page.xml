@@ -65,7 +65,6 @@
                 android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
                 android:gravity="center_horizontal"
                 android:text="@string/start_connect_ip" />
 
@@ -95,13 +94,47 @@
 
             <com.kota.TelnetUI.TextView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
-                android:textColor="@android:color/white"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:text="@string/start_connect_method"
+                android:textColor="@android:color/white" />
+
+            <RadioGroup
+                android:id="@+id/radioButtonConnectMethod"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <RadioButton
+                    android:id="@+id/radioButtonConnectMethod1"
+                    style="@style/SystemSettingsCheckbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/start_connect_method1"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonConnectMethod2"
+                    style="@style/SystemSettingsCheckbox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/start_connect_method2"
+                    android:textColor="@android:color/white"
+                    android:textSize="24dp" />
+
+            </RadioGroup>
+
+            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                style="@style/TextViewSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_horizontal"
-                android:text="@string/start_vault" />
+                android:text="@string/start_vault"
+                android:textColor="@android:color/white" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
