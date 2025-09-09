@@ -2,6 +2,8 @@ package com.kota.Bahamut.Pages.Login
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -14,10 +16,15 @@ class LoginWeb(private val context: Context) {
     private var currentWebView: WebView? = null
     private var onLogoutCompleteCallback: (() -> Unit)? = null
     private var onSignDetectedCallback: (() -> Unit)? = null
+    private var timeoutHandler: Handler? = null
+    private var timeoutRunnable: Runnable? = null
     @SuppressLint("SetJavaScriptEnabled")
     fun init(onLogoutComplete: (() -> Unit)? = null, onSignDetected: (() -> Unit)? = null) {
         this.onLogoutCompleteCallback = onLogoutComplete
         this.onSignDetectedCallback = onSignDetected
+        
+        // 設定 20 秒後自動清理
+        setupTimeout()
         
         try {
             // 直接創建WebView，不使用Dialog
@@ -154,7 +161,7 @@ class LoginWeb(private val context: Context) {
                             Android.signSuccess();
                             setTimeout(()=>{
                                 window.location.href = 'https://user.gamer.com.tw/logout.php';
-                            }, 3000);
+                            }, 1000);
                             return;
                         }
                         
@@ -164,7 +171,7 @@ class LoginWeb(private val context: Context) {
                             // 跳轉到登出頁面
                             setTimeout(()=>{
                                 window.location.href = 'https://user.gamer.com.tw/logout.php';
-                            }, 3000);
+                            }, 1000);
                             return;
                         }
                         
@@ -217,7 +224,7 @@ class LoginWeb(private val context: Context) {
                     
                     setTimeout(()=>{
                     Android.onLogoutSuccess();
-                    }, 3000);
+                    }, 1000);
                 });
             })();
         """.trimIndent()
@@ -225,8 +232,30 @@ class LoginWeb(private val context: Context) {
         webView?.evaluateJavascript(script, null)
     }
     
+    // 設定 20 秒後自動清理
+    private fun setupTimeout() {
+        timeoutHandler = Handler(Looper.getMainLooper())
+        timeoutRunnable = Runnable {
+            println("WebView 登入 20 秒超時，自動清理")
+            cleanup()
+        }
+        timeoutHandler?.postDelayed(timeoutRunnable!!, 20000) // 20 秒 = 20000 毫秒
+    }
+    
+    // 取消計時器
+    private fun cancelTimeout() {
+        timeoutRunnable?.let { runnable ->
+            timeoutHandler?.removeCallbacks(runnable)
+        }
+        timeoutHandler = null
+        timeoutRunnable = null
+    }
+    
     // 清理WebView資源
     fun cleanup() {
+        // 先取消計時器
+        cancelTimeout()
+        
         object : ASRunner() {
             override fun run() {
                 currentWebView?.let { webView ->
