@@ -44,7 +44,8 @@
                 android:layout_height="40dp"
                 android:gravity="top"
                 android:layout_gravity="center"
-                android:id="@+id/BlockWebSignIn">
+                android:id="@+id/BlockWebSignIn"
+                android:visibility="gone">
                 <CheckBox
                     android:id="@+id/LoginWebSignInCheckBox"
                     style="@style/CheckboxBahamut" />

@@ -6,6 +6,7 @@ import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
+import android.os.Build;
 import android.util.Log;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
@@ -179,7 +180,11 @@ public class BahamutController extends ASNavigationController implements TelnetC
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
         Intent intent = new Intent(this, BahaBBSBackgroundService.class);
-        startService(intent);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(intent);
+        } else {
+            startService(intent);
+        }
     }
 
     @Override // com.kota.Telnet.TelnetClientListener

@@ -194,7 +194,7 @@
     <string name="billing_page_note">
         開發者需要鼓勵，才能持續維護。\n
         付費版獨享功能：\n
-        ． 自動登入洽特\n
+        ． 自動登入洽特, 自動簽到Web\n
         ． 滑動手勢關閉(看板和閱讀文章)\n
         ． 工具列左移/右移(看板和閱讀文章)\n
         ． 浮動工具列\n
@@ -402,5 +402,9 @@
     <string name="board_main_unread_all">全部未讀</string>
     <string name="board_main_read_all_msg01">全部已讀，請重新進入看板</string>
     <string name="board_main_unread_all_msg01">全部未讀，請重新進入看板</string>
-    <string name="login_web_sign_in">web自動簽到</string>
+    <string name="login_web_sign_in">Web自動簽到</string>
+    <string name="login_web_sign_in_msg01">Web登入 開始</string>
+    <string name="login_web_sign_in_msg02">Web登出 完畢!</string>
+    <string name="login_web_sign_in_msg03">Web簽到 完成!</string>
+    <string name="login_web_sign_in_msg04">Web登入 失敗</string>
 </resources>

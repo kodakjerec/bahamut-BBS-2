@@ -1,11 +1,14 @@
 package com.kota.Bahamut.Pages.Login;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
@@ -99,7 +102,11 @@ public class LoginPage extends TelnetPage {
         // 讀取預設勇者設定
         loadLogonUser();
 
-        System.out.println("current  version:" + Build.VERSION.SDK_INT);
+        // VIP
+        if (UserSettings.getPropertiesVIP()) {
+            RelativeLayout blockWebSignIn = (RelativeLayout) findViewById(R.id.BlockWebSignIn);
+            blockWebSignIn.setVisibility(View.VISIBLE);
+        }
 
         // 替換外觀
         LinearLayout mainLayout = (LinearLayout) findViewById(R.id.toolbar);
@@ -332,20 +339,20 @@ public class LoginPage extends TelnetPage {
                 public void run() {
                     try {
                         LoginWeb loginWeb = new LoginWeb(getContext());
-                        ASToast.showShortToast("Web登入 開始");
+                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
                         loginWeb.init(
                                 () -> {
                                     // 登入完成後的處理
-                                    ASToast.showShortToast("Web登出 完畢!");
+                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg02));
                                     return null;
                                 },
                                 () -> {
                                     // 檢測到簽到對話框的處理
-                                    ASToast.showShortToast("Web簽到 完成!");
+                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg03));
                                     return null;
                                 });
                     } catch (Exception e) {
-                        ASToast.showShortToast("Web登入 失敗");
+                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04));
                         Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
                     }
                 }
