@@ -402,4 +402,5 @@
     <string name="board_main_unread_all">全部未讀</string>
     <string name="board_main_read_all_msg01">全部已讀，請重新進入看板</string>
     <string name="board_main_unread_all_msg01">全部未讀，請重新進入看板</string>
+    <string name="login_web_sign_in">web自動簽到</string>
 </resources>

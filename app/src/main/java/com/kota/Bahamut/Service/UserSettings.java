@@ -42,6 +42,7 @@ public class UserSettings {
     static final String PROPERTIES_ARTICLE_HEADS = "ArticleHeaders"; // 文章標題清單
     static final String PROPERTIES_ARTICLE_EXPRESSIONS = "ArticleExpressions"; // 表情符號清單
     static final String PROPERTIES_SHORT_URL_NON_ID = "ShortUrlNonId"; // 短網址,開啟去識別化
+    static final String PROPERTIES_WEB_SIGN_IN = "WebSignIn"; // 開啟網頁登入
 
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
@@ -96,6 +97,7 @@ public class UserSettings {
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
                 int varNoVipShortenTimes = prep.getPropertiesInteger(noVipShortenTimes);
+                int webSignIn = prep.getPropertiesInteger(PROPERTIES_WEB_SIGN_IN);
 
                 _editor.putString(PROPERTIES_USERNAME, username);
                 _editor.putString(PROPERTIES_PASSWORD, password);
@@ -123,6 +125,7 @@ public class UserSettings {
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
                 _editor.putInt(noVipShortenTimes, varNoVipShortenTimes);
+                _editor.putInt(PROPERTIES_WEB_SIGN_IN, webSignIn);
                 _editor.putInt("upgrade", 1);
                 _editor.commit();
             }
@@ -464,5 +467,12 @@ public class UserSettings {
     }
     public static boolean getShortUrlNonId() {
         return _sharedPref.getBoolean(PROPERTIES_SHORT_URL_NON_ID, true);
+    }
+
+    public static void setPropertiesWebSignIn(boolean enable) {
+        _editor.putBoolean(PROPERTIES_WEB_SIGN_IN, enable).apply();
+    }
+    public static boolean getPropertiesWebSignIn() {
+        return _sharedPref.getBoolean(PROPERTIES_WEB_SIGN_IN, false);
     }
 }
