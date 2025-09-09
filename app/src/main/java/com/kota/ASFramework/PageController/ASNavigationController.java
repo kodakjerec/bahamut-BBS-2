@@ -509,8 +509,10 @@ public class ASNavigationController extends Activity {
   @Override // android.app.Activity
   public void finish() {
     onControllerWillFinish();
-    getDeviceController().unlockWifi();
-    getDeviceController().unlockWake();
+    // 改善設備控制器的清理
+    if (_device_controller != null) {
+      _device_controller.cleanup();
+    }
     super.finish();
   }
 
@@ -526,12 +528,22 @@ public class ASNavigationController extends Activity {
   protected void onPause() {
     super.onPause();
     this._in_background = true;
+    // 當應用進入背景時，確保連線保持
+    // 這裡不釋放 WiFi 和 CPU lock，讓 telnet 連線保持
   }
 
   @Override // android.app.Activity
   protected void onResume() {
     super.onResume();
     this._in_background = false;
+    // 當應用恢復前景時，檢查網路狀態
+    if (_device_controller != null) {
+      int networkType = _device_controller.isNetworkAvailable();
+      if (networkType == -1) {
+        // 網路已斷開，可能需要重連
+        System.out.println("Network disconnected while in background");
+      }
+    }
   }
 
   public boolean isInBackground() {

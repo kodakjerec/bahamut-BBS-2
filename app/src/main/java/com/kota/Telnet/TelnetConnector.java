@@ -1,6 +1,7 @@
 package com.kota.Telnet;
 
 import android.util.Log;
+import com.kota.ASFramework.PageController.ASDeviceController;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -12,6 +13,8 @@ public class TelnetConnector implements TelnetChannelListener {
     private long _last_send_data_time = 0;
     private TelnetConnectorListener _listener = null;
     private TelnetSocketChannel _socket_channel = null;
+    // 添加設備控制器引用
+    private ASDeviceController _device_controller = null;
 
     public void clear() {
         synchronized (this) {
@@ -34,6 +37,11 @@ public class TelnetConnector implements TelnetChannelListener {
         this._last_send_data_time = 0;
     }
 
+    // 添加設備控制器設定方法
+    public void setDeviceController(ASDeviceController deviceController) {
+        this._device_controller = deviceController;
+    }
+
     /* 防呆,掛網 */
     private class HolderThread extends Thread {
         private boolean _run;
@@ -44,6 +52,8 @@ public class TelnetConnector implements TelnetChannelListener {
 
         public void close() {
             this._run = false;
+            // 添加中斷執行緒處理
+            this.interrupt();
         }
 
         public void run() {
@@ -52,25 +62,62 @@ public class TelnetConnector implements TelnetChannelListener {
                     sleep(30 * 1000);
                 } catch (InterruptedException e) {
                     Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
+                    // 如果被中斷且不應該繼續運行，則退出
+                    if (!this._run) {
+                        break;
+                    }
                 }
-                if (System.currentTimeMillis() - TelnetConnector.this._last_send_data_time > 150 * 1000) {
+                
+                // 檢查連線狀態
+                if (!TelnetConnector.this._is_connecting) {
+                    Log.w("TelnetConnector", "Connection lost, breaking holder thread");
+                    break;
+                }
+                
+                // 檢查網路連線狀態
+                if (!TelnetConnector.this.checkNetworkConnectivity()) {
+                    Log.w("TelnetConnector", "Network connectivity lost");
+                    // 網路斷開時不立即斷線，給網路恢復的時間
+                    continue;
+                }
+                
+                // 增強的 keep-alive 檢查
+                long currentTime = System.currentTimeMillis();
+                if (currentTime - TelnetConnector.this._last_send_data_time > 150 * 1000) {
+                    Log.d("TelnetConnector", "Sending keep-alive message");
                     TelnetConnector.this.sendHoldMessage();
                 }
+                
+                // 添加連線健康檢查
+                if (currentTime - TelnetConnector.this._last_send_data_time > 300 * 1000) {
+                    Log.w("TelnetConnector", "No data for 5 minutes, checking connection health");
+                    if (!TelnetConnector.this.isConnectionHealthy()) {
+                        Log.e("TelnetConnector", "Connection appears to be unhealthy");
+                        // 可以在這裡添加更積極的連線檢查或重連機制
+                    }
+                }
             }
+            Log.d("TelnetConnector", "HolderThread terminated");
         }
     }
 
-    protected void finalize() throws Throwable {
+    // 移除已廢棄的 finalize 方法，改用 cleanup 方法
+    public void cleanup() {
         if (isConnecting()) {
             close();
         }
-        super.finalize();
     }
 
     public void connect(String serverIp, int serverPort) {
         if (isConnecting()) {
             close();
         }
+        
+        // 連線前先鎖定 WiFi 和 CPU
+        if (this._device_controller != null) {
+            this._device_controller.lockWifi();
+        }
+        
         if (this._listener != null) {
             this._listener.onTelnetConnectorConnectStart(this);
         }
@@ -85,8 +132,14 @@ public class TelnetConnector implements TelnetChannelListener {
                 this._channel[1].setListener(this);
             }
             this._is_connecting = true;
+            // 初始化最後發送時間
+            this._last_send_data_time = System.currentTimeMillis();
         } catch (IOException e) {
-            Log.v("SocketChannel", "Connection Fail");
+            Log.e("TelnetConnector", "Connection failed: " + e.getMessage());
+            // 連線失敗時釋放鎖定
+            if (this._device_controller != null) {
+                this._device_controller.unlockWifi();
+            }
             clear();
         }
         if (this._is_connecting) {
@@ -95,12 +148,17 @@ public class TelnetConnector implements TelnetChannelListener {
             }
             this._holder_thread = new HolderThread();
             this._holder_thread.start();
+            Log.d("TelnetConnector", "Connection established, HolderThread started");
         } else if (this._listener != null) {
             this._listener.onTelnetConnectorConnectFail(this);
         }
     }
 
     public void close() {
+        // 關閉連線時釋放鎖定
+        if (this._device_controller != null) {
+            this._device_controller.unlockWifi();
+        }
         clear();
         if (this._listener != null) {
             this._listener.onTelnetConnectorClosed(this);
@@ -195,15 +253,43 @@ public class TelnetConnector implements TelnetChannelListener {
     }
 
     private void sendHoldMessage() {
-        TelnetOutputBuilder.create()
-                .pushData((byte) 0)
-//                .pushData((byte) 27)
-//                .pushData((byte) 91)
-//                .pushData((byte) 65)
-//                .pushData((byte) 27)
-//                .pushData((byte) 91)
-//                .pushData((byte) 66)
-                .sendToServer();
+        try {
+            TelnetOutputBuilder.create()
+                    .pushData((byte) 0)
+    //                .pushData((byte) 27)
+    //                .pushData((byte) 91)
+    //                .pushData((byte) 65)
+    //                .pushData((byte) 27)
+    //                .pushData((byte) 91)
+    //                .pushData((byte) 66)
+                    .sendToServer();
+            
+            // 更新最後發送時間
+            this._last_send_data_time = System.currentTimeMillis();
+            Log.d("TelnetConnector", "Keep-alive message sent");
+        } catch (Exception e) {
+            Log.e("TelnetConnector", "Failed to send keep-alive message: " + e.getMessage());
+            // 如果發送失敗，可能連線已斷開
+            if (this._listener != null) {
+                // 這裡可以觸發重連機制
+            }
+        }
+    }
+
+    // 添加連線狀態檢查方法
+    public boolean isConnectionHealthy() {
+        return this._is_connecting && 
+               this._socket_channel != null && 
+               (System.currentTimeMillis() - this._last_send_data_time < 300 * 1000);
+    }
+
+    // 添加網路連線檢查方法
+    public boolean checkNetworkConnectivity() {
+        if (this._device_controller != null) {
+            int networkType = this._device_controller.isNetworkAvailable();
+            return networkType != -1;
+        }
+        return true; // 如果沒有設備控制器，假設網路正常
     }
 
     public void setListener(TelnetConnectorListener aListener) {

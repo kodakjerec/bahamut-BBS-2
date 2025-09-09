@@ -64,6 +64,10 @@ public class BahamutController extends ASNavigationController implements TelnetC
         // 系統架構
         TelnetClient.construct(BahamutStateHandler.getInstance());
         TelnetClient.getClient().setListener(this);
+        
+        // 設定 TelnetConnector 的設備控制器
+        TelnetClient.getConnector().setDeviceController(getDeviceController());
+        
         PageContainer.constructInstance();
 
         // UserSettings
@@ -112,6 +116,11 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
         // 強制關閉連線
         TelnetClient.getClient().close();
+        
+        // 清理 TelnetConnector 的設備控制器引用
+        if (TelnetClient.getConnector() != null) {
+            TelnetClient.getConnector().setDeviceController(null);
+        }
 
         super.onDestroy();
     }
