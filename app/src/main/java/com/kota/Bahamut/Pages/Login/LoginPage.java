@@ -11,6 +11,7 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
@@ -283,10 +284,26 @@ public class LoginPage extends TelnetPage {
         // 調用WebView登入（如果需要的話）
         new ASRunner() {
             public void run() {
-                LoginWeb example = new LoginWeb(getContext());
-                example.init();
-            }
-        }.runInMainThread();
+                try {
+                    LoginWeb loginWeb = new LoginWeb(getContext());
+                    ASToast.showShortToast("Web登入 開始");
+                    loginWeb.init(
+                            () -> {
+                                // 登入完成後的處理
+                                ASToast.showShortToast("Web登出 完畢!");
+                                return null;
+                            },
+                            () -> {
+                                // 檢測到簽到對話框的處理
+                                ASToast.showShortToast("Web簽到 完成!");
+                                return null;
+                            }
+                    );
+                } catch (Exception e) {
+                    ASToast.showShortToast("Web登入 失敗");
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
+                }
+            }}.runInMainThread();
 
         // 存檔客戶資料
         TelnetClient.getClient().setUsername(_username);

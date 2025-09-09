@@ -1,7 +1,6 @@
 package com.kota.Bahamut.Pages.Login
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Context
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
@@ -13,33 +12,15 @@ import com.kota.Bahamut.Service.UserSettings
 class LoginWeb(private val context: Context) {
     
     private var currentWebView: WebView? = null
-
+    private var onLogoutCompleteCallback: (() -> Unit)? = null
+    private var onSignDetectedCallback: (() -> Unit)? = null
     @SuppressLint("SetJavaScriptEnabled")
-    fun init() {
+    fun init(onLogoutComplete: (() -> Unit)? = null, onSignDetected: (() -> Unit)? = null) {
+        this.onLogoutCompleteCallback = onLogoutComplete
+        this.onSignDetectedCallback = onSignDetected
+        
         try {
-            // 建立 Dialog 來顯示 WebView
-            val dialog = object : Dialog(context) {
-                override fun dismiss() {
-
-                    // 調用WebView登入（如果需要的話）
-                    object : ASRunner() {
-                        override fun run() {
-                            // 在 dismiss 之前執行清理操作
-                            currentWebView?.let { webView ->
-                                webView.stopLoading()
-                                webView.clearHistory()
-                                webView.clearCache(true)
-                                webView.loadUrl("about:blank")
-                            }
-                        }
-                    }.runInMainThread()
-
-                    // 然後執行原本的 dismiss
-                    super.dismiss()
-                }
-            }
-            
-            // 使用Activity context來創建WebView
+            // 直接創建WebView，不使用Dialog
             val webView = WebView(context)
             currentWebView = webView
         
@@ -62,20 +43,7 @@ class LoginWeb(private val context: Context) {
             webSettings.domStorageEnabled = true  // 保留DOM存儲（登入可能需要）
 
             // 添加 JavaScript 接口
-            webView.addJavascriptInterface(WebAppInterface(dialog), "Android")
-            
-            dialog.setContentView(webView)
-            dialog.setCancelable(true)
-            dialog.setTitle("巴哈姆特登入")
-
-            // 設定Dialog大小
-            val window = dialog.window
-            window?.setLayout(
-                (context.resources.displayMetrics.widthPixels * 0.9).toInt(),
-                (context.resources.displayMetrics.heightPixels * 0.8).toInt()
-            )
-
-            dialog.show()
+            webView.addJavascriptInterface(WebAppInterface(), "Android")
 
             // 設定WebViewClient
             webView.webViewClient = object : WebViewClient() {
@@ -117,7 +85,7 @@ class LoginWeb(private val context: Context) {
                 // 檢查 sessionStorage 是否已經執行過腳本
                 if (sessionStorage.getItem('bahamutLoginScriptExecuted')) {
                     console.log('登入腳本已經執行過，跳過重複執行');
-                    Android.onLoginSuccess();
+                    Android.onLogoutSuccess();
                     return;
                 }
                 
@@ -218,7 +186,7 @@ class LoginWeb(private val context: Context) {
                 // 檢查 sessionStorage 是否已經執行過登出腳本
                 if (sessionStorage.getItem('bahamutLogoutScriptExecuted')) {
                     console.log('登出腳本已經執行過，跳過重複執行');
-                    Android.onLoginSuccess();
+                    Android.onLogoutSuccess();
                     return;
                 }
                 
@@ -248,7 +216,7 @@ class LoginWeb(private val context: Context) {
                     logoutButton.click();
                     
                     setTimeout(()=>{
-                    Android.onLoginSuccess();
+                    Android.onLogoutSuccess();
                     }, 3000);
                 });
             })();
@@ -257,20 +225,47 @@ class LoginWeb(private val context: Context) {
         webView?.evaluateJavascript(script, null)
     }
     
+    // 清理WebView資源
+    fun cleanup() {
+        object : ASRunner() {
+            override fun run() {
+                currentWebView?.let { webView ->
+                    webView.stopLoading()
+                    webView.clearHistory()
+                    webView.clearCache(true)
+                    webView.loadUrl("about:blank")
+                    webView.destroy()
+                }
+                currentWebView = null
+            }
+        }.runInMainThread()
+    }
+    
     // JavaScript接口類
-    inner class WebAppInterface(
-        private val dialog: Dialog
-    ) {
+    inner class WebAppInterface {
         @JavascriptInterface
-        fun onLoginSuccess() {
-            println("執行完畢！")
-
-            dialog.dismiss()
+        fun onLogoutSuccess() {
+            println("登出執行完畢！")
+            
+            // 通知登入完成
+            object : ASRunner() {
+                override fun run() {
+                    onLogoutCompleteCallback?.invoke()
+                    cleanup()
+                }
+            }.runInMainThread()
         }
 
         @JavascriptInterface
         fun signSuccess() {
             println("檢測到簽到對話框！")
+            
+            // 通知檢測到簽到
+            object : ASRunner() {
+                override fun run() {
+                    onSignDetectedCallback?.invoke()
+                }
+            }.runInMainThread()
         }
     }
 }
