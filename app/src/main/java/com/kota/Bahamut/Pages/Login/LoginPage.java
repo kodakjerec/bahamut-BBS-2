@@ -91,11 +91,18 @@ public class LoginPage extends TelnetPage {
         findViewById(R.id.Login_loginButton).setOnClickListener(_login_listener);
         // checkbox區塊點擊
         CheckBox checkBox = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        findViewById(R.id.loginRememberLabel).setOnClickListener(view -> checkBox.setChecked(!checkBox.isChecked()));
+        findViewById(R.id.loginRememberLabel).setOnClickListener(view -> {
+            checkBox.setChecked(!checkBox.isChecked());
+            UserSettings.setPropertiesSaveLogonUser(checkBox.isChecked());
+            UserSettings.notifyDataUpdated();
+        });
         // web登入
         CheckBox webLoginCheckBox = (CheckBox) findViewById(R.id.LoginWebSignInCheckBox);
-        findViewById(R.id.LoginWebSignInLabel)
-                .setOnClickListener(view -> webLoginCheckBox.setChecked(!webLoginCheckBox.isChecked()));
+        findViewById(R.id.LoginWebSignInLabel).setOnClickListener(view -> {
+            webLoginCheckBox.setChecked(!webLoginCheckBox.isChecked());
+            UserSettings.setPropertiesWebSignIn(webLoginCheckBox.isChecked());
+            UserSettings.notifyDataUpdated();
+        });
         // TelnetView
         _telnet_view = (TelnetView) findViewById(R.id.Login_TelnetView);
 
@@ -205,7 +212,6 @@ public class LoginPage extends TelnetPage {
      */
     void saveLogonUserToProperties() {
         CheckBox login_remember = (CheckBox) findViewById(R.id.Login_loginRememberCheckBox);
-        CheckBox login_web_sign_in = (CheckBox) findViewById(R.id.LoginWebSignInCheckBox);
         String username = ((EditText) findViewById(R.id.Login_UsernameEdit)).getText().toString().trim();
         String password = ((EditText) findViewById(R.id.Login_passwordEdit)).getText().toString().trim();
 
@@ -216,9 +222,6 @@ public class LoginPage extends TelnetPage {
             UserSettings.setPropertiesUsername("");
             UserSettings.setPropertiesPassword("");
         }
-        UserSettings.setPropertiesWebSignIn(login_web_sign_in.isChecked());
-        UserSettings.setPropertiesSaveLogonUser(login_remember.isChecked());
-        UserSettings.notifyDataUpdated();
     }
 
     /**
@@ -335,28 +338,36 @@ public class LoginPage extends TelnetPage {
     public void onLoginSuccess() {
         // 調用WebView登入（如果需要的話）
         if (checkWebSignIn) {
-            new ASRunner() {
-                public void run() {
-                    try {
-                        LoginWeb loginWeb = new LoginWeb(getContext());
-                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
-                        loginWeb.init(
-                                () -> {
-                                    // 登入完成後的處理
-                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg02));
-                                    return null;
-                                },
-                                () -> {
-                                    // 檢測到簽到對話框的處理
-                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg03));
-                                    return null;
-                                });
-                    } catch (Exception e) {
-                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04));
-                        Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
+            // 檢查是否在3小時內已經自動簽到過
+            if (isWebAutoLoginWithin3Hours()) {
+                // 如果在3小時內已經登入過，跳過自動簽到
+                ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg05));
+            } else {
+                new ASRunner() {
+                    public void run() {
+                        try {
+                            LoginWeb loginWeb = new LoginWeb(getContext());
+                            ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
+                            loginWeb.init(
+                                    () -> {
+                                        // 登入完成後的處理
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg02));
+                                        return null;
+                                    },
+                                    () -> {
+                                        // 檢測到簽到對話框的處理
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg03));
+                                        // 記錄web自動簽到成功時間
+                                        setWebAutoLoginSuccessTime();
+                                        return null;
+                                    });
+                        } catch (Exception e) {
+                            ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04));
+                            Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
+                        }
                     }
-                }
-            }.runInMainThread();
+                }.runInMainThread();
+            }
         }
 
         // 存檔客戶資料
@@ -368,6 +379,36 @@ public class LoginPage extends TelnetPage {
             CloudBackup cloudBackup = new CloudBackup();
             cloudBackup.restore();
         }
+    }
+
+    /**
+     * 檢查web自動簽到是否在3小時內執行過
+     */
+    private boolean isWebAutoLoginWithin3Hours() {
+        String lastLoginTime = TempSettings.getWebAutoLoginSuccessTime();
+        if (lastLoginTime.isEmpty()) {
+            return false;
+        }
+
+        try {
+            long lastTime = Long.parseLong(lastLoginTime);
+            long currentTime = System.currentTimeMillis();
+            long threeHoursInMillis = 3 * 60 * 60 * 1000L; // 3小時的毫秒數
+
+            return (currentTime - lastTime) < threeHoursInMillis;
+        } catch (NumberFormatException e) {
+            // 如果時間格式錯誤，重置時間
+            TempSettings.setWebAutoLoginSuccessTime("");
+            return false;
+        }
+    }
+
+    /**
+     * 設置web自動簽到成功時間
+     */
+    private void setWebAutoLoginSuccessTime() {
+        String currentTime = String.valueOf(System.currentTimeMillis());
+        TempSettings.setWebAutoLoginSuccessTime(currentTime);
     }
 
     /**

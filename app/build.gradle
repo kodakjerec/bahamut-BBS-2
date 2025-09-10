@@ -5,15 +5,14 @@ plugins {
 
 android {
     namespace 'com.kota.Bahamut'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.kota.Bahamut"
         minSdk 26
-
-        targetSdk 35
-        versionCode 45
-        versionName "2.8.2"
+        targetSdk 36
+        versionCode 46
+        versionName "2.9.0"
     }
 
     buildTypes {
@@ -42,34 +41,34 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.13.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.7'
-    implementation 'androidx.navigation:navigation-ui-ktx:2.7.7'
-    implementation 'androidx.activity:activity-ktx:1.9.0'
+    implementation 'androidx.core:core-ktx:1.17.0'
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.9.3'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.9.3'
+    implementation 'androidx.activity:activity-ktx:1.10.1'
 
     // for url head
-    implementation 'org.jsoup:jsoup:1.17.2'
+    implementation 'org.jsoup:jsoup:1.21.2'
     // for image loading
-    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation 'com.github.bumptech.glide:glide:5.0.4'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     // drawer
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
     // gson
-    implementation 'com.google.code.gson:gson:2.10'
+    implementation 'com.google.code.gson:gson:2.13.1'
 
     // billing
-    implementation 'com.android.billingclient:billing:7.0.0'
-    implementation 'com.google.android.play:integrity:1.3.0'
+    implementation 'com.android.billingclient:billing:8.0.0'
+    implementation 'com.google.android.play:integrity:1.5.0'
 
     // define a BOM and its version
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
 
     // okhttp3
-    implementation "com.squareup.okhttp3:okhttp:4.12.0"
-    implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "com.squareup.okhttp3:okhttp:5.1.0"
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
 
     // 調色盤
     implementation 'com.github.skydoves:colorpickerview:2.3.0'

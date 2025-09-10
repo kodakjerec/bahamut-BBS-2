@@ -34,6 +34,8 @@ object TempSettings {
     @JvmField
     var cloudSaveLastTime: String = "" // 雲端備份最後時間
     @JvmField
+    var webAutoLoginSuccessTime: String = "" // web自動簽到成功時間
+    @JvmField
     var transportType = -1 // 網路狀況
     @JvmField
     var bookmarkStore: BookmarkStore? = null // 公用的 bookmarkStore
@@ -86,6 +88,17 @@ object TempSettings {
         notReadMessageCount = aCount
 
         messageSmall?.updateBadge(notReadMessageCount.toString())
+    }
+
+    /** web自動簽到成功時間 */
+    @JvmStatic
+    fun setWebAutoLoginSuccessTime(time: String) {
+        webAutoLoginSuccessTime = time
+    }
+
+    @JvmStatic
+    fun getWebAutoLoginSuccessTime(): String {
+        return webAutoLoginSuccessTime
     }
 
     /** 聊天小視窗 */

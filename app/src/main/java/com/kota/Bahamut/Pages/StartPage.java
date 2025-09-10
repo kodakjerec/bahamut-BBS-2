@@ -33,12 +33,18 @@ public class StartPage extends TelnetPage {
     View.OnClickListener urlClickListener = v -> {
         int id = v.getId();
         String url = "";
-        if (id == R.id.Start_instructions) url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
-        if (id == R.id.Start_Icon_Discord) url = "https://discord.gg/YP8dthZ";
-        if (id == R.id.Start_Icon_Facebook) url = "https://www.facebook.com/groups/264144897071532";
-        if (id == R.id.Start_Icon_Reddit) url = "https://www.reddit.com/r/bahachat";
-        if (id == R.id.Start_Icon_Steam) url = "https://steamcommunity.com/groups/BAHACHAT";
-        if (id == R.id.Start_Icon_Telegram) url = "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A";
+        if (id == R.id.Start_instructions)
+            url = "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/";
+        if (id == R.id.Start_Icon_Discord)
+            url = "https://discord.gg/YP8dthZ";
+        if (id == R.id.Start_Icon_Facebook)
+            url = "https://www.facebook.com/groups/264144897071532";
+        if (id == R.id.Start_Icon_Reddit)
+            url = "https://www.reddit.com/r/bahachat";
+        if (id == R.id.Start_Icon_Steam)
+            url = "https://steamcommunity.com/groups/BAHACHAT";
+        if (id == R.id.Start_Icon_Telegram)
+            url = "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A";
 
         if (!url.isEmpty()) {
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
@@ -46,6 +52,7 @@ public class StartPage extends TelnetPage {
             startActivity(intent);
         }
     };
+
     /** 避難所 */
 
     public int getPageLayout() {
@@ -73,6 +80,7 @@ public class StartPage extends TelnetPage {
         RadioButton radioButton1 = (RadioButton) findViewById(R.id.radioButtonIP1);
         RadioButton radioButton2 = (RadioButton) findViewById(R.id.radioButtonIP2);
 
+        // 連線位址
         String connectIp = NotificationSettings.getConnectIpAddress();
         assert connectIp != null;
         if (connectIp.equals(radioButton1.getText().toString())) {
@@ -100,21 +108,24 @@ public class StartPage extends TelnetPage {
         connectMethodGroup.setOnCheckedChangeListener((group, checkedId) -> {
             RadioButton rb = (RadioButton) findViewById(checkedId);
             NotificationSettings.setConnectMethod(rb.getText().toString());
+            updateIPSelectionState(checkedId == R.id.radioButtonConnectMethod2, radioGroup, radioButton1, radioButton2);
         });
+
+        // 初始化時設置狀態
+        updateIPSelectionState(connectMethodButton2.isChecked(), radioGroup, radioButton1, radioButton2);
 
         PackageInfo packageInfo;
         try {
-            packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(),0);
+            packageInfo = getContext().getPackageManager().getPackageInfo(getContext().getPackageName(), 0);
             int versionCode = (int) PackageInfoCompat.getLongVersionCode(packageInfo);
             String versionName = packageInfo.versionName;
-            ((TelnetTextViewSmall)findViewById(R.id.version)).setText(versionCode + " - "+versionName );
+            ((TelnetTextViewSmall) findViewById(R.id.version)).setText(versionCode + " - " + versionName);
         } catch (PackageManager.NameNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-
         // 替換外觀
-        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout) findViewById(R.id.toolbar));
     }
 
     public void onPageWillAppear() {
@@ -154,15 +165,32 @@ public class StartPage extends TelnetPage {
     public void connect() {
         int _transportType = getNavigationController().getDeviceController().isNetworkAvailable();
         TempSettings.transportType = _transportType;
-        if (_transportType>-1) {
+        if (_transportType > -1) {
             ASProcessingDialog.showProcessingDialog("連線中", aDialog -> {
                 TelnetClient.getClient().close();
                 return false;
             });
             String connectIpAddress = NotificationSettings.getConnectIpAddress();
-            ASRunner.runInNewThread(()-> TelnetClient.getClient().connect(connectIpAddress, 23));
+            ASRunner.runInNewThread(() -> TelnetClient.getClient().connect(connectIpAddress, 23));
             return;
         }
         ASToast.showShortToast("您未連接網路");
+    }
+
+    // 添加輔助方法
+    private void updateIPSelectionState(boolean isWebSocket, RadioGroup ipGroup, RadioButton ip1, RadioButton ip2) {
+        if (isWebSocket) {
+            // WebSocket 模式：禁用 IP 選擇
+            ipGroup.setEnabled(false);
+            ip1.setEnabled(false);
+            ip2.setEnabled(false);
+            ipGroup.setAlpha(0.5f);
+        } else {
+            // Telnet 模式：啟用 IP 選擇
+            ipGroup.setEnabled(true);
+            ip1.setEnabled(true);
+            ip2.setEnabled(true);
+            ipGroup.setAlpha(1.0f);
+        }
     }
 }

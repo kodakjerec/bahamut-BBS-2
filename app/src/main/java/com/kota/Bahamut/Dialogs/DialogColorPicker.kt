@@ -9,9 +9,6 @@ import com.kota.Bahamut.Service.CommonFunctions.rgbToInt
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorListener
 import com.skydoves.colorpickerview.sliders.AlphaSlideBar
-import java.util.Objects
-
-
 class DialogColorPicker : ASDialog() {
     private var colorPickerView: ColorPickerView
     private var textView: PostEditText
