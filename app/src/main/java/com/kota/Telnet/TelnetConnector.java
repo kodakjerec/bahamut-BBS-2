@@ -245,7 +245,7 @@ public class TelnetConnector implements TelnetChannelListener {
                 return selected_channel.readData();
             } catch (IOException e) {
                 Log.v("SocketChannel", "readData IO Exception");
-                return 0;
+                throw new TelnetConnectionClosedException();
             }
         }
         return 0;

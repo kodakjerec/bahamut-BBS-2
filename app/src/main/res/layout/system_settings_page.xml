@@ -208,7 +208,7 @@
             <CheckBox android:id="@+id/SystemSettings_animationEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_animation_hint"/>
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
-        <RelativeLayout android:id="@+id/SystemSettings_item_keepWifi" style="@style/SystemSettingsItem">
+        <RelativeLayout android:id="@+id/SystemSettings_item_keepWifi" style="@style/SystemSettingsItem" android:visibility="gone">
             <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_keep_wifi_on_sleep" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_keepWifi" style="@style/SystemSettingsCheckbox"/>
         </RelativeLayout>
