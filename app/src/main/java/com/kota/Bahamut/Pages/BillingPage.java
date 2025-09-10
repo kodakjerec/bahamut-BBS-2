@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 public class BillingPage extends TelnetPage {
     private BillingClient billingClient;
+
     @Override // com.kota.ASFramework.PageController.ASViewController
     public int getPageType() {
         return BahamutPage.BAHAMUT_BILLING;
@@ -52,7 +53,7 @@ public class BillingPage extends TelnetPage {
         MyBillingClient.checkPurchaseHistoryQuery();
 
         // 檢查已購買
-        Button button1 = (Button)findViewById(R.id.button_checkPurchaseQuery);
+        Button button1 = (Button) findViewById(R.id.button_checkPurchaseQuery);
         button1.setOnClickListener(view -> {
             MyBillingClient.checkPurchaseHistoryCloud(qty -> {
                 String totalMoney = String.valueOf(qty * 90);
@@ -65,7 +66,7 @@ public class BillingPage extends TelnetPage {
         button1.performClick();
 
         // 替換外觀
-        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+        new ThemeFunctions().layoutReplaceTheme((LinearLayout) findViewById(R.id.toolbar));
     }
 
     // 取得商品清單
@@ -83,40 +84,44 @@ public class BillingPage extends TelnetPage {
                 .setProductList(productList).build();
 
         billingClient.queryProductDetailsAsync(queryProductDetailsParams,
-                (billingResult, list) -> {
+                (billingResult, productDetailsList) -> {
                     // check billingResult
-                    // process returned productDetailsList
-                    for(ProductDetails product: list) {
-                        String btnName = product.getProductId().replace("com.kota.billing.","");
-                        new ASRunner() {
-                            @Override
-                            public void run() {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
+                            && productDetailsList != null) {
+                        // process returned productDetailsList
+                        for (ProductDetails product : productDetailsList.getProductDetailsList()) {
+                            String btnName = product.getProductId().replace("com.kota.billing.", "");
+                            new ASRunner() {
+                                @Override
+                                public void run() {
 
-                                Button btn = null;
-                                if (btnName.equals("90")) {
-                                    btn = (Button) findViewById(R.id.button_90);
-                                    btn.setEnabled(true);
-                                    btn.setText(product.getName());
+                                    Button btn = null;
+                                    if (btnName.equals("90")) {
+                                        btn = (Button) findViewById(R.id.button_90);
+                                        btn.setEnabled(true);
+                                        btn.setText(product.getName());
+                                    }
+                                    if (btn != null) {
+                                        btn.setOnClickListener(view -> {
+                                            ArrayList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
+
+                                            productDetailsParamsList
+                                                    .add(BillingFlowParams.ProductDetailsParams.newBuilder()
+                                                            .setProductDetails(product)
+                                                            .build());
+
+                                            BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
+                                                    .setProductDetailsParamsList(productDetailsParamsList)
+                                                    .setIsOfferPersonalized(true)
+                                                    .build();
+
+                                            // Launch the billing flow
+                                            billingClient.launchBillingFlow(activity, billingFlowParams);
+                                        });
+                                    }
                                 }
-                                if (btn!=null) {
-                                    btn.setOnClickListener(view -> {
-                                        ArrayList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
-
-                                        productDetailsParamsList.add(BillingFlowParams.ProductDetailsParams.newBuilder()
-                                                .setProductDetails(product)
-                                                .build());
-
-                                        BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
-                                                .setProductDetailsParamsList(productDetailsParamsList)
-                                                .setIsOfferPersonalized(true)
-                                                .build();
-
-                                        // Launch the billing flow
-                                        billingClient.launchBillingFlow(activity, billingFlowParams);
-                                    });
-                                }
-                            }
-                        }.runInMainThread();
+                            }.runInMainThread();
+                        }
                     }
                 });
     }

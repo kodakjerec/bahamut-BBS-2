@@ -105,11 +105,11 @@ object MyBillingClient {
     fun checkPurchaseHistoryQuery() {
         var needQueryCloud = false
         try {
-            billingClient.queryPurchaseHistoryAsync(
-                QueryPurchaseHistoryParams.newBuilder()
+            billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder()
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
-            ) { billingResult: BillingResult, list: List<PurchaseHistoryRecord?>? ->
+            ) { billingResult: BillingResult, list: List<Purchase?>? ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
                     // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                     if (list.toTypedArray().isNotEmpty()) {
