@@ -11,7 +11,7 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 36
-        versionCode 46
+        versionCode 47
         versionName "2.9.0"
     }
 
@@ -29,9 +29,6 @@ android {
         jvmTarget = '17'
     }
 
-    aaptOptions {
-        cruncherEnabled = false
-    }
     buildFeatures {
         buildConfig true
         viewBinding true

@@ -8,9 +8,7 @@ import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResponseListener
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
@@ -103,7 +101,6 @@ object MyBillingClient {
     /** 重新確認已購買的商品 */
     @JvmStatic
     fun checkPurchaseHistoryQuery() {
-        var needQueryCloud = false
         try {
             billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder()
@@ -135,8 +132,8 @@ object MyBillingClient {
                                 ASRunner.runInNewThread {
                                     try {
                                         client.newCall(request).execute().use { _ -> }
-                                    } catch (e:Exception) {
-                                        needQueryCloud = true
+                                    } catch (_:Exception) {
+                                        checkPurchaseHistoryCloud{ }
                                     }
                                 }
                             }
@@ -144,15 +141,11 @@ object MyBillingClient {
                     } else {
                         // 查不到有可能是函數不能用, 走其他方式
                         UserSettings.setPropertiesVIP(false)
-                        needQueryCloud = true
+                        checkPurchaseHistoryCloud{ }
                     }
                 }
             }
-        }catch (e:Exception) {
-            needQueryCloud = true
-        }
-
-        if (needQueryCloud) {
+        }catch (_:Exception) {
             checkPurchaseHistoryCloud{ }
         }
     }
@@ -174,7 +167,7 @@ object MyBillingClient {
             .build()
         ASRunner.runInNewThread {
             client.newCall(request).execute().use { response ->
-                val data = response.body!!.string()
+                val data = response.body.string()
                 val jsonObject = JSONObject(data)
                 val buyQty =  jsonObject.optString("qty", "0").toInt()
                 if (buyQty>0) {

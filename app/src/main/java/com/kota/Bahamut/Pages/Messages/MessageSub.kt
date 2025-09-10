@@ -19,6 +19,7 @@ import com.kota.Bahamut.Dialogs.Dialog_InsertSymbol
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.Pages.Model.PostEditText
 import com.kota.Bahamut.R
+import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Bahamut.Service.TempSettings
 import com.kota.Bahamut.Service.UserSettings
 import com.kota.Telnet.Reference.TelnetKeyboard
@@ -149,6 +150,11 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
             R.id.Message_Sub_ShortenImage -> {
                 // 縮圖
+                var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
+                if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
+                    ASToast.showLongToast(getContextString(R.string.vip_only_message))
+                    return
+                }
                 val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
                 startActivity(intent)
             }

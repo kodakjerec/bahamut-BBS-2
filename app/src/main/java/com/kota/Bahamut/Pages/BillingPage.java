@@ -22,6 +22,8 @@ import com.kota.TelnetUI.TelnetPage;
 
 import java.util.ArrayList;
 
+import kotlin.Unit;
+
 public class BillingPage extends TelnetPage {
     private BillingClient billingClient;
 
@@ -58,8 +60,10 @@ public class BillingPage extends TelnetPage {
             MyBillingClient.checkPurchaseHistoryCloud(qty -> {
                 String totalMoney = String.valueOf(qty * 90);
                 TextView textView = (TextView) findViewById(R.id.BillingPage_already_billing_value);
-                textView.setText(totalMoney);
-                return null;
+                if (textView != null) {
+                    textView.setText(totalMoney);
+                }
+                return Unit.INSTANCE;
             });
             ASToast.showShortToast(getContextString(R.string.billing_page_result_success));
         });
@@ -86,22 +90,17 @@ public class BillingPage extends TelnetPage {
         billingClient.queryProductDetailsAsync(queryProductDetailsParams,
                 (billingResult, productDetailsList) -> {
                     // check billingResult
-                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK
-                            && productDetailsList != null) {
+                    if (billingResult.getResponseCode() == BillingClient.BillingResponseCode.OK) {
                         // process returned productDetailsList
                         for (ProductDetails product : productDetailsList.getProductDetailsList()) {
-                            String btnName = product.getProductId().replace("com.kota.billing.", "");
+
                             new ASRunner() {
                                 @Override
                                 public void run() {
-
-                                    Button btn = null;
-                                    if (btnName.equals("90")) {
-                                        btn = (Button) findViewById(R.id.button_90);
+                                    Button btn = (Button) findViewById(R.id.button_90);
+                                    if (btn != null) {
                                         btn.setEnabled(true);
                                         btn.setText(product.getName());
-                                    }
-                                    if (btn != null) {
                                         btn.setOnClickListener(view -> {
                                             ArrayList<BillingFlowParams.ProductDetailsParams> productDetailsParamsList = new ArrayList<>();
 

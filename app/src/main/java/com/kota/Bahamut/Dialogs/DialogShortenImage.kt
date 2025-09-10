@@ -133,12 +133,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     /** 轉檔 */
     @SuppressLint("SimpleDateFormat")
     private var transferListener = OnClickListener {
-        var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
-        if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
-            ASToast.showLongToast(getContextString(R.string.vip_only_message))
-            return@OnClickListener
-        }
-
         showProcessingDialog()
 
         var finalUri: Uri? = null
@@ -178,6 +172,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                             outputParam = sampleTextView!!.text.toString()
                             sendButton!!.isEnabled = true
                             transferButton!!.isEnabled = false
+                            var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
                             UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
                         }
                     }.runInMainThread()

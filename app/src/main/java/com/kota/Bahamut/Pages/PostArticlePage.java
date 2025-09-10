@@ -298,6 +298,11 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
+            var shortenTimes = UserSettings.getPropertiesNoVipShortenTimes();
+            if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
+                ASToast.showLongToast(getContextString(R.string.vip_only_message));
+                return;
+            }
             Intent intent = new Intent(TempSettings.myActivity, DialogShortenImage.class);
             startActivity(intent);
         } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
