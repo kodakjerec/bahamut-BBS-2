@@ -350,7 +350,7 @@ public class LoginPage extends TelnetPage {
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
                             loginWeb.init(
                                     () -> {
-                                        // 登入完成後的處理
+                                        // 登出完成後的處理
                                         ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg02));
                                         return null;
                                     },

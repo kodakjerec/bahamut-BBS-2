@@ -145,10 +145,8 @@ class LoginWeb(private val context: Context) {
                     console.log('已經在登入頁面');
                     setupLoginForm();
                 } else {
-                    console.log('不在登入頁面，5秒後跳轉到登出頁面');
-                    
-                    console.log('開始檢測簽到對話框...');
-                    
+                    console.log('不在登入頁面，開始檢測簽到對話框...');
+
                     Signin.mobile();
 
                     var startTime = Date.now();
@@ -256,6 +254,9 @@ class LoginWeb(private val context: Context) {
         // 先取消計時器
         cancelTimeout()
         
+        // 先調用回調，再清理引用
+        val tempCallback = onLogoutCompleteCallback
+    
         object : ASRunner() {
             override fun run() {
                 currentWebView?.let { webView ->
@@ -266,6 +267,13 @@ class LoginWeb(private val context: Context) {
                     webView.destroy()
                 }
                 currentWebView = null
+                
+                // 清理回調函數引用
+                onLogoutCompleteCallback = null
+                onSignDetectedCallback = null
+                
+                // 最後調用回調通知完成
+                tempCallback?.invoke()
             }
         }.runInMainThread()
     }
@@ -276,10 +284,8 @@ class LoginWeb(private val context: Context) {
         fun onLogoutSuccess() {
             println("登出執行完畢！")
             
-            // 通知登入完成
             object : ASRunner() {
                 override fun run() {
-                    onLogoutCompleteCallback?.invoke()
                     cleanup()
                 }
             }.runInMainThread()
