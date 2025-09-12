@@ -10,8 +10,8 @@ android {
     defaultConfig {
         applicationId "com.kota.Bahamut"
         minSdk 26
-        targetSdk 36
-        versionCode 47
+        targetSdk 35 // 固定在35, 不然edgeToedge會有問題
+        versionCode 48
         versionName "2.9.0"
     }
 
