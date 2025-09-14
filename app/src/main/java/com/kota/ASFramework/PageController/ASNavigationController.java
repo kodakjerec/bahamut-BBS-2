@@ -105,6 +105,12 @@ public class ASNavigationController extends Activity {
   @Override // android.app.Activity
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    
+    // 啟用 edge-to-edge 支援
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      getWindow().setDecorFitsSystemWindows(false);
+    }
+    
     setNavigationController(this);
 
     getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics);
@@ -119,6 +125,10 @@ public class ASNavigationController extends Activity {
     this._root_view = new ASNavigationControllerView(this);
     this._root_view.setPageController(this);
     setContentView(this._root_view);
+    
+    // 設定 WindowInsets 處理
+    setupWindowInsets();
+    
     onControllerDidLoad();
   }
 
@@ -636,5 +646,37 @@ public class ASNavigationController extends Activity {
           }
         }
       }
+  }
+
+  /**
+   * 設定 WindowInsets 處理以支援 edge-to-edge
+   */
+  private void setupWindowInsets() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      this._root_view.setOnApplyWindowInsetsListener((v, windowInsets) -> {
+        androidx.core.view.WindowInsetsCompat windowInsetsCompat = 
+            androidx.core.view.WindowInsetsCompat.toWindowInsetsCompat(windowInsets, v);
+        
+        // 獲取系統欄的insets
+        androidx.core.graphics.Insets systemBars = windowInsetsCompat
+            .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+        
+        // 獲取軟鍵盤的insets
+        androidx.core.graphics.Insets imeInsets = windowInsetsCompat
+            .getInsets(androidx.core.view.WindowInsetsCompat.Type.ime());
+        
+        // 計算總的底部間距（系統欄 + 軟鍵盤）
+        int bottomPadding = Math.max(systemBars.bottom, imeInsets.bottom);
+        
+        // 更新 ASWindowStateHandler 中的狀態
+        ASWindowStateHandler.updateWindowInsets(systemBars.top, bottomPadding, 
+                                               systemBars.left, systemBars.right);
+        
+        // 設定內容區域的 padding 以避免與系統欄和軟鍵盤重疊
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+        
+        return windowInsets;
+      });
+    }
   }
 }

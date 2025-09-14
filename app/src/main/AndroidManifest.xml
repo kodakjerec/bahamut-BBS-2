@@ -32,7 +32,7 @@
             android:exported="true"
             android:screenOrientation="unspecified"
             android:supportsPictureInPicture="true"
-            android:theme="@style/MyTheme.WindowOptOutEdgeToEdge"
+            android:theme="@style/MyTheme"
             android:windowSoftInputMode="adjustResize"
             tools:ignore="Instantiatable">
             <intent-filter>

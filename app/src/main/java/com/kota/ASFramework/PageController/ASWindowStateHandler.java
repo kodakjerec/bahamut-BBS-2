@@ -39,13 +39,7 @@ public class ASWindowStateHandler {
   
   public static void construct(Activity paramActivity) {
     activity = paramActivity;
-    Rect rect = new Rect();
-    Window window = activity.getWindow();
-    window.getDecorView().getWindowVisibleDisplayFrame(rect);
-    statusBarHeight = rect.top;
-    int i = window.findViewById(android.R.id.content).getTop();
-    if (i > 0)
-      titleBarHeight = i - statusBarHeight; 
+    
     DisplayMetrics displayMetrics = new DisplayMetrics();
     activity.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
     screenWidthPx = displayMetrics.widthPixels;
@@ -54,7 +48,36 @@ public class ASWindowStateHandler {
     screenHeightInch = (displayMetrics.heightPixels / displayMetrics.ydpi);
     screenInch = Math.sqrt(Math.pow(screenWidthInch, 2.0D) + Math.pow(screenHeightInch, 2.0D));
     contentViewWidth = screenWidthPx;
-    contentViewHeight = screenHeightPx - titleBarHeight - statusBarHeight;
+    
+    // 適應 edge-to-edge 的處理
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      // 在 edge-to-edge 模式下，初始設定為全螢幕
+      // 實際的 insets 會由 WindowInsets 處理
+      statusBarHeight = 0;
+      titleBarHeight = 0;
+      contentViewHeight = screenHeightPx;
+    } else {
+      // 舊版本的處理方式
+      Rect rect = new Rect();
+      Window window = activity.getWindow();
+      window.getDecorView().getWindowVisibleDisplayFrame(rect);
+      statusBarHeight = rect.top;
+      int i = window.findViewById(android.R.id.content).getTop();
+      if (i > 0)
+        titleBarHeight = i - statusBarHeight; 
+      contentViewHeight = screenHeightPx - titleBarHeight - statusBarHeight;
+    }
+  }
+  
+  /**
+   * 更新 WindowInsets 資訊（用於 edge-to-edge 模式）
+   */
+  public static void updateWindowInsets(int top, int bottom, int left, int right) {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      statusBarHeight = top;
+      // 更新內容視圖高度，扣除上下的系統欄
+      contentViewHeight = screenHeightPx - top - bottom;
+    }
   }
 }
 
