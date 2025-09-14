@@ -410,5 +410,5 @@
     <string name="login_web_sign_in_msg02">Web登出 完畢!</string>
     <string name="login_web_sign_in_msg03">Web簽到 完成!</string>
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
-    <string name="login_web_sign_in_msg05">Web自動簽到已在3小時內執行過，跳過此次簽到</string>
+    <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
 </resources>

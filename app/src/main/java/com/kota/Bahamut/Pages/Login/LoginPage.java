@@ -338,9 +338,9 @@ public class LoginPage extends TelnetPage {
     public void onLoginSuccess() {
         // 調用WebView登入（如果需要的話）
         if (checkWebSignIn) {
-            // 檢查是否在3小時內已經自動簽到過
-            if (isWebAutoLoginWithin3Hours()) {
-                // 如果在3小時內已經登入過，跳過自動簽到
+            // 檢查今日是否已經自動簽到過
+            if (isWebAutoLoginToday()) {
+                // 如果今日已經登入過，跳過自動簽到
                 ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg05));
             } else {
                 new ASRunner() {
@@ -382,9 +382,9 @@ public class LoginPage extends TelnetPage {
     }
 
     /**
-     * 檢查web自動簽到是否在3小時內執行過
+     * 檢查web自動簽到是否在今日已執行過
      */
-    private boolean isWebAutoLoginWithin3Hours() {
+    private boolean isWebAutoLoginToday() {
         String lastLoginTime = TempSettings.getWebAutoLoginSuccessTime();
         if (lastLoginTime.isEmpty()) {
             return false;
@@ -393,9 +393,17 @@ public class LoginPage extends TelnetPage {
         try {
             long lastTime = Long.parseLong(lastLoginTime);
             long currentTime = System.currentTimeMillis();
-            long threeHoursInMillis = 3 * 60 * 60 * 1000L; // 3小時的毫秒數
+            
+            // 取得昨日與今日的時間邊界 (今日00:00:00)
+            java.util.Calendar calendar = java.util.Calendar.getInstance();
+            calendar.setTimeInMillis(currentTime);
+            calendar.set(java.util.Calendar.HOUR_OF_DAY, 0);
+            calendar.set(java.util.Calendar.MINUTE, 0);
+            calendar.set(java.util.Calendar.SECOND, 0);
+            calendar.set(java.util.Calendar.MILLISECOND, 0);
+            long todayStartTime = calendar.getTimeInMillis();
 
-            return (currentTime - lastTime) < threeHoursInMillis;
+            return lastTime >= todayStartTime;
         } catch (NumberFormatException e) {
             // 如果時間格式錯誤，重置時間
             TempSettings.setWebAutoLoginSuccessTime("");
