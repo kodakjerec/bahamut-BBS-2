@@ -84,8 +84,8 @@ class B2UEncoder private constructor(inputStream: InputStream) {
     private fun encodeToBytes(stringData: ByteArray): ByteArray {
         val buffers = Vector<ByteBuffer>()
         buffers.add(getBuffer().createByteBuffer())
-        buffers.first().put(-2.toByte())
-        buffers.first().put(-1.toByte())
+        buffers.first().put((-2).toByte())
+        buffers.first().put((-1).toByte())
         
         var i = 0
         while (i < stringData.size) {

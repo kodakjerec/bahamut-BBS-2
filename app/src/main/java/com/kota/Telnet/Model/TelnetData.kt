@@ -24,7 +24,7 @@ data class TelnetData(
         this.italic = data.italic
     }
     
-    public override fun clone(): TelnetData {
+    fun clone(): TelnetData {
         return TelnetData(this)
     }
     

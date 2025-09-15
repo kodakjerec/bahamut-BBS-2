@@ -130,7 +130,7 @@ class TelnetFrame {
         return (backgroundColor shl 16) or (textColor shl 8) or blink or italic
     }
     
-    public override fun clone(): TelnetFrame {
+    fun clone(): TelnetFrame {
         return TelnetFrame(this)
     }
     

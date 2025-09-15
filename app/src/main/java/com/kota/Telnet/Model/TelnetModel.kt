@@ -1,6 +1,5 @@
 package com.kota.Telnet.Model
 
-import com.kota.Telnet.Reference.TelnetAnsiCode
 import com.kota.Telnet.TelnetAnsi
 import com.kota.Telnet.TelnetCursor
 import java.nio.ByteBuffer
@@ -121,8 +120,8 @@ class TelnetModel {
             telnetRow.data[currentColumn] = data
             telnetRow.textColor[currentColumn] = ansiState.textColor
             telnetRow.backgroundColor[currentColumn] = ansiState.backgroundColor
-            telnetRow.blink[currentColumn] = ansiState.blink
-            telnetRow.italic[currentColumn] = ansiState.italic
+            telnetRow.blink[currentColumn] = ansiState.textBlink
+            telnetRow.italic[currentColumn] = ansiState.textItalic
         }
     }
     

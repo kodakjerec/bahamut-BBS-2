@@ -168,7 +168,7 @@ class TelnetRow {
         println("self become: ${getRawString()}")
     }
     
-    public override fun clone(): TelnetRow {
+    fun clone(): TelnetRow {
         return TelnetRow(this)
     }
     
@@ -200,17 +200,17 @@ class TelnetRow {
     fun getTextColor(): ByteArray {
         val colors = ByteArray(80)
         var nowIndex = -1
-        var bitIndex: Byte = 0
+        var bitIndex = 0
         
         while (bitIndex < bitSpace.size) {
             nowIndex++
             if (bitSpace[bitIndex] > 0) {
                 // 雙字元
-                colors[nowIndex] = textColor[bitIndex.toInt()]
+                colors[nowIndex] = textColor[bitIndex]
                 bitIndex++
             } else {
                 // 單字元
-                colors[nowIndex] = textColor[bitIndex.toInt()]
+                colors[nowIndex] = textColor[bitIndex]
             }
             bitIndex++
         }
@@ -223,17 +223,17 @@ class TelnetRow {
     fun getBackgroundColor(): ByteArray {
         val colors = ByteArray(80)
         var nowIndex = -1
-        var bitIndex: Byte = 0
+        var bitIndex = 0
         
         while (bitIndex < bitSpace.size) {
             nowIndex++
             if (bitSpace[bitIndex] > 0) {
                 // 雙字元
-                colors[nowIndex] = backgroundColor[bitIndex.toInt()]
+                colors[nowIndex] = backgroundColor[bitIndex]
                 bitIndex++
             } else {
                 // 單字元
-                colors[nowIndex] = backgroundColor[bitIndex.toInt()]
+                colors[nowIndex] = backgroundColor[bitIndex]
             }
             bitIndex++
         }

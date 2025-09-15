@@ -55,7 +55,7 @@ class TelnetWebSocketChannel @Throws(IOException::class) constructor(
 
             override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                 synchronized(readLock) {
-                    if (pendingData.remaining() >= bytes.size()) {
+                    if (pendingData.remaining() >= bytes.size) {
                         pendingData.put(bytes.toByteArray())
                     }
                     (readLock as Object).notifyAll()
@@ -158,7 +158,7 @@ class TelnetWebSocketChannel @Throws(IOException::class) constructor(
     override fun finishConnect(): Boolean {
         webSocket?.close(1000, "Normal closure")
         isConnected = false
-        client?.dispatcher()?.executorService()?.shutdown()
+        client?.dispatcher?.executorService?.shutdown()
         return true
     }
 

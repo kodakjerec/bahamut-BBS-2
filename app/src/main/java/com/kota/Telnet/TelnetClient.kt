@@ -80,7 +80,7 @@ class TelnetClient private constructor(
         var encodeSuccess = false
         try {
             val data2 = (str + "\n").toByteArray(charset(TelnetDefs.CHARSET))
-            data = U2BEncoder.getInstance().encodeToBytes(data2, 0)
+            data = U2BEncoder.getInstance()?.encodeToBytes(data2, 0)
             encodeSuccess = true
         } catch (e: UnsupportedEncodingException) {
             Log.e(javaClass.simpleName, e.message ?: "")
@@ -99,7 +99,7 @@ class TelnetClient private constructor(
         var encodeSuccess = false
         try {
             val data2 = (str + "\n").toByteArray(charset(TelnetDefs.CHARSET))
-            data = U2BEncoder.getInstance().encodeToBytes(data2, 0)
+            data = U2BEncoder.getInstance()?.encodeToBytes(data2, 0)
             encodeSuccess = true
         } catch (e: UnsupportedEncodingException) {
             Log.e(javaClass.simpleName, e.message ?: "")
@@ -177,7 +177,7 @@ class TelnetClient private constructor(
     }
 
     override fun onTelnetConnectorReceiveDataStart(connector: TelnetConnector) {
-        model.cleanCahcedData()
+        model.cleanCahcedData
         stateHandler.handleState()
     }
 

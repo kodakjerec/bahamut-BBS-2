@@ -107,7 +107,7 @@ class TelnetChannel(private val _socket_channel: TelnetSocketChannel) {
             data[i] = _input_buffer.array()[i]
         }
         try {
-            println("receive data:${B2UEncoder.getInstance().encodeToString(data)}")
+            println("receive data:${B2UEncoder.getInstance()?.encodeToString(data)}")
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, e.message ?: "")
         }
@@ -124,7 +124,7 @@ class TelnetChannel(private val _socket_channel: TelnetSocketChannel) {
             }
         }
         try {
-            println("send data:\n${B2UEncoder.getInstance().encodeToString(data)}")
+            println("send data:\n${B2UEncoder.getInstance()?.encodeToString(data)}")
             var hexData = ""
             for (datum in data) {
                 hexData += String.format(" %1\$02x", datum)

@@ -5,10 +5,6 @@ data class TelnetCursor(
     var column: Int = 0
 ) {
     
-    constructor(row: Int, column: Int) : this() {
-        set(row, column)
-    }
-    
     fun set(row: Int, column: Int) {
         this.row = row
         this.column = column
@@ -27,7 +23,7 @@ data class TelnetCursor(
         return cursor.row == this.row && cursor.column == this.column
     }
     
-    public override fun clone(): TelnetCursor {
+    fun clone(): TelnetCursor {
         return TelnetCursor(this.row, this.column)
     }
     
