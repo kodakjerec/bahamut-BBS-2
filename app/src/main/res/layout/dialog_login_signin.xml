@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="500dp"
+    android:background="@color/dialog_border_color"
+    android:orientation="vertical"
+    android:padding="3dp"
+    android:id="@+id/dialog_login_signin_layout">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black"
+        android:orientation="vertical"
+        android:padding="1dp">
+        
+        <com.kota.TelnetUI.TextView.TelnetTextViewLarge 
+            android:textColor="@color/white"
+            android:background="#202020"
+            android:padding="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="WebView 登入調試"
+            style="@style/TextViewLarge"/>
+            
+        <WebView
+            android:id="@+id/debug_webview"
+            android:background="@color/item_background_color"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+        
+        <View style="@style/BlockDividerHorizontal"/>
+        
+        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
+            <Button 
+                android:id="@+id/debug_btn_close"
+                android:text="關閉"
+                style="@style/DialogToolbarItem"/>
+        </LinearLayout>
+        
+    </LinearLayout>
+</LinearLayout>

@@ -407,8 +407,9 @@
     <string name="board_main_unread_all_msg01">全部未讀，請重新進入看板</string>
     <string name="login_web_sign_in">Web自動簽到</string>
     <string name="login_web_sign_in_msg01">Web登入 開始</string>
-    <string name="login_web_sign_in_msg02">Web登出 完畢!</string>
+    <string name="login_web_sign_in_msg02">Web簽到 失敗!</string>
     <string name="login_web_sign_in_msg03">Web簽到 完成!</string>
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
     <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
+    <string name="login_web_sign_in_msg06">需要手動完成驗證，請在網頁中操作</string>
 </resources>

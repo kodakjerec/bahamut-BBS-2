@@ -336,6 +336,16 @@ public class LoginPage extends TelnetPage {
      * 登入成功
      */
     public void onLoginSuccess() {
+        // 存檔客戶資料
+        TelnetClient.getClient().setUsername(_username);
+        saveLogonUserToProperties();
+
+        // 讀取雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.restore();
+        }
+
         // 調用WebView登入（如果需要的話）
         if (checkWebSignIn) {
             // 檢查今日是否已經自動簽到過
@@ -346,21 +356,15 @@ public class LoginPage extends TelnetPage {
                 new ASRunner() {
                     public void run() {
                         try {
-                            LoginWeb loginWeb = new LoginWeb(getContext());
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
-                            loginWeb.init(
-                                    () -> {
-                                        // 登出完成後的處理
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg02));
-                                        return null;
-                                    },
-                                    () -> {
-                                        // 檢測到簽到對話框的處理
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg03));
-                                        // 記錄web自動簽到成功時間
-                                        setWebAutoLoginSuccessTime();
-                                        return null;
-                                    });
+                            
+                            // 使用 LoginWebDebugView 來顯示和處理自動登入
+                            LoginWebDebugView debugView = new LoginWebDebugView(getContext());
+                            debugView.startAutoLogin(() -> {
+                                // 記錄web自動簽到成功時間
+                                setWebAutoLoginSuccessTime();
+                                return null;
+                            });
                         } catch (Exception e) {
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04));
                             Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
@@ -368,16 +372,6 @@ public class LoginPage extends TelnetPage {
                     }
                 }.runInMainThread();
             }
-        }
-
-        // 存檔客戶資料
-        TelnetClient.getClient().setUsername(_username);
-        saveLogonUserToProperties();
-
-        // 讀取雲端
-        if (NotificationSettings.getCloudSave()) {
-            CloudBackup cloudBackup = new CloudBackup();
-            cloudBackup.restore();
         }
     }
 

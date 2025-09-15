@@ -2,6 +2,7 @@ package com.kota.Bahamut.Pages.Login
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.webkit.JavascriptInterface
@@ -9,35 +10,47 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.kota.ASFramework.Thread.ASRunner
+import com.kota.Bahamut.R
+
 import com.kota.Bahamut.Service.UserSettings
 
-class LoginWeb(private val context: Context) {
+class LoginWeb(private val context: Context, private val externalWebView: WebView? = null) {
     
     private var currentWebView: WebView? = null
-    private var onLogoutCompleteCallback: (() -> Unit)? = null
+    private var onFailCallback: (() -> Unit)? = null
     private var onSignDetectedCallback: (() -> Unit)? = null
+    private var onManualCallback: ((String) -> Unit)? = null
     private var timeoutHandler: Handler? = null
     private var timeoutRunnable: Runnable? = null
+
     @SuppressLint("SetJavaScriptEnabled")
-    fun init(onLogoutComplete: (() -> Unit)? = null, onSignDetected: (() -> Unit)? = null) {
-        this.onLogoutCompleteCallback = onLogoutComplete
+    fun init(onSignDetected: (() -> Unit)? = null, onFail: (() -> Unit)? = null, onManual: ((String) -> Unit)? = null) {
         this.onSignDetectedCallback = onSignDetected
+        this.onFailCallback = onFail
+        this.onManualCallback = onManual
         
         // 設定 20 秒後自動清理
         setupTimeout()
         
         try {
-            // 直接創建WebView，不使用Dialog
-            val webView = WebView(context)
+            // 使用外部提供的 WebView 或創建新的 WebView
+            val webView = externalWebView ?: WebView(context)
             currentWebView = webView
-        
+
             // WebView設定
             val webSettings: WebSettings = webView.settings
             webSettings.javaScriptEnabled = true
 
-            // 禁用圖片載入
-            webSettings.loadsImagesAutomatically = false
-            webSettings.blockNetworkImage = true
+            // 確保可以載入網路資源（包括JavaScript文件）
+            webSettings.allowFileAccess = true
+            webSettings.allowContentAccess = true
+            
+            // 允許混合內容（HTTPS頁面載入HTTP資源）
+            webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+
+            // 禁用圖片載入（但保持JavaScript和其他資源載入）
+//            webSettings.loadsImagesAutomatically = false
+//            webSettings.blockNetworkImage = true
                         
             // 禁用影片和媒體自動播放
             webSettings.mediaPlaybackRequiresUserGesture = true
@@ -45,9 +58,10 @@ class LoginWeb(private val context: Context) {
             // 禁用不必要的功能來提升載入速度
             webSettings.builtInZoomControls = false
             webSettings.displayZoomControls = false
-            webSettings.allowFileAccess = false  // 禁用檔案存取
-            webSettings.allowContentAccess = false  // 禁用內容存取
             webSettings.domStorageEnabled = true  // 保留DOM存儲（登入可能需要）
+            
+            // 確保用戶代理字串完整，某些網站根據此判斷是否載入JavaScript
+            webSettings.userAgentString = webSettings.userAgentString
 
             // 添加 JavaScript 接口
             webView.addJavascriptInterface(WebAppInterface(), "Android")
@@ -57,19 +71,18 @@ class LoginWeb(private val context: Context) {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
 
-                    // 頁面載入完成後，根據URL執行不同的腳本
+                    // 先注入通用腳本（所有頁面都需要）
+                    injectCommonScript(view)
+                    
+                    // 然後根據URL執行特定腳本
                     when {
                         url?.contains("login.php") == true -> {
                             // 在登入頁面，注入登入腳本
                             injectLoginScript(view)
                         }
-                        url?.contains("logout.php") == true -> {
-                            // 在登出頁面，注入登出腳本
-                            injectLogoutScript(view)
-                        }
                         url?.contains("gamer.com.tw") == true -> {
                             // 在其他巴哈頁面，檢查登入狀態
-                            injectLoginScript(view)
+                            injectForumScript(view)
                         }
                     }
                 }
@@ -86,22 +99,13 @@ class LoginWeb(private val context: Context) {
         }
     }
     
-    private fun injectLoginScript(webView: WebView?) {
+    // 注入通用腳本（所有頁面都需要的函數）
+    private fun injectCommonScript(webView: WebView?) {
         val script = """
             javascript:(function() {
-                // 檢查 sessionStorage 是否已經執行過腳本
-                if (sessionStorage.getItem('bahamutLoginScriptExecuted')) {
-                    console.log('登入腳本已經執行過，跳過重複執行');
-                    Android.onLogoutSuccess();
-                    return;
-                }
-                
-                // 標記腳本已執行到 sessionStorage
-                sessionStorage.setItem('bahamutLoginScriptExecuted', 'true');
-                console.log('開始注入登入腳本');
                 
                 // 等待元素出現的函數
-                function waitForElement(selector, callback, timeout = 10000) {
+                window.waitForElement = function(selector, callback, timeout = 10000) {
                     var startTime = Date.now();
                     function check() {
                         var element = document.querySelector(selector);
@@ -114,27 +118,133 @@ class LoginWeb(private val context: Context) {
                         }
                     }
                     check();
-                }
+                };
                 
+                // 統一的簽到對話框檢測函數
+                window.startSigninCheck = function() {
+                    console.log('開始檢測簽到對話框...');
+                    if (typeof Signin !== 'undefined') {
+                        Signin.mobile();
+                    }
+
+                    var startTime = Date.now();
+                    var timeout = 10000; // 10秒超時
+                    
+                    function checkDialog() {
+                        var signDialog = document.querySelector('dialog#dialogify_1.dialogify.fixed.popup-dailybox');
+                        if (signDialog) {
+                            console.log('找到簽到對話框，呼叫 signSuccess');
+                            Android.signSuccess();
+                            return;
+                        }
+                        
+                        // 檢查是否超時
+                        if (Date.now() - startTime >= timeout) {
+                            console.log('10秒內未找到簽到對話框');
+                            Android.onFail();
+                            return;
+                        }
+                        
+                        // 繼續檢查
+                        setTimeout(checkDialog, 500);
+                    }
+                    
+                    checkDialog();
+                };
+                
+                console.log('巴哈姆特通用腳本已載入');
+            })();
+        """.trimIndent()
+        
+        webView?.evaluateJavascript(script, null)
+    }
+    
+    // 注入登入腳本
+    private fun injectLoginScript(webView: WebView?) {
+        val script = """
+            javascript:(function() {
                 // 設置登入表單
                 function setupLoginForm() {
                     console.log('開始設置登入表單');
                     
                     // 等待用戶名輸入框
-                    waitForElement('input[name="userid"]', function(useridInput) {
+                    window.waitForElement('input[name="userid"]', function(useridInput) {
                         console.log('找到用戶名輸入框');
                         useridInput.value = '${UserSettings.getPropertiesUsername()}';
                         
                         // 等待密碼輸入框
-                        waitForElement('input[name="password"]', function(passwordInput) {
+                        window.waitForElement('input[name="password"]', function(passwordInput) {
                             console.log('找到密碼輸入框');
                             passwordInput.value = '${UserSettings.getPropertiesPassword()}';
                             
-                            // 等待登入按鈕
-                            waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
-                                console.log('自動點擊登入按鈕');
-                                loginButton.click();
-                            });
+                            // 觸發用戶名blur事件，讓巴哈姆特原生腳本檢查2SA需求
+                            console.log('觸發用戶名blur事件');
+                            useridInput.dispatchEvent(new Event('blur', { bubbles: true }));
+                            
+                            // 等待一段時間讓伺服器響應和原生腳本處理
+                            setTimeout(function() {
+                                console.log('檢查是否需要手動驗證');
+                                
+                                // 檢查reCAPTCHA
+                                var recaptchaElements = document.querySelectorAll('.recaptcha-checkbox, #recaptcha-anchor, iframe[src*="recaptcha"], .g-recaptcha');
+                                if (recaptchaElements.length > 0) {
+                                    console.log('檢測到reCAPTCHA驗證，需要手動處理');
+                                    Android.needManualLogin();
+                                    return;
+                                }
+                                
+                                // 檢查2SA
+                                var twoFactorInput = document.querySelector('#input-2sa');
+                                if (twoFactorInput) {
+                                    var computedStyle = window.getComputedStyle(twoFactorInput);
+                                    if (computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden') {
+                                        console.log('檢測到2SA驗證，需要手動處理');
+                                        Android.needManualLogin();
+                                        return;
+                                    }
+                                }
+                                
+                                console.log('無需手動驗證，繼續自動登入流程');
+                                
+                                // 找到並提交登入表單
+                                var loginForm = document.querySelector('#form-login, form[name="loginForm"]');
+                                if (loginForm) {
+                                    console.log('找到登入表單，準備提交');
+                                    
+                                    // 監聽表單提交事件
+                                    loginForm.addEventListener('submit', function(e) {
+                                        console.log('登入表單已提交，開始等待登入結果');
+                                        // 等待3秒後開始檢測簽到對話框
+                                        setTimeout(function() {
+                                            console.log('登入提交後3秒，開始檢測簽到對話框');
+                                            if (typeof window.startSigninCheck === 'function') {
+                                                window.startSigninCheck();
+                                            } else {
+                                                Android.onFail();
+                                            }
+                                        }, 3000);
+                                    });
+                                    
+                                    // 提交表單
+                                    loginForm.submit();
+                                } else {
+                                    // 如果找不到表單，嘗試點擊登入按鈕
+                                    window.waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
+                                        console.log('找不到表單，改為點擊登入按鈕');
+                                        loginButton.click();
+                                        
+                                        // 等待3秒後開始檢測簽到對話框
+                                        setTimeout(function() {
+                                            console.log('登入按鈕點擊後3秒，開始檢測簽到對話框');
+                                            if (typeof window.startSigninCheck === 'function') {
+                                                window.startSigninCheck();
+                                            } else {
+                                                Android.onFail();
+                                            }
+                                        }, 3000);
+                                    });
+                                }
+                            }, 1000); // 等待1秒讓巴哈姆特原生腳本處理2SA檢測
                         });
                     });
                 }
@@ -145,39 +255,19 @@ class LoginWeb(private val context: Context) {
                     console.log('已經在登入頁面');
                     setupLoginForm();
                 } else {
-                    console.log('不在登入頁面，開始檢測簽到對話框...');
-
-                    Signin.mobile();
-
-                    var startTime = Date.now();
-                    var timeout = 5000; // 5秒超時
-                    
-                    function checkDialog() {
-                        var signDialog = document.querySelector('dialog#dialogify_1.dialogify.fixed.popup-dailybox');
-                        if (signDialog) {
-                            console.log('找到簽到對話框，呼叫 signSuccess，跳轉登出');
-                            Android.signSuccess();
-                            setTimeout(()=>{
-                                window.location.href = 'https://user.gamer.com.tw/logout.php';
-                            }, 1000);
-                            return;
-                        }
-                        
-                        // 檢查是否超時
-                        if (Date.now() - startTime >= timeout) {
-                            console.log('5秒內未找到簽到對話框，跳轉登出');
-                            // 跳轉到登出頁面
-                            setTimeout(()=>{
-                                window.location.href = 'https://user.gamer.com.tw/logout.php';
-                            }, 1000);
-                            return;
-                        }
-                        
-                        // 繼續檢查
-                        setTimeout(checkDialog, 500);
+                    // 使用統一的簽到檢測函數
+                    if (typeof window.startSigninCheck === 'function') {
+                        window.startSigninCheck();
+                    } else {
+                        console.log('通用腳本尚未載入，等待後重試');
+                        setTimeout(function() {
+                            if (typeof window.startSigninCheck === 'function') {
+                                window.startSigninCheck();
+                            } else {
+                                Android.onFail();
+                            }
+                        }, 1000);
                     }
-                    
-                    checkDialog();
                 }
             })();
         """.trimIndent()
@@ -185,56 +275,36 @@ class LoginWeb(private val context: Context) {
         webView?.evaluateJavascript(script, null)
     }
     
-    private fun injectLogoutScript(webView: WebView?) {
+    // 注入論壇頁面檢查腳本
+    private fun injectForumScript(webView: WebView?) {
         val script = """
             javascript:(function() {
-                // 檢查 sessionStorage 是否已經執行過登出腳本
-                if (sessionStorage.getItem('bahamutLogoutScriptExecuted')) {
-                    console.log('登出腳本已經執行過，跳過重複執行');
-                    Android.onLogoutSuccess();
-                    return;
-                }
-                
-                // 標記登出腳本已執行到 sessionStorage
-                sessionStorage.setItem('bahamutLogoutScriptExecuted', 'true');
-                console.log('開始注入登出腳本');
-                
-                // 等待元素出現的函數
-                function waitForElement(selector, callback, timeout = 10000) {
-                    var startTime = Date.now();
-                    function check() {
-                        var element = document.querySelector(selector);
-                        if (element) {
-                            callback(element);
-                        } else if (Date.now() - startTime < timeout) {
-                            setTimeout(check, 500);
+                // 使用統一的簽到檢測函數
+                if (typeof window.startSigninCheck === 'function') {
+                    window.startSigninCheck();
+                } else {
+                    console.log('通用腳本尚未載入，等待後重試');
+                    setTimeout(function() {
+                        if (typeof window.startSigninCheck === 'function') {
+                            window.startSigninCheck();
                         } else {
-                            console.log('等待元素超時: ' + selector);
+                            console.log('無法載入通用腳本，執行失敗邏輯');
+                            Android.onFail();
                         }
-                    }
-                    check();
-                }
-                
-                // 等待並點擊登出確定按鈕
-                waitForElement('button.btn.btn--primary[onclick="logout();"]', function(logoutButton) {
-                    console.log('找到登出確定按鈕，點擊登出');
-                    logoutButton.click();
-                    
-                    setTimeout(()=>{
-                    Android.onLogoutSuccess();
                     }, 1000);
-                });
+                }
             })();
         """.trimIndent()
         
         webView?.evaluateJavascript(script, null)
     }
-    
+
     // 設定 20 秒後自動清理
     private fun setupTimeout() {
         timeoutHandler = Handler(Looper.getMainLooper())
         timeoutRunnable = Runnable {
             println("WebView 登入 20 秒超時，自動清理")
+            onFailCallback?.invoke()
             cleanup()
         }
         timeoutHandler?.postDelayed(timeoutRunnable!!, 20000) // 20 秒 = 20000 毫秒
@@ -248,32 +318,25 @@ class LoginWeb(private val context: Context) {
         timeoutHandler = null
         timeoutRunnable = null
     }
-    
+
     // 清理WebView資源
     fun cleanup() {
         // 先取消計時器
         cancelTimeout()
         
-        // 先調用回調，再清理引用
-        val tempCallback = onLogoutCompleteCallback
-    
         object : ASRunner() {
             override fun run() {
                 currentWebView?.let { webView ->
                     webView.stopLoading()
-                    webView.clearHistory()
-                    webView.clearCache(true)
                     webView.loadUrl("about:blank")
                     webView.destroy()
                 }
                 currentWebView = null
-                
+
                 // 清理回調函數引用
-                onLogoutCompleteCallback = null
+                onFailCallback = null
                 onSignDetectedCallback = null
-                
-                // 最後調用回調通知完成
-                tempCallback?.invoke()
+                onManualCallback = null
             }
         }.runInMainThread()
     }
@@ -281,11 +344,12 @@ class LoginWeb(private val context: Context) {
     // JavaScript接口類
     inner class WebAppInterface {
         @JavascriptInterface
-        fun onLogoutSuccess() {
-            println("登出執行完畢！")
+        fun onFail() {
+            println("檢測不到簽到。")
             
             object : ASRunner() {
                 override fun run() {
+                    onFailCallback?.invoke()
                     cleanup()
                 }
             }.runInMainThread()
@@ -295,10 +359,22 @@ class LoginWeb(private val context: Context) {
         fun signSuccess() {
             println("檢測到簽到對話框！")
             
-            // 通知檢測到簽到
             object : ASRunner() {
                 override fun run() {
                     onSignDetectedCallback?.invoke()
+                    cleanup()
+                }
+            }.runInMainThread()
+        }
+        
+        @JavascriptInterface
+        fun needManualLogin() {
+            println("需要手動登入驗證")
+            cancelTimeout()
+
+            object : ASRunner() {
+                override fun run() {
+                    onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
                 }
             }.runInMainThread()
         }
