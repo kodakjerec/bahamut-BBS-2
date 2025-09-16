@@ -3,11 +3,14 @@
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
         <LinearLayout android:orientation="vertical" android:id="@+id/ClassPage_ItemView_backgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/white" android:ellipsize="end" android:id="@+id/ClassPage_ItemView_classTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
+                <com.kota.telnetUI.textView.TelnetTextViewNormal
+                    android:textColor="@color/white" android:ellipsize="end" android:id="@+id/ClassPage_ItemView_classTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/class_page_item_view_name" android:id="@+id/ClassPage_ItemView_className" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/class_page_item_view_manager" android:gravity="right" android:id="@+id/ClassPage_ItemView_classManager" android:paddingLeft="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/class_page_item_view_name" android:id="@+id/ClassPage_ItemView_className" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/class_page_item_view_manager" android:gravity="right" android:id="@+id/ClassPage_ItemView_classManager" android:paddingLeft="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
             </LinearLayout>
         </LinearLayout>
         <View style="@style/ItemViewDividerVertical"/>

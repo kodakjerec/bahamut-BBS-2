@@ -56,14 +56,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp">
 
-                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+                <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
                     style="@style/TextViewUltraLarge"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="12dp"
                     android:text="@string/theme_manager_page_group0" />
 
-                <com.kota.Bahamut.Pages.Model.PostEditText
+                <com.kota.Bahamut.pages.model.PostEditText
                     android:id="@+id/Theme_Manager_Page_Toolbar_Name"
                     style="@style/EditTextSingleLine"
                     android:autofillHints="username"
@@ -72,14 +72,14 @@
                     android:maxLength="12"
                     android:textSize="28sp" />
             </LinearLayout>
-            <com.kota.TelnetUI.TextView.TelnetTextView
+            <com.kota.telnetUI.textView.TelnetTextView
                 style="@style/SystemSettingsChapter"
                 android:text="@string/theme_manager_page_group1"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     style="@style/TextViewSmall"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
@@ -108,13 +108,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     style="@style/TextViewSmall"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/theme_manager_page_chapter_text"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Text_Color_Pressed"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"
@@ -122,7 +122,7 @@
                     android:layout_height="60dp"
                     android:gravity="center"
                     android:text="@string/loading"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Text_Color"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"
@@ -130,7 +130,7 @@
                     android:layout_height="60dp"
                     android:gravity="center"
                     android:text="@string/loading"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Text_Color_Disabled"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"
@@ -143,13 +143,13 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     style="@style/TextViewSmall"
                     android:layout_width="20dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:text="@string/theme_manager_page_chapter_back"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Back_Color_Pressed"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"
@@ -157,7 +157,7 @@
                     android:layout_height="60dp"
                     android:gravity="center"
                     android:text="@string/loading"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Back_Color"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"
@@ -165,7 +165,7 @@
                     android:layout_height="60dp"
                     android:gravity="center"
                     android:text="@string/loading"/>
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Theme_Manager_Page_Back_Color_Disabled"
                     style="@style/TextViewNormal"
                     android:layout_width="0dp"

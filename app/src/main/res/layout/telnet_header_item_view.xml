@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         style="@style/TouchBlock">
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+        <com.kota.telnetUI.textView.TelnetTextViewNormal
             android:textColor="@color/yellow"
             android:id="@+id/title"
             android:layout_width="match_parent"
@@ -15,8 +15,10 @@
             style="@style/TextViewNormal"
             android:textIsSelectable="true"/>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
         </LinearLayout>
     </LinearLayout>
     <View android:id="@+id/menu_divider" android:visibility="gone" style="@style/ItemViewDividerVertical"/>

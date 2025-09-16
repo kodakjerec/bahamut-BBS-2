@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:id="@+id/content_view">
 
-    <com.kota.TelnetUI.TelnetHeaderItemView
+    <com.kota.telnetUI.TelnetHeaderItemView
         android:id="@+id/ClassPage_headerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:layout_below="@id/ClassPage_headerView"
         android:layout_above="@id/toolbar">
 
-        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+        <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
             android:id="@+id/ClassPage_listEmptyView"
             style="@style/TextViewUltraLarge"
             android:layout_width="match_parent"
@@ -27,7 +27,7 @@
             android:textColor="@color/white"
             android:visibility="invisible" />
 
-        <com.kota.ASFramework.UI.ASListView
+        <com.kota.asFramework.ui.ASListView
             android:id="@+id/ClassPage_listView"
             style="@style/List"
             android:layout_width="match_parent"

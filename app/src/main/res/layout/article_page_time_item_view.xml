@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/time_line_background_color">
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+    <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/ArticleTimeItemView_IP"
         style="@style/TextViewSmall"
         android:layout_width="wrap_content"
@@ -12,7 +12,7 @@
         android:textColor="@color/white"
         android:layout_alignParentStart="true"
         android:textIsSelectable="true"/>
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+    <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/ArticleTimeItemView_Time"
         style="@style/TextViewSmall"
         android:layout_width="wrap_content"

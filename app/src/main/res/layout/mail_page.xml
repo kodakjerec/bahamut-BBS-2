@@ -19,8 +19,9 @@
                 android:id="@+id/Mail_TextContentView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
-                <com.kota.ASFramework.UI.ASListView
+                <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
+                    android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                <com.kota.asFramework.ui.ASListView
                     android:id="@+id/Mail_contentList"
                     style="@style/List"
                     android:layout_width="match_parent"
@@ -30,16 +31,16 @@
                     android:scrollbars="vertical" />
             </FrameLayout>
             <!-- telnet模式 -->
-            <com.kota.ASFramework.UI.ASScrollView
+            <com.kota.asFramework.ui.ASScrollView
                 android:id="@+id/Mail_contentTelnetViewBlock"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:visibility="gone">
-                <com.kota.TelnetUI.TelnetView
+                <com.kota.telnetUI.TelnetView
                     android:id="@+id/Mail_contentTelnetView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
-            </com.kota.ASFramework.UI.ASScrollView>
+            </com.kota.asFramework.ui.ASScrollView>
         </FrameLayout>
         <LinearLayout
             android:id="@+id/toolbar_block"

@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:padding="1dp">
         
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge 
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:textColor="@color/white"
             android:background="#202020"
             android:padding="6dp"

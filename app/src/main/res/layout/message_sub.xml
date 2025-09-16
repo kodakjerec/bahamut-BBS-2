@@ -35,13 +35,13 @@
         android:orientation="vertical"
         android:layout_below="@+id/Message_Sub_Header"
         android:layout_above="@+id/Message_Sub_EditField">
-        <com.kota.ASFramework.UI.ASListView
+        <com.kota.asFramework.ui.ASListView
             android:id="@+id/Message_Sub_Scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:divider="@null"/>
     </LinearLayout>
-    <com.kota.Bahamut.Pages.Model.PostEditText
+    <com.kota.Bahamut.pages.model.PostEditText
         android:id="@+id/Message_Sub_EditField"
         style="@style/EditTextSingleLine"
         android:layout_above="@+id/toolbar"

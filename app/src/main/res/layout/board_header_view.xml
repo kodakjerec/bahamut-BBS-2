@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         style="@style/TouchBlock">
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+        <com.kota.telnetUI.textView.TelnetTextViewNormal
             android:textColor="@color/yellow"
             android:id="@+id/title"
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 android:id="@+id/detail_1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 android:id="@+id/detail_vV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 android:visibility="gone"/>
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 android:id="@+id/detail_2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

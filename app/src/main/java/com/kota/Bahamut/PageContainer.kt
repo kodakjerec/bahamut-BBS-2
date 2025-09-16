@@ -1,23 +1,23 @@
 package com.kota.Bahamut
 
-import com.kota.Bahamut.Pages.ArticlePage.ArticlePage
-import com.kota.Bahamut.Pages.BBSUser.UserConfigPage
-import com.kota.Bahamut.Pages.BBSUser.UserInfoPage
-import com.kota.Bahamut.Pages.BillingPage
-import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage
-import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage
-import com.kota.Bahamut.Pages.ClassPage
-import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage
-import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage
-import com.kota.Bahamut.Pages.Login.LoginPage
-import com.kota.Bahamut.Pages.MailBoxPage
-import com.kota.Bahamut.Pages.MainPage
-import com.kota.Bahamut.Pages.Messages.MessageMain
-import com.kota.Bahamut.Pages.Messages.MessageSub
-import com.kota.Bahamut.Pages.PostArticlePage
-import com.kota.Bahamut.Pages.StartPage
-import com.kota.Bahamut.Pages.Theme.ThemeManagerPage
+import com.kota.Bahamut.pages.articlePage.ArticlePage
+import com.kota.Bahamut.pages.bbsUser.UserConfigPage
+import com.kota.Bahamut.pages.bbsUser.UserInfoPage
+import com.kota.Bahamut.pages.BillingPage
+import com.kota.Bahamut.pages.boardPage.BoardLinkPage
+import com.kota.Bahamut.pages.boardPage.BoardMainPage
+import com.kota.Bahamut.pages.boardPage.BoardSearchPage
+import com.kota.Bahamut.pages.ClassPage
+import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
+import com.kota.Bahamut.pages.essencePage.BoardEssencePage
+import com.kota.Bahamut.pages.login.LoginPage
+import com.kota.Bahamut.pages.MailBoxPage
+import com.kota.Bahamut.pages.MainPage
+import com.kota.Bahamut.pages.messages.MessageMain
+import com.kota.Bahamut.pages.messages.MessageSub
+import com.kota.Bahamut.pages.PostArticlePage
+import com.kota.Bahamut.pages.StartPage
+import com.kota.Bahamut.pages.theme.ThemeManagerPage
 import java.util.Stack
 
 /* loaded from: classes.dex */

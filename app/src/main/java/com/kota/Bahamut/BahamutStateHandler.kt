@@ -1,67 +1,67 @@
 package com.kota.Bahamut
 
 import android.util.Log
-import com.kota.ASFramework.PageController.ASNavigationController
-import com.kota.ASFramework.PageController.ASNavigationController.pushViewController
-import com.kota.ASFramework.PageController.ASViewController
-import com.kota.ASFramework.Thread.ASRunner
-import com.kota.ASFramework.UI.ASSnackBar.show
-import com.kota.ASFramework.UI.ASToast.showLongToast
-import com.kota.ASFramework.UI.ASToast.showShortToast
-import com.kota.Bahamut.Command.BahamutCommandLoadArticleEnd
-import com.kota.Bahamut.Command.BahamutCommandLoadArticleEndForSearch
-import com.kota.Bahamut.Command.BahamutCommandLoadMoreArticle
-import com.kota.Bahamut.Pages.ArticlePage.ArticlePage
-import com.kota.Bahamut.Pages.ArticlePage.ArticlePage.setArticle
-import com.kota.Bahamut.Pages.BBSUser.UserConfigPage
-import com.kota.Bahamut.Pages.BBSUser.UserInfoPage
-import com.kota.Bahamut.Pages.BoardPage.BoardLinkPage
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage.cancelRunner
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage.lastListAction
-import com.kota.Bahamut.Pages.BoardPage.BoardMainPage.openPushArticleDialog
-import com.kota.Bahamut.Pages.BoardPage.BoardPageAction
-import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage
-import com.kota.Bahamut.Pages.ClassPage
-import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage
-import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage.setArticle
-import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage
-import com.kota.Bahamut.Pages.Login.LoginPage
-import com.kota.Bahamut.Pages.Login.LoginPage.onLoginSuccess
-import com.kota.Bahamut.Pages.MailBoxPage
-import com.kota.Bahamut.Pages.MailPage
-import com.kota.Bahamut.Pages.MailPage.setArticle
-import com.kota.Bahamut.Pages.MainPage
-import com.kota.Bahamut.Pages.Messages.BahaMessage
-import com.kota.Bahamut.Pages.Messages.MessageDatabase
-import com.kota.Bahamut.Pages.Messages.MessageMain
-import com.kota.Bahamut.Pages.Messages.MessageSmall
-import com.kota.Bahamut.Pages.Messages.MessageStatus
-import com.kota.Bahamut.Pages.Messages.MessageSub
-import com.kota.Bahamut.Pages.PostArticlePage
-import com.kota.Bahamut.Service.HeroStep
-import com.kota.Bahamut.Service.NotificationSettings.getShowMessageFloating
-import com.kota.Bahamut.Service.TempSettings
-import com.kota.Bahamut.Service.TempSettings.getMessageSmall
-import com.kota.Bahamut.Service.TempSettings.getNotReadMessageCount
-import com.kota.Bahamut.Service.TempSettings.setMessageSmall
-import com.kota.Bahamut.Service.TempSettings.setNotReadMessageCount
-import com.kota.Telnet.Logic.Article_Handler
-import com.kota.Telnet.Logic.SearchBoard_Handler
-import com.kota.Telnet.Model.TelnetModel.cursor
-import com.kota.Telnet.Model.TelnetModel.getRow
-import com.kota.Telnet.Model.TelnetRow
-import com.kota.Telnet.Reference.TelnetKeyboard
-import com.kota.Telnet.TelnetArticle
-import com.kota.Telnet.TelnetClient
-import com.kota.Telnet.TelnetClient.model
-import com.kota.Telnet.TelnetCursor
-import com.kota.Telnet.TelnetCursor.equals
-import com.kota.Telnet.TelnetOutputBuilder.Companion.create
-import com.kota.Telnet.TelnetStateHandler
-import com.kota.Telnet.TelnetUtils.getHeader
-import com.kota.TelnetUI.TelnetPage
-import com.kota.TextEncoder.B2UEncoder
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.pageController.ASNavigationController.pushViewController
+import com.kota.asFramework.pageController.ASViewController
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASSnackBar.show
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.Bahamut.command.BahamutCommandLoadArticleEnd
+import com.kota.Bahamut.command.BahamutCommandLoadArticleEndForSearch
+import com.kota.Bahamut.command.BahamutCommandLoadMoreArticle
+import com.kota.Bahamut.pages.articlePage.ArticlePage
+import com.kota.Bahamut.pages.articlePage.ArticlePage.setArticle
+import com.kota.Bahamut.pages.bbsUser.UserConfigPage
+import com.kota.Bahamut.pages.bbsUser.UserInfoPage
+import com.kota.Bahamut.pages.boardPage.BoardLinkPage
+import com.kota.Bahamut.pages.boardPage.BoardMainPage
+import com.kota.Bahamut.pages.boardPage.BoardMainPage.cancelRunner
+import com.kota.Bahamut.pages.boardPage.BoardMainPage.lastListAction
+import com.kota.Bahamut.pages.boardPage.BoardMainPage.openPushArticleDialog
+import com.kota.Bahamut.pages.boardPage.BoardPageAction
+import com.kota.Bahamut.pages.boardPage.BoardSearchPage
+import com.kota.Bahamut.pages.ClassPage
+import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
+import com.kota.Bahamut.pages.essencePage.ArticleEssencePage.setArticle
+import com.kota.Bahamut.pages.essencePage.BoardEssencePage
+import com.kota.Bahamut.pages.login.LoginPage
+import com.kota.Bahamut.pages.login.LoginPage.onLoginSuccess
+import com.kota.Bahamut.pages.MailBoxPage
+import com.kota.Bahamut.pages.MailPage
+import com.kota.Bahamut.pages.MailPage.setArticle
+import com.kota.Bahamut.pages.MainPage
+import com.kota.Bahamut.pages.messages.BahaMessage
+import com.kota.Bahamut.pages.messages.MessageDatabase
+import com.kota.Bahamut.pages.messages.MessageMain
+import com.kota.Bahamut.pages.messages.MessageSmall
+import com.kota.Bahamut.pages.messages.MessageStatus
+import com.kota.Bahamut.pages.messages.MessageSub
+import com.kota.Bahamut.pages.PostArticlePage
+import com.kota.Bahamut.service.HeroStep
+import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
+import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.TempSettings.getMessageSmall
+import com.kota.Bahamut.service.TempSettings.getNotReadMessageCount
+import com.kota.Bahamut.service.TempSettings.setMessageSmall
+import com.kota.Bahamut.service.TempSettings.setNotReadMessageCount
+import com.kota.telnet.logic.ArticleHandler
+import com.kota.telnet.logic.SearchBoardHandler
+import com.kota.telnet.model.TelnetModel.cursor
+import com.kota.telnet.model.TelnetModel.getRow
+import com.kota.telnet.model.TelnetRow
+import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.telnet.TelnetArticle
+import com.kota.telnet.TelnetClient
+import com.kota.telnet.TelnetClient.model
+import com.kota.telnet.TelnetCursor
+import com.kota.telnet.TelnetCursor.equals
+import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.TelnetStateHandler
+import com.kota.telnet.TelnetUtils.getHeader
+import com.kota.telnetUI.TelnetPage
+import com.kota.textEncoder.B2UEncoder
 import java.io.ByteArrayOutputStream
 import java.util.Vector
 import java.util.function.Consumer
@@ -78,7 +78,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     var firstHeader: String = ""
     var lastHeader: String = ""
     var telnetCursor: TelnetCursor? = null
-    val articleHandler: Article_Handler = Article_Handler()
+    val articleHandler: ArticleHandler = ArticleHandler()
     var duringReadingArticle: Boolean = false // 正在讀取文章
 
     /** 設定文章編號  */
@@ -435,10 +435,10 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleSearchBoard() {
         if (this.row_string_final.startsWith("★ 列表") && this.telnetCursor!!.equals(23, 29)) {
-            SearchBoard_Handler.instance.read()
+            SearchBoardHandler.instance.read()
             TelnetClient.getClient().sendKeyboardInputToServer(67)
         } else if (this.telnetCursor!!.row == 1) {
-            SearchBoard_Handler.instance.read()
+            SearchBoardHandler.instance.read()
             val data = create().pushKey(TelnetKeyboard.CTRL_Y).pushString("\n\n").build()
             TelnetClient.getClient().sendDataToServer(data)
             object : ASRunner() {

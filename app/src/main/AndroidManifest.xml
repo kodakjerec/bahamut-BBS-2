@@ -45,7 +45,7 @@
             android:theme="@style/Dialog.NoTitleBar"
             android:configChanges="orientation|screenSize" />
         <receiver
-            android:name="com.kota.ASFramework.Network.ASNetworkStateChangeReceiver"
+            android:name="com.kota.asFramework.network.ASNetworkStateChangeReceiver"
             android:exported="true"
             android:label="NetworkConnection">
             <intent-filter>

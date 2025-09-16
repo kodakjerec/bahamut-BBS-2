@@ -14,7 +14,7 @@
         android:orientation="vertical"
         android:padding="1dp">
 
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/TextViewLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -62,7 +62,7 @@
                                 android:id="@+id/Dialog_reference_author1_removeBlank"
                                 style="@style/ListDialogItem">
 
-                                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                <com.kota.telnetUI.textView.TelnetTextViewNormal
                                     style="@style/SystemSettingsCheckboxText"
                                     android:text="@string/dialog_reference_remove_blank" />
 
@@ -71,7 +71,7 @@
                                     style="@style/SystemSettingsCheckbox" />
                             </RelativeLayout>
 
-                            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                            <com.kota.telnetUI.textView.TelnetTextViewNormal
                                 style="@style/TextViewNormal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
@@ -134,7 +134,7 @@
                             <RelativeLayout
                                 android:id="@+id/Dialog_reference_author0_removeBlank"
                                 style="@style/ListDialogItem">
-                                <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                                <com.kota.telnetUI.textView.TelnetTextViewNormal
                                     android:text="@string/dialog_reference_remove_blank"
                                     style="@style/SystemSettingsCheckboxText"/>
                                 <CheckBox
@@ -142,7 +142,7 @@
                                     style="@style/SystemSettingsCheckbox"/>
                             </RelativeLayout>
 
-                            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                            <com.kota.telnetUI.textView.TelnetTextViewNormal
                                 style="@style/TextViewNormal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
