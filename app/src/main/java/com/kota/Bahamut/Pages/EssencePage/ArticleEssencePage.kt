@@ -105,7 +105,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     var title = ""
                     var boardName = ""
                     if (telnetArticle!=null) {
-                        author = telnetArticle!!.Author
+                        author = telnetArticle!!.author
                         title = telnetArticle!!.Title
                         if (telnetArticle!!.Nickname != null) {
                             author = author + "(" + telnetArticle!!.Nickname + ")"
@@ -373,7 +373,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
 
     private fun onMenuClicked() {
-        if (telnetArticle != null && telnetArticle!!.Author != null) {
+        if (telnetArticle != null && telnetArticle!!.author != null) {
             ASListDialog.createDialog()
                 .addItem(CommonFunctions.getContextString(R.string.change_mode))
                 .addItem(
@@ -517,7 +517,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     UserSettings.setBlockList(newList)
                     UserSettings.notifyDataUpdated()
                     if (UserSettings.getPropertiesBlockListEnable()) {
-                        if (aBlockName == telnetArticle!!.Author) {
+                        if (aBlockName == telnetArticle!!.author) {
                             onBackPressed()
                         } else {
                             listAdapter.notifyDataSetChanged()
