@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -95,7 +96,7 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
             // 載入巴哈姆特網站
             webView.loadUrl("https://user.gamer.com.tw/login.php")
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, "Error initializing LoginWeb", e)
         }
     }
     
@@ -177,10 +178,6 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                             console.log('找到密碼輸入框');
                             passwordInput.value = '${UserSettings.getPropertiesPassword()}';
                             
-                            // 觸發用戶名blur事件，讓巴哈姆特原生腳本檢查2SA需求
-                            console.log('觸發用戶名blur事件');
-                            useridInput.dispatchEvent(new Event('blur', { bubbles: true }));
-                            
                             // 等待一段時間讓伺服器響應和原生腳本處理
                             setTimeout(function() {
                                 console.log('檢查是否需要手動驗證');
@@ -205,45 +202,12 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                                 }
                                 
                                 console.log('無需手動驗證，繼續自動登入流程');
-                                
-                                // 找到並提交登入表單
-                                var loginForm = document.querySelector('#form-login, form[name="loginForm"]');
-                                if (loginForm) {
-                                    console.log('找到登入表單，準備提交');
-                                    
-                                    // 監聽表單提交事件
-                                    loginForm.addEventListener('submit', function(e) {
-                                        console.log('登入表單已提交，開始等待登入結果');
-                                        // 等待3秒後開始檢測簽到對話框
-                                        setTimeout(function() {
-                                            console.log('登入提交後3秒，開始檢測簽到對話框');
-                                            if (typeof window.startSigninCheck === 'function') {
-                                                window.startSigninCheck();
-                                            } else {
-                                                Android.onFail();
-                                            }
-                                        }, 3000);
-                                    });
-                                    
-                                    // 提交表單
-                                    loginForm.submit();
-                                } else {
-                                    // 如果找不到表單，嘗試點擊登入按鈕
-                                    window.waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
-                                        console.log('找不到表單，改為點擊登入按鈕');
-                                        loginButton.click();
-                                        
-                                        // 等待3秒後開始檢測簽到對話框
-                                        setTimeout(function() {
-                                            console.log('登入按鈕點擊後3秒，開始檢測簽到對話框');
-                                            if (typeof window.startSigninCheck === 'function') {
-                                                window.startSigninCheck();
-                                            } else {
-                                                Android.onFail();
-                                            }
-                                        }, 3000);
-                                    });
-                                }
+
+                                // 找到按鈕並提交登入表單
+                                window.waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
+                                    console.log('點擊登入按鈕');
+                                    loginButton.click();
+                                });
                             }, 1000); // 等待1秒讓巴哈姆特原生腳本處理2SA檢測
                         });
                     });
@@ -378,5 +342,6 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                 }
             }.runInMainThread()
         }
+        
     }
 }

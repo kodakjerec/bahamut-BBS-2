@@ -30,7 +30,7 @@ public class TelnetConnector implements TelnetChannelListener {
             try {
                 this._socket_channel.finishConnect();
             } catch (IOException e) {
-                Log.v("SocketChannel", "IO Exception");
+                Log.v(getClass().getSimpleName(), "IO Exception");
             }
         }
         this._socket_channel = null;
@@ -71,13 +71,13 @@ public class TelnetConnector implements TelnetChannelListener {
                 
                 // 檢查連線狀態
                 if (!TelnetConnector.this._is_connecting) {
-                    Log.w("TelnetConnector", "Connection lost, breaking holder thread");
+                    Log.w(getClass().getSimpleName(), "Connection lost, breaking holder thread");
                     break;
                 }
                 
                 // 檢查網路連線狀態
                 if (!TelnetConnector.this.checkNetworkConnectivity()) {
-                    Log.w("TelnetConnector", "Network connectivity lost");
+                    Log.w(getClass().getSimpleName(), "Network connectivity lost");
                     // 網路斷開時不立即斷線，給網路恢復的時間
                     continue;
                 }
@@ -85,20 +85,20 @@ public class TelnetConnector implements TelnetChannelListener {
                 // 增強的 keep-alive 檢查
                 long currentTime = System.currentTimeMillis();
                 if (currentTime - TelnetConnector.this._last_send_data_time > 150 * 1000) {
-                    Log.d("TelnetConnector", "Sending keep-alive message");
+                    Log.d(getClass().getSimpleName(), "Sending keep-alive message");
                     TelnetConnector.this.sendHoldMessage();
                 }
                 
                 // 添加連線健康檢查
                 if (currentTime - TelnetConnector.this._last_send_data_time > 300 * 1000) {
-                    Log.w("TelnetConnector", "No data for 5 minutes, checking connection health");
+                    Log.w(getClass().getSimpleName(), "No data for 5 minutes, checking connection health");
                     if (!TelnetConnector.this.isConnectionHealthy()) {
-                        Log.e("TelnetConnector", "Connection appears to be unhealthy");
+                        Log.e(getClass().getSimpleName(), "Connection appears to be unhealthy");
                         // 可以在這裡添加更積極的連線檢查或重連機制
                     }
                 }
             }
-            Log.d("TelnetConnector", "HolderThread terminated");
+            Log.d(getClass().getSimpleName(), "HolderThread terminated");
         }
     }
 
@@ -147,7 +147,7 @@ public class TelnetConnector implements TelnetChannelListener {
             // 初始化最後發送時間
             this._last_send_data_time = System.currentTimeMillis();
         } catch (IOException e) {
-            Log.e("TelnetConnector", "Telnet connection failed: " + e.getMessage());
+            Log.e(getClass().getSimpleName(), "Telnet connection failed: " + e.getMessage());
             // 連線失敗時釋放鎖定
             if (this._device_controller != null) {
                 this._device_controller.unlockWifi();
@@ -160,7 +160,7 @@ public class TelnetConnector implements TelnetChannelListener {
             }
             this._holder_thread = new HolderThread();
             this._holder_thread.start();
-            Log.d("TelnetConnector", "Telnet connection established, HolderThread started");
+            Log.d(getClass().getSimpleName(), "Telnet connection established, HolderThread started");
         } else if (this._listener != null) {
             this._listener.onTelnetConnectorConnectFail(this);
         }
@@ -196,7 +196,7 @@ public class TelnetConnector implements TelnetChannelListener {
             // 初始化最後發送時間
             this._last_send_data_time = System.currentTimeMillis();
         } catch (IOException e) {
-            Log.e("TelnetConnector", "WebSocket connection failed: " + e.getMessage());
+            Log.e(getClass().getSimpleName(), "WebSocket connection failed: " + e.getMessage());
             // 連線失敗時釋放鎖定
             if (this._device_controller != null) {
                 this._device_controller.unlockWifi();
@@ -209,7 +209,7 @@ public class TelnetConnector implements TelnetChannelListener {
             }
             this._holder_thread = new HolderThread();
             this._holder_thread.start();
-            Log.d("TelnetConnector", "WebSocket connection established, HolderThread started");
+            Log.d(getClass().getSimpleName(), "WebSocket connection established, HolderThread started");
         } else if (this._listener != null) {
             this._listener.onTelnetConnectorConnectFail(this);
         }
@@ -244,7 +244,7 @@ public class TelnetConnector implements TelnetChannelListener {
             try {
                 return selected_channel.readData();
             } catch (IOException e) {
-                Log.v("SocketChannel", "readData IO Exception");
+                Log.v(getClass().getSimpleName(), "readData IO Exception");
                 throw new TelnetConnectionClosedException();
             }
         }
@@ -327,9 +327,9 @@ public class TelnetConnector implements TelnetChannelListener {
             
             // 更新最後發送時間
             this._last_send_data_time = System.currentTimeMillis();
-            Log.d("TelnetConnector", "Keep-alive message sent");
+            Log.d(getClass().getSimpleName(), "Keep-alive message sent");
         } catch (Exception e) {
-            Log.e("TelnetConnector", "Failed to send keep-alive message: " + e.getMessage());
+            Log.e(getClass().getSimpleName(), "Failed to send keep-alive message: " + e.getMessage());
             // 如果發送失敗，可能連線已斷開
             if (this._listener != null) {
                 // 這裡可以觸發重連機制

@@ -83,7 +83,7 @@ public class LoginPage extends TelnetPage {
         try (UrlDatabase urlDatabase = new UrlDatabase(getContext())) { // 清除URL資料庫
             urlDatabase.clearDb();
         } catch (Exception e) {
-            Log.e("Bookmark", "initial fail");
+            Log.e(getClass().getSimpleName(), "initial fail");
         }
 
         // 登入

@@ -20,7 +20,7 @@
             android:padding="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="WebView 登入調試"
+            android:text="@string/login_web_sign_in"
             style="@style/TextViewLarge"/>
             
         <WebView
@@ -35,7 +35,7 @@
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button 
                 android:id="@+id/debug_btn_close"
-                android:text="關閉"
+                android:text="@string/exit"
                 style="@style/DialogToolbarItem"/>
         </LinearLayout>
         
