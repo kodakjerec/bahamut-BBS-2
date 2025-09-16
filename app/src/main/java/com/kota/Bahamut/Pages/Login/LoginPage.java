@@ -65,6 +65,7 @@ public class LoginPage extends TelnetPage {
     ASAlertDialog _remove_logon_user_dialog = null; // 刪除重複登入對話框
     ASDialog _save_unfinished_article_dialog = null; // 儲存未完成文章對話框
     TelnetView _telnet_view = null; // Telnet視圖
+    Thread _daily_check_thread = null; // 每日檢查執行緒
 
     @Override
     public int getPageType() {
@@ -137,6 +138,13 @@ public class LoginPage extends TelnetPage {
         _telnet_view = null;
         _remove_logon_user_dialog = null;
         _save_unfinished_article_dialog = null;
+
+        // 停止每日檢查執行緒
+        if (_daily_check_thread != null && _daily_check_thread.isAlive()) {
+            _daily_check_thread.interrupt();
+            _daily_check_thread = null;
+        }
+
         clear();
     }
 
@@ -357,7 +365,7 @@ public class LoginPage extends TelnetPage {
                     public void run() {
                         try {
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
-                            
+
                             // 使用 LoginWebDebugView 來顯示和處理自動登入
                             LoginWebDebugView debugView = new LoginWebDebugView(getContext());
                             debugView.startAutoLogin(() -> {
@@ -372,6 +380,43 @@ public class LoginPage extends TelnetPage {
                     }
                 }.runInMainThread();
             }
+
+            // 每小時檢查是否換日，如果換日則執行自動簽到
+            _daily_check_thread = new Thread(() -> {
+                while (true) {
+                    try {
+                        Thread.sleep(60 * 60 * 1000); // 每小時檢查一次
+
+                        // 檢查今日是否已經自動簽到過
+                        if (!isWebAutoLoginToday()) {
+                            // 換日了，執行自動簽到
+                            new ASRunner() {
+                                public void run() {
+                                    try {
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01));
+
+                                        // 使用 LoginWebDebugView 來處理自動簽到
+                                        LoginWebDebugView debugView = new LoginWebDebugView(getContext());
+                                        debugView.startAutoLogin(() -> {
+                                            // 記錄web自動簽到成功時間
+                                            setWebAutoLoginSuccessTime();
+                                            return null;
+                                        });
+                                    } catch (Exception e) {
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04));
+                                        Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
+                                    }
+                                }
+                            }.runInMainThread();
+                        }
+                    } catch (InterruptedException e) {
+                        Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                }
+            });
+            _daily_check_thread.start();
         }
     }
 
@@ -387,7 +432,7 @@ public class LoginPage extends TelnetPage {
         try {
             long lastTime = Long.parseLong(lastLoginTime);
             long currentTime = System.currentTimeMillis();
-            
+
             // 取得昨日與今日的時間邊界 (今日00:00:00)
             java.util.Calendar calendar = java.util.Calendar.getInstance();
             calendar.setTimeInMillis(currentTime);

@@ -98,9 +98,7 @@ object TempSettings {
 
     @JvmStatic
     fun getWebAutoLoginSuccessTime(): String {
-        // TODO
-        return ""
-        // return webAutoLoginSuccessTime
+        return webAutoLoginSuccessTime
     }
 
     /** 聊天小視窗 */
