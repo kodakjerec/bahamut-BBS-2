@@ -166,16 +166,26 @@ object MyBillingClient {
             .post(body)
             .build()
         ASRunner.runInNewThread {
-            client.newCall(request).execute().use { response ->
-                val data = response.body.string()
-                val jsonObject = JSONObject(data)
-                val buyQty =  jsonObject.optString("qty", "0").toInt()
-                if (buyQty>0) {
-                    UserSettings.setPropertiesVIP(true)
-                } else {
-                    UserSettings.setPropertiesVIP(false)
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val data = response.body.string()
+                        val jsonObject = JSONObject(data)
+                        val buyQty = jsonObject.optString("qty", "0").toInt()
+                        if (buyQty > 0) {
+                            UserSettings.setPropertiesVIP(true)
+                        } else {
+                            UserSettings.setPropertiesVIP(false)
+                        }
+                        callback(buyQty)
+                    } else {
+                        // HTTP error response
+                        UserSettings.setPropertiesVIP(false)
+                        callback(0)
+                    }
                 }
-                callback(buyQty)
+            } catch (_: Exception) {
+                callback(0)
             }
         }
     }

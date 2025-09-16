@@ -18,8 +18,11 @@ public class TelnetWebSocketChannel implements TelnetSocketChannel {
 
     public TelnetWebSocketChannel(String serverUrl) throws IOException {
         client = new OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(0, TimeUnit.MILLISECONDS) // No timeout for reading
+                .connectTimeout(30, TimeUnit.SECONDS)  // Increased from 10 to 30 seconds
+                .readTimeout(30, TimeUnit.SECONDS)     // Set reasonable read timeout
+                .writeTimeout(30, TimeUnit.SECONDS)    // Set write timeout
+                .callTimeout(60, TimeUnit.SECONDS)     // Overall call timeout
+                .retryOnConnectionFailure(true)        // Enable retry on connection failure
                 .build();
 
         connectLatch = new CountDownLatch(1);
@@ -40,7 +43,7 @@ public class TelnetWebSocketChannel implements TelnetSocketChannel {
             public void onOpen(WebSocket webSocket, Response response) {
                 isConnected = true;
                 connectLatch.countDown();
-                Log.d("WebSocket", "Connected to " + serverUrl);
+                Log.d(getClass().getSimpleName(), "Connected to " + serverUrl);
             }
 
             @Override
@@ -77,23 +80,53 @@ public class TelnetWebSocketChannel implements TelnetSocketChannel {
             public void onFailure(WebSocket webSocket, Throwable t, Response response) {
                 isConnected = false;
                 connectLatch.countDown();
-                Log.e("WebSocket", "Connection failed: " + t.getMessage());
+                
+                // 更詳細的錯誤日誌記錄
+                if (t instanceof java.net.SocketTimeoutException) {
+                    Log.e(getClass().getSimpleName(), "Socket timeout exception: " + t.getMessage());
+                } else if (t instanceof java.net.ConnectException) {
+                    Log.e(getClass().getSimpleName(), "Connection exception: " + t.getMessage());
+                } else if (t instanceof java.net.UnknownHostException) {
+                    Log.e(getClass().getSimpleName(), "Unknown host exception: " + t.getMessage());
+                } else if (t instanceof IOException) {
+                    Log.e(getClass().getSimpleName(), "IO exception: " + t.getMessage());
+                } else {
+                    Log.e(getClass().getSimpleName(), "Connection failed: " + t.getClass().getSimpleName() + " - " + t.getMessage());
+                }
+                
+                if (response != null) {
+                    Log.e(getClass().getSimpleName(), "Response code: " + response.code() + ", message: " + response.message());
+                }
+                
                 synchronized (readLock) {
                     readLock.notifyAll();
                 }
             }
         });
 
-        // 等待連線建立
+        // 等待連線建立 - 增加等待時間以配合更長的超時設定
         try {
-            if (!connectLatch.await(10, TimeUnit.SECONDS)) {
-                throw new IOException("WebSocket connection timeout");
+            if (!connectLatch.await(30, TimeUnit.SECONDS)) {
+                // 清理資源
+                if (webSocket != null) {
+                    webSocket.close(1000, "Connection timeout");
+                }
+                throw new IOException("WebSocket connection timeout after 30 seconds");
             }
         } catch (InterruptedException e) {
+            // 清理資源
+            if (webSocket != null) {
+                webSocket.close(1000, "Connection interrupted");
+            }
+            Thread.currentThread().interrupt(); // 恢復中斷狀態
             throw new IOException("WebSocket connection interrupted");
         }
 
         if (!isConnected) {
+            // 清理資源
+            if (webSocket != null) {
+                webSocket.close(1000, "Connection failed");
+            }
             throw new IOException("WebSocket connection failed");
         }
     }

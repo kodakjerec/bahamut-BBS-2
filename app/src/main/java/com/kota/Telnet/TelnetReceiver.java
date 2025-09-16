@@ -16,6 +16,12 @@ public class TelnetReceiver {
     }
 
     public void startReceiver() {
+        // Stop existing receiver if it's running
+        if (this._receiver_thread != null && this._receiver_thread.isAlive()) {
+            stopReceiver();
+        }
+        
+        // Create and start new receiver thread
         this._receiver_thread = new TelnetReceiverThread(this._connector, this._model);
         this._receiver_thread.setDaemon(true);
         this._receiver_thread.start();
@@ -24,14 +30,17 @@ public class TelnetReceiver {
     public void stopReceiver() {
         if (this._receiver_thread != null) {
             this._receiver_thread.close();
+            try {
+                // Wait for the thread to finish, but don't wait indefinitely
+                this._receiver_thread.join(1000); // Wait up to 1 second
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restore interrupt status
+            }
             this._receiver_thread = null;
         }
     }
 
     public boolean isReceiving() {
-        if (this._receiver_thread != null) {
-            return true;
-        }
-        return false;
+        return this._receiver_thread != null && this._receiver_thread.isAlive();
     }
 }

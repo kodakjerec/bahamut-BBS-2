@@ -179,11 +179,29 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
-        Intent intent = new Intent(this, BahaBBSBackgroundService.class);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent);
-        } else {
-            startService(intent);
+        try {
+            Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
+        } catch (SecurityException e) {
+            // Handle permission issues for foreground service
+            Log.e(getClass().getSimpleName(), "Failed to start foreground service: SecurityException", e);
+            // Try to start as regular service instead
+            try {
+                Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+                startService(intent);
+            } catch (Exception fallbackException) {
+                Log.e(getClass().getSimpleName(), "Failed to start service as fallback", fallbackException);
+            }
+        } catch (IllegalStateException e) {
+            // Handle cases where the app is in background and can't start foreground service
+            Log.e(getClass().getSimpleName(), "Failed to start foreground service: IllegalStateException", e);
+        } catch (Exception e) {
+            // Handle any other unexpected exceptions
+            Log.e(getClass().getSimpleName(), "Failed to start service", e);
         }
     }
 

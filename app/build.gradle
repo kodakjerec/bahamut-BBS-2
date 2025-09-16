@@ -5,8 +5,7 @@ plugins {
 
 android {
     namespace 'com.kota.Bahamut'
-    compileSdk 36
-
+    
     defaultConfig {
         applicationId "com.kota.Bahamut"
         minSdk 26
