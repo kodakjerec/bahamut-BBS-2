@@ -12,6 +12,8 @@ import com.kota.Telnet.TelnetArticlePush
 import java.util.*
 import java.util.regex.Pattern
 
+private val TelnetArticle.getInfoSize: Any
+
 class Article_Handler {
     var telnetArticle = TelnetArticle()
     private var _last_page: TelnetArticlePage? = null
@@ -20,7 +22,7 @@ class Article_Handler {
     fun loadPage(aModel: TelnetModel?) {
         var startLine = 1
         aModel?.let { model ->
-            val pageIndex = parsePageIndex(model.getLastRow())
+            val pageIndex = parsePageIndex(model.lastRow)
             if (pageIndex > 0) {
                 val page = TelnetArticlePage()
                 if (pageIndex == 1) {
@@ -38,10 +40,10 @@ class Article_Handler {
         var start = if (_pages.size > 0) 1 else 0
         var end = 23
         
-        while (start < 23 && aModel.getRow(start).isEmpty()) {
+        while (start < 23 && aModel.getRow(start)?.isEmpty() == true) {
             start++
         }
-        while (end > start && aModel.getRow(end).isEmpty()) {
+        while (end > start && aModel.getRow(end)?.isEmpty() == true) {
             end--
         }
         
@@ -165,7 +167,7 @@ class Article_Handler {
                             processingItem.setQuoteLevel(quoteLevel)
                             
                             if (quoteLevel != 0) {
-                                var i4 = telnetArticle.getInfoSize() - 1
+                                var i4 = telnetArticle.getInfoSize - 1
                                 while (i4 >= 0) {
                                     val itemInfo = telnetArticle.getInfo(i4)
                                     if (itemInfo.quoteLevel == quoteLevel) {
