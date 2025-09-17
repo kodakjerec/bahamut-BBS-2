@@ -11,6 +11,7 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.util.Vector
+import androidx.core.content.edit
 
 /*
     戰巴哈專用暫存檔
@@ -19,21 +20,21 @@ import java.util.Vector
     9  發文
  */
 class ArticleTempStore {
-    private val _context: Context?
-    private var _file_path: String? = null
+    private val context: Context?
+    private var filePath: String? = null
     @JvmField
     var articles: Vector<ArticleTemp> = Vector<ArticleTemp>()
 
     constructor(context: Context?, aFilePath: String?) {
-        this._context = context
-        this._file_path = aFilePath
+        this.context = context
+        this.filePath = aFilePath
         for (i in 0..9) {
             this.articles.add(ArticleTemp())
         }
     }
 
     constructor(context: Context?) {
-        this._context = context
+        this.context = context
         for (i in 0..9) {
             this.articles.add(ArticleTemp())
         }
@@ -42,32 +43,32 @@ class ArticleTempStore {
 
     fun load() {
         println("load article store from file")
-        var load_from_file = false
-        if (this._file_path != null && this._file_path!!.length > 0) {
-            val file = File(this._file_path)
+        var loadFromFile = false
+        if (this.filePath != null && this.filePath!!.isNotEmpty()) {
+            val file = File(this.filePath!!)
             if (file.exists()) {
                 try {
-                    val file_input_stream: InputStream = FileInputStream(file)
-                    val input_stream = ObjectInputStream(file_input_stream)
-                    importFromStream(input_stream)
-                    input_stream.close()
-                    file_input_stream.close()
+                    val fileInputStream: InputStream = FileInputStream(file)
+                    val inputStream = ObjectInputStream(fileInputStream)
+                    importFromStream(inputStream)
+                    inputStream.close()
+                    fileInputStream.close()
                     file.delete()
-                    load_from_file = true
+                    loadFromFile = true
                 } catch (e: IOException) {
                     Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
             }
         }
-        if (load_from_file) {
+        if (loadFromFile) {
             store()
         }
-        if (!load_from_file && this._context != null) {
+        if (!loadFromFile && this.context != null) {
             try {
-                val save_data: String = this._context.getSharedPreferences("article_temp", 0)
+                val saveData: String = this.context.getSharedPreferences("article_temp", 0)
                     .getString("save_data", "")!!
-                if (save_data.length > 0) {
-                    importFromJSON(JSONObject(save_data))
+                if (saveData.isNotEmpty()) {
+                    importFromJSON(JSONObject(saveData))
                 }
             } catch (e2: Exception) {
                 e2.printStackTrace()
@@ -76,10 +77,10 @@ class ArticleTempStore {
     }
 
     fun store() {
-        if (this._context != null) {
+        if (this.context != null) {
             try {
-                val perf = this._context.getSharedPreferences("article_temp", 0)
-                perf.edit().putString("save_data", exportToJSON().toString()).commit()
+                val perf = this.context.getSharedPreferences("article_temp", 0)
+                perf.edit(commit = true) { putString("save_data", exportToJSON().toString()) }
             } catch (e: Exception) {
                 Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
             }
@@ -91,9 +92,9 @@ class ArticleTempStore {
         val data = obj.getJSONArray("data")
         this.articles.clear()
         for (i in 0..<data.length()) {
-            val item_data = data.getJSONObject(i)
+            val itemData = data.getJSONObject(i)
             val temp = ArticleTemp()
-            temp.importFromJSON(item_data)
+            temp.importFromJSON(itemData)
             this.articles.add(temp)
         }
     }
@@ -101,11 +102,11 @@ class ArticleTempStore {
     @Throws(JSONException::class)
     fun exportToJSON(): JSONObject {
         val obj = JSONObject()
-        val save_data = JSONArray()
+        val saveData = JSONArray()
         for (article in this.articles) {
-            save_data.put(article.exportToJSON())
+            saveData.put(article.exportToJSON())
         }
-        obj.put("data", save_data)
+        obj.put("data", saveData)
         return obj
     }
 
@@ -121,7 +122,7 @@ class ArticleTempStore {
     }
 
     companion object {
-        const val version: Int = 1
+        const val VERSION: Int = 1
         @JvmStatic
         fun upgrade(context: Context?, aFilePath: String?) {
             ArticleTempStore(context, aFilePath).load()

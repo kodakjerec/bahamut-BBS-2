@@ -21,18 +21,18 @@ import com.kota.Bahamut.pages.theme.ThemeManagerPage
 import java.util.Stack
 
 class PageContainer private constructor() {
-    private var _start_page: StartPage? = null
-    private var _login_page: LoginPage? = null
-    private var _main_page: MainPage? = null
-    private val _class_page = Stack<ClassPage>()
-    private var _board_page: BoardMainPage? = null
-    private var _board_title_linked_page: BoardLinkPage? = null
-    private var _board_search_page: BoardSearchPage? = null
-    private var _mail_page: MailBoxPage? = null
-    private var _article_page: ArticlePage? = null
-    private var _billing_page: BillingPage? = null
-    private var _post_article_page: PostArticlePage? = null
-    private val _board_essence_page_list = Stack<BoardEssencePage>()
+    private var startPageInstance: StartPage? = null
+    private var loginPageInstance: LoginPage? = null
+    private var mainPageInstance: MainPage? = null
+    private val classPageStack = Stack<ClassPage>()
+    private var boardMainPageInstance: BoardMainPage? = null
+    private var boardTitleLinkPageInstance: BoardLinkPage? = null
+    private var boardSearchPageInstance: BoardSearchPage? = null
+    private var mailBoxPageInstance: MailBoxPage? = null
+    private var articlePageInstance: ArticlePage? = null
+    private var billingPageInstance: BillingPage? = null
+    private var postArticlePageInstance: PostArticlePage? = null
+    private val boardEssencePageStack = Stack<BoardEssencePage>()
     private var articleEssencePage: ArticleEssencePage? = null
     private var themeManagerPage: ThemeManagerPage? = null
     private var userInfoPage: UserInfoPage? = null
@@ -42,10 +42,10 @@ class PageContainer private constructor() {
 
     val startPage: StartPage
         get() {
-            if (this._start_page == null) {
-                this._start_page = StartPage()
+            if (this.startPageInstance == null) {
+                this.startPageInstance = StartPage()
             }
-            return this._start_page!!
+            return this.startPageInstance!!
         }
 
     fun cleanStartPage() {
@@ -70,120 +70,120 @@ class PageContainer private constructor() {
 
     val loginPage: LoginPage
         get() {
-            if (this._login_page == null) {
-                this._login_page = LoginPage()
+            if (this.loginPageInstance == null) {
+                this.loginPageInstance = LoginPage()
             }
-            return this._login_page!!
+            return this.loginPageInstance!!
         }
 
     fun cleanLoginPage() {
-        if (this._login_page != null) {
-            this._login_page!!.clear()
-            this._login_page = null
+        if (this.loginPageInstance != null) {
+            this.loginPageInstance!!.clear()
+            this.loginPageInstance = null
         }
     }
 
     val mainPage: MainPage
         get() {
-            if (this._main_page == null) {
-                this._main_page = MainPage()
+            if (this.mainPageInstance == null) {
+                this.mainPageInstance = MainPage()
             }
-            return this._main_page!!
+            return this.mainPageInstance!!
         }
 
     fun cleanMainPage() {
-        if (this._main_page != null) {
-            this._main_page!!.clear()
-            this._main_page = null
+        if (this.mainPageInstance != null) {
+            this.mainPageInstance!!.clear()
+            this.mainPageInstance = null
         }
     }
 
     fun pushClassPage(aClassName: String?, aClassTitle: String?) {
-        val class_page = ClassPage()
-        class_page.listName = aClassName
-        class_page.setClassTitle(aClassTitle)
-        this._class_page.push(class_page)
+        val classPage1 = ClassPage()
+        classPage1.listName = aClassName
+        classPage1.setClassTitle(aClassTitle)
+        this.classPageStack.push(classPage1)
     }
 
     fun popClassPage() {
-        if (this._class_page.size > 0) {
-            this._class_page.pop()
+        if (this.classPageStack.isNotEmpty()) {
+            this.classPageStack.pop()
         }
     }
 
-    val classPage: ClassPage?
+    val classPage: ClassPage
         get() {
-            if (this._class_page.size > 0) {
-                return this._class_page.lastElement()
+            if (this.classPageStack.isNotEmpty()) {
+                return this.classPageStack.lastElement()
             }
-            return null
+            return this.classPageStack.lastElement()
         }
 
     fun cleanClassPage() {
-        for (page in this._class_page) {
+        for (page in this.classPageStack) {
             page.clear()
         }
-        this._class_page.clear()
+        this.classPageStack.clear()
     }
 
     val boardPage: BoardMainPage
         get() {
-            if (this._board_page == null) {
-                this._board_page = BoardMainPage()
+            if (this.boardMainPageInstance == null) {
+                this.boardMainPageInstance = BoardMainPage()
             }
-            return this._board_page!!
+            return this.boardMainPageInstance!!
         }
 
     fun cleanBoardPage() {
-        if (this._board_page != null) {
-            this._board_page!!.clear()
-            this._board_page = null
+        if (this.boardMainPageInstance != null) {
+            this.boardMainPageInstance!!.clear()
+            this.boardMainPageInstance = null
         }
     }
 
     val boardLinkedTitlePage: BoardLinkPage
         get() {
-            if (this._board_title_linked_page == null) {
-                this._board_title_linked_page = BoardLinkPage()
+            if (this.boardTitleLinkPageInstance == null) {
+                this.boardTitleLinkPageInstance = BoardLinkPage()
             }
-            return this._board_title_linked_page!!
+            return this.boardTitleLinkPageInstance!!
         }
 
     fun cleanBoardTitleLinkedPage() {
-        if (this._board_title_linked_page != null) {
-            this._board_title_linked_page!!.clear()
-            this._board_title_linked_page = null
+        if (this.boardTitleLinkPageInstance != null) {
+            this.boardTitleLinkPageInstance!!.clear()
+            this.boardTitleLinkPageInstance = null
         }
     }
 
     val boardSearchPage: BoardSearchPage
         get() {
-            if (this._board_search_page == null) {
-                this._board_search_page = BoardSearchPage()
+            if (this.boardSearchPageInstance == null) {
+                this.boardSearchPageInstance = BoardSearchPage()
             }
-            return this._board_search_page!!
+            return this.boardSearchPageInstance!!
         }
 
     fun cleanBoardSearchPage() {
-        if (this._board_search_page != null) {
-            this._board_search_page!!.clear()
-            this._board_search_page = null
+        if (this.boardSearchPageInstance != null) {
+            this.boardSearchPageInstance!!.clear()
+            this.boardSearchPageInstance = null
         }
     }
 
-    val boardEssencePage: BoardEssencePage?
+    val boardEssencePage: BoardEssencePage
         get() {
-            if (this._board_essence_page_list.size > 0) {
-                return this._board_essence_page_list.lastElement()
+            if (this.boardEssencePageStack.isNotEmpty()) {
+                return this.boardEssencePageStack.lastElement()
             }
-            return null
+            return this.boardEssencePageStack.lastElement()
         }
 
     fun cleanBoardEssencePage() {
-        for (page in this._board_essence_page_list) {
+        for (page in this.boardEssencePageStack) {
             page.clear()
         }
-        this._board_essence_page_list.clear()
+        this.boardEssencePageStack.clear()
     }
 
     fun pushBoardEssencePage(aClassName: String?, aClassTitle: String) {
@@ -191,12 +191,12 @@ class PageContainer private constructor() {
         boardEssencePage.clear()
         boardEssencePage.listName = aClassName
         boardEssencePage.setClassTitle(aClassTitle)
-        this._board_essence_page_list.push(boardEssencePage)
+        this.boardEssencePageStack.push(boardEssencePage)
     }
 
     fun popBoardEssencePage() {
-        if (this._board_essence_page_list.size > 0) {
-            this._board_essence_page_list.pop()
+        if (this.boardEssencePageStack.isNotEmpty()) {
+            this.boardEssencePageStack.pop()
         }
     }
 
@@ -216,61 +216,61 @@ class PageContainer private constructor() {
 
     val mailBoxPage: MailBoxPage
         get() {
-            if (this._mail_page == null) {
-                this._mail_page = MailBoxPage()
+            if (this.mailBoxPageInstance == null) {
+                this.mailBoxPageInstance = MailBoxPage()
             }
-            return this._mail_page!!
+            return this.mailBoxPageInstance!!
         }
 
     fun cleanMainBoxPage() {
-        if (this._mail_page != null) {
-            this._mail_page!!.clear()
-            this._mail_page = null
+        if (this.mailBoxPageInstance != null) {
+            this.mailBoxPageInstance!!.clear()
+            this.mailBoxPageInstance = null
         }
     }
 
     val articlePage: ArticlePage
         get() {
-            if (this._article_page == null) {
-                this._article_page = ArticlePage()
+            if (this.articlePageInstance == null) {
+                this.articlePageInstance = ArticlePage()
             }
-            return this._article_page!!
+            return this.articlePageInstance!!
         }
 
     fun cleanArticlePage() {
-        if (this._article_page != null) {
-            this._article_page!!.clear()
-            this._article_page = null
+        if (this.articlePageInstance != null) {
+            this.articlePageInstance!!.clear()
+            this.articlePageInstance = null
         }
     }
 
     val billingPage: BillingPage
         get() {
-            if (this._billing_page == null) {
-                this._billing_page = BillingPage()
+            if (this.billingPageInstance == null) {
+                this.billingPageInstance = BillingPage()
             }
-            return this._billing_page!!
+            return this.billingPageInstance!!
         }
 
     fun cleanBillingPage() {
-        if (this._billing_page != null) {
-            this._billing_page!!.clear()
-            this._billing_page = null
+        if (this.billingPageInstance != null) {
+            this.billingPageInstance!!.clear()
+            this.billingPageInstance = null
         }
     }
 
     val postArticlePage: PostArticlePage
         get() {
-            if (this._post_article_page == null) {
-                this._post_article_page = PostArticlePage()
+            if (this.postArticlePageInstance == null) {
+                this.postArticlePageInstance = PostArticlePage()
             }
-            return this._post_article_page!!
+            return this.postArticlePageInstance!!
         }
 
     fun cleanPostArticlePage() {
-        if (this._post_article_page != null) {
-            this._post_article_page!!.clear()
-            this._post_article_page = null
+        if (this.postArticlePageInstance != null) {
+            this.postArticlePageInstance!!.clear()
+            this.postArticlePageInstance = null
         }
     }
 

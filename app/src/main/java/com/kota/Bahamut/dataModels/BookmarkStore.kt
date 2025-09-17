@@ -15,88 +15,88 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.util.Vector
+import androidx.core.content.edit
 
 /*
  書籤清單的儲存
 */
 
-class BookmarkStore(val _context: Context?, var _file_path: String?) {
-    val _bookmarks: MutableMap<String?, BookmarkList?> = HashMap<String?, BookmarkList?>()
-    val _global_bookmarks: BookmarkList = BookmarkList("")
-    var _owner: String? = ""
-    var _version: Int = 1
+class BookmarkStore(val context: Context?, var filePath: String?) {
+    val bookmarks: MutableMap<String?, BookmarkList?> = HashMap()
+    val globalBookmarks: BookmarkList = BookmarkList("")
+    var owner: String? = ""
+    var version: Int = 1
 
     init {
-        if (this._context == null) {
+        if (this.context == null) {
             println("Bookmark context can't null.")
         }
     }
 
     fun getBookmarkList(aBoardName: String?): BookmarkList {
-        if (this._bookmarks.containsKey(aBoardName)) {
-            val item = this._bookmarks.get(aBoardName)
+        if (this.bookmarks.containsKey(aBoardName)) {
+            val item = this.bookmarks[aBoardName]
             if (item != null) return item
         }
         val list = BookmarkList(aBoardName)
-        this._bookmarks.put(aBoardName, list)
+        this.bookmarks.put(aBoardName, list)
         return list
     }
 
     val totalBookmarkList: Vector<Bookmark>
         get() {
-            val total_list =
+            val totalList =
                 Vector<Bookmark>()
-            for (key in this._bookmarks.keys) {
-                val bookmark_list = getBookmarkList(key)
-                for (i in 0..<bookmark_list.getBookmarkSize()) {
+            for (key in this.bookmarks.keys) {
+                val bookmarkList = getBookmarkList(key)
+                for (i in 0..<bookmarkList.bookmarkSize) {
                     val bookmark =
-                        bookmark_list.getBookmark(i)
-                    bookmark.index = i
-                    bookmark.optional =
+                        bookmarkList.getBookmark(i)
+                    bookmark?.index = i
+                    bookmark?.optional =
                         Bookmark.Companion.OPTIONAL_BOOKMARK
-                    total_list.add(bookmark)
+                    totalList.add(bookmark)
                 }
-                for (i2 in 0..<bookmark_list.getHistoryBookmarkSize()) {
+                for (i2 in 0..<bookmarkList.historyBookmarkSize) {
                     val bookmark2 =
-                        bookmark_list.getHistoryBookmark(i2)
-                    bookmark2.index = i2
-                    bookmark2.optional =
+                        bookmarkList.getHistoryBookmark(i2)
+                    bookmark2?.index = i2
+                    bookmark2?.optional =
                         Bookmark.Companion.OPTIONAL_STORY
-                    total_list.add(bookmark2)
+                    totalList.add(bookmark2)
                 }
             }
-            for (i3 in 0..<this._global_bookmarks.getBookmarkSize()) {
+            for (i3 in 0..<this.globalBookmarks.bookmarkSize) {
                 val bookmark3 =
-                    this._global_bookmarks.getBookmark(i3)
-                bookmark3.index = i3
-                total_list.add(bookmark3)
+                    this.globalBookmarks.getBookmark(i3)
+                bookmark3?.index = i3
+                totalList.add(bookmark3)
             }
-            return total_list
+            return totalList
         }
 
     fun cleanBookmark() {
-        this._bookmarks.clear()
-        this._global_bookmarks.clear()
+        this.bookmarks.clear()
+        this.globalBookmarks.clear()
     }
 
     fun addBookmark(aBookmark: Bookmark) {
-        val board_name = aBookmark.getBoard().trim { it <= ' ' }
-        if (board_name.length == 0) {
-            this._global_bookmarks.addBookmark(aBookmark)
+        val boardName = aBookmark.board?.trim { it <= ' ' }
+        if (boardName!!.isEmpty()) {
+            this.globalBookmarks.addBookmark(aBookmark)
         } else if (aBookmark.optional == Bookmark.Companion.OPTIONAL_STORY) {
-            getBookmarkList(board_name).addHistoryBookmark(aBookmark)
+            getBookmarkList(boardName).addHistoryBookmark(aBookmark)
         } else {
-            getBookmarkList(board_name).addBookmark(aBookmark)
+            getBookmarkList(boardName).addBookmark(aBookmark)
         }
     }
 
     /** 儲存書籤  */
     fun store() {
-        val obj: JSONObject?
+        val obj: JSONObject? = null
         println("save bookmark store to file")
-        if (this._context != null && (exportToJSON().also { obj = it }) != null) {
-            this._context.getSharedPreferences("bookmark", 0).edit()
-                .putString("save_data", obj.toString()).commit()
+        this.context?.getSharedPreferences("bookmark", 0)?.edit {
+            putString("save_data", obj.toString())
         }
 
         // 雲端備份
@@ -108,49 +108,48 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
 
     /** 儲存書籤, 但是不通知雲端  */
     fun storeWithoutCloud() {
-        val obj: JSONObject?
+        val obj: JSONObject? = null
         println("save bookmark store to file")
-        if (this._context != null && (exportToJSON().also { obj = it }) != null) {
-            this._context.getSharedPreferences("bookmark", 0).edit()
-                .putString("save_data", obj.toString()).commit()
+        this.context?.getSharedPreferences("bookmark", 0)?.edit {
+            putString("save_data", obj.toString())
         }
     }
 
     private fun load(): BookmarkStore {
-        val perf: SharedPreferences?
-        val save_data: String?
+        var perf: SharedPreferences? = null
+        var saveData: String? = ""
         println("load bookmark store from file")
-        var load_file = false
-        if (this._file_path == null || this._file_path!!.length == 0) {
+        var loadFile = false
+        if (this.filePath == null || this.filePath!!.isEmpty()) {
             println("bookmark file not exists")
         } else {
-            val file = File(this._file_path)
+            val file = File(this.filePath)
             if (file.exists()) {
                 println("bookmark file exists")
                 try {
-                    val file_input_stream: InputStream = FileInputStream(file)
-                    val input_stream = ObjectInputStream(file_input_stream)
-                    importFromStream(input_stream)
-                    input_stream.close()
-                    file_input_stream.close()
+                    val fileInputStream: InputStream = FileInputStream(file)
+                    val inputStream = ObjectInputStream(fileInputStream)
+                    importFromStream(inputStream)
+                    inputStream.close()
+                    fileInputStream.close()
                 } catch (e: IOException) {
                     Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
                 file.delete()
-                load_file = true
+                loadFile = true
             }
         }
-        if (load_file) {
+        if (loadFile) {
             store()
         }
-        if (!load_file && this._context != null && (this._context.getSharedPreferences(
+        if (!loadFile && this.context != null && (this.context.getSharedPreferences(
                 "bookmark",
                 0
             ).also { perf = it }) != null && (perf!!.getString("save_data", "")
-                .also { save_data = it }) != null && save_data!!.length > 0
+                .also { saveData = it }) != null && saveData!!.isNotEmpty()
         ) {
             try {
-                importFromJSON(JSONObject(save_data))
+                importFromJSON(JSONObject(saveData))
             } catch (e2: JSONException) {
                 e2.printStackTrace()
             }
@@ -161,21 +160,21 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
     @Throws(IOException::class)
     fun importFromStream(aStream: ObjectInputStream) {
         cleanBookmark()
-        this._version = aStream.readInt()
-        this._owner = aStream.readUTF()
+        this.version = aStream.readInt()
+        this.owner = aStream.readUTF()
         val size = aStream.readInt()
         for (i in 0..<size) {
             addBookmark(Bookmark(aStream))
         }
-        val _ext_data = ByteArray(aStream.readInt())
-        aStream.read(_ext_data)
+        val extData = ByteArray(aStream.readInt())
+        aStream.read(extData)
     }
 
     fun importFromJSON(obj: JSONObject) {
         cleanBookmark()
         try {
-            this._version = obj.getInt("version")
-            this._owner = obj.getString("owner")
+            this.version = obj.getInt("version")
+            this.owner = obj.getString("owner")
             val data = obj.getJSONArray("data")
             for (i in 0..<data.length()) {
                 addBookmark(Bookmark(data.getJSONObject(i)))
@@ -188,17 +187,17 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
     }
 
     private fun sortBookmarks() {
-        for (key in this._bookmarks.keys) {
+        for (key in this.bookmarks.keys) {
             getBookmarkList(key).sort()
         }
-        this._global_bookmarks.sort()
+        this.globalBookmarks.sort()
     }
 
     fun exportToJSON(): JSONObject {
         val obj = JSONObject()
         try {
-            obj.put("version", this._version)
-            obj.put("owner", this._owner)
+            obj.put("version", this.version)
+            obj.put("owner", this.owner)
             val data = JSONArray()
             for (bookmark in this.totalBookmarkList) {
                 data.put(bookmark.exportToJSON())

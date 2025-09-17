@@ -2,7 +2,7 @@ package com.kota.Bahamut.dataModels
 
 
 class ShortenUrl {
-    var shorten_url: String? = ""
+    var shortenUrl: String? = ""
     @JvmField
     var title: String? = ""
     var url: String? = ""

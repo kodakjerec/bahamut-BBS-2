@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
@@ -579,9 +580,9 @@ open class ASNavigationController : Activity() {
     }
 
     /** 移除畫面上永遠存在的View  */
-    fun removeForeverView(view: View) {
-        val parentViewGroup = view.parent as ViewGroup?
-        parentViewGroup?.removeView(view)
+    fun removeForeverView(messageSmall: MessageSmall?) {
+        val parentViewGroup = messageSmall?.parent as ViewGroup?
+        parentViewGroup?.removeView(messageSmall)
     }
 
     /** 根據最上層頁面決定是否顯示訊息小視窗  */

@@ -1,10 +1,8 @@
 package com.kota.Bahamut
 
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.setListener
 import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
@@ -21,6 +19,7 @@ import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.pages.StartPage
+import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.theme.ThemeStore.upgrade
 import com.kota.Bahamut.service.BahaBBSBackgroundService
 import com.kota.Bahamut.service.CloudBackup
@@ -36,16 +35,13 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetClient.Companion.construct
-import com.kota.telnet.TelnetClient.connector
 import com.kota.telnet.TelnetClientListener
-import com.kota.telnet.TelnetConnector.isConnecting
-import com.kota.telnet.TelnetConnector.setDeviceController
-import com.kota.telnet.TelnetCursor.equals
 import com.kota.telnetUI.TelnetPage
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 import java.util.TimeZone
 import java.util.Vector
 
@@ -54,26 +50,26 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onControllerWillLoad() {
         requestWindowFeature(1)
         try {
-            B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u))
-            U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b))
+            B2UEncoder.constructInstance(resources.openRawResource(R.raw.b2u))
+            U2BEncoder.constructInstance(resources.openRawResource(R.raw.u2b))
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         // 書籤
-        val bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat"
-        BookmarkStore.upgrade(this, bookmark_file_path)
+        val bookmarkFilePath = filesDir.path + "/bookmark.dat"
+        BookmarkStore.upgrade(this, bookmarkFilePath)
 
         // 暫存檔
-        val article_file_path = getFilesDir().getPath() + "/article_temp.dat"
-        ArticleTempStore.upgrade(this, article_file_path)
+        val articleFilePath = filesDir.path + "/article_temp.dat"
+        ArticleTempStore.upgrade(this, articleFilePath)
 
         // 系統架構
         construct(BahamutStateHandler.Companion.getInstance())
-        TelnetClient.getClient().setListener(this)
+        TelnetClient.client?.setListener(this)
 
 
         // 設定 TelnetConnector 的設備控制器
-        TelnetClient.connector.setDeviceController(deviceController)
+        TelnetClient.client?.connector?.setDeviceController(deviceController)
 
         PageContainer.Companion.constructInstance()
 
@@ -86,12 +82,12 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
         // 共用函數
         TempSettings.myContext = this
-        TempSettings.myActivity = ASNavigationController.getCurrentController()
+        TempSettings.myActivity = currentController
         changeScreenOrientation()
 
         // 以下需等待 共用函數 設定完畢
         // VIP
-        TempSettings.applicationContext = getApplicationContext()
+        TempSettings.applicationContext = applicationContext
         initBillingClient()
 
         // 外觀
@@ -100,11 +96,11 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
     // com.kota.ASFramework.PageController.ASNavigationController
     override fun onControllerDidLoad() {
-        val start_page: StartPage? = PageContainer.Companion.getInstance().getStartPage()
-        pushViewController(start_page, false)
+        val startPage: StartPage? = PageContainer.instance?.startPage
+        pushViewController(startPage, false)
     }
 
-    protected override fun onResume() {
+    override fun onResume() {
         checkPurchase()
         super.onResume()
     }
@@ -120,30 +116,29 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         }
 
         // 強制關閉連線
-        TelnetClient.getClient().close()
+        TelnetClient.client?.close()
 
 
         // 清理 TelnetConnector 的設備控制器引用
-        if (TelnetClient.connector != null) {
-            TelnetClient.connector.setDeviceController(null)
+        if (TelnetClient.client?.connector != null) {
+            TelnetClient.client?.connector?.setDeviceController(null)
         }
 
         super.onDestroy()
     }
 
-    // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity
-    protected override fun onPause() {
+    override fun onPause() {
         super.onPause()
     }
 
-    val controllerName: String?
+    override val controllerName: String?
         // com.kota.ASFramework.PageController.ASNavigationController
         get() = R.string.app_name.toString()
 
     // com.kota.ASFramework.PageController.ASNavigationController
-    public override fun onBackLongPressed(): Boolean {
+    override fun onBackLongPressed(): Boolean {
         var result = true
-        if (TelnetClient.connector.isConnecting) {
+        if (TelnetClient.client?.connector?.isConnecting == true) {
             val dialog = ASAlertDialog()
             dialog
                 .setMessage("是否確定要強制斷線?")
@@ -153,11 +148,11 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                     // from class: com.kota.Bahamut.BahamutController.1
                     // com.kota.ASFramework.Dialog.ASAlertDialogListener
                     override fun onAlertDialogDismissWithButtonIndex(
-                        aDialog: ASAlertDialog?,
-                        index: Int
+                        paramASAlertDialog: ASAlertDialog?,
+                        paramInt: Int
                     ) {
-                        if (index == 1) {
-                            TelnetClient.getClient().close()
+                        if (paramInt == 1) {
+                            TelnetClient.client?.close()
                         }
                     }
                 }).show()
@@ -169,51 +164,45 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     private fun showConnectionStartMessage() {
-        val date_format = SimpleDateFormat("yyyy-MM-dd kk:hh:ss")
-        date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"))
-        val time_string = date_format.format(Date())
-        println("BahaBBS connection start:" + time_string)
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
+        dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")
+        val timeString = dateFormat.format(Date())
+        println("BahaBBS connection start:$timeString")
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionStart(aClient: TelnetClient?) {
+    override fun onTelnetClientConnectionStart(telnetClient: TelnetClient?) {
         object : ASRunner() {
             // from class: com.kota.Bahamut.BahamutController.2
             // com.kota.ASFramework.Thread.ASRunner
-            public override fun run() {
+            override fun run() {
                 this@BahamutController.showConnectionStartMessage()
             }
         }.runInMainThread()
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionSuccess(aClient: TelnetClient?) {
+    override fun onTelnetClientConnectionSuccess(telnetClient: TelnetClient?) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(intent)
-        } else {
-            startService(intent)
-        }
+        startForegroundService(intent)
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionFail(aClient: TelnetClient?) {
+    override fun onTelnetClientConnectionFail(telnetClient: TelnetClient?) {
         dismissProcessingDialog()
         showShortToast("連線失敗，請檢查網路連線或稍後再試")
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionClosed(aClient: TelnetClient?) {
+    override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient?) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
         object : ASRunner() {
-            // from class: com.kota.Bahamut.BahamutController.3
-            // com.kota.ASFramework.Thread.ASRunner
-            public override fun run() {
-                val date_format = SimpleDateFormat("yyyy-MM-dd kk:hh:ss")
-                date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"))
-                val time_string = date_format.format(Date())
-                println("BahaBBS connection close:" + time_string)
+            override fun run() {
+                val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
+                dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")
+                val timeString = dateFormat.format(Date())
+                println("BahaBBS connection close:$timeString")
 
                 this@BahamutController.handleNormalConnectionClosed()
 
@@ -227,7 +216,8 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                 }
 
                 if (getMessageSmall() != null) {
-                    getCurrentController().removeForeverView(getMessageSmall())
+                    val messageSmall: MessageSmall? = getMessageSmall()
+                    currentController!!.removeForeverView(messageSmall)
                     setMessageSmall(null)
                 }
             }
@@ -235,24 +225,23 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     private fun handleNormalConnectionClosed() {
-        val pages: Vector<ASViewController?> =
-            ASNavigationController.getCurrentController().getViewControllers()
-        val new_controllers = Vector<ASViewController?>()
+        val pages: Vector<ASViewController?> = currentController!!.viewControllers
+        val newControllers = Vector<ASViewController>()
         for (controller in pages) {
-            val telnet_page = controller as TelnetPage
-            if (telnet_page.pageType == 0 || telnet_page.isKeepOnOffline) {
-                new_controllers.add(telnet_page)
+            val telnetPage = controller as TelnetPage
+            if (telnetPage.pageType == 0 || telnetPage.isKeepOnOffline) {
+                newControllers.add(telnetPage)
             }
         }
-        val start_page: StartPage? = PageContainer.Companion.getInstance().getStartPage()
-        if (!new_controllers.contains(start_page)) {
-            new_controllers.insertElementAt(start_page, 0)
+        val startPage: StartPage? = PageContainer.instance?.startPage
+        if (!newControllers.contains(startPage)) {
+            newControllers.insertElementAt(startPage, 0)
         }
-        setViewControllers(new_controllers)
+        setViewControllers(newControllers)
     }
 
     // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity, android.content.ComponentCallbacks
-    public override fun onLowMemory() {
+    override fun onLowMemory() {
         super.onLowMemory()
         BoardPageBlock.release()
         BoardPageItem.release()
@@ -264,7 +253,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         System.gc()
     }
 
-    val isAnimationEnable: Boolean
+    override var isAnimationEnable: Boolean = false
         // com.kota.ASFramework.PageController.ASNavigationController
         get() = propertiesAnimationEnable
 

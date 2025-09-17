@@ -8,17 +8,18 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.util.Log
 import com.kota.telnet.TelnetClient
+import java.util.Locale.getDefault
 import java.util.Vector
 
 class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     context,
-    TelnetClient.getClient().getUsername().toLowerCase().trim() + "_database",
+    TelnetClient.client?.username?.lowercase(getDefault())?.trim() + "_database",
     null,
     1
 ) {
     override fun onCreate(aDatabase: SQLiteDatabase) {
         try {
-            var CREATE_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS urls (" +
+            var createUrlsTableQuery = "CREATE TABLE IF NOT EXISTS urls (" +
                     "url TEXT PRIMARY KEY, " +
                     "title TEXT, " +
                     "description TEXT, " +
@@ -26,14 +27,14 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                     "isPic TEXT" +
                     ")"
 
-            aDatabase.execSQL(CREATE_TABLE_QUERY)
-            CREATE_TABLE_QUERY = "CREATE TABLE IF NOT EXISTS shorten_urls (" +
+            aDatabase.execSQL(createUrlsTableQuery)
+            createUrlsTableQuery = "CREATE TABLE IF NOT EXISTS shorten_urls (" +
                     "shorten_url TEXT PRIMARY KEY, " +
                     "title TEXT, " +
                     "description TEXT, " +
                     "url TEXT)"
 
-            aDatabase.execSQL(CREATE_TABLE_QUERY)
+            aDatabase.execSQL(createUrlsTableQuery)
         } catch (e: SQLException) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
@@ -61,20 +62,20 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
         values.put("imageUrl", imageUrl)
         values.put("isPic", isPic)
         try {
-            val db = getWritableDatabase()
+            val db = writableDatabase
             db.insertWithOnConflict("urls", null, values, SQLiteDatabase.CONFLICT_IGNORE)
             db.close()
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
     @SuppressLint("Range")
     fun getUrl(url: String?): Vector<String?>? {
         try {
-            val db = getReadableDatabase()
+            val db = readableDatabase
             val columns = arrayOf<String?>("url", "title", "description", "imageUrl", "isPic")
             val selection = "url = ?"
-            val selectionArgs = arrayOf<String?>(url)
+            val selectionArgs = arrayOf(url)
 
             val cursor = db.query("urls", columns, selection, selectionArgs, null, null, null)
 
@@ -98,24 +99,24 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
 
                 return null
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             return null
         }
     }
 
     fun addShortenUrl(url: String?, title: String?, description: String?, shortenUrl: String?) {
         try {
-            val db = getWritableDatabase()
+            val db = writableDatabase
 
             val values = ContentValues()
             values.put("shorten_url", shortenUrl)
             values.put("title", title)
             values.put("description", description)
             values.put("url", url)
-            db.delete("shorten_urls", "shorten_url=?", arrayOf<String?>(shortenUrl))
+            db.delete("shorten_urls", "shorten_url=?", arrayOf(shortenUrl))
             db.insertWithOnConflict("shorten_urls", null, values, SQLiteDatabase.CONFLICT_IGNORE)
             db.close()
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 
@@ -123,11 +124,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     val shortenUrls: Vector<ShortenUrl?>
         get() {
             try {
-                val db = getReadableDatabase()
+                val db = readableDatabase
                 val columns =
                     arrayOf<String?>("shorten_url", "title", "description", "url")
                 val selection = ""
-                val selectionArgs = arrayOf<String?>("")
 
                 val cursor =
                     db.query("shorten_urls", columns, selection, null, null, null, "rowid DESC")
@@ -136,10 +136,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                     val returnList = Vector<ShortenUrl?>()
                     do {
                         val data = ShortenUrl()
-                        data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")))
-                        data.setTitle(cursor.getString(cursor.getColumnIndex("title")))
-                        data.setDescription(cursor.getString(cursor.getColumnIndex("description")))
-                        data.setUrl(cursor.getString(cursor.getColumnIndex("url")))
+                        data.shortenUrl = cursor.getString(cursor.getColumnIndex("shorten_url"))
+                        data.title = cursor.getString(cursor.getColumnIndex("title"))
+                        data.description = cursor.getString(cursor.getColumnIndex("description"))
+                        data.url = cursor.getString(cursor.getColumnIndex("url"))
                         returnList.add(data)
                     } while (cursor.moveToNext())
 
@@ -153,7 +153,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
 
                     return Vector<ShortenUrl?>()
                 }
-            } catch (ignored: Exception) {
+            } catch (_: Exception) {
                 return Vector<ShortenUrl?>()
             }
         }
@@ -161,10 +161,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     @SuppressLint("Range")
     fun getShortenUrl(url: String?): Vector<ShortenUrl?> {
         try {
-            val db = getReadableDatabase()
+            val db = readableDatabase
             val columns = arrayOf<String?>("shorten_url", "title", "description", "url")
             val selection = "url = ?"
-            val selectionArgs = arrayOf<String?>(url)
+            val selectionArgs = arrayOf(url)
 
             val cursor = db.query(
                 "shorten_urls",
@@ -180,10 +180,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                 val returnList = Vector<ShortenUrl?>()
                 do {
                     val data = ShortenUrl()
-                    data.setShorten_url(cursor.getString(cursor.getColumnIndex("shorten_url")))
-                    data.setTitle(cursor.getString(cursor.getColumnIndex("title")))
-                    data.setDescription(cursor.getString(cursor.getColumnIndex("description")))
-                    data.setUrl(cursor.getString(cursor.getColumnIndex("url")))
+                    data.shortenUrl = cursor.getString(cursor.getColumnIndex("shorten_url"))
+                    data.title = cursor.getString(cursor.getColumnIndex("title"))
+                    data.description = cursor.getString(cursor.getColumnIndex("description"))
+                    data.url = cursor.getString(cursor.getColumnIndex("url"))
                     returnList.add(data)
                 } while (cursor.moveToNext())
 
@@ -197,18 +197,18 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
 
                 return Vector<ShortenUrl?>()
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             return Vector<ShortenUrl?>()
         }
     }
 
     fun clearDb() {
         try {
-            val db = getWritableDatabase()
+            val db = writableDatabase
             db.execSQL("DELETE FROM urls WHERE rowid NOT IN (SELECT rowid FROM urls ORDER BY rowid DESC LIMIT 100) ")
             db.execSQL("DELETE FROM shorten_urls WHERE rowid NOT IN (SELECT rowid FROM shorten_urls ORDER BY rowid DESC LIMIT 100) ")
             onCreate(db)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 }

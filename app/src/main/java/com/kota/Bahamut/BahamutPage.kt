@@ -29,6 +29,6 @@ interface BahamutPage {
         const val BAHAMUT_MESSAGE_SUB_PAGE: Int = 25
         const val MANUAL: Int = 26
         const val START: Int = 0
-        val UNKNOWN: Int = -1
+        const val UNKNOWN: Int = -1
     }
 }

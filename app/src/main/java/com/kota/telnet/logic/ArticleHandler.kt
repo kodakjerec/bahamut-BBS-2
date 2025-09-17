@@ -30,13 +30,13 @@ class ArticleHandler {
         }
     }
 
-    fun loadLastPage(aModel: TelnetModel) {
+    fun loadLastPage(aModel: TelnetModel?) {
         var start = if (pages!!.isNotEmpty()) 1 else 0
         var end = 23
-        while (start < 23 && aModel.getRow(start)?.isEmpty == true) {
+        while (start < 23 && aModel?.getRow(start)?.isEmpty == true) {
             start++
         }
-        while (end > start && aModel.getRow(end)?.isEmpty == true) {
+        while (end > start && aModel?.getRow(end)?.isEmpty == true) {
             end--
         }
         var page = articlePage
@@ -45,7 +45,7 @@ class ArticleHandler {
         }
         page.clear()
         for (i in start..<end) {
-            page.addRow(aModel.getRow(i))
+            page.addRow(aModel?.getRow(i))
         }
         articlePage = page
     }

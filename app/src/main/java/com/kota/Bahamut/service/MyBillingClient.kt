@@ -69,13 +69,13 @@ object MyBillingClient {
         val consumeResponseListener =
             ConsumeResponseListener { billingResult: BillingResult, _: String? ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    if (!UserSettings.getPropertiesVIP()) {
-                        UserSettings.setPropertiesVIP(true)
+                    if (!UserSettings.propertiesVIP) {
+                        UserSettings.propertiesVIP = true
                     }
                     ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_success))
                     // 將購買結果塞入雲端
-                    if (UserSettings.getPropertiesUsername().isNotEmpty()) {
-                        val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+                    if (UserSettings.propertiesUsername?.isNotEmpty() == true) {
+                        val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
                         val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
                         val client = OkHttpClient()
                         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -110,11 +110,11 @@ object MyBillingClient {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
                     // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                     if (list.toTypedArray().isNotEmpty()) {
-                        UserSettings.setPropertiesVIP(true)
+                        UserSettings.propertiesVIP = true
                         // 將購買結果塞入雲端
-                        if (UserSettings.getPropertiesUsername().isNotEmpty()) {
+                        if (UserSettings.propertiesUsername?.isNotEmpty() == true) {
                             list.forEach { record ->
-                                val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+                                val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
                                 val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
                                 val client = OkHttpClient()
                                 val body: RequestBody =
@@ -140,7 +140,7 @@ object MyBillingClient {
                         }
                     } else {
                         // 查不到有可能是函數不能用, 走其他方式
-                        UserSettings.setPropertiesVIP(false)
+                        UserSettings.propertiesVIP = false
                         checkPurchaseHistoryCloud{ }
                     }
                 }
@@ -153,7 +153,7 @@ object MyBillingClient {
     /** 檢查購買紀錄 */
     @JvmStatic
     fun checkPurchaseHistoryCloud(callback: (Int) -> Unit) {
-        val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+        val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
         val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
         val client = OkHttpClient()
         val body: RequestBody =
@@ -170,11 +170,7 @@ object MyBillingClient {
                 val data = response.body.string()
                 val jsonObject = JSONObject(data)
                 val buyQty =  jsonObject.optString("qty", "0").toInt()
-                if (buyQty>0) {
-                    UserSettings.setPropertiesVIP(true)
-                } else {
-                    UserSettings.setPropertiesVIP(false)
-                }
+                UserSettings.propertiesVIP = buyQty>0
                 callback(buyQty)
             }
         }

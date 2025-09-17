@@ -6,7 +6,6 @@ import android.util.Log
 import com.kota.telnet.reference.TelnetDef
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
-import java.util.Arrays
 
 @SuppressLint("StaticFieldLeak")
 object CommonFunctions {
@@ -59,7 +58,7 @@ object CommonFunctions {
     /** 調整螢幕方向  */
     @JvmStatic
     fun changeScreenOrientation() {
-        when (UserSettings.getPropertiesScreenOrientation()) {
+        when (UserSettings.propertiesScreenOrientation) {
             0 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
             1 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
             2 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
@@ -68,11 +67,10 @@ object CommonFunctions {
 
     /** 傳入字串,依照第 maxColumn 個字元分割後, 再回傳之後的字串
      * @param fromContent 來源字串
-     * @param maxLength 一行最多幾個字元
+     * @param android.R.attr.maxLength 一行最多幾個字元
      */
     @JvmStatic
     fun judgeDoubleWord(fromContent: String, fromMaxLength: Int): String {
-        var oldLineAuthorChar = "" // 記錄前一行開頭是不是引用, 如果本行不是引用擇要加分行
         val returnArrays: MutableList<String> = ArrayList()
         // 分割成字串陣列
         try {
@@ -86,7 +84,7 @@ object CommonFunctions {
                 else if (array.startsWith("> "))
                     maxLength+=2
                 val data2 = array.toByteArray(charset(TelnetDef.CHARSET))
-                var data1 = U2BEncoder.getInstance().encodeToBytes(data2, 0)
+                var data1 = U2BEncoder.instance!!.encodeToBytes(data2, 0)
                 while (data1.size >= maxLength) {
                     var isControlCode = false
                     var column = 0 // 現在取得的字元index
@@ -115,18 +113,18 @@ object CommonFunctions {
                             // 控制碼狀態下出現不該出現的文字, 下一輪回復正常
                         }
                     }
-                    val newCharArray = Arrays.copyOfRange(data1, 0, column)
-                    var inputString = B2UEncoder.getInstance().encodeToString(newCharArray)
+                    val newCharArray = data1.copyOfRange(0, column)
+                    var inputString = B2UEncoder.instance!!.encodeToString(newCharArray)
 
                     inputString+="\n"
                     returnArrays.add(inputString)
 
-                    data1 = Arrays.copyOfRange(data1, column, data1.size)
+                    data1 = data1.copyOfRange(column, data1.size)
                 }
                 // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
                 // 如果data2無資料, data1無料, 代表這是空白行
                 if (!(data2.isNotEmpty() && data1.isEmpty())) {
-                    val inputString = B2UEncoder.getInstance().encodeToString(data1)
+                    val inputString = B2UEncoder.instance!!.encodeToString(data1)
                     returnArrays.add(inputString+"\n")
                 }
             }

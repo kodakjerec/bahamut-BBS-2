@@ -6,17 +6,16 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.Bahamut.R
+import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.telnet.TelnetClient
 
 class BahaBBSBackgroundService : Service() {
-    var _client: TelnetClient? = null
-    var _controller: ASNavigationController? = null
+    var telnetClient: TelnetClient? = null
+    var aSNavigationController: ASNavigationController? = null
 
     // android.app.Service
     override fun onBind(intent: Intent?): IBinder? {
@@ -30,7 +29,7 @@ class BahaBBSBackgroundService : Service() {
 
     // android.app.Service
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val action = if (intent != null) intent.getAction() else null
+        val action = intent?.action
 
 
         // 處理斷線動作
@@ -39,8 +38,8 @@ class BahaBBSBackgroundService : Service() {
             return START_NOT_STICKY
         }
 
-        this._client = TelnetClient.getClient()
-        this._controller = ASNavigationController.getCurrentController()
+        this.telnetClient = TelnetClient.client
+        this.aSNavigationController = ASNavigationController.currentController
 
 
         // 啟動前景服務
@@ -53,38 +52,30 @@ class BahaBBSBackgroundService : Service() {
     // android.app.Service
     override fun onDestroy() {
         super.onDestroy()
-        this._client = null
-        this._controller = null
+        this.telnetClient = null
+        this.aSNavigationController = null
         Log.i("BahaBBS", "BackgroundService finish.")
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val serviceChannel = NotificationChannel(
-                CHANNEL_ID,
-                "Bahamut BBS 服務",
-                NotificationManager.IMPORTANCE_LOW
-            )
-            serviceChannel.setDescription("維持 BBS 連線")
-            serviceChannel.setShowBadge(false)
+        val serviceChannel = NotificationChannel(
+            CHANNEL_ID,
+            "Bahamut BBS 服務",
+            NotificationManager.IMPORTANCE_LOW
+        )
+        serviceChannel.description = "維持 BBS 連線"
+        serviceChannel.setShowBadge(false)
 
-            val manager = getSystemService<NotificationManager?>(NotificationManager::class.java)
-            if (manager != null) {
-                manager.createNotificationChannel(serviceChannel)
-            }
-        }
+        val manager = getSystemService(NotificationManager::class.java)
+        manager?.createNotificationChannel(serviceChannel)
     }
 
     private fun createNotification(): Notification {
         // 創建主要內容的 PendingIntent (點擊通知) - 使用不同方式
-        val notificationIntent = getPackageManager().getLaunchIntentForPackage(getPackageName())
-        if (notificationIntent != null) {
-            notificationIntent.setFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
-                        Intent.FLAG_ACTIVITY_NEW_TASK
-            )
-        }
+        val notificationIntent = packageManager.getLaunchIntentForPackage(packageName)
+        notificationIntent?.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or
+                Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                Intent.FLAG_ACTIVITY_NEW_TASK
 
         val contentIntent = PendingIntent.getActivity(
             this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE
@@ -93,7 +84,7 @@ class BahaBBSBackgroundService : Service() {
 
         // 創建斷線按鈕的 PendingIntent
         val disconnectIntent = Intent(this, BahaBBSBackgroundService::class.java)
-        disconnectIntent.setAction(ACTION_DISCONNECT)
+        disconnectIntent.action = ACTION_DISCONNECT
         val disconnectPendingIntent = PendingIntent.getService(
             this, 1, disconnectIntent, PendingIntent.FLAG_IMMUTABLE
         )
@@ -115,13 +106,14 @@ class BahaBBSBackgroundService : Service() {
             .build()
     }
 
+    @Suppress("DEPRECATION")
     private fun disconnectAndStop() {
         Log.i("BahaBBS", "User requested disconnect from notification")
 
 
         // 斷開 Telnet 連線
-        if (_client != null) {
-            _client!!.close()
+        if (telnetClient != null) {
+            telnetClient!!.close()
         }
 
 

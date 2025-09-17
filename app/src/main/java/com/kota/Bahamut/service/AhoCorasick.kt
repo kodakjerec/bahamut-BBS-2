@@ -11,10 +11,9 @@ class AhoCorasick(dictionary: MutableSet<String?>) {
         var word: String? = null
     }
 
-    private val root: TrieNode
+    private val root: TrieNode = TrieNode()
 
     init {
-        root = TrieNode()
         // construct the trie
         for (word in dictionary) {
             if (word == null || word.isEmpty()) continue  // empty strings are not allowed
@@ -29,7 +28,7 @@ class AhoCorasick(dictionary: MutableSet<String?>) {
         var current = root
         for (ch in word.toCharArray()) {
             current.children.putIfAbsent(ch, TrieNode())
-            current = current.children.get(ch)
+            current = current.children[ch]!!
         }
         current.isEndOfWord = true
         current.word = word
@@ -58,20 +57,20 @@ class AhoCorasick(dictionary: MutableSet<String?>) {
                     fail = fail.fail
                 }
 
-                child.fail = if (fail == null) root else fail.children.get(ch)
+                child.fail = if (fail == null) root else fail.children[ch]
                 queue.offer(child)
             }
         }
     }
 
     fun search(text: String): MutableList<String?> {
-        val found: MutableList<String?> = ArrayList<String?>()
+        val found: MutableList<String?> = ArrayList()
         var current = root
 
         for (ch in text.toCharArray()) {
             // if we can't find the character, go to the fail link
             while (current !== root && !current.children.containsKey(ch)) {
-                current = current.fail
+                current = current.fail!!
             }
 
             // if we reached the root, start from the beginning

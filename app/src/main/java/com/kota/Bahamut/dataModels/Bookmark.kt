@@ -12,14 +12,14 @@ import java.io.ObjectInputStream
 */
 
 class Bookmark {
-    var _author: String? = ""
-    var _board: String? = ""
-    var _detail: String = ""
-    var _ext_data: ByteArray = ByteArray(0)
-    var _gy: String? = ""
-    var _keyword: String? = ""
-    var _mark: String? = "n"
-    var _title: String? = ""
+    var myAuthor: String? = ""
+    var myBoard: String? = ""
+    var myDetail: String = ""
+    var myExtData: ByteArray = ByteArray(0)
+    var myGY: String? = ""
+    var myKeyword: String? = ""
+    var myMark: String? = "n"
+    var myTitle: String? = ""
     @JvmField
     var index: Int = 0
     var optional: String = OPTIONAL_BOOKMARK
@@ -41,14 +41,14 @@ class Bookmark {
         obj.put("version", 1)
         obj.put("index", index)
         obj.put("optional", optional)
-        obj.put("board", _board)
-        obj.put("title", _title)
+        obj.put("board", myBoard)
+        obj.put("title", myTitle)
         obj.put("weight", weight)
-        obj.put("detail", _detail)
-        obj.put("keyword", _keyword)
-        obj.put("author", _author)
-        obj.put("mark", _mark)
-        obj.put("gy", _gy)
+        obj.put("detail", myDetail)
+        obj.put("keyword", myKeyword)
+        obj.put("author", myAuthor)
+        obj.put("mark", myMark)
+        obj.put("gy", myGY)
         return obj
     }
 
@@ -59,14 +59,14 @@ class Bookmark {
             print("index:0")
         }
         optional = obj.getString("optional")
-        _board = obj.getString("board")
-        _title = obj.getString("title")
+        myBoard = obj.getString("board")
+        myTitle = obj.getString("title")
         weight = obj.getInt("weight")
-        _detail = obj.getString("detail")
-        _keyword = obj.getString("keyword")
-        _author = obj.getString("author")
-        _mark = obj.getString("mark")
-        _gy = obj.getString("gy")
+        myDetail = obj.getString("detail")
+        myKeyword = obj.getString("keyword")
+        myAuthor = obj.getString("author")
+        myMark = obj.getString("mark")
+        myGY = obj.getString("gy")
     }
 
     @Throws(IOException::class)
@@ -74,93 +74,73 @@ class Bookmark {
         aStream.readInt()
         index = 0
         optional = aStream.readUTF()
-        _board = aStream.readUTF()
-        _title = aStream.readUTF()
+        myBoard = aStream.readUTF()
+        myTitle = aStream.readUTF()
         weight = aStream.readInt()
-        _detail = aStream.readUTF()
-        _keyword = aStream.readUTF()
-        _author = aStream.readUTF()
-        _mark = aStream.readUTF()
-        _gy = aStream.readUTF()
-        _ext_data = ByteArray(aStream.readInt())
-        aStream.read(_ext_data)
+        myDetail = aStream.readUTF()
+        myKeyword = aStream.readUTF()
+        myAuthor = aStream.readUTF()
+        myMark = aStream.readUTF()
+        myGY = aStream.readUTF()
+        myExtData = ByteArray(aStream.readInt())
+        aStream.read(myExtData)
     }
 
     var title: String?
-        get() = _title
+        get() = myTitle
         set(title) {
-            if (title == null) {
-                _title = ""
-            } else {
-                _title = title
-            }
+            myTitle = title ?: ""
         }
 
     var keyword: String?
-        get() = _keyword
+        get() = myKeyword
         set(keyword) {
-            if (keyword == null) {
-                _keyword = ""
-            } else {
-                _keyword = keyword
-            }
+            myKeyword = keyword ?: ""
         }
 
     var author: String?
-        get() = _author
+        get() = myAuthor
         set(author) {
-            if (author == null) {
-                _author = ""
-            } else {
-                _author = author
-            }
+            myAuthor = author ?: ""
         }
 
     var mark: String?
-        get() = _mark
+        get() = myMark
         set(mark) {
-            if (mark == null || mark != "y") {
-                _mark = "n"
+            myMark = if (mark == null || mark != "y") {
+                "n"
             } else {
-                _mark = mark
+                mark
             }
         }
 
     var gy: String?
-        get() = _gy
+        get() = myGY
         set(gy) {
-            if (gy == null) {
-                _gy = ""
-            } else {
-                _gy = gy
-            }
+            myGY = gy ?: ""
         }
 
     var board: String?
-        get() = _board
+        get() = myBoard
         set(board) {
-            if (board == null) {
-                _board = ""
-            } else {
-                _board = board
-            }
+            myBoard = board ?: ""
         }
 
     fun generateTitle(): String {
         var title = ""
-        if (_keyword!!.trim { it <= ' ' }.length > 0) {
-            title = getContextString(R.string.title_) + _keyword
+        if (myKeyword!!.trim { it <= ' ' }.isNotEmpty()) {
+            title = getContextString(R.string.title_) + myKeyword
         }
-        if (title.length == 0 && _author!!.trim { it <= ' ' }.length > 0) {
-            title = getContextString(R.string.author_) + _author
+        if (title.isEmpty() && myAuthor!!.trim { it <= ' ' }.isNotEmpty()) {
+            title = getContextString(R.string.author_) + myAuthor
         }
-        if (title.length == 0 && _gy!!.trim { it <= ' ' }.length > 0) {
-            title = getContextString(R.string.do_gy_) + _gy
+        if (title.isEmpty() && myGY!!.trim { it <= ' ' }.isNotEmpty()) {
+            title = getContextString(R.string.do_gy_) + myGY
         }
-        if (_mark == "y") {
-            title = "M " + title
+        if (myMark == "y") {
+            title = "M $title"
         }
-        if (title.length == 0) {
+        if (title.isEmpty()) {
             return getContextString(R.string.no_assign)
         }
         return title
@@ -169,6 +149,6 @@ class Bookmark {
     companion object {
         const val OPTIONAL_BOOKMARK: String = "0" // 書籤
         const val OPTIONAL_STORY: String = "1" // 紀錄
-        const val version: Int = 1
+        const val VERSION: Int = 1
     }
 }

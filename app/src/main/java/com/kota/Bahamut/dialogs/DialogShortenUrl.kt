@@ -77,7 +77,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         // 找歷史檔案
         val historyItem:Vector<ShortenUrl> = urlDatabase.getShortenUrl(targetUrl)
         if (!historyItem.isEmpty()) {
-            val shortUrl = historyItem[0].shorten_url
+            val shortUrl = historyItem[0].shortenUrl
             changeFrontend(shortUrl)
             UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_url_same_url))
@@ -261,7 +261,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder?) {
-        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView!!.layoutPosition).shorten_url
+        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView!!.layoutPosition).shortenUrl
         changeFrontend(shortUrl)
     }
 

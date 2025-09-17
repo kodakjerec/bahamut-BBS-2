@@ -59,7 +59,7 @@ class CloudBackup {
                 }
             }
             setShowCloudSave(true)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             final()
         }
         return this
@@ -68,7 +68,7 @@ class CloudBackup {
     // 檢查雲端
     private fun checkCloud() {
         // encrypt
-        val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+        val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
         val apiUrl = "https://cloud-restore.kodakjerec.workers.dev/"
         val client = OkHttpClient()
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -82,7 +82,7 @@ class CloudBackup {
 
         ASRunner.runInNewThread {
             client.newCall(request).execute().use { response ->
-                val data = response.body!!.string()
+                val data = response.body.string()
                 val jsonObject = JSONObject(data)
                 val status = jsonObject.optString("error")
                 if (status.isNotEmpty()) {
@@ -131,7 +131,7 @@ class CloudBackup {
     // 備份所有設定
     fun backup() {
         try {
-            val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+            val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
             if (userId.isEmpty())
                 return
             val jsonObject = JSONObject()
@@ -148,7 +148,7 @@ class CloudBackup {
             // get bookmark
             jsonObject.put("bookmark", TempSettings.bookmarkStore!!.exportToJSON().toString())
             // get user_settings
-            jsonObject.put("user_settings", UserSettings.mySharedPref.all)
+            jsonObject.put("user_settings", UserSettings.mySharedPref?.all)
             // encrypt
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
@@ -165,7 +165,7 @@ class CloudBackup {
             ASRunner.runInNewThread {
                 try {
                     client.newCall(request).execute().use { response->
-                        val data = response.body!!.string()
+                        val data = response.body.string()
                         val fromJsonObject = JSONObject(data)
                         val error = fromJsonObject.optString("error")
                         if (error.isNotEmpty()) {
@@ -191,7 +191,7 @@ class CloudBackup {
     fun restore() {
         try {
             // encrypt
-            val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
+            val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
             if (userId.isEmpty())
                 return
             val apiUrl = "https://cloud-restore.kodakjerec.workers.dev/"
@@ -207,7 +207,7 @@ class CloudBackup {
             ASRunner.runInNewThread {
                 try {
                     client.newCall(request).execute().use { response->
-                        val data = response.body!!.string()
+                        val data = response.body.string()
                         val jsonObject = JSONObject(data)
                         val error = jsonObject.optString("error")
                         if (error.isNotEmpty()) {
@@ -241,25 +241,25 @@ class CloudBackup {
                                 if (value != null && !notRestoreKeys.contains(key)) {
                                     when (value) {
                                         is String ->
-                                            UserSettings.myEditor.putString(key, value)
+                                            UserSettings.myEditor?.putString(key, value)
 
                                         is Float ->
-                                            UserSettings.myEditor.putFloat(key, value)
+                                            UserSettings.myEditor?.putFloat(key, value)
 
                                         is Double -> {
                                             val insertValue: Int = value.toInt()
-                                            UserSettings.myEditor.putInt(key, insertValue)
+                                            UserSettings.myEditor?.putInt(key, insertValue)
                                         }
                                         is Int ->
-                                            UserSettings.myEditor.putInt(key, value)
+                                            UserSettings.myEditor?.putInt(key, value)
 
                                         is Boolean ->
-                                            UserSettings.myEditor.putBoolean(key, value)
+                                            UserSettings.myEditor?.putBoolean(key, value)
 
                                     }
                                 }
                             }
-                            UserSettings.myEditor.apply()
+                            UserSettings.myEditor?.apply()
 
                             // set bookmark
                             val bookmark = JSONObject((fromJsonObject["bookmark"] as String))

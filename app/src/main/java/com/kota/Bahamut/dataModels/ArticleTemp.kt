@@ -47,6 +47,6 @@ class ArticleTemp {
     }
 
     companion object {
-        const val version: Int = 1
+        const val VERSION: Int = 1
     }
 }

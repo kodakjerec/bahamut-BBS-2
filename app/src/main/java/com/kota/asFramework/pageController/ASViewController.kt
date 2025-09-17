@@ -1,18 +1,8 @@
 package com.kota.asFramework.pageController
 
-import android.content.Context
 import android.content.Intent
 import android.content.res.AssetManager
 import android.content.res.Resources
-
-fun clear() {
-    }
-
-    val context: Context?
-        get() = this.navigationController
-
-    val resource: Resources?
-        get() = this.navigationController?.resourcesontent.res.Resources
 import android.view.View
 import java.util.Vector
 
@@ -83,7 +73,7 @@ abstract class ASViewController {
 
     fun notifyPageDidRemoveFromNavigationController() {
         if (this.operationListeners != null) {
-            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners)
+            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerWillRemoveFromNavigationController(this)
             }
@@ -93,7 +83,7 @@ abstract class ASViewController {
 
     fun notifyPageDidAddToNavigationController() {
         if (this.operationListeners != null) {
-            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners)
+            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerWillAddToNavigationController(this)
             }
@@ -104,7 +94,7 @@ abstract class ASViewController {
     fun notifyPageWillAppear() {
         this.isPageDisappeared = false
         if (this.appearListeners != null) {
-            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners)
+            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerWillAppear(this)
             }
@@ -115,7 +105,7 @@ abstract class ASViewController {
     fun notifyPageDidAppear() {
         this.isPageAppeared = true
         if (this.appearListeners != null) {
-            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners)
+            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerDidAppear(this)
             }
@@ -130,7 +120,7 @@ abstract class ASViewController {
     fun notifyPageWillDisappear() {
         this.isPageAppeared = false
         if (this.disappearListeners != null) {
-            val listeners = Vector<ASViewControllerDisappearListener?>(this.disappearListeners)
+            val listeners = Vector<ASViewControllerDisappearListener?>(this.disappearListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerWillDisappear(this)
             }
@@ -141,7 +131,7 @@ abstract class ASViewController {
     fun notifyPageDidDisappear() {
         this.isPageDisappeared = true
         if (this.disappearListeners != null) {
-            val listeners = Vector<ASViewControllerDisappearListener?>(this.disappearListeners)
+            val listeners = Vector<ASViewControllerDisappearListener?>(this.disappearListeners!!)
             for (listener in listeners) {
                 listener?.onASViewControllerDidDisappear(this)
             }
@@ -169,7 +159,7 @@ abstract class ASViewController {
     open fun clear() {
     }
 
-    val context: Context
+    val context: ASNavigationController?
         get() = this.navigationController
 
     val resource: Resources?
