@@ -57,7 +57,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u))
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b))
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         // 書籤
         val bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat"

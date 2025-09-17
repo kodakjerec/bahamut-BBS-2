@@ -21,12 +21,14 @@ class TelnetFrame {
         set(aFrame)
     }
 
-    fun set(aFrame: TelnetFrame) {
-        if (this.rows.size != aFrame.rowSize) {
+    fun set(aFrame: TelnetFrame?) {
+        if (aFrame != null && this.rows.size != aFrame.rowSize) {
             initialData(aFrame.rowSize)
         }
-        for (i in this.rows.indices) {
-            this.rows[i].set(aFrame.getRow(i))
+        if (aFrame != null) {
+            for (i in this.rows.indices) {
+                this.rows[i].set(aFrame.getRow(i))
+            }
         }
     }
 
@@ -75,20 +77,20 @@ class TelnetFrame {
         getRow(row)!!.cleanColumn(column)
     }
 
-    fun setRow(index: Int, aRow: TelnetRow?) {
+    fun setRow(index: Int, aRow: TelnetRow) {
         if (index >= 0 && index < this.rows.size) {
             this.rows[index] = aRow
         }
     }
 
-    fun getRow(index: Int): TelnetRow? {
+    fun getRow(index: Int): TelnetRow {
         return this.rows[index]
     }
 
-    val firstRow: TelnetRow?
+    val firstRow: TelnetRow
         get() = this.rows.firstElement()
 
-    val latestRow: TelnetRow?
+    val latestRow: TelnetRow
         get() = this.rows.lastElement()
 
     fun switchRow(index: Int, andIndex: Int) {

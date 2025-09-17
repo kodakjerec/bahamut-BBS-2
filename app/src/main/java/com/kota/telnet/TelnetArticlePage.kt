@@ -6,7 +6,7 @@ import java.util.Vector
 class TelnetArticlePage {
     private val rows = Vector<TelnetRow?>()
 
-    fun addRow(row: TelnetRow) {
+    fun addRow(row: TelnetRow?) {
         this.rows.add(row.clone())
     }
 

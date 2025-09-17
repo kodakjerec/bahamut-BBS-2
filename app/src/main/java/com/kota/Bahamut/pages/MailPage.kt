@@ -177,12 +177,12 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPage_L
             }
         } else if (itemViewOrigin is ArticlePage_HeaderItemView) {
             var author = telnetArticle!!.author
-            if (telnetArticle!!.Nickname != null) {
-                author = author + "(" + telnetArticle!!.Nickname + ")"
+            if (telnetArticle!!.nickName != null) {
+                author = author + "(" + telnetArticle!!.nickName + ")"
             }
-            itemViewOrigin.setData(telnetArticle!!.Title, author, telnetArticle!!.BoardName)
+            itemViewOrigin.setData(telnetArticle!!.title, author, telnetArticle!!.boardName)
         } else if (itemViewOrigin is ArticlePage_TimeTimeView) {
-            itemViewOrigin.setTime("《" + telnetArticle!!.DateTime + "》")
+            itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
             itemViewOrigin.setIP(telnetArticle!!.fromIP)
         }
         return itemViewOrigin

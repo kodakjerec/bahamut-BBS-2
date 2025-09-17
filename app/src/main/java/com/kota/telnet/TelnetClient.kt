@@ -3,26 +3,25 @@ package com.kota.telnet
 import android.util.Log
 import com.kota.asFramework.thread.ASRunner
 import com.kota.telnet.model.TelnetModel
-import com.kota.telnet.reference.TelnetDefs
+import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard.getKeyData
 import com.kota.textEncoder.U2BEncoder
 import java.io.UnsupportedEncodingException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-/* loaded from: classes.dex */
-class TelnetClient private constructor(private val _state_handler: TelnetStateHandler?) :
+class TelnetClient private constructor(private val stateHandler: TelnetStateHandler?) :
     TelnetConnectorListener {
     var connector: TelnetConnector? = null
-        get() = client.field
+        get() = client!!.connector
         private set
     var model: TelnetModel? = null
-        get() = client.field
+        get() = client!!.model
         private set
     private var _receiver: TelnetReceiver? = null
-    private var _username: String? = null
-    private var _listener: TelnetClientListener? = null
-    var _send_executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private var myUserName: String? = null
+    private var clientListener: TelnetClientListener? = null
+    var sendExecutor: ExecutorService = Executors.newSingleThreadExecutor()
 
     init {
         this.model = TelnetModel()
@@ -32,7 +31,7 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
     }
 
     fun clear() {
-        _state_handler!!.clear()
+        stateHandler!!.clear()
         connector!!.clear()
         model!!.clear()
         _receiver!!.stopReceiver()
@@ -46,12 +45,12 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
         try {
             connector!!.close() // 關閉連線
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
     }
 
     fun sendStringToServer(str: String?) {
-        if (ASRunner.isMainThread()) {
+        if (ASRunner.isMainThread) {
             sendStringToServerInBackground(str, 0)
         } else {
             sendStringToServer(str, 0)
@@ -60,15 +59,15 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
 
     private fun sendStringToServer(str: String?, channel: Int) {
         var data: ByteArray? = null
-        var encode_success = false
+        var encodeSuccess = false
         try {
-            val data2: ByteArray? = (str + "\n").toByteArray(charset(TelnetDefs.CHARSET))
-            data = U2BEncoder.getInstance().encodeToBytes(data2, 0)
-            encode_success = true
+            val data2: ByteArray = (str + "\n").toByteArray(charset(TelnetDef.CHARSET))
+            data = U2BEncoder.instance!!.encodeToBytes(data2, 0)
+            encodeSuccess = true
         } catch (e: UnsupportedEncodingException) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
-        if (encode_success) {
+        if (encodeSuccess) {
             sendDataToServer(data, channel)
         }
     }
@@ -76,21 +75,21 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
     @JvmOverloads
     fun sendStringToServerInBackground(str: String?, channel: Int = 0) {
         var data: ByteArray? = null
-        var encode_success = false
+        var encodeSuccess = false
         try {
-            val data2: ByteArray? = (str + "\n").toByteArray(charset(TelnetDefs.CHARSET))
-            data = U2BEncoder.getInstance().encodeToBytes(data2, 0)
-            encode_success = true
+            val data2: ByteArray = (str + "\n").toByteArray(charset(TelnetDef.CHARSET))
+            data = U2BEncoder.instance!!.encodeToBytes(data2, 0)
+            encodeSuccess = true
         } catch (e: UnsupportedEncodingException) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
-        if (encode_success) {
+        if (encodeSuccess) {
             sendDataToServerInBackground(data, channel)
         }
     }
 
     fun sendKeyboardInputToServer(key: Int) {
-        if (ASRunner.isMainThread()) {
+        if (ASRunner.isMainThread) {
             sendKeyboardInputToServerInBackground(key, 0)
         } else {
             sendKeyboardInputToServer(key, 0)
@@ -107,7 +106,7 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
     }
 
     fun sendDataToServer(data: ByteArray?) {
-        if (ASRunner.isMainThread()) {
+        if (ASRunner.isMainThread) {
             sendDataToServerInBackground(data, 0)
         } else {
             sendDataToServer(data, 0)
@@ -115,78 +114,78 @@ class TelnetClient private constructor(private val _state_handler: TelnetStateHa
     }
 
     fun sendDataToServer(data: ByteArray?, channel: Int) {
-        if (data != null && connector!!.isConnecting()) {
+        if (data != null && connector!!.isConnecting) {
             connector!!.writeData(data, channel)
             connector!!.sendData(channel)
         }
     }
 
     fun sendDataToServerInBackground(data: ByteArray?, channel: Int) {
-        if (data != null && connector!!.isConnecting()) {
-            _send_executor.submit(Runnable {
+        if (data != null && connector!!.isConnecting) {
+            sendExecutor.submit {
                 this@TelnetClient.connector!!.writeData(data, channel)
                 this@TelnetClient.connector!!.sendData(channel)
-            })
+            }
         }
     }
 
     fun setListener(aListener: TelnetClientListener?) {
-        _listener = aListener
+        clientListener = aListener
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectStart(aConnector: TelnetConnector?) {
-        if (_listener != null) {
-            _listener!!.onTelnetClientConnectionStart(this)
+    override fun onTelnetConnectorConnectStart(telnetConnector: TelnetConnector?) {
+        if (clientListener != null) {
+            clientListener!!.onTelnetClientConnectionStart(this)
         }
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorClosed(aConnector: TelnetConnector?) {
+    override fun onTelnetConnectorClosed(telnetConnector: TelnetConnector?) {
         clear()
-        if (_listener != null) {
-            _listener!!.onTelnetClientConnectionClosed(this)
+        if (clientListener != null) {
+            clientListener!!.onTelnetClientConnectionClosed(this)
         }
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectSuccess(aConnector: TelnetConnector?) {
+    override fun onTelnetConnectorConnectSuccess(telnetConnector: TelnetConnector?) {
         _receiver!!.startReceiver()
-        if (_listener != null) {
-            _listener!!.onTelnetClientConnectionSuccess(this)
+        if (clientListener != null) {
+            clientListener!!.onTelnetClientConnectionSuccess(this)
         }
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectFail(aConnector: TelnetConnector?) {
+    override fun onTelnetConnectorConnectFail(telnetConnector: TelnetConnector?) {
         clear()
-        if (_listener != null) {
-            _listener!!.onTelnetClientConnectionFail(this)
+        if (clientListener != null) {
+            clientListener!!.onTelnetClientConnectionFail(this)
         }
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorReceiveDataStart(aConnector: TelnetConnector?) {
-        if (_state_handler != null) {
-            model!!.cleanCahcedData()
-            _state_handler.handleState()
+    override fun onTelnetConnectorReceiveDataStart(telnetConnector: TelnetConnector?) {
+        if (stateHandler != null) {
+            model!!.cleanCachedData()
+            stateHandler.handleState()
         }
     }
 
     // com.kota.Telnet.TelnetConnectorListener
-    override fun onTelnetConnectorReceiveDataFinished(aConnector: TelnetConnector?) {
+    override fun onTelnetConnectorReceiveDataFinished(telnetConnector: TelnetConnector?) {
         connector!!.cleanReadDataSize()
     }
 
     var username: String?
         get() {
-            if (_username == null) {
-                _username = ""
+            if (myUserName == null) {
+                myUserName = ""
             }
-            return _username
+            return myUserName
         }
         set(aUsername) {
-            _username = aUsername
+            myUserName = aUsername
         }
 
     companion object {

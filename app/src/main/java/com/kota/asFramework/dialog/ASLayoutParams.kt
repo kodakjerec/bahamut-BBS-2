@@ -1,9 +1,9 @@
 package com.kota.asFramework.dialog
 
 import android.content.res.ColorStateList
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
+import androidx.core.graphics.drawable.toDrawable
 
 class ASLayoutParams private constructor() {
     init {
@@ -15,13 +15,13 @@ class ASLayoutParams private constructor() {
     val alertItemBackgroundDrawable: Drawable
         get() {
             val stateListDrawable = StateListDrawable()
-            var colorDrawable = ColorDrawable(-14066)
+            var colorDrawable = (-14066).toDrawable()
             stateListDrawable.addState(intArrayOf(16842919, 16842910), colorDrawable)
-            colorDrawable = ColorDrawable(-8388608)
+            colorDrawable = (-8388608).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910, 16842908), colorDrawable)
-            colorDrawable = ColorDrawable(-12582912)
+            colorDrawable = (-12582912).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910), colorDrawable)
-            colorDrawable = ColorDrawable(-14680064)
+            colorDrawable = (-14680064).toDrawable()
             stateListDrawable.addState(IntArray(0), colorDrawable)
             return stateListDrawable
         }
@@ -51,13 +51,13 @@ class ASLayoutParams private constructor() {
     val listItemBackgroundDrawable: Drawable
         get() {
             val stateListDrawable = StateListDrawable()
-            var colorDrawable = ColorDrawable(-14066)
+            var colorDrawable = (-14066).toDrawable()
             stateListDrawable.addState(intArrayOf(16842919, 16842910), colorDrawable)
-            colorDrawable = ColorDrawable(-16777216)
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910, 16842908), colorDrawable)
-            colorDrawable = ColorDrawable(-16777216)
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910), colorDrawable)
-            colorDrawable = ColorDrawable(-16777216)
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(IntArray(0), colorDrawable)
             return stateListDrawable
         }
@@ -93,14 +93,14 @@ class ASLayoutParams private constructor() {
         get() = 28.0f
 
     companion object {
-        private var _instance: ASLayoutParams? = null
+        private var layoutParamsInstance: ASLayoutParams? = null
 
         @JvmStatic
         val instance: ASLayoutParams
             get() {
-                if (_instance == null) _instance =
+                if (layoutParamsInstance == null) layoutParamsInstance =
                     ASLayoutParams()
-                return _instance!!
+                return layoutParamsInstance!!
             }
     }
 } /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\Dialog\ASLayoutParams.class

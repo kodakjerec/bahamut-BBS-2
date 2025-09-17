@@ -55,7 +55,7 @@ class ArticleTempStore {
                     file.delete()
                     load_from_file = true
                 } catch (e: IOException) {
-                    Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                    Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
             }
         }
@@ -81,7 +81,7 @@ class ArticleTempStore {
                 val perf = this._context.getSharedPreferences("article_temp", 0)
                 perf.edit().putString("save_data", exportToJSON().toString()).commit()
             } catch (e: Exception) {
-                Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
             }
         }
     }

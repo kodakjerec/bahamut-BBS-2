@@ -20,7 +20,6 @@ import com.kota.Bahamut.pages.StartPage
 import com.kota.Bahamut.pages.theme.ThemeManagerPage
 import java.util.Stack
 
-/* loaded from: classes.dex */
 class PageContainer private constructor() {
     private var _start_page: StartPage? = null
     private var _login_page: LoginPage? = null

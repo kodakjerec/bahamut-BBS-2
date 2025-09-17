@@ -164,7 +164,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                         }
                     } catch (e: Exception) {
                         Log.e(
-                            javaClass.getSimpleName(),
+                            javaClass.simpleName,
                             (if (e.message != null) e.message else "")!!
                         )
                     }
@@ -783,7 +783,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 try {
                     PageContainer.Companion.getInstance().getArticlePage().setArticle(aArticle)
                 } catch (e: Exception) {
-                    Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                    Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
             }
         }.runInMainThread()

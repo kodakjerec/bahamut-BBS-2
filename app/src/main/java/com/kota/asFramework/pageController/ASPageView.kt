@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.widget.FrameLayout
 
-/* loaded from: classes.dex */
 open class ASPageView : FrameLayout {
     var ownerController: ASViewController?
 
@@ -34,13 +33,13 @@ open class ASPageView : FrameLayout {
     // android.view.View
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        val save_count = canvas.getSaveCount()
+        val saveCount = canvas.saveCount
         dispatchDraw(canvas)
-        canvas.restoreToCount(save_count)
+        canvas.restoreToCount(saveCount)
     }
 
     // android.view.View
-    override fun onDraw(aCanvas: Canvas?) {
+    override fun onDraw(canvas: Canvas) {
     }
 
     fun onPageAnimationStart() {
@@ -50,6 +49,6 @@ open class ASPageView : FrameLayout {
     }
 
     companion object {
-        private const val _count = 0
+        private const val COUNT = 0
     }
 }

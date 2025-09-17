@@ -18,13 +18,13 @@ object TelnetUtils {
     fun getIntegerFromData(aRow: TelnetRow, from: Int, to: Int): Int {
         try {
             val temp = aRow.getSpaceString(from, to).trim { it <= ' ' }
-            if (temp.length > 0) {
+            if (temp.isNotEmpty()) {
                 return temp.toInt()
             }
             return 0
         } catch (e: Exception) {
             Log.e(
-                TelnetUtils::class.java.getSimpleName(),
+                TelnetUtils::class.java.simpleName,
                 (if (e.message != null) e.message else "")!!
             )
             return 0
@@ -33,9 +33,9 @@ object TelnetUtils {
 
     @JvmStatic
     fun getHeader(source: String): String {
-        val trim_source = source.replace(" ", "")
-        if (trim_source.length > 1) {
-            return trim_source.substring(0, 2)
+        val trimSource = source.replace(" ", "")
+        if (trimSource.length > 1) {
+            return trimSource.substring(0, 2)
         }
         return ""
     }

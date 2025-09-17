@@ -13,18 +13,18 @@ import java.util.Vector
 import kotlin.math.ceil
 
 class ASAlertDialog : ASDialog, View.OnClickListener {
-    private var _alert_id: String? = null
+    private var alertId: String? = null
 
-    private val _item_list = Vector<Button?>()
+    private val itemList = Vector<Button?>()
 
-    private var _listener: ASAlertDialogListener? = null
+    private var listener: ASAlertDialogListener? = null
 
-    private var _message_label: TextView? = null
+    private var messageLabel: TextView? = null
 
-    private var _title_label: TextView? = null
+    private var titleLabel: TextView? = null
 
-    private var _toolbar: LinearLayout? = null
-    private var _default_index = -1
+    private var toolbar: LinearLayout? = null
+    private var defaultIndex = -1
 
     constructor() {
         initial()
@@ -32,230 +32,215 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
 
     constructor(paramString: String?) {
         initial()
-        _alert_id = paramString
+        alertId = paramString
     }
 
     private fun buildContentView(): View {
         val n = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            ASLayoutParams.Companion.getInstance().getDialogWidthNormal(),
-            getContext().getResources().getDisplayMetrics()
+            ASLayoutParams.instance.dialogWidthNormal,
+            context.resources.displayMetrics
         ).toInt()
         val i = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             100.0f,
-            getContext().getResources().getDisplayMetrics()
+            context.resources.displayMetrics
         ).toInt()
         val k = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 6.0f,
-                getContext().getResources().getDisplayMetrics()
+                context.resources.displayMetrics
             ).toDouble()
         ).toInt()
         val j = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 3.0f,
-                getContext().getResources().getDisplayMetrics()
+                context.resources.displayMetrics
             ).toDouble()
         ).toInt()
         val m = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 1.0f,
-                getContext().getResources().getDisplayMetrics()
+                context.resources.displayMetrics
             ).toDouble()
         ).toInt()
-        val linearLayout2 = LinearLayout(getContext())
-        linearLayout2.setOrientation(LinearLayout.VERTICAL)
+        val linearLayout2 = LinearLayout(context)
+        linearLayout2.orientation = LinearLayout.VERTICAL
         linearLayout2.setPadding(j, j, j, j)
         linearLayout2.setBackgroundResource(R.color.dialog_border_color)
-        val linearLayout1 = LinearLayout(getContext())
-        linearLayout1.setOrientation(LinearLayout.VERTICAL)
+        val linearLayout1 = LinearLayout(context)
+        linearLayout1.orientation = LinearLayout.VERTICAL
         linearLayout1.setPadding(m, m, m, m)
         linearLayout1.setBackgroundColor(-16777216)
         linearLayout2.addView(linearLayout1 as View)
-        _title_label = TextView(getContext())
-        _title_label!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                n,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ) as ViewGroup.LayoutParams
-        )
-        _title_label!!.setPadding(k, k, k, k)
-        _title_label!!.setTextSize(
+        titleLabel = TextView(context)
+        titleLabel!!.layoutParams = LinearLayout.LayoutParams(
+            n,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ) as ViewGroup.LayoutParams
+        titleLabel!!.setPadding(k, k, k, k)
+        titleLabel!!.setTextSize(
             2,
-            ASLayoutParams.Companion.getInstance().getTextSizeUltraLarge()
+            ASLayoutParams.instance.textSizeUltraLarge
         )
-        _title_label!!.setTextColor(-1)
-        _title_label!!.setTypeface(_title_label!!.getTypeface(), Typeface.BOLD)
-        _title_label!!.setVisibility(View.GONE)
-        _title_label!!.setBackgroundColor(-15724528)
-        _title_label!!.setSingleLine(true)
-        linearLayout1.addView(_title_label as View?)
-        _message_label = TextView(getContext())
-        _message_label!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                n,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ) as ViewGroup.LayoutParams
-        )
-        _message_label!!.setPadding(k, k, k, k)
-        _message_label!!.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeLarge())
-        _message_label!!.setMinimumHeight(i)
-        _message_label!!.setTextColor(-1)
-        _message_label!!.setVisibility(View.GONE)
-        _message_label!!.setBackgroundColor(-16777216)
-        linearLayout1.addView(_message_label as View?)
-        _toolbar = LinearLayout(getContext())
-        _toolbar!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                n,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            ) as ViewGroup.LayoutParams
-        )
-        _toolbar!!.setGravity(17)
-        _toolbar!!.setOrientation(LinearLayout.HORIZONTAL)
-        linearLayout1.addView(_toolbar as View?)
+        titleLabel!!.setTextColor(-1)
+        titleLabel!!.setTypeface(titleLabel!!.typeface, Typeface.BOLD)
+        titleLabel!!.visibility = View.GONE
+        titleLabel!!.setBackgroundColor(-15724528)
+        titleLabel!!.isSingleLine = true
+        linearLayout1.addView(titleLabel as View?)
+        messageLabel = TextView(context)
+        messageLabel!!.layoutParams = LinearLayout.LayoutParams(
+            n,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ) as ViewGroup.LayoutParams
+        messageLabel!!.setPadding(k, k, k, k)
+        messageLabel!!.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
+        messageLabel!!.minimumHeight = i
+        messageLabel!!.setTextColor(-1)
+        messageLabel!!.visibility = View.GONE
+        messageLabel!!.setBackgroundColor(-16777216)
+        linearLayout1.addView(messageLabel as View?)
+        toolbar = LinearLayout(context)
+        toolbar!!.layoutParams = LinearLayout.LayoutParams(
+            n,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        ) as ViewGroup.LayoutParams
+        toolbar!!.gravity = 17
+        toolbar!!.orientation = LinearLayout.HORIZONTAL
+        linearLayout1.addView(toolbar as View?)
         return linearLayout2 as View
     }
 
     private fun clear() {
-        if (_message_label != null) _message_label!!.setText("")
-        if (_title_label != null) _title_label!!.setText("")
-        _toolbar!!.removeAllViews()
-        _item_list.clear()
+        if (messageLabel != null) messageLabel!!.text = ""
+        if (titleLabel != null) titleLabel!!.text = ""
+        toolbar!!.removeAllViews()
+        itemList.clear()
     }
 
     private fun createButton(): Button {
-        val button = Button(getContext())
-        button.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f
-            ) as ViewGroup.LayoutParams
-        )
+        val button = Button(context)
+        button.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            1.0f
+        ) as ViewGroup.LayoutParams
         val j = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             3.0f,
-            getContext().getResources().getDisplayMetrics()
+            context.resources.displayMetrics
         ).toInt()
         val i = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             5.0f,
-            getContext().getResources().getDisplayMetrics()
+            context.resources.displayMetrics
         ).toInt()
         button.setPadding(i, j, i, j)
-        button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeLarge())
-        button.setMinimumHeight(
-            TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                ASLayoutParams.Companion.getInstance().getDefaultTouchBlockHeight(),
-                getContext().getResources().getDisplayMetrics()
-            ).toInt()
-        )
-        button.setGravity(17)
+        button.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
+        button.minimumHeight = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            ASLayoutParams.instance.defaultTouchBlockHeight,
+            context.resources.displayMetrics
+        ).toInt()
+        button.gravity = 17
         button.setOnClickListener(this)
-        button.setBackground(
-            ASLayoutParams.Companion.getInstance().getAlertItemBackgroundDrawable()
-        )
-        button.setSingleLine(false)
-        button.setTextColor(ASLayoutParams.Companion.getInstance().getAlertItemTextColor())
+        button.background = ASLayoutParams.instance.alertItemBackgroundDrawable
+        button.isSingleLine = false
+        button.setTextColor(ASLayoutParams.instance.alertItemTextColor)
         return button
     }
 
     private fun initial() {
         requestWindowFeature(1)
         setContentView(buildContentView())
-        getWindow()!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
     }
 
     fun addButton(paramString: String?): ASAlertDialog {
         if (paramString != null) {
-            if (_item_list.size > 0) _toolbar!!.addView(createDivider())
+            if (itemList.isNotEmpty()) toolbar!!.addView(createDivider())
             val button = createButton()
-            _toolbar!!.addView(button as View)
-            button.setText(paramString)
+            toolbar!!.addView(button as View)
+            button.text = paramString
             if (paramString.length < 4) {
-                button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeLarge())
+                button.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
             } else {
-                button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeNormal())
+                button.setTextSize(2, ASLayoutParams.instance.textSizeNormal)
             }
             button.setOnClickListener(this)
-            _item_list.add(button)
+            itemList.add(button)
         }
         return this
     }
 
     fun createDivider(): View {
-        val view = View(getContext())
-        view.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ceil(
-                    TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        1.0f,
-                        getContext().getResources().getDisplayMetrics()
-                    ).toDouble()
-                ).toInt(), ViewGroup.LayoutParams.MATCH_PARENT
-            ) as ViewGroup.LayoutParams
-        )
+        val view = View(context)
+        view.layoutParams = LinearLayout.LayoutParams(
+            ceil(
+                TypedValue.applyDimension(
+                    TypedValue.COMPLEX_UNIT_DIP,
+                    1.0f,
+                    context.resources.displayMetrics
+                ).toDouble()
+            ).toInt(), ViewGroup.LayoutParams.MATCH_PARENT
+        ) as ViewGroup.LayoutParams
         view.setBackgroundColor(-16777216)
         return view
     }
 
     override fun dismiss() {
-        if (_alert_id != null) _alerts.remove(_alert_id)
+        if (alertId != null) _alerts.remove(alertId)
         super.dismiss()
     }
 
     override fun onClick(paramView: View?) {
-        if (_listener != null) {
-            val i = _item_list.indexOf(paramView)
-            _listener!!.onAlertDialogDismissWithButtonIndex(this, i)
+        if (listener != null) {
+            val i = itemList.indexOf(paramView)
+            listener!!.onAlertDialogDismissWithButtonIndex(this, i)
         }
         dismiss()
     }
 
     fun setItemTitle(paramInt: Int, paramString: String?): ASAlertDialog {
-        if (paramInt >= 0 && paramInt < _item_list.size) (_item_list.get(paramInt) as Button).setText(
+        if (paramInt >= 0 && paramInt < itemList.size) (itemList[paramInt] as Button).text =
             paramString
-        )
         return this
     }
 
     fun setListener(paramASAlertDialogListener: ASAlertDialogListener?): ASAlertDialog {
-        _listener = paramASAlertDialogListener
+        listener = paramASAlertDialogListener
         return this
     }
 
     fun setMessage(paramString: String?): ASAlertDialog {
         if (paramString == null) {
-            _message_label!!.setVisibility(View.GONE)
+            messageLabel!!.visibility = View.GONE
             return this
         }
-        _message_label!!.setVisibility(View.VISIBLE)
-        _message_label!!.setText(paramString)
+        messageLabel!!.visibility = View.VISIBLE
+        messageLabel!!.text = paramString
         return this
     }
 
     fun setTitle(paramString: String?): ASAlertDialog {
         if (paramString == null) {
-            _title_label!!.setVisibility(View.GONE)
+            titleLabel!!.visibility = View.GONE
             return this
         }
-        _title_label!!.setVisibility(View.VISIBLE)
-        _title_label!!.setText(paramString)
+        titleLabel!!.visibility = View.VISIBLE
+        titleLabel!!.text = paramString
         return this
     }
 
     override fun show() {
-        if (_alert_id != null) {
-            val aSAlertDialog: ASAlertDialog? = _alerts.get(_alert_id)
-            if (aSAlertDialog != null && aSAlertDialog.isShowing()) aSAlertDialog.dismiss()
-            _alerts.put(_alert_id, this)
+        if (alertId != null) {
+            val aSAlertDialog: ASAlertDialog? = _alerts[alertId]
+            if (aSAlertDialog != null && aSAlertDialog.isShowing) aSAlertDialog.dismiss()
+            _alerts.put(alertId, this)
         }
         super.show()
     }
@@ -263,13 +248,13 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     // 設定都不按的時候, 是否傳回預設值
     // 預設不傳
     fun setDefaultButtonIndex(i: Int): ASAlertDialog {
-        _default_index = i
+        defaultIndex = i
         return this
     }
 
     override fun cancel() {
-        if (_default_index > -1) {
-            _listener!!.onAlertDialogDismissWithButtonIndex(this, _default_index)
+        if (defaultIndex > -1) {
+            listener!!.onAlertDialogDismissWithButtonIndex(this, defaultIndex)
         }
         super.cancel()
     }
@@ -285,7 +270,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         }
 
         fun create(paramString: String?): ASAlertDialog {
-            val aSAlertDialog: ASAlertDialog? = _alerts.get(paramString)
+            val aSAlertDialog: ASAlertDialog? = _alerts[paramString]
             if (aSAlertDialog == null) return ASAlertDialog(paramString)
             aSAlertDialog.clear()
             return aSAlertDialog
@@ -297,18 +282,18 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         }
 
         fun hideAlert(paramString: String?) {
-            val aSAlertDialog: ASAlertDialog? = _alerts.get(paramString)
-            if (aSAlertDialog != null) aSAlertDialog.dismiss()
+            val aSAlertDialog: ASAlertDialog? = _alerts[paramString]
+            aSAlertDialog?.dismiss()
         }
 
         @JvmStatic
-        fun showErrorDialog(err_message: String?, bahamutController: ASViewController?) {
+        fun showErrorDialog(errMessage: String?, aSViewController: ASViewController?) {
             createDialog()
                 .setTitle("錯誤")
-                .setMessage(err_message)
+                .setMessage(errMessage)
                 .addButton("確定")
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int -> aDialog!!.dismiss() })
-                .scheduleDismissOnPageDisappear(bahamutController)
+                .setListener { aDialog: ASAlertDialog?, index: Int -> aDialog!!.dismiss() }
+                .scheduleDismissOnPageDisappear(aSViewController)
                 .show()
         }
     }

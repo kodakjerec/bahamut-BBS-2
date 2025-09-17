@@ -29,12 +29,12 @@ object ASStreamWriter {
 
     @Throws(IOException::class)
     fun writeData(paramOutputStream: OutputStream, paramDouble: Double) {
-        writeData(paramOutputStream, Double.doubleToLongBits(paramDouble))
+        writeData(paramOutputStream, paramDouble.toLong())
     }
 
     @Throws(IOException::class)
     fun writeData(paramOutputStream: OutputStream, paramFloat: Float) {
-        writeData(paramOutputStream, Float.floatToIntBits(paramFloat))
+        writeData(paramOutputStream, paramFloat.toInt())
     }
 
     @Throws(IOException::class)
@@ -78,9 +78,9 @@ object ASStreamWriter {
     }
 
     @Throws(IOException::class)
-    fun writeData(paramOutputStream: OutputStream, paramArrayOfbyte: ByteArray) {
-        writeData(paramOutputStream, paramArrayOfbyte.size)
-        paramOutputStream.write(paramArrayOfbyte)
+    fun writeData(paramOutputStream: OutputStream, paramArrayOfByte: ByteArray) {
+        writeData(paramOutputStream, paramArrayOfByte.size)
+        paramOutputStream.write(paramArrayOfByte)
     }
 } /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\Utils\ASStreamWriter.class
  * Java compiler version: 6 (50.0)

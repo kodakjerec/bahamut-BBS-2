@@ -1,6 +1,5 @@
 package com.kota.Bahamut
 
-/* loaded from: classes.dex */
 interface BahamutPage {
     companion object {
         const val BAHAMUT_LOGIN: Int = 1

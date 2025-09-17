@@ -58,7 +58,7 @@ object TelnetAsciiCode {
     const val STX: Int = 2
     const val SUB: Int = 26
     const val SYN: Int = 22
-    val UNSET: Int = -1
+    const val UNSET: Int = -1
     const val US: Int = 31
     const val VT: Int = 11
 }

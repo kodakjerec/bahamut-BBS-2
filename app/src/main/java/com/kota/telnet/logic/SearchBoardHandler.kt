@@ -9,11 +9,11 @@ class SearchBoardHandler private constructor() {
     fun read() {
         var i = 3
         while (i < 23) {
-            val content = TelnetClient.getModel().getRowString(i).trim { it <= ' ' }
-            if (content.length != 0) {
+            val content = TelnetClient.client!!.model!!.getRowString(i).trim { it <= ' ' }
+            if (content.isNotEmpty()) {
                 for (board in content.split(" +".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()) {
-                    if (board.length > 0) {
+                    if (board.isNotEmpty()) {
                         this._boards.add(board)
                     }
                 }
@@ -32,7 +32,7 @@ class SearchBoardHandler private constructor() {
         get() = this._boards.size
 
     fun getBoard(index: Int): String? {
-        return this._boards.get(index)
+        return this._boards[index]
     }
 
     val boards: Array<String?>

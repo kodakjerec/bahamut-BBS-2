@@ -32,7 +32,6 @@ import kotlin.collections.HashSet
 import kotlin.collections.MutableMap
 import kotlin.collections.MutableSet
 
-/* loaded from: classes.dex */
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
     private val _operation_command_stack = Vector<TelnetCommand>()
@@ -117,7 +116,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     sleep(1000L)
                 }
             } catch (e: Exception) {
-                Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 run = false
             }
         }

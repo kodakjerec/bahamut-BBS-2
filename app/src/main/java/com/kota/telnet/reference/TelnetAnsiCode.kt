@@ -47,15 +47,15 @@ object TelnetAnsiCode {
      */
     @JvmStatic
     fun getTextColor(colorIndex: Byte): Int {
-        val color_index = colorIndex.toInt() and 255
+        val colorIndex1 = colorIndex.toInt() and 255
         if (colorIndex < 8) {
-            return TEXT_COLOR_NORMAL[color_index]
+            return TEXT_COLOR_NORMAL[colorIndex1]
         }
         try {
-            return COLOR_BRIGHT[color_index - 8]
+            return COLOR_BRIGHT[colorIndex1 - 8]
         } catch (e: Exception) {
             Log.e(
-                TelnetAnsiCode::class.java.getSimpleName(),
+                TelnetAnsiCode::class.java.simpleName,
                 (if (e.message != null) e.message else "")!!
             )
             return -4144960
@@ -69,15 +69,15 @@ object TelnetAnsiCode {
      */
     @JvmStatic
     fun getBackgroundColor(colorIndex: Byte): Int {
-        val color_index = colorIndex.toInt() and 255
+        val colorIndex1 = colorIndex.toInt() and 255
         if (colorIndex < 8) {
-            return BACKGROUND_COLOR_NORMAL[color_index]
+            return BACKGROUND_COLOR_NORMAL[colorIndex1]
         }
         try {
-            return COLOR_BRIGHT[color_index - 8]
+            return COLOR_BRIGHT[colorIndex1 - 8]
         } catch (e: Exception) {
             Log.e(
-                TelnetAnsiCode::class.java.getSimpleName(),
+                TelnetAnsiCode::class.java.simpleName,
                 (if (e.message != null) e.message else "")!!
             )
             return -4144960
@@ -92,7 +92,7 @@ object TelnetAnsiCode {
     @JvmStatic
     fun getTextAsciiCode(colorIndex: Int): String {
         if (colorIndex < 8) {
-            return "3" + colorIndex
+            return "3$colorIndex"
         }
         return ""
     }
@@ -105,7 +105,7 @@ object TelnetAnsiCode {
     @JvmStatic
     fun getBackAsciiCode(colorIndex: Byte): String {
         if (colorIndex < 8) {
-            return "4" + colorIndex
+            return "4$colorIndex"
         }
         return ""
     }

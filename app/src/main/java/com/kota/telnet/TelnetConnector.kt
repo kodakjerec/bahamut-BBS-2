@@ -6,41 +6,41 @@ import com.kota.Bahamut.service.NotificationSettings.getConnectMethod
 import java.io.IOException
 
 class TelnetConnector : TelnetChannelListener {
-    private val _channel: Array<TelnetChannel?>? = arrayOfNulls<TelnetChannel>(2)
-    private var _holder_thread: HolderThread? = null
+    private val telnetChannels: Array<TelnetChannel?>? = arrayOfNulls(2)
+    private var holderThread: HolderThread? = null
     var isConnecting: Boolean = false
         private set
-    private var _last_send_data_time: Long = 0
-    private var _listener: TelnetConnectorListener? = null
-    private var _socket_channel: TelnetSocketChannel? = null
+    private var lastSentDataTime: Long = 0
+    private var connectorListener: TelnetConnectorListener? = null
+    private var socketChannel: TelnetSocketChannel? = null
 
     // 添加設備控制器引用
-    private var _device_controller: ASDeviceController? = null
+    private var deviceController: ASDeviceController? = null
 
     fun clear() {
         synchronized(this) {
-            this._channel!![0] = null
-            this._channel[1] = null
+            this.telnetChannels!![0] = null
+            this.telnetChannels[1] = null
         }
-        if (this._holder_thread != null) {
-            this._holder_thread!!.close()
+        if (this.holderThread != null) {
+            this.holderThread!!.close()
         }
-        this._holder_thread = null
-        if (this._socket_channel != null) {
+        this.holderThread = null
+        if (this.socketChannel != null) {
             try {
-                this._socket_channel!!.finishConnect()
-            } catch (e: IOException) {
+                this.socketChannel!!.finishConnect()
+            } catch (_: IOException) {
                 Log.v("SocketChannel", "IO Exception")
             }
         }
-        this._socket_channel = null
+        this.socketChannel = null
         this.isConnecting = false
-        this._last_send_data_time = 0
+        this.lastSentDataTime = 0
     }
 
     // 添加設備控制器設定方法
     fun setDeviceController(deviceController: ASDeviceController?) {
-        this._device_controller = deviceController
+        this.deviceController = deviceController
     }
 
     /* 防呆,掛網 */
@@ -54,11 +54,11 @@ class TelnetConnector : TelnetChannelListener {
         }
 
         override fun run() {
-            while (this._run && this@TelnetConnector._holder_thread === this) {
+            while (this._run && this@TelnetConnector.holderThread === this) {
                 try {
                     sleep((30 * 1000).toLong())
                 } catch (e: InterruptedException) {
-                    Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                    Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                     // 如果被中斷且不應該繼續運行，則退出
                     if (!this._run) {
                         break
@@ -83,14 +83,14 @@ class TelnetConnector : TelnetChannelListener {
 
                 // 增強的 keep-alive 檢查
                 val currentTime = System.currentTimeMillis()
-                if (currentTime - this@TelnetConnector._last_send_data_time > 150 * 1000) {
+                if (currentTime - this@TelnetConnector.lastSentDataTime > 150 * 1000) {
                     Log.d("TelnetConnector", "Sending keep-alive message")
                     this@TelnetConnector.sendHoldMessage()
                 }
 
 
                 // 添加連線健康檢查
-                if (currentTime - this@TelnetConnector._last_send_data_time > 300 * 1000) {
+                if (currentTime - this@TelnetConnector.lastSentDataTime > 300 * 1000) {
                     Log.w("TelnetConnector", "No data for 5 minutes, checking connection health")
                     if (!this@TelnetConnector.isConnectionHealthy) {
                         Log.e("TelnetConnector", "Connection appears to be unhealthy")
@@ -127,43 +127,43 @@ class TelnetConnector : TelnetChannelListener {
 
 
         // 連線前先鎖定 WiFi 和 CPU
-        if (this._device_controller != null) {
-            this._device_controller!!.lockWifi()
+        if (this.deviceController != null) {
+            this.deviceController!!.lockWifi()
         }
 
-        if (this._listener != null) {
-            this._listener!!.onTelnetConnectorConnectStart(this)
+        if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorConnectStart(this)
         }
         this.isConnecting = false
         try {
-            println("Connect to Telnet " + serverIp + ":" + serverPort)
-            this._socket_channel = TelnetDefaultSocketChannel(serverIp, serverPort)
+            println("Connect to Telnet $serverIp:$serverPort")
+            this.socketChannel = TelnetDefaultSocketChannel(serverIp, serverPort)
             synchronized(this) {
-                this._channel!![0] = TelnetChannel(this._socket_channel)
-                this._channel[0]!!.setListener(this)
-                this._channel[1] = TelnetChannel(this._socket_channel)
-                this._channel[1]!!.setListener(this)
+                this.telnetChannels!![0] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[0]!!.setListener(this)
+                this.telnetChannels[1] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[1]!!.setListener(this)
             }
             this.isConnecting = true
             // 初始化最後發送時間
-            this._last_send_data_time = System.currentTimeMillis()
+            this.lastSentDataTime = System.currentTimeMillis()
         } catch (e: IOException) {
             Log.e("TelnetConnector", "Telnet connection failed: " + e.message)
             // 連線失敗時釋放鎖定
-            if (this._device_controller != null) {
-                this._device_controller!!.unlockWifi()
+            if (this.deviceController != null) {
+                this.deviceController!!.unlockWifi()
             }
             clear()
         }
         if (this.isConnecting) {
-            if (this._listener != null) {
-                this._listener!!.onTelnetConnectorConnectSuccess(this)
+            if (this.connectorListener != null) {
+                this.connectorListener!!.onTelnetConnectorConnectSuccess(this)
             }
-            this._holder_thread = HolderThread()
-            this._holder_thread!!.start()
+            this.holderThread = HolderThread()
+            this.holderThread!!.start()
             Log.d("TelnetConnector", "Telnet connection established, HolderThread started")
-        } else if (this._listener != null) {
-            this._listener!!.onTelnetConnectorConnectFail(this)
+        } else if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorConnectFail(this)
         }
     }
 
@@ -175,66 +175,66 @@ class TelnetConnector : TelnetChannelListener {
 
 
         // 連線前先鎖定 WiFi 和 CPU
-        if (this._device_controller != null) {
-            this._device_controller!!.lockWifi()
+        if (this.deviceController != null) {
+            this.deviceController!!.lockWifi()
         }
 
-        if (this._listener != null) {
-            this._listener!!.onTelnetConnectorConnectStart(this)
+        if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorConnectStart(this)
         }
         this.isConnecting = false
         try {
             // 構建 WebSocket URL - 使用巴哈姆特的實際 WebSocket 端點
             val wsUrl = "wss://term.gamer.com.tw/bbs"
-            println("Connect to WebSocket " + wsUrl)
-            this._socket_channel = TelnetWebSocketChannel(wsUrl)
+            println("Connect to WebSocket $wsUrl")
+            this.socketChannel = TelnetWebSocketChannel(wsUrl)
             synchronized(this) {
-                this._channel!![0] = TelnetChannel(this._socket_channel)
-                this._channel[0]!!.setListener(this)
-                this._channel[1] = TelnetChannel(this._socket_channel)
-                this._channel[1]!!.setListener(this)
+                this.telnetChannels!![0] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[0]!!.setListener(this)
+                this.telnetChannels[1] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[1]!!.setListener(this)
             }
             this.isConnecting = true
             // 初始化最後發送時間
-            this._last_send_data_time = System.currentTimeMillis()
+            this.lastSentDataTime = System.currentTimeMillis()
         } catch (e: IOException) {
             Log.e("TelnetConnector", "WebSocket connection failed: " + e.message)
             // 連線失敗時釋放鎖定
-            if (this._device_controller != null) {
-                this._device_controller!!.unlockWifi()
+            if (this.deviceController != null) {
+                this.deviceController!!.unlockWifi()
             }
             clear()
         }
         if (this.isConnecting) {
-            if (this._listener != null) {
-                this._listener!!.onTelnetConnectorConnectSuccess(this)
+            if (this.connectorListener != null) {
+                this.connectorListener!!.onTelnetConnectorConnectSuccess(this)
             }
-            this._holder_thread = HolderThread()
-            this._holder_thread!!.start()
+            this.holderThread = HolderThread()
+            this.holderThread!!.start()
             Log.d("TelnetConnector", "WebSocket connection established, HolderThread started")
-        } else if (this._listener != null) {
-            this._listener!!.onTelnetConnectorConnectFail(this)
+        } else if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorConnectFail(this)
         }
     }
 
     fun close() {
         // 關閉連線時釋放鎖定
-        if (this._device_controller != null) {
-            this._device_controller!!.unlockWifi()
+        if (this.deviceController != null) {
+            this.deviceController!!.unlockWifi()
         }
         clear()
-        if (this._listener != null) {
-            this._listener!!.onTelnetConnectorClosed(this)
+        if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorClosed(this)
         }
     }
 
     private fun getChannel(channel: Int): TelnetChannel? {
         val telnetChannel: TelnetChannel?
         synchronized(this) {
-            if (this._channel != null) {
-                telnetChannel = this._channel[channel]
+            telnetChannel = if (this.telnetChannels != null) {
+                this.telnetChannels[channel]
             } else {
-                telnetChannel = null
+                null
             }
         }
         return telnetChannel
@@ -242,73 +242,63 @@ class TelnetConnector : TelnetChannelListener {
 
     @Throws(TelnetConnectionClosedException::class)
     fun readData(channel: Int): Byte {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
+        val selectedChannel = getChannel(channel)
+        if (selectedChannel != null) {
             try {
-                return selected_channel.readData()
+                return selectedChannel.readData()
             } catch (e: IOException) {
                 Log.v("SocketChannel", "readData IO Exception")
-                throw TelnetConnectionClosedException()
+                throw TelnetConnectionClosedException
             }
         }
         return 0
     }
 
     fun undoReadData(channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
-            selected_channel.undoReadData()
-        }
+        val selectedChannel = getChannel(channel)
+        selectedChannel?.undoReadData()
     }
 
     fun writeData(data: ByteArray, channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
-            selected_channel.writeData(data)
-        }
+        val selectedChannel = getChannel(channel)
+        selectedChannel?.writeData(data)
     }
 
     fun writeData(data: Byte, channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
-            selected_channel.writeData(data)
-        }
+        val selectedChannel = getChannel(channel)
+        selectedChannel?.writeData(data)
     }
 
     fun sendData(channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null && selected_channel.sendData()) {
-            this._last_send_data_time = System.currentTimeMillis()
+        val selectedChannel = getChannel(channel)
+        if (selectedChannel != null && selectedChannel.sendData()) {
+            this.lastSentDataTime = System.currentTimeMillis()
         }
     }
 
     fun lockChannel(channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
-            selected_channel.lock()
-        }
+        val selectedChannel = getChannel(channel)
+        selectedChannel?.lock()
     }
 
     fun unlockChannel(channel: Int) {
-        val selected_channel = getChannel(channel)
-        if (selected_channel != null) {
-            selected_channel.unlock()
+        val selectedChannel = getChannel(channel)
+        if (selectedChannel != null) {
+            selectedChannel.unlock()
             sendData(channel)
         }
     }
 
     fun cleanReadDataSize() {
-        val selected_channel = getChannel(0)
-        if (selected_channel != null) {
-            selected_channel.cleanReadDataSize()
-        }
+        val selectedChannel = getChannel(0)
+        selectedChannel?.cleanReadDataSize()
     }
 
     val readDataSize: Int
         get() {
-            val selected_channel = getChannel(0)
-            if (selected_channel != null) {
-                return selected_channel.getReadDataSize()
+            val selectedChannel = getChannel(0)
+            if (selectedChannel != null) {
+                return selectedChannel.readDataSize
             }
             return 0
         }
@@ -326,12 +316,12 @@ class TelnetConnector : TelnetChannelListener {
 
 
             // 更新最後發送時間
-            this._last_send_data_time = System.currentTimeMillis()
+            this.lastSentDataTime = System.currentTimeMillis()
             Log.d("TelnetConnector", "Keep-alive message sent")
         } catch (e: Exception) {
             Log.e("TelnetConnector", "Failed to send keep-alive message: " + e.message)
             // 如果發送失敗，可能連線已斷開
-            if (this._listener != null) {
+            if (this.connectorListener != null) {
                 // 這裡可以觸發重連機制
             }
         }
@@ -339,31 +329,31 @@ class TelnetConnector : TelnetChannelListener {
 
     val isConnectionHealthy: Boolean
         // 添加連線狀態檢查方法
-        get() = this.isConnecting && this._socket_channel != null &&
-                (System.currentTimeMillis() - this._last_send_data_time < 300 * 1000)
+        get() = this.isConnecting && this.socketChannel != null &&
+                (System.currentTimeMillis() - this.lastSentDataTime < 300 * 1000)
 
     // 添加網路連線檢查方法
     fun checkNetworkConnectivity(): Boolean {
-        if (this._device_controller != null) {
-            val networkType = this._device_controller!!.isNetworkAvailable()
+        if (this.deviceController != null) {
+            val networkType = this.deviceController!!.isNetworkAvailable
             return networkType != -1
         }
         return true // 如果沒有設備控制器，假設網路正常
     }
 
     fun setListener(aListener: TelnetConnectorListener?) {
-        this._listener = aListener
+        this.connectorListener = aListener
     }
 
-    override fun onTelnetChannelReceiveDataStart(aChannel: TelnetChannel?) {
-        if (this._listener != null) {
-            this._listener!!.onTelnetConnectorReceiveDataStart(this)
+    override fun onTelnetChannelReceiveDataStart(telnetChannel: TelnetChannel?) {
+        if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorReceiveDataStart(this)
         }
     }
 
-    override fun onTelnetChannelReceiveDataFinished(aChannel: TelnetChannel?) {
-        if (this._listener != null) {
-            this._listener!!.onTelnetConnectorReceiveDataFinished(this)
+    override fun onTelnetChannelReceiveDataFinished(telnetChannel: TelnetChannel?) {
+        if (this.connectorListener != null) {
+            this.connectorListener!!.onTelnetConnectorReceiveDataFinished(this)
         }
     }
 }

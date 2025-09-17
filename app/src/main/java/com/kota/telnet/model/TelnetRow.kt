@@ -69,7 +69,7 @@ class TelnetRow {
         myQuoteLevel = -1
     }
 
-    fun set(aRow: TelnetRow?): TelnetRow {
+    fun set(aRow: TelnetRow): TelnetRow {
         for (i in 0..79) {
             data[i] = aRow.data[i]
             textColor[i] = aRow.textColor[i]

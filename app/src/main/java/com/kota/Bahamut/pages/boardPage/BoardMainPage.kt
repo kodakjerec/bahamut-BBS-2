@@ -829,7 +829,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         try {
             i = str.toInt() - 1
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
             i = -1
         }
         if (i >= 0) {

@@ -134,7 +134,7 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
                     input_stream.close()
                     file_input_stream.close()
                 } catch (e: IOException) {
-                    Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+                    Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
                 file.delete()
                 load_file = true
@@ -181,7 +181,7 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
                 addBookmark(Bookmark(data.getJSONObject(i)))
             }
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         sortBookmarks()
         println("load " + this.totalBookmarkList.size + " bookmarks.")
@@ -205,7 +205,7 @@ class BookmarkStore(val _context: Context?, var _file_path: String?) {
             }
             obj.put("data", data)
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         return obj
     }

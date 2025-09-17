@@ -106,11 +106,11 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     var boardName = ""
                     if (telnetArticle!=null) {
                         author = telnetArticle!!.author
-                        title = telnetArticle!!.Title
-                        if (telnetArticle!!.Nickname != null) {
-                            author = author + "(" + telnetArticle!!.Nickname + ")"
+                        title = telnetArticle!!.title
+                        if (telnetArticle!!.nickName != null) {
+                            author = author + "(" + telnetArticle!!.nickName + ")"
                         }
-                        boardName = telnetArticle!!.BoardName
+                        boardName = telnetArticle!!.boardName
                     }
                     itemView1.setData(title, author, boardName)
                     itemView1.setMenuButtonClickListener(mMenuListener)
@@ -144,7 +144,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
                 ArticlePageItemType.PostTime -> {
                     val itemView4 = itemViewOrigin as ArticlePage_TimeTimeView
-                    itemView4.setTime("《" + telnetArticle!!.DateTime + "》")
+                    itemView4.setTime("《" + telnetArticle!!.dateTime + "》")
                     itemView4.setIP(telnetArticle!!.fromIP)
                 }
             }

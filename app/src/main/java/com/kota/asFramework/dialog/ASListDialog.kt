@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
@@ -15,16 +14,15 @@ import com.kota.Bahamut.R
 import java.util.Vector
 import kotlin.math.ceil
 
-/* loaded from: classes.dex */
 class ASListDialog : ASDialog() {
-    private var _content_view: LinearLayout? = null
-    private var _item_block: LinearLayout? = null
-    private var _listener: ASListDialogItemClickListener? = null
-    private val _item_list: Vector<ASListDialogItem> = Vector<ASListDialogItem>()
-    private var _title_label: TextView? = null
-    private var _dialog_width = 280.0f
-    private var _scroll_view: ScrollView? = null
-    private var _item_text_size = 1
+    private var contentView: LinearLayout? = null
+    private var itemBlock: LinearLayout? = null
+    private var listener: ASListDialogItemClickListener? = null
+    private val itemList: Vector<ASListDialogItem> = Vector<ASListDialogItem>()
+    private var titleLabel: TextView? = null
+    private var dialogWidth = 280.0f
+    private var scrollView: ScrollView? = null
+    private var itemTextSize = 1
 
     private class ASListDialogItem {
         var button: Button? = null
@@ -32,192 +30,182 @@ class ASListDialog : ASDialog() {
     }
 
     fun setItemTextSize(size: Int): ASListDialog {
-        this._item_text_size = size
+        this.itemTextSize = size
         return this
     }
 
     // com.kota.ASFramework.Dialog.ASDialog
-    override fun getName(): String {
+    fun getName(): String {
         return "ListDialog"
     }
 
     init {
         requestWindowFeature(1)
         setContentView(buildContentView())
-        getWindow()!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
     }
 
     @SuppressLint("ResourceAsColor")
     private fun buildContentView(): View {
-        val frame_padding = TypedValue.applyDimension(
+        val framePadding = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             3.0f,
-            getContext().getResources().getDisplayMetrics()
+            context.resources.displayMetrics
         ).toInt()
         val padding = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             5.0f,
-            getContext().getResources().getDisplayMetrics()
+            context.resources.displayMetrics
         ).toInt()
-        val frame = LinearLayout(getContext())
+        val frame = LinearLayout(context)
         frame.setBackgroundResource(R.color.dialog_border_color)
-        frame.setPadding(frame_padding, frame_padding, frame_padding, frame_padding)
-        val content_view = LinearLayout(getContext())
-        content_view.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        frame.setPadding(framePadding, framePadding, framePadding, framePadding)
+        val contentView = LinearLayout(context)
+        contentView.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        content_view.setBackgroundColor(View.MEASURED_STATE_MASK)
-        frame.addView(content_view)
-        content_view.setOrientation(LinearLayout.VERTICAL)
-        val dialog_width = ((TypedValue.applyDimension(
+        contentView.setBackgroundColor(View.MEASURED_STATE_MASK)
+        frame.addView(contentView)
+        contentView.orientation = LinearLayout.VERTICAL
+        val dialogWidth = ((TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            this._dialog_width,
-            getContext().getResources().getDisplayMetrics()
+            this.dialogWidth,
+            context.resources.displayMetrics
         ).toInt()) / 2) * 2
-        this._scroll_view = ScrollView(getContext())
-        this._scroll_view!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                dialog_width,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        this.scrollView = ScrollView(context)
+        this.scrollView!!.layoutParams = LinearLayout.LayoutParams(
+            dialogWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        content_view.addView(this._scroll_view)
-        this._content_view = LinearLayout(getContext())
-        this._content_view!!.setLayoutParams(
-            FrameLayout.LayoutParams(
-                dialog_width,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        contentView.addView(this.scrollView)
+        this.contentView = LinearLayout(context)
+        this.contentView!!.layoutParams = FrameLayout.LayoutParams(
+            dialogWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        this._content_view!!.setOrientation(LinearLayout.VERTICAL)
-        this._content_view!!.setGravity(Gravity.CENTER)
-        this._scroll_view!!.addView(this._content_view)
-        this._title_label = TextView(getContext())
-        this._title_label!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        this.contentView!!.orientation = LinearLayout.VERTICAL
+        this.contentView!!.gravity = Gravity.CENTER
+        this.scrollView!!.addView(this.contentView)
+        this.titleLabel = TextView(context)
+        this.titleLabel!!.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        this._title_label!!.setPadding(padding, padding, padding, padding)
-        this._title_label!!.setTextColor(-1)
-        this._title_label!!.setTextSize(
+        this.titleLabel!!.setPadding(padding, padding, padding, padding)
+        this.titleLabel!!.setTextColor(-1)
+        this.titleLabel!!.setTextSize(
             2,
-            ASLayoutParams.Companion.getInstance().getTextSizeLarge()
+            ASLayoutParams.instance.textSizeLarge
         )
-        this._title_label!!.setText("選項")
-        this._title_label!!.setBackgroundColor(-14671840)
-        this._title_label!!.setGravity(Gravity.CENTER)
-        this._content_view!!.addView(this._title_label)
-        this._item_block = LinearLayout(getContext())
-        this._item_block!!.setLayoutParams(
-            FrameLayout.LayoutParams(
-                dialog_width,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        this.titleLabel!!.text = "選項"
+        this.titleLabel!!.setBackgroundColor(-14671840)
+        this.titleLabel!!.gravity = Gravity.CENTER
+        this.contentView!!.addView(this.titleLabel)
+        this.itemBlock = LinearLayout(context)
+        this.itemBlock!!.layoutParams = FrameLayout.LayoutParams(
+            dialogWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        this._item_block!!.setOrientation(LinearLayout.VERTICAL)
-        this._item_block!!.setGravity(Gravity.CENTER)
-        this._content_view!!.addView(this._item_block)
+        this.itemBlock!!.orientation = LinearLayout.VERTICAL
+        this.itemBlock!!.gravity = Gravity.CENTER
+        this.contentView!!.addView(this.itemBlock)
         return frame
     }
 
     fun setListener(aListener: ASListDialogItemClickListener?): ASListDialog {
-        this._listener = aListener
+        this.listener = aListener
         return this
     }
 
     fun setTitle(aTitle: String?): ASListDialog {
-        if (this._title_label != null) {
-            this._title_label!!.setText(aTitle)
+        if (this.titleLabel != null) {
+            this.titleLabel!!.text = aTitle
         }
         return this
     }
 
     fun addItems(aItemList: Array<String?>): ASListDialog {
-        for (item_title in aItemList) {
-            addItem(item_title)
+        for (itemTitle in aItemList) {
+            addItem(itemTitle)
         }
         return this
     }
 
     fun addItem(aItemTitle: String?): ASListDialog {
         val button = createButton()
-        button.setOnClickListener(View.OnClickListener { v: View? ->
+        button.setOnClickListener { v: View? ->
             this@ASListDialog.onItemClicked(
                 v as Button?
             )
-        })
-        button.setOnLongClickListener(OnLongClickListener { v: View? ->
+        }
+        button.setOnLongClickListener { v: View? ->
             this@ASListDialog.onItemLongClicked(
                 v as Button?
             )
-        })
-        if (aItemTitle == null) {
-            button.setVisibility(View.GONE)
-        } else {
-            if (this._item_list.size > 0) {
-                this._item_block!!.addView(createDivider())
-            }
-            button.setText(aItemTitle)
         }
-        this._item_block!!.addView(button)
+        if (aItemTitle == null) {
+            button.visibility = View.GONE
+        } else {
+            if (this.itemList.isNotEmpty()) {
+                this.itemBlock!!.addView(createDivider())
+            }
+            button.text = aItemTitle
+        }
+        this.itemBlock!!.addView(button)
         val item = ASListDialogItem()
         item.button = button
         item.title = aItemTitle
-        this._item_list.add(item)
+        this.itemList.add(item)
         return this
     }
 
     fun createDivider(): View {
-        val divider = View(getContext())
-        val divider_height = ceil(
+        val divider = View(context)
+        val dividerHeight = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 1.0f,
-                getContext().getResources().getDisplayMetrics()
+                context.resources.displayMetrics
             ).toDouble()
         ).toInt()
-        divider.setLayoutParams(LinearLayout.LayoutParams(-1, divider_height))
+        divider.layoutParams = LinearLayout.LayoutParams(-1, dividerHeight)
         divider.setBackgroundColor(-2130706433)
         return divider
     }
 
     private fun createButton(): Button {
-        val button = Button(getContext())
-        button.setLayoutParams(
-            LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        val button = Button(context)
+        button.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        button.setMinimumHeight(
-            TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                60.0f,
-                getContext().getResources().getDisplayMetrics()
-            ).toInt()
-        )
-        button.setGravity(Gravity.CENTER)
-        if (this._item_text_size == 0) {
-            button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeNormal())
-        } else if (this._item_text_size == 1) {
-            button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeLarge())
-        } else if (this._item_text_size == 2) {
-            button.setTextSize(2, ASLayoutParams.Companion.getInstance().getTextSizeUltraLarge())
+        button.minimumHeight = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            60.0f,
+            context.resources.displayMetrics
+        ).toInt()
+        button.gravity = Gravity.CENTER
+        when (this.itemTextSize) {
+            0 -> {
+                button.setTextSize(2, ASLayoutParams.instance.textSizeNormal)
+            }
+            1 -> {
+                button.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
+            }
+            2 -> {
+                button.setTextSize(2, ASLayoutParams.instance.textSizeUltraLarge)
+            }
         }
-        button.setBackground(ASLayoutParams.Companion.getInstance().getListItemBackgroundDrawable())
-        button.setTextColor(ASLayoutParams.Companion.getInstance().getListItemTextColor())
-        button.setSingleLine(true)
+        button.background = ASLayoutParams.instance .listItemBackgroundDrawable
+        button.setTextColor(ASLayoutParams.instance.listItemTextColor)
+        button.isSingleLine = true
         return button
     }
 
     private fun indexOfButton(aButton: Button?): Int {
-        for (i in this._item_list.indices) {
-            val item = this._item_list.get(i)
+        for (i in this.itemList.indices) {
+            val item = this.itemList[i]
             if (item.button === aButton) {
                 val index = i
                 return index
@@ -227,13 +215,13 @@ class ASListDialog : ASDialog() {
     }
 
     private fun onItemClicked(button: Button?) {
-        if (this._listener != null) {
+        if (this.listener != null) {
             val index = indexOfButton(button)
             if (index != -1) {
-                this._listener!!.onListDialogItemClicked(
+                this.listener!!.onListDialogItemClicked(
                     this,
                     index,
-                    this._item_list.get(index).title
+                    this.itemList[index].title
                 )
             }
             dismiss()
@@ -241,13 +229,13 @@ class ASListDialog : ASDialog() {
     }
 
     private fun onItemLongClicked(button: Button?): Boolean {
-        val index: Int
+        var index = 0
         var result = false
-        if (this._listener != null && (indexOfButton(button).also { index = it }) != -1) {
-            result = this._listener!!.onListDialogItemLongClicked(
+        if (this.listener != null && (indexOfButton(button).also { index = it }) != -1) {
+            result = this.listener!!.onListDialogItemLongClicked(
                 this,
                 index,
-                this._item_list.get(index).title
+                this.itemList[index].title
             )
         }
         if (result) {
@@ -257,23 +245,19 @@ class ASListDialog : ASDialog() {
     }
 
     fun setDialogWidth(width: Float): ASListDialog {
-        this._dialog_width = width
-        val dialog_width = ((TypedValue.applyDimension(
+        this.dialogWidth = width
+        val dialogWidth = ((TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
-            this._dialog_width,
-            getContext().getResources().getDisplayMetrics()
+            this.dialogWidth,
+            context.resources.displayMetrics
         ).toInt()) / 2) * 2
-        this._scroll_view!!.setLayoutParams(
-            LinearLayout.LayoutParams(
-                dialog_width,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        this.scrollView!!.layoutParams = LinearLayout.LayoutParams(
+            dialogWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        this._content_view!!.setLayoutParams(
-            FrameLayout.LayoutParams(
-                dialog_width,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
+        this.contentView!!.layoutParams = FrameLayout.LayoutParams(
+            dialogWidth,
+            ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return this
     }

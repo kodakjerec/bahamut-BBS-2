@@ -171,16 +171,16 @@ class ArticlePage : TelnetPage() {
                 var board_name: String? = null
                 if (telnetArticle != null) {
                     author = telnetArticle!!.author
-                    title = telnetArticle!!.Title
-                    board_name = telnetArticle!!.BoardName
-                    if (telnetArticle!!.Nickname != null) {
-                        author = author + "(" + telnetArticle!!.Nickname + ")"
+                    title = telnetArticle!!.title
+                    board_name = telnetArticle!!.boardName
+                    if (telnetArticle!!.nickName != null) {
+                        author = author + "(" + telnetArticle!!.nickName + ")"
                     }
                 }
                 itemViewOrigin.setData(title, author, board_name)
                 itemViewOrigin.setMenuButtonClickListener(mMenuListener)
             } else if (itemViewOrigin is ArticlePage_TimeTimeView) {
-                itemViewOrigin.setTime("《" + telnetArticle!!.DateTime + "》")
+                itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
                 itemViewOrigin.setIP(telnetArticle!!.fromIP)
             } else if (itemViewOrigin is ArticlePagePushItemView) {
                 val tempIndex = itemIndex - (getCount() - pushLength) // itemIndex - 本文長度
@@ -670,7 +670,7 @@ class ArticlePage : TelnetPage() {
     /** 刪除文章  */
     fun onDeleteButtonClicked() {
         if (telnetArticle != null && _board_page != null) {
-            val item_number = telnetArticle!!.Number
+            val item_number = telnetArticle!!.myNumber
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.delete))
                 .setMessage(getContextString(R.string.del_this_article))
@@ -695,7 +695,7 @@ class ArticlePage : TelnetPage() {
                 val reply_content = telnetArticle!!.generateReplyContent()
                 page.setBoardPage(_board_page)
                 page.setOperationMode(PostArticlePage.OperationMode.Reply)
-                page.setArticleNumber(telnetArticle!!.Number.toString())
+                page.setArticleNumber(telnetArticle!!.myNumber.toString())
                 page.setPostTitle(reply_title)
                 page.setPostContent(reply_content + "\n\n\n")
                 page.setListener(_board_page)
@@ -717,7 +717,7 @@ class ArticlePage : TelnetPage() {
             val edit_content = telnetArticle!!.generateEditContent()
             val edit_format = telnetArticle!!.generateEditFormat()
             page.setBoardPage(_board_page)
-            page.setArticleNumber(telnetArticle!!.Number.toString())
+            page.setArticleNumber(telnetArticle!!.myNumber.toString())
             page.setOperationMode(PostArticlePage.OperationMode.Edit)
             page.setPostTitle(edit_title)
             page.setPostContent(edit_content)
@@ -927,7 +927,7 @@ class ArticlePage : TelnetPage() {
             val store = TempSettings.bookmarkStore
             if (store != null) {
                 val bookmark_list = store.getBookmarkList(board_name)
-                bookmark_list.addHistoryBookmark(telnetArticle!!.Title)
+                bookmark_list.addHistoryBookmark(telnetArticle!!.title)
                 store.storeWithoutCloud()
             }
 
@@ -962,7 +962,7 @@ class ArticlePage : TelnetPage() {
                 }
             }.runInMainThread()
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
     }
 }

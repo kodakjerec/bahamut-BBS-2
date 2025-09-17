@@ -1,6 +1,5 @@
 package com.kota.telnet
 
-/* loaded from: classes.dex */
 class TelnetCommand {
     var action: Byte
     var header: Byte

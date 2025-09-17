@@ -16,10 +16,10 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.TempSettings
+import com.kota.asFramework.pageController.ASPageView
 
-/* loaded from: classes.dex */
 object ASSnackBar {
-    private var previous_snack_bar: Snackbar? = null
+    private var previousSnackBar: Snackbar? = null
 
     /**
      * 產生 snackBar
@@ -32,10 +32,10 @@ object ASSnackBar {
             // from class: com.kota.ASFramework.UI.ASToast.1
             // com.kota.ASFramework.Thread.ASRunner
             override fun run() {
-                if (previous_snack_bar != null) {
-                    previous_snack_bar!!.dismiss()
+                if (previousSnackBar != null) {
+                    previousSnackBar!!.dismiss()
                 }
-                val totalMessage = largeMessage + " " + normalMessage
+                val totalMessage = "$largeMessage $normalMessage"
                 val spannableString = SpannableString(totalMessage)
                 val boldStart = totalMessage.indexOf(largeMessage)
                 val boldEnd = boldStart + largeMessage.length
@@ -78,23 +78,31 @@ object ASSnackBar {
                         Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                     )
                 }
-                val tempView: View =
-                    ASNavigationController.getCurrentController().getTopController().getPageView()
-                previous_snack_bar = Snackbar.make(tempView, spannableString, Snackbar.LENGTH_LONG)
+                val tempView: ASPageView? =
+                    ASNavigationController.currentController?.topController?.pageView
+                
+                // 確保有有效的 View 才能顯示 Snackbar
+                if (tempView != null) {
+                    previousSnackBar = Snackbar.make(tempView, spannableString, Snackbar.LENGTH_LONG)
+                    
+                    // 靠上對齊
+                    val view = previousSnackBar!!.view
+                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    params.gravity = Gravity.TOP
+                    if (TempSettings.myActivity != null) {
+                        view.setBackgroundColor(
+                            ContextCompat.getColor(
+                                TempSettings.myActivity!!,
+                                R.color.list_page_item_arrow_background
+                            )
+                        )
+                    }
+                    view.layoutParams = params
 
-                // 靠上對齊
-                val view = previous_snack_bar!!.getView()
-                val params = view.getLayoutParams() as FrameLayout.LayoutParams
-                params.gravity = Gravity.TOP
-                if (TempSettings.myActivity != null) view.setBackgroundColor(
-                    ContextCompat.getColor(
-                        TempSettings.myActivity!!,
-                        R.color.list_page_item_arrow_background
-                    )
-                )
-                view.setLayoutParams(params)
-
-                previous_snack_bar!!.show()
+                    previousSnackBar!!.show()
+                } else {
+                    return // 如果沒有有效的 View，就不顯示 Snackbar
+                }
             }
         }.runInMainThread()
     }

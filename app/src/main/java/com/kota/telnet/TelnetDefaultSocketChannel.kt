@@ -7,30 +7,26 @@ import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
 class TelnetDefaultSocketChannel(address: String?, port: Int) : TelnetSocketChannel {
-    var _socket_channel: SocketChannel
-
-    init {
-        this._socket_channel = SocketChannel.open(
-            InetSocketAddress(
-                InetAddress.getByName(address).getHostAddress(),
-                port
-            )
+    var socketChannel: SocketChannel = SocketChannel.open(
+        InetSocketAddress(
+            InetAddress.getByName(address).hostAddress,
+            port
         )
+    )
+
+    @Throws(IOException::class)
+    override fun read(byteBuffer: ByteBuffer?): Int {
+        return this.socketChannel.read(byteBuffer)
     }
 
     @Throws(IOException::class)
-    override fun read(buffer: ByteBuffer?): Int {
-        return this._socket_channel.read(buffer)
-    }
-
-    @Throws(IOException::class)
-    override fun write(buffer: ByteBuffer?): Int {
-        return this._socket_channel.write(buffer)
+    override fun write(byteBuffer: ByteBuffer?): Int {
+        return this.socketChannel.write(byteBuffer)
     }
 
     @Throws(IOException::class)
     override fun finishConnect(): Boolean {
-        this._socket_channel.close()
-        return this._socket_channel.finishConnect()
+        this.socketChannel.close()
+        return this.socketChannel.finishConnect()
     }
 }

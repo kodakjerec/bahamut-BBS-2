@@ -4,7 +4,6 @@ import android.database.DataSetObservable
 import android.database.DataSetObserver
 import android.widget.ListAdapter
 
-/* loaded from: classes.dex */
 abstract class ASListViewController : ListAdapter {
     private val mDataSetObservable = DataSetObservable()
 

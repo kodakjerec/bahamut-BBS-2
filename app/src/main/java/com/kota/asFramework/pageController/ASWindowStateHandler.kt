@@ -1,6 +1,7 @@
 package com.kota.asFramework.pageController
 
-import android.R
+import android.R.id
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.graphics.Rect
 import android.os.Build
@@ -9,6 +10,7 @@ import android.view.View
 import kotlin.math.pow
 import kotlin.math.sqrt
 
+@SuppressLint("StaticFieldLeak")
 object ASWindowStateHandler {
     var activity: Activity?
 
@@ -45,11 +47,28 @@ object ASWindowStateHandler {
         activity = paramActivity
 
         val displayMetrics = DisplayMetrics()
-        activity!!.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics)
-        screenWidthPx = displayMetrics.widthPixels
-        screenHeightPx = displayMetrics.heightPixels
-        screenWidthInch = (displayMetrics.widthPixels / displayMetrics.xdpi).toDouble()
-        screenHeightInch = (displayMetrics.heightPixels / displayMetrics.ydpi).toDouble()
+        
+        // 使用適合的 API 獲取顯示器指標
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // API 30+ 使用 WindowMetrics
+            val windowMetrics = activity!!.windowManager.currentWindowMetrics
+            val bounds = windowMetrics.bounds
+            screenWidthPx = bounds.width()
+            screenHeightPx = bounds.height()
+            // 從 resources 獲取 density 相關資訊
+            displayMetrics.density = activity!!.resources.displayMetrics.density
+            displayMetrics.xdpi = activity!!.resources.displayMetrics.xdpi
+            displayMetrics.ydpi = activity!!.resources.displayMetrics.ydpi
+        } else {
+            // API 29 及以下使用傳統方法
+            @Suppress("DEPRECATION")
+            activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            screenWidthPx = displayMetrics.widthPixels
+            screenHeightPx = displayMetrics.heightPixels
+        }
+        
+        screenWidthInch = (screenWidthPx / displayMetrics.xdpi).toDouble()
+        screenHeightInch = (screenHeightPx / displayMetrics.ydpi).toDouble()
         screenInch = sqrt(screenWidthInch.pow(2.0) + screenHeightInch.pow(2.0))
         contentViewWidth = screenWidthPx
 
@@ -64,10 +83,11 @@ object ASWindowStateHandler {
         } else {
             // 舊版本的處理方式
             val rect = Rect()
-            val window = activity!!.getWindow()
-            window.getDecorView().getWindowVisibleDisplayFrame(rect)
+            val window = activity!!.window
+            window.decorView.getWindowVisibleDisplayFrame(rect)
             statusBarHeight = rect.top
-            val i = window.findViewById<View?>(R.id.content).getTop()
+            val contentView = window.findViewById<View?>(id.content)
+            val i = contentView?.top ?: 0
             if (i > 0) titleBarHeight = i - statusBarHeight
             contentViewHeight = screenHeightPx - titleBarHeight - statusBarHeight
         }
@@ -83,9 +103,6 @@ object ASWindowStateHandler {
             contentViewHeight = screenHeightPx - top - bottom
         }
     }
-} /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASWindowStateHandler.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */
+}
 
 

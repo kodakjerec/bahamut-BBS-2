@@ -12,18 +12,18 @@ class TelnetAnsi {
     }
 
     fun resetToDefaultState() {
-        this.textColor = defaultTextColor
-        this.textBlink = defaultTextBlink
+        this.textColor = DEFAULT_TEXT_COLOR
+        this.textBlink = DEFAULT_TEXT_BLINK
         this.textBright = DEFAULT_TEXT_BRIGHT
-        this.textItalic = defaultTextItalic
-        this.backgroundColor = defaultBackgroundColor
+        this.textItalic = DEFAULT_TEXT_ITALIC
+        this.backgroundColor = DEFAULT_BACKGROUND_COLOR
     }
 
     companion object {
-        var defaultBackgroundColor: Byte = 0
-        const val defaultTextBlink: Boolean = false
-        private const val DEFAULT_TEXT_BRIGHT = false
-        var defaultTextColor: Byte = 7
-        const val defaultTextItalic: Boolean = false
+        const val DEFAULT_BACKGROUND_COLOR: Byte = 0
+        const val DEFAULT_TEXT_BLINK: Boolean = false
+        const val DEFAULT_TEXT_BRIGHT = false
+        const val DEFAULT_TEXT_COLOR: Byte = 7
+        const val DEFAULT_TEXT_ITALIC: Boolean = false
     }
 }

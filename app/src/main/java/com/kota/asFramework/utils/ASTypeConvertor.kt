@@ -13,65 +13,56 @@ import kotlin.String
 import kotlin.byteArrayOf
 import kotlin.code
 
-/* loaded from: classes.dex */
 object ASTypeConvertor {
-    fun getData(aBooleanValue: Boolean): ByteArray {
-        return if (aBooleanValue) byteArrayOf(1) else byteArrayOf(0)
-    }
-
-    fun getData(aShortValue: Short): ByteArray {
-        return byteArrayOf((aShortValue.toInt() shr 8).toByte(), aShortValue.toByte())
-    }
-
-    fun getData(aCharValue: Char): ByteArray {
-        return byteArrayOf((aCharValue.code shr '\b'.code).toByte(), aCharValue.code.toByte())
-    }
-
-    fun getData(aIntValue: Int): ByteArray {
-        return byteArrayOf(
-            (aIntValue shr 24).toByte(),
-            (aIntValue shr 16).toByte(),
-            (aIntValue shr 8).toByte(),
-            aIntValue.toByte()
-        )
-    }
-
-    fun getData(aLongValue: Long): ByteArray {
-        return byteArrayOf(
-            (aLongValue shr 56).toByte(),
-            (aLongValue shr 48).toByte(),
-            (aLongValue shr 40).toByte(),
-            (aLongValue shr 32).toByte(),
-            (aLongValue shr 24).toByte(),
-            (aLongValue shr 16).toByte(),
-            (aLongValue shr 8).toByte(),
-            aLongValue.toByte()
-        )
-    }
-
-    fun getData(aFloatValue: Float): ByteArray {
-        return getData(Float.floatToIntBits(aFloatValue))
-    }
-
-    fun getData(aDoubleValue: Double): ByteArray {
-        return getData(Double.doubleToLongBits(aDoubleValue))
-    }
-
-    fun getData(aString: String): ByteArray {
-        var string_data: ByteArray? = null
-        try {
-            string_data = aString.toByteArray(charset("unicode"))
-        } catch (e: UnsupportedEncodingException) {
-            e.printStackTrace()
+    
+    // 泛型整合方法 - 統一處理不同類型轉換
+    inline fun <reified T> getData(value: T): ByteArray {
+        return when (value) {
+            is Boolean -> if (value) byteArrayOf(1) else byteArrayOf(0)
+            is Short -> byteArrayOf((value.toInt() shr 8).toByte(), value.toByte())
+            is Char -> byteArrayOf((value.code shr 8).toByte(), value.code.toByte())
+            is Int -> byteArrayOf(
+                (value shr 24).toByte(),
+                (value shr 16).toByte(),
+                (value shr 8).toByte(),
+                value.toByte()
+            )
+            is Long -> byteArrayOf(
+                (value shr 56).toByte(),
+                (value shr 48).toByte(),
+                (value shr 40).toByte(),
+                (value shr 32).toByte(),
+                (value shr 24).toByte(),
+                (value shr 16).toByte(),
+                (value shr 8).toByte(),
+                value.toByte()
+            )
+            is Float -> getData(value.toInt())
+            is Double -> getData(value.toLong()) 
+            is String -> {
+                try {
+                    val stringData = value.toByteArray(charset("unicode"))
+                    val sizeData = getData(stringData.size)
+                    val data = ByteArray(stringData.size + 4)
+                    sizeData.copyInto(data, 0)
+                    stringData.copyInto(data, 4)
+                    data
+                } catch (e: UnsupportedEncodingException) {
+                    e.printStackTrace()
+                    byteArrayOf()
+                }
+            }
+            else -> throw IllegalArgumentException("Unsupported type: ${T::class.simpleName}")
         }
-        val size_data = getData(string_data!!.size)
-        val data = ByteArray(string_data.size + 4)
-        for (i in 0..3) {
-            data[i] = size_data[i]
-        }
-        for (i2 in string_data.indices) {
-            data[i2 + 4] = string_data[i2]
-        }
-        return data
     }
+
+    // 為了向後兼容，保留原有的方法名（可選）
+    fun getData(aBooleanValue: Boolean): ByteArray = getData<Boolean>(aBooleanValue)
+    fun getData(aShortValue: Short): ByteArray = getData<Short>(aShortValue)
+    fun getData(aCharValue: Char): ByteArray = getData<Char>(aCharValue)
+    fun getData(aIntValue: Int): ByteArray = getData<Int>(aIntValue)
+    fun getData(aLongValue: Long): ByteArray = getData<Long>(aLongValue)
+    fun getData(aFloatValue: Float): ByteArray = getData<Float>(aFloatValue)
+    fun getData(aDoubleValue: Double): ByteArray = getData<Double>(aDoubleValue)
+    fun getData(aString: String): ByteArray = getData<String>(aString)
 }

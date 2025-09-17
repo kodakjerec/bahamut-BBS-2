@@ -15,21 +15,17 @@ import kotlin.math.min
 
 class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
     private val webSocket: WebSocket?
-    private val client: OkHttpClient?
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(10, TimeUnit.SECONDS)
+        .readTimeout(0, TimeUnit.MILLISECONDS) // No timeout for reading
+        .build()
     var isConnected: Boolean = false
         private set
     private val readLock = Any()
-    private val pendingData: ByteBuffer
-    private var connectLatch: CountDownLatch
+    private val pendingData: ByteBuffer = ByteBuffer.allocate(8192)
+    private var connectLatch: CountDownLatch = CountDownLatch(1)
 
     init {
-        client = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(0, TimeUnit.MILLISECONDS) // No timeout for reading
-            .build()
-
-        connectLatch = CountDownLatch(1)
-        pendingData = ByteBuffer.allocate(8192)
 
         val requestBuilder = Request.Builder()
             .url(serverUrl)
@@ -42,13 +38,13 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
         val request = requestBuilder.build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket?, response: Response?) {
+            override fun onOpen(webSocket: WebSocket, response: Response) {
                 isConnected = true
                 connectLatch.countDown()
-                Log.d("WebSocket", "Connected to " + serverUrl)
+                Log.d("WebSocket", "Connected to $serverUrl")
             }
 
-            override fun onMessage(webSocket: WebSocket?, text: String) {
+            override fun onMessage(webSocket: WebSocket, text: String) {
                 // 處理文字訊息，轉換為字節
                 synchronized(readLock) {
                     val textBytes = text.toByteArray()
@@ -59,7 +55,7 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
                 }
             }
 
-            override fun onMessage(webSocket: WebSocket?, bytes: ByteString) {
+            override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
                 synchronized(readLock) {
                     if (pendingData.remaining() >= bytes.size) {
                         pendingData.put(bytes.toByteArray())
@@ -68,14 +64,14 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
                 }
             }
 
-            override fun onClosing(webSocket: WebSocket?, code: Int, reason: String?) {
+            override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                 isConnected = false
                 synchronized(readLock) {
                     (readLock as Object).notifyAll()
                 }
             }
 
-            override fun onFailure(webSocket: WebSocket?, t: Throwable, response: Response?) {
+            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
                 isConnected = false
                 connectLatch.countDown()
                 Log.e("WebSocket", "Connection failed: " + t.message)
@@ -90,7 +86,7 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
             if (!connectLatch.await(10, TimeUnit.SECONDS)) {
                 throw IOException("WebSocket connection timeout")
             }
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             throw IOException("WebSocket connection interrupted")
         }
 
@@ -100,9 +96,13 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
     }
 
     @Throws(IOException::class)
-    override fun read(buffer: ByteBuffer): Int {
+    override fun read(byteBuffer: ByteBuffer?): Int {
         if (!isConnected) {
             throw IOException("WebSocket not connected")
+        }
+        
+        if (byteBuffer == null) {
+            throw IllegalArgumentException("ByteBuffer cannot be null")
         }
 
         synchronized(readLock) {
@@ -110,7 +110,7 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
             while (pendingData.position() == 0 && isConnected) {
                 try {
                     (readLock as Object).wait(1000) // 1秒超時
-                } catch (e: InterruptedException) {
+                } catch (_: InterruptedException) {
                     throw IOException("Read interrupted")
                 }
             }
@@ -125,10 +125,10 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
 
             // 複製數據到輸出緩衝區
             pendingData.flip()
-            val bytesToRead = min(buffer.remaining(), pendingData.remaining())
+            val bytesToRead = min(byteBuffer.remaining(), pendingData.remaining())
             val temp = ByteArray(bytesToRead)
             pendingData.get(temp)
-            buffer.put(temp)
+            byteBuffer.put(temp)
 
             // 如果還有剩餘數據，保留到下次
             if (pendingData.hasRemaining()) {
@@ -144,13 +144,17 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
     }
 
     @Throws(IOException::class)
-    override fun write(buffer: ByteBuffer): Int {
+    override fun write(byteBuffer: ByteBuffer?): Int {
         if (!isConnected) {
             throw IOException("WebSocket not connected")
         }
+        
+        if (byteBuffer == null) {
+            throw IllegalArgumentException("ByteBuffer cannot be null")
+        }
 
-        val data = ByteArray(buffer.remaining())
-        buffer.get(data)
+        val data = ByteArray(byteBuffer.remaining())
+        byteBuffer.get(data)
 
         if (webSocket!!.send(ByteString.of(*data))) {
             return data.size
@@ -165,9 +169,7 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
             webSocket.close(1000, "Normal closure")
             isConnected = false
         }
-        if (client != null) {
-            client.dispatcher.executorService.shutdown()
-        }
+        client.dispatcher.executorService.shutdown()
         return true
     }
 }

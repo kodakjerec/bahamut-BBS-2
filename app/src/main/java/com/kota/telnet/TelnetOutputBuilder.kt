@@ -3,20 +3,20 @@ package com.kota.telnet
 import android.util.Log
 import com.kota.asFramework.thread.ASRunner
 import com.kota.dataPool.MutableByteBuffer
-import com.kota.telnet.reference.TelnetDefs
+import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard.getKeyData
 import com.kota.textEncoder.U2BEncoder
 
 class TelnetOutputBuilder {
-    private val _buffer: MutableByteBuffer = MutableByteBuffer.createMutableByteBuffer()
+    private val byteBuffers: MutableByteBuffer = MutableByteBuffer.createMutableByteBuffer()
 
     @JvmOverloads
     fun sendToServerInBackground(channel: Int = 0) {
-        TelnetClient.Companion.getClient().sendDataToServerInBackground(build(), channel)
+        TelnetClient.Companion.client?.sendDataToServerInBackground(build(), channel)
     }
 
     fun sendToServer() {
-        if (ASRunner.isMainThread()) {
+        if (ASRunner.isMainThread) {
             sendToServerInBackground(0)
         } else {
             sendToServer(0)
@@ -24,18 +24,18 @@ class TelnetOutputBuilder {
     }
 
     private fun sendToServer(channel: Int) {
-        TelnetClient.Companion.getClient().sendDataToServer(build(), channel)
+        TelnetClient.Companion.client?.sendDataToServer(build(), channel)
     }
 
     fun build(): ByteArray? {
-        this._buffer.close()
-        val data = this._buffer.toByteArray()
-        MutableByteBuffer.recycleMutableByteBuffer(this._buffer)
+        this.byteBuffers.close()
+        val data = this.byteBuffers.toByteArray()
+        MutableByteBuffer.recycleMutableByteBuffer(this.byteBuffers)
         return data
     }
 
     fun pushData(data: Byte): TelnetOutputBuilder {
-        this._buffer.put(data)
+        this.byteBuffers.put(data)
         return this
     }
 
@@ -53,11 +53,10 @@ class TelnetOutputBuilder {
     fun pushString(str: String): TelnetOutputBuilder {
         try {
             pushData(
-                U2BEncoder.getInstance()
-                    .encodeToBytes(str.toByteArray(charset(TelnetDefs.CHARSET)), 0)
+                U2BEncoder.instance!!.encodeToBytes(str.toByteArray(charset(TelnetDef.CHARSET)), 0)
             )
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         return this
     }

@@ -3,14 +3,13 @@ package com.kota.asFramework.pageController
 import android.view.animation.Animation
 import com.kota.asFramework.thread.ASRunner
 
-/* loaded from: classes.dex */
 open class ASNavigationControllerPushAnimation(
-    private val _source_controller: ASViewController?,
-    private val _target_controller: ASViewController?
+    private val sourceViewController: ASViewController?,
+    private val targetViewController: ASViewController?
 ) {
-    private var _source_finished = false
-    private var _target_finished = false
-    private var _finished = false
+    private var isSourceFinished = false
+    private var isTargetFinished = false
+    private var isFinished = false
 
     fun start(animated: Boolean) {
         if (!animated) {
@@ -21,13 +20,11 @@ open class ASNavigationControllerPushAnimation(
     }
 
     private fun animate() {
-        val animation_duration = 250
-        if (this._source_controller != null && this._source_controller.getPageView() != null) {
-            val _source_animation = ASPageAnimation.getFadeOutToLeftAnimation()
-            _source_animation.setDuration(animation_duration.toLong())
-            _source_animation.setAnimationListener(object : Animation.AnimationListener {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.1
-                // android.view.animation.Animation.AnimationListener
+        val animationDuration = 250
+        if (this.sourceViewController != null && this.sourceViewController.pageView != null) {
+            val sourceAnimation = ASPageAnimation.fadeOutToLeftAnimation
+            sourceAnimation?.duration = animationDuration.toLong()
+            sourceAnimation?.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {
                 }
 
@@ -38,27 +35,24 @@ open class ASNavigationControllerPushAnimation(
                 // android.view.animation.Animation.AnimationListener
                 override fun onAnimationEnd(animation: Animation?) {
                     synchronized(this@ASNavigationControllerPushAnimation) {
-                        this@ASNavigationControllerPushAnimation._source_controller.getPageView()
-                            .onPageAnimationFinished()
-                        this@ASNavigationControllerPushAnimation._source_finished = true
+                        this@ASNavigationControllerPushAnimation.sourceViewController.pageView?.onPageAnimationFinished()
+                        this@ASNavigationControllerPushAnimation.isSourceFinished = true
                         this@ASNavigationControllerPushAnimation.checkFinished()
                     }
                 }
             })
-            this._source_controller.getPageView().onPageAnimationStart()
-            this._source_controller.getPageView().startAnimation(_source_animation)
+            this.sourceViewController.pageView?.onPageAnimationStart()
+            this.sourceViewController.pageView?.startAnimation(sourceAnimation)
         } else {
             synchronized(this) {
-                this._source_finished = true
+                this.isSourceFinished = true
                 checkFinished()
             }
         }
-        if (this._target_controller != null && this._target_controller.getPageView() != null) {
-            val _target_animation = ASPageAnimation.getFadeInFromRightAnimation()
-            _target_animation.setDuration(animation_duration.toLong())
-            _target_animation.setAnimationListener(object : Animation.AnimationListener {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.2
-                // android.view.animation.Animation.AnimationListener
+        if (this.targetViewController != null && this.targetViewController.pageView != null) {
+            val targetAnimation = ASPageAnimation.fadeInFromRightAnimation
+            targetAnimation?.duration = animationDuration.toLong()
+            targetAnimation?.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {
                 }
 
@@ -69,39 +63,38 @@ open class ASNavigationControllerPushAnimation(
                 // android.view.animation.Animation.AnimationListener
                 override fun onAnimationEnd(animation: Animation?) {
                     synchronized(this@ASNavigationControllerPushAnimation) {
-                        this@ASNavigationControllerPushAnimation._target_controller.getPageView()
-                            .onPageAnimationFinished()
-                        this@ASNavigationControllerPushAnimation._target_finished = true
+                        this@ASNavigationControllerPushAnimation.targetViewController.pageView?.onPageAnimationFinished()
+                        this@ASNavigationControllerPushAnimation.isTargetFinished = true
                         this@ASNavigationControllerPushAnimation.checkFinished()
                     }
                 }
             })
-            this._target_controller.getPageView().onPageAnimationStart()
-            this._target_controller.getPageView().startAnimation(_target_animation)
+            this.targetViewController.pageView?.onPageAnimationStart()
+            this.targetViewController.pageView?.startAnimation(targetAnimation)
             return
         }
         synchronized(this) {
-            this._target_finished = true
+            this.isTargetFinished = true
             checkFinished()
         }
     }
 
     private fun checkFinished() {
-        if (this._source_finished && this._target_finished) {
+        if (this.isSourceFinished && this.isTargetFinished) {
             finish()
         }
     }
 
     private fun finish() {
-        if (!this._finished) {
+        if (!this.isFinished) {
             object : ASRunner() {
                 // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.3
                 // com.kota.ASFramework.Thread.ASRunner
-                public override fun run() {
+                override fun run() {
                     this@ASNavigationControllerPushAnimation.onAnimationFinished()
                 }
             }.runInMainThread()
-            this._finished = true
+            this.isFinished = true
         }
     }
 

@@ -37,6 +37,6 @@ class TelnetData {
         get() = this.data.toInt() == 0
 
     companion object {
-        private const val myCount = 0
+        private const val MY_COUNT = 0
     }
 }

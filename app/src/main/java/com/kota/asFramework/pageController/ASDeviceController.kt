@@ -10,36 +10,36 @@ import android.os.PowerManager
 import android.os.PowerManager.WakeLock
 import android.view.WindowManager
 
-class ASDeviceController(val _context: Context) {
+class ASDeviceController(val context: Context) {
     // 檢查是否正在使用鎖定
     var isWifiLocked: Boolean = false
     var isCpuWakeLocked: Boolean = false
 
-    val mWakeLock: WakeLock
+    // create wake-lock
+    val mWakeLock: WakeLock = (context.getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
+        PowerManager.PARTIAL_WAKE_LOCK,
+        WAKE_LOCK_KEY
+    )
     val mWifiLock: WifiLock
-    var _transportType: Int = -1
+    var transportType: Int = -1
 
     init {
-        // create wake-lock
-        mWakeLock = (_context.getSystemService(Context.POWER_SERVICE) as PowerManager).newWakeLock(
-            PowerManager.PARTIAL_WAKE_LOCK,
-            wakeLockKey
-        )
         mWakeLock.setReferenceCounted(false)
 
         // create wifi-lock
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            mWifiLock =
-                (_context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
-                    WifiManager.WIFI_MODE_FULL_LOW_LATENCY,
-                    wifiLockKey
-                )
+        mWifiLock = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // API 29+ 使用 WIFI_MODE_FULL_LOW_LATENCY
+            (context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
+                WifiManager.WIFI_MODE_FULL_LOW_LATENCY,
+                WIFI_LOCK_KEY
+            )
         } else {
-            mWifiLock =
-                (_context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
-                    WifiManager.WIFI_MODE_FULL_HIGH_PERF,
-                    wifiLockKey
-                )
+            // API 28 及以下使用 WIFI_MODE_FULL_HIGH_PERF (已棄用但仍可用於舊版本)
+            @Suppress("DEPRECATION")
+            (context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
+                WifiManager.WIFI_MODE_FULL_HIGH_PERF,
+                WIFI_LOCK_KEY
+            )
         }
         mWifiLock.setReferenceCounted(false)
     }
@@ -48,31 +48,30 @@ class ASDeviceController(val _context: Context) {
         // 檢查網路狀況
         get() {
             val connectivityManager =
-                _context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-            val activeNetwork = connectivityManager.getActiveNetwork()
+                context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val activeNetwork = connectivityManager.activeNetwork
             val capabilities =
                 connectivityManager.getNetworkCapabilities(activeNetwork)
-            _transportType = -1
+            transportType = -1
             if (capabilities != null) {
                 // any type of internet
                 for (i in 0..9) {
                     if (capabilities.hasTransport(i)) {
-                        _transportType = i
+                        transportType = i
                         break
                     }
                 }
             }
-            return _transportType
+            return transportType
         }
 
     fun lockWake() {
         println("Lock Wake")
-        (_context as Activity).getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        (context as Activity).window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     fun unlockWake() {
-        (_context as Activity).getWindow()
-            .clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+        (context as Activity).window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
     }
 
     // 單獨鎖定 CPU WakeLock
@@ -80,9 +79,9 @@ class ASDeviceController(val _context: Context) {
         println("Lock CPU Wake")
         if (!this.isCpuWakeLocked) {
             this.isCpuWakeLocked = true
-            if (!mWakeLock.isHeld()) {
+            if (!mWakeLock.isHeld) {
                 // 移除時間限制，讓 telnet 連線保持
-                mWakeLock.acquire()
+                mWakeLock.acquire(10*60*1000L /*10 minutes*/)
             }
         }
     }
@@ -91,7 +90,7 @@ class ASDeviceController(val _context: Context) {
         println("Lock Wifi")
         if (!this.isWifiLocked) {
             this.isWifiLocked = true
-            if (!mWifiLock.isHeld()) {
+            if (!mWifiLock.isHeld) {
                 mWifiLock.acquire()
             }
         }
@@ -104,7 +103,7 @@ class ASDeviceController(val _context: Context) {
         if (this.isCpuWakeLocked) {
             println("Unlock CPU Wake")
             try {
-                if (mWakeLock.isHeld()) {
+                if (mWakeLock.isHeld) {
                     mWakeLock.release()
                 }
             } catch (exception: Exception) {
@@ -118,7 +117,7 @@ class ASDeviceController(val _context: Context) {
         if (this.isWifiLocked) {
             println("Unlock Wifi")
             try {
-                if (mWifiLock.isHeld()) mWifiLock.release()
+                if (mWifiLock.isHeld) mWifiLock.release()
             } catch (exception: Exception) {
                 exception.printStackTrace()
             }
@@ -140,8 +139,8 @@ class ASDeviceController(val _context: Context) {
     }
 
     companion object {
-        const val wakeLockKey: String = "myapp:wakeLockKey"
+        const val WAKE_LOCK_KEY: String = "myapp:wakeLockKey"
 
-        const val wifiLockKey: String = "myapp:wifiLockKey"
+        const val WIFI_LOCK_KEY: String = "myapp:wifiLockKey"
     }
 }

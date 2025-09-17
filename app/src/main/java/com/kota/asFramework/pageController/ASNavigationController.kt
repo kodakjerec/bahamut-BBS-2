@@ -12,34 +12,33 @@ import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.WindowInsetsCompat
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.thread.ASRunner.Companion.construct
+import androidx.core.view.isVisible
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASRunner.Companion.construct
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 import kotlin.math.max
 
-/* loaded from: classes.dex */
 open class ASNavigationController : Activity() {
     var deviceController: ASDeviceController? = null
         private set
-    private val _display_metrics = DisplayMetrics()
-    private var _root_view: ASNavigationControllerView? = null
-    private val _controllers = Vector<ASViewController>()
-    private val _temp_controllers = Vector<ASViewController>()
-    private val _remove_list = Vector<ASViewController>()
-    private val _add_list = Vector<ASViewController>()
+    private val displayMetrics = DisplayMetrics()
+    private var rootView: ASNavigationControllerView? = null
+    private val controllers = Vector<ASViewController>()
+    private val tempControllers = Vector<ASViewController>()
+    private val removeList = Vector<ASViewController>()
+    private val addList = Vector<ASViewController>()
     open var isAnimationEnable: Boolean = true
     var isInBackground: Boolean = false
         private set
-    private val _page_commands: Vector<PageCommand?> = Vector<PageCommand?>()
-    private var _is_animating = false
+    private val pageCommands: Vector<PageCommand?> = Vector<PageCommand?>()
+    private var isAnimating = false
 
-    /* loaded from: classes.dex */
-    private abstract class PageCommand {
+    abstract class PageCommand {
         var animated: Boolean = true
 
         abstract fun run()
@@ -63,28 +62,23 @@ open class ASNavigationController : Activity() {
 
     private fun onMenuPressed(): Boolean {
         val page = this.topController
-        if (page == null || !page.onMenuButtonClicked()) {
-            return false
-        }
-        return true
+        return !(page == null || !page.onMenuButtonClicked())
     }
 
     private fun onSearchPressed(): Boolean {
         val page = this.topController
-        if (page == null || !page.onSearchButtonClicked()) {
-            return false
-        }
-        return true
+        return !(page == null || !page.onSearchButtonClicked())
     }
 
     // android.app.Activity
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        var handle_back_button = false
+        var handleBackButton = false
         val page = this.topController
         if (page != null && page.onBackPressed()) {
-            handle_back_button = true
+            handleBackButton = true
         }
-        if (!handle_back_button) {
+        if (!handleBackButton) {
             finish()
         }
     }
@@ -99,13 +93,16 @@ open class ASNavigationController : Activity() {
 
 
         // 啟用 edge-to-edge 支援
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            getWindow().setDecorFitsSystemWindows(false)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            @Suppress("DEPRECATION")
+            window.setDecorFitsSystemWindows(false)
         }
+        // 對於 API 35+ (VANILLA_ICE_CREAM)，行為預設為 false 且無法更改
 
         setNavigationController(this)
 
-        getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics)
+        // 獲取顯示器指標
+        initializeDisplayMetrics()
         construct()
 
         UserSettings(this)
@@ -114,9 +111,9 @@ open class ASNavigationController : Activity() {
         this.deviceController = ASDeviceController(this)
         onControllerWillLoad()
 
-        this._root_view = ASNavigationControllerView(this)
-        this._root_view!!.setPageController(this)
-        setContentView(this._root_view)
+        this.rootView = ASNavigationControllerView(this)
+        this.rootView!!.setPageController(this)
+        setContentView(this.rootView)
 
 
         // 設定 WindowInsets 處理
@@ -135,20 +132,20 @@ open class ASNavigationController : Activity() {
 
     // android.app.Activity, android.view.KeyEvent.Callback
     override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        when (keyCode) {
-            82 -> return onMenuPressed()
-            83 -> return super.onKeyUp(keyCode, event)
-            84 -> return onSearchPressed()
-            else -> return super.onKeyUp(keyCode, event)
+        return when (keyCode) {
+            82 -> onMenuPressed()
+            83 -> super.onKeyUp(keyCode, event)
+            84 -> onSearchPressed()
+            else -> super.onKeyUp(keyCode, event)
         }
     }
 
     val topController: ASViewController?
         get() {
             var controller: ASViewController? = null
-            synchronized(this._controllers) {
-                if (this._controllers.size > 0) {
-                    controller = this._controllers.lastElement()
+            synchronized(this.controllers) {
+                if (this.controllers.isNotEmpty()) {
+                    controller = this.controllers.lastElement()
                 }
             }
             return controller
@@ -157,67 +154,55 @@ open class ASNavigationController : Activity() {
         get() {
             var controllers =
                 Vector<ASViewController>()
-            synchronized(this._controllers) {
-                controllers = this._controllers
+            synchronized(this.controllers) {
+                controllers = this.controllers
             }
             return controllers
         }
 
     private fun buildPageView(controller: ASViewController) {
-        val page_view = ASPageView(this)
-        page_view.setLayoutParams(FrameLayout.LayoutParams(-1, -1))
-        page_view.setBackgroundColor(View.MEASURED_STATE_MASK)
-        getLayoutInflater().inflate(controller.getPageLayout(), page_view)
-        controller.setPageView(page_view)
-        this._root_view!!.getContentView().addView(page_view)
+        val pageView = ASPageView(this)
+        pageView.layoutParams = FrameLayout.LayoutParams(-1, -1)
+        pageView.setBackgroundColor(View.MEASURED_STATE_MASK)
+        layoutInflater.inflate(controller.pageLayout, pageView)
+        controller.pageView = pageView
+        this.rootView!!.contentView?.addView(pageView)
     }
 
     private fun cleanPageView(controller: ASViewController) {
-        controller.setPageView(null)
+        controller.pageView = null
     }
 
     fun addPageView(aPage: ASViewController) {
-        val page_view: View = aPage.getPageView()
-        this._root_view!!.post(object : Runnable {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.1
-            // java.lang.Runnable
-            override fun run() {
-                aPage.onPageDidDisappear()
-                this@ASNavigationController._root_view!!.removeView(page_view)
-            }
-        })
+        val pageView: ASPageView? = aPage.pageView
+        this.rootView!!.post {
+            aPage.onPageDidDisappear()
+            this@ASNavigationController.rootView!!.removeView(pageView)
+        }
     }
 
     fun removePageView(aPage: ASViewController) {
-        val page_view: View = aPage.getPageView()
-        this._root_view!!.post(object : Runnable {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.2
-            // java.lang.Runnable
-            override fun run() {
-                aPage.onPageDidDisappear()
-                this@ASNavigationController._root_view!!.removeView(page_view)
-            }
-        })
+        val pageView: ASPageView? = aPage.pageView
+        this.rootView!!.post {
+            aPage.onPageDidDisappear()
+            this@ASNavigationController.rootView!!.removeView(pageView)
+        }
     }
 
     fun removePageView(aPage: ASViewController, aAnimation: Animation) {
         aAnimation.setAnimationListener(object : Animation.AnimationListener {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.3
-            // android.view.animation.Animation.AnimationListener
             override fun onAnimationStart(animation: Animation?) {
             }
 
-            // android.view.animation.Animation.AnimationListener
             override fun onAnimationRepeat(animation: Animation?) {
             }
 
-            // android.view.animation.Animation.AnimationListener
             override fun onAnimationEnd(animation: Animation?) {
                 this@ASNavigationController.removePageView(aPage)
             }
         })
-        val page_view: View = aPage.getPageView()
-        page_view.startAnimation(aAnimation)
+        val pageView: ASPageView? = aPage.pageView
+        pageView?.startAnimation(aAnimation)
     }
 
     private fun animatePopViewController(
@@ -228,7 +213,7 @@ open class ASNavigationController : Activity() {
         if (aRemovePage != null) {
             aRemovePage.notifyPageWillDisappear()
             if (animated) {
-                removePageView(aRemovePage, ASAnimation.getFadeOutToRightAnimation())
+                removePageView(aRemovePage, ASAnimation.fadeOutToRightAnimation)
             } else {
                 removePageView(aRemovePage)
             }
@@ -243,30 +228,26 @@ open class ASNavigationController : Activity() {
             // from class: com.kota.ASFramework.PageController.ASNavigationController.4
             // com.kota.ASFramework.PageController.ASNavigationControllerPopAnimation
             override fun onAnimationFinished() {
-                if (aRemovePage != null) {
-                    aRemovePage.onPageDidDisappear()
-                }
-                val remove_list = Vector<View?>()
-                for (i in 0..<this@ASNavigationController._root_view!!.getContentView()
-                    .getChildCount()) {
-                    val page_view =
-                        this@ASNavigationController._root_view!!.getContentView().getChildAt(i)
-                    if (page_view !== aAddPage!!.getPageView()) {
-                        remove_list.add(page_view)
+                aRemovePage?.onPageDidDisappear()
+                val removeList = Vector<View?>()
+                val childCount = this@ASNavigationController.rootView!!.contentView?.childCount ?: 0
+                for (i in 0..<childCount) {
+                    val pageView =
+                        this@ASNavigationController.rootView!!.contentView?.getChildAt(i)
+                    if (pageView !== aAddPage!!.pageView) {
+                        removeList.add(pageView)
                     }
                 }
-                for (view in remove_list) {
-                    this@ASNavigationController._root_view!!.getContentView().removeView(view)
+                for (view in removeList) {
+                    this@ASNavigationController.rootView!!.contentView?.removeView(view)
                 }
                 this@ASNavigationController.cleanPageView(aRemovePage!!)
-                for (controller in this@ASNavigationController._controllers) {
-                    if (controller !== aAddPage && controller.getPageView() != null) {
+                for (controller in this@ASNavigationController.controllers) {
+                    if (controller !== aAddPage && controller.pageView != null) {
                         this@ASNavigationController.cleanPageView(controller)
                     }
                 }
-                if (aAddPage != null) {
-                    aAddPage.notifyPageDidAppear()
-                }
+                aAddPage?.notifyPageDidAppear()
                 this@ASNavigationController.onPageCommandExecuteFinished()
             }
         }.start(animated)
@@ -282,41 +263,31 @@ open class ASNavigationController : Activity() {
             targetController.onPageDidLoad()
             targetController.onPageRefresh()
         }
-        if (sourceController != null) {
-            sourceController.notifyPageWillDisappear()
-        }
-        if (targetController != null) {
-            targetController.notifyPageWillAppear()
-        }
+        sourceController?.notifyPageWillDisappear()
+        targetController?.notifyPageWillAppear()
         object : ASNavigationControllerPushAnimation(sourceController, targetController) {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.5
-            // com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation
             override fun onAnimationFinished() {
-                if (sourceController != null) {
-                    sourceController.onPageDidDisappear()
-                }
+                sourceController?.onPageDidDisappear()
                 if (targetController != null) {
-                    val remove_list = Vector<View?>()
-                    for (i in 0..<this@ASNavigationController._root_view!!.getContentView()
-                        .getChildCount()) {
-                        val page_view =
-                            this@ASNavigationController._root_view!!.getContentView().getChildAt(i)
-                        if (page_view !== targetController.getPageView()) {
-                            remove_list.add(page_view)
+                    val removeList = Vector<View?>()
+                    val childCount = this@ASNavigationController.rootView!!.contentView?.childCount ?: 0
+                    for (i in 0..<childCount) {
+                        val pageView =
+                            this@ASNavigationController.rootView!!.contentView?.getChildAt(i)
+                        if (pageView !== targetController.pageView) {
+                            removeList.add(pageView)
                         }
                     }
-                    for (view in remove_list) {
-                        this@ASNavigationController._root_view!!.getContentView().removeView(view)
+                    for (view in removeList) {
+                        this@ASNavigationController.rootView!!.contentView?.removeView(view)
                     }
                 }
-                for (controller in this@ASNavigationController._controllers) {
-                    if (controller !== targetController && controller.getPageView() != null) {
+                for (controller in this@ASNavigationController.controllers) {
+                    if (controller !== targetController && controller.pageView != null) {
                         this@ASNavigationController.cleanPageView(controller)
                     }
                 }
-                if (targetController != null) {
-                    targetController.notifyPageDidAppear()
-                }
+                targetController?.notifyPageDidAppear()
                 this@ASNavigationController.onPageCommandExecuteFinished()
             }
         }.start(animated)
@@ -328,12 +299,10 @@ open class ASNavigationController : Activity() {
         animated: Boolean = this.isAnimationEnable
     ) {
         val command: PageCommand = object : PageCommand() {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.6
-            // com.kota.ASFramework.PageController.ASNavigationController.PageCommand
             override fun run() {
                 if (aController != null) {
-                    if (this@ASNavigationController._temp_controllers.size <= 0 || aController !== this@ASNavigationController._temp_controllers.lastElement()) {
-                        this@ASNavigationController._temp_controllers.add(aController)
+                    if (this@ASNavigationController.tempControllers.isEmpty() || aController !== this@ASNavigationController.tempControllers.lastElement()) {
+                        this@ASNavigationController.tempControllers.add(aController)
                     }
                 }
             }
@@ -345,11 +314,9 @@ open class ASNavigationController : Activity() {
     @JvmOverloads
     fun popViewController(animated: Boolean = this.isAnimationEnable) {
         val command: PageCommand = object : PageCommand() {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.7
-            // com.kota.ASFramework.PageController.ASNavigationController.PageCommand
             override fun run() {
-                if (this@ASNavigationController._temp_controllers.size > 0) {
-                    this@ASNavigationController._temp_controllers.removeAt(this@ASNavigationController._temp_controllers.size - 1)
+                if (this@ASNavigationController.tempControllers.isNotEmpty()) {
+                    this@ASNavigationController.tempControllers.removeAt(this@ASNavigationController.tempControllers.size - 1)
                 }
             }
         }
@@ -363,13 +330,11 @@ open class ASNavigationController : Activity() {
         animated: Boolean = this.isAnimationEnable
     ) {
         val command: PageCommand = object : PageCommand() {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.8
-            // com.kota.ASFramework.PageController.ASNavigationController.PageCommand
             override fun run() {
                 if (aController != null) {
-                    if (this@ASNavigationController._temp_controllers.size <= 0 || aController !== this@ASNavigationController._temp_controllers.lastElement()) {
-                        while (this@ASNavigationController._temp_controllers.size > 0 && this@ASNavigationController._temp_controllers.lastElement() !== aController) {
-                            this@ASNavigationController._temp_controllers.removeAt(this@ASNavigationController._temp_controllers.size - 1)
+                    if (this@ASNavigationController.tempControllers.isEmpty() || aController !== this@ASNavigationController.tempControllers.lastElement()) {
+                        while (this@ASNavigationController.tempControllers.isNotEmpty() && this@ASNavigationController.tempControllers.lastElement() !== aController) {
+                            this@ASNavigationController.tempControllers.removeAt(this@ASNavigationController.tempControllers.size - 1)
                         }
                     }
                 }
@@ -385,12 +350,10 @@ open class ASNavigationController : Activity() {
 
     fun setViewControllers(aControllerList: Vector<ASViewController>?, animated: Boolean) {
         val command: PageCommand = object : PageCommand() {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.9
-            // com.kota.ASFramework.PageController.ASNavigationController.PageCommand
             override fun run() {
                 if (aControllerList != null) {
-                    this@ASNavigationController._temp_controllers.removeAllElements()
-                    this@ASNavigationController._temp_controllers.addAll(aControllerList)
+                    this@ASNavigationController.tempControllers.removeAllElements()
+                    this@ASNavigationController.tempControllers.addAll(aControllerList)
                 }
             }
         }
@@ -400,55 +363,53 @@ open class ASNavigationController : Activity() {
 
     fun exchangeViewControllers(animated: Boolean) {
         object : ASRunner() {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.10
-            // com.kota.ASFramework.Thread.ASRunner
-            public override fun run() {
-                val source_controller =
-                    if (this@ASNavigationController._controllers.size > 0) this@ASNavigationController._controllers.lastElement() else null
-                val target_controller =
-                    if (this@ASNavigationController._temp_controllers.size > 0) this@ASNavigationController._temp_controllers.lastElement() else null
-                val pop = this@ASNavigationController._controllers.contains(target_controller)
-                for (controller in this@ASNavigationController._controllers) {
+            override fun run() {
+                val sourceController =
+                    if (this@ASNavigationController.controllers.isNotEmpty()) this@ASNavigationController.controllers.lastElement() else null
+                val targetController =
+                    if (this@ASNavigationController.tempControllers.isNotEmpty()) this@ASNavigationController.tempControllers.lastElement() else null
+                val pop = this@ASNavigationController.controllers.contains(targetController)
+                for (controller in this@ASNavigationController.controllers) {
                     controller.prepareForRemove()
                 }
-                for (controller2 in this@ASNavigationController._temp_controllers) {
+                for (controller2 in this@ASNavigationController.tempControllers) {
                     controller2.prepareForAdd()
                 }
-                for (controller3 in this@ASNavigationController._controllers) {
-                    if (controller3.isMarkedRemoved()) {
-                        this@ASNavigationController._remove_list.add(controller3)
+                for (controller3 in this@ASNavigationController.controllers) {
+                    if (controller3.isMarkedRemoved) {
+                        this@ASNavigationController.removeList.add(controller3)
                     }
                     controller3.cleanMark()
                 }
-                for (controller4 in this@ASNavigationController._temp_controllers) {
-                    if (controller4.isMarkedAdded()) {
-                        controller4.setNavigationController(this@ASNavigationController)
-                        this@ASNavigationController._add_list.add(controller4)
+                for (controller4 in this@ASNavigationController.tempControllers) {
+                    if (controller4.isMarkedAdded) {
+                        controller4.navigationController = this@ASNavigationController
+                        this@ASNavigationController.addList.add(controller4)
                     }
                     controller4.cleanMark()
                 }
-                this@ASNavigationController._controllers.removeAllElements()
-                this@ASNavigationController._controllers.addAll(this@ASNavigationController._temp_controllers)
-                for (controller5 in this@ASNavigationController._add_list) {
+                this@ASNavigationController.controllers.removeAllElements()
+                this@ASNavigationController.controllers.addAll(this@ASNavigationController.tempControllers)
+                for (controller5 in this@ASNavigationController.addList) {
                     controller5.notifyPageDidAddToNavigationController()
                 }
-                for (controller6 in this@ASNavigationController._remove_list) {
+                for (controller6 in this@ASNavigationController.removeList) {
                     controller6.notifyPageDidRemoveFromNavigationController()
                 }
-                this@ASNavigationController._add_list.clear()
-                this@ASNavigationController._remove_list.clear()
-                if (source_controller === target_controller) {
+                this@ASNavigationController.addList.clear()
+                this@ASNavigationController.removeList.clear()
+                if (sourceController === targetController) {
                     this@ASNavigationController.onPageCommandExecuteFinished()
                 } else if (pop) {
                     this@ASNavigationController.animatePopViewController(
-                        source_controller,
-                        target_controller,
+                        sourceController,
+                        targetController,
                         animated
                     )
                 } else {
                     this@ASNavigationController.animatedPushViewController(
-                        source_controller,
-                        target_controller,
+                        sourceController,
+                        targetController,
                         animated
                     )
                 }
@@ -459,22 +420,20 @@ open class ASNavigationController : Activity() {
     }
 
     val viewControllers: Vector<ASViewController?>
-        get() = Vector<ASViewController?>(this._controllers)
+        get() = Vector<ASViewController?>(this.controllers)
 
     fun containsViewController(aController: ASViewController?): Boolean {
-        return this._controllers.contains(aController)
+        return this.controllers.contains(aController)
     }
 
     fun onSizeChanged(newWidth: Int, newHeight: Int, oldWidth: Int, oldHeight: Int) {
         val page = this.topController
-        if (page != null) {
-            page.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight)
-        }
+        page?.onSizeChanged(newWidth, newHeight, oldWidth, oldHeight)
     }
 
     fun reloadLayout() {
-        if (this._root_view != null) {
-            this._root_view!!.requestLayout()
+        if (this.rootView != null) {
+            this.rootView!!.requestLayout()
         }
     }
 
@@ -512,7 +471,12 @@ open class ASNavigationController : Activity() {
 
     val currentOrientation: Int
         get() {
-            val rotation = getWindowManager().getDefaultDisplay().getRotation()
+            val rotation = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                display?.rotation ?: 0
+            } else {
+                @Suppress("DEPRECATION")
+                windowManager.defaultDisplay.rotation
+            }
             if (rotation != 1 && rotation != 3) {
                 return 1
             }
@@ -520,10 +484,10 @@ open class ASNavigationController : Activity() {
         }
 
     val screenWidth: Int
-        get() = this._display_metrics.widthPixels
+        get() = this.displayMetrics.widthPixels
 
     val screenHeight: Int
-        get() = this._display_metrics.heightPixels
+        get() = this.displayMetrics.heightPixels
 
     // android.app.Activity
     override fun finish() {
@@ -549,7 +513,7 @@ open class ASNavigationController : Activity() {
         this.isInBackground = false
         // 當應用恢復前景時，檢查網路狀態
         if (this.deviceController != null) {
-            val networkType = deviceController!!.isNetworkAvailable()
+            val networkType = deviceController!!.isNetworkAvailable
             if (networkType == -1) {
                 // 網路已斷開，可能需要重連
                 println("Network disconnected while in background")
@@ -558,38 +522,37 @@ open class ASNavigationController : Activity() {
     }
 
     @JvmOverloads
-    fun printControllers(controllers: Vector<ASViewController> = this._controllers) {
+    fun printControllers(controllers: Vector<ASViewController> = this.controllers) {
         for (controller in controllers) {
-            print(controller.getPageType().toString() + " ")
+            print(controller.pageType.toString() + " ")
         }
         print("\n")
     }
 
-    // android.app.Activity, android.content.ComponentCallbacks
     override fun onLowMemory() {
         println("on low memory")
         super.onLowMemory()
     }
 
     fun pushPageCommand(aCommand: PageCommand?) {
-        synchronized(this._page_commands) {
-            this._page_commands.add(aCommand)
+        synchronized(this.pageCommands) {
+            this.pageCommands.add(aCommand)
         }
         executePageCommand()
     }
 
     fun executePageCommand() {
         synchronized(this) {
-            if (!this._is_animating) {
-                synchronized(this._page_commands) {
-                    if (this._page_commands.size > 0) {
+            if (!this.isAnimating) {
+                synchronized(this.pageCommands) {
+                    if (this.pageCommands.isNotEmpty()) {
                         synchronized(this) {
-                            this._is_animating = true
+                            this.isAnimating = true
                         }
-                        this._temp_controllers.addAll(this._controllers)
-                        val animated = this._page_commands.firstElement()!!.animated
-                        while (this._page_commands.size > 0 && this._page_commands.firstElement()!!.animated == animated) {
-                            this._page_commands.removeAt(0)!!.run()
+                        this.tempControllers.addAll(this.controllers)
+                        val animated = this.pageCommands.firstElement()!!.animated
+                        while (this.pageCommands.isNotEmpty() && this.pageCommands.firstElement()!!.animated == animated) {
+                            this.pageCommands.removeAt(0)!!.run()
                         }
                         exchangeViewControllers(animated)
                     }
@@ -600,9 +563,9 @@ open class ASNavigationController : Activity() {
 
     private fun onPageCommandExecuteFinished() {
         synchronized(this) {
-            this._is_animating = false
+            this.isAnimating = false
         }
-        this._temp_controllers.clear()
+        this.tempControllers.clear()
         executePageCommand()
     }
 
@@ -617,19 +580,19 @@ open class ASNavigationController : Activity() {
 
     /** 移除畫面上永遠存在的View  */
     fun removeForeverView(view: View) {
-        val parentViewGroup = view.getParent() as ViewGroup?
-        if (parentViewGroup != null) parentViewGroup.removeView(view)
+        val parentViewGroup = view.parent as ViewGroup?
+        parentViewGroup?.removeView(view)
     }
 
     /** 根據最上層頁面決定是否顯示訊息小視窗  */
     private fun checkMessageFloatingShow() {
         // 如果是PopupPage, 隱藏訊息
-        val top_page = this.topController as TelnetPage?
-        if (top_page != null) if (top_page.isPopupPage) {
+        val topPage = this.topController as TelnetPage?
+        if (topPage != null) if (topPage.isPopupPage) {
             // 已經顯示就隱藏
             if (getMessageSmall() != null) {
                 val messageSmall = getMessageSmall()
-                if (messageSmall!!.getVisibility() == View.VISIBLE) {
+                if (messageSmall!!.isVisible) {
                     messageSmall.hide()
                 }
             }
@@ -645,11 +608,32 @@ open class ASNavigationController : Activity() {
     }
 
     /**
+     * 初始化顯示器指標，支援新舊 API
+     */
+    private fun initializeDisplayMetrics() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // API 30+ 使用 WindowMetrics
+            val windowMetrics = windowManager.currentWindowMetrics
+            val bounds = windowMetrics.bounds
+            displayMetrics.apply {
+                widthPixels = bounds.width()
+                heightPixels = bounds.height()
+                density = resources.displayMetrics.density
+                densityDpi = resources.displayMetrics.densityDpi
+            }
+        } else {
+            // API 29 及以下使用傳統方法
+            @Suppress("DEPRECATION")
+            windowManager.defaultDisplay.getMetrics(displayMetrics)
+        }
+    }
+
+    /**
      * 設定 WindowInsets 處理以支援 edge-to-edge
      */
     private fun setupWindowInsets() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            this._root_view!!.setOnApplyWindowInsetsListener(View.OnApplyWindowInsetsListener { v: View?, windowInsets: WindowInsets? ->
+            this.rootView!!.setOnApplyWindowInsetsListener { v: View?, windowInsets: WindowInsets? ->
                 val windowInsetsCompat =
                     WindowInsetsCompat.toWindowInsetsCompat(windowInsets!!, v)
                 // 獲取系統欄的insets
@@ -676,7 +660,7 @@ open class ASNavigationController : Activity() {
                 // 設定內容區域的 padding 以避免與系統欄和軟鍵盤重疊
                 v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding)
                 windowInsets
-            })
+            }
         }
     }
 

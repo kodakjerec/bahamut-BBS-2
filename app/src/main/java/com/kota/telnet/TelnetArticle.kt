@@ -11,120 +11,120 @@ import java.util.Vector
 
 class TelnetArticle {
     @JvmField
-    var Title: String = ""
+    var title: String = ""
     var author: String = ""
     @JvmField
-    var BoardName: String = ""
+    var boardName: String = ""
     @JvmField
-    var DateTime: String = ""
+    var dateTime: String = ""
     @JvmField
-    var Nickname: String? = ""
+    var nickName: String? = ""
     @JvmField
     var fromIP: String = ""
     @JvmField
-    var Number: Int = 0
-    var Type: Int = 0 // NEW or REPLY
-    private val _extend_items = Vector<TelnetArticleItem>()
+    var myNumber: Int = 0
+    var articleType: Int = 0 // NEW or REPLY
+    private val extendItems = Vector<TelnetArticleItem>()
     var frame: TelnetFrame? = null
         private set
-    private val _info = Vector<TelnetArticleItemInfo>()
-    private val _items = Vector<TelnetArticleItem?>()
-    private val _main_items = Vector<TelnetArticleItem>()
-    private val _push = Vector<TelnetArticlePush?>()
+    private val infos = Vector<TelnetArticleItemInfo>()
+    private val items = Vector<TelnetArticleItem?>()
+    private val mainItems = Vector<TelnetArticleItem>()
+    private val pushes = Vector<TelnetArticlePush?>()
 
-    fun setFrameData(rows: Vector<TelnetRow?>) {
+    fun setFrameData(rows: Vector<TelnetRow>) {
         this.frame = TelnetFrame(rows.size)
         for (i in rows.indices) {
-            frame!!.setRow(i, rows.get(i)!!.clone())
+            frame!!.setRow(i, rows[i]!!.clone())
         }
     }
 
     fun addMainItem(aItem: TelnetArticleItem?) {
-        _main_items.add(aItem)
+        mainItems.add(aItem)
     }
 
     fun addExtendItem(aItem: TelnetArticleItem?) {
-        _extend_items.add(aItem)
+        extendItems.add(aItem)
     }
 
     fun addInfo(aInfo: TelnetArticleItemInfo?) {
-        _info.add(aInfo)
+        infos.add(aInfo)
     }
 
     val infoSize: Int
-        get() = _info.size
+        get() = infos.size
 
     fun getInfo(index: Int): TelnetArticleItemInfo? {
-        return _info.get(index)
+        return infos[index]
     }
 
     fun addPush(aPush: TelnetArticlePush?) {
-        _push.add(aPush)
+        pushes.add(aPush)
     }
 
     fun build() {
-        for (main_item in _main_items) {
-            main_item.build()
+        for (mainItem in mainItems) {
+            mainItem.build()
         }
-        for (extend_item in _extend_items) {
-            extend_item.build()
+        for (extendItem in extendItems) {
+            extendItem.build()
         }
-        val remove_items = Vector<TelnetArticleItem?>()
-        for (item in _main_items) {
-            if (item.isEmpty()) {
-                remove_items.add(item)
+        val removeItems = Vector<TelnetArticleItem?>()
+        for (item in mainItems) {
+            if (item.isEmpty) {
+                removeItems.add(item)
             }
         }
-        for (removeItem in remove_items) {
-            _main_items.remove(removeItem)
+        for (removeItem in removeItems) {
+            mainItems.remove(removeItem)
         }
-        remove_items.clear()
-        for (item2 in _extend_items) {
-            if (item2.isEmpty()) {
-                remove_items.add(item2)
+        removeItems.clear()
+        for (item2 in extendItems) {
+            if (item2.isEmpty) {
+                removeItems.add(item2)
             }
         }
-        for (remove_item in remove_items) {
-            _extend_items.remove(remove_item)
+        for (removeItem in removeItems) {
+            extendItems.remove(removeItem)
         }
-        remove_items.clear()
-        if (!_extend_items.isEmpty()) {
-            _extend_items.lastElement().setType(1)
+        removeItems.clear()
+        if (!extendItems.isEmpty()) {
+            extendItems.lastElement().type = 1
         }
-        _items.clear()
-        _items.addAll(_main_items)
-        _items.addAll(_extend_items)
+        items.clear()
+        items.addAll(mainItems)
+        items.addAll(extendItems)
     }
 
     fun clear() {
-        Title = ""
+        title = ""
         this.author = ""
-        BoardName = ""
-        DateTime = ""
-        _main_items.clear()
-        _items.clear()
-        _push.clear()
-        _info.clear()
+        boardName = ""
+        dateTime = ""
+        mainItems.clear()
+        items.clear()
+        pushes.clear()
+        infos.clear()
         this.frame = null
     }
 
     fun generateReplyTitle(): String {
-        return "Re: " + Title
+        return "Re: $title"
     }
 
     /** 設定文章標題  */
     fun generateEditFormat(): String {
-        val content_buffer = StringBuilder()
-        val time_string = frame!!.getRow(2).toString().substring(4)
-        content_buffer.append("作者: ").append(this.author)
-        if (Nickname != null && !Nickname!!.isEmpty()) {
-            content_buffer.append("(").append(Nickname).append(")")
+        val contentBuffer = StringBuilder()
+        val timeString = frame!!.getRow(2).toString().substring(4)
+        contentBuffer.append("作者: ").append(this.author)
+        if (nickName != null && !nickName!!.isEmpty()) {
+            contentBuffer.append("(").append(nickName).append(")")
         }
-        content_buffer.append(" 看板: ").append(BoardName).append("\n")
-        content_buffer.append("標題: %s\n")
-        content_buffer.append("時間: ").append(time_string).append("\n")
-        content_buffer.append("\n%s")
-        return content_buffer.toString()
+        contentBuffer.append(" 看板: ").append(boardName).append("\n")
+        contentBuffer.append("標題: %s\n")
+        contentBuffer.append("時間: ").append(timeString).append("\n")
+        contentBuffer.append("\n%s")
+        return contentBuffer.toString()
     }
 
     fun generateEditTitle(): String {
@@ -134,16 +134,16 @@ class TelnetArticle {
     /** 產生 修改用的文章內容
      * 有附上ASCII色碼  */
     fun generateEditContent(): String {
-        val content_buffer = StringBuilder()
-        var paintTextColor: Byte = TelnetAnsi.Companion.getDefaultTextColor()
-        var paintBackColor: Byte = TelnetAnsi.Companion.getDefaultBackgroundColor()
+        val contentBuffer = StringBuilder()
+        var paintTextColor: Byte
+        var paintBackColor: Byte
 
         var startContentRowIndex = 0
         // 先找出指定行"時間", 下一行是分隔線, 再下一行是內容
         // 內容如果是空白"", 是發文時系統預設給的, 再往下找一行
         for (i in 0..<frame!!.rowSize) {
-            val _row = frame!!.getRow(i)
-            if (_row!!.rawString.contains("時間")) {
+            val currentRow = frame!!.getRow(i)
+            if (currentRow!!.rawString.contains("時間")) {
                 startContentRowIndex = i + 2
                 if (frame!!.getRow(startContentRowIndex)!!.rawString.isEmpty()) startContentRowIndex += 1
                 break
@@ -151,125 +151,122 @@ class TelnetArticle {
         }
 
         for (rowIndex in startContentRowIndex..<frame!!.rowSize) {
-            val _row = frame!!.getRow(rowIndex)
-            val rawString = _row!!.rawString
-            if (rawString != null) {
-                // 不用換顏色的內容
-                if (rawString.matches("※ .*".toRegex()) || rawString.matches("> .*".toRegex()) || rawString.matches(
-                        "--.*".toRegex()
-                    )
-                ) {
-                    content_buffer.append(rawString).append("\n")
-                } else {
-                    // 換顏色
-                    val ss = SpannableString(rawString)
-                    val finalString = StringBuilder()
-                    val textColor: ByteArray = _row.getTextColor()!!
-                    val backColor = _row.getBackgroundColor()
+            val currentRow = frame!!.getRow(rowIndex)
+            val rawString = currentRow!!.rawString
+            if (rawString.matches("※ .*".toRegex()) || rawString.matches("> .*".toRegex()) || rawString.matches(
+                    "--.*".toRegex()
+                )
+            ) {
+                contentBuffer.append(rawString).append("\n")
+            } else {
+                // 換顏色
+                val ss = SpannableString(rawString)
+                val finalString = StringBuilder()
+                val textColor: ByteArray = currentRow.getTextColor()!!
+                val backColor = currentRow.getBackgroundColor()
 
-                    // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
-                    var needReplaceForeColor = false
-                    paintTextColor = TelnetAnsi.Companion.getDefaultTextColor()
-                    paintBackColor = TelnetAnsi.Companion.getDefaultBackgroundColor()
-                    for (i in textColor.indices) {
-                        if (textColor[i] != paintTextColor || backColor!![i] != paintBackColor) {
-                            if ((i + 1) <= rawString.length) {
-                                needReplaceForeColor = true
-                            }
-                            break
+                // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
+                var needReplaceForeColor = false
+                paintTextColor = TelnetAnsi.DEFAULT_TEXT_COLOR
+                paintBackColor = TelnetAnsi.DEFAULT_BACKGROUND_COLOR
+                for (i in textColor.indices) {
+                    if (textColor[i] != paintTextColor || backColor!![i] != paintBackColor) {
+                        if ((i + 1) <= rawString.length) {
+                            needReplaceForeColor = true
                         }
+                        break
                     }
-
-                    if (needReplaceForeColor) {
-                        var isBlink = false
-                        for (i in 0..<ss.length) {
-                            finalString.append(ss.get(i))
-
-                            // 有附加顏色
-                            if (textColor[i] != paintTextColor || backColor!![i] != paintBackColor) {
-                                var appendString = "*["
-
-                                if (!isBlink && textColor[i] >= 8) {
-                                    isBlink = true
-                                    appendString += "1;"
-                                } else if (isBlink && textColor[i] < 8) {
-                                    isBlink = false
-                                    appendString += ";"
-                                }
-
-                                // 前景代號去除亮色
-                                var noBlinkTextColor = textColor[i].toInt()
-                                if (noBlinkTextColor >= 8) noBlinkTextColor = noBlinkTextColor - 8
-                                // 舊:前景代號去除亮色
-                                var preBlinkTextColor = paintTextColor.toInt()
-                                if (preBlinkTextColor >= 8) preBlinkTextColor =
-                                    preBlinkTextColor - 8
-
-                                if (noBlinkTextColor != preBlinkTextColor) { // 前景不同
-                                    appendString += getTextAsciiCode(noBlinkTextColor)
-
-                                    if (backColor!![i] != paintBackColor) { // 背景不同
-                                        appendString += ";" + getBackAsciiCode(backColor[i])
-                                    }
-                                } else if (backColor!![i] != paintBackColor) { // 背景不同
-                                    appendString += getBackAsciiCode(backColor[i])
-                                }
-                                appendString += "m"
-                                finalString.insert(finalString.length - 1, appendString)
-
-                                // 下一輪
-                                paintTextColor = textColor[i]
-                                paintBackColor = backColor[i]
-                            }
-                        }
-                        // 有替換顏色, 該行最後面加上還原碼
-                        finalString.append("*[m")
-                    } else {
-                        finalString.append(rawString)
-                    }
-                    content_buffer.append(finalString).append("\n")
                 }
+
+                if (needReplaceForeColor) {
+                    var isBlink = false
+                    for (i in 0..<ss.length) {
+                        finalString.append(ss.get(i))
+
+                        // 有附加顏色
+                        if (textColor[i] != paintTextColor || backColor!![i] != paintBackColor) {
+                            var appendString = "*["
+
+                            if (!isBlink && textColor[i] >= 8) {
+                                isBlink = true
+                                appendString += "1;"
+                            } else if (isBlink && textColor[i] < 8) {
+                                isBlink = false
+                                appendString += ";"
+                            }
+
+                            // 前景代號去除亮色
+                            var noBlinkTextColor = textColor[i].toInt()
+                            if (noBlinkTextColor >= 8) noBlinkTextColor = noBlinkTextColor - 8
+                            // 舊:前景代號去除亮色
+                            var preBlinkTextColor = paintTextColor.toInt()
+                            if (preBlinkTextColor >= 8) preBlinkTextColor =
+                                preBlinkTextColor - 8
+
+                            if (noBlinkTextColor != preBlinkTextColor) { // 前景不同
+                                appendString += getTextAsciiCode(noBlinkTextColor)
+
+                                if (backColor!![i] != paintBackColor) { // 背景不同
+                                    appendString += ";" + getBackAsciiCode(backColor[i])
+                                }
+                            } else if (backColor!![i] != paintBackColor) { // 背景不同
+                                appendString += getBackAsciiCode(backColor[i])
+                            }
+                            appendString += "m"
+                            finalString.insert(finalString.length - 1, appendString)
+
+                            // 下一輪
+                            paintTextColor = textColor[i]
+                            paintBackColor = backColor[i]
+                        }
+                    }
+                    // 有替換顏色, 該行最後面加上還原碼
+                    finalString.append("*[m")
+                } else {
+                    finalString.append(rawString)
+                }
+                contentBuffer.append(finalString).append("\n")
             }
         }
 
 
-        return content_buffer.toString()
+        return contentBuffer.toString()
     }
 
     /** 產生 回應用的文章內容
      */
     fun generateReplyContent(): String {
-        val maximum_quote: Int // 回應作者的階層, 0-父 1-祖父
-        val content_builder = StringBuilder()
-        val level_buffer: MutableSet<Int?> = HashSet<Int?>()
-        level_buffer.add(0)
-        for (telnetArticleItemInfo in _info) {
-            level_buffer.add(telnetArticleItemInfo.quoteLevel)
+        val maximumQuote: Int // 回應作者的階層, 0-父 1-祖父
+        val contentBuilder = StringBuilder()
+        val levelBuffer: MutableSet<Int?> = HashSet()
+        levelBuffer.add(0)
+        for (telnetArticleItemInfo in infos) {
+            levelBuffer.add(telnetArticleItemInfo.quoteLevel)
         }
-        val quote_level_list = level_buffer.toTypedArray<Int?>()
-        Arrays.sort(quote_level_list)
-        if (quote_level_list.size < 2) {
-            maximum_quote = quote_level_list[quote_level_list.size - 1]!!
+        val quoteLevelList = levelBuffer.toTypedArray<Int?>()
+        Arrays.sort(quoteLevelList)
+        maximumQuote = if (quoteLevelList.size < 2) {
+            quoteLevelList[quoteLevelList.size - 1]!!
         } else {
-            maximum_quote = quote_level_list[1]!!
+            quoteLevelList[1]!!
         }
 
         // 第一個回覆作者(一定不會被黑名單block)
-        if (maximum_quote > -1) content_builder.append(
+        if (maximumQuote > -1) contentBuilder.append(
             String.format(
                 "※ 引述《%s (%s)》之銘言：\n",
-                this.author, Nickname
+                this.author, nickName
             )
         )
 
-        val blockListEnable = UserSettings.getPropertiesBlockListEnable()
+        val blockListEnable = UserSettings.propertiesBlockListEnable
         // 逐行上推作者
-        for (info in _info) {
-            if (!(blockListEnable && UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximum_quote) {
+        for (info in infos) {
+            if (!(blockListEnable && UserSettings.isBlockListContains(info.author)) && info.quoteLevel <= maximumQuote) {
                 for (i in 0..<info.quoteLevel) {
-                    content_builder.append("> ")
+                    contentBuilder.append("> ")
                 }
-                content_builder.append(
+                contentBuilder.append(
                     String.format(
                         "※ 引述《%s (%s)》之銘言：\n",
                         info.author,
@@ -279,32 +276,32 @@ class TelnetArticle {
             }
         }
         // 作者內容
-        for (item in _main_items) {
-            if (!(blockListEnable && UserSettings.isBlockListContains(item.getAuthor())) && item.getQuoteLevel() <= maximum_quote) {
-                val row_strings: Array<String?> =
-                    item.getContent().split("\n".toRegex()).dropLastWhile { it.isEmpty() }
+        for (item in mainItems) {
+            if (!(blockListEnable && UserSettings.isBlockListContains(item.author)) && item.quoteLevel <= maximumQuote) {
+                val rowStrings: Array<String?> =
+                    item.content.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray()
-                for (append in row_strings) {
-                    for (j in 0..item.getQuoteLevel()) {
-                        content_builder.append("> ")
+                for (append in rowStrings) {
+                    for (j in 0..item.quoteLevel) {
+                        contentBuilder.append("> ")
                     }
-                    content_builder.append(append)
-                    content_builder.append("\n")
+                    contentBuilder.append(append)
+                    contentBuilder.append("\n")
                 }
             }
         }
 
-        return content_builder.toString()
+        return contentBuilder.toString()
     }
 
     val itemSize: Int
-        get() = _items.size
+        get() = items.size
 
     fun getItem(index: Int): TelnetArticleItem? {
-        if (index < 0 || index >= _items.size) {
+        if (index < 0 || index >= items.size) {
             return null
         }
-        return _items.get(index)
+        return items[index]
     }
 
     val fullText: String
@@ -325,13 +322,13 @@ class TelnetArticle {
         }
 
     val pushSize: Int
-        get() = _push.size
+        get() = pushes.size
 
     fun getPush(index: Int): TelnetArticlePush? {
-        try {
-            return _push.get(index)
+        return try {
+            pushes[index]
         } catch (e: Exception) {
-            return null
+            null
         }
     }
 

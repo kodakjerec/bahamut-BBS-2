@@ -3,7 +3,7 @@ package com.kota.asFramework.pageController
 import android.view.MotionEvent
 
 interface ASGestureViewDelegate {
-    fun onASGestureDispathTouchEvent(paramMotionEvent: MotionEvent?)
+    fun onASGestureDisPathTouchEvent(paramMotionEvent: MotionEvent?)
 
     fun onASGestureReceivedGestureDown(): Boolean
 

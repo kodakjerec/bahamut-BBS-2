@@ -30,7 +30,7 @@ class TelnetCursor {
         return aCursor.row == this.row && aCursor.column == this.column
     }
 
-    public override fun clone(): TelnetCursor {
+    fun clone(): TelnetCursor {
         return TelnetCursor(this.row, this.column)
     }
 

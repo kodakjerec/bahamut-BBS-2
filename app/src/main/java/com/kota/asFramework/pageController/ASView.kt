@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 
-/* loaded from: classes.dex */
 class ASView : View {
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,

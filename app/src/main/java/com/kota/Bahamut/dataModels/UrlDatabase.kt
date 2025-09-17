@@ -35,7 +35,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
 
             aDatabase.execSQL(CREATE_TABLE_QUERY)
         } catch (e: SQLException) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
     }
 

@@ -391,7 +391,7 @@ class LoginPage : TelnetPage() {
                         } catch (e: Exception) {
                             showShortToast(getContextString(R.string.login_web_sign_in_msg04))
                             Log.e(
-                                javaClass.getSimpleName(),
+                                javaClass.simpleName,
                                 (if (e.message != null) e.message else "")!!
                             )
                         }

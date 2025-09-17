@@ -142,7 +142,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         try {
             item_index = aIndexString.toInt() - 1
         } catch (e: Exception) {
-            Log.e(javaClass.getSimpleName(), (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
         if (item_index >= 0) {
             setListViewSelection(item_index)

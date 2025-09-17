@@ -3,56 +3,55 @@ package com.kota.asFramework.pageController
 import android.view.animation.Animation
 import android.view.animation.TranslateAnimation
 
-/* loaded from: classes.dex */
 object ASPageAnimation {
-    private var _fade_in_from_left: Animation? = null
-    private var _fade_in_from_right: Animation? = null
-    private var _fade_out_to_left: Animation? = null
-    private var _fade_out_to_right: Animation? = null
+    private var fadeInFromLeft: Animation? = null
+    private var fadeInFromRight: Animation? = null
+    private var fadeOutToLeft: Animation? = null
+    private var fadeOutToRight: Animation? = null
 
     private fun init(aAnimation: Animation) {
-        aAnimation.setFillBefore(true)
-        aAnimation.setFillAfter(true)
-        aAnimation.setFillEnabled(true)
+        aAnimation.fillBefore = true
+        aAnimation.fillAfter = true
+        aAnimation.isFillEnabled = true
     }
 
     val fadeInFromLeftAnimation: Animation?
         get() {
-            if (_fade_in_from_left == null) {
-                _fade_in_from_left =
+            if (fadeInFromLeft == null) {
+                fadeInFromLeft =
                     TranslateAnimation(2, -1.0f, 2, 0.0f, 2, 0.0f, 2, 0.0f)
-                ASPageAnimation.init(_fade_in_from_left!!)
+                init(fadeInFromLeft!!)
             }
-            return _fade_in_from_left
+            return fadeInFromLeft
         }
 
     val fadeInFromRightAnimation: Animation?
         get() {
-            if (_fade_in_from_right == null) {
-                _fade_in_from_right =
+            if (fadeInFromRight == null) {
+                fadeInFromRight =
                     TranslateAnimation(2, 1.0f, 2, 0.0f, 2, 0.0f, 2, 0.0f)
-                ASPageAnimation.init(_fade_in_from_right!!)
+                init(fadeInFromRight!!)
             }
-            return _fade_in_from_right
+            return fadeInFromRight
         }
 
     val fadeOutToLeftAnimation: Animation?
         get() {
-            if (_fade_out_to_left == null) {
-                _fade_out_to_left =
+            if (fadeOutToLeft == null) {
+                fadeOutToLeft =
                     TranslateAnimation(2, 0.0f, 2, -1.0f, 2, 0.0f, 2, 0.0f)
-                ASPageAnimation.init(_fade_out_to_left!!)
+                init(fadeOutToLeft!!)
             }
-            return _fade_out_to_left
+            return fadeOutToLeft
         }
 
     val fadeOutTtRightAnimation: Animation?
         get() {
-            if (_fade_out_to_right == null) {
-                _fade_out_to_right =
+            if (fadeOutToRight == null) {
+                fadeOutToRight =
                     TranslateAnimation(2, 0.0f, 2, 1.0f, 2, 0.0f, 2, 0.0f)
-                ASPageAnimation.init(_fade_out_to_right!!)
+                init(fadeOutToRight!!)
             }
-            return _fade_out_to_right
+            return fadeOutToRight
         }
 }

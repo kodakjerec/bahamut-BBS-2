@@ -1,5 +1,6 @@
 package com.kota.asFramework.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.GestureDetector
@@ -8,17 +9,18 @@ import android.view.ScaleGestureDetector
 import android.view.ScaleGestureDetector.OnScaleGestureListener
 import android.view.View
 import android.widget.LinearLayout
+import androidx.core.view.isNotEmpty
 
 class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGestureListener {
-    private var _content_size_height = 0
+    private var contentSizeHeight = 0
 
-    private var _content_size_width = 0
+    private var contentSizeWidth = 0
 
-    private var _content_view: View? = null
+    private var contentView: View? = null
 
-    private var _scale_detector: ScaleGestureDetector? = null
+    private var scaleDetector: ScaleGestureDetector? = null
 
-    private var _scroll_detector: GestureDetector? = null
+    private var scrollDetector: GestureDetector? = null
 
     constructor(paramContext: Context) : super(paramContext) {
         initial(paramContext)
@@ -32,55 +34,55 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
     }
 
     private fun initial(paramContext: Context) {
-        this._scroll_detector = GestureDetector(paramContext, this)
-        this._scale_detector = ScaleGestureDetector(paramContext, this)
+        this.scrollDetector = GestureDetector(paramContext, this)
+        this.scaleDetector = ScaleGestureDetector(paramContext, this)
     }
 
-    override fun onDown(paramMotionEvent: MotionEvent?): Boolean {
+    override fun onDown(p0: MotionEvent): Boolean {
         return true
     }
 
     override fun onFling(
-        paramMotionEvent1: MotionEvent?,
         paramMotionEvent2: MotionEvent?,
-        paramFloat1: Float,
-        paramFloat2: Float
+        p1: MotionEvent,
+        paramFloat2: Float,
+        p3: Float
     ): Boolean {
         return false
     }
 
-    override fun onLongPress(paramMotionEvent: MotionEvent?) {}
+    override fun onLongPress(p0: MotionEvent) {}
 
-    override fun onScale(paramScaleGestureDetector: ScaleGestureDetector?): Boolean {
+    override fun onScale(p0: ScaleGestureDetector): Boolean {
         return true
     }
 
-    override fun onScaleBegin(paramScaleGestureDetector: ScaleGestureDetector?): Boolean {
+    override fun onScaleBegin(p0: ScaleGestureDetector): Boolean {
         return true
     }
 
-    override fun onScaleEnd(paramScaleGestureDetector: ScaleGestureDetector?) {}
+    override fun onScaleEnd(p0: ScaleGestureDetector) {}
 
     override fun onScroll(
         paramMotionEvent1: MotionEvent?,
-        paramMotionEvent2: MotionEvent?,
+        paramMotionEvent2: MotionEvent,
         paramFloat1: Float,
         paramFloat2: Float
     ): Boolean {
-        if (this._content_view == null) reload()
-        if (this._content_view != null) {
-            this._content_size_width = this._content_view!!.getWidth()
-            this._content_size_height = this._content_view!!.getHeight()
-            var i = getScrollX()
-            var m = getScrollY()
+        if (this.contentView == null) reload()
+        if (this.contentView != null) {
+            this.contentSizeWidth = this.contentView!!.width
+            this.contentSizeHeight = this.contentView!!.height
+            var i = scrollX
+            var m = scrollY
             var j = (i + paramFloat1).toInt()
-            var k = this._content_size_width - getWidth()
+            var k = this.contentSizeWidth - width
             i = j
             if (j > k) i = k
             j = i
             if (i < 0) j = 0
             m = (m + paramFloat2).toInt()
-            k = this._content_size_height - getHeight()
+            k = this.contentSizeHeight - height
             i = m
             if (m > k) i = k
             k = i
@@ -90,25 +92,26 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
         return false
     }
 
-    override fun onShowPress(paramMotionEvent: MotionEvent?) {}
+    override fun onShowPress(p0: MotionEvent) {}
 
-    override fun onSingleTapUp(paramMotionEvent: MotionEvent?): Boolean {
+    override fun onSingleTapUp(p0: MotionEvent): Boolean {
         return false
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
-        return if (paramMotionEvent.getPointerCount() == 2) this._scale_detector!!.onTouchEvent(
+        return if (paramMotionEvent.pointerCount == 2) this.scaleDetector!!.onTouchEvent(
             paramMotionEvent
-        ) else this._scroll_detector!!.onTouchEvent(paramMotionEvent)
+        ) else this.scrollDetector!!.onTouchEvent(paramMotionEvent)
     }
 
     fun reload() {
-        if (getChildCount() > 0) this._content_view = getChildAt(0)
+        if (isNotEmpty()) this.contentView = getChildAt(0)
     }
 
     fun setContentSize(paramInt1: Int, paramInt2: Int) {
-        this._content_size_width = paramInt1
-        this._content_size_height = paramInt2
+        this.contentSizeWidth = paramInt1
+        this.contentSizeHeight = paramInt2
     }
 } /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\UI\ASScrollView.class
  * Java compiler version: 6 (50.0)

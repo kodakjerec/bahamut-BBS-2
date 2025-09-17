@@ -3,7 +3,7 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.util.Log
-import com.kota.telnet.reference.TelnetDefs
+import com.kota.telnet.reference.TelnetDef
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
 import java.util.Arrays
@@ -85,7 +85,7 @@ object CommonFunctions {
                     maxLength+=4
                 else if (array.startsWith("> "))
                     maxLength+=2
-                val data2 = array.toByteArray(charset(TelnetDefs.CHARSET))
+                val data2 = array.toByteArray(charset(TelnetDef.CHARSET))
                 var data1 = U2BEncoder.getInstance().encodeToBytes(data2, 0)
                 while (data1.size >= maxLength) {
                     var isControlCode = false

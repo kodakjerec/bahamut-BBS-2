@@ -25,10 +25,10 @@ object TelnetKeyboard {
     const val SHIFT_M: Int = 115
 
     fun getKeyDataWithTimes(keyCode: Int, times: Int): ByteArray {
-        val keydata = getKeyData(keyCode)
-        val data = ByteArray((keydata.size * times))
+        val keyData = getKeyData(keyCode)
+        val data = ByteArray((keyData.size * times))
         for (index in data.indices) {
-            data[index] = keydata[index % keydata.size]
+            data[index] = keyData[index % keyData.size]
         }
         return data
     }
@@ -40,20 +40,20 @@ object TelnetKeyboard {
      */
     @JvmStatic
     fun getKeyData(keyCode: Int): ByteArray {
-        when (keyCode) {
-            TAB -> return byteArrayOf(9)
-            SPACE -> return byteArrayOf(32)
-            LEFT_ARROW -> return byteArrayOf(27, 91, 68)
-            RIGHT_ARROW -> return byteArrayOf(27, 91, 67)
-            UP_ARROW -> return byteArrayOf(27, 91, 65)
-            DOWN_ARROW -> return byteArrayOf(27, 91, 66)
-            PAGE_UP -> return byteArrayOf(27, 91, 53, 126)
-            PAGE_DOWN -> return byteArrayOf(27, 91, 54, 126)
-            HOME -> return byteArrayOf(27, 91, 49, 126)
-            END -> return byteArrayOf(27, 91, 52, 126)
-            INSERT -> return byteArrayOf(27, 91, 50, 126)
-            DELETE -> return byteArrayOf(27, 91, 51, 126)
-            else -> return byteArrayOf(keyCode.toByte())
+        return when (keyCode) {
+            TAB -> byteArrayOf(9)
+            SPACE -> byteArrayOf(32)
+            LEFT_ARROW -> byteArrayOf(27, 91, 68)
+            RIGHT_ARROW -> byteArrayOf(27, 91, 67)
+            UP_ARROW -> byteArrayOf(27, 91, 65)
+            DOWN_ARROW -> byteArrayOf(27, 91, 66)
+            PAGE_UP -> byteArrayOf(27, 91, 53, 126)
+            PAGE_DOWN -> byteArrayOf(27, 91, 54, 126)
+            HOME -> byteArrayOf(27, 91, 49, 126)
+            END -> byteArrayOf(27, 91, 52, 126)
+            INSERT -> byteArrayOf(27, 91, 50, 126)
+            DELETE -> byteArrayOf(27, 91, 51, 126)
+            else -> byteArrayOf(keyCode.toByte())
         }
     }
 }

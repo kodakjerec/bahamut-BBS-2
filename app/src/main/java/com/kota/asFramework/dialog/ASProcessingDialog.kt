@@ -7,23 +7,22 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
 
-/* loaded from: classes.dex */
 class ASProcessingDialog : ASDialog() {
-    private var _message_label: TextView? = null
-    private var _on_back_delegate: ASProcessingDialogOnBackDelegate? = null
+    private var messageLabel: TextView? = null
+    private var onBackDelegate: ASProcessingDialogOnBackDelegate? = null
 
     init {
         requestWindowFeature(1)
         setContentView(R.layout.as_processing_dialog)
-        if (getWindow() != null) getWindow()!!.setBackgroundDrawable(null)
+        if (window != null) window!!.setBackgroundDrawable(null)
         buildContentView()
     }
 
     fun buildContentView() {
         // frame_view
-        val frame_view = findViewById<LinearLayout>(R.id.as_processing_dialog_frame_view)
-        _message_label = frame_view.findViewById<TextView?>(R.id.as_processing_dialog_text)
-        _message_label!!.setText(R.string.zero_word)
+        val frameView = findViewById<LinearLayout>(R.id.as_processing_dialog_frame_view)
+        messageLabel = frameView.findViewById(R.id.as_processing_dialog_text)
+        messageLabel!!.setText(R.string.zero_word)
     }
 
     // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
@@ -37,12 +36,13 @@ class ASProcessingDialog : ASDialog() {
     }
 
     fun setOnBackDelegate(onBackDelegate: ASProcessingDialogOnBackDelegate?) {
-        this._on_back_delegate = onBackDelegate
+        this.onBackDelegate = onBackDelegate
     }
 
     // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this._on_back_delegate == null || !this._on_back_delegate!!.onASProcessingDialogOnBackDetected(
+        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(
                 this
             )
         ) {
@@ -52,13 +52,13 @@ class ASProcessingDialog : ASDialog() {
 
     companion object {
         @SuppressLint("StaticFieldLeak")
-        private var _instance: ASProcessingDialog? = null
-        private fun construceInstance() {
-            _instance = ASProcessingDialog()
+        private var aSProcessingDialog: ASProcessingDialog? = null
+        private fun constructInstance() {
+            aSProcessingDialog = ASProcessingDialog()
         }
 
         private fun releaseInstance() {
-            _instance = null
+            aSProcessingDialog = null
         }
 
         @JvmStatic
@@ -67,46 +67,46 @@ class ASProcessingDialog : ASDialog() {
             aMessage: String?,
             onBackDelegate: ASProcessingDialogOnBackDelegate? = null
         ) {
-            if (!ASNavigationController.getCurrentController().isInBackground()) {
-                object : ASRunner() {
-                    // from class: com.kota.ASFramework.Dialog.ASProcessingDialog.1
-                    // com.kota.ASFramework.Thread.ASRunner
-                    public override fun run() {
-                        if (_instance == null) {
-                            construceInstance()
+            ASNavigationController.currentController?.isInBackground?.let {
+                if (!it) {
+                    object : ASRunner() {
+                        override fun run() {
+                            if (aSProcessingDialog == null) {
+                                constructInstance()
+                            }
+                            setMessage(aMessage)
+                            aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
+                            if (!aSProcessingDialog!!.isShowing) {
+                                aSProcessingDialog!!.show()
+                            }
                         }
-                        setMessage(aMessage)
-                        _instance!!.setOnBackDelegate(onBackDelegate)
-                        if (!_instance!!.isShowing()) {
-                            _instance!!.show()
-                        }
-                    }
-                }.runInMainThread()
+                    }.runInMainThread()
+                }
             }
         }
 
         @JvmStatic
         fun dismissProcessingDialog() {
-            if (!ASNavigationController.getCurrentController().isInBackground()) {
-                object : ASRunner() {
-                    public override fun run() {
-                        if (_instance != null) {
-                            _instance!!.dismiss()
-                            releaseInstance()
+            ASNavigationController.currentController?.isInBackground?.let {
+                if (!it) {
+                    object : ASRunner() {
+                        override fun run() {
+                            if (aSProcessingDialog != null) {
+                                aSProcessingDialog!!.dismiss()
+                                releaseInstance()
+                            }
                         }
-                    }
-                }.runInMainThread()
+                    }.runInMainThread()
+                }
             }
         }
 
         @JvmStatic
         fun setMessage(message: String?) {
             object : ASRunner() {
-                // from class: com.kota.ASFramework.Dialog.ASProcessingDialog.2
-                // com.kota.ASFramework.Thread.ASRunner
-                public override fun run() {
-                    if (_instance != null) {
-                        _instance!!._message_label!!.setText(message)
+                override fun run() {
+                    if (aSProcessingDialog != null) {
+                        aSProcessingDialog!!.messageLabel!!.text = message
                     }
                 }
             }.runInMainThread()

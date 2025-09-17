@@ -10,134 +10,74 @@ import java.io.OutputStream
 import java.util.Properties
 
 class PropertiesOperator(aSavePath: String?) {
-    private val _property = Properties()
-    private var _save_path: String? = ""
+    val properties = Properties()
+    private var savePath: String = ""
 
     init {
-        this._save_path = aSavePath
+        if (aSavePath != null) {
+            this.savePath = aSavePath
+        }
     }
 
-    fun store(): String? {
-        if (this._save_path == null) {
-            return "save path is null"
-        }
-        try {
-            val file = File(this._save_path)
+    fun store(): Boolean {
+        return try {
+            val file = File(this.savePath)
             if (file.exists()) {
                 file.delete()
             }
             val fos: OutputStream = FileOutputStream(file)
-            this._property.storeToXML(fos, "UserSettings")
+            this.properties.storeToXML(fos, "UserSettings")
             fos.close()
-            return null
+            true
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            return null
+            false
         } catch (e2: IOException) {
             e2.printStackTrace()
-            return null
+            false
         }
     }
 
-    fun load(): String? {
-        if (this._save_path == null) {
-            return "save path is null"
-        }
-        try {
-            val file = File(this._save_path)
+    fun load(): Boolean {
+        return try {
+            val file = File(this.savePath)
             if (!file.exists()) {
-                return null
+                return false
             }
             val fis: InputStream = FileInputStream(file)
-            this._property.loadFromXML(fis)
+            this.properties.loadFromXML(fis)
             fis.close()
-            return null
+            true
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            return null
+            false
         } catch (e2: IOException) {
             e2.printStackTrace()
-            return null
+            false
         }
     }
 
-    fun getPropertiesString(key: String?): String {
-        val str = this._property.getProperty(key)
-        if (str == null) {
-            return ""
-        }
-        return str
-    }
-
-    fun getPropertiesInteger(key: String?): Int {
-        val value = this._property.getProperty(key)
-        if (value == null) {
-            return 0
-        }
-        try {
-            return value.toInt()
+    // 泛型 getter 方法，統一處理不同類型
+    inline fun <reified T> getProperty(key: String?, defaultValue: T): T {
+        val value = this.properties.getProperty(key) ?: return defaultValue
+        
+        return try {
+            when (T::class) {
+                String::class -> value as T
+                Int::class -> value.toInt() as T
+                Boolean::class -> value.toBoolean() as T
+                Float::class -> value.toFloat() as T
+                Double::class -> value.toDouble() as T
+                else -> defaultValue
+            }
         } catch (e: Exception) {
             e.printStackTrace()
-            return 0
+            defaultValue
         }
     }
 
-    fun getPropertiesBoolean(key: String?): Boolean {
-        val value = this._property.getProperty(key)
-        if (value == null) {
-            return false
-        }
-        try {
-            return value.toBoolean()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return false
-        }
-    }
-
-    fun getPropertiesFloat(key: String?): Float {
-        val value = this._property.getProperty(key)
-        if (value == null) {
-            return 0.0f
-        }
-        try {
-            return value.toFloat()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return 0.0f
-        }
-    }
-
-    fun getPropertiesDouble(key: String?): Double {
-        val value = this._property.getProperty(key)
-        if (value == null) {
-            return 0.0
-        }
-        try {
-            return value.toDouble()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            return 0.0
-        }
-    }
-
-    fun setProperties(key: String?, value: String?) {
-        this._property.setProperty(key, value)
-    }
-
-    fun setProperties(key: String?, value: Int) {
-        this._property.setProperty(key, value.toString())
-    }
-
-    fun setProperties(key: String?, value: Boolean) {
-        this._property.setProperty(key, value.toString())
-    }
-
-    fun setProperties(key: String?, value: Float) {
-        this._property.setProperty(key, value.toString())
-    }
-
-    fun setProperties(key: String?, value: Double) {
-        this._property.setProperty(key, value.toString())
+    // 泛型 setter 方法，統一處理不同類型
+    fun <T> setProperty(key: String?, value: T) {
+        this.properties.setProperty(key, value.toString())
     }
 }

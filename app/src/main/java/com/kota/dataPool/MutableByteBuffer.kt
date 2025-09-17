@@ -5,14 +5,13 @@ import java.nio.ByteBuffer
 import java.util.Stack
 import java.util.Vector
 
-class MutableByteBuffer private constructor() : Iterable<ByteBuffer> {
+class MutableByteBuffer private constructor() : Iterable<ByteBuffer?> {
     var isClosed: Boolean = false
         private set
-    private var _size = 0
+    private var bufferSize = 0
 
-    /* access modifiers changed from: private */
-    var _written_buffers: Vector<ByteBuffer?> = Vector<ByteBuffer?>()
-    private var _writing_buffer: ByteBuffer? = createByteBuffer()
+    var writtenBuffers: Vector<ByteBuffer?> = Vector<ByteBuffer?>()
+    private var writingBuffer: ByteBuffer? = createByteBuffer()
 
     fun releasePool() {
         synchronized(_pool) {
@@ -29,56 +28,56 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer> {
             Log.e("ERROR", "This buffer has been closed.")
             return this
         }
-        if (!this._writing_buffer!!.hasRemaining()) {
-            this._writing_buffer!!.flip()
-            this._written_buffers.add(this._writing_buffer)
-            this._writing_buffer = createByteBuffer()
+        if (!this.writingBuffer!!.hasRemaining()) {
+            this.writingBuffer!!.flip()
+            this.writtenBuffers.add(this.writingBuffer)
+            this.writingBuffer = createByteBuffer()
         }
-        this._writing_buffer!!.put(data)
-        this._size++
+        this.writingBuffer!!.put(data)
+        this.bufferSize++
         return this
     }
 
     fun put(data: ByteArray): MutableByteBuffer {
-        for (byte_data in data) {
-            put(byte_data)
+        for (byteData in data) {
+            put(byteData)
         }
         return this
     }
 
     fun size(): Int {
-        return this._size
+        return this.bufferSize
     }
 
     fun close() {
-        this._writing_buffer!!.flip()
-        this._written_buffers.add(this._writing_buffer)
-        this._writing_buffer = createByteBuffer()
+        this.writingBuffer!!.flip()
+        this.writtenBuffers.add(this.writingBuffer)
+        this.writingBuffer = createByteBuffer()
         this.isClosed = true
     }
 
     fun clear() {
-        for (written_buffer in this._written_buffers) {
-            recycleByteBuffer(written_buffer)
+        for (writtenBuffer in this.writtenBuffers) {
+            recycleByteBuffer(writtenBuffer)
         }
-        this._written_buffers.clear()
-        if (this._writing_buffer != null) {
-            this._writing_buffer!!.clear()
+        this.writtenBuffers.clear()
+        if (this.writingBuffer != null) {
+            this.writingBuffer!!.clear()
         }
-        this._size = 0
+        this.bufferSize = 0
         this.isClosed = false
     }
 
     fun toByteArray(): ByteArray {
         check(this.isClosed) { "This buffer has not been closed." }
-        val data = ByteArray(this._size)
+        val data = ByteArray(this.bufferSize)
         var position = 0
         try {
             for (buffer in this) {
                 for (i in 0..<buffer!!.limit()) {
                     data[position] = buffer.get(i)
                     position++
-                    if (position == this._size) {
+                    if (position == this.bufferSize) {
                         break
                     }
                 }
@@ -94,12 +93,12 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer> {
             private var _position = 0
 
             override fun hasNext(): Boolean {
-                return this._position < this@MutableByteBuffer._written_buffers.size
+                return this._position < this@MutableByteBuffer.writtenBuffers.size
             }
 
             override fun next(): ByteBuffer? {
                 this._position++
-                return this@MutableByteBuffer._written_buffers.get(this._position - 1)
+                return this@MutableByteBuffer.writtenBuffers[this._position - 1]
             }
 
             override fun remove() {
@@ -124,7 +123,7 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer> {
         fun createMutableByteBuffer(): MutableByteBuffer {
             var buffer: MutableByteBuffer? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     buffer = _pool.pop()
                 }
             }
@@ -146,7 +145,7 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer> {
         private fun createByteBuffer(): ByteBuffer {
             var buffer: ByteBuffer? = null
             synchronized(_buffer_pool) {
-                if (_buffer_pool.size > 0) {
+                if (_buffer_pool.isNotEmpty()) {
                     buffer = _buffer_pool.pop()
                 }
             }
