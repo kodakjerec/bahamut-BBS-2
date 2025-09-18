@@ -11,12 +11,12 @@ import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.dataModels.ArticleTempStore
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression_Listener
-import com.kota.Bahamut.dialogs.Dialog_InsertSymbol
-import com.kota.Bahamut.dialogs.Dialog_InsertSymbol_Listener
-import com.kota.Bahamut.dialogs.Dialog_PaintColor
-import com.kota.Bahamut.dialogs.Dialog_PaintColor_Listener
+import com.kota.Bahamut.dialogs.DialogInsertExpression
+import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
+import com.kota.Bahamut.dialogs.DialogInsertSymbol
+import com.kota.Bahamut.dialogs.DialogInsertSymbolListener
+import com.kota.Bahamut.dialogs.DialogPaintColor
+import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
@@ -25,7 +25,7 @@ import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
 class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
-    Dialog_InsertSymbol_Listener, Dialog_PaintColor_Listener {
+    DialogInsertSymbolListener, DialogPaintColorListener {
     var _content: String? = null
     var _content_field: EditText? = null
     var _hide_title_button: Button? = null
@@ -223,10 +223,10 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
             // 表情符號
 
             val items: Array<String?> = articleExpressions
-            Dialog_InsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                .setListener(object : Dialog_InsertExpression_Listener {
+            DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+                .setListener(object : DialogInsertExpressionListener {
                     override fun onListDialogItemClicked(
-                        paramASListDialog: Dialog_InsertExpression?,
+                        paramASListDialog: DialogInsertExpression?,
                         index: Int,
                         aTitle: String?
                     ) {
@@ -244,7 +244,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         } else if (view === _hide_title_button) {
             onInsertSymbolButtonClicked()
         } else if (view === _paint_color_button) {
-            val dialog = Dialog_PaintColor()
+            val dialog = DialogPaintColor()
             dialog.setListener(this)
             dialog.show()
         } else if (view.getId() == R.id.SendMailDialog_change) {
@@ -299,7 +299,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     fun onInsertSymbolButtonClicked() {
-        val dialog = Dialog_InsertSymbol()
+        val dialog = DialogInsertSymbol()
         dialog.setListener(this)
         dialog.show()
     }

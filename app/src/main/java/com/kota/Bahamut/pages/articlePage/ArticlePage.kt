@@ -374,8 +374,8 @@ class ArticlePage : TelnetPage() {
             show_link_button.setOnClickListener(mShowLinkListener)
         }
 
-        mainLayout!!.findViewById<View?>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
-        mainLayout!!.findViewById<View?>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ext_toolbar) as LinearLayout?)
@@ -470,9 +470,9 @@ class ArticlePage : TelnetPage() {
         if (choice_toolbar_order == 1) {
             // 最左邊最右邊
             val _btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val _btnLLDivider = toolbar.findViewById<View?>(R.id.toolbar_divider_0)
+            val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
             val _btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val _btnRRDivider = toolbar.findViewById<View?>(R.id.toolbar_divider_3)
+            val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
 
             // 擷取中間的元素
             val allViews = ArrayList<View?>()
@@ -789,7 +789,7 @@ class ArticlePage : TelnetPage() {
         }
         println("enable:" + enable)
         println("article_mode:" + article_mode)
-        val toolbar_view = mainLayout!!.findViewById<View?>(R.id.ext_toolbar)
+        val toolbar_view = mainLayout!!.findViewById<View>(R.id.ext_toolbar)
         if (toolbar_view != null) {
             toolbar_view.setVisibility(if (enable) View.VISIBLE else View.GONE)
         }

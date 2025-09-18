@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.dataModels.ShortenUrl
 import com.kota.Bahamut.R
 
-class DialogShortenUrlItemViewAdapter(private val _blocklist: MutableList<ShortenUrl>) :
+class DialogShortenUrlItemViewAdapter(private val blockedUrls: MutableList<ShortenUrl>) :
     RecyclerView.Adapter<DialogShortenUrlViewHolder?>() {
     private var mClickListener: DialogShortenUrlItemViewListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DialogShortenUrlViewHolder {
-        val v = LayoutInflater.from(parent.getContext())
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.shorten_url_item_view, parent, false)
         return DialogShortenUrlViewHolder(v, mClickListener)
     }
@@ -23,11 +23,11 @@ class DialogShortenUrlItemViewAdapter(private val _blocklist: MutableList<Shorte
     }
 
     fun getItem(position: Int): ShortenUrl {
-        return this._blocklist.get(position)
+        return this.blockedUrls[position]
     }
 
     override fun getItemCount(): Int {
-        return _blocklist.size
+        return blockedUrls.size
     }
 
     fun setOnItemClickListener(listener: DialogShortenUrlItemViewListener?) {

@@ -121,7 +121,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     }
 
     @get:SuppressLint("Range")
-    val shortenUrls: Vector<ShortenUrl?>
+    val shortenUrls: Vector<ShortenUrl>
         get() {
             try {
                 val db = readableDatabase
@@ -133,7 +133,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                     db.query("shorten_urls", columns, selection, null, null, null, "rowid DESC")
 
                 if (cursor.moveToFirst()) {
-                    val returnList = Vector<ShortenUrl?>()
+                    val returnList = Vector<ShortenUrl>()
                     do {
                         val data = ShortenUrl()
                         data.shortenUrl = cursor.getString(cursor.getColumnIndex("shorten_url"))
@@ -151,10 +151,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                     cursor.close()
                     db.close()
 
-                    return Vector<ShortenUrl?>()
+                    return Vector<ShortenUrl>()
                 }
             } catch (_: Exception) {
-                return Vector<ShortenUrl?>()
+                return Vector<ShortenUrl>()
             }
         }
 

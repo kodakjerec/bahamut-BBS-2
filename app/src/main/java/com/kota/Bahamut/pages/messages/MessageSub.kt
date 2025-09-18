@@ -11,9 +11,9 @@ import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.dialogs.DialogShortenImage
 import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.dialogs.DialogShortenUrlListener
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression_Listener
-import com.kota.Bahamut.dialogs.Dialog_InsertSymbol
+import com.kota.Bahamut.dialogs.DialogInsertExpression
+import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
+import com.kota.Bahamut.dialogs.DialogInsertSymbol
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.R
@@ -110,17 +110,17 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         when (view.id) {
             R.id.Message_Sub_Cancel -> {
                 // 符號
-                val dialog = Dialog_InsertSymbol()
+                val dialog = DialogInsertSymbol()
                 dialog.setListener { str: String -> this.insertString(str) }
                 dialog.show()
             }
             R.id.Message_Sub_Symbol -> {
                 // 表情符號
                 val items = UserSettings.getArticleExpressions()
-                Dialog_InsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                    .setListener(object : Dialog_InsertExpression_Listener {
+                DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+                    .setListener(object : DialogInsertExpressionListener {
                         override fun onListDialogItemClicked(
-                            paramASListDialog: Dialog_InsertExpression,
+                            paramASListDialog: DialogInsertExpression,
                             index: Int,
                             aTitle: String
                         ) {
@@ -172,7 +172,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         // 更新db
         val db = MessageDatabase(context)
@@ -201,7 +201,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aSenderName\n")
                 .build()
-            TelnetClient.getClient().sendDataToServer(builder)
+            TelnetClient.client!!.sendDataToServer(builder)
         }
 
         messageAsRunner.postDelayed(3000)
@@ -221,7 +221,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aMessage\n")
                 .build()
-            TelnetClient.getClient().sendDataToServer(builder)
+            TelnetClient.client!!.sendDataToServer(builder)
 
             // 更新db
             val db = MessageDatabase(context)

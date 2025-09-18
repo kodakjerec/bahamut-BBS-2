@@ -4,22 +4,22 @@ import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.TelnetClient
 
-class BahamutCommandGoodArticle(var _article_index: Int) : TelnetCommand() {
+class BahamutCommandGoodArticle(var articleIndex: Int) : TelnetCommand() {
     init {
-        this.Action = BahamutCommandDefs.Companion.GoodArticle
+        this.action = BahamutCommandDef.Companion.GOOD_ARTICLE
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (this._article_index > 0) {
-            TelnetClient.getClient().sendStringToServer(this._article_index.toString() + "\ngy")
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (this.articleIndex > 0) {
+            TelnetClient.client!!.sendStringToServer(this.articleIndex.toString() + "\ngy")
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[GoodArticle][articleIndex=" + this._article_index + "]"
+        return "[GoodArticle][articleIndex=" + this.articleIndex + "]"
     }
 }

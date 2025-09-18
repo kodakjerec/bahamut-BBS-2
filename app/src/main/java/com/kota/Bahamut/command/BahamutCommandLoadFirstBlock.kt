@@ -5,14 +5,14 @@ import com.kota.Bahamut.listPage.TelnetListPageBlock
 
 class BahamutCommandLoadFirstBlock : TelnetCommand() {
     init {
-        this.Action = BahamutCommandDefs.Companion.LoadFirstBlock
+        this.action = BahamutCommandDef.Companion.LOAD_FIRST_BLOCK
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
+    override fun execute(telnetListPage: TelnetListPage) {
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {

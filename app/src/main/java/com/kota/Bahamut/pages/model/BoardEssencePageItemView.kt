@@ -32,7 +32,7 @@ class BoardEssencePageItemView : LinearLayout {
     fun setItem(aItem: BoardEssencePageItem?) {
         if (aItem != null) {
             setTitle(aItem.title)
-            setNumber(aItem.Number)
+            setNumber(aItem.itemNumber)
             setDate(aItem.date)
             author = aItem.author
             aItem.isBBSClickable = aItem.isBBSClickable

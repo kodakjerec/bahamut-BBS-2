@@ -211,7 +211,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         return this
     }
 
-    fun setListener(paramASAlertDialogListener: ASAlertDialogListener?): ASAlertDialog {
+    fun setListener(paramASAlertDialogListener: ASAlertDialogListener): ASAlertDialog {
         listener = paramASAlertDialogListener
         return this
     }

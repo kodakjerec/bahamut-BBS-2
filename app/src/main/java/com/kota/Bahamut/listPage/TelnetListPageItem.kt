@@ -2,7 +2,7 @@ package com.kota.Bahamut.listPage
 
 open class TelnetListPageItem {
     @JvmField
-    var Number: Int = 0
+    var itemNumber: Int = 0
     @JvmField
     var isBlocked: Boolean = false
     @JvmField
@@ -17,7 +17,7 @@ open class TelnetListPageItem {
     }
 
     open fun clear() {
-        this.Number = 0
+        this.itemNumber = 0
         this.isDeleted = false
         this.isLoading = false
         this.isBlocked = false

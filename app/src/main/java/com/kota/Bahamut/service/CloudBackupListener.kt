@@ -1,5 +1,5 @@
 package com.kota.Bahamut.service
 
-interface CloudBackupListener {
+fun interface CloudBackupListener {
     fun onFinal()
 }

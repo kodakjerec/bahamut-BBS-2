@@ -332,8 +332,8 @@ class BookmarkManagePage(
         val state =
             instance.getState(page.getListIdFromListName(this@BookmarkManagePage._board_name))
         if (state != null) {
-            state.Top = 0
-            state.Position = 0
+            state.top = 0
+            state.position = 0
         }
         page.setKeyword(bookmark.keyword)
         page.setAuthor(bookmark.author)

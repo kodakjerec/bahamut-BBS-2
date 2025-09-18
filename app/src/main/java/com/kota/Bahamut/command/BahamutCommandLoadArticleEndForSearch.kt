@@ -6,7 +6,7 @@ import com.kota.telnet.TelnetClient
 class BahamutCommandLoadArticleEndForSearch {
     fun execute() {
         print(toString() + " ")
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.END)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.END)
     }
 
     override fun toString(): String {

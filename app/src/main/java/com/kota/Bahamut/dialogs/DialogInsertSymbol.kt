@@ -12,30 +12,28 @@ import android.widget.TextView
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
 
-class Dialog_InsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
-    var _grid_view: GridView
-    private var _listener: Dialog_InsertSymbol_Listener? = null
-    var _symbols: String =
+class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
+    var mainView: GridView
+    private var _listener: DialogInsertSymbolListener? = null
+    var symbols: String =
         "├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂〔〕【】《》（）｛｝﹙﹚『』﹛﹜﹝﹞＜＞≦≧﹤﹥「」︵︶︷︸︹︺︻︼︽︾〈〉︿﹀∩∪﹁﹂﹃﹄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω╳＋﹢－×÷＝≠≒∞ˇ±√⊥∠∟⊿㏒㏑∫∮∵∴"
 
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_insert_symbol)
-        if (getWindow() != null) getWindow()!!.setBackgroundDrawable(null)
-        this._grid_view = findViewById<GridView>(R.id.SymbolDialog_GridView)
-        this._grid_view.setOnItemClickListener(this)
-        val list = arrayOfNulls<String>(this._symbols.length)
+        if (window != null) window!!.setBackgroundDrawable(null)
+        this.mainView = findViewById<GridView>(R.id.SymbolDialog_GridView)
+        this.mainView.onItemClickListener = this
+        val list = arrayOfNulls<String>(this.symbols.length)
         for (i in list.indices) {
-            list[i] = this._symbols.get(i).toString()
+            list[i] = this.symbols[i].toString()
         }
-        this._grid_view.setAdapter(
-            ArrayAdapter<String?>(
-                getContext(),
-                R.layout.simple_list_item_1,
-                list
-            )
+        this.mainView.adapter = ArrayAdapter<String?>(
+            context,
+            R.layout.simple_list_item_1,
+            list
         )
-        setDialogWidth()
+        setDialogWidth(mainView)
     }
 
     override fun onItemClick(adapterView: AdapterView<*>?, arg1: View?, index: Int, id: Long) {
@@ -46,11 +44,11 @@ class Dialog_InsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     }
 
     override fun getCount(): Int {
-        return this._symbols.length
+        return this.symbols.length
     }
 
     override fun getItem(position: Int): String {
-        return this._symbols.get(position).toString()
+        return this.symbols[position].toString()
     }
 
     override fun getItemId(position: Int): Long {
@@ -64,10 +62,10 @@ class Dialog_InsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         var convertView = convertView
         if (convertView == null) {
-            convertView = TextView(getContext())
-            convertView.setLayoutParams(ViewGroup.LayoutParams(100, 100))
+            convertView = TextView(context)
+            convertView.layoutParams = ViewGroup.LayoutParams(100, 100)
         }
-        (convertView as TextView).setText(getItem(position))
+        (convertView as TextView).text = getItem(position)
         return convertView
     }
 
@@ -97,28 +95,16 @@ class Dialog_InsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
         return false
     }
 
-    fun setListener(aListener: Dialog_InsertSymbol_Listener?) {
+    fun setListener(aListener: DialogInsertSymbolListener?) {
         this._listener = aListener
     }
 
-    public override fun show() {
+    override fun show() {
         if (currentOrientation == 1) {
-            this._grid_view.setNumColumns(4)
+            this.mainView.numColumns = 4
         } else {
-            this._grid_view.setNumColumns(8)
+            this.mainView.numColumns = 8
         }
         super.show()
-    }
-
-    // 變更dialog寬度
-    fun setDialogWidth() {
-        val screenHeight = getContext().getResources().getDisplayMetrics().heightPixels
-        val screenWidth = getContext().getResources().getDisplayMetrics().widthPixels
-        val dialog_height = (screenHeight * 0.7).toInt()
-        val dialog_width = (screenWidth * 0.7).toInt()
-        val oldLayoutParams = _grid_view.getLayoutParams()
-        oldLayoutParams.width = dialog_width
-        oldLayoutParams.height = dialog_height
-        _grid_view.setLayoutParams(oldLayoutParams)
     }
 }

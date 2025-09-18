@@ -316,7 +316,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    private fun insertPageData(aPageData: TelnetListPageBlock?) {
+    private fun insertPageData(telnetListPageBlock: TelnetListPageBlock?) {
         if (aPageData != null) {
             val block_index = getBlockIndex(aPageData.minimumItemNumber - 1)
             synchronized(_block_list) {
@@ -441,7 +441,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     @Synchronized
-    fun executeCommandFinished(aPageData: TelnetListPageBlock?) {
+    fun executeCommandFinished(telnetListPageBlock: TelnetListPageBlock?) {
         if (_executing_command != null) {
             _executing_command!!.executeFinished(this, aPageData)
             if (!_executing_command!!.isDone) {
@@ -455,7 +455,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun isLoadingBlock(itemIndex: Int): Boolean {
         var result: Boolean
         result = false
-        if (_executing_command != null && _executing_command!!.Action == 0) {
+        if (_executing_command != null && _executing_command!!.action == 0) {
             val load_block_command = _executing_command as BahamutCommandLoadBlock
             result = load_block_command.containsArticle(itemIndex)
         }
@@ -466,7 +466,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     break
                 }
                 val command = it.next()
-                if (command != null && command.Action == 0) {
+                if (command != null && command.action == 0) {
                     val load_block_command2 = command as BahamutCommandLoadBlock
                     if (load_block_command2.containsArticle(itemIndex)) {
                         result = true
@@ -490,7 +490,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     break
                 }
                 val command = it.next()
-                if (command.Action == 2) {
+                if (command.action == 2) {
                     load_size_command_exists = true
                     break
                 }
@@ -519,7 +519,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     private fun containsLoadLastBlock(): Boolean {
         for (command in _operation_command_stack) {
-            if (command.Action == 1) {
+            if (command.action == 1) {
                 return true
             }
         }
@@ -578,7 +578,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             item = if (block != null) block.getItem(getIndexInBlock(index)) else null
         }
         if (item != null) {
-            item.Number = item_index
+            item.itemNumber = item_index
         }
         return item
     }
@@ -638,10 +638,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     protected fun saveListState() {
         if (_list_view != null) {
             val state: ListState = ListStateStore.Companion.getInstance().getState(this.listId)
-            state.Position = _list_view!!.getFirstVisiblePosition()
+            state.position = _list_view!!.getFirstVisiblePosition()
             val first_visible_item_view = _list_view!!.getChildAt(0)
             if (first_visible_item_view != null) {
-                state.Top = first_visible_item_view.getTop()
+                state.top = first_visible_item_view.getTop()
             }
         }
     }
@@ -649,7 +649,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     protected fun loadListState() {
         if (_list_view != null) {
             val state: ListState = ListStateStore.Companion.getInstance().getState(this.listId)
-            setListViewSelectionFromTop(state.Position, state.Top)
+            setListViewSelectionFromTop(state.position, state.top)
         }
     }
 

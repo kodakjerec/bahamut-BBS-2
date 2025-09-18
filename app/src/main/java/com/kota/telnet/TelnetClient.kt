@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class TelnetClient private constructor(private val stateHandler: TelnetStateHandler?) :
+class TelnetClient private constructor(private val stateHandler: TelnetStateHandler) :
     TelnetConnectorListener {
     var connector: TelnetConnector? = null
         get() = client!!.connector
@@ -31,7 +31,7 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     fun clear() {
-        stateHandler!!.clear()
+        stateHandler.clear()
         connector!!.clear()
         model!!.clear()
         _receiver!!.stopReceiver()
@@ -166,10 +166,8 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
 
     // com.kota.Telnet.TelnetConnectorListener
     override fun onTelnetConnectorReceiveDataStart(telnetConnector: TelnetConnector?) {
-        if (stateHandler != null) {
-            model!!.cleanCachedData()
-            stateHandler.handleState()
-        }
+        model!!.cleanCachedData()
+        stateHandler.handleState()
     }
 
     // com.kota.Telnet.TelnetConnectorListener
@@ -193,7 +191,7 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
             private set
 
         @JvmStatic
-        fun construct(aStateHandler: TelnetStateHandler?) {
+        fun construct(aStateHandler: TelnetStateHandler) {
             client = TelnetClient(aStateHandler)
         }
     }

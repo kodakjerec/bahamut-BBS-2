@@ -1,10 +1,10 @@
 package com.kota.Bahamut.dialogs
 
-interface Dialog_InsertExpression_Listener {
+interface DialogInsertExpressionListener {
     fun onListDialogItemClicked(
-        paramASListDialog: Dialog_InsertExpression?,
+        paramASListDialog: DialogInsertExpression,
         paramInt: Int,
-        paramString: String?
+        paramString: String
     )
 
     fun onListDialogSettingClicked()

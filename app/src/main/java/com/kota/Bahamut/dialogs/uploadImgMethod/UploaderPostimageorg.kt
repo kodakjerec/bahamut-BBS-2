@@ -60,7 +60,7 @@ class UploaderPostimageorg(private val context: Context) {
             override fun onShowFileChooser(
                 view: WebView?,
                 filePathCallback: android.webkit.ValueCallback<Array<Uri>>?,
-                fileChooserParams: android.webkit.WebChromeClient.FileChooserParams?
+                fileChooserParams: FileChooserParams?
             ): Boolean {
                 // 自動選擇 source Uri
                 filePathCallback?.onReceiveValue(arrayOf(source))

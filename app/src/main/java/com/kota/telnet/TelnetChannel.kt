@@ -6,7 +6,7 @@ import com.kota.textEncoder.B2UEncoder
 import java.io.IOException
 import java.nio.ByteBuffer
 
-class TelnetChannel(aSocketChannel: TelnetSocketChannel?) {
+class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
     private val inputBuffer: ByteBuffer = ByteBuffer.allocate(BUFFER_SIZE)
     private var channelListener: TelnetChannelListener? = null
     private var isLocked = false

@@ -75,7 +75,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPage_L
         _back_button!!.setOnClickListener(this)
         _page_up_button!!.setOnClickListener(this)
         _page_down_button!!.setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.Mail_changeModeButton).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.Mail_changeModeButton).setOnClickListener(this)
         resetAdapter()
 
         // 替換外觀

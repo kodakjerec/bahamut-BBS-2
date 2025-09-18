@@ -4,22 +4,22 @@ import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.TelnetClient
 
-class BahamutCommandPushArticle(var _article_index: Int) : TelnetCommand() {
+class BahamutCommandPushArticle(var articleIndex: Int) : TelnetCommand() {
     init {
-        this.Action = BahamutCommandDefs.Companion.PushArticle
+        this.action = BahamutCommandDef.Companion.PUSH_ARTICLE
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (this._article_index > 0) {
-            TelnetClient.getClient().sendStringToServer(this._article_index.toString() + "\ngx")
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (this.articleIndex > 0) {
+            TelnetClient.client!!.sendStringToServer(this.articleIndex.toString() + "\ngx")
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[PushArticle][articleIndex=" + this._article_index + "]"
+        return "[PushArticle][articleIndex=" + this.articleIndex + "]"
     }
 }

@@ -7,7 +7,7 @@ import android.view.View
 import java.util.Vector
 
 abstract class ASViewController {
-    var navigationController: ASNavigationController? = null
+    lateinit var navigationController: ASNavigationController
     protected var isLoaded: Boolean = false
     private var aSPageView: ASPageView? = null
     private var isContainedInContainer = false
@@ -163,7 +163,7 @@ abstract class ASViewController {
         get() = this.navigationController
 
     val resource: Resources?
-        get() = this.navigationController!!.resources
+        get() = this.navigationController.resources
 
     fun findViewById(viewID: Int): View? {
         if (this.aSPageView != null) {
@@ -173,17 +173,14 @@ abstract class ASViewController {
     }
 
     fun getSystemService(name: String): Any? {
-        if (this.navigationController != null) {
-            return this.navigationController!!.getSystemService(name)
-        }
-        return null
+        return this.navigationController.getSystemService(name)
     }
 
     fun onSizeChanged(newWidth: Int, newHeight: Int, oldWidth: Int, oldHeight: Int) {
     }
 
     open fun onBackPressed(): Boolean {
-        this.navigationController!!.popViewController()
+        this.navigationController.popViewController()
         return true
     }
 
@@ -196,21 +193,15 @@ abstract class ASViewController {
     }
 
     fun startActivity(intent: Intent?) {
-        if (this.navigationController != null) {
-            this.navigationController!!.startActivity(intent)
-        }
+        this.navigationController.startActivity(intent)
     }
 
     fun startActivityForResult(intent: Intent?, code: Int) {
-        if (this.navigationController != null) {
-            this.navigationController!!.startActivityForResult(intent, code)
-        }
+        this.navigationController.startActivityForResult(intent, code)
     }
 
     fun reloadLayout() {
-        if (this.navigationController != null) {
-            this.navigationController!!.reloadLayout()
-        }
+        this.navigationController.reloadLayout()
     }
 
     fun onReceivedGestureUp(): Boolean {
@@ -230,10 +221,10 @@ abstract class ASViewController {
     }
 
     open val isTopPage: Boolean
-        get() = this.navigationController != null && this.navigationController!!.topController === this
+        get() = this.navigationController.topController === this
 
     val assets: AssetManager?
-        get() = this.navigationController!!.assets
+        get() = this.navigationController.assets
 
     fun containsInContainer(): Boolean {
         return this.isContainedInContainer
@@ -261,27 +252,27 @@ abstract class ASViewController {
         return "ASViewController[Type:" + this.pageType + "]"
     }
 
-    fun registerPageOperationListener(aListener: ASViewControllerOperationListener?) {
+    fun registerPageOperationListener(aListener: ASViewControllerOperationListener) {
         if (this.operationListeners == null) {
             this.operationListeners = Vector<ASViewControllerOperationListener?>()
         }
         this.operationListeners!!.add(aListener)
     }
 
-    fun unregisterPageOperationListener(aListener: ASViewControllerOperationListener?) {
+    fun unregisterPageOperationListener(aListener: ASViewControllerOperationListener) {
         if (this.operationListeners != null) {
             this.operationListeners!!.remove(aListener)
         }
     }
 
-    fun registerAppearListener(aListener: ASViewControllerAppearListener?) {
+    fun registerAppearListener(aListener: ASViewControllerAppearListener) {
         if (this.appearListeners == null) {
             this.appearListeners = Vector<ASViewControllerAppearListener?>()
         }
         this.appearListeners!!.add(aListener)
     }
 
-    fun unregisterAppearListener(aListener: ASViewControllerAppearListener?) {
+    fun unregisterAppearListener(aListener: ASViewControllerAppearListener) {
         if (this.appearListeners != null) {
             this.appearListeners!!.remove(aListener)
         }

@@ -176,11 +176,11 @@ class StartPage : TelnetPage() {
             showProcessingDialog(
                 "連線中",
                 ASProcessingDialogOnBackDelegate { aDialog: ASProcessingDialog? ->
-                    TelnetClient.getClient().close()
+                    TelnetClient.client!!.close()
                     false
                 })
             val connectIpAddress = getConnectIpAddress()
-            runInNewThread(Runnable { TelnetClient.getClient().connect(connectIpAddress, 23) })
+            runInNewThread(Runnable { TelnetClient.client!!.connect(connectIpAddress, 23) })
             return
         }
         showShortToast("您未連接網路")

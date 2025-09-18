@@ -9,29 +9,27 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetCommand
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 
-class BahamutCommandEditArticle(var _article_number: String?, title: String, content: String) :
+class BahamutCommandEditArticle(var articleNumber: String?, title: String, content: String) :
     com.kota.Bahamut.command.TelnetCommand() {
-    var _content: String?
-    var _title: String?
+    // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
+    var myContent: String? = judgeDoubleWord(content, TelnetFrame.Companion.DEFAULT_COLUMN - 2)
+
+    // 標題: 第80個字元如果是雙字元則截斷
+    var myTitle: String? = judgeDoubleWord(title, TelnetFrame.Companion.DEFAULT_COLUMN - 9).split("\n".toRegex())
+        .dropLastWhile { it.isEmpty() }.toTypedArray()[0]
 
     init {
-        // 標題: 第80個字元如果是雙字元則截斷
-        _title =
-            judgeDoubleWord(title, TelnetFrame.Companion.DEFAULT_COLUMN - 9).split("\n".toRegex())
-                .dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-        // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
-        _content = judgeDoubleWord(content, TelnetFrame.Companion.DEFAULT_COLUMN - 2)
-        Action = BahamutCommandDefs.Companion.PostArticle
+        action = BahamutCommandDef.Companion.POST_ARTICLE
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (_article_number != null && _content != null && _content!!.length > 0) {
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (articleNumber != null && myContent != null && myContent!!.isNotEmpty()) {
             // 將內文依照 *[ 切換成多段
             val outputs: MutableList<String> =
-                BahamutCommandPostArticle.Companion.convertContentToStringList(_content)
+                BahamutCommandPostArticle.Companion.convertContentToStringList(myContent!!)
 
             val builder = create()
-                .pushString(_article_number + "\nE")
+                .pushString("$articleNumber\nE")
                 .pushData(TelnetKeyboard.CTRL_G.toByte()) // ^G 刪除目前這行之後至檔案結尾
                 .pushData(TelnetKeyboard.CTRL_Y.toByte()) // ^Y 刪除目前這行
             // 貼入內文
@@ -43,18 +41,18 @@ class BahamutCommandEditArticle(var _article_number: String?, title: String, con
             // 結束
             builder.pushData(TelnetCommand.TERMINAL_TYPE)
                 .pushString("S\n")
-            if (_title != null) {
-                builder.pushString("T").pushData(25.toByte()).pushString(_title + "\nY\n")
+            if (myTitle != null) {
+                builder.pushString("T").pushData(25.toByte()).pushString("$myTitle\nY\n")
             }
-            TelnetClient.getClient().sendDataToServer(builder.build())
+            TelnetClient.client!!.sendDataToServer(builder.build())
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[EditArticle][articleIndex=" + _article_number + " title=" + _title + " content=" + _content + "]"
+        return "[EditArticle][articleIndex=$articleNumber title=$myTitle content=$myContent]"
     }
 }

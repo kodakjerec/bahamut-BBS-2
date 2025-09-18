@@ -60,7 +60,7 @@ class BoardEssencePage : TelnetListPage() {
         clear()
         PageContainer.getInstance().popBoardEssencePage()
         navigationController.popViewController()
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 

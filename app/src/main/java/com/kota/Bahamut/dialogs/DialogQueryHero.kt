@@ -48,7 +48,7 @@ class DialogQueryHero : ASDialog() {
             contextView.findViewById<TextView>(R.id.dialog_query_hero_last_date).text = lastDate
             contextView.findViewById<TextView>(R.id.dialog_query_hero_last_time).text = lastTime
             contextView.findViewById<TextView>(R.id.dialog_query_hero_from_ip).text = fromIp
-        } catch(e: Exception) {
+        } catch(_: Exception) {
             dismiss()
             ASAlertDialog.createDialog()
                 .setTitle("錯誤")
@@ -59,9 +59,8 @@ class DialogQueryHero : ASDialog() {
         }
     }
 
-    override fun getName(): String {
-        return "BahamutQueryHeroDialog"
-    }
+    override val name: String?
+        get() = "BahamutQueryHeroDialog"
 
     /* 顯示WEB資訊 */
     @SuppressLint("SetJavaScriptEnabled")

@@ -34,7 +34,7 @@ class MailBoxPage_ItemView : LinearLayout {
     fun setItem(aItem: MailBoxPageItem?) {
         if (aItem != null) {
             setTitle(aItem.Title)
-            setIndex(aItem.Number)
+            setIndex(aItem.itemNumber)
             setDate(aItem.Date)
             setAuthor(aItem.Author)
             setReply(aItem.isReply)

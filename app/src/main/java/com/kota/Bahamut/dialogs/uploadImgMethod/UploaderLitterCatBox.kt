@@ -35,7 +35,7 @@ class UploaderLitterCatBox {
             .build()
 
         client.newCall(request).execute().use { response ->
-            return response.body?.string() ?: throw Exception("No response body")
+            return response.body.string()
         }
     }
 }

@@ -28,14 +28,14 @@ import com.kota.Bahamut.dialogs.DialogReferenceListener
 import com.kota.Bahamut.dialogs.DialogShortenImage
 import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.dialogs.DialogShortenUrlListener
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression
-import com.kota.Bahamut.dialogs.Dialog_InsertExpression_Listener
-import com.kota.Bahamut.dialogs.Dialog_InsertSymbol
-import com.kota.Bahamut.dialogs.Dialog_InsertSymbol_Listener
-import com.kota.Bahamut.dialogs.Dialog_PaintColor
-import com.kota.Bahamut.dialogs.Dialog_PaintColor_Listener
-import com.kota.Bahamut.dialogs.Dialog_PostArticle
-import com.kota.Bahamut.dialogs.Dialog_PostArticle_Listener
+import com.kota.Bahamut.dialogs.DialogInsertExpression
+import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
+import com.kota.Bahamut.dialogs.DialogInsertSymbol
+import com.kota.Bahamut.dialogs.DialogInsertSymbolListener
+import com.kota.Bahamut.dialogs.DialogPaintColor
+import com.kota.Bahamut.dialogs.DialogPaintColorListener
+import com.kota.Bahamut.dialogs.DialogPostArticle
+import com.kota.Bahamut.dialogs.DialogPostArticleListener
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
@@ -185,11 +185,11 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         _paint_color_button = mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_Color)
         _paint_color_button!!.setOnClickListener(this)
 
-        mainLayout!!.findViewById<View?>(R.id.ArticlePostDialog_File).setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.ArticlePostDialog_ShortenUrl).setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.ArticlePostDialog_ShortenImage)
+        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_File).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_ShortenUrl).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_ShortenImage)
             .setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.ArticlePostDialog_EditButtons)
+        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_EditButtons)
             .setOnClickListener(this)
 
         _header_selector = mainLayout!!.findViewById<Spinner?>(R.id.Post_headerSelector)
@@ -198,12 +198,12 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         _header_selector!!.setAdapter(adapter)
         _header_selector!!.setOnItemSelectedListener(this)
-        _title_block = mainLayout!!.findViewById<View?>(R.id.Post_TitleBlock)
+        _title_block = mainLayout!!.findViewById<View>(R.id.Post_TitleBlock)
         _title_block!!.requestFocus()
 
-        mainLayout!!.findViewById<View?>(R.id.Post_Toolbar_Show)
+        mainLayout!!.findViewById<View>(R.id.Post_Toolbar_Show)
             .setOnClickListener(postToolbarShowOnClickListener)
-        mainLayout!!.findViewById<View?>(R.id.ArticlePostDialog_Reference)
+        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_Reference)
             .setOnClickListener(referenceClickListener)
 
         // 替換外觀
@@ -263,10 +263,10 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         } else if (view === _symbol_button) {
             // 表情符號
             val items: Array<String?> = articleExpressions
-            Dialog_InsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                .setListener(object : Dialog_InsertExpression_Listener {
+            DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+                .setListener(object : DialogInsertExpressionListener {
                     override fun onListDialogItemClicked(
-                        paramASListDialog: Dialog_InsertExpression?,
+                        paramASListDialog: DialogInsertExpression?,
                         index: Int,
                         aTitle: String?
                     ) {
@@ -282,13 +282,13 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                 }).scheduleDismissOnPageDisappear(this).show()
         } else if (view === _insert_symbol_button) {
             // 符號
-            val dialog = Dialog_InsertSymbol()
-            dialog.setListener(Dialog_InsertSymbol_Listener { str: String? -> this.insertString(str) })
+            val dialog = DialogInsertSymbol()
+            dialog.setListener(DialogInsertSymbolListener { str: String? -> this.insertString(str) })
             dialog.show()
         } else if (view === _paint_color_button) {
             // 上色
-            val dialog = Dialog_PaintColor()
-            dialog.setListener(Dialog_PaintColor_Listener { str: String? -> this.insertString(str) })
+            val dialog = DialogPaintColor()
+            dialog.setListener(DialogPaintColorListener { str: String? -> this.insertString(str) })
             dialog.show()
         } else if (view.getId() == R.id.ArticlePostDialog_File) {
             // 檔案
@@ -326,8 +326,8 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         if (_article_number != null) {
             if (_operation_mode == OperationMode.Reply) {
                 // 回覆: 有註記回文
-                val dialog = Dialog_PostArticle(1)
-                dialog.setListener(Dialog_PostArticle_Listener { aTarget: String?, aSign: String? ->
+                val dialog = DialogPostArticle(1)
+                dialog.setListener(DialogPostArticleListener { aTarget: String?, aSign: String? ->
                     if (this@PostArticlePage._listener != null) {
                         this@PostArticlePage._listener!!.onPostDialogSendButtonClicked(
                             this@PostArticlePage,
@@ -365,8 +365,8 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             }
         } else {
             // 新增文章
-            val dialog2 = Dialog_PostArticle(0)
-            dialog2.setListener(Dialog_PostArticle_Listener { aTarget: String?, aSign: String? ->
+            val dialog2 = DialogPostArticle(0)
+            dialog2.setListener(DialogPostArticleListener { aTarget: String?, aSign: String? ->
                 if (this@PostArticlePage._listener != null) {
                     this@PostArticlePage._listener!!.onPostDialogSendButtonClicked(
                         this@PostArticlePage,
@@ -390,7 +390,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                 .pushKey(TelnetKeyboard.CTRL_X)
                 .pushString("a\n")
                 .build()
-            TelnetClient.getClient().sendDataToServer(data)
+            TelnetClient.client!!.sendDataToServer(data)
             recover = false
         }
         clear()

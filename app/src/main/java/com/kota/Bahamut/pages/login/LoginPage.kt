@@ -147,7 +147,7 @@ class LoginPage : TelnetPage() {
 
     // 按下返回
     protected override fun onBackPressed(): Boolean {
-        TelnetClient.getClient().close()
+        TelnetClient.client!!.close()
         return true
     }
 
@@ -185,12 +185,12 @@ class LoginPage : TelnetPage() {
         } else if (row_23.startsWith("★ 密碼輸入錯誤") && cursor.row == 23) {
             _error_count++
             onPasswordError()
-            TelnetClient.getClient().sendStringToServer("")
+            TelnetClient.client!!.sendStringToServer("")
             return false
         } else if (row_23.startsWith("★ 錯誤的使用者代號") && cursor.row == 23) {
             _error_count++
             onUsernameError()
-            TelnetClient.getClient().sendStringToServer("")
+            TelnetClient.client!!.sendStringToServer("")
             return false
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
@@ -257,7 +257,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         showProcessingDialog("登入中")
         runInNewThread(Runnable {
-            TelnetClient.getClient()
+            TelnetClient.client!!
                 .sendStringToServerInBackground(this@LoginPage._username)
         })
     }
@@ -277,14 +277,14 @@ class LoginPage : TelnetPage() {
                         .addButton("是")
                         .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
                             if (index == 0) {
-                                TelnetClient.getClient().sendStringToServerInBackground("n")
+                                TelnetClient.client!!.sendStringToServerInBackground("n")
                             } else {
-                                TelnetClient.getClient().sendStringToServerInBackground("y")
+                                TelnetClient.client!!.sendStringToServerInBackground("y")
                             }
                             this@LoginPage._remove_logon_user_dialog = null
                             showProcessingDialog("登入中")
                         }).setOnBackDelegate(ASDialogOnBackPressedDelegate { aDialog: ASDialog? ->
-                            TelnetClient.getClient().sendStringToServerInBackground("n")
+                            TelnetClient.client!!.sendStringToServerInBackground("n")
                             if (this@LoginPage._remove_logon_user_dialog != null) {
                                 this@LoginPage._remove_logon_user_dialog!!.dismiss()
                                 this@LoginPage._remove_logon_user_dialog = null
@@ -351,7 +351,7 @@ class LoginPage : TelnetPage() {
      * 傳送密碼
      */
     fun sendPassword() {
-        TelnetClient.getClient().sendStringToServer(_password)
+        TelnetClient.client!!.sendStringToServer(_password)
     }
 
     /**
@@ -359,7 +359,7 @@ class LoginPage : TelnetPage() {
      */
     fun onLoginSuccess() {
         // 存檔客戶資料
-        TelnetClient.getClient().setUsername(_username)
+        TelnetClient.client!!.setUsername(_username)
         saveLogonUserToProperties()
 
         // 讀取雲端
@@ -451,8 +451,8 @@ class LoginPage : TelnetPage() {
                     .addButton("放棄").addButton("寫入暫存檔")
                     .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
                         when (index) {
-                            0 -> TelnetClient.getClient().sendStringToServer("Q")
-                            1 -> TelnetClient.getClient().sendStringToServer("S")
+                            0 -> TelnetClient.client!!.sendStringToServer("Q")
+                            1 -> TelnetClient.client!!.sendStringToServer("S")
                         }
                         this@LoginPage._save_unfinished_article_dialog = null
                     }).scheduleDismissOnPageDisappear(this)

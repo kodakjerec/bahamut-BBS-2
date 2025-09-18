@@ -45,7 +45,7 @@ class TelnetCommand {
             37 -> return "AUTH"
             39 -> return "NEW_ENV"
             else -> {
-                val name = "UNKNOW(" + aCommand + ")"
+                val name = "UNKNOW($aCommand)"
                 return name
             }
         }
@@ -59,18 +59,18 @@ class TelnetCommand {
 
     companion object {
         const val AUTH: Byte = 37
-        val DO: Byte = -3
-        val DONT: Byte = -2
+        const val DO: Byte = -3
+        const val DONT: Byte = -2
         const val ECHO: Byte = 1
-        val IAC: Byte = -1
+        const val IAC: Byte = -1
         const val IS: Byte = 0
         const val NAWS: Byte = 31
         const val NEW_ENV: Byte = 39
-        val SB: Byte = -6
-        val SE: Byte = -16
+        const val SB: Byte = -6
+        const val SE: Byte = -16
         const val SG: Byte = 3
         const val TERMINAL_TYPE: Byte = 24
-        val WILL: Byte = -5
-        val WONT: Byte = -4
+        const val WILL: Byte = -5
+        const val WONT: Byte = -4
     }
 }

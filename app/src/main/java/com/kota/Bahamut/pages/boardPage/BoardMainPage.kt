@@ -49,8 +49,8 @@ import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.dialogs.DialogPushArticle
 import com.kota.Bahamut.dialogs.DialogSearchArticle
 import com.kota.Bahamut.dialogs.DialogSearchArticleListener
-import com.kota.Bahamut.dialogs.Dialog_SelectArticle
-import com.kota.Bahamut.dialogs.Dialog_SelectArticle_Listener
+import com.kota.Bahamut.dialogs.DialogSelectArticle
+import com.kota.Bahamut.dialogs.DialogSelectArticleListener
 import com.kota.Bahamut.listPage.ListStateStore.Companion.instance
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
@@ -94,7 +94,7 @@ import java.util.Vector
 import kotlin.math.abs
 
 open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
-    Dialog_SelectArticle_Listener, PostArticlePage_Listener, BoardExtendOptionalPageListener,
+    DialogSelectArticleListener, PostArticlePage_Listener, BoardExtendOptionalPageListener,
     ASListViewExtentOptionalDelegate {
     var mainDrawerLayout: DrawerLayout? = null
     var mainLayout: RelativeLayout? = null
@@ -225,13 +225,13 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                         val data = create()
                             .pushString("vV\n")
                             .build()
-                        TelnetClient.getClient().sendDataToServer(data)
+                        TelnetClient.client!!.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_read_all_msg01))
                     } else if (aTitle == getContextString(R.string.board_main_unread_all)) {
                         val data = create()
                             .pushString("vU\n")
                             .build()
-                        TelnetClient.getClient().sendDataToServer(data)
+                        TelnetClient.client!!.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_unread_all_msg01))
                     }
                 }
@@ -421,13 +421,13 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
         val aSListView = mainLayout!!.findViewById<ASListView>(R.id.BoardPageListView)
         aSListView.extendOptionalDelegate = this
-        aSListView.setEmptyView(mainLayout!!.findViewById<View?>(R.id.BoardPageListEmptyView))
+        aSListView.setEmptyView(mainLayout!!.findViewById<View>(R.id.BoardPageListEmptyView))
         listView = aSListView
 
-        mainLayout!!.findViewById<View?>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
-        mainLayout!!.findViewById<View?>(R.id.BoardPageFirstPageButton)
+        mainLayout!!.findViewById<View>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageFirstPageButton)
             .setOnClickListener(mPrevPageClickListener)
-        mainLayout!!.findViewById<View?>(R.id.BoardPageFirstPageButton)
+        mainLayout!!.findViewById<View>(R.id.BoardPageFirstPageButton)
             .setOnLongClickListener(mFirstPageClickListener)
         // 下一頁
         val boardPageLatestPageButton =
@@ -439,8 +439,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         } else {
             boardPageLatestPageButton.setOnClickListener(mLastPageClickListener)
         }
-        mainLayout!!.findViewById<View?>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
-        mainLayout!!.findViewById<View?>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
 
         // 側邊選單
         if (mainDrawerLayout != null) {
@@ -468,12 +468,12 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 })
             }
             val search_article_button =
-                mainDrawerLayout!!.findViewById<View?>(R.id.search_article_button)
+                mainDrawerLayout!!.findViewById<View>(R.id.search_article_button)
             if (search_article_button != null) {
                 search_article_button.setOnClickListener(_search_listener)
             }
             val select_article_button =
-                mainDrawerLayout!!.findViewById<View?>(R.id.select_article_button)
+                mainDrawerLayout!!.findViewById<View>(R.id.select_article_button)
             if (select_article_button != null) {
                 select_article_button.setOnClickListener(_select_listener)
             }
@@ -488,12 +488,12 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 text_checkbox.setOnClickListener(_enable_block_listener)
             }
             val block_setting_button =
-                mainDrawerLayout!!.findViewById<View?>(R.id.block_setting_button)
+                mainDrawerLayout!!.findViewById<View>(R.id.block_setting_button)
             if (block_setting_button != null) {
                 block_setting_button.setOnClickListener(_edit_block_listener)
             }
             val bookmark_edit_button =
-                mainDrawerLayout!!.findViewById<View?>(R.id.bookmark_edit_button)
+                mainDrawerLayout!!.findViewById<View>(R.id.bookmark_edit_button)
             if (bookmark_edit_button != null) {
                 bookmark_edit_button.setOnClickListener(_edit_bookmark_listener)
             }
@@ -512,7 +512,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 if (_mode == 0) _show_bookmark_button!!.performClick()
                 else _show_history_button!!.performClick()
             }
-            mainDrawerLayout!!.findViewById<View?>(R.id.bookmark_tab_button)
+            mainDrawerLayout!!.findViewById<View>(R.id.bookmark_tab_button)
                 .setOnClickListener(toEssencePageClickListener)
         }
 
@@ -573,7 +573,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         this.lastListAction = BoardPageAction.Companion.ESSENCE
         PageContainer.getInstance().pushBoardEssencePage(listName, _board_title)
         navigationController!!.pushViewController(PageContainer.getInstance().getBoardEssencePage())
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.TAB)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
 
     /** 變更工具列位置  */
@@ -660,9 +660,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         if (choice_toolbar_order == 1) {
             // 最左邊最右邊
             val _btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val _btnLLDivider = toolbar.findViewById<View?>(R.id.toolbar_divider_0)
+            val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
             val _btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val _btnRRDivider = toolbar.findViewById<View?>(R.id.toolbar_divider_3)
+            val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
 
             // 擷取中間的元素
             val allViews = ArrayList<View?>()
@@ -738,7 +738,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         if (boardPageItem != null) {
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.Title
-            TempSettings.lastVisitArticleNumber = boardPageItem.Number
+            TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
             return true
@@ -765,7 +765,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         }
         clear()
         navigationController!!.popViewController()
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.getInstance().cleanBoardPage()
         return true
     }
@@ -789,7 +789,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     protected fun showSelectArticleDialog() {
-        val dialog_SelectArticle = Dialog_SelectArticle()
+        val dialog_SelectArticle = DialogSelectArticle()
         dialog_SelectArticle.setListener(this)
         dialog_SelectArticle.show()
     }
@@ -812,8 +812,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         navigationController!!.pushViewController(board_Search_Page)
         val state = instance.getState(board_Search_Page.getListIdFromListName(listName))
         if (state != null) {
-            state.Top = 0
-            state.Position = 0
+            state.top = 0
+            state.position = 0
         }
         board_Search_Page.setKeyword(_keyword)
         board_Search_Page.setAuthor(_author)
@@ -849,8 +849,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         navigationController!!.pushViewController(board_Linked_Title_Page)
         val state = instance.getState(board_Linked_Title_Page.getListIdFromListName(listName))
         if (state != null) {
-            state.Top = 0
-            state.Position = 0
+            state.top = 0
+            state.position = 0
         }
         pushCommand(BahamutCommandListArticle(i))
     }

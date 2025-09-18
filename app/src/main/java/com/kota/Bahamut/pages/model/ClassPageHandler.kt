@@ -65,7 +65,7 @@ class ClassPageHandler private constructor() {
             item.Title = board_title
             item.Manager = board_manager
             class_package.maximumItemNumber = board_index
-            item.Number = board_index
+            item.itemNumber = board_index
             class_package.setItem(i - 3, item)
             i++
         }

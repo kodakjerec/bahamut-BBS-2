@@ -24,9 +24,8 @@ class DialogSearchArticle : ASDialog(), View.OnClickListener {
     private var keywordLabel: EditText
     private var markRadio: RadioGroup
     private lateinit var listener: DialogSearchArticleListener
-    override fun getName(): String {
-        return "BahamutBoardSearchDialog"
-    }
+    override val name: String?
+        get() = "BahamutBoardSearchDialog"
 
     init {
         requestWindowFeature(1)

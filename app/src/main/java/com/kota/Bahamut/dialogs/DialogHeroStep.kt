@@ -47,7 +47,7 @@ class DialogHeroStep:ASDialog() {
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.getClient().sendDataToServer(builder)
+            TelnetClient.client!!.sendDataToServer(builder)
         }
     }
 
@@ -58,7 +58,7 @@ class DialogHeroStep:ASDialog() {
             .pushString("\n") // 按[Enter]結束
             .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
             .build()
-        TelnetClient.getClient().sendDataToServer(builder)
+        TelnetClient.client!!.sendDataToServer(builder)
         dismiss()
     }
 
@@ -78,14 +78,14 @@ class DialogHeroStep:ASDialog() {
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.getClient().sendDataToServer(builder)
+            TelnetClient.client!!.sendDataToServer(builder)
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_hero_success01))
         } else {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.getClient().sendDataToServer(builder)
+            TelnetClient.client!!.sendDataToServer(builder)
         }
         dismiss()
     }

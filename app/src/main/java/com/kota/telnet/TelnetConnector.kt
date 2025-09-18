@@ -11,7 +11,7 @@ class TelnetConnector : TelnetChannelListener {
     var isConnecting: Boolean = false
         private set
     private var lastSentDataTime: Long = 0
-    private var connectorListener: TelnetConnectorListener? = null
+    private lateinit var connectorListener: TelnetConnectorListener
     private var socketChannel: TelnetSocketChannel? = null
 
     // 添加設備控制器引用
@@ -131,17 +131,15 @@ class TelnetConnector : TelnetChannelListener {
             this.deviceController!!.lockWifi()
         }
 
-        if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorConnectStart(this)
-        }
+        this.connectorListener.onTelnetConnectorConnectStart(this)
         this.isConnecting = false
         try {
             println("Connect to Telnet $serverIp:$serverPort")
             this.socketChannel = TelnetDefaultSocketChannel(serverIp, serverPort)
             synchronized(this) {
-                this.telnetChannels!![0] = TelnetChannel(this.socketChannel)
+                this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[0]!!.setListener(this)
-                this.telnetChannels[1] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[1]!!.setListener(this)
             }
             this.isConnecting = true
@@ -156,14 +154,12 @@ class TelnetConnector : TelnetChannelListener {
             clear()
         }
         if (this.isConnecting) {
-            if (this.connectorListener != null) {
-                this.connectorListener!!.onTelnetConnectorConnectSuccess(this)
-            }
+            this.connectorListener.onTelnetConnectorConnectSuccess(this)
             this.holderThread = HolderThread()
             this.holderThread!!.start()
             Log.d("TelnetConnector", "Telnet connection established, HolderThread started")
-        } else if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorConnectFail(this)
+        } else {
+            this.connectorListener.onTelnetConnectorConnectFail(this)
         }
     }
 
@@ -179,9 +175,7 @@ class TelnetConnector : TelnetChannelListener {
             this.deviceController!!.lockWifi()
         }
 
-        if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorConnectStart(this)
-        }
+        this.connectorListener.onTelnetConnectorConnectStart(this)
         this.isConnecting = false
         try {
             // 構建 WebSocket URL - 使用巴哈姆特的實際 WebSocket 端點
@@ -189,9 +183,9 @@ class TelnetConnector : TelnetChannelListener {
             println("Connect to WebSocket $wsUrl")
             this.socketChannel = TelnetWebSocketChannel(wsUrl)
             synchronized(this) {
-                this.telnetChannels!![0] = TelnetChannel(this.socketChannel)
+                this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[0]!!.setListener(this)
-                this.telnetChannels[1] = TelnetChannel(this.socketChannel)
+                this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[1]!!.setListener(this)
             }
             this.isConnecting = true
@@ -206,14 +200,12 @@ class TelnetConnector : TelnetChannelListener {
             clear()
         }
         if (this.isConnecting) {
-            if (this.connectorListener != null) {
-                this.connectorListener!!.onTelnetConnectorConnectSuccess(this)
-            }
+            this.connectorListener.onTelnetConnectorConnectSuccess(this)
             this.holderThread = HolderThread()
             this.holderThread!!.start()
             Log.d("TelnetConnector", "WebSocket connection established, HolderThread started")
-        } else if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorConnectFail(this)
+        } else {
+            this.connectorListener.onTelnetConnectorConnectFail(this)
         }
     }
 
@@ -223,9 +215,7 @@ class TelnetConnector : TelnetChannelListener {
             this.deviceController!!.unlockWifi()
         }
         clear()
-        if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorClosed(this)
-        }
+        this.connectorListener.onTelnetConnectorClosed(this)
     }
 
     private fun getChannel(channel: Int): TelnetChannel? {
@@ -246,7 +236,7 @@ class TelnetConnector : TelnetChannelListener {
         if (selectedChannel != null) {
             try {
                 return selectedChannel.readData()
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Log.v("SocketChannel", "readData IO Exception")
                 throw TelnetConnectionClosedException
             }
@@ -321,9 +311,7 @@ class TelnetConnector : TelnetChannelListener {
         } catch (e: Exception) {
             Log.e("TelnetConnector", "Failed to send keep-alive message: " + e.message)
             // 如果發送失敗，可能連線已斷開
-            if (this.connectorListener != null) {
-                // 這裡可以觸發重連機制
-            }
+            // 這裡可以觸發重連機制
         }
     }
 
@@ -341,19 +329,15 @@ class TelnetConnector : TelnetChannelListener {
         return true // 如果沒有設備控制器，假設網路正常
     }
 
-    fun setListener(aListener: TelnetConnectorListener?) {
+    fun setListener(aListener: TelnetConnectorListener) {
         this.connectorListener = aListener
     }
 
-    override fun onTelnetChannelReceiveDataStart(telnetChannel: TelnetChannel?) {
-        if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorReceiveDataStart(this)
-        }
+    override fun onTelnetChannelReceiveDataStart(telnetChannel: TelnetChannel) {
+        this.connectorListener.onTelnetConnectorReceiveDataStart(this)
     }
 
-    override fun onTelnetChannelReceiveDataFinished(telnetChannel: TelnetChannel?) {
-        if (this.connectorListener != null) {
-            this.connectorListener!!.onTelnetConnectorReceiveDataFinished(this)
-        }
+    override fun onTelnetChannelReceiveDataFinished(telnetChannel: TelnetChannel) {
+        this.connectorListener.onTelnetConnectorReceiveDataFinished(this)
     }
 }

@@ -21,9 +21,8 @@ class DialogReference : ASDialog(), View.OnClickListener {
     private var dialogReferenceListener: DialogReferenceListener? = null
     private lateinit var myAuthors: List<ReferenceAuthor>
 
-    override fun getName(): String {
-        return "BahamutSelectSignDialog"
-    }
+    override val name: String?
+        get() = "BahamutSelectSignDialog"
 
     init {
         requestWindowFeature(1)

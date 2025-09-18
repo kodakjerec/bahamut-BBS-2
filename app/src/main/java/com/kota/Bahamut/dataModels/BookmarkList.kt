@@ -4,8 +4,8 @@ package com.kota.Bahamut.dataModels
  書籤元件 清單
 */
 class BookmarkList(private val myBoard: String?) {
-    private val bookmarks: MutableList<Bookmark?> = ArrayList<Bookmark?>()
-    private val historyBookmarks: MutableList<Bookmark?> = ArrayList<Bookmark?>()
+    private val bookmarks: MutableList<Bookmark?> = ArrayList()
+    private val historyBookmarks: MutableList<Bookmark?> = ArrayList()
     var limit: Int = 40
 
     val bookmarkSize: Int

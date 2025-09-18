@@ -5,7 +5,7 @@ import com.kota.Bahamut.BuildConfig
 import com.kota.telnet.model.TelnetModel
 import java.io.IOException
 
-class TelnetReceiverThread(aConnector: TelnetConnector?, aModel: TelnetModel?) : Thread() {
+class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : Thread() {
     private val telnetCommand = TelnetCommand()
     private var telnetConnector: TelnetConnector? = null
     private var telnetModel: TelnetModel? = null

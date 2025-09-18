@@ -52,7 +52,7 @@ class BoardEssencePageHandler private constructor() {
                     boardPageBlock.minimumItemNumber = articleNumber
                 }
                 boardPageBlock.maximumItemNumber = articleNumber
-                item.Number = articleNumber
+                item.itemNumber = articleNumber
                 item.date = date
                 item.author = author
                 item.isDeleted = false

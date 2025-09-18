@@ -9,14 +9,14 @@ class TelnetArticleItem {
     var author: String? = ""
     var content: String = ""
         private set
-    private var _frame: TelnetFrame? = null
+    var telnetFrame: TelnetFrame? = null
     var nickname: String? = ""
     var quoteLevel: Int = 0
-    private val _rows = Vector<TelnetRow>()
+    val rows = Vector<TelnetRow>()
     var type: Int = 0
 
     fun addRow(row: TelnetRow?) {
-        this._rows.add(row)
+        this.rows.add(row)
     }
 
     fun clear() {
@@ -28,8 +28,8 @@ class TelnetArticleItem {
 
     fun build() {
         val buffer = StringBuilder()
-        for (row in this._rows) {
-            if (buffer.length > 0) {
+        for (row in this.rows) {
+            if (buffer.isNotEmpty()) {
                 buffer.append("\n")
             }
             buffer.append(row.toContentString())
@@ -38,10 +38,10 @@ class TelnetArticleItem {
     }
 
     val isEmpty: Boolean
-        get() = this.content.length == 0
+        get() = this.content.isEmpty()
 
     val model: TelnetModel
-        get() = TelnetModel(this._rows.size)
+        get() = TelnetModel(this.rows.size)
 
     override fun toString(): String {
         return "QuoteLevel:" + this.quoteLevel + "\n" +
@@ -51,17 +51,17 @@ class TelnetArticleItem {
     }
 
     fun buildFrame() {
-        this._frame = TelnetFrame(this._rows.size)
-        for (i in this._rows.indices) {
-            this._frame!!.setRow(i, this._rows.get(i))
+        this.telnetFrame = TelnetFrame(this.rows.size)
+        for (i in this.rows.indices) {
+            this.telnetFrame!!.setRow(i, this.rows[i])
         }
     }
 
     val frame: TelnetFrame?
         get() {
-            if (this._frame == null) {
+            if (this.telnetFrame == null) {
                 buildFrame()
             }
-            return this._frame
+            return this.telnetFrame
         }
 }

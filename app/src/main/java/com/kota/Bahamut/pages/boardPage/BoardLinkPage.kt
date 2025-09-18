@@ -105,7 +105,7 @@ class BoardLinkPage : BoardMainPage() {
     override fun onBackPressed(): Boolean {
         clear()
         navigationController!!.popViewController()
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.getInstance().cleanBoardTitleLinkedPage()
         return true
     }

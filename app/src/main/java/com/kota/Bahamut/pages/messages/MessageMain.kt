@@ -63,7 +63,7 @@ class MessageMain:TelnetPage() {
     private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (isUnderList) {
-                TelnetClient.getClient().sendDataToServer(
+                TelnetClient.client!!.sendDataToServer(
                     TelnetOutputBuilder.create()
                         .pushString("/") // 請輸入勇者代號：
                         .pushKey(TelnetKeyboard.CTRL_Y) // 清除資料
@@ -101,7 +101,7 @@ class MessageMain:TelnetPage() {
             btnSettings.visibility = INVISIBLE
             toolbarList.visibility = VISIBLE
             // 送出查詢指令
-            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
+            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
         // 切換頁籤
         val theme = getSelectTheme()
@@ -117,20 +117,20 @@ class MessageMain:TelnetPage() {
     }
     /** 上一頁 */
     private val prevPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
     }
     /** 下一頁 */
     private val nextPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
     }
     /** 最前頁 */
     private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.HOME)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.HOME)
         return@OnLongClickListener true
     }
     /** 最後頁 */
     private val endPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.END)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.END)
         return@OnLongClickListener true
     }
 
@@ -230,7 +230,7 @@ class MessageMain:TelnetPage() {
     override fun onBackPressed(): Boolean {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         // 顯示小視窗
@@ -244,7 +244,7 @@ class MessageMain:TelnetPage() {
     fun loadMessageList() {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         messageAsRunner.cancel()
@@ -338,7 +338,7 @@ class MessageMain:TelnetPage() {
     /** 同步BBS訊息到DB */
     private fun sendSyncCommand() {
         // 送出查詢指令
-        TelnetClient.getClient().sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 

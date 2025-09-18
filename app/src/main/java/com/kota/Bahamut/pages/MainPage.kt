@@ -49,32 +49,32 @@ class MainPage : TelnetPage() {
         this@MainPage.navigationController!!.pushViewController(
             PageContainer.getInstance().getClassPage()
         )
-        TelnetClient.getClient().sendStringToServerInBackground("b")
+        TelnetClient.client!!.sendStringToServerInBackground("b")
     }
     var classListener: View.OnClickListener = View.OnClickListener { v: View? ->
         PageContainer.getInstance().pushClassPage("Class", "分組討論區")
         this@MainPage.navigationController!!.pushViewController(
             PageContainer.getInstance().getClassPage()
         )
-        TelnetClient.getClient().sendStringToServerInBackground("c")
+        TelnetClient.client!!.sendStringToServerInBackground("c")
     }
     var favoriteListener: View.OnClickListener = View.OnClickListener { v: View? ->
         PageContainer.getInstance().pushClassPage("Favorite", "我的最愛")
         this@MainPage.navigationController!!.pushViewController(
             PageContainer.getInstance().getClassPage()
         )
-        TelnetClient.getClient().sendStringToServerInBackground("f")
+        TelnetClient.client!!.sendStringToServerInBackground("f")
     }
     var _frame_buffer: TelnetFrame? = null
     var goodbyeDialog: ASDialog? = null
     var logoutListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.getClient().sendStringToServerInBackground("g")
+        TelnetClient.client!!.sendStringToServerInBackground("g")
     }
     var mailListener: View.OnClickListener = View.OnClickListener { v: View? ->
         this@MainPage.navigationController!!.pushViewController(
             PageContainer.getInstance().getMailBoxPage()
         )
-        TelnetClient.getClient().sendStringToServerInBackground("m\nr")
+        TelnetClient.client!!.sendStringToServerInBackground("m\nr")
     }
     var saveHotMessageDialog: ASDialog? = null
     var systemSettingListener: View.OnClickListener = View.OnClickListener { v: View? ->
@@ -87,7 +87,7 @@ class MainPage : TelnetPage() {
         var isShowHeroStep = getShowHeroStep()
         isShowHeroStep = !isShowHeroStep
         setShowHeroStep(isShowHeroStep)
-        mainLayout!!.findViewById<View?>(R.id.Main_Block_HeroStepList)
+        mainLayout!!.findViewById<View>(R.id.Main_Block_HeroStepList)
             .setVisibility(if (isShowHeroStep) View.VISIBLE else View.GONE)
     }
 
@@ -108,16 +108,16 @@ class MainPage : TelnetPage() {
 
     public override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
-        mainLayout!!.findViewById<View?>(R.id.Main_BoardsButton)
+        mainLayout!!.findViewById<View>(R.id.Main_BoardsButton)
             .setOnClickListener(this.boardsListener)
-        mainLayout!!.findViewById<View?>(R.id.Main_ClassButton)
+        mainLayout!!.findViewById<View>(R.id.Main_ClassButton)
             .setOnClickListener(this.classListener)
-        mainLayout!!.findViewById<View?>(R.id.Main_FavoriteButton)
+        mainLayout!!.findViewById<View>(R.id.Main_FavoriteButton)
             .setOnClickListener(this.favoriteListener)
-        mainLayout!!.findViewById<View?>(R.id.Main_LogoutButton)
+        mainLayout!!.findViewById<View>(R.id.Main_LogoutButton)
             .setOnClickListener(this.logoutListener)
-        mainLayout!!.findViewById<View?>(R.id.Main_MailButton).setOnClickListener(this.mailListener)
-        mainLayout!!.findViewById<View?>(R.id.Main_SystemSettingsButton)
+        mainLayout!!.findViewById<View>(R.id.Main_MailButton).setOnClickListener(this.mailListener)
+        mainLayout!!.findViewById<View>(R.id.Main_SystemSettingsButton)
             .setOnClickListener(this.systemSettingListener)
         val mainOnlinePeople = mainLayout!!.findViewById<TextView>(R.id.Main_OnlinePeople)
         mainOnlinePeople.setText(onlinePeople) // 線上人數
@@ -135,15 +135,15 @@ class MainPage : TelnetPage() {
             setShowHeroStep(false)
         }
         val isShowHeroStep = getShowHeroStep()
-        mainLayout!!.findViewById<View?>(R.id.Main_Block_HeroStepList)
+        mainLayout!!.findViewById<View>(R.id.Main_Block_HeroStepList)
             .setVisibility(if (isShowHeroStep) View.VISIBLE else View.GONE)
-        mainLayout!!.findViewById<View?>(R.id.Main_HeroStepButton)
+        mainLayout!!.findViewById<View>(R.id.Main_HeroStepButton)
             .setOnClickListener(this.showHeroStepListener)
 
         // 顯示呼叫器
         val txtBBCall = mainLayout!!.findViewById<TextView>(R.id.Main_BBCall)
         txtBBCall.setText(bbCallStatus)
-        mainLayout!!.findViewById<View?>(R.id.Main_BBCall_Layout)
+        mainLayout!!.findViewById<View>(R.id.Main_BBCall_Layout)
             .setOnClickListener(showMessageMainListener)
 
         // 替換外觀
@@ -158,7 +158,7 @@ class MainPage : TelnetPage() {
                 public override fun run() {
                     showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat))
                     // 進入布告討論區
-                    mainLayout!!.findViewById<View?>(R.id.Main_BoardsButton).performClick()
+                    mainLayout!!.findViewById<View>(R.id.Main_BoardsButton).performClick()
                 }
             }.postDelayed(300)
         }
@@ -212,22 +212,22 @@ class MainPage : TelnetPage() {
                 .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
                     this@MainPage.saveHotMessageDialog = null
                     when (index) {
-                        0 -> TelnetClient.getClient().sendStringToServerInBackground("M")
-                        1 -> TelnetClient.getClient().sendStringToServerInBackground("K")
+                        0 -> TelnetClient.client!!.sendStringToServerInBackground("M")
+                        1 -> TelnetClient.client!!.sendStringToServerInBackground("K")
                         2 -> {
-                            TelnetClient.getClient().sendStringToServerInBackground("C")
+                            TelnetClient.client!!.sendStringToServerInBackground("C")
                             MessageDatabase(context).use { db ->
                                 db.clearDb()
                             }
                         }
 
-                        else -> TelnetClient.getClient().sendStringToServerInBackground("K")
+                        else -> TelnetClient.client!!.sendStringToServerInBackground("K")
                     }
                 })
             this.saveHotMessageDialog!!.setOnDismissListener(DialogInterface.OnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.saveHotMessageDialog != null) {
-                    TelnetClient.getClient().sendStringToServerInBackground("K")
+                    TelnetClient.client!!.sendStringToServerInBackground("K")
                 }
             })
             this.saveHotMessageDialog!!.show()
@@ -247,16 +247,16 @@ class MainPage : TelnetPage() {
                     this@MainPage.goodbyeDialog = null
                     when (index) {
                         2 ->  // 確定
-                            TelnetClient.getClient().sendStringToServerInBackground("G")
+                            TelnetClient.client!!.sendStringToServerInBackground("G")
 
                         1 -> { // 勇者足跡
-                            TelnetClient.getClient().sendStringToServerInBackground("N")
+                            TelnetClient.client!!.sendStringToServerInBackground("N")
                             val dialogHeroStep = DialogHeroStep()
                             dialogHeroStep.show()
                         }
 
                         0 ->  // 取消
-                            TelnetClient.getClient().sendStringToServerInBackground("Q")
+                            TelnetClient.client!!.sendStringToServerInBackground("Q")
 
                         else -> {}
                     }
@@ -265,7 +265,7 @@ class MainPage : TelnetPage() {
             this.goodbyeDialog!!.setOnDismissListener(DialogInterface.OnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.goodbyeDialog != null) {
-                    TelnetClient.getClient().sendStringToServerInBackground("G")
+                    TelnetClient.client!!.sendStringToServerInBackground("G")
                 }
             })
         }

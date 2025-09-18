@@ -86,7 +86,7 @@ object ASWindowStateHandler {
             val window = activity!!.window
             window.decorView.getWindowVisibleDisplayFrame(rect)
             statusBarHeight = rect.top
-            val contentView = window.findViewById<View?>(id.content)
+            val contentView = window.findViewById<View>(id.content)
             val i = contentView?.top ?: 0
             if (i > 0) titleBarHeight = i - statusBarHeight
             contentViewHeight = screenHeightPx - titleBarHeight - statusBarHeight

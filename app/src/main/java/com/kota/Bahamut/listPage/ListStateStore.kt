@@ -1,15 +1,15 @@
 package com.kota.Bahamut.listPage
 
 class ListStateStore private constructor() {
-    private val _states: MutableMap<String?, ListState?> = HashMap<Any?, Any?>()
+    private val states: MutableMap<String, ListState> = HashMap()
 
-    fun getState(aBoardName: String?): ListState {
-        val state = this._states.get(aBoardName)
+    fun getState(aBoardName: String): ListState {
+        val state = this.states[aBoardName]
         if (state != null) {
             return state
         }
         val state2 = ListState()
-        this._states.put(aBoardName, state2)
+        this.states.put(aBoardName, state2)
         return state2
     }
 

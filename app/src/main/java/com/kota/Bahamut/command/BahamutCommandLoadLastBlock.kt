@@ -9,50 +9,46 @@ import com.kota.telnet.TelnetOutputBuilder.Companion.create
 open class BahamutCommandLoadLastBlock : TelnetCommand() {
     enum class OperationMode {
         End,
-        Left_Right_End,
-        Home_End,
-        Left_S_End,
+        LeftRightEnd,
+        HomeEnd,
+        LeftSEnd,
         NotAvailable
     }
 
     init {
-        this.Action = BahamutCommandDefs.Companion.LoadLastBlock
+        this.action = BahamutCommandDef.Companion.LOAD_LAST_BLOCK
     }
 
     private fun getLoadLastBlockMode(aListPage: TelnetListPage): OperationMode {
-        when (aListPage.getListType()) {
-            BoardPageAction.LINK_TITLE -> return OperationMode.Left_S_End
+        when (aListPage.listType) {
+            BoardPageAction.LINK_TITLE -> return OperationMode.LeftSEnd
             BoardPageAction.SEARCH, BoardPageAction.ESSENCE -> {
-                if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {
+                if (aListPage.selectedIndex != aListPage.itemSize) {
                     return OperationMode.End
                 }
-                if (aListPage.getSelectedIndex() > 1) {
-                    return OperationMode.Home_End
+                if (aListPage.selectedIndex > 1) {
+                    return OperationMode.HomeEnd
                 }
                 return OperationMode.NotAvailable
             }
 
             else -> {
                 // 目前的文章index != 所有文章
-                if (aListPage.getSelectedIndex() != aListPage.getItemSize()) {
+                if (aListPage.selectedIndex != aListPage.itemSize) {
                     return OperationMode.End
                 }
                 // 只有一篇 看板/文章
-                if (aListPage.getItemSize() == 1) {
-                    return OperationMode.Left_Right_End
+                if (aListPage.itemSize == 1) {
+                    return OperationMode.LeftRightEnd
                 }
-                return OperationMode.Home_End
+                return OperationMode.HomeEnd
             }
         }
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (aListPage == null) {
-            setDone(true)
-            return
-        }
-        when (getLoadLastBlockMode(aListPage)) {
-            OperationMode.Left_Right_End -> {
+    override fun execute(telnetListPage: TelnetListPage) {
+        when (getLoadLastBlockMode(telnetListPage)) {
+            OperationMode.LeftRightEnd -> {
                 create()
                     .pushKey(TelnetKeyboard.LEFT_ARROW)
                     .pushKey(TelnetKeyboard.RIGHT_ARROW)
@@ -60,14 +56,14 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
                 return
             }
 
-            OperationMode.Home_End -> {
+            OperationMode.HomeEnd -> {
                 create()
                     .pushKey(TelnetKeyboard.HOME)
                     .pushKey(TelnetKeyboard.END).sendToServer()
                 return
             }
 
-            OperationMode.Left_S_End -> {
+            OperationMode.LeftSEnd -> {
                 create()
                     .pushKey(TelnetKeyboard.LEFT_ARROW)
                     .pushKey(TelnetKeyboard.BACK_ONE_CHAR)
@@ -81,16 +77,23 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
                 return
             }
 
-            else -> setDone(true)
+            else -> isDone = true
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock) {
-        if (aListPage.getItemSize() > aPageData.maximumItemNumber) {
-            aListPage.setItemSize(0)
+    override fun executeFinished(
+        telnetListPage: TelnetListPage?,
+        telnetListPageBlock: TelnetListPageBlock?
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    open fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock) {
+        if (aListPage.itemSize > aPageData.maximumItemNumber) {
+            aListPage.itemSize = 0
             aListPage.cleanAllItem()
         }
-        setDone(true)
+        isDone = true
     }
 
     override fun toString(): String {

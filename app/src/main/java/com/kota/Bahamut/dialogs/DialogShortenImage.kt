@@ -168,8 +168,8 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                             outputParam = sampleTextView!!.text.toString()
                             sendButton!!.isEnabled = true
                             transferButton!!.isEnabled = false
-                            var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
-                            UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+                            var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
+                            UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
                         }
                     }.runInMainThread()
                 } else {
@@ -288,7 +288,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     videoView.requestFocus()
                     transferButton!!.performClick()
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Log.e("PhotoPicker", "Error loading image/video")
             }
         } else {
@@ -358,13 +358,13 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
     private fun postUrl(str:String) {
         // 最上層是 發文 或 看板
-        val topPage = ASNavigationController.getCurrentController().topController
-        if (topPage.javaClass == PostArticlePage::class.java) {
-            val aPage = PageContainer.getInstance().postArticlePage
+        val topPage = ASNavigationController.currentController!!.topController
+        if ((topPage as Any).javaClass == PostArticlePage::class.java) {
+            val aPage = PageContainer.instance!!.postArticlePage
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.getInstance().messageSub
-            aPage.insertString(str)
+            val aPage = PageContainer.instance!!.messageSub
+            aPage!!.insertString(str)
         }
     }
 

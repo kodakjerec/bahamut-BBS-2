@@ -7,76 +7,76 @@ import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 
-class BahamutCommandTheSameTitleTop(articleIndex: Int) : TelnetCommand() {
-    var _article_index: Int
+class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
+    var articleIndex: Int
 
     init {
-        Action = BahamutCommandDefs.Companion.LoadForwardSameTitleItem
-        _article_index = articleIndex
+        action = BahamutCommandDef.Companion.LOAD_FORWARD_SAME_ARTICLE
+        articleIndex = fromArticleIndex
     }
 
-    override fun execute(aListPage: TelnetListPage) {
-        if (aListPage.getListType() > 0) {
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (telnetListPage.listType > 0) {
             // 找出沒被block的最小index
             val miniumAvailableIndex = 1
-            if (_article_index == miniumAvailableIndex) {
+            if (articleIndex == miniumAvailableIndex) {
                 object : ASRunner() {
-                    public override fun run() {
+                    override fun run() {
                         showShortToast("找沒有了耶...:(")
-                        aListPage.onLoadItemFinished()
+                        telnetListPage.onLoadItemFinished()
                     }
                 }.runInMainThread()
-                setDone(true)
+                isDone = true
             } else {
                 create()
                     .pushString(miniumAvailableIndex.toString() + "\n")
                     .sendToServer()
             }
-        } else if (_article_index > 0) {
+        } else if (articleIndex > 0) {
             create()
-                .pushString(_article_index.toString() + "\n\\")
+                .pushString(articleIndex.toString() + "\n\\")
                 .sendToServer()
         } else {
-            setDone(true)
+            isDone = true
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock) {
-        if (aPageData.selectedItem.isDeleted || aListPage.isItemBlocked(aPageData.selectedItem)) {
-            if (_article_index == aPageData.selectedItemNumber) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        if (telnetListPageBlock.selectedItem!!.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
+            if (articleIndex == telnetListPageBlock.selectedItemNumber) {
                 object : ASRunner() {
-                    public override fun run() {
-                        aListPage.onLoadItemFinished()
+                    override fun run() {
+                        telnetListPage.onLoadItemFinished()
                     }
                 }.runInMainThread()
-                setDone(true)
+                isDone = true
             } else {
-//                _article_index = aPageData.selectedItemNumber;
+//                articleIndex = aPageData.selectedItemNumber;
 
                 create()
                     .pushKey(TelnetKeyboard.DOWN_ARROW)
                     .sendToServer()
-                setDone(false)
+                isDone = false
             }
-        } else if (aListPage.isItemLoadingByNumber(aPageData.selectedItemNumber)) {
+        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock.selectedItemNumber)) {
             object : ASRunner() {
-                public override fun run() {
+                override fun run() {
                     showShortToast("找沒有了耶...:(")
-                    aListPage.onLoadItemFinished()
+                    telnetListPage.onLoadItemFinished()
                 }
             }.runInMainThread()
-            setDone(true)
-        } else if (!aListPage.isEnabled(aPageData.selectedItemNumber - 1)) {
+            isDone = true
+        } else if (!telnetListPage.isEnabled(telnetListPageBlock.selectedItemNumber - 1)) {
             showShortToast("上一篇不可使用")
-            aListPage.onLoadItemFinished()
-            setDone(true)
+            telnetListPage.onLoadItemFinished()
+            isDone = true
         } else {
-            aListPage.loadItemAtNumber(aPageData.selectedItemNumber)
-            setDone(true)
+            telnetListPage.loadItemAtNumber(telnetListPageBlock.selectedItemNumber)
+            isDone = true
         }
     }
 
     override fun toString(): String {
-        return "[BahamutCommandTheSameTitleTop][articleIndex=" + _article_index + "]"
+        return "[BahamutCommandTheSameTitleTop][articleIndex=$articleIndex]"
     }
 }

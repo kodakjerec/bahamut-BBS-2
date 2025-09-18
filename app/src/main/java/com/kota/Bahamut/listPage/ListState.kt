@@ -2,12 +2,12 @@ package com.kota.Bahamut.listPage
 
 class ListState {
     @JvmField
-    var Position: Int = -1
+    var position: Int = -1
     @JvmField
-    var Top: Int = -1
+    var top: Int = -1
 
     fun clear() {
-        this.Top = -1
-        this.Position = -1
+        this.top = -1
+        this.position = -1
     }
 }

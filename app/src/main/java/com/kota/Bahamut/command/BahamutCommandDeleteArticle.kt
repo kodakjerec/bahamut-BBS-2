@@ -4,22 +4,22 @@ import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.TelnetClient
 
-class BahamutCommandDeleteArticle(var _article_index: Int) : TelnetCommand() {
+class BahamutCommandDeleteArticle(var articleIndex: Int) : TelnetCommand() {
     init {
-        Action = BahamutCommandDefs.Companion.DeleteArticle
+        action = BahamutCommandDef.Companion.DELETE_ARTICLE
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (_article_index > 0) {
-            TelnetClient.getClient().sendStringToServer(_article_index.toString() + "\ndy")
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (articleIndex > 0) {
+            TelnetClient.client!!.sendStringToServer("$articleIndex\ndy")
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[DeleteArticle][articleIndex=" + _article_index + "]"
+        return "[DeleteArticle][articleIndex=$articleIndex]"
     }
 }

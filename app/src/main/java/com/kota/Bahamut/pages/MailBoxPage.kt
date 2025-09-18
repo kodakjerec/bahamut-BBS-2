@@ -19,8 +19,8 @@ import com.kota.Bahamut.command.BahamutCommandSearchArticle
 import com.kota.Bahamut.command.BahamutCommandSendMail
 import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.dialogs.DialogSearchArticleListener
-import com.kota.Bahamut.dialogs.Dialog_SelectArticle
-import com.kota.Bahamut.dialogs.Dialog_SelectArticle_Listener
+import com.kota.Bahamut.dialogs.DialogSelectArticle
+import com.kota.Bahamut.dialogs.DialogSelectArticleListener
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
@@ -39,7 +39,7 @@ import com.kota.telnetUI.TelnetHeaderItemView
 import java.util.Vector
 
 class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
-    Dialog_SelectArticle_Listener, SendMailPage_Listener, View.OnClickListener,
+    DialogSelectArticleListener, SendMailPage_Listener, View.OnClickListener,
     OnLongClickListener {
     var _back_button: Button? = null
     var _header_view: TelnetHeaderItemView? = null
@@ -121,7 +121,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     }
 
     fun showSelectArticleDialog() {
-        val dialog = Dialog_SelectArticle()
+        val dialog = DialogSelectArticle()
         dialog.setListener(this)
         dialog.show()
     }

@@ -38,7 +38,7 @@ class PageContainer private constructor() {
     private var userInfoPage: UserInfoPage? = null
     private var userConfigPage: UserConfigPage? = null
     private var messageMain: MessageMain? = null
-    private var messageSub: MessageSub? = null
+    var messageSub: MessageSub? = null
 
     val startPage: StartPage
         get() {

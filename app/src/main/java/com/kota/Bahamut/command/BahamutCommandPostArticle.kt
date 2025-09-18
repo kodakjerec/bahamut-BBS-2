@@ -9,7 +9,7 @@ import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import kotlin.math.ceil
 
 class BahamutCommandPostArticle(
-    aListPage: TelnetListPage?,
+    telnetListPage: TelnetListPage?,
     title: String,
     content: String,
     aTarget: String?,
@@ -17,42 +17,40 @@ class BahamutCommandPostArticle(
     aSign: String?,
     isRecoverPost: Boolean
 ) : TelnetCommand() {
-    var _article_number: String?
-    var _content: String
-    var _list_page: TelnetListPage?
-    var _sign: String?
-    var _target: String?
-    var _title: String?
+    var articleNumber: String?
+    var myContent: String
+    var listPage: TelnetListPage?
+    var sign: String?
+    var target: String?
+    // 標題: 第80個字元如果是雙字元則截斷
+    var title: String? = judgeDoubleWord(title, TelnetFrame.Companion.DEFAULT_COLUMN - 9).split("\n".toRegex())
+        .dropLastWhile { it.isEmpty() }.toTypedArray()[0]
 
-    var _isRecoverPost: Boolean
+    var isRecoverPost: Boolean
 
     init {
-        // 標題: 第80個字元如果是雙字元則截斷
-        _title =
-            judgeDoubleWord(title, TelnetFrame.Companion.DEFAULT_COLUMN - 9).split("\n".toRegex())
-                .dropLastWhile { it.isEmpty() }.toTypedArray()[0]
         // 內文: 一行超過80個字元預先截斷, 第80個字元如果是雙字元則先截斷, 這個雙字元歸類到下一行
-        _content = judgeDoubleWord(content, TelnetFrame.Companion.DEFAULT_COLUMN - 2)
-        Action = BahamutCommandDefs.Companion.PostArticle
-        _target = aTarget
-        _article_number = aArticleNumber
-        _list_page = aListPage
-        _sign = aSign
-        if (_sign == null) {
-            _sign = ""
+        myContent = judgeDoubleWord(content, TelnetFrame.Companion.DEFAULT_COLUMN - 2)
+        action = BahamutCommandDef.Companion.POST_ARTICLE
+        target = aTarget
+        articleNumber = aArticleNumber
+        listPage = telnetListPage
+        sign = aSign
+        if (sign == null) {
+            sign = ""
         }
-        _isRecoverPost = isRecoverPost
+        this@BahamutCommandPostArticle.isRecoverPost = isRecoverPost
     }
 
     // com.kota.Bahamut.Command.TelnetCommand
-    override fun execute(aListPage: TelnetListPage?) {
+    override fun execute(telnetListPage: TelnetListPage) {
         var buffer = create()
         // Reply
-        if (_article_number != null && _target != null) {
-            if (_isRecoverPost) {
+        if (articleNumber != null && target != null) {
+            if (isRecoverPost) {
                 // 砍掉所有內文重新貼上
                 val pageUpCounts =
-                    ceil(_content.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
+                    ceil(myContent.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
                         .toTypedArray().size.toDouble() / 23).toInt() + 1
                 for (i in 0..<pageUpCounts) {
                     buffer.pushKey(TelnetKeyboard.PAGE_UP) // ctrl+B, pageUp
@@ -66,7 +64,7 @@ class BahamutCommandPostArticle(
                 // 重新貼文
                 buffer = create()
                 // 將內文依照 *[ 切換成多段
-                val outputs: MutableList<String> = convertContentToStringList(_content)
+                val outputs: MutableList<String> = convertContentToStringList(myContent)
                 // 貼入內文
                 for (output in outputs) {
                     if (output == "*")  // 跳脫字元
@@ -74,26 +72,26 @@ class BahamutCommandPostArticle(
                     else buffer.pushString(output)
                 }
             } else {
-                buffer.pushString(_article_number + "\n") // 指定文章編號, 按下Enter
+                buffer.pushString(articleNumber + "\n") // 指定文章編號, 按下Enter
                 buffer.pushString("y") // y-回應
-                buffer.pushString(_target + "\n") // 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (Q)取消？[F]
-                if (_target != null && (_target == "F" || _target == "B")) {
+                buffer.pushString(target + "\n") // 回應至 (F)看板 (M)作者信箱 (B)二者皆是 (Q)取消？[F]
+                if (target != null && (target == "F" || target == "B")) {
                     buffer.pushString("\n") // 類別: a)問題 b)情報 c)心得 d)討論 e)攻略 f)秘技 g)閒聊 h)其它 :
                 }
-                if (_title != null) {
+                if (title != null) {
                     buffer.pushKey(TelnetKeyboard.CTRL_Y) // ctrl + Y
-                    buffer.pushString(_title + "\n")
+                    buffer.pushString(title + "\n")
                     buffer.pushString("N\n") // 請問要引用原文嗎(Y/N/All/Repost/1-9)？[Y]
-                    buffer.pushString(_sign + "\n") // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：
+                    buffer.pushString(sign + "\n") // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：
                 } else {
                     buffer.pushString("\n")
                     buffer.pushString("N\n") // 請問要引用原文嗎(Y/N/All/Repost/1-9)？[Y]
-                    buffer.pushString(_sign + "\n") // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：
+                    buffer.pushString(sign + "\n") // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：
                 }
 
                 // 重新貼文
                 // 將內文依照 *[ 切換成多段
-                val outputs: MutableList<String> = convertContentToStringList(_content)
+                val outputs: MutableList<String> = convertContentToStringList(myContent)
                 // 貼入內文
                 for (output in outputs) {
                     if (output == "*")  // 跳脫字元
@@ -103,7 +101,7 @@ class BahamutCommandPostArticle(
             }
             buffer.pushKey(TelnetKeyboard.CTRL_X) // ctrl+x 存檔
             buffer.pushString("s\n") // S-存檔
-            if (_target == "M") {
+            if (target == "M") {
                 buffer.pushString("Y\n\n") // 是否自存底稿(Y/N)？[N]
             }
             buffer.sendToServer()
@@ -111,12 +109,12 @@ class BahamutCommandPostArticle(
             // New
             buffer.pushKey(TelnetKeyboard.CTRL_P) // Ctrl+P
             buffer.pushString("\n")
-            buffer.pushString(_title!!)
-            buffer.pushString("\n" + _sign + "\n")
+            buffer.pushString(title!!)
+            buffer.pushString("\n" + sign + "\n")
 
             // 貼文
             // 將內文依照 *[ 切換成多段
-            val outputs: MutableList<String> = convertContentToStringList(_content)
+            val outputs: MutableList<String> = convertContentToStringList(myContent)
             // 貼入內文
             for (output in outputs) {
                 if (output == "*")  // 跳脫字元
@@ -131,29 +129,32 @@ class BahamutCommandPostArticle(
     }
 
     // com.kota.Bahamut.Command.TelnetCommand
-    override fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock?) {
-        aListPage.pushPreloadCommand(0)
-        setDone(true)
+    override fun executeFinished(
+        telnetListPage: TelnetListPage?,
+        telnetListPageBlock: TelnetListPageBlock?
+    ) {
+        telnetListPage?.pushPreloadCommand(0)
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[PostArticle][title=" + _title + " content" + _content + "]"
+        return "[PostArticle][title=$title content$myContent]"
     }
 
     companion object {
-        fun convertContentToStringList(_content: String): MutableList<String> {
+        fun convertContentToStringList(content: String): MutableList<String> {
             // 將內文依照 *[ 切換成多段
-            var _content = _content
-            val outputs: MutableList<String> = ArrayList<String>()
+            var myContent = content
+            val outputs: MutableList<String> = ArrayList()
             var endIndex: Int
             while (true) {
-                endIndex = _content.indexOf("*[")
+                endIndex = myContent.indexOf("*[")
                 if (endIndex > -1) {
-                    outputs.add(_content.substring(0, endIndex))
+                    outputs.add(myContent.substring(0, endIndex))
                     outputs.add("*") // 標記起來之後用來替換字元
-                    _content = _content.substring(endIndex + 1)
+                    myContent = myContent.substring(endIndex + 1)
                 } else {
-                    outputs.add(_content)
+                    outputs.add(myContent)
                     break
                 }
             }

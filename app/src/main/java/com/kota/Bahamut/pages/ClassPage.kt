@@ -15,8 +15,8 @@ import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessin
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.dialogs.Dialog_SearchBoard
-import com.kota.Bahamut.dialogs.Dialog_SearchBoard_Listener
+import com.kota.Bahamut.dialogs.DialogSearchBoard
+import com.kota.Bahamut.dialogs.DialogSearchBoardListener
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
@@ -39,7 +39,7 @@ import com.kota.telnetUI.TelnetHeaderItemView
 import java.util.Timer
 import java.util.TimerTask
 
-class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Listener {
+class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
     var mainLayout: RelativeLayout? = null
     private var _title: String? = ""
 
@@ -55,11 +55,11 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
         val list_view = mainLayout!!.findViewById<ListView>(R.id.ClassPage_listView)
-        list_view.setEmptyView(mainLayout!!.findViewById<View?>(R.id.ClassPage_listEmptyView))
+        list_view.setEmptyView(mainLayout!!.findViewById<View>(R.id.ClassPage_listEmptyView))
         listView = list_view
-        mainLayout!!.findViewById<View?>(R.id.ClassPage_SearchButton).setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
-        mainLayout!!.findViewById<View?>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
+        mainLayout!!.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
@@ -71,7 +71,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
             val timer = Timer()
             val task1: TimerTask = object : TimerTask() {
                 override fun run() {
-                    TelnetClient.getClient().sendStringToServerInBackground("sChat")
+                    TelnetClient.client!!.sendStringToServerInBackground("sChat")
                 }
             }
             timer.schedule(task1, 300)
@@ -103,7 +103,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
                 _detail_2.bringToFront()
                 _detail_2.setText(lastVisitBoard)
                 _detail_2.setOnClickListener(View.OnClickListener { v: View? ->
-                    TelnetClient.getClient().sendStringToServer("s" + finalLastVisitBoard)
+                    TelnetClient.client!!.sendStringToServer("s" + finalLastVisitBoard)
                 })
             }
             val _detail = "看板列表"
@@ -115,7 +115,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
         clear()
         PageContainer.getInstance().popClassPage()
         navigationController!!.popViewController()
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -125,7 +125,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
     }
 
     private fun showSearchBoardDialog() {
-        val dialog = Dialog_SearchBoard()
+        val dialog = DialogSearchBoard()
         dialog.setListener(this)
         dialog.show()
     }
@@ -158,7 +158,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
                 .addButton("確定")
                 .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index1: Int ->
                     if (index1 == 1) {
-                        TelnetClient.getClient()
+                        TelnetClient.client!!
                             .sendStringToServerInBackground(item_index.toString() + "\nd")
                         this@ClassPage.loadLastBlock()
                     }
@@ -172,7 +172,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
                 .addButton("確定")
                 .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index12: Int ->
                     if (index12 == 1) {
-                        TelnetClient.getClient()
+                        TelnetClient.client!!
                             .sendStringToServerInBackground(item_index2.toString() + "\na")
                     }
                 }).show()
@@ -201,7 +201,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }
-                    TelnetClient.getClient().sendStringToServerInBackground("s" + board)
+                    TelnetClient.client!!.sendStringToServerInBackground("s" + board)
 
                     SearchBoardHandler.instance.clear()
                 }
@@ -227,7 +227,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, Dialog_SearchBoard_Lis
                         .sendToServerInBackground()
                     return@setListener
                 }
-                TelnetClient.getClient().sendStringToServerInBackground("s" + boardName)
+                TelnetClient.client!!.sendStringToServerInBackground("s" + boardName)
                 SearchBoardHandler.instance.clear()
             }).scheduleDismissOnPageDisappear(this).show()
     }

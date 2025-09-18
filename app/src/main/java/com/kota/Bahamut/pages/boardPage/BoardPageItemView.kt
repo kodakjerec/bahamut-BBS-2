@@ -38,7 +38,7 @@ class BoardPageItemView : LinearLayout {
     fun setItem(aItem: BoardPageItem?) {
         if (aItem != null) {
             setTitle(aItem.Title)
-            setNumber(aItem.Number)
+            setNumber(aItem.itemNumber)
             setDate(aItem.Date)
             this.author = aItem.Author
             setMark(aItem.isMarked)
@@ -64,7 +64,7 @@ class BoardPageItemView : LinearLayout {
         _gy_label = _content_view!!.findViewById<TextView?>(R.id.BoardPage_ItemView_GY)
         _mark_label = _content_view!!.findViewById<TextView?>(R.id.BoardPage_ItemView_mark)
         _author_label = _content_view!!.findViewById<TextView?>(R.id.BoardPage_ItemView_Author)
-        _divider_bottom = _content_view!!.findViewById<View?>(R.id.BoardPage_ItemView_DividerBottom)
+        _divider_bottom = _content_view!!.findViewById<View>(R.id.BoardPage_ItemView_DividerBottom)
     }
 
     fun setDividerBottomVisible(visible: Boolean) {

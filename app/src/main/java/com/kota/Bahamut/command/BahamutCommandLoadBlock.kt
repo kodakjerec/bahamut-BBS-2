@@ -6,32 +6,31 @@ import com.kota.telnet.logic.ItemUtils.getBlock
 import com.kota.telnet.TelnetClient
 
 class BahamutCommandLoadBlock(aBlock: Int) : TelnetCommand() {
-    var _block: Int
+    var block: Int
 
     init {
-        this.Action = BahamutCommandDefs.Companion.LoadBlock
-        this._block = aBlock
+        this.action = BahamutCommandDef.Companion.LOAD_BLOCK
+        this.block = aBlock
     }
 
     fun containsArticle(articleIndex: Int): Boolean {
-        return this._block == getBlock(articleIndex)
+        return this.block == getBlock(articleIndex)
     }
 
-    override fun isOperationCommand(): Boolean {
-        return false
-    }
+    override val isOperationCommand: Boolean
+        get() = false
 
-    override fun execute(aListPage: TelnetListPage?) {
-        if (this._block >= 0) {
-            TelnetClient.getClient().sendStringToServer(((this._block * 20) + 1).toString())
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (this.block >= 0) {
+            TelnetClient.client!!.sendStringToServer(((this.block * 20) + 1).toString())
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
-        return "[LoadBlock][block=" + this._block + " targetIndex=" + ((this._block * 20) + 1) + "]"
+        return "[LoadBlock][block=" + this.block + " targetIndex=" + ((this.block * 20) + 1) + "]"
     }
 }

@@ -12,7 +12,7 @@ class TelnetOutputBuilder {
 
     @JvmOverloads
     fun sendToServerInBackground(channel: Int = 0) {
-        TelnetClient.Companion.client?.sendDataToServerInBackground(build(), channel)
+        TelnetClient.client!!.sendDataToServerInBackground(build(), channel)
     }
 
     fun sendToServer() {

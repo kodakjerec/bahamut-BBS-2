@@ -28,7 +28,7 @@ class MailBoxPageHandler private constructor() {
                     board_data.minimumItemNumber = article_index
                 }
                 board_data.maximumItemNumber = article_index
-                item.Number = article_index
+                item.itemNumber = article_index
                 item.Date = date
                 item.Author = author
                 item.isRead = info.toInt() != 43 && info.toInt() != 77

@@ -7,71 +7,71 @@ import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 
-class BahamutCommandTheSameTitleUp(articleIndex: Int) : TelnetCommand() {
-    var _article_index: Int
+class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
+    var articleIndex: Int
 
     init {
-        this.Action = BahamutCommandDefs.Companion.LoadForwardSameTitleItem
-        this._article_index = articleIndex
+        action = BahamutCommandDef.Companion.LOAD_FORWARD_SAME_ARTICLE
+        articleIndex = fromArticleIndex
     }
 
-    override fun execute(aListPage: TelnetListPage) {
-        if (aListPage.getListType() > 0) {
-            if (this._article_index == 1) {
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (telnetListPage.listType > 0) {
+            if (this.articleIndex == 1) {
                 object : ASRunner() {
-                    public override fun run() {
+                    override fun run() {
                         showShortToast("無上一篇同主題文章")
-                        aListPage.onLoadItemFinished()
+                        telnetListPage.onLoadItemFinished()
                     }
                 }.runInMainThread()
-                setDone(true)
+                isDone = true
             } else {
                 create()
-                    .pushString(this._article_index.toString() + "\n")
+                    .pushString(this.articleIndex.toString() + "\n")
                     .pushKey(TelnetKeyboard.UP_ARROW).sendToServer()
             }
-        } else if (this._article_index > 0) {
+        } else if (this.articleIndex > 0) {
             create()
-                .pushString(this._article_index.toString() + "\n[")
+                .pushString(this.articleIndex.toString() + "\n[")
                 .sendToServer()
         } else {
-            setDone(true)
+            isDone = true
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock) {
-        if (aPageData.selectedItem.isDeleted || aListPage.isItemBlocked(aPageData.selectedItem)) {
-            if (_article_index == aPageData.selectedItemNumber) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        if (telnetListPageBlock.selectedItem!!.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
+            if (articleIndex == telnetListPageBlock.selectedItemNumber) {
                 object : ASRunner() {
-                    public override fun run() {
+                    override fun run() {
                         showShortToast("無上一篇同主題文章")
-                        aListPage.onLoadItemFinished()
+                        telnetListPage.onLoadItemFinished()
                     }
                 }.runInMainThread()
-                setDone(true)
+                isDone = true
             } else {
-                this._article_index = aPageData.selectedItemNumber
-                setDone(false)
+                articleIndex = telnetListPageBlock.selectedItemNumber
+                isDone = false
             }
-        } else if (aListPage.isItemLoadingByNumber(aPageData.selectedItemNumber)) {
+        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock.selectedItemNumber)) {
             object : ASRunner() {
-                public override fun run() {
+                override fun run() {
                     showShortToast("無上一篇同主題文章")
-                    aListPage.onLoadItemFinished()
+                    telnetListPage.onLoadItemFinished()
                 }
             }.runInMainThread()
-            setDone(true)
-        } else if (!aListPage.isEnabled(aPageData.selectedItemNumber - 1)) {
+            isDone = true
+        } else if (!telnetListPage.isEnabled(telnetListPageBlock.selectedItemNumber - 1)) {
             showShortToast("上一篇不可使用")
-            aListPage.onLoadItemFinished()
-            setDone(true)
+            telnetListPage.onLoadItemFinished()
+            isDone = true
         } else {
-            aListPage.loadItemAtNumber(aPageData.selectedItemNumber)
-            setDone(true)
+            telnetListPage.loadItemAtNumber(telnetListPageBlock.selectedItemNumber)
+            isDone = true
         }
     }
 
     override fun toString(): String {
-        return "[TheSameTitleUp][articleIndex=" + this._article_index + "]"
+        return "[TheSameTitleUp][articleIndex=" + this.articleIndex + "]"
     }
 }

@@ -2,6 +2,6 @@ package com.kota.Bahamut.listPage
 
 interface PagePreloadCommand {
     companion object {
-        const val LoadLastBlock: Int = 0
+        const val LOAD_LAST_BLOCK: Int = 0
     }
 }

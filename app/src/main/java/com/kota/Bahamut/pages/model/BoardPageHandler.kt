@@ -4,7 +4,6 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.telnet.model.TelnetModel
 import com.kota.telnet.model.TelnetModel.getRowString
 import com.kota.telnet.model.TelnetRow
-import com.kota.telnet.model.TelnetRow.getSpaceString
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetClient.model
 import com.kota.telnet.TelnetUtils
@@ -138,7 +137,7 @@ class BoardPageHandler private constructor() {
                     board_package.minimumItemNumber = article_number
                 }
                 board_package.maximumItemNumber = article_number
-                item.Number = article_number
+                item.itemNumber = article_number
                 item.Date = date
                 item.Author = author
                 item.isRead = info.toInt() != 43 && info.toInt() != 77

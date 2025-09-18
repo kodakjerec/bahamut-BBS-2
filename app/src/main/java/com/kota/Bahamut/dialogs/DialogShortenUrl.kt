@@ -17,27 +17,25 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.UrlDatabase
+import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.dataModels.ShortenUrl
-import com.kota.Bahamut.dataModels.UrlDatabase
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.UserSettings
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
-import java.util.Vector
 
 class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {
-    private lateinit var mainLayout: RelativeLayout
-    private lateinit var editText: EditText
-    private lateinit var sampleTextView: TextView
+    private var mainLayout: RelativeLayout
+    private var editText: EditText
+    private var sampleTextView: TextView
     private var sendButton: Button? = null
     private var outputParam: String = ""
     private lateinit var shortenUrlListener: DialogShortenUrlListener
@@ -46,14 +44,13 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     private var isTransfer: Boolean = true
     private var mOrientationEventListener: OrientationEventListener
 
-    override fun getName(): String {
-        return "BahamutShortenUrlDialog"
-    }
+    override val name: String?
+        get() = "BahamutShortenUrlDialog"
 
     /** 轉檔 */
     private var transferListener = OnClickListener {
-        var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
-        if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
+        var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
+        if (!UserSettings.propertiesVIP && shortenTimes>30) {
             ASToast.showLongToast(getContextString(R.string.vip_only_message))
             return@OnClickListener
         }
@@ -75,11 +72,11 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         val targetUrl = urls[0].url
 
         // 找歷史檔案
-        val historyItem:Vector<ShortenUrl> = urlDatabase.getShortenUrl(targetUrl)
+        val historyItem = urlDatabase.getShortenUrl(targetUrl)
         if (!historyItem.isEmpty()) {
-            val shortUrl = historyItem[0].shortenUrl
-            changeFrontend(shortUrl)
-            UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+            val shortUrl = historyItem[0]!!.shortenUrl
+            changeFrontend(shortUrl!!)
+            UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_url_same_url))
             return@OnClickListener
         }
@@ -98,7 +95,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         ASRunner.runInNewThread {
             try{
                 client.newCall(request).execute().use { response->
-                    val data = response.body!!.string()
+                    val data = response.body.string()
                     val jsonObject = JSONObject(data)
                     val status = jsonObject.optString("res")
                     if (status.isNotEmpty()) {
@@ -110,7 +107,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                             override fun run() {
                                 editText.setText(targetUrl)
                                 changeFrontend(shortUrl)
-                                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+                                UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
                             }
                         }.runInMainThread()
 
@@ -217,7 +214,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
         val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
-        checkbox.isChecked = UserSettings.getShortUrlNonId()
+        checkbox.isChecked = UserSettings.shortUrlNonId
         checkbox.setOnClickListener(changeNonIdListenerForCheckbox)
         mainLayout.findViewById<TextView>(R.id.dialog_shorten_url_non_id_label).setOnClickListener(changeNonIdListenerForLabel)
 
@@ -260,9 +257,9 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         shortenUrlListener = listener
     }
 
-    override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder?) {
-        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView!!.layoutPosition).shortenUrl
-        changeFrontend(shortUrl)
+    override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder) {
+        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView.layoutPosition).shortenUrl
+        changeFrontend(shortUrl!!)
     }
 
     override fun onStart() {
@@ -286,7 +283,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
     /** 去識別化 */
     private fun urlRemoveId() {
-        val filterString = if (UserSettings.getShortUrlNonId()) {
+        val filterString = if (UserSettings.shortUrlNonId) {
             var returnString = editText.text.toString()
             val textView = TextView(context)
             textView.text = returnString
@@ -308,19 +305,13 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                     // www.facebook.com , 只保留 fbid=1234
                     // www.youtube.com , 只保留 v=1234
                     if (splits[0].indexOf("www.youtube.com")>0 || splits[0].indexOf("www.facebook.com")>0) {
-                        var isFirstParam = true
                         val reserveKeys = arrayOf("v","fbid")
                         val params = splits[1].split("&")
                         if (params.isNotEmpty()) {
                             for (param in params) {
                                 val paramPair = param.split("=")
                                 if (reserveKeys.contains(paramPair[0])) {
-                                    if (isFirstParam)
-                                        returnString+= "?$param"
-                                    else {
-                                        returnString += "&$param"
-                                        isFirstParam = false
-                                    }
+                                    returnString+= "?$param"
                                 }
                             }
                         } else {

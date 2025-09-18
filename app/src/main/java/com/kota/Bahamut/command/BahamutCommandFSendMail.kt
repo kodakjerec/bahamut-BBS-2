@@ -11,18 +11,18 @@ import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 
-class BahamutCommandFSendMail(var _receiver: String) : TelnetCommand() {
+class BahamutCommandFSendMail(var receiver: String) : TelnetCommand() {
     init {
-        this.Action = BahamutCommandDefs.Companion.SendMail
+        this.action = BahamutCommandDef.Companion.SEND_MAIL
     }
 
-    override fun execute(telnetListPage: TelnetListPage?) {
-        if (_receiver.length > 0) {
-            TelnetClient.getClient().sendDataToServer(
+    override fun execute(telnetListPage: TelnetListPage) {
+        if (receiver.isNotEmpty()) {
+            TelnetClient.client!!.sendDataToServer(
                 create()
                     .pushString("FA\n")
                     .pushKey(TelnetKeyboard.CTRL_Y)
-                    .pushString(_receiver + "\n")
+                    .pushString(receiver + "\n")
                     .build()
             )
         }
@@ -33,7 +33,7 @@ class BahamutCommandFSendMail(var _receiver: String) : TelnetCommand() {
         telnetListPage: TelnetListPage?,
         telnetListPageBlock: TelnetListPageBlock?
     ) {
-        setDone(true)
+        isDone = true
         dismissProcessingDialog()
         showShortToast(getContextString(R.string.board_page_send_mail_finish))
     }

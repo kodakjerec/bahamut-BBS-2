@@ -6,7 +6,7 @@ import java.net.InetSocketAddress
 import java.nio.ByteBuffer
 import java.nio.channels.SocketChannel
 
-class TelnetDefaultSocketChannel(address: String?, port: Int) : TelnetSocketChannel {
+class TelnetDefaultSocketChannel(address: String, port: Int) : TelnetSocketChannel {
     var socketChannel: SocketChannel = SocketChannel.open(
         InetSocketAddress(
             InetAddress.getByName(address).hostAddress,

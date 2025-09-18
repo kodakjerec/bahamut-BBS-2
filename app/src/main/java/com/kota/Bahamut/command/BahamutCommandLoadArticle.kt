@@ -7,19 +7,19 @@ import com.kota.telnet.TelnetClient
 
 class BahamutCommandLoadArticle(var articleIndex: Int) : TelnetCommand() {
     init {
-        this.Action = BahamutCommandDefs.Companion.LoadArticle
+        this.action = BahamutCommandDef.Companion.LOAD_ARTICLE
     }
 
-    override fun execute(aListPage: TelnetListPage?) {
+    override fun execute(telnetListPage: TelnetListPage) {
         if (this.articleIndex > 0) {
-            val article_number = this.articleIndex.toString()
-            BahamutStateHandler.getInstance().setArticleNumber(article_number)
-            TelnetClient.getClient().sendStringToServerInBackground(article_number + "\n")
+            val articleNumber = this.articleIndex.toString()
+            BahamutStateHandler.getInstance().setArticleNumber(articleNumber)
+            TelnetClient.client!!.sendStringToServerInBackground(articleNumber + "\n")
         }
     }
 
-    override fun executeFinished(aListPage: TelnetListPage?, aPageData: TelnetListPageBlock?) {
-        setDone(true)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+        isDone = true
     }
 
     override fun toString(): String {
