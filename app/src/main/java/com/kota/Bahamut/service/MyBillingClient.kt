@@ -29,9 +29,9 @@ object MyBillingClient {
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_cancel))
+            ASToast.showShortToast(TempSettings.applicationContext?.getString(R.string.billing_page_result_cancel))
         } else {
-            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_error))
+            ASToast.showShortToast(TempSettings.applicationContext?.getString(R.string.billing_page_result_error))
         }
     }
 
@@ -72,7 +72,7 @@ object MyBillingClient {
                     if (!UserSettings.propertiesVIP) {
                         UserSettings.propertiesVIP = true
                     }
-                    ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_success))
+                    ASToast.showShortToast(TempSettings.applicationContext?.getString(R.string.billing_page_result_success))
                     // 將購買結果塞入雲端
                     if (UserSettings.propertiesUsername?.isNotEmpty() == true) {
                         val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
@@ -121,7 +121,7 @@ object MyBillingClient {
                                     MultipartBody.Builder().setType(MultipartBody.FORM)
                                         .addFormDataPart("userId", userId)
                                         .addFormDataPart("buyType", "history")
-                                        .addFormDataPart("qty", record!!.quantity.toString())
+                                        .addFormDataPart("qty", record?.quantity.toString())
                                         .addFormDataPart("purchaseData", record.originalJson)
                                         .build()
                                 val request: Request = Request.Builder()

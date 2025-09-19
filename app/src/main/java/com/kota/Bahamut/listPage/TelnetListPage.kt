@@ -34,19 +34,20 @@ import kotlin.collections.MutableSet
 
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
-    private val _operation_command_stack = Vector<TelnetCommand>()
-    private val _load_command_stack = Stack<TelnetCommand?>()
-    private var _executing_command: TelnetCommand? = null
-    private val _page_preload_command = BooleanArray(1)
-    private val _page_refresh_command = BooleanArray(2)
-    open var listName: String? = null
+    private val operationCommandStack = Vector<TelnetCommand>()
+    private val loadCommandStack = Stack<TelnetCommand?>()
+    private var executingCommand: TelnetCommand? = null
+    private val pagePreloadCommand = BooleanArray(1)
+    private val pageRefreshCommand = BooleanArray(2)
+    open var name: String?
+        get() = "TelnetListPage"
     @JvmField
-    protected var _list_view: ListView? = null
-    private var _list_loaded = false
-    private var _last_load_time: Long = 0
-    private var _last_send_time: Long = 0
-    private var _auto_load_thread: AutoLoadThread? = null
-    private var _list_count = 0
+    protected var listViewWidget: ListView? = null
+    private var isListLoaded = false
+    private var lastLoadTime: Long = 0
+    private var lastSendTime: Long = 0
+    private var autoLoadThread: AutoLoadThread? = null
+    var listCount = 0
     var itemSize: Int = 0
     var selectedIndex: Int = 0
         private set
@@ -55,10 +56,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     var lastLoadItemIndex: Int = 0
         private set
     private var _initialed = false
-    private var _manual_load_page = false
+    private var isManualLoadPending = false
 
     @SuppressLint("UseSparseArrays")
-    private val _block_list: MutableMap<Int?, TelnetListPageBlock?> =
+    private val blockList: MutableMap<Int?, TelnetListPageBlock?> =
         HashMap<Int?, TelnetListPageBlock?>()
     private val mDataSetObservable = DataSetObservable()
 
@@ -92,27 +93,27 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
         // java.lang.Thread, java.lang.Runnable
         override fun run() {
-            var send_command: Boolean
+            var sendCommand: Boolean
             try {
                 sleep(10000L)
                 while (run) {
-                    val current_time = System.currentTimeMillis()
-                    val total_offset = current_time - this@TelnetListPage._last_load_time
-                    val span_offset = current_time - this@TelnetListPage._last_send_time
-                    if (total_offset > 900000) {
-                        send_command = span_offset > 60000
-                    } else if (total_offset > 180000) {
-                        send_command = span_offset > 30000
-                    } else if (total_offset > 10000 && total_offset > span_offset) {
-                        send_command = true
+                    val currentTime = System.currentTimeMillis()
+                    val totalOffset = currentTime - this@TelnetListPage.lastLoadTime
+                    val spanOffset = currentTime - this@TelnetListPage.lastSendTime
+                    sendCommand = if (totalOffset > 900000) {
+                        spanOffset > 60000
+                    } else if (totalOffset > 180000) {
+                        spanOffset > 30000
+                    } else if (totalOffset > 10000 && totalOffset > spanOffset) {
+                        true
                     } else {
-                        send_command = false
+                        false
                     }
-                    if ((send_command || this@TelnetListPage._manual_load_page) && run) {
+                    if ((sendCommand || this@TelnetListPage.isManualLoadPending) && run) {
                         this@TelnetListPage.loadLastBlock(false)
-                        this@TelnetListPage._last_send_time = current_time
+                        this@TelnetListPage.lastSendTime = currentTime
                     }
-                    this@TelnetListPage._manual_load_page = false
+                    this@TelnetListPage.isManualLoadPending = false
                     sleep(1000L)
                 }
             } catch (e: Exception) {
@@ -123,17 +124,16 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setManualLoadPage() {
-        _manual_load_page = true
+        isManualLoadPending = true
     }
 
     // com.kota.TelnetUI.TelnetPage, com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageDidUnload() {
+    override fun onPageDidUnload() {
         stopAutoLoad()
         super.onPageDidUnload()
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageDidRemoveFromNavigationController() {
+    override fun onPageDidRemoveFromNavigationController() {
         _initialed = false
         cleanAllItem()
         stopAutoLoad()
@@ -166,55 +166,49 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageWillAppear() {
+    override fun onPageWillAppear() {
         loadListState()
         startAutoLoad()
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageWillDisappear() {
+    override fun onPageWillDisappear() {
         stopAutoLoad()
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageDidDisappear() {
+    override fun onPageDidDisappear() {
         saveListState()
     }
 
     fun pushRefreshCommand(aCommand: Int) {
-        _page_refresh_command[aCommand] = true
+        pageRefreshCommand[aCommand] = true
     }
 
     fun pushPreloadCommand(aCommand: Int) {
-        _page_preload_command[aCommand] = true
+        pagePreloadCommand[aCommand] = true
     }
 
-    val pageType: Int
-        // com.kota.ASFramework.PageController.ASViewController
+    override val pageType: Int
         get() = 0
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun clear() {
+    override fun clear() {
         cleanCommand()
         cleanAllItem()
-        _list_loaded = false
+        isListLoaded = false
         this.selectedIndex = 0
         this.currentBlock = 0
         this.itemSize = 0
-        _last_load_time = 0L
-        _last_send_time = 0L
-        this.listName = null
+        lastLoadTime = 0L
+        lastSendTime = 0L
     }
 
     var listView: ListView?
-        get() = _list_view
+        get() = listViewWidget
         set(aListView) {
-            _list_view = aListView
-            if (_list_view != null) {
-                _list_view!!.setOnItemClickListener(this)
-                _list_view!!.setOnItemLongClickListener(this)
-                _list_view!!.setAdapter(this)
+            listViewWidget = aListView
+            if (listViewWidget != null) {
+                listViewWidget?.onItemClickListener = this
+                listViewWidget?.onItemLongClickListener = this
+                listViewWidget?.setAdapter(this)
             }
         }
 
@@ -222,12 +216,12 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         object : ASRunner() {
             // from class: com.kota.Bahamut.ListPage.TelnetListPage.1
             // com.kota.ASFramework.Thread.ASRunner
-            public override fun run() {
-                if (this@TelnetListPage._list_view != null) {
+            override fun run() {
+                if (this@TelnetListPage.listViewWidget != null) {
                     if (selection == -1) {
-                        this@TelnetListPage._list_view!!.setSelection(this@TelnetListPage.getCount() - 1)
+                        this@TelnetListPage.listViewWidget?.setSelection(this@TelnetListPage.getCount() - 1)
                     } else {
-                        this@TelnetListPage._list_view!!.setSelection(selection)
+                        this@TelnetListPage.listViewWidget?.setSelection(selection)
                     }
                 }
             }
@@ -235,79 +229,76 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setListViewSelectionFromTop(selection: Int, top: Int) {
-        if (_list_view != null) {
+        if (listViewWidget != null) {
             if (selection == -1) {
-                _list_view!!.setSelection(getCount() - 1)
+                listViewWidget?.setSelection(getCount() - 1)
             } else {
-                _list_view!!.setSelectionFromTop(selection, top)
+                listViewWidget?.setSelectionFromTop(selection, top)
             }
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageDidLoad() {
-        _load_command_stack.setSize(2)
+    override fun onPageDidLoad() {
+        loadCommandStack.setSize(2)
     }
 
-    val pageLayout: Int
-        // com.kota.ASFramework.PageController.ASViewController
+    override val pageLayout: Int
         get() = 0
 
-    @Synchronized  // com.kota.TelnetUI.TelnetPage
-    public override fun onPagePreload(): Boolean {
-        val page_data = loadPage()
+    @Synchronized
+    override fun onPagePreload(): Boolean {
+        val pageData = loadPage()
         if (!_initialed) {
             pushPreloadCommand(0)
             _initialed = true
         }
-        executeCommandFinished(page_data)
-        insertPageData(page_data)
+        if (pageData == null) return false
+        executeCommandFinished(pageData)
+        insertPageData(pageData)
         executePreloadCommand()
         executeCommand()
         return true
     }
 
     @Synchronized  // com.kota.ASFramework.PageController.ASViewController
-    public override fun onPageRefresh() {
-        synchronized(_list_count) {
-            _list_count = this.itemSize
-            reloadListView()
-        }
+    override fun onPageRefresh() {
+        listCount = this.itemSize
+        reloadListView()
         executeRefreshCommand()
     }
 
     private fun executeRefreshCommand() {
-        if (_page_refresh_command[0]) {
+        if (pageRefreshCommand[0]) {
             setListViewSelection(0)
         }
-        if (_page_refresh_command[1]) {
+        if (pageRefreshCommand[1]) {
             setListViewSelection(this.itemSize - 1)
         }
         cleanRefreshCommand()
     }
 
     private fun cleanRefreshCommand() {
-        Arrays.fill(_page_refresh_command, false)
+        Arrays.fill(pageRefreshCommand, false)
     }
 
     private fun executePreloadCommand() {
-        if (_page_preload_command[0]) {
+        if (pagePreloadCommand[0]) {
             loadLastBlock()
         }
         cleanPreloadCommand()
     }
 
     private fun cleanPreloadCommand() {
-        Arrays.fill(_page_preload_command, false)
+        Arrays.fill(pagePreloadCommand, false)
     }
 
     private fun removeBlock(key: Int?) {
-        var item: TelnetListPageItem?
-        val block = _block_list.remove(key)
+        var item: TelnetListPageItem? = null
+        val block = blockList.remove(key)
         if (block != null) {
             var i = 0
             while (i < 20 && (block.getItem(i).also { item = it }) != null) {
-                item!!.clear()
+                item?.clear()
                 recycleItem(item)
                 i++
             }
@@ -316,59 +307,57 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    private fun insertPageData(telnetListPageBlock: TelnetListPageBlock?) {
-        if (aPageData != null) {
-            val block_index = getBlockIndex(aPageData.minimumItemNumber - 1)
-            synchronized(_block_list) {
-                setBlock(block_index, aPageData)
-                val first_block_index = this.firstVisibleBlockIndex
-                val last_block_index = this.lastVisibleBlockIndex
-                if (first_block_index != 0 && last_block_index != 0 && first_block_index >= 0 && last_block_index >= 0) {
-                    val keys: MutableSet<Int> = HashSet<Int>(_block_list.keys)
-                    for (key in keys) {
-                        if (key != block_index && (key > last_block_index + 3 || key < first_block_index - 3)) {
-                            removeBlock(key)
-                        }
+    private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
+        val blockIndex = getBlockIndex(telnetListPageBlock.minimumItemNumber - 1)
+        synchronized(blockList) {
+            setBlock(blockIndex, telnetListPageBlock)
+            val firstBlockIndex = this.firstVisibleBlockIndex
+            val lastBlockIndex = this.lastVisibleBlockIndex
+            if (firstBlockIndex != 0 && lastBlockIndex != 0 && firstBlockIndex >= 0 && lastBlockIndex >= 0) {
+                val keys: MutableSet<Int?> = HashSet(blockList.keys)
+                for (key in keys) {
+                    if (key != null && key != blockIndex && (key > lastBlockIndex + 3 || key < firstBlockIndex - 3)) {
+                        removeBlock(key)
                     }
                 }
             }
-            if (aPageData.selectedItemNumber > 0) {
-                this.selectedIndex = aPageData.selectedItemNumber
-                this.currentBlock = ItemUtils.getBlock(this.selectedIndex)
-            }
-            if (aPageData.maximumItemNumber > this.itemSize) {
-                this.itemSize = aPageData.maximumItemNumber
-            }
+        }
+        if (telnetListPageBlock.selectedItemNumber > 0) {
+            this.selectedIndex = telnetListPageBlock.selectedItemNumber
+            this.currentBlock = ItemUtils.getBlock(this.selectedIndex)
+        }
+        if (telnetListPageBlock.maximumItemNumber > this.itemSize) {
+            this.itemSize = telnetListPageBlock.maximumItemNumber
         }
     }
 
     val firstVisibleBlockIndex: Int
         get() {
-            if (_list_view == null) {
+            if (listViewWidget == null) {
                 return -1
             }
-            return getBlockIndex(_list_view!!.getFirstVisiblePosition())
+            return getBlockIndex(listViewWidget?.firstVisiblePosition)
         }
 
     val lastVisibleBlockIndex: Int
         get() {
-            if (_list_view == null) {
+            if (listViewWidget == null) {
                 return -1
             }
-            return getBlockIndex(_list_view!!.getLastVisiblePosition())
+            return getBlockIndex(listViewWidget?.lastVisiblePosition)
         }
 
     private fun startAutoLoad() {
-        if (this.isAutoLoadEnable && _auto_load_thread == null) {
-            _auto_load_thread = AutoLoadThread()
-            _auto_load_thread!!.start()
+        if (this.isAutoLoadEnable && autoLoadThread == null) {
+            autoLoadThread = AutoLoadThread()
+            autoLoadThread?.start()
         }
     }
 
     private fun stopAutoLoad() {
-        if (_auto_load_thread != null) {
-            _auto_load_thread!!.run = false
-            _auto_load_thread = null
+        if (autoLoadThread != null) {
+            autoLoadThread?.run = false
+            autoLoadThread = null
         }
     }
 
@@ -376,10 +365,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun popCommand(): TelnetCommand? {
         var command: TelnetCommand?
         command = null
-        if (_operation_command_stack.size > 0) {
-            command = _operation_command_stack.removeAt(0)
-        } else if (!_load_command_stack.isEmpty()) {
-            command = _load_command_stack.pop()
+        if (operationCommandStack.isNotEmpty()) {
+            command = operationCommandStack.removeAt(0)
+        } else if (!loadCommandStack.isEmpty()) {
+            command = loadCommandStack.pop()
         }
         return command
     }
@@ -388,9 +377,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun rePushCommand(aCommand: TelnetCommand?) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand) {
-                _load_command_stack.push(aCommand)
+                loadCommandStack.push(aCommand)
             } else {
-                _operation_command_stack.insertElementAt(aCommand, 0)
+                operationCommandStack.insertElementAt(aCommand, 0)
             }
         }
     }
@@ -404,9 +393,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun pushCommand(aCommand: TelnetCommand?, executeNow: Boolean) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand) {
-                _load_command_stack.push(aCommand)
+                loadCommandStack.push(aCommand)
             } else {
-                _operation_command_stack.add(aCommand)
+                operationCommandStack.add(aCommand)
             }
         }
         if (executeNow) {
@@ -416,24 +405,24 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     @Synchronized
     fun cleanCommand() {
-        _operation_command_stack.clear()
-        _load_command_stack.clear()
-        _executing_command = null
+        operationCommandStack.clear()
+        loadCommandStack.clear()
+        executingCommand = null
         cleanRefreshCommand()
         cleanPreloadCommand()
     }
 
     @Synchronized
     fun executeCommand() {
-        if (_executing_command == null) {
-            _executing_command = popCommand()
-            if (_executing_command != null) {
-                if (_executing_command!!.recordTime) {
-                    _last_load_time = System.currentTimeMillis()
+        if (executingCommand == null) {
+            executingCommand = popCommand()
+            if (executingCommand != null) {
+                if (executingCommand?.recordTime) {
+                    lastLoadTime = System.currentTimeMillis()
                 }
-                _executing_command!!.execute(this)
-                if (_executing_command!!.isDone) {
-                    _executing_command = null
+                executingCommand?.execute(this)
+                if (executingCommand?.isDone) {
+                    executingCommand = null
                     executeCommand()
                 }
             }
@@ -441,13 +430,13 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     @Synchronized
-    fun executeCommandFinished(telnetListPageBlock: TelnetListPageBlock?) {
-        if (_executing_command != null) {
-            _executing_command!!.executeFinished(this, aPageData)
-            if (!_executing_command!!.isDone) {
-                rePushCommand(_executing_command)
+    fun executeCommandFinished(telnetListPageBlock: TelnetListPageBlock) {
+        if (executingCommand != null) {
+            executingCommand?.executeFinished(this, telnetListPageBlock)
+            if (!executingCommand?.isDone) {
+                rePushCommand(executingCommand)
             }
-            _executing_command = null
+            executingCommand = null
         }
     }
 
@@ -455,20 +444,20 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun isLoadingBlock(itemIndex: Int): Boolean {
         var result: Boolean
         result = false
-        if (_executing_command != null && _executing_command!!.action == 0) {
-            val load_block_command = _executing_command as BahamutCommandLoadBlock
-            result = load_block_command.containsArticle(itemIndex)
+        if (executingCommand != null && executingCommand?.action == 0) {
+            val loadBlockCommand = executingCommand as BahamutCommandLoadBlock
+            result = loadBlockCommand.containsArticle(itemIndex)
         }
         if (!result) {
-            val it = _load_command_stack.iterator()
+            val it = loadCommandStack.iterator()
             while (true) {
                 if (!it.hasNext()) {
                     break
                 }
                 val command = it.next()
                 if (command != null && command.action == 0) {
-                    val load_block_command2 = command as BahamutCommandLoadBlock
-                    if (load_block_command2.containsArticle(itemIndex)) {
+                    val loadBlockCommand2 = command as BahamutCommandLoadBlock
+                    if (loadBlockCommand2.containsArticle(itemIndex)) {
                         result = true
                         break
                     }
@@ -481,21 +470,21 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     @get:Synchronized
     val isLoadingSize: Boolean
         get() {
-            var load_size_command_exists: Boolean
-            load_size_command_exists = false
+            var loadSizeCommandExists: Boolean
+            loadSizeCommandExists = false
             val it =
-                _operation_command_stack.iterator()
+                operationCommandStack.iterator()
             while (true) {
                 if (!it.hasNext()) {
                     break
                 }
                 val command = it.next()
                 if (command.action == 2) {
-                    load_size_command_exists = true
+                    loadSizeCommandExists = true
                     break
                 }
             }
-            return load_size_command_exists
+            return loadSizeCommandExists
         }
 
     fun loadBoardBlock(block: Int) {
@@ -518,7 +507,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     private fun containsLoadLastBlock(): Boolean {
-        for (command in _operation_command_stack) {
+        for (command in operationCommandStack) {
             if (command.action == 1) {
                 return true
             }
@@ -532,10 +521,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun reloadListView() {
-        if (_list_view != null) {
+        if (listViewWidget != null) {
             notifyDataSetChanged()
-            if (!_list_loaded) {
-                _list_loaded = true
+            if (!isListLoaded) {
+                isListLoaded = true
                 setListViewSelection(getCount() - 1)
             }
         }
@@ -543,10 +532,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     // android.widget.Adapter
     override fun getCount(): Int {
-        val intValue: Int
-        synchronized(_list_count) {
-            intValue = _list_count
-        }
+        val intValue: Int = listCount
         return intValue
     }
 
@@ -559,26 +545,26 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setBlock(blockIndex: Int, aBlock: TelnetListPageBlock?) {
-        _block_list.put(blockIndex, aBlock)
+        blockList.put(blockIndex, aBlock)
     }
 
     fun getBlock(blockIndex: Int): TelnetListPageBlock? {
-        return _block_list.get(blockIndex)
+        return blockList[blockIndex]
     }
 
     val blockSize: Int
-        get() = _block_list.size
+        get() = blockList.size
 
     @Synchronized  // android.widget.Adapter
     override fun getItem(index: Int): TelnetListPageItem? {
         val item: TelnetListPageItem?
-        val item_index = index + 1
-        synchronized(_block_list) {
+        val itemIndex = index + 1
+        synchronized(blockList) {
             val block = getBlock(getBlockIndex(index))
-            item = if (block != null) block.getItem(getIndexInBlock(index)) else null
+            item = block?.getItem(getIndexInBlock(index))
         }
         if (item != null) {
-            item.itemNumber = item_index
+            item.itemNumber = itemIndex
         }
         return item
     }
@@ -626,7 +612,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         parentView: AdapterView<*>?,
         view: View?,
         index: Int,
-        ID: Long
+        id: Long
     ): Boolean {
         return onListViewItemLongClicked(view, index)
     }
@@ -636,19 +622,19 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     protected fun saveListState() {
-        if (_list_view != null) {
-            val state: ListState = ListStateStore.Companion.getInstance().getState(this.listId)
-            state.position = _list_view!!.getFirstVisiblePosition()
-            val first_visible_item_view = _list_view!!.getChildAt(0)
-            if (first_visible_item_view != null) {
-                state.top = first_visible_item_view.getTop()
+        if (listViewWidget != null) {
+            val state: ListState = ListStateStore.instance.getState(this.listId)
+            state.position = listViewWidget?.firstVisiblePosition
+            val firstVisibleItemView = listViewWidget?.getChildAt(0)
+            if (firstVisibleItemView != null) {
+                state.top = firstVisibleItemView.top
             }
         }
     }
 
     protected fun loadListState() {
-        if (_list_view != null) {
-            val state: ListState = ListStateStore.Companion.getInstance().getState(this.listId)
+        if (listViewWidget != null) {
+            val state: ListState = ListStateStore.instance.getState(this.listId)
             setListViewSelectionFromTop(state.position, state.top)
         }
     }
@@ -657,12 +643,12 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         get() = BoardPageAction.LIST
 
     fun cleanAllItem() {
-        synchronized(_block_list) {
-            val keys: MutableSet<Int?> = HashSet<Int?>(_block_list.keys)
+        synchronized(blockList) {
+            val keys: MutableSet<Int?> = HashSet(blockList.keys)
             for (key in keys) {
                 removeBlock(key)
             }
-            _block_list.clear()
+            blockList.clear()
         }
     }
 
@@ -674,7 +660,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         get() = false
 
     val listId: String?
-        get() = getListIdFromListName(this.listName)
+        get() = getListIdFromListName(this.name)
 
     open fun getListIdFromListName(aName: String?): String? {
         return aName

@@ -30,7 +30,7 @@ class BoardSearchPage : BoardMainPage() {
         super.onPageRefresh()
         val header_view = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
         if (header_view != null) {
-            var board_name = listName
+            var board_name = name
             if (board_name == null) {
                 board_name = getContextString(R.string.loading)
             }
@@ -49,19 +49,19 @@ class BoardSearchPage : BoardMainPage() {
         if (item != null) {
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
-                .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.Title + "\"")
+                .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.insert))
                 .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
                     if (index == 1) {
                         val bookmark = Bookmark()
                         println("add bookmark:" + bookmark.title)
-                        bookmark.board = this@BoardSearchPage.listName
-                        bookmark.keyword = item.Title
+                        bookmark.board = this@BoardSearchPage.name
+                        bookmark.keyword = item.title
                         bookmark.title = bookmark.generateTitle()
                         val store = TempSettings.bookmarkStore
                         if (store != null) {
-                            store.getBookmarkList(this@BoardSearchPage.listName)
+                            store.getBookmarkList(this@BoardSearchPage.name)
                                 .addBookmark(bookmark)
                             store.store()
                         }
@@ -88,7 +88,7 @@ class BoardSearchPage : BoardMainPage() {
                 if (index == 1) {
                     val bookmark = Bookmark()
                     println("add bookmark:" + bookmark.title)
-                    bookmark.board = this@BoardSearchPage.listName
+                    bookmark.board = this@BoardSearchPage.name
                     bookmark.keyword = this@BoardSearchPage._keyword
                     bookmark.author = this@BoardSearchPage._author
                     bookmark.mark = this@BoardSearchPage._mark
@@ -96,7 +96,7 @@ class BoardSearchPage : BoardMainPage() {
                     bookmark.title = bookmark.generateTitle()
                     val store = TempSettings.bookmarkStore
                     if (store != null) {
-                        store.getBookmarkList(this@BoardSearchPage.listName).addBookmark(bookmark)
+                        store.getBookmarkList(this@BoardSearchPage.name).addBookmark(bookmark)
                         store.store()
                     }
                 }
@@ -121,9 +121,9 @@ class BoardSearchPage : BoardMainPage() {
 
     override fun onBackPressed(): Boolean {
         clear()
-        navigationController!!.popViewController()
-        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
-        PageContainer.getInstance().cleanBoardSearchPage()
+        navigationController.popViewController()
+        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        PageContainer.instance?.cleanBoardSearchPage()
         return true
     }
 

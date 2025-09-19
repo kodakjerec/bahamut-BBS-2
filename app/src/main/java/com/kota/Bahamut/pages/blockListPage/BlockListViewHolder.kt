@@ -16,7 +16,7 @@ class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
         _name_label = view.findViewById<TextView?>(R.id.BlockListItemView_Name)
         val _delete_button = view.findViewById<Button>(R.id.BlockListItemView_Delete)
         _delete_button.setOnClickListener(View.OnClickListener { view1: View? ->
-            if (mListener != null) mListener!!.onBlockListPage_ItemView_delete_clicked(this@BlockListViewHolder)
+            if (mListener != null) mListener?.onBlockListPage_ItemView_delete_clicked(this@BlockListViewHolder)
         })
 
         this.mListener = listener
@@ -32,7 +32,7 @@ class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
 
     override fun onClick(v: View?) {
         if (mListener != null) {
-            mListener!!.onBlockListPage_ItemView_clicked(this)
+            mListener?.onBlockListPage_ItemView_clicked(this)
         }
     }
 }

@@ -11,7 +11,7 @@ class BahamutCommandLoadFirstBlock : TelnetCommand() {
     override fun execute(telnetListPage: TelnetListPage) {
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
     }
 

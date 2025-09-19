@@ -74,7 +74,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         // 找歷史檔案
         val historyItem = urlDatabase.getShortenUrl(targetUrl)
         if (!historyItem.isEmpty()) {
-            val shortUrl = historyItem[0]!!.shortenUrl
+            val shortUrl = historyItem[0]?.shortenUrl
             changeFrontend(shortUrl!!)
             UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_url_same_url))
@@ -132,7 +132,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     fun changeFrontend(shortUrl: String) {
         sampleTextView.text = shortUrl
         outputParam = sampleTextView.text.toString()
-        sendButton!!.isEnabled = true
+        sendButton?.isEnabled = true
     }
 
     /** 擷取剪貼簿 */
@@ -199,7 +199,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         val layoutId = R.layout.dialog_shorten_url
         requestWindowFeature(1)
         setContentView(layoutId)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
         setTitle(context.getString(R.string.dialog_shorten_url_title))
         mainLayout = findViewById(R.id.dialog_shorten_url_layout)
         editText = mainLayout.findViewById(R.id.dialog_shorten_url_content)
@@ -209,7 +209,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         // 按鈕
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_transfer).setOnClickListener(transferListener)
         sendButton = mainLayout.findViewById(R.id.send)
-        sendButton!!.setOnClickListener(this)
+        sendButton?.setOnClickListener(this)
         mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
@@ -226,11 +226,11 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 if (nowOrientation!=oldOrientation) {
                     val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
                     if (nowOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        layoutParams!!.height = ViewGroup.LayoutParams.WRAP_CONTENT
+                        layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
                         oldOrientation = nowOrientation
                     } else {
                         val factor = context.resources.displayMetrics.density
-                        layoutParams!!.height = (500 * factor).toInt()
+                        layoutParams?.height = (500 * factor).toInt()
                         oldOrientation = nowOrientation
                     }
                     mainLayout.layoutParams = layoutParams

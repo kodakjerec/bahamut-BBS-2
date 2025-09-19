@@ -8,19 +8,12 @@ import com.kota.Bahamut.R
 
 class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
-    private val _author_label: TextView?
-    private val _gy_label: TextView?
-    private val _mark_label: TextView
-    private val _title_label: TextView?
+    private val authorLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Author)
+    private val gyLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)
+    private val markLevel: TextView = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
+    private val titleLevel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
 
     init {
-        _title_label =
-            view.findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
-        _author_label =
-            view.findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_Author)
-        _mark_label =
-            view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
-        _gy_label = view.findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)
 
         view.setOnClickListener(this)
     }
@@ -37,40 +30,40 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     }
 
     fun setTitle(title: String?) {
-        if (this._title_label != null) {
-            if (title == null || title.length == 0) {
-                this._title_label.setText("未輸入")
+        if (this.titleLevel != null) {
+            if (title == null || title.isEmpty()) {
+                this.titleLevel.text = "未輸入"
             } else {
-                this._title_label.setText(title)
+                this.titleLevel.text = title
             }
         }
     }
 
     fun setAuthor(author: String?) {
-        if (this._author_label != null) {
-            if (author == null || author.length == 0) {
-                this._author_label.setText("未輸入")
+        if (this.authorLabel != null) {
+            if (author == null || author.isEmpty()) {
+                this.authorLabel.text = "未輸入"
             } else {
-                this._author_label.setText(author)
+                this.authorLabel.text = author
             }
         }
     }
 
     fun setGYNumber(number: String?) {
-        if (this._gy_label != null) {
-            if (number == null || number.length == 0) {
-                this._gy_label.setText(Bookmark.OPTIONAL_BOOKMARK)
+        if (this.gyLabel != null) {
+            if (number == null || number.isEmpty()) {
+                this.gyLabel.text = Bookmark.OPTIONAL_BOOKMARK
             } else {
-                this._gy_label.setText(number)
+                this.gyLabel.text = number
             }
         }
     }
 
     fun setMark(isMarked: Boolean) {
         if (isMarked) {
-            this._mark_label.setVisibility(View.VISIBLE)
+            this.markLevel.visibility = View.VISIBLE
         } else {
-            this._mark_label.setVisibility(View.INVISIBLE)
+            this.markLevel.visibility = View.INVISIBLE
         }
     }
 
@@ -82,8 +75,6 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     }
 
     override fun onClick(view: View?) {
-        if (mListener != null) {
-            mListener.onItemClick(view, getAdapterPosition())
-        }
+        mListener?.onItemClick(view, adapterPosition)
     }
 }

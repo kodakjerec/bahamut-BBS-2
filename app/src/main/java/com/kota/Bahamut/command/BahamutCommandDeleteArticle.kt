@@ -11,11 +11,11 @@ class BahamutCommandDeleteArticle(var articleIndex: Int) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (articleIndex > 0) {
-            TelnetClient.client!!.sendStringToServer("$articleIndex\ndy")
+            TelnetClient.client?.sendStringToServer("$articleIndex\ndy")
         }
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
     }
 

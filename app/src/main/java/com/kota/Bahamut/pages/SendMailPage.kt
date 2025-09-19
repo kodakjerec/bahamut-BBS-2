@@ -8,7 +8,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dialogs.DialogInsertExpression
@@ -26,40 +25,40 @@ import java.util.Vector
 
 class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     DialogInsertSymbolListener, DialogPaintColorListener {
-    var _content: String? = null
-    var _content_field: EditText? = null
-    var _hide_title_button: Button? = null
-    var _paint_color_button: Button? = null
-    var _listener: SendMailPage_Listener? = null
-    var _post_button: Button? = null
-    var _receiver: String? = null
-    var _receiver_field: EditText? = null
-    var _receiver_field_background: TextView? = null
-    var _symbol_button: Button? = null
-    var _title: String? = null
-    var _title_block: View? = null
-    var _title_block_hidden: Boolean = false
-    var _title_field: EditText? = null
-    var _title_field_background: TextView? = null
+    var myContent: String? = null
+    var contentField: EditText? = null
+    var hideTitleButton: Button? = null
+    var paintColorButton: Button? = null
+    var listener: SendMailPageListener? = null
+    var postButton: Button? = null
+    var receiver: String? = null
+    var receiverField: EditText? = null
+    var receiverFieldBackground: TextView? = null
+    var symbolButton: Button? = null
+    var myTitle: String? = null
+    var titleBlock: View? = null
+    var isTitleBlockHidden: Boolean = false
+    var titleField: EditText? = null
+    var titleFieldBackground: TextView? = null
     var recover: Boolean = false
 
     val name: String
         get() = "BahamutSendMailDialog"
 
-    fun setListener(aListener: SendMailPage_Listener?) {
-        _listener = aListener
+    fun setListener(aListener: SendMailPageListener?) {
+        listener = aListener
     }
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.send_mail_page
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_SEND_MAIL
 
-    val isPopupPage: Boolean
+    override val isPopupPage: Boolean
         get() = true
 
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         initial()
         if (recover) {
             loadTempArticle(8)
@@ -67,187 +66,187 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         }
     }
 
-    public override fun onPageDidDisappear() {
-        _title_field = null
-        _title_field_background = null
-        _receiver_field = null
-        _receiver_field_background = null
-        _content_field = null
-        _post_button = null
-        _symbol_button = null
-        _hide_title_button = null
-        _title_block = null
+    override fun onPageDidDisappear() {
+        titleField = null
+        titleFieldBackground = null
+        receiverField = null
+        receiverFieldBackground = null
+        contentField = null
+        postButton = null
+        symbolButton = null
+        hideTitleButton = null
+        titleBlock = null
         super.onPageDidDisappear()
     }
 
     fun refreshTitleField() {
-        if (_title_field != null && _title != null) {
-            _title_field!!.setText(_title)
-            if (_title!!.length > 0) {
-                Selection.setSelection(_title_field!!.getText(), 1)
+        if (titleField != null && myTitle != null) {
+            titleField?.setText(myTitle)
+            if (myTitle?.isNotEmpty()) {
+                Selection.setSelection(titleField?.text, 1)
             }
-            _title = null
+            myTitle = null
         }
     }
 
     fun refreshReceiverField() {
-        if (_receiver_field != null && _receiver != null) {
-            _receiver_field!!.setText(_receiver)
-            _receiver = null
+        if (receiverField != null && receiver != null) {
+            receiverField?.setText(receiver)
+            receiver = null
         }
     }
 
     fun refreshContentField() {
-        if (_content_field != null && _content != null) {
-            _content_field!!.setText(_content)
-            if (_content!!.length > 0) {
-                Selection.setSelection(_content_field!!.getText(), _content!!.length)
+        if (contentField != null && myContent != null) {
+            contentField?.setText(myContent)
+            if (myContent?.isNotEmpty()) {
+                Selection.setSelection(contentField?.text, myContent?.length)
             }
-            _content = null
+            myContent = null
         }
     }
 
-    public override fun onPageRefresh() {
+    override fun onPageRefresh() {
         refreshTitleField()
         refreshContentField()
         refreshReceiverField()
     }
 
     fun initial() {
-        _title_field = findViewById(R.id.SendMail_TitleField) as EditText?
-        _title_field!!.setOnFocusChangeListener(this)
-        _title_field_background = findViewById(R.id.SendMail_TitleFieldBackground) as TextView?
+        titleField = findViewById(R.id.SendMail_TitleField) as EditText?
+        titleField?.onFocusChangeListener = this
+        titleFieldBackground = findViewById(R.id.SendMail_TitleFieldBackground) as TextView?
 
-        _receiver_field = findViewById(R.id.SendMail_ReceiverField) as EditText?
-        _receiver_field!!.setOnFocusChangeListener(this)
-        _receiver_field_background =
+        receiverField = findViewById(R.id.SendMail_ReceiverField) as EditText?
+        receiverField?.onFocusChangeListener = this
+        receiverFieldBackground =
             findViewById(R.id.SendMail_ReceiverFieldBackground) as TextView?
 
-        _content_field = findViewById(R.id.SendMailDialog_EditField) as EditText?
+        contentField = findViewById(R.id.SendMailDialog_EditField) as EditText?
 
-        _post_button = findViewById(R.id.SendMailDialog_Post) as Button?
-        _post_button!!.setOnClickListener(this)
+        postButton = findViewById(R.id.SendMailDialog_Post) as Button?
+        postButton?.setOnClickListener(this)
 
-        _symbol_button = findViewById(R.id.SendMailDialog_Symbol) as Button?
-        _symbol_button!!.setOnClickListener(this)
+        symbolButton = findViewById(R.id.SendMailDialog_Symbol) as Button?
+        symbolButton?.setOnClickListener(this)
 
-        _hide_title_button = findViewById(R.id.SendMailDialog_Cancel) as Button?
-        _hide_title_button!!.setOnClickListener(this)
+        hideTitleButton = findViewById(R.id.SendMailDialog_Cancel) as Button?
+        hideTitleButton?.setOnClickListener(this)
 
-        _paint_color_button = findViewById(R.id.ArticlePostDialog_Color) as Button?
-        _paint_color_button!!.setOnClickListener(this)
+        paintColorButton = findViewById(R.id.ArticlePostDialog_Color) as Button?
+        paintColorButton?.setOnClickListener(this)
 
-        findViewById(R.id.SendMailDialog_change)!!.setOnClickListener(this)
-        _title_block = findViewById(R.id.SendMail_TitleBlock)
+        findViewById(R.id.SendMailDialog_change)?.setOnClickListener(this)
+        titleBlock = findViewById(R.id.SendMail_TitleBlock)
         refresh()
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
-    public override fun clear() {
-        if (_receiver_field != null) {
-            _receiver_field!!.setText("")
+    override fun clear() {
+        if (receiverField != null) {
+            receiverField?.setText("")
         }
-        if (_title_field != null) {
-            _title_field!!.setText("")
+        if (titleField != null) {
+            titleField?.setText("")
         }
-        if (_content_field != null) {
-            _content_field!!.setText("")
+        if (contentField != null) {
+            contentField?.setText("")
         }
-        _listener = null
+        listener = null
     }
 
     fun setPostTitle(aTitle: String?) {
-        _title = aTitle
+        myTitle = aTitle
         refreshTitleField()
     }
 
     fun setPostContent(aContent: String?) {
-        _content = aContent
+        myContent = aContent
         refreshContentField()
     }
 
     override fun onClick(view: View) {
-        if (view === _post_button) {
-            if (_listener != null) {
-                val receiver = _receiver_field!!.getText().toString().replace("\n", "")
-                val title = _title_field!!.getText().toString().replace("\n", "")
-                val content = _content_field!!.getText().toString()
-                val err_msg = StringBuilder()
+        if (view === postButton) {
+            if (listener != null) {
+                val receiver = receiverField?.text.toString().replace("\n", "")
+                val title = titleField?.text.toString().replace("\n", "")
+                val content = contentField?.text.toString()
+                val errMsg = StringBuilder()
                 val empty = Vector<String?>()
-                if (receiver.length == 0) {
+                if (receiver.isEmpty()) {
                     empty.add("收件人")
                 }
-                if (title.length == 0) {
+                if (title.isEmpty()) {
                     empty.add("標題")
                 }
-                if (content.length == 0) {
+                if (content.isEmpty()) {
                     empty.add("內文")
                 }
-                if (empty.size > 0) {
+                if (empty.isNotEmpty()) {
                     for (i in empty.indices) {
-                        err_msg.append(empty.get(i))
+                        errMsg.append(empty[i])
                         if (i == empty.size - 2) {
-                            err_msg.append("與")
+                            errMsg.append("與")
                         } else if (i < empty.size - 2) {
-                            err_msg.append("、")
+                            errMsg.append("、")
                         }
                     }
-                    err_msg.append("不可為空")
+                    errMsg.append("不可為空")
                 }
-                if (err_msg.length > 0) {
-                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_msg.toString())
+                if (errMsg.isNotEmpty()) {
+                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg.toString())
                         .addButton("確定").show()
                     return
                 }
-                val send_receiver = receiver
-                val send_title = title
-                val send_content = content
+                val sendReceiver = receiver
+                val sendTitle = title
+                val sendContent = content
                 ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認")
                     .setMessage("您是否確定要送出此信件?")
-                    .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                    .setListener { aDialog: ASAlertDialog?, index: Int ->
                         if (index == 1) {
-                            _listener!!.onSendMailDialogSendButtonClicked(
+                            listener?.onSendMailDialogSendButtonClicked(
                                 this@SendMailPage,
-                                send_receiver,
-                                send_title,
-                                send_content
+                                sendReceiver,
+                                sendTitle,
+                                sendContent
                             )
-                            navigationController!!.popViewController()
+                            navigationController.popViewController()
                             clear()
                         }
-                    }).show()
+                    }.show()
             }
-        } else if (view === _symbol_button) {
+        } else if (view === symbolButton) {
             // 表情符號
 
-            val items: Array<String?> = articleExpressions
+            val items: Array<String> = articleExpressions
             DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
                 .setListener(object : DialogInsertExpressionListener {
                     override fun onListDialogItemClicked(
-                        paramASListDialog: DialogInsertExpression?,
-                        index: Int,
-                        aTitle: String?
+                        paramASListDialog: DialogInsertExpression,
+                        paramInt: Int,
+                        paramString: String
                     ) {
-                        val symbol = items[index]
-                        _content_field!!.getEditableText()
-                            .insert(_content_field!!.getSelectionStart(), symbol)
+                        val symbol = items[paramInt]
+                        contentField?.editableText
+                            .insert(contentField?.selectionStart, symbol)
                     }
 
                     override fun onListDialogSettingClicked() {
                         // 將當前內容存檔, pushView會讓當前頁面消失
                         setRecover()
-                        navigationController!!.pushViewController(ArticleExpressionListPage())
+                        navigationController.pushViewController(ArticleExpressionListPage())
                     }
                 }).scheduleDismissOnPageDisappear(this).show()
-        } else if (view === _hide_title_button) {
+        } else if (view === hideTitleButton) {
             onInsertSymbolButtonClicked()
-        } else if (view === _paint_color_button) {
+        } else if (view === paintColorButton) {
             val dialog = DialogPaintColor()
             dialog.setListener(this)
             dialog.show()
-        } else if (view.getId() == R.id.SendMailDialog_change) {
+        } else if (view.id == R.id.SendMailDialog_change) {
             changeViewMode()
         }
     }
@@ -258,43 +257,43 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     fun refresh() {
-        if (_title_block_hidden) {
-            _title_block!!.setVisibility(View.GONE)
+        if (isTitleBlockHidden) {
+            titleBlock?.visibility = View.GONE
         } else {
-            _title_block!!.setVisibility(View.VISIBLE)
+            titleBlock?.visibility = View.VISIBLE
         }
     }
 
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
-        if (v === _receiver_field) {
+        if (v === receiverField) {
             if (hasFocus) {
-                _receiver_field!!.setSingleLine(false)
-                _receiver_field_background!!.setTextColor(0)
-                _receiver_field!!.setTextColor(-1)
+                receiverField?.isSingleLine = false
+                receiverFieldBackground?.setTextColor(0)
+                receiverField?.setTextColor(-1)
             } else {
-                _receiver_field!!.setSingleLine(true)
-                _receiver_field!!.setTextColor(0)
-                _receiver_field_background!!.setTextColor(-1)
-                _receiver_field_background!!.setText(_receiver_field!!.getText().toString())
+                receiverField?.isSingleLine = true
+                receiverField?.setTextColor(0)
+                receiverFieldBackground?.setTextColor(-1)
+                receiverFieldBackground?.text = receiverField?.text.toString()
             }
         }
-        if (v !== _title_field) {
+        if (v !== titleField) {
             return
         }
         if (hasFocus) {
-            _title_field!!.setSingleLine(false)
-            _title_field!!.setTextColor(-1)
-            _title_field_background!!.setTextColor(0)
+            titleField?.isSingleLine = false
+            titleField?.setTextColor(-1)
+            titleFieldBackground?.setTextColor(0)
             return
         }
-        _title_field!!.setSingleLine(true)
-        _title_field!!.setTextColor(0)
-        _title_field_background!!.setTextColor(-1)
-        _title_field_background!!.setText(_title_field!!.getText().toString())
+        titleField?.isSingleLine = true
+        titleField?.setTextColor(0)
+        titleFieldBackground?.setTextColor(-1)
+        titleFieldBackground?.text = titleField?.text.toString()
     }
 
     fun changeViewMode() {
-        _title_block_hidden = !_title_block_hidden
+        isTitleBlockHidden = !isTitleBlockHidden
         refresh()
     }
 
@@ -304,40 +303,40 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         dialog.show()
     }
 
-    override fun onSymbolDialogDismissWithSymbol(symbol: String?) {
-        _content_field!!.getEditableText().insert(_content_field!!.getSelectionStart(), symbol)
+    override fun onSymbolDialogDismissWithSymbol(str: String) {
+        contentField?.editableText.insert(contentField?.selectionStart, str)
     }
 
-    fun setReceiver(a_receiver: String?) {
-        _receiver = a_receiver
+    fun setReceiver(aReceiver: String?) {
+        receiver = aReceiver
         refreshReceiverField()
     }
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
-    override fun onPaintColorDone(str: String?) {
-        _content_field!!.getEditableText().insert(_content_field!!.getSelectionStart(), str)
+    override fun onPaintColorDone(str: String) {
+        contentField?.editableText.insert(contentField?.selectionStart, str)
     }
 
     // 讀取暫存檔
     private fun loadTempArticle(index: Int) {
-        val article_temp = ArticleTempStore(context).articles.get(index)
-        _receiver_field!!.setText(article_temp.header)
-        _title_field!!.setText(article_temp.title)
-        _content_field!!.setText(article_temp.content)
+        val articleTemp = ArticleTempStore(context).articles[index]
+        receiverField?.setText(articleTemp.header)
+        titleField?.setText(articleTemp.title)
+        contentField?.setText(articleTemp.content)
     }
 
     // 儲存暫存檔
     private fun saveTempArticle(index: Int) {
         val store = ArticleTempStore(context)
-        val article_temp = store.articles.get(index)
+        val articleTemp = store.articles[index]
         // 收信者
-        article_temp.header = _receiver_field!!.getText().toString()
+        articleTemp.header = receiverField?.text.toString()
         // 標題
-        article_temp.title = _title_field!!.getText().toString()
+        articleTemp.title = titleField?.text.toString()
         // 內文
-        article_temp.content = _content_field!!.getText().toString()
+        articleTemp.content = contentField?.text.toString()
 
         // 存檔
         store.store()

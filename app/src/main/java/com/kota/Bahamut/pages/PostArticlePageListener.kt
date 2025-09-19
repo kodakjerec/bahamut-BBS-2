@@ -1,6 +1,6 @@
 package com.kota.Bahamut.pages
 
-interface PostArticlePage_Listener {
+interface PostArticlePageListener {
     fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,

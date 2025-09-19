@@ -39,8 +39,8 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
         }
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
-        if (telnetListPageBlock.selectedItem!!.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
+        if (telnetListPageBlock.selectedItem?.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
             if (articleIndex == telnetListPageBlock.selectedItemNumber) {
                 object : ASRunner() {
                     override fun run() {

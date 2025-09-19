@@ -41,16 +41,16 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
             val f1 = abs(paramFloat2)
             if (f2 > filter && f2 > range * f1) {
                 bool1 = if (paramFloat1 > 0.0f) {
-                    this.gestureViewDelegate!!.onASGestureReceivedGestureRight()
+                    this.gestureViewDelegate?.onASGestureReceivedGestureRight()
                 } else {
-                    this.gestureViewDelegate!!.onASGestureReceivedGestureLeft()
+                    this.gestureViewDelegate?.onASGestureReceivedGestureLeft()
                 }
             } else {
                 if (f1 > filter) {
                     if (f1 > range * f2) bool1 = if (paramFloat2 > 0.0f) {
-                        this.gestureViewDelegate!!.onASGestureReceivedGestureDown()
+                        this.gestureViewDelegate?.onASGestureReceivedGestureDown()
                     } else {
-                        this.gestureViewDelegate!!.onASGestureReceivedGestureUp()
+                        this.gestureViewDelegate?.onASGestureReceivedGestureUp()
                     }
                 }
             }
@@ -59,7 +59,7 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
         if (bool1 && this.gestureViewDelegate != null) {
             paramMotionEvent1 = MotionEvent.obtain(paramMotionEvent2)
             paramMotionEvent1.action = 3
-            this.gestureViewDelegate!!.onASGestureDisPathTouchEvent(paramMotionEvent1)
+            this.gestureViewDelegate?.onASGestureDisPathTouchEvent(paramMotionEvent1)
             paramMotionEvent1.recycle()
         }
         return bool1
@@ -85,7 +85,7 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
         this.gestureDetector.onTouchEvent(paramMotionEvent)
-        if (!this.eventLocked && this.gestureViewDelegate != null) this.gestureViewDelegate!!.onASGestureDisPathTouchEvent(
+        if (!this.eventLocked && this.gestureViewDelegate != null) this.gestureViewDelegate?.onASGestureDisPathTouchEvent(
             paramMotionEvent
         )
         if (paramMotionEvent.action == 1) this.eventLocked = false

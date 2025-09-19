@@ -77,48 +77,48 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         linearLayout1.setBackgroundColor(-16777216)
         linearLayout2.addView(linearLayout1 as View)
         titleLabel = TextView(context)
-        titleLabel!!.layoutParams = LinearLayout.LayoutParams(
+        titleLabel?.layoutParams = LinearLayout.LayoutParams(
             n,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ) as ViewGroup.LayoutParams
-        titleLabel!!.setPadding(k, k, k, k)
-        titleLabel!!.setTextSize(
+        titleLabel?.setPadding(k, k, k, k)
+        titleLabel?.setTextSize(
             2,
             ASLayoutParams.instance.textSizeUltraLarge
         )
-        titleLabel!!.setTextColor(-1)
-        titleLabel!!.setTypeface(titleLabel!!.typeface, Typeface.BOLD)
-        titleLabel!!.visibility = View.GONE
-        titleLabel!!.setBackgroundColor(-15724528)
-        titleLabel!!.isSingleLine = true
+        titleLabel?.setTextColor(-1)
+        titleLabel?.setTypeface(titleLabel?.typeface, Typeface.BOLD)
+        titleLabel?.visibility = View.GONE
+        titleLabel?.setBackgroundColor(-15724528)
+        titleLabel?.isSingleLine = true
         linearLayout1.addView(titleLabel as View?)
         messageLabel = TextView(context)
-        messageLabel!!.layoutParams = LinearLayout.LayoutParams(
+        messageLabel?.layoutParams = LinearLayout.LayoutParams(
             n,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ) as ViewGroup.LayoutParams
-        messageLabel!!.setPadding(k, k, k, k)
-        messageLabel!!.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
-        messageLabel!!.minimumHeight = i
-        messageLabel!!.setTextColor(-1)
-        messageLabel!!.visibility = View.GONE
-        messageLabel!!.setBackgroundColor(-16777216)
+        messageLabel?.setPadding(k, k, k, k)
+        messageLabel?.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
+        messageLabel?.minimumHeight = i
+        messageLabel?.setTextColor(-1)
+        messageLabel?.visibility = View.GONE
+        messageLabel?.setBackgroundColor(-16777216)
         linearLayout1.addView(messageLabel as View?)
         toolbar = LinearLayout(context)
-        toolbar!!.layoutParams = LinearLayout.LayoutParams(
+        toolbar?.layoutParams = LinearLayout.LayoutParams(
             n,
             ViewGroup.LayoutParams.WRAP_CONTENT
         ) as ViewGroup.LayoutParams
-        toolbar!!.gravity = 17
-        toolbar!!.orientation = LinearLayout.HORIZONTAL
+        toolbar?.gravity = 17
+        toolbar?.orientation = LinearLayout.HORIZONTAL
         linearLayout1.addView(toolbar as View?)
         return linearLayout2 as View
     }
 
     private fun clear() {
-        if (messageLabel != null) messageLabel!!.text = ""
-        if (titleLabel != null) titleLabel!!.text = ""
-        toolbar!!.removeAllViews()
+        if (messageLabel != null) messageLabel?.text = ""
+        if (titleLabel != null) titleLabel?.text = ""
+        toolbar?.removeAllViews()
         itemList.clear()
     }
 
@@ -157,14 +157,14 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     private fun initial() {
         requestWindowFeature(1)
         setContentView(buildContentView())
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
     }
 
     fun addButton(paramString: String?): ASAlertDialog {
         if (paramString != null) {
-            if (itemList.isNotEmpty()) toolbar!!.addView(createDivider())
+            if (itemList.isNotEmpty()) toolbar?.addView(createDivider())
             val button = createButton()
-            toolbar!!.addView(button as View)
+            toolbar?.addView(button as View)
             button.text = paramString
             if (paramString.length < 4) {
                 button.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
@@ -200,7 +200,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     override fun onClick(paramView: View?) {
         if (listener != null) {
             val i = itemList.indexOf(paramView)
-            listener!!.onAlertDialogDismissWithButtonIndex(this, i)
+            listener?.onAlertDialogDismissWithButtonIndex(this, i)
         }
         dismiss()
     }
@@ -218,21 +218,21 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
 
     fun setMessage(paramString: String?): ASAlertDialog {
         if (paramString == null) {
-            messageLabel!!.visibility = View.GONE
+            messageLabel?.visibility = View.GONE
             return this
         }
-        messageLabel!!.visibility = View.VISIBLE
-        messageLabel!!.text = paramString
+        messageLabel?.visibility = View.VISIBLE
+        messageLabel?.text = paramString
         return this
     }
 
     fun setTitle(paramString: String?): ASAlertDialog {
         if (paramString == null) {
-            titleLabel!!.visibility = View.GONE
+            titleLabel?.visibility = View.GONE
             return this
         }
-        titleLabel!!.visibility = View.VISIBLE
-        titleLabel!!.text = paramString
+        titleLabel?.visibility = View.VISIBLE
+        titleLabel?.text = paramString
         return this
     }
 
@@ -254,7 +254,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
 
     override fun cancel() {
         if (defaultIndex > -1) {
-            listener!!.onAlertDialogDismissWithButtonIndex(this, defaultIndex)
+            listener?.onAlertDialogDismissWithButtonIndex(this, defaultIndex)
         }
         super.cancel()
     }
@@ -292,7 +292,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
                 .setTitle("錯誤")
                 .setMessage(errMessage)
                 .addButton("確定")
-                .setListener { aDialog: ASAlertDialog?, index: Int -> aDialog!!.dismiss() }
+                .setListener { aDialog: ASAlertDialog?, index: Int -> aDialog?.dismiss() }
                 .scheduleDismissOnPageDisappear(aSViewController)
                 .show()
         }

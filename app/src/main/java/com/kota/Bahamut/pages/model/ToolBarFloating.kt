@@ -6,11 +6,10 @@ import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.floatingLocation
 import com.kota.Bahamut.service.UserSettings.Companion.setFloatingLocation
@@ -35,54 +34,54 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         idleTime = toolbarIdle
         alphaPercentage = toolbarAlpha / 100
         inflate(context, R.layout.toolbar_floating, this)
-        scale = getContext().getResources().getDisplayMetrics().density
+        scale = getContext().resources.displayMetrics.density
 
-        mainLayout = findViewById<LinearLayout>(R.id.ToolbarFloating)
+        mainLayout = findViewById(R.id.ToolbarFloating)
         // 取得上次紀錄
         val list = floatingLocation
-        if (list.size > 0 && list.get(0)!! >= 0.0f) {
-            val pointX: Float = list.get(0)!!
-            val pointY: Float = list.get(1)!!
+        if (list.isNotEmpty() && list[0]!! >= 0.0f) {
+            val pointX: Float = list[0]!!
+            val pointY: Float = list[1]!!
             updateLayout(pointX, pointY, false)
         } else {
             // 畫面預設值
-            val screenWidth = getContext().getResources().getDisplayMetrics().widthPixels.toFloat()
+            val screenWidth = getContext().resources.displayMetrics.widthPixels.toFloat()
             val screenHeight =
-                getContext().getResources().getDisplayMetrics().heightPixels.toFloat()
+                getContext().resources.displayMetrics.heightPixels.toFloat()
             updateLayout(screenWidth, screenHeight / 2, false)
         }
 
-        btnSetting = mainLayout!!.findViewById<Button>(R.id.ToolbarFloating_setting)
-        btn1 = mainLayout!!.findViewById<Button>(R.id.ToolbarFloating_1)
-        btn2 = mainLayout!!.findViewById<Button>(R.id.ToolbarFloating_2)
-        btnSetting!!.setOnTouchListener(onTouchListener)
+        btnSetting = mainLayout?.findViewById(R.id.ToolbarFloating_setting)
+        btn1 = mainLayout?.findViewById(R.id.ToolbarFloating_1)
+        btn2 = mainLayout?.findViewById(R.id.ToolbarFloating_2)
+        btnSetting?.setOnTouchListener(onTouchListener)
 
         // 啟用定時隱藏
         // 如果之前已經隱藏就不要再讓他顯現出來
-        if (TempSettings.isFloatingInvisible) mainLayout!!.setAlpha(alphaPercentage)
+        if (TempSettings.isFloatingInvisible) mainLayout?.alpha = alphaPercentage
         else startInvisible()
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById<ViewGroup?>(R.id.ToolbarFloating))
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ToolbarFloating))
     }
 
     // 移動toolbar
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent? ->
-        val duration = event!!.getEventTime() - event.getDownTime()
-        var pointX = event.getRawX()
-        var pointY = event.getRawY()
+        val duration = event?.eventTime - event.downTime
+        var pointX = event.rawX
+        var pointY = event.rawY
         // 微調手指中心點
         pointX -= scale * 30
         pointY -= scale * 60
 
         // 彈出視窗位置
         val location = IntArray(2)
-        getRootView().getLocationOnScreen(location)
+        rootView.getLocationOnScreen(location)
         pointX -= location[0].toFloat()
         pointY -= location[1].toFloat()
 
-        when (event.getAction()) {
+        when (event.action) {
             MotionEvent.ACTION_DOWN ->                 // 手指按下
                 cancelInvisible()
 
@@ -112,10 +111,10 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         // 获取LinearLayout的LayoutParams
         var deltaX = deltaX
         var deltaY = deltaY
-        val barWidth = mainLayout!!.getLayoutParams().width
-        val barHeight = mainLayout!!.getLayoutParams().height
-        val screenWidth = getContext().getResources().getDisplayMetrics().widthPixels.toFloat()
-        val screenHeight = getContext().getResources().getDisplayMetrics().heightPixels.toFloat()
+        val barWidth = mainLayout?.layoutParams.width
+        val barHeight = mainLayout?.layoutParams.height
+        val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
+        val screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
 
         // X軸錯誤處理
         if (deltaX < 0) {
@@ -125,10 +124,10 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         } else {
             if (!dragging) {
                 // 吸附X軸
-                if (deltaX > screenWidth / 2) {
-                    deltaX = screenWidth - barWidth
+                deltaX = if (deltaX > screenWidth / 2) {
+                    screenWidth - barWidth
                 } else {
-                    deltaX = 0f
+                    0f
                 }
             }
         }
@@ -140,81 +139,81 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             deltaY = 0f
         }
 
-        val params = mainLayout!!.getLayoutParams() as LayoutParams
+        val params = mainLayout?.layoutParams as LayoutParams
         // 更新LayoutParams中的leftMargin和topMargin
         params.leftMargin = deltaX.toInt()
         params.topMargin = deltaY.toInt()
         // 应用新的LayoutParams
-        mainLayout!!.setLayoutParams(params)
+        mainLayout?.layoutParams = params
         // 儲存位置
         setFloatingLocation(deltaX, deltaY)
     }
 
     // 指定按鈕動作和文字 btnSetting
     fun setOnClickListenerSetting(listener: OnClickListener?) {
-        btnSetting!!.setOnClickListener(listener)
+        btnSetting?.setOnClickListener(listener)
     }
 
     fun setTextSetting(text: String?) {
-        btnSetting!!.setText(text)
+        btnSetting?.text = text
     }
 
     // 指定按鈕動作和文字 btn1
     fun setOnClickListener1(listener: OnClickListener?) {
-        btn1!!.setOnClickListener(listener)
+        btn1?.setOnClickListener(listener)
     }
 
     fun setOnLongClickListener1(listener: OnLongClickListener?) {
-        btn1!!.setOnLongClickListener(listener)
+        btn1?.setOnLongClickListener(listener)
     }
 
     fun setText1(text: String?) {
-        btn1!!.setText(text)
+        btn1?.text = text
     }
 
     // 指定按鈕動作和文字 btn2
     fun setOnClickListener2(listener: OnClickListener?) {
-        btn2!!.setOnClickListener(listener)
+        btn2?.setOnClickListener(listener)
     }
 
     fun setOnLongClickListener2(listener: OnLongClickListener?) {
-        btn2!!.setOnLongClickListener(listener)
+        btn2?.setOnLongClickListener(listener)
     }
 
     fun setText2(text: String?) {
-        btn2!!.setText(text)
+        btn2?.text = text
     }
 
     // 指定layout顯示
     override fun setVisibility(visibility: Int) {
-        mainLayout!!.setVisibility(visibility)
+        mainLayout?.visibility = visibility
     }
 
     // 旋轉或變彈出視窗時, 將工具列回到右方預設位置
     override fun onConfigurationChanged(newConfig: Configuration?) {
-        val screenWidth = getContext().getResources().getDisplayMetrics().widthPixels.toFloat()
-        val screenHeight = getContext().getResources().getDisplayMetrics().heightPixels.toFloat()
+        val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
+        val screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
         updateLayout(screenWidth, screenHeight / 2, false)
 
         super.onConfigurationChanged(newConfig)
     }
 
     private fun startInvisible() {
-        if (timer != null) timer!!.cancel()
+        if (timer != null) timer?.cancel()
 
         timer = Timer()
         val task1: TimerTask = object : TimerTask() {
             override fun run() {
-                mainLayout!!.setAlpha(alphaPercentage)
+                mainLayout?.alpha = alphaPercentage
             }
         }
-        timer!!.schedule(task1, idleTime.toInt() * 1000L)
+        timer?.schedule(task1, idleTime.toInt() * 1000L)
         TempSettings.isFloatingInvisible = true
     }
 
     private fun cancelInvisible() {
-        if (timer != null) timer!!.cancel()
-        mainLayout!!.setAlpha(1f)
+        if (timer != null) timer?.cancel()
+        mainLayout?.alpha = 1f
         TempSettings.isFloatingInvisible = false
     }
 }

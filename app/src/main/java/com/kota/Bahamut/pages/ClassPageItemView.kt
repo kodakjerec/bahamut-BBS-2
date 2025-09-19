@@ -12,10 +12,10 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import java.util.Objects
 
 class ClassPageItemView : LinearLayout {
-    private var _board_manager_label: TextView? = null
-    private var _board_name_label: TextView? = null
-    private var _board_title_label: TextView? = null
-    private var _divider_bottom: View? = null
+    private var boardManagerLabel: TextView? = null
+    private var boardNameLabel: TextView? = null
+    private var boardTitleLabel: TextView? = null
+    private var dividerBottom: View? = null
 
     constructor(context: Context?) : super(context) {
         init()
@@ -26,70 +26,64 @@ class ClassPageItemView : LinearLayout {
     }
 
     private fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
             R.layout.class_page_item_view,
             this
         )
-        this._board_title_label = findViewById<TextView?>(R.id.ClassPage_ItemView_classTitle)
-        this._board_name_label = findViewById<TextView?>(R.id.ClassPage_ItemView_className)
-        this._board_manager_label = findViewById<TextView?>(R.id.ClassPage_ItemView_classManager)
-        this._divider_bottom = findViewById<View?>(R.id.ClassPage_ItemView_DividerBottom)
+        this.boardTitleLabel = findViewById(R.id.ClassPage_ItemView_classTitle)
+        this.boardNameLabel = findViewById(R.id.ClassPage_ItemView_className)
+        this.boardManagerLabel = findViewById(R.id.ClassPage_ItemView_classManager)
+        this.dividerBottom = findViewById(R.id.ClassPage_ItemView_DividerBottom)
     }
 
     fun setDividerBottomVisible(visible: Boolean) {
-        if (this._divider_bottom == null) {
+        if (this.dividerBottom == null) {
             return
         }
         if (visible) {
-            if (this._divider_bottom!!.getVisibility() != VISIBLE) {
-                this._divider_bottom!!.setVisibility(VISIBLE)
+            if (this.dividerBottom?.visibility != VISIBLE) {
+                this.dividerBottom?.visibility = VISIBLE
             }
-        } else if (this._divider_bottom!!.getVisibility() != GONE) {
-            this._divider_bottom!!.setVisibility(GONE)
+        } else if (this.dividerBottom?.visibility != GONE) {
+            this.dividerBottom?.visibility = GONE
         }
     }
 
     fun setBoardTitleText(title: String?) {
-        if (this._board_title_label == null) {
+        if (this.boardTitleLabel == null) {
             return
         }
-        this._board_title_label!!.setText(
-            Objects.requireNonNullElse<String?>(
-                title,
-                getContextString(R.string.loading_)
-            )
+        this.boardTitleLabel?.text = Objects.requireNonNullElse<String?>(
+            title,
+            getContextString(R.string.loading_)
         )
     }
 
     fun setBoardNameText(boardName: String?) {
-        if (this._board_name_label == null) {
+        if (this.boardNameLabel == null) {
             return
         }
-        this._board_name_label!!.setText(
-            Objects.requireNonNullElse<String?>(
-                boardName,
-                getContextString(R.string.loading)
-            )
+        this.boardNameLabel?.text = Objects.requireNonNullElse<String?>(
+            boardName,
+            getContextString(R.string.loading)
         )
     }
 
     fun setBoardManagerText(boardManager: String?) {
-        if (this._board_manager_label == null) {
+        if (this.boardManagerLabel == null) {
             return
         }
-        this._board_manager_label!!.setText(
-            Objects.requireNonNullElse<String?>(
-                boardManager,
-                getContextString(R.string.loading)
-            )
+        this.boardManagerLabel?.text = Objects.requireNonNullElse<String?>(
+            boardManager,
+            getContextString(R.string.loading)
         )
     }
 
     fun setItem(aItem: ClassPageItem?) {
         if (aItem != null) {
-            setBoardTitleText(aItem.Title)
-            setBoardNameText(aItem.Name)
-            setBoardManagerText(aItem.Manager)
+            setBoardTitleText(aItem.title)
+            setBoardNameText(aItem.name)
+            setBoardManagerText(aItem.manager)
             return
         }
         clear()
@@ -102,6 +96,6 @@ class ClassPageItemView : LinearLayout {
     }
 
     companion object {
-        private const val _count = 0
+        private const val COUNT = 0
     }
 }

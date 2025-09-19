@@ -1,7 +1,6 @@
 package com.kota.Bahamut.pages.theme
 
 import android.content.res.ColorStateList
-import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +10,8 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.toDrawable
+import androidx.core.view.isNotEmpty
 import com.kota.Bahamut.service.CommonFunctions.rgbToInt
 
 class ThemeFunctions {
@@ -37,9 +38,12 @@ class ThemeFunctions {
                 )
                 // 背景
                 val backgroundDrawable = StateListDrawable()
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), ColorDrawable(rgbToInt(theme.backgroundColorPressed)))
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), ColorDrawable(rgbToInt(theme.backgroundColor)))
-                backgroundDrawable.addState(intArrayOf(), ColorDrawable(rgbToInt(theme.backgroundColorDisabled)))
+                backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed),
+                    rgbToInt(theme.backgroundColorPressed).toDrawable())
+                backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled),
+                    rgbToInt(theme.backgroundColor).toDrawable())
+                backgroundDrawable.addState(intArrayOf(),
+                    rgbToInt(theme.backgroundColorDisabled).toDrawable())
 
                 if (childView.javaClass == Button::class.java) {
                     val button = childView as Button
@@ -57,7 +61,7 @@ class ThemeFunctions {
                 || childView.javaClass==GridLayout::class.java
                 || childView.javaClass==ConstraintLayout::class.java) {
                 val tempChildView:ViewGroup = childView as ViewGroup
-                if (tempChildView.childCount>0) {
+                if (tempChildView.isNotEmpty()) {
                     recursiveReplace(tempChildView)
                 }
             }

@@ -13,14 +13,14 @@ object ASToast {
             // com.kota.ASFramework.Thread.ASRunner
             override fun run() {
                 if (previousToast != null) {
-                    previousToast!!.cancel()
+                    previousToast?.cancel()
                 }
                 previousToast = Toast.makeText(
                     ASNavigationController.getCurrentController(),
                     aToastMessage,
                     Toast.LENGTH_SHORT
                 )
-                previousToast!!.show()
+                previousToast?.show()
             }
         }.runInMainThread()
     }
@@ -32,14 +32,14 @@ object ASToast {
             // com.kota.ASFramework.Thread.ASRunner
             override fun run() {
                 if (previousToast != null) {
-                    previousToast!!.cancel()
+                    previousToast?.cancel()
                 }
                 previousToast = Toast.makeText(
                     ASNavigationController.getCurrentController(),
                     aToastMessage,
                     Toast.LENGTH_LONG
                 )
-                previousToast!!.show()
+                previousToast?.show()
             }
         }.runInMainThread()
     }

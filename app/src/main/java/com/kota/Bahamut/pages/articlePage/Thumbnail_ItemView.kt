@@ -77,7 +77,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         try {
             UrlDatabase(getContext()).use { urlDatabase ->
                 val findUrl: Vector<String>? = urlDatabase.getUrl(myUrl)
-                urlView!!.setText(myUrl)
+                urlView?.setText(myUrl)
                 // 已經有URL資料
                 if (findUrl != null) {
                     myTitle = findUrl.get(1)
@@ -214,36 +214,36 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
             object : ASRunner() {
                 // com.kota.ASFramework.Thread.ASRunner
                 public override fun run() {
-                    layoutDefault!!.setVisibility(GONE)
+                    layoutDefault?.setVisibility(GONE)
 
                     // 圖片
-                    layoutPic!!.setVisibility(VISIBLE)
+                    layoutPic?.setVisibility(VISIBLE)
                     if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image()
                     } else if (myImageUrl == "") {
-                        imageViewButton!!.setVisibility(GONE)
+                        imageViewButton?.setVisibility(GONE)
                     }
 
                     // 內容
-                    layoutNormal!!.setVisibility(GONE)
+                    layoutNormal?.setVisibility(GONE)
                 }
             }.runInMainThread()
         } else { // 內容網址
             object : ASRunner() {
                 // com.kota.ASFramework.Thread.ASRunner
                 public override fun run() {
-                    layoutDefault!!.setVisibility(GONE)
+                    layoutDefault?.setVisibility(GONE)
 
                     // 圖片
-                    layoutPic!!.setVisibility(VISIBLE)
+                    layoutPic?.setVisibility(VISIBLE)
                     if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image()
                     } else if (myImageUrl == "") {
-                        imageViewButton!!.setVisibility(GONE)
+                        imageViewButton?.setVisibility(GONE)
                     }
 
                     // 內容
-                    layoutNormal!!.setVisibility(VISIBLE)
+                    layoutNormal?.setVisibility(VISIBLE)
                     set_normal()
                 }
             }.runInMainThread()
@@ -259,33 +259,33 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         } else {
             viewHeight = viewHeight / 4
         }
-        photoViewPic!!.setMinimumHeight(viewHeight)
+        photoViewPic?.setMinimumHeight(viewHeight)
         loadImage()
-        urlView!!.setText(myImageUrl)
+        urlView?.setText(myImageUrl)
     }
 
     /** 內容網址  */
     private fun set_normal() {
         if (!myTitle.isEmpty()) {
-            titleView!!.setText(myTitle)
-            titleView!!.setVisibility(VISIBLE)
+            titleView?.setText(myTitle)
+            titleView?.setVisibility(VISIBLE)
         }
         if (!myDescription.isEmpty()) {
-            descriptionView!!.setText(myDescription)
-            descriptionView!!.setVisibility(VISIBLE)
+            descriptionView?.setText(myDescription)
+            descriptionView?.setVisibility(VISIBLE)
         }
-        urlView!!.setText(myUrl)
+        urlView?.setText(myUrl)
     }
 
     /** 意外處理  */
     private fun set_fail() {
-        layoutDefault!!.setVisibility(GONE)
+        layoutDefault?.setVisibility(GONE)
 
         // 圖片
-        layoutPic!!.setVisibility(GONE)
+        layoutPic?.setVisibility(GONE)
 
         // 內容
-        layoutNormal!!.setVisibility(GONE)
+        layoutNormal?.setVisibility(GONE)
     }
 
     /** 讀取圖片  */
@@ -294,9 +294,9 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         object : ASRunner() {
             @SuppressLint("ResourceType")
             public override fun run() {
-                imageViewButton!!.setVisibility(GONE)
-                photoViewPic!!.setVisibility(VISIBLE)
-                photoViewPic!!.setContentDescription(myDescription)
+                imageViewButton?.setVisibility(GONE)
+                photoViewPic?.setVisibility(VISIBLE)
+                photoViewPic?.setContentDescription(myDescription)
                 try {
                     val circularProgressDrawable = CircularProgressDrawable(getContext())
                     circularProgressDrawable.setStrokeWidth(10f)
@@ -314,7 +314,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                         return
                     }
 
-                    photoViewPic!!.setImageDrawable(circularProgressDrawable)
+                    photoViewPic?.setImageDrawable(circularProgressDrawable)
 
                     Glide.with(this@Thumbnail_ItemView)
                         .load(myImageUrl)
@@ -365,15 +365,15 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
                                     val tempHeight = (picHeight * scale).toInt()
                                     targetHeight = min(tempHeight, targetHeight)
-                                    photoViewPic!!.setMinimumHeight(targetHeight)
+                                    photoViewPic?.setMinimumHeight(targetHeight)
 
                                     val tempWidth = (picWidth * scale).toInt()
                                     targetWidth = min(tempWidth, targetWidth)
-                                    photoViewPic!!.setMinimumWidth(targetWidth)
+                                    photoViewPic?.setMinimumWidth(targetWidth)
 
                                     if (resource is GifDrawable) {
                                         resource.startFromFirstFrame()
-                                        photoViewPic!!.setImageDrawable(resource)
+                                        photoViewPic?.setImageDrawable(resource)
                                     } else {
                                         val newBitmap = Bitmap.createScaledBitmap(
                                             bitmap,
@@ -381,7 +381,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                                             targetHeight,
                                             true
                                         )
-                                        photoViewPic!!.setImageBitmap(newBitmap)
+                                        photoViewPic?.setImageBitmap(newBitmap)
                                     }
                                 } catch (ignored: Exception) {
                                     object : ASRunner() {
@@ -441,22 +441,22 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
             this
         )
         mainLayout = findViewById<LinearLayout>(R.id.thumbnail_content_view)
-        layoutDefault = mainLayout!!.findViewById<LinearLayout>(R.id.thumbnail_default)
+        layoutDefault = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_default)
 
-        layoutPic = mainLayout!!.findViewById<LinearLayout>(R.id.thumbnail_pic)
-        photoViewPic = mainLayout!!.findViewById<PhotoView>(R.id.thumbnail_image_pic)
-        photoViewPic!!.setOnClickListener(openUrlListener)
-        photoViewPic!!.setMaximumScale(20.0f)
-        photoViewPic!!.setMediumScale(3.0f)
+        layoutPic = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_pic)
+        photoViewPic = mainLayout?.findViewById<PhotoView>(R.id.thumbnail_image_pic)
+        photoViewPic?.setOnClickListener(openUrlListener)
+        photoViewPic?.setMaximumScale(20.0f)
+        photoViewPic?.setMediumScale(3.0f)
 
-        imageViewButton = mainLayout!!.findViewById<Button>(R.id.thumbnail_image_button)
-        imageViewButton!!.setOnClickListener(OnClickListener { view: View? -> prepare_load_image() })
+        imageViewButton = mainLayout?.findViewById<Button>(R.id.thumbnail_image_button)
+        imageViewButton?.setOnClickListener(OnClickListener { view: View? -> prepare_load_image() })
 
-        layoutNormal = mainLayout!!.findViewById<LinearLayout>(R.id.thumbnail_normal)
-        titleView = mainLayout!!.findViewById<TextView>(R.id.thumbnail_title)
-        titleView!!.setOnClickListener(titleListener)
-        descriptionView = mainLayout!!.findViewById<TextView>(R.id.thumbnail_description)
-        descriptionView!!.setOnClickListener(descriptionListener)
-        urlView = mainLayout!!.findViewById<TextView>(R.id.thumbnail_url)
+        layoutNormal = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_normal)
+        titleView = mainLayout?.findViewById<TextView>(R.id.thumbnail_title)
+        titleView?.setOnClickListener(titleListener)
+        descriptionView = mainLayout?.findViewById<TextView>(R.id.thumbnail_description)
+        descriptionView?.setOnClickListener(descriptionListener)
+        urlView = mainLayout?.findViewById<TextView>(R.id.thumbnail_url)
     }
 }

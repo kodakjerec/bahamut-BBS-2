@@ -33,7 +33,7 @@ object ASSnackBar {
             // com.kota.ASFramework.Thread.ASRunner
             override fun run() {
                 if (previousSnackBar != null) {
-                    previousSnackBar!!.dismiss()
+                    previousSnackBar?.dismiss()
                 }
                 val totalMessage = "$largeMessage $normalMessage"
                 val spannableString = SpannableString(totalMessage)
@@ -86,7 +86,7 @@ object ASSnackBar {
                     previousSnackBar = Snackbar.make(tempView, spannableString, Snackbar.LENGTH_LONG)
                     
                     // 靠上對齊
-                    val view = previousSnackBar!!.view
+                    val view = previousSnackBar?.view
                     val params = view.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
                     if (TempSettings.myActivity != null) {
@@ -99,7 +99,7 @@ object ASSnackBar {
                     }
                     view.layoutParams = params
 
-                    previousSnackBar!!.show()
+                    previousSnackBar?.show()
                 } else {
                     return // 如果沒有有效的 View，就不顯示 Snackbar
                 }

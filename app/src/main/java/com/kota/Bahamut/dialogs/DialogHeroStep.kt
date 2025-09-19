@@ -23,7 +23,7 @@ class DialogHeroStep:ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_hero_step)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
 
         mainLayout = findViewById(R.id.content_view)
         content1 = mainLayout.findViewById(R.id.Dialog_hero_step_content1)
@@ -47,7 +47,7 @@ class DialogHeroStep:ASDialog() {
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
         }
     }
 
@@ -58,7 +58,7 @@ class DialogHeroStep:ASDialog() {
             .pushString("\n") // 按[Enter]結束
             .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
             .build()
-        TelnetClient.client!!.sendDataToServer(builder)
+        TelnetClient.client?.sendDataToServer(builder)
         dismiss()
     }
 
@@ -66,11 +66,11 @@ class DialogHeroStep:ASDialog() {
     private val sendOnClickListener = OnClickListener {_->
         isClickButton = true
         var sendContent = ""
-        if (content1.text!!.isNotEmpty())
+        if (content1.text?.isNotEmpty())
             sendContent += content1.text.toString()+"\n"
-        if (content2.text!!.isNotEmpty())
+        if (content2.text?.isNotEmpty())
             sendContent += content2.text.toString()+"\n"
-        if (content3.text!!.isNotEmpty())
+        if (content3.text?.isNotEmpty())
             sendContent += content3.text.toString()+"\n"
         if (sendContent.isNotEmpty()) {
             val builder = TelnetOutputBuilder.create()
@@ -78,14 +78,14 @@ class DialogHeroStep:ASDialog() {
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_hero_success01))
         } else {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
         }
         dismiss()
     }

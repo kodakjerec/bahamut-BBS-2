@@ -23,7 +23,7 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_post_article)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         this.myTarget = aTarget
         this.postTargetRadioGroup = findViewById<RadioGroup>(R.id.post_target)
         this.sendButton = findViewById<Button>(R.id.send)
@@ -67,7 +67,7 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
                     "F"
                 }
             }
-            this.listener!!.onPostArticleDoneWithTarget(target, sign)
+            this.listener?.onPostArticleDoneWithTarget(target, sign)
         }
         dismiss()
     }

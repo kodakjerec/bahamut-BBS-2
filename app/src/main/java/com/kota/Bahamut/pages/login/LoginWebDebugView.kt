@@ -20,7 +20,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_login_signin)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
 
         mainLayout = findViewById(R.id.dialog_login_signin_layout)
         webView = findViewById(R.id.debug_webview)

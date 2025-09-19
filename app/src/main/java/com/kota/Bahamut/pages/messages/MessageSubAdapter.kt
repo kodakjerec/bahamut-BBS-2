@@ -26,7 +26,7 @@ class MessageSubAdapter(list: MutableList<BahaMessage>): BaseAdapter() {
     }
 
     override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
-        var myView: View? = convertView
+        var myView: View?
         val item = getItem(index)
         if (item.type==0) {
             myView = MessageSubReceive(myContext!!)

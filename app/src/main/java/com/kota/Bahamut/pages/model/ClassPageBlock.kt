@@ -25,7 +25,7 @@ class ClassPageBlock private constructor() : TelnetListPageBlock() {
         fun create(): ClassPageBlock {
             var block: ClassPageBlock? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     block = _pool.pop()
                 }
             }

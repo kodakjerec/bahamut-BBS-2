@@ -38,7 +38,7 @@ class BahamutCommandSendMail(var receiver: String, var title: String, var conten
         }
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
     }
 

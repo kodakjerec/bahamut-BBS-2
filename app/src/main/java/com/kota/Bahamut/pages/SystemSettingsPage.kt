@@ -59,6 +59,7 @@ import com.kota.telnetUI.textView.TelnetTextViewSmall
 import java.util.Timer
 import java.util.TimerTask
 import androidx.core.net.toUri
+import com.kota.Bahamut.service.TempSettings.myContext
 
 class SystemSettingsPage : TelnetPage() {
     var mainLayout: LinearLayout? = null
@@ -73,7 +74,7 @@ class SystemSettingsPage : TelnetPage() {
     var animationEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             propertiesAnimationEnable = isChecked
-            ASNavigationController.currentController!!.isAnimationEnable = propertiesAnimationEnable
+            ASNavigationController.currentController?.isAnimationEnable = propertiesAnimationEnable
         }
     var articleMoveBoardEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
@@ -105,7 +106,7 @@ class SystemSettingsPage : TelnetPage() {
             if (getCloudSave()) {
                 // 詢問雲端
                 val cloudBackup = CloudBackup()
-                cloudBackup.setListener({
+                cloudBackup.setListener {
                     showProcessingDialog("設定套用中\n請重新進入設定")
                     onBackPressed()
 
@@ -116,7 +117,7 @@ class SystemSettingsPage : TelnetPage() {
                         }
                     }
                     timer.schedule(task, 3000)
-                })
+                }
                 cloudBackup.askCloudSave()
             }
         }
@@ -140,15 +141,15 @@ class SystemSettingsPage : TelnetPage() {
     var keepWifiListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             propertiesKeepWifi = isChecked
-            if (isChecked) navigationController.deviceController!!.lockWifi()
-            else navigationController.deviceController!!.unlockWifi()
+            if (isChecked) navigationController.deviceController?.lockWifi()
+            else navigationController.deviceController?.unlockWifi()
         }
 
     /** 不受電池最佳化限制  */
     @SuppressLint("BatteryLife")
     var ignoreBatteryListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val powerManager = context!!.getSystemService(Context.POWER_SERVICE) as PowerManager
-        val packageName: String? = context!!.getPackageName()
+        val powerManager = context?.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val packageName: String? = context?.packageName
         val intent = Intent(Intent.ACTION_VIEW)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
@@ -163,25 +164,25 @@ class SystemSettingsPage : TelnetPage() {
 
     /** 開啟贊助葉面  */
     var billingPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance!!.billingPage
+        val page = PageContainer.instance?.billingPage
         navigationController.pushViewController(page)
     }
 
     /** 開啟外觀管理  */
     var themeManagerPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance!!.getThemeManagerPage()
+        val page = PageContainer.instance?.getThemeManagerPage()
         navigationController.pushViewController(page)
     }
 
     /** 開啟BBS個人資料  */
     var bbsUserInfoListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.client!!.sendStringToServerInBackground("u\ni")
-        val page = PageContainer.instance!!.getUserInfoPage()
+        TelnetClient.client?.sendStringToServerInBackground("u\ni")
+        val page = PageContainer.instance?.getUserInfoPage()
         navigationController.pushViewController(page)
     }
     var bbsUserConfigListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.client!!.sendStringToServerInBackground("u\nc")
-        val page = PageContainer.instance!!.getUserConfigPage()
+        TelnetClient.client?.sendStringToServerInBackground("u\nc")
+        val page = PageContainer.instance?.getUserConfigPage()
         navigationController.pushViewController(page)
     }
 
@@ -204,7 +205,7 @@ class SystemSettingsPage : TelnetPage() {
         }
 
     /** 側邊選單位置  */
-    var _drawer_location_listener: AdapterView.OnItemSelectedListener =
+    var drawerLocationListener: AdapterView.OnItemSelectedListener =
         object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 adapterView: AdapterView<*>?,
@@ -222,7 +223,7 @@ class SystemSettingsPage : TelnetPage() {
         }
 
     /** 工具列位置  */
-    var _toolbar_location_listener: AdapterView.OnItemSelectedListener =
+    var toolbarLocationListener: AdapterView.OnItemSelectedListener =
         object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 adapterView: AdapterView<*>?,
@@ -231,18 +232,18 @@ class SystemSettingsPage : TelnetPage() {
                 l: Long
             ) {
                 if (i <= 2) {
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
                         View.VISIBLE
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
                         View.GONE
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
                         View.GONE
                 } else {
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
                         View.GONE
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
                         View.VISIBLE
-                    mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
                         View.VISIBLE
                 }
                 propertiesToolbarLocation = i
@@ -254,7 +255,7 @@ class SystemSettingsPage : TelnetPage() {
         }
 
     /** 工具列排序  */
-    var _toolbar_order_listener: AdapterView.OnItemSelectedListener =
+    var toolbarOrderListener: AdapterView.OnItemSelectedListener =
         object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 adapterView: AdapterView<*>?,
@@ -271,7 +272,7 @@ class SystemSettingsPage : TelnetPage() {
         }
 
     /** 連結自動預覽  */
-    var _link_auto_show_listener: CompoundButton.OnCheckedChangeListener =
+    var linkAutoShowListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             setPropertiesLinkAutoShow(isChecked)
             changeLinkAutoShowStatus(isChecked)
@@ -279,21 +280,21 @@ class SystemSettingsPage : TelnetPage() {
 
     fun changeLinkAutoShowStatus(enable: Boolean) {
         if (enable) {
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail).visibility =
                 View.VISIBLE
-            (mainLayout!!.findViewById<View>(R.id.SystemSettings_enableLinkShowThumbnail) as CheckBox).isChecked =
+            (mainLayout?.findViewById<View>(R.id.SystemSettings_enableLinkShowThumbnail) as CheckBox).isChecked =
                 linkShowThumbnail
             changeLinkOnlyWifiStatus(linkShowThumbnail)
         } else {
             linkShowThumbnail = false
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail).visibility =
                 View.GONE
             changeLinkOnlyWifiStatus(false)
         }
     }
 
     /** 顯示預覽圖  */
-    var _link_show_thumbnail_listener: CompoundButton.OnCheckedChangeListener =
+    var linkShowThumbnailListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             linkShowThumbnail = isChecked
             changeLinkOnlyWifiStatus(isChecked)
@@ -301,13 +302,13 @@ class SystemSettingsPage : TelnetPage() {
 
     fun changeLinkOnlyWifiStatus(enable: Boolean) {
         if (enable) {
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi).visibility =
                 View.VISIBLE
-            (mainLayout!!.findViewById<View>(R.id.SystemSettings_enableLinkShowOnlyWifi) as CheckBox).isChecked =
+            (mainLayout?.findViewById<View>(R.id.SystemSettings_enableLinkShowOnlyWifi) as CheckBox).isChecked =
                 linkShowOnlyWifi
         } else {
             linkShowOnlyWifi = false
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi).visibility =
                 View.GONE
         }
     }
@@ -328,264 +329,264 @@ class SystemSettingsPage : TelnetPage() {
         get() = true
 
     @SuppressLint("SetTextI18n")
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as LinearLayout?
 
         // 黑名單
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_blockListSetting)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_blockListSetting)
             .setOnClickListener(blockListSettingClickListener)
         val blockListEnableBox =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_blockListEnable)
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_blockListEnable)
         blockListEnableBox.isChecked = propertiesBlockListEnable
         blockListEnableBox.setOnCheckedChangeListener(blockListEnableListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_blockListEnable)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_blockListEnable)
             .setOnClickListener { view: View? -> blockListEnableBox.isChecked = !blockListEnableBox.isChecked }
         val blockListForTitleBox =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_blockListForTitle)
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_blockListForTitle)
         blockListForTitleBox.isChecked = propertiesBlockListForTitle
         blockListForTitleBox.setOnCheckedChangeListener(blockListForTitleListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_blockListForTitle)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_blockListForTitle)
             .setOnClickListener { view: View? -> blockListForTitleBox.isChecked = !blockListForTitleBox.isChecked }
 
         // keep-wifi
-        val keepWifiBox = mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_keepWifi)
+        val keepWifiBox = mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_keepWifi)
         keepWifiBox.isChecked = propertiesKeepWifi
         keepWifiBox.setOnCheckedChangeListener(keepWifiListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_keepWifi)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_keepWifi)
             .setOnClickListener { view: View? -> keepWifiBox.isChecked = !keepWifiBox.isChecked }
 
 
         // 換頁動畫
         val animationEnableBox =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_animationEnable)
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_animationEnable)
         animationEnableBox.isChecked = propertiesAnimationEnable
         animationEnableBox.setOnCheckedChangeListener(animationEnableListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_animationEnable)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_animationEnable)
             .setOnClickListener { view: View? -> animationEnableBox.isChecked = !animationEnableBox.isChecked }
 
         // 看板上一頁/下一頁
         val articleMoveEnableBoardBox =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableBoardMove)
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableBoardMove)
         articleMoveEnableBoardBox.setChecked((propertiesBoardMoveEnable > 0))
         articleMoveEnableBoardBox.setOnCheckedChangeListener(articleMoveBoardEnableListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableBoardMove)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableBoardMove)
             .setOnClickListener { view: View? -> articleMoveEnableBoardBox.isChecked = !articleMoveEnableBoardBox.isChecked }
 
 
         // 文章首篇/末篇
-        val article_move_enable_box =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableArticleMove)
-        article_move_enable_box.isChecked = propertiesArticleMoveEnable
-        article_move_enable_box.setOnCheckedChangeListener(articleMoveEnableListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableArticleMove)
-            .setOnClickListener { view: View? -> article_move_enable_box.isChecked = !article_move_enable_box.isChecked }
+        val articleMoveEnableBox =
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableArticleMove)
+        articleMoveEnableBox.isChecked = propertiesArticleMoveEnable
+        articleMoveEnableBox.setOnCheckedChangeListener(articleMoveEnableListener)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableArticleMove)
+            .setOnClickListener { view: View? -> articleMoveEnableBox.isChecked = !articleMoveEnableBox.isChecked }
 
         // 螢幕方向
-        val adapter_screen_orientation: ArrayAdapter<String?> = ArrayAdapter<Any?>(
-            context,
+        val adapterScreenOrientation: ArrayAdapter<Any> = ArrayAdapter<Any>(
+            myContext!!,
             R.layout.simple_spinner_item,
-            resource.getStringArray(R.array.system_setting_page_screen_orientation_items)
+            resource?.getStringArray(R.array.system_setting_page_screen_orientation_items)
         )
-        adapter_screen_orientation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        val spinner_screen_orientation =
-            mainLayout!!.findViewById<Spinner>(R.id.SystemSettings_screen_orientation_spinner)
-        spinner_screen_orientation.adapter = adapter_screen_orientation
-        spinner_screen_orientation.setSelection(propertiesScreenOrientation)
-        spinner_screen_orientation.onItemSelectedListener = screenOrientationListener
+        adapterScreenOrientation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val spinnerScreenOrientation =
+            mainLayout?.findViewById<Spinner>(R.id.SystemSettings_screen_orientation_spinner)
+        spinnerScreenOrientation.adapter = adapterScreenOrientation
+        spinnerScreenOrientation.setSelection(propertiesScreenOrientation)
+        spinnerScreenOrientation.onItemSelectedListener = screenOrientationListener
 
         // 不受電池最佳化限制
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_IgnoreBatteryOptimizations)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_IgnoreBatteryOptimizations)
             .setOnClickListener(ignoreBatteryListener)
 
         // 連結自動預覽
-        val link_auto_show_box =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableLinkAutoShow)
-        link_auto_show_box.isChecked = linkAutoShow
-        link_auto_show_box.setOnCheckedChangeListener(_link_auto_show_listener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkAutoShow)
-            .setOnClickListener { view: View? -> link_auto_show_box.isChecked = !link_auto_show_box.isChecked }
+        val linkAutoShowBox =
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkAutoShow)
+        linkAutoShowBox.isChecked = linkAutoShow
+        linkAutoShowBox.setOnCheckedChangeListener(linkAutoShowListener)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkAutoShow)
+            .setOnClickListener { view: View? -> linkAutoShowBox.isChecked = !linkAutoShowBox.isChecked }
         changeLinkAutoShowStatus(linkAutoShow)
 
         // 顯示預覽圖
-        val link_show_thumbnail =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowThumbnail)
-        link_show_thumbnail.isChecked = linkShowThumbnail
-        link_show_thumbnail.setOnCheckedChangeListener(_link_show_thumbnail_listener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail)
-            .setOnClickListener { view: View? -> link_show_thumbnail.isChecked = !link_show_thumbnail.isChecked }
+        val linkShowThumbnail1 =
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowThumbnail)
+        linkShowThumbnail1.isChecked = linkShowThumbnail
+        linkShowThumbnail1.setOnCheckedChangeListener(linkShowThumbnailListener)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail)
+            .setOnClickListener { view: View? -> linkShowThumbnail1.isChecked = !linkShowThumbnail1.isChecked }
 
         // 只在wifi下自動開啟
-        val link_show_only_wifi =
-            mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowOnlyWifi)
-        link_show_only_wifi.isChecked = linkShowOnlyWifi
-        link_show_only_wifi.setOnCheckedChangeListener(linkShowOnlyWifiListener)
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi)
-            .setOnClickListener { view: View? -> link_show_only_wifi.isChecked = !link_show_only_wifi.isChecked }
+        val linkShowOnlyWifi1 =
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowOnlyWifi)
+        linkShowOnlyWifi1.isChecked = linkShowOnlyWifi
+        linkShowOnlyWifi1.setOnCheckedChangeListener(linkShowOnlyWifiListener)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi)
+            .setOnClickListener { view: View? -> linkShowOnlyWifi1.isChecked = !linkShowOnlyWifi1.isChecked }
 
         // VIP
         if (propertiesVIP) {
             // 使用手勢在看板/文章
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard).visibility =
                 View.VISIBLE
-            val gesture_on_board_enable_box =
-                mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableGestureOnBoard)
-            gesture_on_board_enable_box.isChecked = propertiesGestureOnBoardEnable
-            gesture_on_board_enable_box.setOnCheckedChangeListener(gestureOnBoardEnableListener)
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)
-                .setOnClickListener { view: View? -> gesture_on_board_enable_box.isChecked = !gesture_on_board_enable_box.isChecked }
+            val gestureOnBoardEnableBox =
+                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableGestureOnBoard)
+            gestureOnBoardEnableBox.isChecked = propertiesGestureOnBoardEnable
+            gestureOnBoardEnableBox.setOnCheckedChangeListener(gestureOnBoardEnableListener)
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)
+                .setOnClickListener { view: View? -> gestureOnBoardEnableBox.isChecked = !gestureOnBoardEnableBox.isChecked }
 
             // 自動登入洽特
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat).visibility =
                 View.VISIBLE
-            val auto_to_chat_enable_box =
-                mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_enableAutoToChat)
-            auto_to_chat_enable_box.isChecked = propertiesAutoToChat
-            auto_to_chat_enable_box.setOnCheckedChangeListener(autoToChatEnableListener)
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat)
-                .setOnClickListener { view: View? -> auto_to_chat_enable_box.isChecked = !auto_to_chat_enable_box.isChecked }
+            val autoToChatEnableBox =
+                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableAutoToChat)
+            autoToChatEnableBox.isChecked = propertiesAutoToChat
+            autoToChatEnableBox.setOnCheckedChangeListener(autoToChatEnableListener)
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat)
+                .setOnClickListener { view: View? -> autoToChatEnableBox.isChecked = !autoToChatEnableBox.isChecked }
 
             // 工具列位置
-            val adapter_toolbar_location: ArrayAdapter<String?> = ArrayAdapter<Any?>(
-                context,
+            val adapterToolbarLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
+                myContext!!,
                 R.layout.simple_spinner_item,
-                resource.getStringArray(R.array.system_setting_page_toolbar_location_items)
+                resource?.getStringArray(R.array.system_setting_page_toolbar_location_items)
             )
-            adapter_toolbar_location.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            val spinner_toolbar_location =
-                mainLayout!!.findViewById<Spinner>(R.id.SystemSettings_toolbar_location_spinner)
-            spinner_toolbar_location.adapter = adapter_toolbar_location
-            spinner_toolbar_location.setSelection(propertiesToolbarLocation)
-            spinner_toolbar_location.onItemSelectedListener = _toolbar_location_listener
+            adapterToolbarLocation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val spinnerToolbarLocation =
+                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_location_spinner)
+            spinnerToolbarLocation.adapter = adapterToolbarLocation
+            spinnerToolbarLocation.setSelection(propertiesToolbarLocation)
+            spinnerToolbarLocation.onItemSelectedListener = toolbarLocationListener
 
             // 工具列順序
-            val adapter_toolbar_order: ArrayAdapter<String?> = ArrayAdapter<Any?>(
-                context,
+            val adapterToolbarOrder: ArrayAdapter<Any> = ArrayAdapter<Any>(
+                myContext!!,
                 R.layout.simple_spinner_item,
-                resource.getStringArray(R.array.system_setting_page_toolbar_order_items)
+                resource?.getStringArray(R.array.system_setting_page_toolbar_order_items)
             )
-            adapter_toolbar_order.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            val spinner_toolbar_order =
-                mainLayout!!.findViewById<Spinner>(R.id.SystemSettings_toolbar_order_spinner)
-            spinner_toolbar_order.adapter = adapter_toolbar_order
-            spinner_toolbar_order.setSelection(propertiesToolbarOrder)
-            spinner_toolbar_order.onItemSelectedListener = _toolbar_order_listener
+            adapterToolbarOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val spinnerToolbarOrder =
+                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_order_spinner)
+            spinnerToolbarOrder.adapter = adapterToolbarOrder
+            spinnerToolbarOrder.setSelection(propertiesToolbarOrder)
+            spinnerToolbarOrder.onItemSelectedListener = toolbarOrderListener
             if (propertiesToolbarLocation <= 2) { // 底部工具列
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
                     View.VISIBLE
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
                     View.GONE
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
                     View.GONE
             } else { // 浮動
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1).visibility =
                     View.GONE
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2).visibility =
                     View.VISIBLE
-                mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
+                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3).visibility =
                     View.VISIBLE
             }
-            val textSmall_idle =
-                mainLayout!!.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_idle_text)
-            val slider_idle =
-                mainLayout!!.findViewById<Slider>(R.id.system_setting_page_toolbar_idle)
-            slider_idle.value = toolbarIdle
-            textSmall_idle.text = slider_idle.value.toString() + "s"
-            slider_idle.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
+            val textSmallIdle =
+                mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_idle_text)
+            val sliderIdle =
+                mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_idle)
+            sliderIdle.value = toolbarIdle
+            textSmallIdle.text = sliderIdle.value.toString() + "s"
+            sliderIdle.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
                 toolbarIdle = value
-                textSmall_idle.text = value.toString() + "s"
+                textSmallIdle.text = value.toString() + "s"
             }
-            val textSmall_alpha =
-                mainLayout!!.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_alpha_text)
-            val slider_alpha =
-                mainLayout!!.findViewById<Slider>(R.id.system_setting_page_toolbar_alpha)
-            slider_alpha.value = toolbarAlpha
-            textSmall_alpha.text = slider_alpha.value.toInt().toString() + "%"
-            slider_alpha.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
+            val textSmallAlpha =
+                mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_alpha_text)
+            val sliderAlpha =
+                mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_alpha)
+            sliderAlpha.value = toolbarAlpha
+            textSmallAlpha.text = sliderAlpha.value.toInt().toString() + "%"
+            sliderAlpha.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
                 toolbarAlpha = value
-                textSmall_alpha.text = value.toInt().toString() + "%"
+                textSmallAlpha.text = value.toInt().toString() + "%"
             }
             // 側滑選單位置
-            val adapter_drawer_location: ArrayAdapter<String?> = ArrayAdapter<Any?>(
-                context,
+            val adapterDrawerLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
+                myContext!!,
                 R.layout.simple_spinner_item,
-                resource.getStringArray(R.array.system_setting_page_drawer_location_items)
+                resource?.getStringArray(R.array.system_setting_page_drawer_location_items)
             )
-            adapter_drawer_location.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            val spinner_drawer_location =
-                mainLayout!!.findViewById<Spinner>(R.id.SystemSettings_drawer_location_spinner)
-            spinner_drawer_location.adapter = adapter_drawer_location
-            spinner_drawer_location.setSelection(propertiesDrawerLocation)
-            spinner_drawer_location.onItemSelectedListener = _drawer_location_listener
+            adapterDrawerLocation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val spinnerDrawerLocation =
+                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_drawer_location_spinner)
+            spinnerDrawerLocation.adapter = adapterDrawerLocation
+            spinnerDrawerLocation.setSelection(propertiesDrawerLocation)
+            spinnerDrawerLocation.onItemSelectedListener = drawerLocationListener
 
             // 表情符號設定
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting)
+            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting)
                 .setOnClickListener(articleHeaderSettingListener)
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting)
+            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting)
                 .setOnClickListener(articleExpressionSettingListener)
 
             // 雲端設定
-            val cloud_save_enable_box =
-                mainLayout!!.findViewById<CheckBox>(R.id.SystemSettings_cloudSaveEnable)
-            cloud_save_enable_box.isChecked = getCloudSave()
-            cloud_save_enable_box.setOnCheckedChangeListener(cloudSaveEnableListener)
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_cloudSaveEnable)
-                .setOnClickListener { view: View? -> cloud_save_enable_box.isChecked = !cloud_save_enable_box.isChecked }
-            val cloud_save_last_time =
-                mainLayout!!.findViewById<TextView>(R.id.SystemSettings_cloudSaveLastTime)
+            val cloudSaveEnableBox =
+                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_cloudSaveEnable)
+            cloudSaveEnableBox.isChecked = getCloudSave()
+            cloudSaveEnableBox.setOnCheckedChangeListener(cloudSaveEnableListener)
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_cloudSaveEnable)
+                .setOnClickListener { view: View? -> cloudSaveEnableBox.isChecked = !cloudSaveEnableBox.isChecked }
+            val cloudSaveLastTime =
+                mainLayout?.findViewById<TextView>(R.id.SystemSettings_cloudSaveLastTime)
             val lastTime = TempSettings.cloudSaveLastTime
             if (lastTime.isEmpty()) {
-                cloud_save_last_time.visibility = View.GONE
+                cloudSaveLastTime.visibility = View.GONE
             } else {
-                cloud_save_last_time.text = lastTime
+                cloudSaveLastTime.text = lastTime
             }
         } else {
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_location).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_location).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_toolbar_order).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_drawer_location).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_drawer_location).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting).visibility =
                 View.GONE
-            mainLayout!!.findViewById<View>(R.id.SystemSettings_item_cloud_save_layout).visibility =
+            mainLayout?.findViewById<View>(R.id.SystemSettings_item_cloud_save_layout).visibility =
                 View.GONE
         }
 
         // billing-page
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_goBillingPage)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_goBillingPage)
             .setOnClickListener(billingPageListener)
 
         // theme-manager-page
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_goThemeManagerPage)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_goThemeManagerPage)
             .setOnClickListener(themeManagerPageListener)
 
         // bbs-user-info-page
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)
             .setOnClickListener(bbsUserInfoListener)
 
         // bbs-user-page
-        mainLayout!!.findViewById<View>(R.id.SystemSettings_goBBSUserConfig)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserConfig)
             .setOnClickListener(bbsUserConfigListener)
     }
 
     val name: String
         get() = "TelnetSystemSettingsDialog"
 
-    public override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean {
         notifyDataUpdated()
         return super.onBackPressed()
     }
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast("返回")
         return true

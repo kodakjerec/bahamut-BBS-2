@@ -77,7 +77,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         isAnimationEnable = propertiesAnimationEnable
         // 啟用wifi鎖定
         if (propertiesKeepWifi) {
-            deviceController!!.lockWifi()
+            deviceController?.lockWifi()
         }
 
         // 共用函數
@@ -217,7 +217,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
                 if (getMessageSmall() != null) {
                     val messageSmall: MessageSmall? = getMessageSmall()
-                    currentController!!.removeForeverView(messageSmall)
+                    currentController?.removeForeverView(messageSmall)
                     setMessageSmall(null)
                 }
             }
@@ -225,7 +225,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     private fun handleNormalConnectionClosed() {
-        val pages: Vector<ASViewController?> = currentController!!.viewControllers
+        val pages: Vector<ASViewController?> = currentController?.viewControllers
         val newControllers = Vector<ASViewController>()
         for (controller in pages) {
             val telnetPage = controller as TelnetPage

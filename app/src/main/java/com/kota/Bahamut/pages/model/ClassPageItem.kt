@@ -5,26 +5,26 @@ import java.util.Stack
 
 class ClassPageItem private constructor() : TelnetListPageItem() {
     @JvmField
-    var Manager: String? = null
-    var Mode: Int = 0
+    var manager: String? = null
+    var mode: Int = 0
     @JvmField
-    var Name: String? = null
+    var name: String? = null
     @JvmField
-    var Title: String? = null
+    var title: String? = null
     @JvmField
     var isDirectory: Boolean = false
 
-    public override fun clear() {
+    override fun clear() {
         super.clear()
-        this.Manager = null
-        this.Name = null
-        this.Title = null
+        this.manager = null
+        this.name = null
+        this.title = null
         this.isDirectory = false
-        this.Mode = 0
+        this.mode = 0
     }
 
     companion object {
-        private const val _count = 0
+        private const val COUNT = 0
         private val _pool = Stack<ClassPageItem?>()
         @JvmStatic
         fun release() {
@@ -43,7 +43,7 @@ class ClassPageItem private constructor() : TelnetListPageItem() {
         fun create(): ClassPageItem {
             var item: ClassPageItem? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     item = _pool.pop()
                 }
             }

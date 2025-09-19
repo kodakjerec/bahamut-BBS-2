@@ -39,13 +39,13 @@ class ArticlePage_TimeTimeView : RelativeLayout, TelnetArticleItemView {
 
     fun setTime(aTime: String?) {
         if (timeLabel != null) {
-            timeLabel!!.setText(aTime)
+            timeLabel?.setText(aTime)
         }
     }
 
     fun setIP(aIP: String?) {
         if (ipLabel != null) {
-            ipLabel!!.setText(aIP)
+            ipLabel?.setText(aIP)
         }
     }
 

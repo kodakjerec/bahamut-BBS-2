@@ -5,12 +5,12 @@ import java.util.Stack
 
 class MailBoxPageItem private constructor() : TelnetListPageItem() {
     @JvmField
-    var Author: String? = null
+    var author: String? = null
     @JvmField
-    var Date: String? = null
-    var Size: Int = 0
+    var date: String? = null
+    var size: Int = 0
     @JvmField
-    var Title: String? = null
+    var title: String? = null
     @JvmField
     var isMarked: Boolean = false
     var isOrigin: Boolean = false
@@ -19,32 +19,32 @@ class MailBoxPageItem private constructor() : TelnetListPageItem() {
     @JvmField
     var isReply: Boolean = false
 
-    public override fun clear() {
+    override fun clear() {
         super.clear()
-        this.Size = 0
+        this.size = 0
         this.isRead = false
         this.isReply = false
-        this.Date = null
-        this.Author = null
-        this.Title = null
+        this.date = null
+        this.author = null
+        this.title = null
     }
 
-    public override fun set(item: TelnetListPageItem?) {
-        super.set(item)
-        if (item != null) {
-            val mail_item = item as MailBoxPageItem
-            this.Size = mail_item.Size
-            this.Date = mail_item.Date
-            this.Author = mail_item.Author
-            this.isRead = mail_item.isRead
-            this.isReply = mail_item.isReply
-            this.isMarked = mail_item.isMarked
-            this.Title = mail_item.Title
+    override fun set(aData: TelnetListPageItem?) {
+        super.set(aData)
+        if (aData != null) {
+            val mailItem = aData as MailBoxPageItem
+            this.size = mailItem.size
+            this.date = mailItem.date
+            this.author = mailItem.author
+            this.isRead = mailItem.isRead
+            this.isReply = mailItem.isReply
+            this.isMarked = mailItem.isMarked
+            this.title = mailItem.title
         }
     }
 
     companion object {
-        private const val _count = 0
+        private const val COUNT = 0
         private val _pool = Stack<MailBoxPageItem?>()
         @JvmStatic
         fun release() {
@@ -63,7 +63,7 @@ class MailBoxPageItem private constructor() : TelnetListPageItem() {
         fun create(): MailBoxPageItem {
             var item: MailBoxPageItem? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     item = _pool.pop()
                 }
             }

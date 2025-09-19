@@ -156,7 +156,7 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
         val data = ByteArray(byteBuffer.remaining())
         byteBuffer.get(data)
 
-        if (webSocket!!.send(ByteString.of(*data))) {
+        if (webSocket?.send(ByteString.of(*data))) {
             return data.size
         } else {
             throw IOException("Failed to send data")

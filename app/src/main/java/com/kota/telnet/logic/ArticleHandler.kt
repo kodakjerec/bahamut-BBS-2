@@ -26,12 +26,12 @@ class ArticleHandler {
             for (sourceIndex in startLine..22) {
                 page.addRow(aModel.getRow(sourceIndex))
             }
-            pages!!.add(page)
+            pages?.add(page)
         }
     }
 
     fun loadLastPage(aModel: TelnetModel?) {
-        var start = if (pages!!.isNotEmpty()) 1 else 0
+        var start = if (pages?.isNotEmpty()) 1 else 0
         var end = 23
         while (start < 23 && aModel?.getRow(start)?.isEmpty == true) {
             start++
@@ -52,7 +52,7 @@ class ArticleHandler {
 
     fun clear() {
         article.clear()
-        pages!!.clear()
+        pages?.clear()
         articlePage = null
     }
 
@@ -339,8 +339,8 @@ class ArticleHandler {
 
     private fun buildRows(rows: Vector<TelnetRow>) {
         synchronized(pages!!) {
-            if (pages != null && pages!!.isNotEmpty()) {
-                val pageCount = pages!!.size
+            if (pages != null && pages?.isNotEmpty()) {
+                val pageCount = pages?.size
                 for (pageIndex in 0..<pageCount) {
                     addPage(pages!![pageIndex], rows)
                 }

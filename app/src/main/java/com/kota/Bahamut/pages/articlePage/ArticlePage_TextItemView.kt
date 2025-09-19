@@ -71,7 +71,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                 author_buffer.append("(").append(nickname).append(")")
             }
             if (author != null && !author.isEmpty()) author_buffer.append(" 說:")
-            authorLabel!!.setText(author_buffer.toString())
+            authorLabel?.setText(author_buffer.toString())
         }
     }
 
@@ -80,12 +80,12 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
             if (myQuote > 0) {
-                contentLabel!!.setText(content)
+                contentLabel?.setText(content)
                 stringNewUrlSpan(contentLabel!!)
             } else {
                 // 塗顏色
                 val colorfulText = stringPaint(rows)
-                contentLabel!!.setText(colorfulText)
+                contentLabel?.setText(colorfulText)
             }
             // 預覽圖
             stringThumbnail()
@@ -165,7 +165,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                 var paintBackColor: Byte = TelnetAnsi.getDefaultBackgroundColor()
                 // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
                 var needReplaceBackColor = false
-                for (i in backgroundColor!!.indices) {
+                for (i in backgroundColor?.indices) {
                     if (backgroundColor[i] != paintBackColor) {
                         if ((i + 1) <= ssRawString.length) {
                             needReplaceBackColor = true
@@ -251,7 +251,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
             // 使用預覽圖
             if (linkAutoShow) {
                 // 修正：先處理網址中的 \n
-                val rawText = contentLabel!!.getText().toString()
+                val rawText = contentLabel?.getText().toString()
                 val fixedText = fixUrlNewlines(rawText)
                 val spannableText: Spannable = SpannableString(fixedText)
 
@@ -427,12 +427,12 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
         myQuote = quote
         // 之前的引用文章
         if (myQuote > 0) {
-            authorLabel!!.setTextColor(getContextColor(R.color.article_page_text_item_author1))
-            contentLabel!!.setTextColor(getContextColor(R.color.article_page_text_item_content1))
+            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author1))
+            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content1))
         } else {
             // 使用者回文
-            authorLabel!!.setTextColor(getContextColor(R.color.article_page_text_item_author0))
-            contentLabel!!.setTextColor(getContextColor(R.color.article_page_text_item_content0))
+            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author0))
+            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content0))
         }
     }
 
@@ -445,17 +445,17 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setDividerHidden(isHidden: Boolean) {
         if (isHidden) {
-            dividerView!!.setVisibility(GONE)
+            dividerView?.setVisibility(GONE)
         } else {
-            dividerView!!.setVisibility(VISIBLE)
+            dividerView?.setVisibility(VISIBLE)
         }
     }
 
     fun setVisible(visible: Boolean) {
         if (visible) {
-            contentView!!.setVisibility(VISIBLE)
+            contentView?.setVisibility(VISIBLE)
         } else {
-            contentView!!.setVisibility(GONE)
+            contentView?.setVisibility(GONE)
         }
     }
 }

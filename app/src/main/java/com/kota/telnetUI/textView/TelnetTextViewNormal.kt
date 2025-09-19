@@ -20,7 +20,6 @@ class TelnetTextViewNormal : TelnetTextView {
         reloadTextSize()
     }
 
-    /* access modifiers changed from: protected */
     public override fun reloadTextSize() {
         setTextModelSize(TEXT_VIEW_SIZE_NORMAL)
     }

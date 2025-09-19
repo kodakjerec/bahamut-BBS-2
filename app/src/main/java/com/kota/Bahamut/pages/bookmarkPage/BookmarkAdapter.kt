@@ -11,7 +11,7 @@ class BookmarkAdapter(private val _bookmarks: MutableList<Bookmark?>) :
     private var mClickListener: BookmarkClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkViewHolder {
-        val v = LayoutInflater.from(parent.getContext())
+        val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.board_extend_optional_page_bookmark_item_view, parent, false)
         return BookmarkViewHolder(v, mClickListener)
     }
@@ -22,7 +22,7 @@ class BookmarkAdapter(private val _bookmarks: MutableList<Bookmark?>) :
     }
 
     fun getItem(position: Int): Bookmark? {
-        return this._bookmarks.get(position)
+        return this._bookmarks[position]
     }
 
     override fun getItemCount(): Int {

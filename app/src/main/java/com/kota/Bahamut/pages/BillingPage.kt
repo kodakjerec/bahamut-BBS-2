@@ -9,40 +9,37 @@ import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingResult
-import com.android.billingclient.api.ProductDetailsResponseListener
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsResult
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryQuery
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
 
 class BillingPage : TelnetPage() {
     private var billingClient: BillingClient? = null
 
-    val pageType: Int
-        // com.kota.ASFramework.PageController.ASViewController
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BILLING
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.billing_page
 
-    val isPopupPage: Boolean
+    override val isPopupPage: Boolean
+        get() = true
+
+    override val isKeepOnOffline: Boolean
         // com.kota.TelnetUI.TelnetPage
         get() = true
 
-    val isKeepOnOffline: Boolean
-        // com.kota.TelnetUI.TelnetPage
-        get() = true
-
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         billingClient = MyBillingClient.billingClient
         this.productList
 
@@ -50,17 +47,14 @@ class BillingPage : TelnetPage() {
 
         // 檢查已購買
         val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button?
-        button1!!.setOnClickListener(View.OnClickListener { view: View? ->
+        button1?.setOnClickListener { view: View? ->
             checkPurchaseHistoryCloud { qty: Int? ->
                 val totalMoney = (qty!! * 90).toString()
                 val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
-                if (textView != null) {
-                    textView.setText(totalMoney)
-                }
-                Unit
+                textView?.text = totalMoney
             }
             showShortToast(getContextString(R.string.billing_page_result_success))
-        })
+        }
         button1.performClick()
 
         // 替換外觀
@@ -86,55 +80,55 @@ class BillingPage : TelnetPage() {
                 QueryProductDetailsParams.newBuilder()
                     .setProductList(productList).build()
 
-            billingClient!!.queryProductDetailsAsync(
-                queryProductDetailsParams,
-                ProductDetailsResponseListener { billingResult: BillingResult?, productDetailsList: QueryProductDetailsResult? ->
-                    // check billingResult
-                    if (billingResult!!.getResponseCode() == BillingClient.BillingResponseCode.OK) {
-                        // process returned productDetailsList
-                        for (product in productDetailsList!!.getProductDetailsList()) {
-                            object : ASRunner() {
-                                public override fun run() {
-                                    val btn =
-                                        findViewById(R.id.button_90) as Button?
-                                    if (btn != null) {
-                                        btn.setEnabled(true)
-                                        btn.setText(product.getName())
-                                        btn.setOnClickListener(View.OnClickListener { view: View? ->
-                                            val productDetailsParamsList =
-                                                ArrayList<ProductDetailsParams?>()
-                                            productDetailsParamsList
-                                                .add(
-                                                    ProductDetailsParams.newBuilder()
-                                                        .setProductDetails(product)
-                                                        .build()
-                                                )
-
-                                            val billingFlowParams =
-                                                BillingFlowParams.newBuilder()
-                                                    .setProductDetailsParamsList(
-                                                        productDetailsParamsList
-                                                    )
-                                                    .setIsOfferPersonalized(true)
+            billingClient?.queryProductDetailsAsync(
+                queryProductDetailsParams
+            ) { billingResult: BillingResult?, productDetailsList: QueryProductDetailsResult? ->
+                // check billingResult
+                if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
+                    // process returned productDetailsList
+                    for (product in productDetailsList?.productDetailsList) {
+                        object : ASRunner() {
+                            override fun run() {
+                                val btn =
+                                    findViewById(R.id.button_90) as Button?
+                                if (btn != null) {
+                                    btn.isEnabled = true
+                                    btn.text = product.name
+                                    btn.setOnClickListener { view: View? ->
+                                        val productDetailsParamsList =
+                                            ArrayList<ProductDetailsParams?>()
+                                        productDetailsParamsList
+                                            .add(
+                                                ProductDetailsParams.newBuilder()
+                                                    .setProductDetails(product)
                                                     .build()
-
-                                            // Launch the billing flow
-                                            billingClient!!.launchBillingFlow(
-                                                activity!!,
-                                                billingFlowParams
                                             )
-                                        })
+
+                                        val billingFlowParams =
+                                            BillingFlowParams.newBuilder()
+                                                .setProductDetailsParamsList(
+                                                    productDetailsParamsList
+                                                )
+                                                .setIsOfferPersonalized(true)
+                                                .build()
+
+                                        // Launch the billing flow
+                                        billingClient?.launchBillingFlow(
+                                            activity!!,
+                                            billingFlowParams
+                                        )
                                     }
                                 }
-                            }.runInMainThread()
-                        }
+                            }
+                        }.runInMainThread()
                     }
-                })
+                }
+            }
         }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        PageContainer.getInstance().cleanBillingPage()
+        PageContainer.instance?.cleanBillingPage()
         showShortToast("返回")
         return true
     }

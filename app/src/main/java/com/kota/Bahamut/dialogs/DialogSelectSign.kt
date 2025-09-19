@@ -18,7 +18,7 @@ class DialogSelectSign : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_select_sign)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         setTitle(context.getString(R.string.select_sign))
         this.signField = findViewById<EditText>(R.id.Bahamut_Dialog_Select_Sign_Input_Field)
         this.confirmButton = findViewById<Button>(R.id.Bahamut_Dialog_Select_Sign_confirm_Button)
@@ -29,7 +29,7 @@ class DialogSelectSign : ASDialog(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         if (view === this.confirmButton && this.listener != null) {
-            this.listener!!.onSelectSign(this.signField.text.toString().replace("\n", ""))
+            this.listener?.onSelectSign(this.signField.text.toString().replace("\n", ""))
         }
         dismiss()
     }

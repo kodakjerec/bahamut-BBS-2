@@ -82,7 +82,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
 
     fun addBookmark(aBookmark: Bookmark) {
         val boardName = aBookmark.board?.trim { it <= ' ' }
-        if (boardName!!.isEmpty()) {
+        if (boardName?.isEmpty()) {
             this.globalBookmarks.addBookmark(aBookmark)
         } else if (aBookmark.optional == Bookmark.Companion.OPTIONAL_STORY) {
             getBookmarkList(boardName).addHistoryBookmark(aBookmark)
@@ -120,7 +120,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         var saveData: String? = ""
         println("load bookmark store from file")
         var loadFile = false
-        if (this.filePath == null || this.filePath!!.isEmpty()) {
+        if (this.filePath == null || this.filePath?.isEmpty()) {
             println("bookmark file not exists")
         } else {
             val file = File(this.filePath)
@@ -145,8 +145,8 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         if (!loadFile && this.context != null && (this.context.getSharedPreferences(
                 "bookmark",
                 0
-            ).also { perf = it }) != null && (perf!!.getString("save_data", "")
-                .also { saveData = it }) != null && saveData!!.isNotEmpty()
+            ).also { perf = it }) != null && (perf?.getString("save_data", "")
+                .also { saveData = it }) != null && saveData?.isNotEmpty()
         ) {
             try {
                 importFromJSON(JSONObject(saveData))

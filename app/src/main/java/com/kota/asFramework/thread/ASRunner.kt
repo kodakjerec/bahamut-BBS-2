@@ -19,7 +19,7 @@ abstract class ASRunner {
         } else {
             val message = Message()
             message.obj = this
-            mainHandler!!.sendMessage(message)
+            mainHandler?.sendMessage(message)
         }
         return this
     }
@@ -33,16 +33,16 @@ abstract class ASRunner {
 
         runnable = Runnable { this.run() }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            mainHandler!!.postDelayed(runnable!!, token, delayMillis.toLong())
+            mainHandler?.postDelayed(runnable!!, token, delayMillis.toLong())
         } else {
-            mainHandler!!.postDelayed(runnable!!, delayMillis.toLong())
+            mainHandler?.postDelayed(runnable!!, delayMillis.toLong())
         }
     }
 
     /** 取消執行  */
     fun cancel() {
         if (runnable != null) {
-            mainHandler!!.removeCallbacks(runnable!!, token)
+            mainHandler?.removeCallbacks(runnable!!, token)
         }
         runnable = null
     }

@@ -23,7 +23,7 @@ class BahamutCommandEditArticle(var articleNumber: String?, title: String, conte
     }
 
     override fun execute(telnetListPage: TelnetListPage) {
-        if (articleNumber != null && myContent != null && myContent!!.isNotEmpty()) {
+        if (articleNumber != null && myContent != null && myContent?.isNotEmpty()) {
             // 將內文依照 *[ 切換成多段
             val outputs: MutableList<String> =
                 BahamutCommandPostArticle.Companion.convertContentToStringList(myContent!!)
@@ -44,11 +44,11 @@ class BahamutCommandEditArticle(var articleNumber: String?, title: String, conte
             if (myTitle != null) {
                 builder.pushString("T").pushData(25.toByte()).pushString("$myTitle\nY\n")
             }
-            TelnetClient.client!!.sendDataToServer(builder.build())
+            TelnetClient.client?.sendDataToServer(builder.build())
         }
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
     }
 

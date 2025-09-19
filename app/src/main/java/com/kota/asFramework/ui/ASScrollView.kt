@@ -71,8 +71,8 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
     ): Boolean {
         if (this.contentView == null) reload()
         if (this.contentView != null) {
-            this.contentSizeWidth = this.contentView!!.width
-            this.contentSizeHeight = this.contentView!!.height
+            this.contentSizeWidth = this.contentView?.width
+            this.contentSizeHeight = this.contentView?.height
             var i = scrollX
             var m = scrollY
             var j = (i + paramFloat1).toInt()
@@ -100,9 +100,9 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
-        return if (paramMotionEvent.pointerCount == 2) this.scaleDetector!!.onTouchEvent(
+        return if (paramMotionEvent.pointerCount == 2) this.scaleDetector?.onTouchEvent(
             paramMotionEvent
-        ) else this.scrollDetector!!.onTouchEvent(paramMotionEvent)
+        ) else this.scrollDetector?.onTouchEvent(paramMotionEvent)
     }
 
     fun reload() {

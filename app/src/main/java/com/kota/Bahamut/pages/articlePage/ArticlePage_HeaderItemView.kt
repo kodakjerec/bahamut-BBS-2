@@ -54,13 +54,13 @@ class ArticlePage_HeaderItemView(context: Context?) : TelnetHeaderItemView(conte
                     aTitle: String?
                 ) {
                     if (aTitle == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.client!!.sendDataToServer(
+                        TelnetClient.client?.sendDataToServer(
                             create()
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
                         )
                     } else if (aTitle == getContextString(R.string.message_sub_send_hero)) {
-                        val aPage = PageContainer.getInstance().getMessageSub()
+                        val aPage = PageContainer.instance?.getMessageSub()
                         ASNavigationController.getCurrentController().pushViewController(aPage)
                         var authorId = detailTextView1.getText().toString()
                         if (authorId.contains("(")) authorId =

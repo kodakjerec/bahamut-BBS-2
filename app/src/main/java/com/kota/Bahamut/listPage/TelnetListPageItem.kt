@@ -9,11 +9,9 @@ open class TelnetListPageItem {
     var isDeleted: Boolean = false
     var isLoading: Boolean = false
 
-    open fun set(aData: TelnetListPageItem?) {
-        if (aData != null) {
-            this.isDeleted = aData.isDeleted
-            this.isLoading = aData.isLoading
-        }
+    open fun set(aData: TelnetListPageItem) {
+        this.isDeleted = aData.isDeleted
+        this.isLoading = aData.isLoading
     }
 
     open fun clear() {

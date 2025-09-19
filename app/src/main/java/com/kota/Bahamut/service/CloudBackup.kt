@@ -146,7 +146,7 @@ class CloudBackup {
                 .create()
 
             // get bookmark
-            jsonObject.put("bookmark", TempSettings.bookmarkStore!!.exportToJSON().toString())
+            jsonObject.put("bookmark", TempSettings.bookmarkStore?.exportToJSON().toString())
             // get user_settings
             jsonObject.put("user_settings", UserSettings.mySharedPref?.all)
             // encrypt
@@ -263,7 +263,7 @@ class CloudBackup {
 
                             // set bookmark
                             val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
-                            TempSettings.bookmarkStore!!.importFromJSON(bookmark)
+                            TempSettings.bookmarkStore?.importFromJSON(bookmark)
                         }
                     }
                 } catch (e: Exception) {

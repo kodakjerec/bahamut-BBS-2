@@ -35,8 +35,8 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     // 按下新增
     var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (_inputField != null) {
-            val block_name = _inputField!!.getText().toString().trim { it <= ' ' }
-            _inputField!!.setText("")
+            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
+            _inputField?.setText("")
             if (block_name.length > 0) {
                 val new_list: MutableList<String?> =
                     ArrayList<String?>(Arrays.asList<String>(*articleHeaders))
@@ -71,7 +71,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
                 if (button_index > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField!!.setText("")
+                    _inputField?.setText("")
                     resetArticleHeaders()
                     this@ArticleHeaderListPage.reload()
                 }
@@ -98,7 +98,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                     showShortToast(getContextString(R.string.article_header_zero_error_message))
                 } else {
                     Collections.swap(_articleHeadersList, start, end)
-                    articleHeaderListAdapter!!.notifyItemMoved(start, end)
+                    articleHeaderListAdapter?.notifyItemMoved(start, end)
                 }
             } else {
                 showShortToast(getContextString(R.string.vip_only_message))
@@ -117,7 +117,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                     isDragged = true
                     if (viewHolder != null) { // 選取變色
                         dragView = viewHolder.itemView
-                        dragView!!.setBackgroundResource(R.color.ripple_material)
+                        dragView?.setBackgroundResource(R.color.ripple_material)
                     }
                 }
 
@@ -135,7 +135,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                     }
                     if (!isSwiped && isDragged) { // The user used onMove()
                         if (dragView != null) { // 解除 選取變色
-                            dragView!!.setBackgroundResource(R.color.transparent)
+                            dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
                         UserSettings.setArticleHeaders(_articleHeadersList!!)
@@ -161,16 +161,16 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
 
     public override fun onPageDidLoad() {
         val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+        recyclerView?.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         articleHeaderListAdapter = BlockListAdapter(_articleHeadersList)
         recyclerView.setAdapter(articleHeaderListAdapter)
-        articleHeaderListAdapter!!.setOnItemClickListener(this)
+        articleHeaderListAdapter?.setOnItemClickListener(this)
 
         _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)!!.setOnClickListener(_addListener)
-        findViewById(R.id.BlockList_Reset)!!.setOnClickListener(_resetListener)
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
 
         showNotification()
 
@@ -198,9 +198,9 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
         val _temp = Arrays.asList<String?>(*articleHeaders)
-        _articleHeadersList!!.clear()
-        _articleHeadersList!!.addAll(_temp)
-        articleHeaderListAdapter!!.notifyDataSetChanged()
+        _articleHeadersList?.clear()
+        _articleHeadersList?.addAll(_temp)
+        articleHeaderListAdapter?.notifyDataSetChanged()
     }
 
     public override fun onReceivedGestureRight(): Boolean {
@@ -220,7 +220,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             return
         }
         val new_list = this@ArticleHeaderListPage._articleHeadersList
-        new_list!!.removeAt(deleted_index)
+        new_list?.removeAt(deleted_index)
 
         // 更新
         UserSettings.setArticleHeaders(_articleHeadersList!!)

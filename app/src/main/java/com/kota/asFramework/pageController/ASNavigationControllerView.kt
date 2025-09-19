@@ -47,14 +47,14 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
 
     private fun initial(context: Context) {
         this.backgroundView = ASPageView(context)
-        this.backgroundView!!.layoutParams = LayoutParams(-1, -1)
+        this.backgroundView?.layoutParams = LayoutParams(-1, -1)
         addView(this.backgroundView)
         this.contentView = ASPageView(context)
-        this.contentView!!.layoutParams = LayoutParams(-1, -1)
+        this.contentView?.layoutParams = LayoutParams(-1, -1)
         addView(this.contentView)
         this.gestureView = ASGestureView(context)
-        this.gestureView!!.layoutParams = LayoutParams(-1, -1)
-        this.gestureView!!.setDelegate(this)
+        this.gestureView?.layoutParams = LayoutParams(-1, -1)
+        this.gestureView?.setDelegate(this)
         addView(this.gestureView)
     }
 
@@ -66,19 +66,19 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
         if (this.pageController != null) {
-            this.pageController!!.onSizeChanged(w, h, oldw, oldh)
+            this.pageController?.onSizeChanged(w, h, oldw, oldh)
         }
     }
 
     // com.kota.ASFramework.PageController.ASGestureViewDelegate
     override fun onASGestureDisPathTouchEvent(paramMotionEvent: MotionEvent?) {
-        this.contentView!!.dispatchTouchEvent(paramMotionEvent)
+        this.contentView?.dispatchTouchEvent(paramMotionEvent)
     }
 
     // com.kota.ASFramework.PageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureUp(): Boolean {
         if (this.pageController != null) {
-            return this.pageController!!.onReceivedGestureUp()
+            return this.pageController?.onReceivedGestureUp()
         }
         return false
     }
@@ -86,7 +86,7 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
     // com.kota.ASFramework.PageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureDown(): Boolean {
         if (this.pageController != null) {
-            return this.pageController!!.onReceivedGestureDown()
+            return this.pageController?.onReceivedGestureDown()
         }
         return false
     }
@@ -94,7 +94,7 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
     // com.kota.ASFramework.PageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureLeft(): Boolean {
         if (this.pageController != null) {
-            return this.pageController!!.onReceivedGestureLeft()
+            return this.pageController?.onReceivedGestureLeft()
         }
         return false
     }
@@ -102,7 +102,7 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
     // com.kota.ASFramework.PageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureRight(): Boolean {
         if (this.pageController != null) {
-            return this.pageController!!.onReceivedGestureRight()
+            return this.pageController?.onReceivedGestureRight()
         }
         return false
     }

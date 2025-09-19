@@ -32,7 +32,7 @@ class DialogShortenUrlViewHolder(view: View, var mListener: DialogShortenUrlItem
 
     override fun onClick(v: View?) {
         if (mListener != null) {
-            mListener!!.onDialogShortenUrlItemViewClicked(this)
+            mListener?.onDialogShortenUrlItemViewClicked(this)
         }
     }
 }

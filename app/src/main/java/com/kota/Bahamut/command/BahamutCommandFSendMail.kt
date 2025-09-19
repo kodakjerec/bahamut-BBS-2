@@ -18,7 +18,7 @@ class BahamutCommandFSendMail(var receiver: String) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (receiver.isNotEmpty()) {
-            TelnetClient.client!!.sendDataToServer(
+            TelnetClient.client?.sendDataToServer(
                 create()
                     .pushString("FA\n")
                     .pushKey(TelnetKeyboard.CTRL_Y)

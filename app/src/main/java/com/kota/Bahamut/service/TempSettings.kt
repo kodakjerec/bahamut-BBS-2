@@ -69,7 +69,7 @@ object TempSettings {
     }
 
     @JvmStatic
-    fun getHeroStepList(): List<HeroStep> {
+    fun getHeroStepList(): MutableList<HeroStep> {
         return heroStepList
     }
 

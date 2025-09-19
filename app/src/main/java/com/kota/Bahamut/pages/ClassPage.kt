@@ -8,7 +8,6 @@ import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
@@ -41,12 +40,12 @@ import java.util.TimerTask
 
 class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
     var mainLayout: RelativeLayout? = null
-    private var _title: String? = ""
+    private var title: String? = ""
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_CLASS
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.class_page
 
     override fun onPageDidLoad() {
@@ -54,12 +53,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
-        val list_view = mainLayout!!.findViewById<ListView>(R.id.ClassPage_listView)
-        list_view.setEmptyView(mainLayout!!.findViewById<View>(R.id.ClassPage_listEmptyView))
-        listView = list_view
-        mainLayout!!.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
-        mainLayout!!.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
-        mainLayout!!.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
+        val listView1 = mainLayout?.findViewById<ListView>(R.id.ClassPage_listView)
+        listView1.emptyView = mainLayout?.findViewById(R.id.ClassPage_listEmptyView)
+        listView = listView1
+        mainLayout?.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
+        mainLayout?.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
+        mainLayout?.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
@@ -71,55 +70,51 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             val timer = Timer()
             val task1: TimerTask = object : TimerTask() {
                 override fun run() {
-                    TelnetClient.client!!.sendStringToServerInBackground("sChat")
+                    TelnetClient.client?.sendStringToServerInBackground("sChat")
                 }
             }
             timer.schedule(task1, 300)
         }
     }
 
-    override fun onPageDidDisappear() {
-        super.onPageDidDisappear()
-    }
-
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        var title = this._title
-        if (title == null || title.length == 0) {
+        var title = this.title
+        if (title == null || title.isEmpty()) {
             title = getContextString(R.string.loading)
         }
 
-        val header_view =
-            mainLayout!!.findViewById<TelnetHeaderItemView?>(R.id.ClassPage_headerView)
-        if (header_view != null) {
+        val headerView =
+            mainLayout?.findViewById<TelnetHeaderItemView?>(R.id.ClassPage_headerView)
+        if (headerView != null) {
             if (!TempSettings.lastVisitBoard.isEmpty()) {
                 val finalLastVisitBoard = TempSettings.lastVisitBoard
                 val lastVisitBoard =
                     finalLastVisitBoard + getContextString(R.string.toolbar_item_rr)
 
-                val _detail_2 = mainLayout!!.findViewById<TextView>(R.id.ClassPage_lastVisit)
-                _detail_2.setVisibility(View.VISIBLE)
-                _detail_2.bringToFront()
-                _detail_2.setText(lastVisitBoard)
-                _detail_2.setOnClickListener(View.OnClickListener { v: View? ->
-                    TelnetClient.client!!.sendStringToServer("s" + finalLastVisitBoard)
-                })
+                val detail2 = mainLayout?.findViewById<TextView>(R.id.ClassPage_lastVisit)
+                detail2.visibility = View.VISIBLE
+                detail2.bringToFront()
+                detail2.text = lastVisitBoard
+                detail2.setOnClickListener { v: View? ->
+                    TelnetClient.client?.sendStringToServer("s$finalLastVisitBoard")
+                }
             }
-            val _detail = "看板列表"
-            header_view.setData(title, _detail, "")
+            val detail = "看板列表"
+            headerView.setData(title, detail, "")
         }
     }
 
-    protected override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.getInstance().popClassPage()
-        navigationController!!.popViewController()
-        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        PageContainer.instance?.popClassPage()
+        navigationController.popViewController()
+        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
-    protected override fun onSearchButtonClicked(): Boolean {
+    override fun onSearchButtonClicked(): Boolean {
         showSearchBoardDialog()
         return true
     }
@@ -130,57 +125,61 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         dialog.show()
     }
 
-    override fun onSearchButtonClickedWithKeyword(keyword: String?) {
+    override fun onSearchButtonClickedWithKeyword(str: String) {
         SearchBoardHandler.instance.clear()
         showProcessingDialog("搜尋中")
-        create().pushString("s" + keyword + " ").sendToServerInBackground()
+        create().pushString("s$str ").sendToServerInBackground()
     }
 
     fun setClassTitle(aTitle: String?) {
-        this._title = aTitle
+        this.title = aTitle
     }
 
     override fun onClick(aView: View) {
-        val get_id = aView.getId()
-        if (get_id == R.id.ClassPage_FirstPageButton) {
-            moveToFirstPosition()
-        } else if (get_id == R.id.ClassPage_LastestPageButton) {
-            moveToLastPosition()
-        } else if (get_id == R.id.ClassPage_SearchButton) {
-            onSearchButtonClicked()
+        val getId = aView.id
+        when (getId) {
+            R.id.ClassPage_FirstPageButton -> {
+                moveToFirstPosition()
+            }
+            R.id.ClassPage_LastestPageButton -> {
+                moveToLastPosition()
+            }
+            R.id.ClassPage_SearchButton -> {
+                onSearchButtonClicked()
+            }
         }
     }
 
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
-        if (listName != null && listName == "Favorite") {
-            val item_index = index + 1
+        if (name != null && name == "Favorite") {
+            val itemIndex = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消")
                 .addButton("確定")
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index1: Int ->
+                .setListener { aDialog: ASAlertDialog?, index1: Int ->
                     if (index1 == 1) {
                         TelnetClient.client!!
-                            .sendStringToServerInBackground(item_index.toString() + "\nd")
+                            .sendStringToServerInBackground("$itemIndex\nd")
                         this@ClassPage.loadLastBlock()
                     }
-                }).scheduleDismissOnPageDisappear(this).show()
+                }.scheduleDismissOnPageDisappear(this).show()
             return true
         } else if ((getItem(index) as ClassPageItem).isDirectory) {
             return false
         } else {
-            val item_index2 = index + 1
+            val itemIndex2 = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板加入我的最愛?").addButton("取消")
                 .addButton("確定")
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index12: Int ->
+                .setListener { aDialog: ASAlertDialog?, index12: Int ->
                     if (index12 == 1) {
                         TelnetClient.client!!
-                            .sendStringToServerInBackground(item_index2.toString() + "\na")
+                            .sendStringToServerInBackground("$itemIndex2\na")
                     }
-                }).show()
+                }.show()
             return true
         }
     }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast("返回")
         return true
@@ -192,24 +191,24 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         ASListDialog.createDialog().addItems(SearchBoardHandler.instance.boards)
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ) {
                     val board = SearchBoardHandler.instance.getBoard(index)
-                    if (this@ClassPage.listName == "Favorite") {
+                    if (this@ClassPage.name == "Favorite") {
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }
-                    TelnetClient.client!!.sendStringToServerInBackground("s" + board)
+                    TelnetClient.client?.sendStringToServerInBackground("s$board")
 
                     SearchBoardHandler.instance.clear()
                 }
 
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ): Boolean {
                     return false
                 }
@@ -219,67 +218,67 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     fun showAddBoardToFavoriteDialog(boardName: String?) {
         ASAlertDialog.createDialog().setMessage("是否將看板" + boardName + "加入我的最愛?")
             .addButton("取消").addButton("加入")
-            .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     create().pushKey(TelnetKeyboard.LEFT_ARROW).pushString("B\n")
-                        .pushKey(TelnetKeyboard.HOME).pushString("/" + boardName + "\na ")
-                        .pushKey(TelnetKeyboard.LEFT_ARROW).pushString("F\ns" + boardName + "\n")
+                        .pushKey(TelnetKeyboard.HOME).pushString("/$boardName\na ")
+                        .pushKey(TelnetKeyboard.LEFT_ARROW).pushString("F\ns$boardName\n")
                         .sendToServerInBackground()
                     return@setListener
                 }
-                TelnetClient.client!!.sendStringToServerInBackground("s" + boardName)
+                TelnetClient.client?.sendStringToServerInBackground("s$boardName")
                 SearchBoardHandler.instance.clear()
-            }).scheduleDismissOnPageDisappear(this).show()
+            }.scheduleDismissOnPageDisappear(this).show()
     }
 
-    public override fun loadPage(): TelnetListPageBlock? {
+    override fun loadPage(): TelnetListPageBlock? {
         return ClassPageHandler.instance.load()
     }
 
-    val isAutoLoadEnable: Boolean
+    override val isAutoLoadEnable: Boolean
         get() = false
 
-    public override fun getListIdFromListName(aName: String?): String? {
-        return aName + "[Class]"
+    override fun getListIdFromListName(aName: String?): String? {
+        return "$aName[Class]"
     }
 
-    public override fun loadItemAtIndex(index: Int) {
+    override fun loadItemAtIndex(index: Int) {
         val item = getItem(index) as ClassPageItem?
         if (item == null) return
 
         if (item.isDirectory) {
-            PageContainer.getInstance().pushClassPage(item.Name, item.Title)
-            navigationController!!.pushViewController(PageContainer.getInstance().getClassPage())
+            PageContainer.instance?.pushClassPage(item.name, item.title)
+            navigationController.pushViewController(PageContainer.instance?.classPage)
         } else {
-            val page = PageContainer.getInstance().getBoardPage()
+            val page = PageContainer.instance?.boardPage
             page.prepareInitial()
-            navigationController!!.pushViewController(page)
+            navigationController.pushViewController(page)
         }
         super.loadItemAtIndex(index)
     }
 
     /** 填入看板  */
-    public override fun getView(index: Int, itemView: View?, parentView: ViewGroup?): View? {
-        var itemView = itemView
-        val item_index = index + 1
-        val item_block = ItemUtils.getBlock(item_index)
-        val item = getItem(index) as ClassPageItem?
-        if (item == null && currentBlock != item_block && !isLoadingBlock(item_index)) {
-            loadBoardBlock(item_block)
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
+        var itemView = view
+        val itemIndex = i + 1
+        val itemBlock = ItemUtils.getBlock(itemIndex)
+        val item = getItem(i) as ClassPageItem?
+        if (item == null && currentBlock != itemBlock && !isLoadingBlock(itemIndex)) {
+            loadBoardBlock(itemBlock)
         }
         if (itemView == null) {
             itemView = ClassPageItemView(context)
-            itemView.setLayoutParams(AbsListView.LayoutParams(-1, -2))
+            itemView.layoutParams = AbsListView.LayoutParams(-1, -2)
         }
         (itemView as ClassPageItemView).setItem(item)
         return itemView
     }
 
-    public override fun recycleBlock(aBlock: TelnetListPageBlock?) {
-        recycle(aBlock as ClassPageBlock?)
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+        recycle(telnetListPageBlock as ClassPageBlock?)
     }
 
-    public override fun recycleItem(aItem: TelnetListPageItem?) {
-        recycle(aItem as ClassPageItem?)
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+        recycle(telnetListPageItem as ClassPageItem?)
     }
 }

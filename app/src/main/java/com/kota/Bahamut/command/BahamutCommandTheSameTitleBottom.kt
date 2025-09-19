@@ -53,9 +53,9 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
 
     override fun executeFinished(
         telnetListPage: TelnetListPage,
-        telnetListPageBlock: TelnetListPageBlock
+        telnetListPageBlock: TelnetListPageBlock?
     ) {
-        if (telnetListPageBlock.selectedItem!!.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
+        if (telnetListPageBlock.selectedItem?.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
             if (articleIndex == telnetListPageBlock.selectedItemNumber) {
                 object : ASRunner() {
                     override fun run() {

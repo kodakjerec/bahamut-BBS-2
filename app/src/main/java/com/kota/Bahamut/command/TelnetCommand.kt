@@ -14,7 +14,7 @@ abstract class TelnetCommand : BahamutCommandDef {
 
     abstract fun executeFinished(
         telnetListPage: TelnetListPage,
-        telnetListPageBlock: TelnetListPageBlock
+        telnetListPageBlock: TelnetListPageBlock?
     )
 
     open val isOperationCommand: Boolean

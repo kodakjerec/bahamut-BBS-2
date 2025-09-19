@@ -10,25 +10,25 @@ abstract class TelnetStateHandler {
 
     fun cleanRow(row: Int) {
         if (TelnetClient.client?.model != null) {
-            TelnetClient.client!!.model!!.cleanRow(row)
+            TelnetClient.client?.model?.cleanRow(row)
         }
     }
 
     fun cleanFrame() {
         if (TelnetClient.client?.model != null) {
-            TelnetClient.client!!.model!!.cleanFrame()
+            TelnetClient.client?.model?.cleanFrame()
         }
     }
 
     fun getRowString(row: Int): String {
         if (TelnetClient.client?.model != null) {
-            return TelnetClient.client!!.model!!.getRowString(row)
+            return TelnetClient.client?.model?.getRowString(row)
         }
         return ""
     }
 
     val rows: Vector<TelnetRow>
-        get() = TelnetClient.client!!.model!!.rows
+        get() = TelnetClient.client?.model?.rows
 
     open fun clear() {
     }

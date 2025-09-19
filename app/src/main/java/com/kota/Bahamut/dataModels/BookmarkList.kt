@@ -103,16 +103,16 @@ class BookmarkList(private val myBoard: String?) {
 
     fun sort() {
         bookmarks.sortWith(Comparator { o1: Bookmark?, o2: Bookmark? ->
-                    if (o1!!.index == 0 && o2!!.index == 0) {
+                    if (o1?.index == 0 && o2?.index == 0) {
                         println("error")
                     }
-                    o1.index.compareTo(o2!!.index)
+                    o1.index.compareTo(o2?.index)
                 })
         historyBookmarks.sortWith(Comparator { o1: Bookmark?, o2: Bookmark? ->
-                    if (o1!!.index == 0 && o2!!.index == 0) {
+                    if (o1?.index == 0 && o2?.index == 0) {
                         println("error")
                     }
-                    o1.index.compareTo(o2!!.index)
+                    o1.index.compareTo(o2?.index)
                 })
     }
 }

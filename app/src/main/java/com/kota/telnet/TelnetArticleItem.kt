@@ -53,7 +53,7 @@ class TelnetArticleItem {
     fun buildFrame() {
         this.telnetFrame = TelnetFrame(this.rows.size)
         for (i in this.rows.indices) {
-            this.telnetFrame!!.setRow(i, this.rows[i])
+            this.telnetFrame?.setRow(i, this.rows[i])
         }
     }
 

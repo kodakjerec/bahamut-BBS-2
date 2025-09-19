@@ -30,11 +30,11 @@ abstract class ASViewController {
         get() = this.aSPageView
         set(aPageView) {
             if (this.aSPageView != null) {
-                this.aSPageView!!.ownerController = null
+                this.aSPageView?.ownerController = null
             }
             this.aSPageView = aPageView
             if (this.aSPageView != null) {
-                this.aSPageView!!.ownerController = this
+                this.aSPageView?.ownerController = this
             }
         }
 
@@ -167,7 +167,7 @@ abstract class ASViewController {
 
     fun findViewById(viewID: Int): View? {
         if (this.aSPageView != null) {
-            return this.aSPageView!!.findViewById(viewID)
+            return this.aSPageView?.findViewById(viewID)
         }
         return null
     }
@@ -256,12 +256,12 @@ abstract class ASViewController {
         if (this.operationListeners == null) {
             this.operationListeners = Vector<ASViewControllerOperationListener?>()
         }
-        this.operationListeners!!.add(aListener)
+        this.operationListeners?.add(aListener)
     }
 
     fun unregisterPageOperationListener(aListener: ASViewControllerOperationListener) {
         if (this.operationListeners != null) {
-            this.operationListeners!!.remove(aListener)
+            this.operationListeners?.remove(aListener)
         }
     }
 
@@ -269,12 +269,12 @@ abstract class ASViewController {
         if (this.appearListeners == null) {
             this.appearListeners = Vector<ASViewControllerAppearListener?>()
         }
-        this.appearListeners!!.add(aListener)
+        this.appearListeners?.add(aListener)
     }
 
     fun unregisterAppearListener(aListener: ASViewControllerAppearListener) {
         if (this.appearListeners != null) {
-            this.appearListeners!!.remove(aListener)
+            this.appearListeners?.remove(aListener)
         }
     }
 
@@ -282,12 +282,12 @@ abstract class ASViewController {
         if (this.disappearListeners == null) {
             this.disappearListeners = Vector<ASViewControllerDisappearListener?>()
         }
-        this.disappearListeners!!.add(aListener)
+        this.disappearListeners?.add(aListener)
     }
 
     fun unregisterDisappearListener(aListener: ASViewControllerDisappearListener?) {
         if (this.disappearListeners != null) {
-            this.disappearListeners!!.remove(aListener)
+            this.disappearListeners?.remove(aListener)
         }
     }
 

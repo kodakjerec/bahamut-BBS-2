@@ -30,13 +30,11 @@ class ThemeManagerPage: TelnetPage() {
     private lateinit var btnReset:Button
     private lateinit var btnUpdate:Button
 
-    override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
 
-    override fun getPageLayout(): Int {
-        return R.layout.theme_manager_page
-    }
+    override val pageLayout: Int
+        get() = R.layout.theme_manager_page
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as LinearLayout
@@ -198,7 +196,7 @@ class ThemeManagerPage: TelnetPage() {
     }
 
     override fun onBackPressed(): Boolean {
-        PageContainer.getInstance().cleanThemeManagerPage()
+        PageContainer.instance?.cleanThemeManagerPage()
         return super.onBackPressed()
     }
 

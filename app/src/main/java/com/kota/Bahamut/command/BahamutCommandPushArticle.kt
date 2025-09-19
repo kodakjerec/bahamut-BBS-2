@@ -11,11 +11,11 @@ class BahamutCommandPushArticle(var articleIndex: Int) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (this.articleIndex > 0) {
-            TelnetClient.client!!.sendStringToServer(this.articleIndex.toString() + "\ngx")
+            TelnetClient.client?.sendStringToServer(this.articleIndex.toString() + "\ngx")
         }
     }
 
-    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock) {
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
     }
 

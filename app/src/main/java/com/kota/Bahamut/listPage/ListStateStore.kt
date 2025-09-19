@@ -3,7 +3,10 @@ package com.kota.Bahamut.listPage
 class ListStateStore private constructor() {
     private val states: MutableMap<String, ListState> = HashMap()
 
-    fun getState(aBoardName: String): ListState {
+    fun getState(aBoardName: String?): ListState {
+        if (aBoardName == null) {
+            return ListState()
+        }
         val state = this.states[aBoardName]
         if (state != null) {
             return state

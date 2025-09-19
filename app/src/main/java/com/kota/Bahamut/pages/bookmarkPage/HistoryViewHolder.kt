@@ -8,11 +8,9 @@ import com.kota.Bahamut.R
 
 class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
-    private val _title_label: TextView?
+    private val titleLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Title)
 
     init {
-        _title_label =
-            view.findViewById<TextView?>(R.id.BoardExtendOptionalPage_historyItemView_Title)
 
         view.setOnClickListener(this)
     }
@@ -26,11 +24,11 @@ class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener
     }
 
     fun setTitle(title: String?) {
-        if (this._title_label != null) {
-            if (title == null || title.length == 0) {
-                this._title_label.setText("未輸入")
+        if (this.titleLabel != null) {
+            if (title == null || title.isEmpty()) {
+                this.titleLabel.text = "未輸入"
             } else {
-                this._title_label.setText(title)
+                this.titleLabel.text = title
             }
         }
     }
@@ -40,8 +38,6 @@ class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener
     }
 
     override fun onClick(view: View?) {
-        if (mListener != null) {
-            mListener.onItemClick(view, getAdapterPosition())
-        }
+        mListener?.onItemClick(view, adapterPosition)
     }
 }

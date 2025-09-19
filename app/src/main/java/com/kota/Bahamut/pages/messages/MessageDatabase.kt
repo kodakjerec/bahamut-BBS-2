@@ -13,9 +13,9 @@ import java.util.Date
 import java.util.Locale
 
 class MessageDatabase(context: Context?) :
-    SQLiteOpenHelper(context, TelnetClient.client!!.username.lowercase(
+    SQLiteOpenHelper(context, TelnetClient.client?.username?.lowercase(
         Locale.getDefault()
-    ).trim { it <= ' ' } + "_database_msg", null, 1) {
+    )?.trim { it <= ' ' } + "_database_msg", null, 1) {
     override fun onCreate(aDatabase: SQLiteDatabase) {
         try {
             val createTableQuery = "CREATE TABLE IF NOT EXISTS messages (" +
@@ -62,7 +62,7 @@ class MessageDatabase(context: Context?) :
             val db = writableDatabase
             db.insert("messages", null, values)
             db.close()
-        } catch (ignored: Exception) { }
+        } catch (_: Exception) { }
 
         val messageObj = BahaMessage()
         messageObj.senderName = aSenderName
@@ -137,7 +137,7 @@ class MessageDatabase(context: Context?) :
             val db = writableDatabase
             messageObj.id = db.insert("messages", null, values)
             db.close()
-        } catch (ignored: Exception) { return null }
+        } catch (_: Exception) { return null }
 
         return messageObj
     }
@@ -151,8 +151,8 @@ class MessageDatabase(context: Context?) :
                     aMessage.status, aMessage.id
                 )
             )
-        } catch (ignored: Exception) {
-            ignored.printStackTrace()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 
@@ -194,7 +194,7 @@ class MessageDatabase(context: Context?) :
                 cursor.close()
                 db.close()
             }
-        } catch (ignored: Exception) { }
+        } catch (_: Exception) { }
         setNotReadMessageCount(totalUnreadCount)
         return returnList
     }
@@ -269,7 +269,7 @@ class MessageDatabase(context: Context?) :
                 db.close()
                 ArrayList()
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             ArrayList()
         }
     }
@@ -281,7 +281,7 @@ class MessageDatabase(context: Context?) :
             val db = writableDatabase
             db.execSQL("DELETE FROM messages ")
             onCreate(db)
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
         }
     }
 }

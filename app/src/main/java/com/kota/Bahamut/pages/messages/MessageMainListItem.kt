@@ -47,32 +47,32 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
             .addItem(getContextString(R.string.message_sub_send_hero))
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ) {
-                    if (aTitle == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.client!!.sendDataToServer(
+                    if (title == getContextString(R.string.dialog_query_hero)) {
+                        TelnetClient.client?.sendDataToServer(
                             TelnetOutputBuilder.create()
                                 .pushString(txtIndex.text.toString()+"\n")
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
                         )
-                    } else if (aTitle == getContextString(R.string.message_sub_send_hero)) {
-                        val aPage = PageContainer.getInstance().messageSub
-                        ASNavigationController.getCurrentController().pushViewController(aPage)
+                    } else if (title == getContextString(R.string.message_sub_send_hero)) {
+                        val aPage = PageContainer.instance?.messageSub
+                        ASNavigationController.currentController?.pushViewController(aPage)
                         var authorId: String = txtSenderName.text.toString()
                         if (authorId.contains("(")) authorId =
                             authorId.substring(0, authorId.indexOf("("))
-                        aPage.setSenderName(authorId)
+                        aPage?.setSenderName(authorId)
                     }
                 }
             }).show()

@@ -29,7 +29,7 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
 
     @Throws(TelnetConnectionClosedException::class, IOException::class)
     private fun readData(): Byte {
-        return this.telnetConnector!!.readData(0)
+        return this.telnetConnector?.readData(0)
     }
 
     private fun receiveData(): Boolean {
@@ -44,27 +44,27 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
                 this.telnetCommand.option = option
                 handleCommand()
             } else if (data.toInt() == 13) {
-                this.telnetModel!!.moveCursorColumnToBegin()
+                this.telnetModel?.moveCursorColumnToBegin()
             } else if (data.toInt() == 10) {
-                this.telnetModel!!.moveCursorToNextLine()
+                this.telnetModel?.moveCursorToNextLine()
             } else if (data.toInt() == 7) {
                 println("get BEL")
             } else if (data.toInt() == 8) {
-                this.telnetModel!!.moveCursorColumnLeft()
+                this.telnetModel?.moveCursorColumnLeft()
             } else if (data.toInt() != 27) {
-                this.telnetModel!!.pushData(data)
+                this.telnetModel?.pushData(data)
             } else if (readData().toInt() == 91) {
-                this.telnetModel!!.cleanAnsiBuffer()
+                this.telnetModel?.cleanAnsiBuffer()
                 var data2 = readData()
-                this.telnetModel!!.pushAnsiBuffer(data2)
+                this.telnetModel?.pushAnsiBuffer(data2)
                 while (true) {
                     if ((data2 < 48 || data2 > 57) && data2.toInt() != 59) {
                         break
                     }
                     data2 = readData()
-                    this.telnetModel!!.pushAnsiBuffer(data2)
+                    this.telnetModel?.pushAnsiBuffer(data2)
                 }
-                this.telnetModel!!.parseAnsiBuffer()
+                this.telnetModel?.parseAnsiBuffer()
             }
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) Log.e(
@@ -74,8 +74,8 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
 
             Log.v("SocketChannel", "receiveData Exception")
             result = false
-            if (this.telnetConnector != null && this.telnetConnector!!.isConnecting) {
-                this.telnetConnector!!.close()
+            if (this.telnetConnector != null && this.telnetConnector?.isConnecting) {
+                this.telnetConnector?.close()
             }
         }
         return result
@@ -104,9 +104,9 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
         } else if (this.telnetCommand.isEqualTo(-1, -3, 0)) {
             sendCommandToServer(-1, -4, 0)
         } else if (this.telnetCommand.isEqualTo(-1, -6, 24)) {
-            this.telnetConnector!!.readData(0)
-            this.telnetConnector!!.readData(0)
-            this.telnetConnector!!.readData(0)
+            this.telnetConnector?.readData(0)
+            this.telnetConnector?.readData(0)
+            this.telnetConnector?.readData(0)
             TelnetOutputBuilder.create().pushData((-1).toByte()).pushData((-6).toByte())
                 .pushData(TelnetCommand.TERMINAL_TYPE).pushData(0.toByte())
                 .pushData(65.toByte()).pushData(78.toByte())

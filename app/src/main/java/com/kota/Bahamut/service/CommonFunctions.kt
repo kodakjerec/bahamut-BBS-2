@@ -84,7 +84,7 @@ object CommonFunctions {
                 else if (array.startsWith("> "))
                     maxLength+=2
                 val data2 = array.toByteArray(charset(TelnetDef.CHARSET))
-                var data1 = U2BEncoder.instance!!.encodeToBytes(data2, 0)
+                var data1 = U2BEncoder.instance?.encodeToBytes(data2, 0)
                 while (data1.size >= maxLength) {
                     var isControlCode = false
                     var column = 0 // 現在取得的字元index
@@ -114,7 +114,7 @@ object CommonFunctions {
                         }
                     }
                     val newCharArray = data1.copyOfRange(0, column)
-                    var inputString = B2UEncoder.instance!!.encodeToString(newCharArray)
+                    var inputString = B2UEncoder.instance?.encodeToString(newCharArray)
 
                     inputString+="\n"
                     returnArrays.add(inputString)
@@ -124,7 +124,7 @@ object CommonFunctions {
                 // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
                 // 如果data2無資料, data1無料, 代表這是空白行
                 if (!(data2.isNotEmpty() && data1.isEmpty())) {
-                    val inputString = B2UEncoder.instance!!.encodeToString(data1)
+                    val inputString = B2UEncoder.instance?.encodeToString(data1)
                     returnArrays.add(inputString+"\n")
                 }
             }

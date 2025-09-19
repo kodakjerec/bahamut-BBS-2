@@ -4,39 +4,39 @@ import com.kota.Bahamut.listPage.TelnetListPageItem
 import java.util.Stack
 
 class BoardPageItem private constructor() : TelnetListPageItem() {
-    var Author: String? = null
-    var Date: String? = null
-    var GY: Int = 0
-    var Size: Int = 0
-    var Title: String? = null
+    var author: String? = null
+    var date: String? = null
+    var gy: Int = 0
+    var size: Int = 0
+    var title: String? = null
     var isMarked: Boolean = false
     var isRead: Boolean = false
     var isReply: Boolean = false
 
-    public override fun clear() {
+    override fun clear() {
         super.clear()
-        this.Size = 0
+        this.size = 0
         this.isRead = false
         this.isMarked = false
         this.isReply = false
-        this.GY = 0
-        this.Date = null
-        this.Author = null
-        this.Title = null
+        this.gy = 0
+        this.date = null
+        this.author = null
+        this.title = null
     }
 
-    public override fun set(item: TelnetListPageItem?) {
-        super.set(item)
-        if (item != null) {
-            val article_item = item as BoardPageItem
-            this.Size = article_item.Size
-            this.Date = article_item.Date
-            this.Author = article_item.Author
-            this.isRead = article_item.isRead
-            this.isMarked = article_item.isMarked
-            this.isReply = article_item.isReply
-            this.GY = article_item.GY
-            this.Title = article_item.Title
+    override fun set(aData: TelnetListPageItem?) {
+        super.set(aData)
+        if (aData != null) {
+            val articleItem = aData as BoardPageItem
+            this.size = articleItem.size
+            this.date = articleItem.date
+            this.author = articleItem.author
+            this.isRead = articleItem.isRead
+            this.isMarked = articleItem.isMarked
+            this.isReply = articleItem.isReply
+            this.gy = articleItem.gy
+            this.title = articleItem.title
         }
     }
 
@@ -58,7 +58,7 @@ class BoardPageItem private constructor() : TelnetListPageItem() {
         fun create(): BoardPageItem {
             var item: BoardPageItem? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     item = _pool.pop()
                 }
             }

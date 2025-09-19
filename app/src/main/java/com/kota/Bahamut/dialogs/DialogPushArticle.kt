@@ -21,7 +21,7 @@ class DialogPushArticle:ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_push_article)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
 
         mainLayout = findViewById(R.id.content_view)
         content1 = mainLayout.findViewById(R.id.Dialog_push_article_content1)
@@ -42,7 +42,7 @@ class DialogPushArticle:ASDialog() {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
         }
     }
 
@@ -52,7 +52,7 @@ class DialogPushArticle:ASDialog() {
         val builder = TelnetOutputBuilder.create()
             .pushString("\n") // 按[Enter]結束
             .build()
-        TelnetClient.client!!.sendDataToServer(builder)
+        TelnetClient.client?.sendDataToServer(builder)
         dismiss()
     }
 
@@ -60,20 +60,20 @@ class DialogPushArticle:ASDialog() {
     private val sendOnClickListener = OnClickListener {_->
         isClickButton = true
         var sendContent = ""
-        if (content1.text!!.isNotEmpty())
+        if (content1.text?.isNotEmpty())
             sendContent += content1.text.toString()
         if (sendContent.isNotEmpty()) {
             val builder = TelnetOutputBuilder.create()
                 .pushString(sendContent)
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_push_article_success01))
         } else {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
         }
         dismiss()
     }

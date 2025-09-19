@@ -9,7 +9,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.thread.ASRunner
@@ -30,55 +29,49 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.telnet.model.TelnetFrame
-import com.kota.telnet.model.TelnetFrame.clone
-import com.kota.telnet.model.TelnetModel.frame
-import com.kota.telnet.TelnetArticle.frame
-import com.kota.telnet.TelnetArticleItem.frame
 import com.kota.telnet.TelnetClient
-import com.kota.telnet.TelnetClient.model
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
-import com.kota.telnetUI.TelnetView.frame
 
 class MainPage : TelnetPage() {
     var onlinePeople: String? = "" // 線上人數
     var bbCallStatus: String? = "" // 呼叫器
     var mainLayout: RelativeLayout? = null
     var boardsListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.getInstance().pushClassPage("Boards", "佈告討論區")
-        this@MainPage.navigationController!!.pushViewController(
-            PageContainer.getInstance().getClassPage()
+        PageContainer.instance?.pushClassPage("Boards", "佈告討論區")
+        this@MainPage.navigationController.pushViewController(
+            PageContainer.instance?.classPage
         )
-        TelnetClient.client!!.sendStringToServerInBackground("b")
+        TelnetClient.client?.sendStringToServerInBackground("b")
     }
     var classListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.getInstance().pushClassPage("Class", "分組討論區")
-        this@MainPage.navigationController!!.pushViewController(
-            PageContainer.getInstance().getClassPage()
+        PageContainer.instance?.pushClassPage("Class", "分組討論區")
+        this@MainPage.navigationController.pushViewController(
+            PageContainer.instance?.classPage
         )
-        TelnetClient.client!!.sendStringToServerInBackground("c")
+        TelnetClient.client?.sendStringToServerInBackground("c")
     }
     var favoriteListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.getInstance().pushClassPage("Favorite", "我的最愛")
-        this@MainPage.navigationController!!.pushViewController(
-            PageContainer.getInstance().getClassPage()
+        PageContainer.instance?.pushClassPage("Favorite", "我的最愛")
+        this@MainPage.navigationController.pushViewController(
+            PageContainer.instance?.classPage
         )
-        TelnetClient.client!!.sendStringToServerInBackground("f")
+        TelnetClient.client?.sendStringToServerInBackground("f")
     }
-    var _frame_buffer: TelnetFrame? = null
+    var telnetFrameBuffer: TelnetFrame? = null
     var goodbyeDialog: ASDialog? = null
     var logoutListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.client!!.sendStringToServerInBackground("g")
+        TelnetClient.client?.sendStringToServerInBackground("g")
     }
     var mailListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        this@MainPage.navigationController!!.pushViewController(
-            PageContainer.getInstance().getMailBoxPage()
+        this@MainPage.navigationController.pushViewController(
+            PageContainer.instance?.mailBoxPage
         )
-        TelnetClient.client!!.sendStringToServerInBackground("m\nr")
+        TelnetClient.client?.sendStringToServerInBackground("m\nr")
     }
     var saveHotMessageDialog: ASDialog? = null
     var systemSettingListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        this@MainPage.navigationController!!.pushViewController(SystemSettingsPage())
+        this@MainPage.navigationController.pushViewController(SystemSettingsPage())
     }
 
     /** 顯示勇者足跡  */
@@ -87,63 +80,61 @@ class MainPage : TelnetPage() {
         var isShowHeroStep = getShowHeroStep()
         isShowHeroStep = !isShowHeroStep
         setShowHeroStep(isShowHeroStep)
-        mainLayout!!.findViewById<View>(R.id.Main_Block_HeroStepList)
-            .setVisibility(if (isShowHeroStep) View.VISIBLE else View.GONE)
+        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList).visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
     }
 
     /** 顯示聊天main  */
     var showMessageMainListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val aPage = PageContainer.getInstance().getMessageMain()
-        this@MainPage.navigationController!!.pushViewController(aPage)
+        val aPage = PageContainer.instance?.getMessageMain()
+        this@MainPage.navigationController.pushViewController(aPage)
 
         // 隱藏小視窗
-        if (getMessageSmall() != null) getMessageSmall()!!.hide()
+        if (getMessageSmall() != null) getMessageSmall()?.hide()
     }
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.main_page
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_MAIN
 
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
-        mainLayout!!.findViewById<View>(R.id.Main_BoardsButton)
+        mainLayout?.findViewById<View>(R.id.Main_BoardsButton)
             .setOnClickListener(this.boardsListener)
-        mainLayout!!.findViewById<View>(R.id.Main_ClassButton)
+        mainLayout?.findViewById<View>(R.id.Main_ClassButton)
             .setOnClickListener(this.classListener)
-        mainLayout!!.findViewById<View>(R.id.Main_FavoriteButton)
+        mainLayout?.findViewById<View>(R.id.Main_FavoriteButton)
             .setOnClickListener(this.favoriteListener)
-        mainLayout!!.findViewById<View>(R.id.Main_LogoutButton)
+        mainLayout?.findViewById<View>(R.id.Main_LogoutButton)
             .setOnClickListener(this.logoutListener)
-        mainLayout!!.findViewById<View>(R.id.Main_MailButton).setOnClickListener(this.mailListener)
-        mainLayout!!.findViewById<View>(R.id.Main_SystemSettingsButton)
+        mainLayout?.findViewById<View>(R.id.Main_MailButton).setOnClickListener(this.mailListener)
+        mainLayout?.findViewById<View>(R.id.Main_SystemSettingsButton)
             .setOnClickListener(this.systemSettingListener)
-        val mainOnlinePeople = mainLayout!!.findViewById<TextView>(R.id.Main_OnlinePeople)
-        mainOnlinePeople.setText(onlinePeople) // 線上人數
+        val mainOnlinePeople = mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)
+        mainOnlinePeople.text = onlinePeople // 線上人數
 
         // 顯示勇者足跡
         val heroStepList: MutableList<HeroStep> = getHeroStepList()
-        val heroStepListLayout = mainLayout!!.findViewById<LinearLayout>(R.id.Main_HeroStepList)
+        val heroStepListLayout = mainLayout?.findViewById<LinearLayout>(R.id.Main_HeroStepList)
         for (heroStep in heroStepList) {
             val itemView = HeroStepItemView(context)
             itemView.setItem(heroStep)
             heroStepListLayout.addView(itemView)
         }
         // 沒資料不顯示
-        if (heroStepList.size == 0) {
+        if (heroStepList.isEmpty()) {
             setShowHeroStep(false)
         }
         val isShowHeroStep = getShowHeroStep()
-        mainLayout!!.findViewById<View>(R.id.Main_Block_HeroStepList)
-            .setVisibility(if (isShowHeroStep) View.VISIBLE else View.GONE)
-        mainLayout!!.findViewById<View>(R.id.Main_HeroStepButton)
+        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList).visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
+        mainLayout?.findViewById<View>(R.id.Main_HeroStepButton)
             .setOnClickListener(this.showHeroStepListener)
 
         // 顯示呼叫器
-        val txtBBCall = mainLayout!!.findViewById<TextView>(R.id.Main_BBCall)
-        txtBBCall.setText(bbCallStatus)
-        mainLayout!!.findViewById<View>(R.id.Main_BBCall_Layout)
+        val txtBBCall = mainLayout?.findViewById<TextView>(R.id.Main_BBCall)
+        txtBBCall.text = bbCallStatus
+        mainLayout?.findViewById<View>(R.id.Main_BBCall_Layout)
             .setOnClickListener(showMessageMainListener)
 
         // 替換外觀
@@ -155,47 +146,47 @@ class MainPage : TelnetPage() {
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             object : ASRunner() {
-                public override fun run() {
+                override fun run() {
                     showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat))
                     // 進入布告討論區
-                    mainLayout!!.findViewById<View>(R.id.Main_BoardsButton).performClick()
+                    mainLayout?.findViewById<View>(R.id.Main_BoardsButton).performClick()
                 }
             }.postDelayed(300)
         }
     }
 
-    public override fun onPageRefresh() {
+    override fun onPageRefresh() {
         setFrameToTelnetView()
     }
 
     private fun setFrameToTelnetView() {
-        val telnet_view = mainLayout!!.findViewById<TelnetView?>(R.id.Main_TelnetView)
-        if (telnet_view != null) {
-            if (BahamutStateHandler.getInstance().currentPage == BahamutPage.BAHAMUT_MAIN) {
-                this._frame_buffer = TelnetClient.model.frame.clone()
+        val telnetView = mainLayout?.findViewById<TelnetView?>(R.id.Main_TelnetView)
+        if (telnetView != null) {
+            if (BahamutStateHandler.instance?.currentPage == BahamutPage.BAHAMUT_MAIN) {
+                this.telnetFrameBuffer = TelnetClient.client?.model?.frame?.clone()
                 for (i in 12..23) {
-                    this._frame_buffer!!.removeRow(12)
+                    this.telnetFrameBuffer?.removeRow(12)
                 }
-                this._frame_buffer!!.removeRow(0)
+                this.telnetFrameBuffer?.removeRow(0)
             }
-            if (this._frame_buffer != null) {
-                telnet_view.frame = this._frame_buffer
+            if (this.telnetFrameBuffer != null) {
+                telnetView.frame = this.telnetFrameBuffer
             }
         }
     }
 
-    public override fun onPageWillDisappear() {
+    override fun onPageWillDisappear() {
         clear()
     }
 
-    public override fun onPageDidDisappear() {
+    override fun onPageDidDisappear() {
         this.goodbyeDialog = null
         this.saveHotMessageDialog = null
         super.onPageDidDisappear()
     }
 
     /* access modifiers changed from: protected */
-    public override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean {
         this.logoutListener.onClick(null)
         return true
     }
@@ -209,28 +200,28 @@ class MainPage : TelnetPage() {
                 .addButton("備忘錄")
                 .addButton("保留")
                 .addButton("清除")
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { aDialog: ASAlertDialog?, index: Int ->
                     this@MainPage.saveHotMessageDialog = null
                     when (index) {
-                        0 -> TelnetClient.client!!.sendStringToServerInBackground("M")
-                        1 -> TelnetClient.client!!.sendStringToServerInBackground("K")
+                        0 -> TelnetClient.client?.sendStringToServerInBackground("M")
+                        1 -> TelnetClient.client?.sendStringToServerInBackground("K")
                         2 -> {
-                            TelnetClient.client!!.sendStringToServerInBackground("C")
+                            TelnetClient.client?.sendStringToServerInBackground("C")
                             MessageDatabase(context).use { db ->
                                 db.clearDb()
                             }
                         }
 
-                        else -> TelnetClient.client!!.sendStringToServerInBackground("K")
+                        else -> TelnetClient.client?.sendStringToServerInBackground("K")
                     }
-                })
-            this.saveHotMessageDialog!!.setOnDismissListener(DialogInterface.OnDismissListener { dialog: DialogInterface? ->
+                }
+            this.saveHotMessageDialog?.setOnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.saveHotMessageDialog != null) {
-                    TelnetClient.client!!.sendStringToServerInBackground("K")
+                    TelnetClient.client?.sendStringToServerInBackground("K")
                 }
-            })
-            this.saveHotMessageDialog!!.show()
+            }
+            this.saveHotMessageDialog?.show()
         }
     }
 
@@ -243,45 +234,45 @@ class MainPage : TelnetPage() {
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.main_hero_step))
                 .addButton(getContextString(R.string.confirm))
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { aDialog: ASAlertDialog?, index: Int ->
                     this@MainPage.goodbyeDialog = null
                     when (index) {
                         2 ->  // 確定
-                            TelnetClient.client!!.sendStringToServerInBackground("G")
+                            TelnetClient.client?.sendStringToServerInBackground("G")
 
                         1 -> { // 勇者足跡
-                            TelnetClient.client!!.sendStringToServerInBackground("N")
+                            TelnetClient.client?.sendStringToServerInBackground("N")
                             val dialogHeroStep = DialogHeroStep()
                             dialogHeroStep.show()
                         }
 
                         0 ->  // 取消
-                            TelnetClient.client!!.sendStringToServerInBackground("Q")
+                            TelnetClient.client?.sendStringToServerInBackground("Q")
 
                         else -> {}
                     }
-                })
+                }
                 .scheduleDismissOnPageDisappear(this)
-            this.goodbyeDialog!!.setOnDismissListener(DialogInterface.OnDismissListener { dialog: DialogInterface? ->
+            this.goodbyeDialog?.setOnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.goodbyeDialog != null) {
-                    TelnetClient.client!!.sendStringToServerInBackground("G")
+                    TelnetClient.client?.sendStringToServerInBackground("G")
                 }
-            })
+            }
         }
-        this.goodbyeDialog!!.show()
+        this.goodbyeDialog?.show()
     }
 
-    public override fun clear() {
+    override fun clear() {
         if (this.goodbyeDialog != null) {
-            if (this.goodbyeDialog!!.isShowing()) {
-                this.goodbyeDialog!!.dismiss()
+            if (this.goodbyeDialog?.isShowing) {
+                this.goodbyeDialog?.dismiss()
             }
             this.goodbyeDialog = null
         }
         if (this.saveHotMessageDialog != null) {
-            if (this.saveHotMessageDialog!!.isShowing()) {
-                this.saveHotMessageDialog!!.dismiss()
+            if (this.saveHotMessageDialog?.isShowing) {
+                this.saveHotMessageDialog?.dismiss()
             }
             this.saveHotMessageDialog = null
         }
@@ -301,8 +292,8 @@ class MainPage : TelnetPage() {
     @SuppressLint("BatteryLife")
     private fun checkBatteryLife() {
         if (!getAlarmIgnoreBatteryOptimizations()) {
-            val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-            val packageName: String? = context.getPackageName()
+            val powerManager = context?.getSystemService(Context.POWER_SERVICE) as PowerManager
+            val packageName: String? = context?.packageName
 
             if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
                 ASAlertDialog.createDialog()

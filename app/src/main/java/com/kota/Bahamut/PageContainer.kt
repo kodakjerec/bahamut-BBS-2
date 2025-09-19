@@ -37,7 +37,7 @@ class PageContainer private constructor() {
     private var themeManagerPage: ThemeManagerPage? = null
     private var userInfoPage: UserInfoPage? = null
     private var userConfigPage: UserConfigPage? = null
-    private var messageMain: MessageMain? = null
+    var messageMain: MessageMain? = null
     var messageSub: MessageSub? = null
 
     val startPage: StartPage
@@ -78,7 +78,7 @@ class PageContainer private constructor() {
 
     fun cleanLoginPage() {
         if (this.loginPageInstance != null) {
-            this.loginPageInstance!!.clear()
+            this.loginPageInstance?.clear()
             this.loginPageInstance = null
         }
     }
@@ -93,14 +93,14 @@ class PageContainer private constructor() {
 
     fun cleanMainPage() {
         if (this.mainPageInstance != null) {
-            this.mainPageInstance!!.clear()
+            this.mainPageInstance?.clear()
             this.mainPageInstance = null
         }
     }
 
     fun pushClassPage(aClassName: String?, aClassTitle: String?) {
         val classPage1 = ClassPage()
-        classPage1.listName = aClassName
+        classPage1.name = aClassName
         classPage1.setClassTitle(aClassTitle)
         this.classPageStack.push(classPage1)
     }
@@ -136,7 +136,7 @@ class PageContainer private constructor() {
 
     fun cleanBoardPage() {
         if (this.boardMainPageInstance != null) {
-            this.boardMainPageInstance!!.clear()
+            this.boardMainPageInstance?.clear()
             this.boardMainPageInstance = null
         }
     }
@@ -151,7 +151,7 @@ class PageContainer private constructor() {
 
     fun cleanBoardTitleLinkedPage() {
         if (this.boardTitleLinkPageInstance != null) {
-            this.boardTitleLinkPageInstance!!.clear()
+            this.boardTitleLinkPageInstance?.clear()
             this.boardTitleLinkPageInstance = null
         }
     }
@@ -166,7 +166,7 @@ class PageContainer private constructor() {
 
     fun cleanBoardSearchPage() {
         if (this.boardSearchPageInstance != null) {
-            this.boardSearchPageInstance!!.clear()
+            this.boardSearchPageInstance?.clear()
             this.boardSearchPageInstance = null
         }
     }
@@ -189,7 +189,7 @@ class PageContainer private constructor() {
     fun pushBoardEssencePage(aClassName: String?, aClassTitle: String) {
         val boardEssencePage = BoardEssencePage()
         boardEssencePage.clear()
-        boardEssencePage.listName = aClassName
+        boardEssencePage.name = aClassName
         boardEssencePage.setClassTitle(aClassTitle)
         this.boardEssencePageStack.push(boardEssencePage)
     }
@@ -209,7 +209,7 @@ class PageContainer private constructor() {
 
     fun cleanArticleEssencePage() {
         if (this.articleEssencePage != null) {
-            this.articleEssencePage!!.clear()
+            this.articleEssencePage?.clear()
             this.articleEssencePage = null
         }
     }
@@ -224,7 +224,7 @@ class PageContainer private constructor() {
 
     fun cleanMainBoxPage() {
         if (this.mailBoxPageInstance != null) {
-            this.mailBoxPageInstance!!.clear()
+            this.mailBoxPageInstance?.clear()
             this.mailBoxPageInstance = null
         }
     }
@@ -239,7 +239,7 @@ class PageContainer private constructor() {
 
     fun cleanArticlePage() {
         if (this.articlePageInstance != null) {
-            this.articlePageInstance!!.clear()
+            this.articlePageInstance?.clear()
             this.articlePageInstance = null
         }
     }
@@ -254,7 +254,7 @@ class PageContainer private constructor() {
 
     fun cleanBillingPage() {
         if (this.billingPageInstance != null) {
-            this.billingPageInstance!!.clear()
+            this.billingPageInstance?.clear()
             this.billingPageInstance = null
         }
     }
@@ -269,7 +269,7 @@ class PageContainer private constructor() {
 
     fun cleanPostArticlePage() {
         if (this.postArticlePageInstance != null) {
-            this.postArticlePageInstance!!.clear()
+            this.postArticlePageInstance?.clear()
             this.postArticlePageInstance = null
         }
     }
@@ -283,7 +283,7 @@ class PageContainer private constructor() {
 
     fun cleanThemeManagerPage() {
         if (this.themeManagerPage != null) {
-            this.themeManagerPage!!.clear()
+            this.themeManagerPage?.clear()
             this.themeManagerPage = null
         }
     }
@@ -297,7 +297,7 @@ class PageContainer private constructor() {
 
     fun cleanUserInfoPage() {
         if (this.userInfoPage != null) {
-            this.userInfoPage!!.clear()
+            this.userInfoPage?.clear()
             this.userInfoPage = null
         }
     }
@@ -311,7 +311,7 @@ class PageContainer private constructor() {
 
     fun cleanUserConfigPage() {
         if (this.userConfigPage != null) {
-            this.userConfigPage!!.clear()
+            this.userConfigPage?.clear()
             this.userConfigPage = null
         }
     }
@@ -325,7 +325,7 @@ class PageContainer private constructor() {
 
     fun cleanMessageMain() {
         if (this.messageMain != null) {
-            this.messageMain!!.clear()
+            this.messageMain?.clear()
             this.messageMain = null
         }
     }
@@ -339,7 +339,7 @@ class PageContainer private constructor() {
 
     fun cleanMessageSub() {
         if (this.messageSub != null) {
-            this.messageSub!!.clear()
+            this.messageSub?.clear()
             this.messageSub = null
         }
     }

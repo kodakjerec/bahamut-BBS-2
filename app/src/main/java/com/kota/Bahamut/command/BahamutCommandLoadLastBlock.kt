@@ -88,7 +88,7 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
         TODO("Not yet implemented")
     }
 
-    open fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock) {
+    open fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock?) {
         if (aListPage.itemSize > aPageData.maximumItemNumber) {
             aListPage.itemSize = 0
             aListPage.cleanAllItem()

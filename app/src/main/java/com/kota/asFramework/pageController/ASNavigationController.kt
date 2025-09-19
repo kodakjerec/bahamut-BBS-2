@@ -113,7 +113,7 @@ open class ASNavigationController : Activity() {
         onControllerWillLoad()
 
         this.rootView = ASNavigationControllerView(this)
-        this.rootView!!.setPageController(this)
+        this.rootView?.setPageController(this)
         setContentView(this.rootView)
 
 
@@ -167,7 +167,7 @@ open class ASNavigationController : Activity() {
         pageView.setBackgroundColor(View.MEASURED_STATE_MASK)
         layoutInflater.inflate(controller.pageLayout, pageView)
         controller.pageView = pageView
-        this.rootView!!.contentView?.addView(pageView)
+        this.rootView?.contentView?.addView(pageView)
     }
 
     private fun cleanPageView(controller: ASViewController) {
@@ -176,17 +176,17 @@ open class ASNavigationController : Activity() {
 
     fun addPageView(aPage: ASViewController) {
         val pageView: ASPageView? = aPage.pageView
-        this.rootView!!.post {
+        this.rootView?.post {
             aPage.onPageDidDisappear()
-            this@ASNavigationController.rootView!!.removeView(pageView)
+            this@ASNavigationController.rootView?.removeView(pageView)
         }
     }
 
     fun removePageView(aPage: ASViewController) {
         val pageView: ASPageView? = aPage.pageView
-        this.rootView!!.post {
+        this.rootView?.post {
             aPage.onPageDidDisappear()
-            this@ASNavigationController.rootView!!.removeView(pageView)
+            this@ASNavigationController.rootView?.removeView(pageView)
         }
     }
 
@@ -231,16 +231,16 @@ open class ASNavigationController : Activity() {
             override fun onAnimationFinished() {
                 aRemovePage?.onPageDidDisappear()
                 val removeList = Vector<View?>()
-                val childCount = this@ASNavigationController.rootView!!.contentView?.childCount ?: 0
+                val childCount = this@ASNavigationController.rootView?.contentView?.childCount ?: 0
                 for (i in 0..<childCount) {
                     val pageView =
-                        this@ASNavigationController.rootView!!.contentView?.getChildAt(i)
-                    if (pageView !== aAddPage!!.pageView) {
+                        this@ASNavigationController.rootView?.contentView?.getChildAt(i)
+                    if (pageView !== aAddPage?.pageView) {
                         removeList.add(pageView)
                     }
                 }
                 for (view in removeList) {
-                    this@ASNavigationController.rootView!!.contentView?.removeView(view)
+                    this@ASNavigationController.rootView?.contentView?.removeView(view)
                 }
                 this@ASNavigationController.cleanPageView(aRemovePage!!)
                 for (controller in this@ASNavigationController.controllers) {
@@ -271,16 +271,16 @@ open class ASNavigationController : Activity() {
                 sourceController?.onPageDidDisappear()
                 if (targetController != null) {
                     val removeList = Vector<View?>()
-                    val childCount = this@ASNavigationController.rootView!!.contentView?.childCount ?: 0
+                    val childCount = this@ASNavigationController.rootView?.contentView?.childCount ?: 0
                     for (i in 0..<childCount) {
                         val pageView =
-                            this@ASNavigationController.rootView!!.contentView?.getChildAt(i)
+                            this@ASNavigationController.rootView?.contentView?.getChildAt(i)
                         if (pageView !== targetController.pageView) {
                             removeList.add(pageView)
                         }
                     }
                     for (view in removeList) {
-                        this@ASNavigationController.rootView!!.contentView?.removeView(view)
+                        this@ASNavigationController.rootView?.contentView?.removeView(view)
                     }
                 }
                 for (controller in this@ASNavigationController.controllers) {
@@ -434,7 +434,7 @@ open class ASNavigationController : Activity() {
 
     fun reloadLayout() {
         if (this.rootView != null) {
-            this.rootView!!.requestLayout()
+            this.rootView?.requestLayout()
         }
     }
 
@@ -495,7 +495,7 @@ open class ASNavigationController : Activity() {
         onControllerWillFinish()
         // 改善設備控制器的清理
         if (this.deviceController != null) {
-            deviceController!!.cleanup()
+            deviceController?.cleanup()
         }
         super.finish()
     }
@@ -514,7 +514,7 @@ open class ASNavigationController : Activity() {
         this.isInBackground = false
         // 當應用恢復前景時，檢查網路狀態
         if (this.deviceController != null) {
-            val networkType = deviceController!!.isNetworkAvailable
+            val networkType = deviceController?.isNetworkAvailable
             if (networkType == -1) {
                 // 網路已斷開，可能需要重連
                 println("Network disconnected while in background")
@@ -551,9 +551,9 @@ open class ASNavigationController : Activity() {
                             this.isAnimating = true
                         }
                         this.tempControllers.addAll(this.controllers)
-                        val animated = this.pageCommands.firstElement()!!.animated
-                        while (this.pageCommands.isNotEmpty() && this.pageCommands.firstElement()!!.animated == animated) {
-                            this.pageCommands.removeAt(0)!!.run()
+                        val animated = this.pageCommands.firstElement()?.animated
+                        while (this.pageCommands.isNotEmpty() && this.pageCommands.firstElement()?.animated == animated) {
+                            this.pageCommands.removeAt(0)?.run()
                         }
                         exchangeViewControllers(animated)
                     }
@@ -593,7 +593,7 @@ open class ASNavigationController : Activity() {
             // 已經顯示就隱藏
             if (getMessageSmall() != null) {
                 val messageSmall = getMessageSmall()
-                if (messageSmall!!.isVisible) {
+                if (messageSmall?.isVisible) {
                     messageSmall.hide()
                 }
             }
@@ -602,7 +602,7 @@ open class ASNavigationController : Activity() {
             if (getShowMessageFloating()) {
                 if (getMessageSmall() != null) {
                     val messageSmall = getMessageSmall()
-                    messageSmall!!.show()
+                    messageSmall?.show()
                 }
             }
         }
@@ -634,7 +634,7 @@ open class ASNavigationController : Activity() {
      */
     private fun setupWindowInsets() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            this.rootView!!.setOnApplyWindowInsetsListener { v: View?, windowInsets: WindowInsets? ->
+            this.rootView?.setOnApplyWindowInsetsListener { v: View?, windowInsets: WindowInsets? ->
                 val windowInsetsCompat =
                     WindowInsetsCompat.toWindowInsetsCompat(windowInsets!!, v)
                 // 獲取系統欄的insets
@@ -659,7 +659,7 @@ open class ASNavigationController : Activity() {
 
 
                 // 設定內容區域的 padding 以避免與系統欄和軟鍵盤重疊
-                v!!.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding)
+                v?.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding)
                 windowInsets
             }
         }

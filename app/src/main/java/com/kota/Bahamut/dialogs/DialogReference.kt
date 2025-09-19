@@ -19,7 +19,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
     private var cancelButton: Button
     private var sendButton: Button
     private var dialogReferenceListener: DialogReferenceListener? = null
-    private lateinit var myAuthors: List<ReferenceAuthor>
+    private lateinit var myAuthors: MutableList<ReferenceAuthor>
 
     override val name: String?
         get() = "BahamutSelectSignDialog"
@@ -133,14 +133,14 @@ class DialogReference : ASDialog(), View.OnClickListener {
                 }
             }
 
-            dialogReferenceListener!!.onSelectAuthor(myAuthors)
+            dialogReferenceListener?.onSelectAuthor(myAuthors)
         }
         saveSettings()
         dismiss()
     }
 
     @SuppressLint("SetTextI18n")
-    fun setAuthors(authors:List<ReferenceAuthor>) {
+    fun setAuthors(authors:MutableList<ReferenceAuthor>) {
         myAuthors = authors
         val checkBoxAuthor0:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0)
         val checkBoxAuthor0Layout:LinearLayout = mainLayout.findViewById(R.id.Dialog_reference_author0_subLayout)

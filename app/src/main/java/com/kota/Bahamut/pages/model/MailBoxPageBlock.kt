@@ -1,36 +1,38 @@
 package com.kota.Bahamut.pages.model
 
 import com.kota.Bahamut.listPage.TelnetListPageBlock
-import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import java.util.Stack
 
-object MailBoxPageBlock : TelnetListPageBlock() {
-    private val _pool = Stack<MailBoxPageBlock?>()
+class MailBoxPageBlock : TelnetListPageBlock() {
+    
+    companion object {
+        private val myPool = Stack<MailBoxPageBlock?>()
 
-    @JvmStatic
-    fun release() {
-        synchronized(_pool) {
-            _pool.clear()
-        }
-    }
-
-    @JvmStatic
-    fun recycle(block: MailBoxPageBlock?) {
-        synchronized(_pool) {
-            _pool.push(block)
-        }
-    }
-
-    fun create(): MailBoxPageBlock {
-        var block: MailBoxPageBlock? = null
-        synchronized(_pool) {
-            if (_pool.size > 0) {
-                block = _pool.pop()
+        @JvmStatic
+        fun release() {
+            synchronized(myPool) {
+                myPool.clear()
             }
         }
-        if (block == null) {
-            return MailBoxPageBlock()
+
+        @JvmStatic
+        fun recycle(block: MailBoxPageBlock?) {
+            synchronized(myPool) {
+                myPool.push(block)
+            }
         }
-        return block
+
+        fun create(): MailBoxPageBlock {
+            var block: MailBoxPageBlock? = null
+            synchronized(myPool) {
+                if (myPool.isNotEmpty()) {
+                    block = myPool.pop()
+                }
+            }
+            if (block == null) {
+                return MailBoxPageBlock()
+            }
+            return block
+        }
     }
 }

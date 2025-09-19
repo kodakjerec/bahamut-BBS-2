@@ -1,5 +1,5 @@
 package com.kota.Bahamut.dialogs
 
-interface DialogShortenUrlListener {
+fun interface DialogShortenUrlListener {
     fun onShortenUrlDone(str: String?)
 }

@@ -53,20 +53,20 @@ class BoardExtendBookmarkItemView : LinearLayout {
             return
         }
         if (visible) {
-            if (_divider_top!!.getVisibility() != VISIBLE) {
-                _divider_top!!.setVisibility(VISIBLE)
+            if (_divider_top?.getVisibility() != VISIBLE) {
+                _divider_top?.setVisibility(VISIBLE)
             }
-        } else if (_divider_top!!.getVisibility() != GONE) {
-            _divider_top!!.setVisibility(GONE)
+        } else if (_divider_top?.getVisibility() != GONE) {
+            _divider_top?.setVisibility(GONE)
         }
     }
 
     fun setTitle(title: String?) {
         if (_title_label != null) {
             if (title == null || title.length == 0) {
-                _title_label!!.setText("未輸入")
+                _title_label?.setText("未輸入")
             } else {
-                _title_label!!.setText(title)
+                _title_label?.setText(title)
             }
         }
     }
@@ -74,9 +74,9 @@ class BoardExtendBookmarkItemView : LinearLayout {
     fun setAuthor(author: String?) {
         if (_author_label != null) {
             if (author == null || author.length == 0) {
-                _author_label!!.setText("未輸入")
+                _author_label?.setText("未輸入")
             } else {
-                _author_label!!.setText(author)
+                _author_label?.setText(author)
             }
         }
     }
@@ -84,18 +84,18 @@ class BoardExtendBookmarkItemView : LinearLayout {
     fun setGYNumber(number: String?) {
         if (_gy_label != null) {
             if (number == null || number.length == 0) {
-                _gy_label!!.setText(Bookmark.OPTIONAL_BOOKMARK)
+                _gy_label?.setText(Bookmark.OPTIONAL_BOOKMARK)
             } else {
-                _gy_label!!.setText(number)
+                _gy_label?.setText(number)
             }
         }
     }
 
     fun setMark(isMarked: Boolean) {
         if (isMarked) {
-            _mark_label!!.setVisibility(VISIBLE)
+            _mark_label?.setVisibility(VISIBLE)
         } else {
-            _mark_label!!.setVisibility(INVISIBLE)
+            _mark_label?.setVisibility(INVISIBLE)
         }
     }
 

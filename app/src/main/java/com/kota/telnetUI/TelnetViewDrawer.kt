@@ -46,7 +46,7 @@ class TelnetViewDrawer {
         block.top = this.originY + (block.height * row)
         block.bottom = block.top + block.height
 
-        this.canvas!!.withSave {
+        this.canvas?.withSave {
             when (this@TelnetViewDrawer.clip) {
                 CLIP_LEFT -> clipRect(
                     block.left,
@@ -73,7 +73,7 @@ class TelnetViewDrawer {
 
     private fun drawBackground(block: TelnetViewBlock) {
         this.paint.color = this.backgroundColor
-        this.canvas!!.drawRect(block.left, block.top, block.right, block.bottom, this.paint)
+        this.canvas?.drawRect(block.left, block.top, block.right, block.bottom, this.paint)
     }
 
     private fun drawTextAtPosition(aContext: Context, block: TelnetViewBlock, c: Char) {
@@ -89,7 +89,7 @@ class TelnetViewDrawer {
         this.paint.color = this.textColor
         when (c.code) {
             717 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 8.0f)).toInt())),
                     block.right,
@@ -101,7 +101,7 @@ class TelnetViewDrawer {
 
             9472 -> {
                 val originY = ((block.top + (block.height / 2)) - (this.lineWidth / 2)).toInt()
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     originY.toFloat(),
                     block.right,
@@ -112,23 +112,23 @@ class TelnetViewDrawer {
             }
 
             9585 -> {
-                this.canvas!!.drawLine(block.left, block.bottom, block.right, block.top, this.paint)
+                this.canvas?.drawLine(block.left, block.bottom, block.right, block.top, this.paint)
                 return
             }
 
             9586, 65340 -> {
-                this.canvas!!.drawLine(block.left, block.top, block.right, block.bottom, this.paint)
+                this.canvas?.drawLine(block.left, block.top, block.right, block.bottom, this.paint)
                 return
             }
 
             9587 -> {
-                this.canvas!!.drawLine(block.left, block.bottom, block.right, block.top, this.paint)
-                this.canvas!!.drawLine(block.left, block.top, block.right, block.bottom, this.paint)
+                this.canvas?.drawLine(block.left, block.bottom, block.right, block.top, this.paint)
+                this.canvas?.drawLine(block.left, block.top, block.right, block.bottom, this.paint)
                 return
             }
 
             9601 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 7.0f)).toInt())),
                     block.right,
@@ -139,7 +139,7 @@ class TelnetViewDrawer {
             }
 
             9602 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 6.0f)).toInt())),
                     block.right,
@@ -150,7 +150,7 @@ class TelnetViewDrawer {
             }
 
             9603 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 5.0f)).toInt())),
                     block.right,
@@ -161,7 +161,7 @@ class TelnetViewDrawer {
             }
 
             9604 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 4.0f)).toInt())),
                     block.right,
@@ -172,7 +172,7 @@ class TelnetViewDrawer {
             }
 
             9605 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 3.0f)).toInt())),
                     block.right,
@@ -183,7 +183,7 @@ class TelnetViewDrawer {
             }
 
             9606 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 2.0f)).toInt())),
                     block.right,
@@ -194,7 +194,7 @@ class TelnetViewDrawer {
             }
 
             9607 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - (((block.height) - (this.verticalUnit * 1.0f)).toInt())),
                     block.right,
@@ -205,12 +205,12 @@ class TelnetViewDrawer {
             }
 
             9608 -> {
-                this.canvas!!.drawRect(block.left, block.top, block.right, block.bottom, this.paint)
+                this.canvas?.drawRect(block.left, block.top, block.right, block.bottom, this.paint)
                 return
             }
 
             9609 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 7.0f).toInt())),
@@ -221,7 +221,7 @@ class TelnetViewDrawer {
             }
 
             9610 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 6.0f).toInt())),
@@ -232,7 +232,7 @@ class TelnetViewDrawer {
             }
 
             9611 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 5.0f).toInt())),
@@ -243,7 +243,7 @@ class TelnetViewDrawer {
             }
 
             9612 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 4.0f).toInt())),
@@ -254,7 +254,7 @@ class TelnetViewDrawer {
             }
 
             9613 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 3.0f).toInt())),
@@ -265,7 +265,7 @@ class TelnetViewDrawer {
             }
 
             9614 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 2.0f).toInt())),
@@ -276,7 +276,7 @@ class TelnetViewDrawer {
             }
 
             9615 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     (block.left + ((this.horizontalUnit * 1.0f).toInt())),
@@ -287,7 +287,7 @@ class TelnetViewDrawer {
             }
 
             9621 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     (block.right - this.lineWidth),
                     block.top,
                     block.right,
@@ -299,7 +299,7 @@ class TelnetViewDrawer {
 
             9675 -> {
                 this.paint.style = Paint.Style.STROKE
-                this.canvas!!.drawCircle(
+                this.canvas?.drawCircle(
                     block.left + this.radius.toFloat(),
                     block.top + this.radius.toFloat(),
                     this.radius.toFloat(),
@@ -310,7 +310,7 @@ class TelnetViewDrawer {
             }
 
             9679 -> {
-                this.canvas!!.drawCircle(
+                this.canvas?.drawCircle(
                     block.left + this.radius.toFloat(),
                     block.top + this.radius.toFloat(),
                     this.radius.toFloat(),
@@ -325,7 +325,7 @@ class TelnetViewDrawer {
                 path.lineTo(block.right, block.top)
                 path.lineTo(block.right, block.bottom)
                 path.lineTo(block.left, block.bottom)
-                this.canvas!!.drawPath(path, this.paint)
+                this.canvas?.drawPath(path, this.paint)
                 return
             }
 
@@ -335,7 +335,7 @@ class TelnetViewDrawer {
                 path2.lineTo(block.left, block.top)
                 path2.lineTo(block.right, block.bottom)
                 path2.lineTo(block.left, block.bottom)
-                this.canvas!!.drawPath(path2, this.paint)
+                this.canvas?.drawPath(path2, this.paint)
                 return
             }
 
@@ -345,7 +345,7 @@ class TelnetViewDrawer {
                 path3.lineTo(block.left, block.top)
                 path3.lineTo(block.right, block.top)
                 path3.lineTo(block.left, block.bottom)
-                this.canvas!!.drawPath(path3, this.paint)
+                this.canvas?.drawPath(path3, this.paint)
                 return
             }
 
@@ -355,12 +355,12 @@ class TelnetViewDrawer {
                 path4.lineTo(block.right, block.top)
                 path4.lineTo(block.right, block.bottom)
                 path4.lineTo(block.left, block.top)
-                this.canvas!!.drawPath(path4, this.paint)
+                this.canvas?.drawPath(path4, this.paint)
                 return
             }
 
             65343 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     (block.bottom - this.lineWidth),
                     block.right,
@@ -371,7 +371,7 @@ class TelnetViewDrawer {
             }
 
             65507 -> {
-                this.canvas!!.drawRect(
+                this.canvas?.drawRect(
                     block.left,
                     block.top,
                     block.right,
@@ -381,7 +381,7 @@ class TelnetViewDrawer {
                 return
             }
 
-            else -> this.canvas!!.drawText(
+            else -> this.canvas?.drawText(
                 charArrayOf(c),
                 0,
                 1,

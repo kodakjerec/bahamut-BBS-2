@@ -25,6 +25,7 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
         txtReceivedDate = findViewById(R.id.Message_Sub_Receive_Time)
     }
 
+    @SuppressLint("SimpleDateFormat")
     fun setContent(fromObject: BahaMessage) {
         txtMessage.text = fromObject.message
         // 設定日期格式
@@ -73,7 +74,7 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
 
         Linkify.addLinks(txtMessage, Linkify.WEB_URLS)
         // 使用預覽圖
-        if (UserSettings.getLinkAutoShow()) {
+        if (UserSettings.linkAutoShow) {
             val originalString = txtMessage.text as SpannableString
             val urlSpans: Array<URLSpan> = txtMessage.urls
             if (urlSpans.isNotEmpty()) {

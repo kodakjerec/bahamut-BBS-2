@@ -25,9 +25,8 @@ class MessageMainChatAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapt
     }
 
     override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
-        var myView: View? = convertView
 
-        myView = MessageMainChatItem(TempSettings.myContext!!)
+        val myView = MessageMainChatItem(TempSettings.myContext!!)
         myView.setContent(getItem(index))
 
         return myView

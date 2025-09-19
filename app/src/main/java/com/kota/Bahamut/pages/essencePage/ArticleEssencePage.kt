@@ -34,7 +34,7 @@ import com.kota.Bahamut.pages.articlePage.ArticlePage_TimeTimeView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.pages.articlePage.Thumbnail_ItemView
 import com.kota.Bahamut.pages.SendMailPage
-import com.kota.Bahamut.pages.SendMailPage_Listener
+import com.kota.Bahamut.pages.SendMailPageListener
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
@@ -45,7 +45,7 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
-class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_Listener {
+class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListener {
     var mainLayout: RelativeLayout? = null
     private var telnetArticle: TelnetArticle? = null
     private var asListView: ASListView? = null
@@ -63,13 +63,13 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
     private val listAdapter: BaseAdapter = object :BaseAdapter() {
         override fun getCount(): Int {
             return if (telnetArticle != null) {
-                telnetArticle!!.itemSize + 2
+                telnetArticle?.itemSize + 2
             } else 0
         }
 
         override fun getItem(itemIndex: Int): TelnetArticleItem? {
             return if (telnetArticle != null) {
-                telnetArticle!!.getItem(itemIndex - 1)
+                telnetArticle?.getItem(itemIndex - 1)
             } else null
         }
 
@@ -105,12 +105,12 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     var title = ""
                     var boardName = ""
                     if (telnetArticle!=null) {
-                        author = telnetArticle!!.author
-                        title = telnetArticle!!.title
-                        if (telnetArticle!!.nickName != null) {
-                            author = author + "(" + telnetArticle!!.nickName + ")"
+                        author = telnetArticle?.author
+                        title = telnetArticle?.title
+                        if (telnetArticle?.nickName != null) {
+                            author = author + "(" + telnetArticle?.nickName + ")"
                         }
-                        boardName = telnetArticle!!.boardName
+                        boardName = telnetArticle?.boardName
                     }
                     itemView1.setData(title, author, boardName)
                     itemView1.setMenuButtonClickListener(mMenuListener)
@@ -144,8 +144,8 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
                 ArticlePageItemType.PostTime -> {
                     val itemView4 = itemViewOrigin as ArticlePage_TimeTimeView
-                    itemView4.setTime("《" + telnetArticle!!.dateTime + "》")
-                    itemView4.setIP(telnetArticle!!.fromIP)
+                    itemView4.setTime("《" + telnetArticle?.dateTime + "》")
+                    itemView4.setIP(telnetArticle?.fromIP)
                 }
             }
             return itemViewOrigin
@@ -158,7 +158,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
             }
             return if (itemIndex == count - 1) {
                 ArticlePageItemType.PostTime
-            } else getItem(itemIndex)!!.type
+            } else getItem(itemIndex)?.type
         }
 
         override fun getViewTypeCount(): Int {
@@ -204,20 +204,20 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
-        telnetViewBlock = mainLayout!!.findViewById(R.id.Essence_contentTelnetViewBlock)
-        telnetView = mainLayout!!.findViewById(R.id.Essence_contentTelnetView)
+        telnetViewBlock = mainLayout?.findViewById(R.id.Essence_contentTelnetViewBlock)
+        telnetView = mainLayout?.findViewById(R.id.Essence_contentTelnetView)
         reloadTelnetLayout()
-        asListView = mainLayout!!.findViewById(R.id.Essence_contentList)
-        listEmptyView = mainLayout!!.findViewById(R.id.Essence_listEmptyView)
-        asListView!!.adapter = listAdapter
-        asListView!!.emptyView = listEmptyView
-        asListView!!.onItemLongClickListener = listLongClickListener
-        pageUpButton = mainLayout!!.findViewById(R.id.Essence_pageUpButton)
-        pageDownButton = mainLayout!!.findViewById(R.id.Essence_pageDownButton)
-        changeModeButton = mainLayout!!.findViewById(R.id.Essence_changeModeButton)
-        changeModeButton!!.setOnClickListener(this)
-        pageUpButton!!.setOnClickListener(this)
-        pageDownButton!!.setOnClickListener(this)
+        asListView = mainLayout?.findViewById(R.id.Essence_contentList)
+        listEmptyView = mainLayout?.findViewById(R.id.Essence_listEmptyView)
+        asListView?.adapter = listAdapter
+        asListView?.emptyView = listEmptyView
+        asListView?.onItemLongClickListener = listLongClickListener
+        pageUpButton = mainLayout?.findViewById(R.id.Essence_pageUpButton)
+        pageDownButton = mainLayout?.findViewById(R.id.Essence_pageDownButton)
+        changeModeButton = mainLayout?.findViewById(R.id.Essence_changeModeButton)
+        changeModeButton?.setOnClickListener(this)
+        pageUpButton?.setOnClickListener(this)
+        pageDownButton?.setOnClickListener(this)
         resetAdapter()
 
         // 替換外觀
@@ -246,16 +246,16 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
     fun setArticle(aArticle: TelnetArticle?) {
         clear()
         telnetArticle = aArticle
-        telnetView!!.frame = telnetArticle!!.frame
-        telnetView!!.layoutParams = telnetView!!.layoutParams
-        telnetViewBlock!!.scrollTo(0, 0)
+        telnetView?.frame = telnetArticle?.frame
+        telnetView?.layoutParams = telnetView?.layoutParams
+        telnetViewBlock?.scrollTo(0, 0)
         ASProcessingDialog.dismissProcessingDialog()
         resetAdapter()
     }
 
     private fun resetAdapter() {
         if (telnetArticle != null) {
-            asListView!!.adapter = listAdapter
+            asListView?.adapter = listAdapter
         }
     }
 
@@ -279,7 +279,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         title: String,
         content: String
     ) {
-        PageContainer.getInstance().mailBoxPage.onSendMailDialogSendButtonClicked(
+        PageContainer.instance?.mailBoxPage.onSendMailDialogSendButtonClicked(
             aDialog,
             receiver,
             title,
@@ -290,7 +290,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
     private fun onPageUpButtonClicked() {
         if (TelnetClient.getConnector().isConnecting) {
-            PageContainer.getInstance().boardEssencePage.loadPreviousArticle()
+            PageContainer.instance?.boardEssencePage.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -298,7 +298,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
     private fun onPageDownButtonClicked() {
         if (TelnetClient.getConnector().isConnecting) {
-            PageContainer.getInstance().boardEssencePage.loadNextArticle()
+            PageContainer.instance?.boardEssencePage.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -316,13 +316,13 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                 ArticleViewMode.MODE_TEXT
             }
         if (viewMode == ArticleViewMode.MODE_TEXT) {
-            asListView!!.visibility = View.VISIBLE
-            telnetViewBlock!!.visibility = View.GONE
+            asListView?.visibility = View.VISIBLE
+            telnetViewBlock?.visibility = View.GONE
             return
         }
-        asListView!!.visibility = View.GONE
-        telnetViewBlock!!.visibility = View.VISIBLE
-        telnetViewBlock!!.invalidate()
+        asListView?.visibility = View.GONE
+        telnetViewBlock?.visibility = View.VISIBLE
+        telnetViewBlock?.invalidate()
     }
 
     override fun onReceivedGestureRight(): Boolean {
@@ -349,7 +349,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         OnItemLongClickListener { _: AdapterView<*>?, view: View, itemIndex: Int, _: Long ->
             if (view.javaClass == ArticlePage_TelnetItemView::class.java) {
                 // 開啟切換模式
-                val item: TelnetArticleItem = telnetArticle!!.getItem(itemIndex - 1)
+                val item: TelnetArticleItem = telnetArticle?.getItem(itemIndex - 1)
                 when (item.type) {
                     0 -> {
                         item.type = 1
@@ -373,7 +373,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
 
 
     private fun onMenuClicked() {
-        if (telnetArticle != null && telnetArticle!!.author != null) {
+        if (telnetArticle != null && telnetArticle?.author != null) {
             ASListDialog.createDialog()
                 .addItem(CommonFunctions.getContextString(R.string.change_mode))
                 .addItem(
@@ -417,7 +417,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         if (telnetArticle != null) {
             // 擷取文章內的所有連結
             val textView = TextView(context)
-            textView.text = telnetArticle!!.fullText
+            textView.text = telnetArticle?.fullText
             Linkify.addLinks(textView, Linkify.WEB_URLS)
             val urls = textView.urls
             if (urls.isEmpty()) {
@@ -517,7 +517,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
                     UserSettings.setBlockList(newList)
                     UserSettings.notifyDataUpdated()
                     if (UserSettings.getPropertiesBlockListEnable()) {
-                        if (aBlockName == telnetArticle!!.author) {
+                        if (aBlockName == telnetArticle?.author) {
                             onBackPressed()
                         } else {
                             listAdapter.notifyDataSetChanged()
@@ -558,7 +558,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
     }
     // 轉寄至信箱
     fun fSendMail() {
-        boardEssencePage!!.pushCommand(BahamutCommandFSendMail(UserSettings.getPropertiesUsername()))
+        boardEssencePage?.pushCommand(BahamutCommandFSendMail(UserSettings.getPropertiesUsername()))
     }
 
     // 變更telnetView大小
@@ -580,9 +580,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPage_List
         } else {
             isFullScreen = false
         }
-        val layoutParams = telnetView!!.layoutParams
+        val layoutParams = telnetView?.layoutParams
         layoutParams.width = telnetViewWidth
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        telnetView!!.layoutParams = layoutParams
+        telnetView?.layoutParams = layoutParams
     }
 }

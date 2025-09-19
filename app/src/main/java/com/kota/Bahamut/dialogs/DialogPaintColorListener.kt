@@ -1,5 +1,5 @@
 package com.kota.Bahamut.dialogs
 
-interface DialogPaintColorListener {
+fun interface DialogPaintColorListener {
     fun onPaintColorDone(str: String)
 }

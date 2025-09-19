@@ -30,7 +30,7 @@ class B2UEncoder private constructor(inputStream: InputStream) {
             this.myOffset = readCharFromStream(inputStream).code
             this.myTableSize = readCharFromStream(inputStream).code
             this.myTable = CharArray(this.myTableSize)
-            for (i in this.myTable!!.indices) {
+            for (i in this.myTable?.indices) {
                 this.myTable!![i] = NULL_CHAR.toChar()
             }
             var i2 = 0

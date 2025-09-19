@@ -13,34 +13,22 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dataModels.ReferenceAuthor
-import com.kota.Bahamut.dialogs.DialogReference
-import com.kota.Bahamut.dialogs.DialogReferenceListener
-import com.kota.Bahamut.dialogs.DialogShortenImage
-import com.kota.Bahamut.dialogs.DialogShortenUrl
-import com.kota.Bahamut.dialogs.DialogShortenUrlListener
 import com.kota.Bahamut.dialogs.DialogInsertExpression
 import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
 import com.kota.Bahamut.dialogs.DialogInsertSymbol
-import com.kota.Bahamut.dialogs.DialogInsertSymbolListener
 import com.kota.Bahamut.dialogs.DialogPaintColor
-import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.dialogs.DialogPostArticle
-import com.kota.Bahamut.dialogs.DialogPostArticleListener
-import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.dialogs.DialogReference
+import com.kota.Bahamut.dialogs.DialogShortenImage
+import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.CommonFunctions.judgeDoubleWord
 import com.kota.Bahamut.service.TempSettings
@@ -48,35 +36,40 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
 import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTimes
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
-import com.kota.telnet.model.TelnetFrame
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.model.TelnetFrame
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
-import java.util.Arrays
 
 class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSelectedListener {
     var mainLayout: RelativeLayout? = null
-    private var _article_number: String? = null
-    private var _board_page: BoardMainPage? = null
-    private var _ori_content: String? = null
-    private var _content_field: EditText? = null
-    private var _edit_format: String? = null
-    private var _header_hidden = false
-    private var _header_selected = 0
-    private var _header_selector: Spinner? = null
-    private var _listener: PostArticlePage_Listener? = null
-    private var _operation_mode: OperationMode? = OperationMode.New
-    private var _ori_title: String? = null
-    private var _post_button: TextView? = null
-    private var _symbol_button: TextView? = null
-    private var _insert_symbol_button: TextView? = null
-    private var _paint_color_button: TextView? = null
-    private var _title_block: View? = null
-    private var _title_field: EditText? = null
-    private var _title_field_background: TextView? = null
-    var _headers: Array<String?>
+    private var articleNumber: String? = null
+    private var boardMainPage: BoardMainPage? = null
+    private var originalContent: String? = null
+    private var contentField: EditText? = null
+    private var editFormat: String? = null
+    private var isHeaderHidden = false
+    private var headerSelected = 0
+    private var headerSelector: Spinner? = null
+    private var postArticlePageListener: PostArticlePageListener? = null
+    private var operationMode: OperationMode? = OperationMode.New
+    private var originalTitle: String? = null
+    private var postButton: TextView? = null
+    private var symbolButton: TextView? = null
+    private var insertSymbolButton: TextView? = null
+    private var paintColorButton: TextView? = null
+    private var titleBlock: View? = null
+    private var titleField: EditText? = null
+    private var titleFieldBackground: TextView? = null
+    lateinit var headers: Array<String>
     var recover: Boolean = false
     private var telnetArticle: TelnetArticle? = null
 
@@ -89,20 +82,20 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         Edit
     }
 
-    fun setListener(aListener: PostArticlePage_Listener?) {
-        _listener = aListener
+    fun setListener(aListener: PostArticlePageListener?) {
+        postArticlePageListener = aListener
     }
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.post_article_page
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_POST_ARTICLE
 
-    val isPopupPage: Boolean
+    override val isPopupPage: Boolean
         get() = true
 
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         initial()
         if (recover) {
             loadTempArticle(9)
@@ -110,51 +103,51 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         }
     }
 
-    public override fun onPageDidDisappear() {
-        _header_selector = null
-        _title_field = null
-        _title_field_background = null
-        _content_field = null
-        _title_block = null
-        _symbol_button = null
-        _post_button = null
-        _insert_symbol_button = null
-        _paint_color_button = null
+    override fun onPageDidDisappear() {
+        headerSelector = null
+        titleField = null
+        titleFieldBackground = null
+        contentField = null
+        titleBlock = null
+        symbolButton = null
+        postButton = null
+        insertSymbolButton = null
+        paintColorButton = null
         super.onPageDidDisappear()
     }
 
     private fun refreshTitleField() {
-        if (_title_field != null && _ori_title != null) {
-            _title_field!!.setText(_ori_title)
-            if (_ori_title!!.length > 0) {
-                Selection.setSelection(_title_field!!.getText(), 1)
+        if (titleField != null && originalTitle != null) {
+            titleField?.setText(originalTitle)
+            if (originalTitle?.isNotEmpty()) {
+                Selection.setSelection(titleField?.text, 1)
             }
-            _ori_title = null
+            originalTitle = null
         }
     }
 
     private fun refreshContentField() {
-        if (_content_field != null && _ori_content != null) {
-            _content_field!!.setText(_ori_content)
-            if (_ori_content!!.length > 0) {
-                Selection.setSelection(_content_field!!.getText(), _ori_content!!.length)
+        if (contentField != null && originalContent != null) {
+            contentField?.setText(originalContent)
+            if (originalContent?.isNotEmpty()) {
+                Selection.setSelection(contentField?.text, originalContent?.length)
             }
-            _ori_content = null
+            originalContent = null
         }
     }
 
     private fun refreshHeaderSelector() {
-        if (_header_selector == null) {
+        if (headerSelector == null) {
             return
         }
-        if (_header_hidden) {
-            _header_selector!!.setVisibility(View.GONE)
+        if (isHeaderHidden) {
+            headerSelector?.visibility = View.GONE
         } else {
-            _header_selector!!.setVisibility(View.VISIBLE)
+            headerSelector?.visibility = View.VISIBLE
         }
     }
 
-    public override fun onPageRefresh() {
+    override fun onPageRefresh() {
         refreshTitleField()
         refreshContentField()
         refreshHeaderSelector()
@@ -162,62 +155,62 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     @SuppressLint("ResourceType")
     private fun initial() {
-        _headers = articleHeaders
+        headers = articleHeaders
 
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
-        _title_field = mainLayout!!.findViewById<EditText?>(R.id.ArticlePostDialog_TitleField)
+        titleField = mainLayout?.findViewById(R.id.ArticlePostDialog_TitleField)
         // 點標題的時候拉大編輯框
-        _title_field!!.setOnFocusChangeListener(titleFieldListener)
-        _title_field_background =
-            mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_TitleFieldBackground)
-        _content_field = mainLayout!!.findViewById<EditText?>(R.id.ArticlePostDialog_EditField)
+        titleField?.onFocusChangeListener = titleFieldListener
+        titleFieldBackground =
+            mainLayout?.findViewById(R.id.ArticlePostDialog_TitleFieldBackground)
+        contentField = mainLayout?.findViewById(R.id.ArticlePostDialog_EditField)
 
-        _post_button = mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_Post)
-        _post_button!!.setOnClickListener(this)
+        postButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Post)
+        postButton?.setOnClickListener(this)
 
-        _symbol_button = mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_Symbol)
-        _symbol_button!!.setOnClickListener(this)
+        symbolButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Symbol)
+        symbolButton?.setOnClickListener(this)
 
-        _insert_symbol_button = mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_Cancel)
-        _insert_symbol_button!!.setOnClickListener(this)
+        insertSymbolButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Cancel)
+        insertSymbolButton?.setOnClickListener(this)
 
-        _paint_color_button = mainLayout!!.findViewById<TextView?>(R.id.ArticlePostDialog_Color)
-        _paint_color_button!!.setOnClickListener(this)
+        paintColorButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Color)
+        paintColorButton?.setOnClickListener(this)
 
-        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_File).setOnClickListener(this)
-        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_ShortenUrl).setOnClickListener(this)
-        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_ShortenImage)
+        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_File).setOnClickListener(this)
+        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenUrl).setOnClickListener(this)
+        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenImage)
             .setOnClickListener(this)
-        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_EditButtons)
+        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_EditButtons)
             .setOnClickListener(this)
 
-        _header_selector = mainLayout!!.findViewById<Spinner?>(R.id.Post_headerSelector)
-        val adapter: ArrayAdapter<String?> =
-            ArrayAdapter<Any?>(context, R.layout.simple_spinner_item, _headers)
+        headerSelector = mainLayout?.findViewById(R.id.Post_headerSelector)
+        val adapter: ArrayAdapter<Any> =
+            ArrayAdapter<Any>(context!!, R.layout.simple_spinner_item, headers)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        _header_selector!!.setAdapter(adapter)
-        _header_selector!!.setOnItemSelectedListener(this)
-        _title_block = mainLayout!!.findViewById<View>(R.id.Post_TitleBlock)
-        _title_block!!.requestFocus()
+        headerSelector?.adapter = adapter
+        headerSelector?.onItemSelectedListener = this
+        titleBlock = mainLayout?.findViewById(R.id.Post_TitleBlock)
+        titleBlock?.requestFocus()
 
-        mainLayout!!.findViewById<View>(R.id.Post_Toolbar_Show)
+        mainLayout?.findViewById<View>(R.id.Post_Toolbar_Show)
             .setOnClickListener(postToolbarShowOnClickListener)
-        mainLayout!!.findViewById<View>(R.id.ArticlePostDialog_Reference)
+        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Reference)
             .setOnClickListener(referenceClickListener)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
-    public override fun clear() {
-        if (_title_field != null) {
-            _title_field!!.setText("")
+    override fun clear() {
+        if (titleField != null) {
+            titleField?.setText("")
         }
-        if (_content_field != null) {
-            _content_field!!.setText("")
+        if (contentField != null) {
+            contentField?.setText("")
         }
-        _listener = null
+        postArticlePageListener = null
         recover = false
     }
 
@@ -229,76 +222,76 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 設定文章標題  */
     fun setPostTitle(aTitle: String?) {
-        _ori_title = aTitle
+        originalTitle = aTitle
         refreshTitleField()
     }
 
     /** 設定內文  */
     fun setPostContent(aContent: String?) {
-        _ori_content = aContent
+        originalContent = aContent
         refreshContentField()
     }
 
     override fun onClick(view: View) {
-        if (view === _post_button) {
-            if (_listener != null) {
-                val title = getArticleHeader(_header_selected) + _title_field!!.getText().toString()
+        if (view === postButton) {
+            if (postArticlePageListener != null) {
+                val title = getArticleHeader(headerSelected) + titleField?.text.toString()
                     .replace("\n", "")
-                val content = _content_field!!.getText().toString()
-                var err_msg: String? = null
-                if (title.length == 0 && content.length == 0) {
-                    err_msg = "標題與內文不可為空"
-                } else if (title.length == 0) {
-                    err_msg = "標題不可為空"
-                } else if (content.length == 0) {
-                    err_msg = "內文不可為空"
+                val content = contentField?.text.toString()
+                var errMsg: String? = null
+                if (title.isEmpty() && content.isEmpty()) {
+                    errMsg = "標題與內文不可為空"
+                } else if (title.isEmpty()) {
+                    errMsg = "標題不可為空"
+                } else if (content.isEmpty()) {
+                    errMsg = "內文不可為空"
                 }
-                if (err_msg == null) {
+                if (errMsg == null) {
                     post(title, content)
                 } else {
-                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(err_msg)
+                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg)
                         .addButton(getContextString(R.string.sure)).show()
                 }
             }
-        } else if (view === _symbol_button) {
+        } else if (view === symbolButton) {
             // 表情符號
-            val items: Array<String?> = articleExpressions
+            val items: Array<String> = articleExpressions
             DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
                 .setListener(object : DialogInsertExpressionListener {
                     override fun onListDialogItemClicked(
-                        paramASListDialog: DialogInsertExpression?,
-                        index: Int,
-                        aTitle: String?
+                        paramASListDialog: DialogInsertExpression,
+                        paramInt: Int,
+                        paramString: String
                     ) {
-                        val symbol = items[index]
+                        val symbol = items[paramInt]
                         this@PostArticlePage.insertString(symbol)
                     }
 
                     override fun onListDialogSettingClicked() {
                         // 將當前內容存檔, pushView會讓當前頁面消失
                         setRecover()
-                        navigationController!!.pushViewController(ArticleExpressionListPage())
+                        navigationController.pushViewController(ArticleExpressionListPage())
                     }
                 }).scheduleDismissOnPageDisappear(this).show()
-        } else if (view === _insert_symbol_button) {
+        } else if (view === insertSymbolButton) {
             // 符號
             val dialog = DialogInsertSymbol()
-            dialog.setListener(DialogInsertSymbolListener { str: String? -> this.insertString(str) })
+            dialog.setListener { str: String? -> this.insertString(str) }
             dialog.show()
-        } else if (view === _paint_color_button) {
+        } else if (view === paintColorButton) {
             // 上色
             val dialog = DialogPaintColor()
-            dialog.setListener(DialogPaintColorListener { str: String? -> this.insertString(str) })
+            dialog.setListener { str: String? -> this.insertString(str) }
             dialog.show()
-        } else if (view.getId() == R.id.ArticlePostDialog_File) {
+        } else if (view.id == R.id.ArticlePostDialog_File) {
             // 檔案
             onFileClicked()
-        } else if (view.getId() == R.id.ArticlePostDialog_ShortenUrl) {
+        } else if (view.id == R.id.ArticlePostDialog_ShortenUrl) {
             // 短網址
             val dialog = DialogShortenUrl()
-            dialog.setListener(DialogShortenUrlListener { str: String? -> this.insertString(str) })
+            dialog.setListener { str: String? -> this.insertString(str) }
             dialog.show()
-        } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
+        } else if (view.id == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
             val shortenTimes = propertiesNoVipShortenTimes
             if (!propertiesVIP && shortenTimes > 30) {
@@ -307,34 +300,33 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             }
             val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
             startActivity(intent)
-        } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
+        } else if (view.id == R.id.ArticlePostDialog_EditButtons) {
             showShortToast(getContextString(R.string.error_under_develop))
         }
     }
 
     /** 發文  */
     private fun post(title: String, content: String?) {
-        val send_title: String?
 
-        if (_article_number == null || title != _ori_title) {
-            send_title = title
+        val sendTitle: String? = if (articleNumber == null || title != originalTitle) {
+            title
         } else {
-            send_title = null
+            null
         }
-        val send_content = content
+        val sendContent = content
         // 有來源文章編號, 可能為Reply, edit
-        if (_article_number != null) {
-            if (_operation_mode == OperationMode.Reply) {
+        if (articleNumber != null) {
+            if (operationMode == OperationMode.Reply) {
                 // 回覆: 有註記回文
                 val dialog = DialogPostArticle(1)
-                dialog.setListener(DialogPostArticleListener { aTarget: String?, aSign: String? ->
-                    if (this@PostArticlePage._listener != null) {
-                        this@PostArticlePage._listener!!.onPostDialogSendButtonClicked(
+                dialog.setListener { aTarget: String?, aSign: String? ->
+                    if (this@PostArticlePage.postArticlePageListener != null) {
+                        this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
                             this@PostArticlePage,
-                            send_title,
-                            send_content,
+                            sendTitle,
+                            sendContent,
                             aTarget,
-                            this@PostArticlePage._article_number,
+                            this@PostArticlePage.articleNumber,
                             aSign,
                             recover
                         )
@@ -343,42 +335,42 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                     if (aTarget == "M") {
                         closeArticle()
                     }
-                })
+                }
                 dialog.show()
             } else {
                 // 修改: 沒有註記回文
                 ASAlertDialog.createDialog().addButton(getContextString(R.string.cancel))
                     .addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?")
-                    .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                    .setListener { aDialog: ASAlertDialog?, index: Int ->
                         if (index == 1) {
-                            if (this@PostArticlePage._listener != null) {
-                                this@PostArticlePage._listener!!.onPostDialogEditButtonClicked(
+                            if (this@PostArticlePage.postArticlePageListener != null) {
+                                this@PostArticlePage.postArticlePageListener?.onPostDialogEditButtonClicked(
                                     this@PostArticlePage,
-                                    this@PostArticlePage._article_number,
-                                    send_title,
+                                    this@PostArticlePage.articleNumber,
+                                    sendTitle,
                                     this@PostArticlePage.editContent
                                 )
                             }
                         }
                         closeArticle()
-                    }).show()
+                    }.show()
             }
         } else {
             // 新增文章
             val dialog2 = DialogPostArticle(0)
-            dialog2.setListener(DialogPostArticleListener { aTarget: String?, aSign: String? ->
-                if (this@PostArticlePage._listener != null) {
-                    this@PostArticlePage._listener!!.onPostDialogSendButtonClicked(
+            dialog2.setListener { aTarget: String?, aSign: String? ->
+                if (this@PostArticlePage.postArticlePageListener != null) {
+                    this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
                         this@PostArticlePage,
-                        send_title,
-                        send_content,
+                        sendTitle,
+                        sendContent,
                         null,
                         null,
                         aSign,
                         recover
                     )
                 }
-            })
+            }
             dialog2.show()
         }
     }
@@ -390,16 +382,16 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                 .pushKey(TelnetKeyboard.CTRL_X)
                 .pushString("a\n")
                 .build()
-            TelnetClient.client!!.sendDataToServer(data)
+            TelnetClient.client?.sendDataToServer(data)
             recover = false
         }
         clear()
-        navigationController!!.popToViewController(_board_page)
-        PageContainer.getInstance().cleanPostArticlePage()
+        navigationController.popToViewController(boardMainPage)
+        PageContainer.instance?.cleanPostArticlePage()
     }
 
     override fun onItemSelected(adapterView: AdapterView<*>?, aView: View?, index: Int, id: Long) {
-        _header_selected = index
+        headerSelected = index
     }
 
     override fun onNothingSelected(adapterView: AdapterView<*>?) {
@@ -408,23 +400,23 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
     /** 標題欄位取得焦點  */
     var titleFieldListener: OnFocusChangeListener =
         OnFocusChangeListener { view: View?, hasFocus: Boolean ->
-            if (view !== _title_field) {
+            if (view !== titleField) {
                 return@OnFocusChangeListener
             }
             if (hasFocus) {
-                _title_field!!.setSingleLine(false)
-                _title_field!!.setTextColor(-1)
-                _title_field_background!!.setTextColor(0)
+                titleField?.isSingleLine = false
+                titleField?.setTextColor(-1)
+                titleFieldBackground?.setTextColor(0)
                 return@OnFocusChangeListener
             }
-            _title_field!!.setSingleLine(true)
-            _title_field!!.setTextColor(0)
-            _title_field_background!!.setTextColor(-1)
-            _title_field_background!!.setText(_title_field!!.getText().toString())
+            titleField?.isSingleLine = true
+            titleField?.setTextColor(0)
+            titleFieldBackground?.setTextColor(-1)
+            titleFieldBackground?.text = titleField?.text.toString()
         }
 
     fun setHeaderHidden(hidden: Boolean) {
-        _header_hidden = hidden
+        isHeaderHidden = hidden
         refreshHeaderSelector()
     }
 
@@ -436,21 +428,21 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addItem(getContextString(R.string.save_to_temp))
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ) {
-                    if (aTitle == getContextString(R.string.load_temp)) {
+                    if (paramString == getContextString(R.string.load_temp)) {
                         this@PostArticlePage.ontLoadArticleFromTempButtonClicked()
-                    } else if (aTitle == getContextString(R.string.save_to_temp)) {
+                    } else if (paramString == getContextString(R.string.save_to_temp)) {
                         this@PostArticlePage.ontSaveArticleToTempButtonClicked()
                     }
                 }
@@ -469,40 +461,40 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addItem(getContextString(R.string.load_temp) + ".5")
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ) {
-                    if (index == 0) {
+                    if (paramInt == 0) {
                         ASAlertDialog.createDialog()
                             .setTitle(getContextString(R.string.load_temp))
                             .setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?")
                             .addButton(getContextString(R.string.cancel))
                             .addButton(getContextString(R.string.sure))
-                            .setListener(ASAlertDialogListener { aDialog12: ASAlertDialog?, button_index: Int ->
+                            .setListener { aDialog12: ASAlertDialog?, buttonIndex: Int ->
                                 this@PostArticlePage.loadTempArticle(
                                     9
                                 )
-                            }).show()
+                            }.show()
                     } else {
                         ASAlertDialog.createDialog()
                             .setTitle(getContextString(R.string.load_temp))
-                            .setMessage("您是否確定要以暫存檔." + index + "的內容取代您現在編輯的內容?")
+                            .setMessage("您是否確定要以暫存檔." + paramInt + "的內容取代您現在編輯的內容?")
                             .addButton(getContextString(R.string.cancel))
                             .addButton(getContextString(R.string.sure))
-                            .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                                if (button_index == 1) {
-                                    this@PostArticlePage.loadTempArticle(index - 1)
+                            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                                if (buttonIndex == 1) {
+                                    this@PostArticlePage.loadTempArticle(paramInt - 1)
                                 }
-                            }).show()
+                            }.show()
                     }
                 }
             }).show()
@@ -510,25 +502,25 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 讀取暫存檔  */
     private fun loadTempArticle(index: Int) {
-        val article_temp = ArticleTempStore(context).articles.get(index)
-        _header_selector!!.setSelection(getIndexOfHeader(article_temp.header))
-        _title_field!!.setText(article_temp.title)
-        _content_field!!.setText(article_temp.content)
+        val articleTemp = ArticleTempStore(context).articles[index]
+        headerSelector?.setSelection(getIndexOfHeader(articleTemp.header))
+        titleField?.setText(articleTemp.title)
+        contentField?.setText(articleTemp.content)
     }
 
     /** 儲存暫存檔  */
     private fun saveTempArticle(index: Int) {
         val store = ArticleTempStore(context)
-        val article_temp = store.articles.get(index)
+        val articleTemp = store.articles[index]
         // 類別
-        article_temp.header = ""
-        if (_header_selector!!.getSelectedItemPosition() > 0) {
-            article_temp.header = getArticleHeader(_header_selector!!.getSelectedItemPosition())
+        articleTemp.header = ""
+        if (headerSelector?.selectedItemPosition > 0) {
+            articleTemp.header = getArticleHeader(headerSelector?.selectedItemPosition)
         }
         // 標題
-        article_temp.title = _title_field!!.getText().toString()
+        articleTemp.title = titleField?.text.toString()
         // 內文
-        article_temp.content = _content_field!!.getText().toString()
+        articleTemp.content = contentField?.text.toString()
 
         // 存檔
         store.store()
@@ -541,11 +533,11 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 從字串去回推標題定位  */
     fun getIndexOfHeader(aHeader: String?): Int {
-        if (aHeader == null || aHeader.length == 0) {
+        if (aHeader == null || aHeader.isEmpty()) {
             return 0
         }
-        for (i in 1..<_headers.size) {
-            if (_headers[i] == aHeader) {
+        for (i in 1..<headers.size) {
+            if (headers[i] == aHeader) {
                 return i
             }
         }
@@ -554,10 +546,10 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 從定位取出特定標題  */
     fun getArticleHeader(index: Int): String? {
-        if (index <= 0 || index >= _headers.size) {
+        if (index <= 0 || index >= headers.size) {
             return ""
         }
-        return _headers[index]
+        return headers[index]
     }
 
     /** 按下 存入暫存檔  */
@@ -571,28 +563,28 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addItem(getContextString(R.string.save_to_temp) + ".5")
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ) {
                     ASAlertDialog.createDialog()
                         .setTitle(getContextString(R.string.load_temp))
-                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (paramInt + 1) + "的內容?")
                         .addButton(getContextString(R.string.cancel))
                         .addButton(getContextString(R.string.sure))
-                        .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                            if (button_index == 1) {
-                                this@PostArticlePage.saveTempArticle(index)
+                        .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                            if (buttonIndex == 1) {
+                                this@PostArticlePage.saveTempArticle(paramInt)
                             }
-                        }).show()
+                        }.show()
                 }
             }).show()
     }
@@ -608,72 +600,72 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addItem(getContextString(R.string.save_to_temp) + ".5")
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
+                    paramASListDialog: ASListDialog?,
+                    paramInt: Int,
+                    paramString: String?
                 ) {
                     ASAlertDialog.createDialog()
                         .setTitle(getContextString(R.string.load_temp))
-                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (paramInt + 1) + "的內容?")
                         .addButton(getContextString(R.string.cancel))
                         .addButton(getContextString(R.string.sure))
-                        .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                            if (button_index == 0) {
+                        .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                            if (buttonIndex == 0) {
                                 this@PostArticlePage.onBackPressed()
                             } else {
-                                this@PostArticlePage.saveTempArticle(index)
+                                this@PostArticlePage.saveTempArticle(paramInt)
                                 closeArticle()
                             }
-                        }).show()
+                        }.show()
                 }
             }).show()
     }
 
     fun setOperationMode(aMode: OperationMode?) {
-        _operation_mode = aMode
+        operationMode = aMode
     }
 
     fun setArticleNumber(aNumber: String?) {
-        _article_number = aNumber
+        articleNumber = aNumber
     }
 
     fun setEditFormat(aFormat: String?) {
-        _edit_format = aFormat
+        editFormat = aFormat
     }
 
     val editContent: String?
         /** 組合修改文章內容  */
         get() {
-            if (_edit_format == null) {
+            if (editFormat == null) {
                 return null
             }
-            val _title = judgeDoubleWord(
-                _title_field!!.getText().toString(),
+            val editTitle = judgeDoubleWord(
+                titleField?.text.toString(),
                 TelnetFrame.Companion.DEFAULT_COLUMN - 9
             ).split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-            val _content = _content_field!!.getText().toString()
-            return String.format(_edit_format!!, _title, _content)
+            val editContent = contentField?.text.toString()
+            return String.format(editFormat!!, editTitle, editContent)
         }
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
     fun setBoardPage(aBoardMainPage: BoardMainPage?) {
-        _board_page = aBoardMainPage
+        boardMainPage = aBoardMainPage
     }
 
     /** 按下 返回  */
-    protected override fun onBackPressed(): Boolean {
-        if (_title_field!!.getText().toString().length == 0 && _content_field!!.getText()
-                .toString().length == 0
+    override fun onBackPressed(): Boolean {
+        if (titleField?.text.toString().isEmpty() && contentField?.text
+                .toString().isEmpty()
         ) {
             return super.onBackPressed()
         }
@@ -683,45 +675,45 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string._giveUp))
             .addButton(getContextString(R.string._save))
-            .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     closeArticle()
                 } else if (index == 2) {
                     this@PostArticlePage.ontSaveArticleToTempAndLeaveButtonClicked()
                 }
-            }).show()
+            }.show()
         return true
     }
 
     /** 按下 展開/摺疊  */
     var postToolbarShowOnClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         val thisBtn = view as TextView
-        val toolBar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
-        val layoutParams = toolBar.getLayoutParams() as RelativeLayout.LayoutParams
+        val toolBar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)
+        val layoutParams = toolBar.layoutParams as RelativeLayout.LayoutParams
         if (isToolbarShow) {
             // 從展開->摺疊
             isToolbarShow = false
-            thisBtn.setText(getContextString(R.string.post_toolbar_show))
+            thisBtn.text = getContextString(R.string.post_toolbar_show)
             layoutParams.height = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 60f,
-                resource.getDisplayMetrics()
+                resource?.displayMetrics
             ).toInt()
         } else {
             isToolbarShow = true
-            thisBtn.setText(getContextString(R.string.post_toolbar_collapse))
+            thisBtn.text = getContextString(R.string.post_toolbar_collapse)
             layoutParams.height = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 120f,
-                resource.getDisplayMetrics()
+                resource?.displayMetrics
             ).toInt()
         }
-        toolBar.setLayoutParams(layoutParams)
+        toolBar.layoutParams = layoutParams
     }
 
     fun insertString(str: String?) {
-        if (_content_field != null) {
-            _content_field!!.getEditableText().insert(_content_field!!.getSelectionStart(), str)
+        if (contentField != null) {
+            contentField?.editableText.insert(contentField?.selectionStart, str)
         }
     }
 
@@ -732,36 +724,36 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 按下格式  */
     var referenceClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val authors: MutableList<ReferenceAuthor?> = ArrayList<ReferenceAuthor?>()
+        val authors: MutableList<ReferenceAuthor> = ArrayList()
         if (telnetArticle == null) {
             showErrorDialog(getContextString(R.string.dialog_reference_error_1), this)
             return@OnClickListener
         }
 
-        if (_edit_format == null) {
+        if (editFormat == null) {
             // 回覆
             // 回應作者
             val replyAuthor = ReferenceAuthor()
             replyAuthor.enabled = true
-            replyAuthor.authorName = telnetArticle!!.author
+            replyAuthor.authorName = telnetArticle?.author
             authors.add(replyAuthor)
 
             // 更上一層
             val newAuthor = ReferenceAuthor()
-            if (telnetArticle!!.infoSize > 0) {
-                val item = telnetArticle!!.getInfo(0)
+            if (telnetArticle?.infoSize > 0) {
+                val item = telnetArticle?.getInfo(0)
                 newAuthor.enabled = true
-                newAuthor.authorName = item!!.author
+                newAuthor.authorName = item?.author
             }
             authors.add(newAuthor)
         } else {
             // 修改
-            if (telnetArticle!!.infoSize > 0) {
-                for (i in 0..<telnetArticle!!.infoSize) {
+            if (telnetArticle?.infoSize > 0) {
+                for (i in 0..<telnetArticle?.infoSize) {
                     val newAuthor = ReferenceAuthor()
-                    val item = telnetArticle!!.getInfo(i)
+                    val item = telnetArticle?.getInfo(i)
                     newAuthor.enabled = true
-                    newAuthor.authorName = item!!.author
+                    newAuthor.authorName = item?.author
                     authors.add(newAuthor)
                 }
             }
@@ -769,27 +761,27 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
         val dialog = DialogReference()
         dialog.setAuthors(authors)
-        dialog.setListener(DialogReferenceListener { authors: List<ReferenceAuthor> ->
+        dialog.setListener { authors ->
             this.referenceBack(
                 authors
             )
-        })
+        }
         dialog.show()
     }
 
     fun referenceBack(authors: MutableList<ReferenceAuthor>) {
         // 找出父層內容
-        val originParentContent = Arrays.asList<String?>(
-            *telnetArticle!!.generateReplyContent().split("\n".toRegex())
+        val originParentContent = listOf(
+            *telnetArticle?.generateReplyContent().split("\n".toRegex())
                 .dropLastWhile { it.isEmpty() }.toTypedArray()
         )
-        val tempParentContent: MutableList<String> = ArrayList<String>()
-        val finalParentContent: MutableList<String?> = ArrayList<String?>()
+        val tempParentContent: MutableList<String> = ArrayList()
+        val finalParentContent: MutableList<String?> = ArrayList()
 
 
         // 開始篩選
-        val author0 = authors.get(0)
-        val author1 = authors.get(1)
+        val author0 = authors[0]
+        val author1 = authors[1]
         var author0InsertRows = 0
         var author1InsertRows = 0
 
@@ -797,7 +789,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         var author0TotalRows = 0
         var author1TotalRows = 0
         for (i in originParentContent.indices) {
-            val rowString = originParentContent.get(i)
+            val rowString = originParentContent[i]
             if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
                 if (!(author1.removeBlank && rowString.replace("> > ".toRegex(), "").isEmpty())) {
                     tempParentContent.add(rowString)
@@ -813,7 +805,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
         var needInsert: Boolean
         for (i in tempParentContent.indices) {
-            val rowString = tempParentContent.get(i)
+            val rowString = tempParentContent[i]
             needInsert = false
             if (rowString.startsWith("> ※ ")) {
                 // 前二
@@ -869,22 +861,22 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         val joinedParentContent = java.lang.String.join("\n", finalParentContent)
 
         // 找出自己打的內容
-        val originFromContent = Arrays.asList<String?>(
-            *_content_field!!.getText().toString().split("\n".toRegex())
+        val originFromContent = listOf(
+            *contentField?.text.toString().split("\n".toRegex())
                 .dropLastWhile { it.isEmpty() }.toTypedArray()
         )
-        val selfContent: MutableList<String?> = ArrayList<String?>()
+        val selfContent: MutableList<String?> = ArrayList()
         for (i in originFromContent.indices) {
-            if (!originFromContent.get(i)!!.startsWith("※ 引述") && !originFromContent.get(i)!!
+            if (!originFromContent[i].startsWith("※ 引述") && !originFromContent[i]
                     .startsWith("> ")
             ) {
-                selfContent.add(originFromContent.get(i))
+                selfContent.add(originFromContent[i])
             }
         }
         // final Result
         val joinedSelfContent = java.lang.String.join("\n", selfContent)
 
-        val _rev2 = java.lang.String.join("", joinedParentContent, "\n", joinedSelfContent)
-        _content_field!!.setText(_rev2)
+        val rev2 = java.lang.String.join("", joinedParentContent, "\n", joinedSelfContent)
+        contentField?.setText(rev2)
     }
 }

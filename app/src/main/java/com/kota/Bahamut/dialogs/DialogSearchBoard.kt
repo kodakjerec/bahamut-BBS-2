@@ -18,7 +18,7 @@ class DialogSearchBoard : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_search_board)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         setTitle("搜尋看板")
         this.keywordLabel = findViewById<EditText>(R.id.Bahamut_Dialog_Search_board_keyword)
         this.searchButton = findViewById<Button>(R.id.Bahamut_Dialog_Search_board_Search_Button)
@@ -29,7 +29,7 @@ class DialogSearchBoard : ASDialog(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         if (view === this.searchButton && this.listener != null) {
-            this.listener!!.onSearchButtonClickedWithKeyword(
+            this.listener?.onSearchButtonClickedWithKeyword(
                 this.keywordLabel.text.toString().replace("\n", "")
             )
         }

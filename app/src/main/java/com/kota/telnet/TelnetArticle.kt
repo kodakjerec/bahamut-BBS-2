@@ -35,7 +35,7 @@ class TelnetArticle {
     fun setFrameData(rows: Vector<TelnetRow>) {
         this.frame = TelnetFrame(rows.size)
         for (i in rows.indices) {
-            frame!!.setRow(i, rows[i]!!.clone())
+            frame?.setRow(i, rows[i]?.clone())
         }
     }
 
@@ -115,9 +115,9 @@ class TelnetArticle {
     /** 設定文章標題  */
     fun generateEditFormat(): String {
         val contentBuffer = StringBuilder()
-        val timeString = frame!!.getRow(2).toString().substring(4)
+        val timeString = frame?.getRow(2).toString().substring(4)
         contentBuffer.append("作者: ").append(this.author)
-        if (nickName != null && !nickName!!.isEmpty()) {
+        if (nickName != null && !nickName?.isEmpty()) {
             contentBuffer.append("(").append(nickName).append(")")
         }
         contentBuffer.append(" 看板: ").append(boardName).append("\n")
@@ -128,7 +128,7 @@ class TelnetArticle {
     }
 
     fun generateEditTitle(): String {
-        return frame!!.getRow(1).toString().substring(4)
+        return frame?.getRow(1).toString().substring(4)
     }
 
     /** 產生 修改用的文章內容
@@ -141,18 +141,18 @@ class TelnetArticle {
         var startContentRowIndex = 0
         // 先找出指定行"時間", 下一行是分隔線, 再下一行是內容
         // 內容如果是空白"", 是發文時系統預設給的, 再往下找一行
-        for (i in 0..<frame!!.rowSize) {
-            val currentRow = frame!!.getRow(i)
-            if (currentRow!!.rawString.contains("時間")) {
+        for (i in 0..<frame?.rowSize) {
+            val currentRow = frame?.getRow(i)
+            if (currentRow?.rawString.contains("時間")) {
                 startContentRowIndex = i + 2
-                if (frame!!.getRow(startContentRowIndex)!!.rawString.isEmpty()) startContentRowIndex += 1
+                if (frame?.getRow(startContentRowIndex)?.rawString.isEmpty()) startContentRowIndex += 1
                 break
             }
         }
 
-        for (rowIndex in startContentRowIndex..<frame!!.rowSize) {
-            val currentRow = frame!!.getRow(rowIndex)
-            val rawString = currentRow!!.rawString
+        for (rowIndex in startContentRowIndex..<frame?.rowSize) {
+            val currentRow = frame?.getRow(rowIndex)
+            val rawString = currentRow?.rawString
             if (rawString.matches("※ .*".toRegex()) || rawString.matches("> .*".toRegex()) || rawString.matches(
                     "--.*".toRegex()
                 )
@@ -310,13 +310,13 @@ class TelnetArticle {
                 return ""
             }
             val builder = StringBuilder()
-            val len = frame!!.rowSize
+            val len = frame?.rowSize
             for (i in 0..<len) {
-                val row = frame!!.getRow(i)
+                val row = frame?.getRow(i)
                 if (i > 0) {
                     builder.append("\n")
                 }
-                builder.append(row!!.rawString)
+                builder.append(row?.rawString)
             }
             return builder.toString()
         }

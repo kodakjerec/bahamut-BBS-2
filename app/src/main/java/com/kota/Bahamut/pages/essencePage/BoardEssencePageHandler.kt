@@ -4,34 +4,34 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.telnet.model.TelnetRow
-import com.kota.telnet.TelnetClient.getModel
+import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetUtils
 
 class BoardEssencePageHandler private constructor() {
     fun load(): BoardPageBlock {
         var row: TelnetRow
         val boardPageBlock = BoardPageBlock.create()
-        val firstRowString = getModel().getRowString(0)
+        val firstRowString = TelnetClient.client?.model?.getRowString(0)
 
         // 沒有版主, 沒有看板標題
-        boardPageBlock.BoardManager = ""
-        boardPageBlock.BoardName = ""
+        boardPageBlock.boardManager = ""
+        boardPageBlock.boardName = ""
 
         val regexBoardName: Regex = """《(?<boardName>.*?)》""".trimIndent().toRegex()
-        val boardName = regexBoardName.find(firstRowString)
+        val boardName = regexBoardName.find(firstRowString.toString())
 
         if (boardName!=null) {
-            boardPageBlock.BoardTitle = boardName.groups[1]!!.value
+            boardPageBlock.boardTitle = boardName.groups[1]?.value
         }
 
-        if (boardPageBlock.BoardManager == null || boardPageBlock.BoardManager != "主題串列") {
-            boardPageBlock.Type = BoardPageAction.LIST
+        if (boardPageBlock.boardManager == null || boardPageBlock.boardManager != "主題串列") {
+            boardPageBlock.boardType = BoardPageAction.LIST
         } else {
-            boardPageBlock.Type = BoardPageAction.SEARCH
+            boardPageBlock.boardType = BoardPageAction.SEARCH
         }
         val endIndex = 3 + 20
         var i6 = 3
-        row = getModel().getRow(i6)
+        row = TelnetClient.client?.model?.getRow(i6)!!
         while (i6 < endIndex && row.toString().isNotEmpty()) {
             row.reloadSpace()
             val articleSelected = row.getSpaceString(0, 0).trim()
@@ -65,7 +65,7 @@ class BoardEssencePageHandler private constructor() {
                 }
             }
             i6++
-            row = getModel().getRow(i6)
+            row = TelnetClient.client?.model?.getRow(i6)!!
         }
         return boardPageBlock
     }

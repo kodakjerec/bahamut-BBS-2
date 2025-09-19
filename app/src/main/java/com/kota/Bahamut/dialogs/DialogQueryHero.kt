@@ -26,17 +26,17 @@ class DialogQueryHero : ASDialog() {
             """.trimIndent().toRegex()
 
             val match = regex.find(fromStrings[2])!!
-            id = match.groups[1]!!.value
-            val nick = match.groups[2]!!.value
-            val hp = match.groups[3]!!.value
-            val mp = match.groups[4]!!.value
+            id = match.groups[1]?.value
+            val nick = match.groups[2]?.value
+            val hp = match.groups[3]?.value
+            val mp = match.groups[4]?.value
             val authStatus = match.groups[5]?.value ?: "未知"
             val authLevel = match.groups[6]?.value ?: "無"
             val match2 = regex2.find(fromStrings[3])!!
 
-            val lastDate = match2.groups[1]!!.value + "日"
-            val lastTime = match2.groups[2]!!.value
-            val fromIp = match2.groups[3]!!.value
+            val lastDate = match2.groups[1]?.value + "日"
+            val lastTime = match2.groups[2]?.value
+            val fromIp = match2.groups[3]?.value
 
             val contextView = findViewById<LinearLayout>(R.id.content_view)
             contextView.findViewById<TextView>(R.id.dialog_query_hero_id).text = id
@@ -86,7 +86,7 @@ class DialogQueryHero : ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_query_hero)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
 
         val contextView = findViewById<LinearLayout>(R.id.content_view)
         contextView.findViewById<Button>(R.id.cancel).setOnClickListener { dismiss() }

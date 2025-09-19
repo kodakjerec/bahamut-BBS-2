@@ -70,7 +70,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         val layoutId = R.layout.dialog_shorten_image
         requestWindowFeature(1)
         setContentView(layoutId)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
         mainLayout = findViewById(R.id.dialog_shorten_image_layout)
         mainLayout.setOnClickListener { _ -> closeProcessingDialog() }
         textView = mainLayout.findViewById(R.id.dialog_shorten_image_hint)
@@ -85,10 +85,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
         transferButton = mainLayout.findViewById(R.id.dialog_shorten_image_transfer)
-        transferButton!!.setOnClickListener(transferListener)
+        transferButton?.setOnClickListener(transferListener)
         sendButton = mainLayout.findViewById(R.id.send)
-        sendButton!!.setOnClickListener(this)
-        sendButton!!.isEnabled = false
+        sendButton?.setOnClickListener(this)
+        sendButton?.isEnabled = false
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
         mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
 
@@ -148,10 +148,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 //            val link = uploaderObj.postImage(finalUri!!)
 //            // 後續處理 link
 //            if (!link.isEmpty()) {
-//                sampleTextView!!.text = link
-//                outputParam = sampleTextView!!.text.toString()
-//                sendButton!!.isEnabled = true
-//                transferButton!!.isEnabled = false
+//                sampleTextView?.text = link
+//                outputParam = sampleTextView?.text.toString()
+//                sendButton?.isEnabled = true
+//                transferButton?.isEnabled = false
 //                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
 //            }
 //            closeProcessingDialog()
@@ -164,10 +164,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 if (link.startsWith("http")) {
                     object : ASRunner() {
                         override fun run() {
-                            sampleTextView!!.text = link
-                            outputParam = sampleTextView!!.text.toString()
-                            sendButton!!.isEnabled = true
-                            transferButton!!.isEnabled = false
+                            sampleTextView?.text = link
+                            outputParam = sampleTextView?.text.toString()
+                            sendButton?.isEnabled = true
+                            transferButton?.isEnabled = false
                             var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
                             UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
                         }
@@ -196,12 +196,12 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         videoView.suspend()
         videoView.setVideoURI(null)
         videoView.visibility = GONE
-        sampleTextView!!.text = getContextString(R.string.dialog_paint_color_sample_ch)
+        sampleTextView?.text = getContextString(R.string.dialog_paint_color_sample_ch)
         outputParam = ""
         selectedImageUri = null
         selectedVideoUri = null
-        sendButton!!.isEnabled = false
-        transferButton!!.isEnabled = true
+        sendButton?.isEnabled = false
+        transferButton?.isEnabled = true
     }
     /** 註冊 intent */
     private val intentCameraLauncher = registerForActivityResult(StartActivityForResult()) { result ->
@@ -223,7 +223,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
                     Glide.with(this).load(bitmap).into(imageView)
                 }
-                transferButton!!.performClick()
+                transferButton?.performClick()
             } catch (e:Exception) {
                 Log.d("DialogShortenImage", e.message.toString())
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
@@ -238,12 +238,12 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 textView.visibility = GONE
                 imageView.visibility = GONE
                 videoView.visibility = VISIBLE
-                val uri: Uri? = result.data!!.data
+                val uri: Uri? = result.data?.data
                 selectedVideoUri = uri
                 videoView.setVideoURI(uri)
                 videoView.start()
                 videoView.requestFocus()
-                transferButton!!.performClick()
+                transferButton?.performClick()
             } catch (e:Exception) {
                 Log.d("DialogShortenImage", e.message.toString())
             }
@@ -277,7 +277,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                         selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
                     }
-                    transferButton!!.performClick()
+                    transferButton?.performClick()
                 } else {
                     // 影片
                     imageView.visibility = GONE
@@ -286,7 +286,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     videoView.setVideoURI(uri)
                     videoView.start()
                     videoView.requestFocus()
-                    transferButton!!.performClick()
+                    transferButton?.performClick()
                 }
             } catch (_: IOException) {
                 Log.e("PhotoPicker", "Error loading image/video")
@@ -358,13 +358,13 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
     private fun postUrl(str:String) {
         // 最上層是 發文 或 看板
-        val topPage = ASNavigationController.currentController!!.topController
+        val topPage = ASNavigationController.currentController?.topController
         if ((topPage as Any).javaClass == PostArticlePage::class.java) {
-            val aPage = PageContainer.instance!!.postArticlePage
+            val aPage = PageContainer.instance?.postArticlePage
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.instance!!.messageSub
-            aPage!!.insertString(str)
+            val aPage = PageContainer.instance?.messageSub
+            aPage?.insertString(str)
         }
     }
 
@@ -375,10 +375,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private fun changeDialogHeight(newConfig: Configuration) {
         val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutParams!!.height = ViewGroup.LayoutParams.MATCH_PARENT
+            layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
         } else {
             val factor = applicationContext.resources.displayMetrics.density
-            layoutParams!!.height = (500 * factor).toInt()
+            layoutParams?.height = (500 * factor).toInt()
         }
         mainLayout.layoutParams = layoutParams
     }

@@ -35,8 +35,8 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     // 按下新增
     var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (_inputField != null) {
-            val block_name = _inputField!!.getText().toString().trim { it <= ' ' }
-            _inputField!!.setText("")
+            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
+            _inputField?.setText("")
             if (block_name.length > 0) {
                 val new_list: MutableList<String?> =
                     ArrayList<String?>(Arrays.asList<String>(*articleExpressions))
@@ -71,7 +71,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
             .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
                 if (button_index > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField!!.setText("")
+                    _inputField?.setText("")
                     resetArticleExpressions()
                     this@ArticleExpressionListPage.reload()
                 }
@@ -95,7 +95,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
             end = target.getAdapterPosition()
             if (propertiesVIP) {
                 Collections.swap(_articleExpressionsList, start, end)
-                articleExpressionListAdapter!!.notifyItemMoved(start, end)
+                articleExpressionListAdapter?.notifyItemMoved(start, end)
             } else {
                 showShortToast(getContextString(R.string.vip_only_message))
             }
@@ -113,7 +113,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                     isDragged = true
                     if (viewHolder != null) { // 選取變色
                         dragView = viewHolder.itemView
-                        dragView!!.setBackgroundResource(R.color.ripple_material)
+                        dragView?.setBackgroundResource(R.color.ripple_material)
                     }
                 }
 
@@ -131,7 +131,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                     }
                     if (!isSwiped && isDragged) { // The user used onMove()
                         if (dragView != null) { // 解除 選取變色
-                            dragView!!.setBackgroundResource(R.color.transparent)
+                            dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
                         UserSettings.setArticleExpressions(_articleExpressionsList!!)
@@ -157,16 +157,16 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
 
     public override fun onPageDidLoad() {
         val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+        recyclerView?.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         articleExpressionListAdapter = BlockListAdapter(_articleExpressionsList)
         recyclerView.setAdapter(articleExpressionListAdapter)
-        articleExpressionListAdapter!!.setOnItemClickListener(this)
+        articleExpressionListAdapter?.setOnItemClickListener(this)
 
         _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)!!.setOnClickListener(_addListener)
-        findViewById(R.id.BlockList_Reset)!!.setOnClickListener(_resetListener)
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
 
         showNotification()
 
@@ -194,9 +194,9 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
         val _temp = Arrays.asList<String?>(*articleExpressions)
-        _articleExpressionsList!!.clear()
-        _articleExpressionsList!!.addAll(_temp)
-        articleExpressionListAdapter!!.notifyDataSetChanged()
+        _articleExpressionsList?.clear()
+        _articleExpressionsList?.addAll(_temp)
+        articleExpressionListAdapter?.notifyDataSetChanged()
     }
 
     public override fun onReceivedGestureRight(): Boolean {
@@ -212,7 +212,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     override fun onBlockListPage_ItemView_delete_clicked(blockListPage_ItemView: BlockListViewHolder) {
         val deleted_index = blockListPage_ItemView.getAdapterPosition()
         val new_list = this@ArticleExpressionListPage._articleExpressionsList
-        new_list!!.removeAt(deleted_index)
+        new_list?.removeAt(deleted_index)
 
         // 更新
         UserSettings.setArticleExpressions(_articleExpressionsList!!)

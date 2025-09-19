@@ -35,7 +35,6 @@ class BoardEssencePageItemView : LinearLayout {
             setNumber(aItem.itemNumber)
             setDate(aItem.date)
             author = aItem.author
-            aItem.isBBSClickable = aItem.isBBSClickable
             setDirectory(aItem.isDirectory, aItem.isBBSClickable)
             return
         }
@@ -49,21 +48,23 @@ class BoardEssencePageItemView : LinearLayout {
         )
         contentView = findViewById(R.id.BoardPage_ItemView_contentView)
         if (contentView!=null) {
-            statusLabel = contentView!!.findViewById(R.id.BoardPage_ItemView_Status)
-            titleLabel = contentView!!.findViewById(R.id.BoardPage_ItemView_Title)
-            numberLabel = contentView!!.findViewById(R.id.BoardPage_ItemView_Number)
-            dateLabel = contentView!!.findViewById(R.id.BoardPage_ItemView_Date)
-            authorLabel = contentView!!.findViewById(R.id.BoardPage_ItemView_Author)
-            dividerBottom = contentView!!.findViewById(R.id.BoardPage_ItemView_DividerBottom)
-            contentView!!.findViewById<TextView>(R.id.BoardPage_ItemView_mark).visibility = View.INVISIBLE
-            contentView!!.findViewById<TextView>(R.id.BoardPage_ItemView_GY_Title).visibility = View.INVISIBLE
-            contentView!!.findViewById<TextView>(R.id.BoardPage_ItemView_GY).visibility = View.INVISIBLE
+            statusLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Status)
+            titleLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Title)
+            numberLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Number)
+            dateLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Date)
+            authorLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Author)
+            dividerBottom = contentView?.findViewById(R.id.BoardPage_ItemView_DividerBottom)
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_mark).visibility =
+                INVISIBLE
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY_Title).visibility =
+                INVISIBLE
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY).visibility = INVISIBLE
         }
     }
 
     fun setTitle(title: String?) {
         if (titleLabel != null) {
-            titleLabel!!.text = Objects.requireNonNullElse(
+            titleLabel?.text = Objects.requireNonNullElse(
                 title,
                 CommonFunctions.getContextString(R.string.loading_)
             )
@@ -71,10 +72,10 @@ class BoardEssencePageItemView : LinearLayout {
     }
 
     var author: String?
-        get() = authorLabel!!.text as String
+        get() = authorLabel?.text as String
         set(author) {
             if (authorLabel != null) {
-                authorLabel!!.text = Objects.requireNonNullElse(
+                authorLabel?.text = Objects.requireNonNullElse(
                     author,
                     CommonFunctions.getContextString(R.string.loading)
                 )
@@ -83,7 +84,7 @@ class BoardEssencePageItemView : LinearLayout {
 
     fun setDate(date: String?) {
         if (dateLabel != null) {
-            dateLabel!!.text = Objects.requireNonNullElse(
+            dateLabel?.text = Objects.requireNonNullElse(
                 date,
                 CommonFunctions.getContextString(R.string.loading)
             )
@@ -94,10 +95,10 @@ class BoardEssencePageItemView : LinearLayout {
     fun setNumber(number: Int) {
         if (numberLabel != null) {
             if (number > 0) {
-                numberLabel!!.text = String.format("%1$05d", number)
+                numberLabel?.text = String.format("%1$05d", number)
                 return
             }
-            numberLabel!!.text = CommonFunctions.getContextString(R.string.loading)
+            numberLabel?.text = CommonFunctions.getContextString(R.string.loading)
         }
     }
 
@@ -106,21 +107,20 @@ class BoardEssencePageItemView : LinearLayout {
         setDate(null)
         author = null
         setNumber(0)
-        setDirectory(false, false)
+        setDirectory(isDirectory = false, isBBSClickable = false)
     }
 
     private fun setDirectory(isDirectory: Boolean, isBBSClickable: Boolean) {
-        var statusText: String
-        if (isDirectory) {
-            statusText = "◆"
+        var statusText: String = if (isDirectory) {
+            "◆"
         } else {
-            statusText = "◇"
+            "◇"
         }
         if (!isBBSClickable) {
             statusText += "("
             isClickable = true
         }
 
-        statusLabel!!.text = statusText
+        statusLabel?.text = statusText
     }
 }

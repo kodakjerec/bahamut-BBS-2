@@ -59,14 +59,14 @@ open class TelnetHeaderItemView : LinearLayout {
 
     fun setMenuButtonClickListener(aListener: OnClickListener?) {
         if (aListener == null) {
-            mMenuDivider!!.visibility = GONE
-            mMenuButton!!.visibility = GONE
-            mMenuButton!!.setOnClickListener(null)
+            mMenuDivider?.visibility = GONE
+            mMenuButton?.visibility = GONE
+            mMenuButton?.setOnClickListener(null)
             return
         }
-        mMenuDivider!!.visibility = VISIBLE
-        mMenuButton!!.visibility = VISIBLE
-        mMenuButton!!.setOnClickListener(aListener)
+        mMenuDivider?.visibility = VISIBLE
+        mMenuButton?.visibility = VISIBLE
+        mMenuButton?.setOnClickListener(aListener)
     }
 
     fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
@@ -77,33 +77,33 @@ open class TelnetHeaderItemView : LinearLayout {
 
     fun setTitle(aTitle: String?) {
         if (myTitle != null) {
-            myTitle!!.text = aTitle
+            myTitle?.text = aTitle
             if (aTitle != null && aTitle.contains("系統精靈送信來了")) {
-                myTitle!!.setTextColor(getContextColor(R.color.white))
-                myTitle!!.setBackgroundColor(getContextColor(R.color.red))
-                val layoutParams = myTitle!!.layoutParams
+                myTitle?.setTextColor(getContextColor(R.color.white))
+                myTitle?.setBackgroundColor(getContextColor(R.color.red))
+                val layoutParams = myTitle?.layoutParams
                 layoutParams.width = LayoutParams.WRAP_CONTENT
-                myTitle!!.layoutParams = layoutParams
+                myTitle?.layoutParams = layoutParams
             }
         }
     }
 
     fun setDetail1(aDetail1: String?) {
         if (detail1 != null) {
-            detail1!!.text = aDetail1
+            detail1?.text = aDetail1
         }
     }
 
     /** 設定點擊功能 detail1  */
     fun setDetail1ClickListener(aListener: OnClickListener?) {
         if (aListener != null) {
-            detail1!!.setOnClickListener(aListener)
+            detail1?.setOnClickListener(aListener)
         }
     }
 
     fun setDetail2(aDetail2: String?) {
         if (detail2 != null) {
-            detail2!!.text = aDetail2
+            detail2?.text = aDetail2
         }
     }
 }

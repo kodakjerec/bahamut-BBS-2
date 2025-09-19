@@ -19,7 +19,7 @@ class DialogColorPicker : ASDialog() {
         val layoutId = R.layout.dialog_color_picker
         requestWindowFeature(1)
         setContentView(layoutId)
-        window!!.setBackgroundDrawable(null)
+        window?.setBackgroundDrawable(null)
 
         colorPickerView = findViewById(R.id.dialog_color_picker_view)
         val alphaSlideBar: AlphaSlideBar = findViewById(R.id.dialog_color_picker_alpha)

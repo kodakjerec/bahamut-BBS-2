@@ -108,7 +108,7 @@ class TelnetView : View {
                 try {
                     sleep(1000L)
                     if (this@TelnetView.myHandler != null) {
-                        this@TelnetView.myHandler!!.sendEmptyMessage(0)
+                        this@TelnetView.myHandler?.sendEmptyMessage(0)
                     }
                 } catch (e: InterruptedException) {
                     Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
@@ -267,14 +267,14 @@ class TelnetView : View {
         }
         if (blinkThread == null) {
             blinkThread = BlinkThread()
-            blinkThread!!.start()
+            blinkThread?.start()
         }
     }
 
     private fun stopBlink() {
         myHandler = null
         if (blinkThread != null) {
-            blinkThread!!.stopBlink()
+            blinkThread?.stopBlink()
             blinkThread = null
         }
     }
@@ -286,7 +286,7 @@ class TelnetView : View {
         get() = telnetFrame
         set(aTelnetFrame) {
             telnetFrame = aTelnetFrame
-            telnetFrame!!.reloadSpace()
+            telnetFrame?.reloadSpace()
             cleanBitmap()
             invalidate()
         }
@@ -318,7 +318,7 @@ class TelnetView : View {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec)
             return
         }
-        myRow = telnetFrame!!.rowSize
+        myRow = telnetFrame?.rowSize
         columnCount = 80
         // 螢幕寬度/每行字元數 = 得到雙字元寬度(預估)
         // => /2 得到單字元寬度
@@ -472,10 +472,10 @@ class TelnetView : View {
                 var column = columnStart
                 while (column < columnEnd) {
                     val cursorColumn = column - columnStart
-                    if (telnetFrame!!.getPositionBlink(row, column)) {
+                    if (telnetFrame?.getPositionBlink(row, column)) {
                         blink = true
                     }
-                    val bitSpace = telnetFrame!!.getPositionBitSpace(row, column)
+                    val bitSpace = telnetFrame?.getPositionBitSpace(row, column)
                     if (bitSpace.toInt() == 1) {
                         drawSingleBitSpace2r1(row, column, cursorRow, cursorColumn)
                         column++
@@ -510,7 +510,7 @@ class TelnetView : View {
             }
             if (drawSeparatorLine) {
                 drawer.paint.color = 1728053247
-                for (row2 in 0..<telnetFrame!!.rowSize) {
+                for (row2 in 0..<telnetFrame?.rowSize) {
                     val positionY = (row2 * blockHeight).toInt()
                     canvas.drawLine(
                         0.0f,
@@ -552,7 +552,7 @@ class TelnetView : View {
         bitmapSpaceRows = 0
         bitmapSpaceColumns = 0
         if (telnetFrame != null) {
-            val rowMaximum = telnetFrame!!.rowSize
+            val rowMaximum = telnetFrame?.rowSize
             bitmapSpaceRows =
                 (if (rowMaximum % bitmapSpaceY > 0) 1 else 0) + (rowMaximum / bitmapSpaceY)
             bitmapSpaceColumns =
@@ -578,8 +578,8 @@ class TelnetView : View {
             val canvas = Canvas(bm)
             val rowStart = row * bitmapSpaceY
             var rowEnd = (row + 1) * bitmapSpaceY
-            if (rowEnd > telnetFrame!!.rowSize) {
-                rowEnd = telnetFrame!!.rowSize
+            if (rowEnd > telnetFrame?.rowSize) {
+                rowEnd = telnetFrame?.rowSize
             }
             val columnStart = column * bitmapSpaceX
             var columnEnd = (column + 1) * bitmapSpaceX
@@ -639,20 +639,20 @@ class TelnetView : View {
     }
 
     fun bitmapContainsPosition(row: Int, column: Int): Boolean {
-        return myBitmaps != null && row >= 0 && row < myBitmaps!!.size && column >= 0 && column < myBitmaps!![row].size
+        return myBitmaps != null && row >= 0 && row < myBitmaps?.size && column >= 0 && column < myBitmaps!![row].size
     }
 
     private fun drawBitSpace1(row: Int, column: Int, cursorRow: Int, cursorColumn: Int) {
         var z = true
         drawer.paint.textSize = enTextSize.toInt().toFloat()
-        val c = telnetFrame!!.getPositionData(row, column).toChar()
-        val textColor = telnetFrame!!.getPositionTextColor(row, column)
-        val backgroundColor = telnetFrame!!.getPositionBackgroundColor(row, column)
+        val c = telnetFrame?.getPositionData(row, column).toChar()
+        val textColor = telnetFrame?.getPositionTextColor(row, column)
+        val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
         drawer.backgroundColor = backgroundColor
         drawer.bit = 1
         drawer.paint.typeface = enTypePace
-        if (!blink || !telnetFrame!!.getPositionBlink(row, column)) {
+        if (!blink || !telnetFrame?.getPositionBlink(row, column)) {
             z = false
         }
         drawer.blink = z
@@ -662,68 +662,68 @@ class TelnetView : View {
 
     private fun drawSingleBitSpace2r1(row: Int, column: Int, cursorRow: Int, cursorColumn: Int) {
         drawer.paint.textSize = zhTextSize.toInt().toFloat()
-        val upper = telnetFrame!!.getPositionData(row, column)
-        val lower = telnetFrame!!.getPositionData(row, column + 1)
+        val upper = telnetFrame?.getPositionData(row, column)
+        val lower = telnetFrame?.getPositionData(row, column + 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
-        val textColor = telnetFrame!!.getPositionTextColor(row, column)
-        val backgroundColor = telnetFrame!!.getPositionBackgroundColor(row, column)
+        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val textColor = telnetFrame?.getPositionTextColor(row, column)
+        val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
         drawer.backgroundColor = backgroundColor
         drawer.bit = 2
         drawer.paint.typeface = zhTypePace
-        drawer.blink = blink && telnetFrame!!.getPositionBlink(row, column)
+        drawer.blink = blink && telnetFrame?.getPositionBlink(row, column)
         drawer.clip = 0.toByte()
         drawer.drawCharAtPosition(context, cursorRow, cursorColumn, c)
     }
 
     private fun drawSingleBitSpace2r2(row: Int, column: Int, cursorRow: Int, cursorColumn: Int) {
         drawer.paint.textSize = zhTextSize.toInt().toFloat()
-        val lower = telnetFrame!!.getPositionData(row, column)
-        val upper = telnetFrame!!.getPositionData(row, column - 1)
+        val lower = telnetFrame?.getPositionData(row, column)
+        val upper = telnetFrame?.getPositionData(row, column - 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
-        val textColor = telnetFrame!!.getPositionTextColor(row, column)
-        val backgroundColor = telnetFrame!!.getPositionBackgroundColor(row, column)
+        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val textColor = telnetFrame?.getPositionTextColor(row, column)
+        val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
         drawer.backgroundColor = backgroundColor
         drawer.bit = 2
         drawer.paint.typeface = zhTypePace
-        drawer.blink = blink && telnetFrame!!.getPositionBlink(row, column)
+        drawer.blink = blink && telnetFrame?.getPositionBlink(row, column)
         drawer.clip = 0.toByte()
         drawer.drawCharAtPosition(context, cursorRow, cursorColumn - 1, c)
     }
 
     private fun drawDoubleBitSpace2r1(row: Int, column: Int, cursorRow: Int, cursorColumn: Int) {
         drawer.paint.textSize = zhTextSize.toInt().toFloat()
-        val upper = telnetFrame!!.getPositionData(row, column)
-        val lower = telnetFrame!!.getPositionData(row, column + 1)
+        val upper = telnetFrame?.getPositionData(row, column)
+        val lower = telnetFrame?.getPositionData(row, column + 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
-        val textColor = telnetFrame!!.getPositionTextColor(row, column)
-        val backgroundColor = telnetFrame!!.getPositionBackgroundColor(row, column)
+        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val textColor = telnetFrame?.getPositionTextColor(row, column)
+        val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
         drawer.backgroundColor = backgroundColor
         drawer.bit = 2
         drawer.paint.typeface = zhTypePace
-        drawer.blink = blink && telnetFrame!!.getPositionBlink(row, column)
+        drawer.blink = blink && telnetFrame?.getPositionBlink(row, column)
         drawer.clip = 1.toByte()
         drawer.drawCharAtPosition(context, cursorRow, cursorColumn, c)
     }
 
     private fun drawDoubleBitSpace2r2(row: Int, column: Int, cursorRow: Int, cursorColumn: Int) {
         drawer.paint.textSize = zhTextSize.toInt().toFloat()
-        val lower = telnetFrame!!.getPositionData(row, column)
-        val upper = telnetFrame!!.getPositionData(row, column - 1)
+        val lower = telnetFrame?.getPositionData(row, column)
+        val upper = telnetFrame?.getPositionData(row, column - 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
-        val textColor = telnetFrame!!.getPositionTextColor(row, column)
-        val backgroundColor = telnetFrame!!.getPositionBackgroundColor(row, column)
+        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val textColor = telnetFrame?.getPositionTextColor(row, column)
+        val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
         drawer.backgroundColor = backgroundColor
         drawer.bit = 2
         drawer.paint.typeface = zhTypePace
-        drawer.blink = blink && telnetFrame!!.getPositionBlink(row, column)
+        drawer.blink = blink && telnetFrame?.getPositionBlink(row, column)
         drawer.clip = 2.toByte()
         drawer.drawCharAtPosition(context, cursorRow, cursorColumn - 1, c)
     }

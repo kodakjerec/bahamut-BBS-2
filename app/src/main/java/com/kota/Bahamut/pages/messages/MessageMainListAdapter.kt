@@ -25,9 +25,8 @@ class MessageMainListAdapter(list: MutableList<MessageMainListItemStructure>): B
     }
 
     override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
-        var myView: View? = convertView
 
-        myView = MessageMainListItem(TempSettings.myContext!!)
+        val myView = MessageMainListItem(TempSettings.myContext!!)
         myView.setContent(getItem(index))
 
         return myView

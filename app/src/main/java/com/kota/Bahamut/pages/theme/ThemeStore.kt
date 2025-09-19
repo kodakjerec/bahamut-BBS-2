@@ -5,17 +5,18 @@ import android.content.SharedPreferences
 import android.util.Log
 import org.json.JSONArray
 import org.json.JSONObject
+import androidx.core.content.edit
 
 object ThemeStore {
     private lateinit var perf: SharedPreferences
-    private const val perfName:String = "themeStore"
+    private const val PERF_NAME:String = "themeStore"
     private var themeStore:ArrayList<Theme> = ArrayList()
 
     // 變數
-    private const val perSelectThemeIndex:String = "select_theme_index" // 選擇外觀
+    private const val PER_SELECT_THEME_INDEX:String = "select_theme_index" // 選擇外觀
 
     fun upgrade(activity: Activity) {
-        perf = activity.getSharedPreferences(perfName, 0)
+        perf = activity.getSharedPreferences(PERF_NAME, 0)
         load()
     }
 
@@ -87,22 +88,22 @@ object ThemeStore {
                 jsonArray.put(theme.exportToJSON())
             }
             obj.put("data", jsonArray)
-            perf.edit().putString("themeStore", obj.toString()).apply()
+            perf.edit { putString("themeStore", obj.toString()) }
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, e.message.toString())
         }
     }
 
     fun getSelectIndex(): Int {
-        return perf.getInt(perSelectThemeIndex, 0)
+        return perf.getInt(PER_SELECT_THEME_INDEX, 0)
     }
     fun getSelectTheme(): Theme {
-        val themeIndex = perf.getInt(perSelectThemeIndex, 0)
+        val themeIndex = perf.getInt(PER_SELECT_THEME_INDEX, 0)
         return themeStore[themeIndex]
     }
 
     fun setSelectIndex(selectedIndex: Int) {
-        perf.edit().putInt(perSelectThemeIndex, selectedIndex).apply()
+        perf.edit { putInt(PER_SELECT_THEME_INDEX, selectedIndex) }
     }
 
     /** 取得預設外觀 */

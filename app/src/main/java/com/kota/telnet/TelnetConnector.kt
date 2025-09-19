@@ -23,12 +23,12 @@ class TelnetConnector : TelnetChannelListener {
             this.telnetChannels[1] = null
         }
         if (this.holderThread != null) {
-            this.holderThread!!.close()
+            this.holderThread?.close()
         }
         this.holderThread = null
         if (this.socketChannel != null) {
             try {
-                this.socketChannel!!.finishConnect()
+                this.socketChannel?.finishConnect()
             } catch (_: IOException) {
                 Log.v("SocketChannel", "IO Exception")
             }
@@ -128,7 +128,7 @@ class TelnetConnector : TelnetChannelListener {
 
         // 連線前先鎖定 WiFi 和 CPU
         if (this.deviceController != null) {
-            this.deviceController!!.lockWifi()
+            this.deviceController?.lockWifi()
         }
 
         this.connectorListener.onTelnetConnectorConnectStart(this)
@@ -138,9 +138,9 @@ class TelnetConnector : TelnetChannelListener {
             this.socketChannel = TelnetDefaultSocketChannel(serverIp, serverPort)
             synchronized(this) {
                 this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
-                this.telnetChannels[0]!!.setListener(this)
+                this.telnetChannels[0]?.setListener(this)
                 this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
-                this.telnetChannels[1]!!.setListener(this)
+                this.telnetChannels[1]?.setListener(this)
             }
             this.isConnecting = true
             // 初始化最後發送時間
@@ -149,14 +149,14 @@ class TelnetConnector : TelnetChannelListener {
             Log.e("TelnetConnector", "Telnet connection failed: " + e.message)
             // 連線失敗時釋放鎖定
             if (this.deviceController != null) {
-                this.deviceController!!.unlockWifi()
+                this.deviceController?.unlockWifi()
             }
             clear()
         }
         if (this.isConnecting) {
             this.connectorListener.onTelnetConnectorConnectSuccess(this)
             this.holderThread = HolderThread()
-            this.holderThread!!.start()
+            this.holderThread?.start()
             Log.d("TelnetConnector", "Telnet connection established, HolderThread started")
         } else {
             this.connectorListener.onTelnetConnectorConnectFail(this)
@@ -172,7 +172,7 @@ class TelnetConnector : TelnetChannelListener {
 
         // 連線前先鎖定 WiFi 和 CPU
         if (this.deviceController != null) {
-            this.deviceController!!.lockWifi()
+            this.deviceController?.lockWifi()
         }
 
         this.connectorListener.onTelnetConnectorConnectStart(this)
@@ -184,9 +184,9 @@ class TelnetConnector : TelnetChannelListener {
             this.socketChannel = TelnetWebSocketChannel(wsUrl)
             synchronized(this) {
                 this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
-                this.telnetChannels[0]!!.setListener(this)
+                this.telnetChannels[0]?.setListener(this)
                 this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
-                this.telnetChannels[1]!!.setListener(this)
+                this.telnetChannels[1]?.setListener(this)
             }
             this.isConnecting = true
             // 初始化最後發送時間
@@ -195,14 +195,14 @@ class TelnetConnector : TelnetChannelListener {
             Log.e("TelnetConnector", "WebSocket connection failed: " + e.message)
             // 連線失敗時釋放鎖定
             if (this.deviceController != null) {
-                this.deviceController!!.unlockWifi()
+                this.deviceController?.unlockWifi()
             }
             clear()
         }
         if (this.isConnecting) {
             this.connectorListener.onTelnetConnectorConnectSuccess(this)
             this.holderThread = HolderThread()
-            this.holderThread!!.start()
+            this.holderThread?.start()
             Log.d("TelnetConnector", "WebSocket connection established, HolderThread started")
         } else {
             this.connectorListener.onTelnetConnectorConnectFail(this)
@@ -212,7 +212,7 @@ class TelnetConnector : TelnetChannelListener {
     fun close() {
         // 關閉連線時釋放鎖定
         if (this.deviceController != null) {
-            this.deviceController!!.unlockWifi()
+            this.deviceController?.unlockWifi()
         }
         clear()
         this.connectorListener.onTelnetConnectorClosed(this)
@@ -323,7 +323,7 @@ class TelnetConnector : TelnetChannelListener {
     // 添加網路連線檢查方法
     fun checkNetworkConnectivity(): Boolean {
         if (this.deviceController != null) {
-            val networkType = this.deviceController!!.isNetworkAvailable
+            val networkType = this.deviceController?.isNetworkAvailable
             return networkType != -1
         }
         return true // 如果沒有設備控制器，假設網路正常

@@ -21,7 +21,7 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_insert_symbol)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         this.mainView = findViewById<GridView>(R.id.SymbolDialog_GridView)
         this.mainView.onItemClickListener = this
         val list = arrayOfNulls<String>(this.symbols.length)
@@ -38,7 +38,7 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
 
     override fun onItemClick(adapterView: AdapterView<*>?, arg1: View?, index: Int, id: Long) {
         if (this._listener != null) {
-            this._listener!!.onSymbolDialogDismissWithSymbol(getItem(index))
+            this._listener?.onSymbolDialogDismissWithSymbol(getItem(index))
         }
         dismiss()
     }

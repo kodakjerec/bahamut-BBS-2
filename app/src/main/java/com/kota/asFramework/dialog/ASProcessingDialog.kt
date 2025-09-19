@@ -14,7 +14,7 @@ class ASProcessingDialog : ASDialog() {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.as_processing_dialog)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         buildContentView()
     }
 
@@ -22,7 +22,7 @@ class ASProcessingDialog : ASDialog() {
         // frame_view
         val frameView = findViewById<LinearLayout>(R.id.as_processing_dialog_frame_view)
         messageLabel = frameView.findViewById(R.id.as_processing_dialog_text)
-        messageLabel!!.setText(R.string.zero_word)
+        messageLabel?.setText(R.string.zero_word)
     }
 
     // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
@@ -42,7 +42,7 @@ class ASProcessingDialog : ASDialog() {
     // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(
+        if (this.onBackDelegate == null || !this.onBackDelegate?.onASProcessingDialogOnBackDetected(
                 this
             )
         ) {
@@ -75,9 +75,9 @@ class ASProcessingDialog : ASDialog() {
                                 constructInstance()
                             }
                             setMessage(aMessage)
-                            aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
-                            if (!aSProcessingDialog!!.isShowing) {
-                                aSProcessingDialog!!.show()
+                            aSProcessingDialog?.setOnBackDelegate(onBackDelegate)
+                            if (!aSProcessingDialog?.isShowing) {
+                                aSProcessingDialog?.show()
                             }
                         }
                     }.runInMainThread()
@@ -92,7 +92,7 @@ class ASProcessingDialog : ASDialog() {
                     object : ASRunner() {
                         override fun run() {
                             if (aSProcessingDialog != null) {
-                                aSProcessingDialog!!.dismiss()
+                                aSProcessingDialog?.dismiss()
                                 releaseInstance()
                             }
                         }
@@ -106,7 +106,7 @@ class ASProcessingDialog : ASDialog() {
             object : ASRunner() {
                 override fun run() {
                     if (aSProcessingDialog != null) {
-                        aSProcessingDialog!!.messageLabel!!.text = message
+                        aSProcessingDialog?.messageLabel?.text = message
                     }
                 }
             }.runInMainThread()

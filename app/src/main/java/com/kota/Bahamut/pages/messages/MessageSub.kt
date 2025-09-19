@@ -32,9 +32,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     private lateinit var contentField:PostEditText
     private var isPostDelayedSuccess = false
 
-    override fun getPageLayout(): Int {
-        return R.layout.message_sub
-    }
+    override val pageLayout: Int
+        get() = R.layout.message_sub
 
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
@@ -42,11 +41,11 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         return true
     }
 
-    override fun isTopPage(): Boolean {
+    fun isTopPage(): Boolean {
         return true
     }
 
-    override fun isPopupPage(): Boolean {
+    fun isPopupPage(): Boolean {
         return true
     }
 
@@ -116,15 +115,15 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
             R.id.Message_Sub_Symbol -> {
                 // 表情符號
-                val items = UserSettings.getArticleExpressions()
+                val items = UserSettings.articleExpressions
                 DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
                     .setListener(object : DialogInsertExpressionListener {
                         override fun onListDialogItemClicked(
                             paramASListDialog: DialogInsertExpression,
-                            index: Int,
-                            aTitle: String
+                            paramInt: Int,
+                            paramString: String
                         ) {
-                            val symbol = items[index]
+                            val symbol = items[paramInt]
                             insertString(symbol)
                         }
 
@@ -145,8 +144,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
             R.id.Message_Sub_ShortenImage -> {
                 // 縮圖
-                var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
-                if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
+                val shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
+                if (!UserSettings.propertiesVIP && shortenTimes>30) {
                     ASToast.showLongToast(getContextString(R.string.vip_only_message))
                     return
                 }
@@ -155,7 +154,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             }
             R.id.Message_Sub_Post -> {
                 // 發表
-                if (contentField.text!!.isNotEmpty()) {
+                if (contentField.text?.isNotEmpty() == true) {
                     // 送出訊息指令
                     sendMessagePart1()
 
@@ -172,7 +171,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         // 更新db
         val db = MessageDatabase(context)
@@ -196,12 +195,12 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         messageAsRunner.cancel()
 
         if (tempMessage!=null) {
-            val aSenderName = tempMessage!!.senderName
+            val aSenderName = tempMessage?.senderName
 
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aSenderName\n")
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
         }
 
         messageAsRunner.postDelayed(3000)
@@ -215,13 +214,13 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         isPostDelayedSuccess = true
 
         if (tempMessage!=null) {
-            tempMessage!!.status = MessageStatus.Success
-            val aMessage = tempMessage!!.message
+            tempMessage?.status = MessageStatus.Success
+            val aMessage = tempMessage?.message
 
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aMessage\n")
                 .build()
-            TelnetClient.client!!.sendDataToServer(builder)
+            TelnetClient.client?.sendDataToServer(builder)
 
             // 更新db
             val db = MessageDatabase(context)
@@ -232,8 +231,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                     val view = listView.getChildAt(i)
                     if (view.javaClass == MessageSubSend::class.java) {
                         val item:MessageSubSend = view as MessageSubSend
-                        if (item.myBahaMessage.id == tempMessage!!.id) {
-                            item.setStatus(tempMessage!!.status)
+                        if (item.myBahaMessage.id == tempMessage?.id) {
+                            item.setStatus(tempMessage?.status)
                             break
                         }
                     }
@@ -249,7 +248,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         isPostDelayedSuccess = false
 
         if (tempMessage!=null) {
-            tempMessage!!.status = status
+            tempMessage?.status = status
             // 更新db
             val db = MessageDatabase(context)
             try {
@@ -259,8 +258,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                     val view = listView.getChildAt(i)
                     if (view.javaClass == MessageSubSend::class.java) {
                         val item:MessageSubSend = view as MessageSubSend
-                        if (item.myBahaMessage.id == tempMessage!!.id) {
-                            item.setStatus(tempMessage!!.status)
+                        if (item.myBahaMessage.id == tempMessage?.id) {
+                            item.setStatus(tempMessage?.status)
                             break
                         }
                     }

@@ -53,7 +53,7 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
         try {
             this.outputBuffer.close()
             for (byteBuffer in this.outputBuffer) {
-                this.socketChannel!!.write(byteBuffer)
+                this.socketChannel?.write(byteBuffer)
             }
             //            printOutputBuffer();
             this.outputBuffer.clear()
@@ -85,7 +85,7 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
     @Throws(TelnetConnectionClosedException::class, IOException::class)
     private fun receiveData() {
         this.inputBuffer.clear()
-        this.socketChannel!!.read(this.inputBuffer)
+        this.socketChannel?.read(this.inputBuffer)
         if (this.inputBuffer.position() != 0) {
             this.inputBuffer.flip()
             return
@@ -95,13 +95,13 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
 
     private fun onReceiveDataStart() {
         if (this.channelListener != null) {
-            this.channelListener!!.onTelnetChannelReceiveDataStart(this)
+            this.channelListener?.onTelnetChannelReceiveDataStart(this)
         }
     }
 
     private fun onReceiveDataFinished() {
         if (this.channelListener != null) {
-            this.channelListener!!.onTelnetChannelReceiveDataFinished(this)
+            this.channelListener?.onTelnetChannelReceiveDataFinished(this)
             //            printInputBuffer();
         }
     }
@@ -113,7 +113,7 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
             data[i] = this.inputBuffer.array()[i]
         }
         try {
-            println("receive data:" + B2UEncoder.instance!!.encodeToString(data))
+            println("receive data:" + B2UEncoder.instance?.encodeToString(data))
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
@@ -124,13 +124,13 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
         val data = ByteArray(this.outputBuffer.size())
         var position = 0
         for (outputBuffer in this.outputBuffer) {
-            for (i in 0..<outputBuffer!!.limit()) {
+            for (i in 0..<outputBuffer?.limit()) {
                 data[position] = outputBuffer.array()[i]
                 position++
             }
         }
         try {
-            println("send data:\n" + B2UEncoder.instance!!.encodeToString(data))
+            println("send data:\n" + B2UEncoder.instance?.encodeToString(data))
             var hexData = ""
             for (datum in data) {
                 hexData = hexData + String.format(" %1$02x", datum)

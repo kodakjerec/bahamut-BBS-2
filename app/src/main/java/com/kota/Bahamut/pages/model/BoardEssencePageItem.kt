@@ -25,9 +25,9 @@ class BoardEssencePageItem private constructor() : TelnetListPageItem() {
         title = null
     }
 
-    override fun set(item: TelnetListPageItem) {
-        super.set(item)
-        val articleItem = item as BoardEssencePageItem
+    override fun set(aData: TelnetListPageItem) {
+        super.set(aData)
+        val articleItem = aData as BoardEssencePageItem
         size = articleItem.size
         date = articleItem.date
         author = articleItem.author
@@ -49,14 +49,14 @@ class BoardEssencePageItem private constructor() : TelnetListPageItem() {
         fun create(): BoardEssencePageItem {
             var item: BoardEssencePageItem? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     item = _pool.pop()
                 }
             }
             if (item == null)
                 item = BoardEssencePageItem()
 
-            return item as BoardEssencePageItem
+            return item
         }
     }
 }

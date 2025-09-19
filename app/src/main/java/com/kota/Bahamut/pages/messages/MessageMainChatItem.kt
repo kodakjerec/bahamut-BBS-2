@@ -1,5 +1,6 @@
 package com.kota.Bahamut.pages.messages
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -27,6 +28,7 @@ class MessageMainChatItem(context: Context): LinearLayout(context) {
 
     /** 設定內容 */
     private var myObject:BahaMessageSummarize = BahaMessageSummarize()
+    @SuppressLint("SimpleDateFormat")
     fun setContent(fromObject: BahaMessageSummarize) {
         myObject = fromObject
         txtSenderName.text = fromObject.senderName
@@ -50,9 +52,9 @@ class MessageMainChatItem(context: Context): LinearLayout(context) {
     }
 
     private val itemClickListener = OnClickListener { _->
-        val aPage = PageContainer.getInstance().messageSub
-        ASNavigationController.getCurrentController().pushViewController(aPage)
+        val aPage = PageContainer.instance?.messageSub
+        ASNavigationController.currentController?.pushViewController(aPage)
 
-        aPage.setSenderName(txtSenderName.text.toString())
+        aPage?.setSenderName(txtSenderName.text.toString())
     }
 }

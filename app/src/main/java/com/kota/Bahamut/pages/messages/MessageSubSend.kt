@@ -47,7 +47,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
         stringThumbnail()
     }
 
-    fun setStatus(status: MessageStatus) {
+    fun setStatus(status: MessageStatus?) {
         val txtStatus = when(status) {
             MessageStatus.Default -> "" // default
             MessageStatus.Success -> "已讀" // 成功

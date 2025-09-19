@@ -57,7 +57,7 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
     // android.widget.AbsListView, android.view.View
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        this.gestureDetector!!.onTouchEvent(event)
+        this.gestureDetector?.onTouchEvent(event)
         if (event.action == 0) {
             detectScrollPosition(event)
         }
@@ -88,7 +88,7 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
                         i++
                     } else {
                         val index = firstVisiblePosition + i
-                        if (this.extendOptionalDelegate!!.onASListViewHandleExtentOptional(
+                        if (this.extendOptionalDelegate?.onASListViewHandleExtentOptional(
                                 this,
                                 index
                             )
@@ -106,13 +106,13 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
             synchronized(this) {
                 if (velocityY < 0.0f) {
                     if (this.isScrolledToBottom) {
-                        this.overscrollDelegate!!.onASListViewDelectedOverscrollTop(this)
+                        this.overscrollDelegate?.onASListViewDelectedOverscrollTop(this)
                         this.isScrolledToTop = false
                         this.isScrolledToBottom = false
                     }
                 }
                 if (velocityY > 0.0f && this.isScrolledToTop) {
-                    this.overscrollDelegate!!.onASListViewDelectedOverscrollBottom(this)
+                    this.overscrollDelegate?.onASListViewDelectedOverscrollBottom(this)
                 }
                 this.isScrolledToTop = false
                 this.isScrolledToBottom = false

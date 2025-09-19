@@ -120,10 +120,10 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                 };
                 
                 // 統一的簽到對話框檢測函數
-                window.startSigninCheck = function() {
+                window.startSigningCheck = function() {
                     console.log('開始檢測簽到對話框...');
-                    if (typeof Signin !== 'undefined') {
-                        Signin.mobile();
+                    if (typeof Signing !== 'undefined') {
+                        Signing.mobile();
                     }
 
                     var startTime = Date.now();
@@ -169,12 +169,12 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                     // 等待用戶名輸入框
                     window.waitForElement('input[name="userid"]', function(useridInput) {
                         console.log('找到用戶名輸入框');
-                        useridInput.value = '${UserSettings.getPropertiesUsername()}';
+                        useridInput.value = '${UserSettings.propertiesUsername}';
                         
                         // 等待密碼輸入框
                         window.waitForElement('input[name="password"]', function(passwordInput) {
                             console.log('找到密碼輸入框');
-                            passwordInput.value = '${UserSettings.getPropertiesPassword()}';
+                            passwordInput.value = '${UserSettings.propertiesPassword}';
                             
                             // 觸發用戶名blur事件，讓巴哈姆特原生腳本檢查2SA需求
                             console.log('觸發用戶名blur事件');
@@ -216,8 +216,8 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                                         // 等待3秒後開始檢測簽到對話框
                                         setTimeout(function() {
                                             console.log('登入提交後3秒，開始檢測簽到對話框');
-                                            if (typeof window.startSigninCheck === 'function') {
-                                                window.startSigninCheck();
+                                            if (typeof window.startSigningCheck === 'function') {
+                                                window.startSigningCheck();
                                             } else {
                                                 Android.onFail();
                                             }
@@ -235,8 +235,8 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                                         // 等待3秒後開始檢測簽到對話框
                                         setTimeout(function() {
                                             console.log('登入按鈕點擊後3秒，開始檢測簽到對話框');
-                                            if (typeof window.startSigninCheck === 'function') {
-                                                window.startSigninCheck();
+                                            if (typeof window.startSigningCheck === 'function') {
+                                                window.startSigningCheck();
                                             } else {
                                                 Android.onFail();
                                             }
@@ -255,13 +255,13 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                     setupLoginForm();
                 } else {
                     // 使用統一的簽到檢測函數
-                    if (typeof window.startSigninCheck === 'function') {
-                        window.startSigninCheck();
+                    if (typeof window.startSigningCheck === 'function') {
+                        window.startSigningCheck();
                     } else {
                         console.log('通用腳本尚未載入，等待後重試');
                         setTimeout(function() {
-                            if (typeof window.startSigninCheck === 'function') {
-                                window.startSigninCheck();
+                            if (typeof window.startSigningCheck === 'function') {
+                                window.startSigningCheck();
                             } else {
                                 Android.onFail();
                             }
@@ -279,13 +279,13 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
         val script = """
             javascript:(function() {
                 // 使用統一的簽到檢測函數
-                if (typeof window.startSigninCheck === 'function') {
-                    window.startSigninCheck();
+                if (typeof window.startSigningCheck === 'function') {
+                    window.startSigningCheck();
                 } else {
                     console.log('通用腳本尚未載入，等待後重試');
                     setTimeout(function() {
-                        if (typeof window.startSigninCheck === 'function') {
-                            window.startSigninCheck();
+                        if (typeof window.startSigningCheck === 'function') {
+                            window.startSigningCheck();
                         } else {
                             console.log('無法載入通用腳本，執行失敗邏輯');
                             Android.onFail();

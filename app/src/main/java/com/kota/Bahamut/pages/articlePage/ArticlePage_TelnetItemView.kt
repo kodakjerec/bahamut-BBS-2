@@ -28,7 +28,7 @@ class ArticlePage_TelnetItemView(context: Context?) : LinearLayout(context), Tel
     }
 
     fun setFrame(aFrame: TelnetFrame?) {
-        telnetView!!.frame = aFrame
+        telnetView?.frame = aFrame
     }
 
     val type: Int
@@ -36,9 +36,9 @@ class ArticlePage_TelnetItemView(context: Context?) : LinearLayout(context), Tel
 
     fun setDividerHidden(isHidden: Boolean) {
         if (isHidden) {
-            dividerView!!.setVisibility(GONE)
+            dividerView?.setVisibility(GONE)
         } else {
-            dividerView!!.setVisibility(VISIBLE)
+            dividerView?.setVisibility(VISIBLE)
         }
     }
 }

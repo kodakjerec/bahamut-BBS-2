@@ -27,14 +27,14 @@ class DialogInsertExpression : ASDialog() {
     }
 
     var settingListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        this.listener!!.onListDialogSettingClicked()
+        this.listener?.onListDialogSettingClicked()
         dismiss()
     }
 
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_insert_expressions)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
 
         mainView = findViewById<ScrollView>(R.id.dialog_insert_expressions_scrollView)
         titleLabel = findViewById<TextView?>(R.id.dialog_insert_expressions_title)
@@ -51,21 +51,21 @@ class DialogInsertExpression : ASDialog() {
         return this
     }
 
-    fun setTitle(aTitle: String?): DialogInsertExpression {
+    fun setTitle(aTitle: String): DialogInsertExpression {
         if (this.titleLabel != null) {
-            this.titleLabel!!.text = aTitle
+            this.titleLabel?.text = aTitle
         }
         return this
     }
 
-    fun addItems(aItemList: Array<String?>): DialogInsertExpression {
+    fun addItems(aItemList: Array<String>): DialogInsertExpression {
         for (itemTitle in aItemList) {
             addItem(itemTitle)
         }
         return this
     }
 
-    fun addItem(aItemTitle: String?): DialogInsertExpression {
+    fun addItem(aItemTitle: String): DialogInsertExpression {
         val button = createButton()
 
         button.setOnClickListener { v: View? ->
@@ -74,14 +74,10 @@ class DialogInsertExpression : ASDialog() {
             )
         }
 
-        if (aItemTitle == null) {
-            button.visibility = View.GONE
-        } else {
-            if (this.itemList.isNotEmpty()) {
-                this.itemBlock.addView(createDivider())
-            }
-            button.text = aItemTitle
+        if (this.itemList.isNotEmpty()) {
+            this.itemBlock.addView(createDivider())
         }
+        button.text = aItemTitle
         this.itemBlock.addView(button)
         val item = DialogItem()
         item.button = button
@@ -137,7 +133,7 @@ class DialogInsertExpression : ASDialog() {
         if (this.listener != null) {
             val index = indexOfButton(button)
             if (index != -1) {
-                this.listener!!.onListDialogItemClicked(
+                this.listener?.onListDialogItemClicked(
                     this,
                     index,
                     this.itemList[index].title!!

@@ -33,11 +33,11 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     // 按下新增
     var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (_inputField != null) {
-            val block_name = _inputField!!.getText().toString().trim { it <= ' ' }
-            _inputField!!.setText("")
+            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
+            _inputField?.setText("")
             if (block_name.length > 0) {
                 val new_list: MutableList<String?>? = blockList
-                if (new_list!!.contains(block_name)) {
+                if (new_list?.contains(block_name)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
                         this@BlockListPage
@@ -65,7 +65,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
                 if (button_index > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField!!.setText("")
+                    _inputField?.setText("")
                     resetBlockList()
                     this@BlockListPage.reload()
                 }
@@ -90,7 +90,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             end = target.getAdapterPosition()
             if (propertiesVIP) {
                 Collections.swap(_blockList, start, end)
-                blockListAdapter!!.notifyItemMoved(start, end)
+                blockListAdapter?.notifyItemMoved(start, end)
             } else {
                 showShortToast(getContextString(R.string.vip_only_message))
             }
@@ -108,7 +108,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                     isDragged = true
                     if (viewHolder != null) { // 選取變色
                         dragView = viewHolder.itemView
-                        dragView!!.setBackgroundResource(R.color.ripple_material)
+                        dragView?.setBackgroundResource(R.color.ripple_material)
                     }
                 }
 
@@ -126,7 +126,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                     }
                     if (!isSwiped && isDragged) { // The user used onMove()
                         if (dragView != null) { // 解除 選取變色
-                            dragView!!.setBackgroundResource(R.color.transparent)
+                            dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
                         blockList = _blockList
@@ -152,16 +152,16 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
 
     public override fun onPageDidLoad() {
         val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView!!.setLayoutManager(LinearLayoutManager(context))
+        recyclerView?.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         blockListAdapter = BlockListAdapter(_blockList)
         recyclerView.setAdapter(blockListAdapter)
-        blockListAdapter!!.setOnItemClickListener(this)
+        blockListAdapter?.setOnItemClickListener(this)
 
         _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)!!.setOnClickListener(_addListener)
-        findViewById(R.id.BlockList_Reset)!!.setOnClickListener(_resetListener)
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
 
         showNotification()
 
@@ -191,7 +191,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         val _temp: MutableList<String?>? = blockList
         _blockList.clear()
         _blockList.addAll(_temp!!)
-        blockListAdapter!!.notifyDataSetChanged()
+        blockListAdapter?.notifyDataSetChanged()
     }
 
     public override fun onReceivedGestureRight(): Boolean {

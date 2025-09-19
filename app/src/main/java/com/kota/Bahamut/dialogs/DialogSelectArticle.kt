@@ -32,7 +32,7 @@ class DialogSelectArticle : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_select_article)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         this.content = findViewById<TextView>(R.id.Bahamut_Dialog_Select_content_Label)
         this.button0p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_0_p)
         this.button1p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_1_p)
@@ -95,7 +95,7 @@ class DialogSelectArticle : ASDialog(), View.OnClickListener {
                 return
             }
             if (this.listener != null) {
-                this.listener!!.onSelectDialogDismissWIthIndex(this.contentString)
+                this.listener?.onSelectDialogDismissWIthIndex(this.contentString)
             }
             dismiss()
         } else if (view === this.cancelButton) {

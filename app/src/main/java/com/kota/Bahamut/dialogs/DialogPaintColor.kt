@@ -108,7 +108,7 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_paint_color)
-        if (window != null) window!!.setBackgroundDrawable(null)
+        if (window != null) window?.setBackgroundDrawable(null)
         setTitle(getContextString(R.string.post_article_page_paint_color))
         mainLayout = findViewById<LinearLayout>(R.id.dialog_paint_color_content_view)
 
@@ -227,7 +227,7 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         if (view === snedButton && listener != null) {
-            listener!!.onPaintColorDone(outputParam!!)
+            listener?.onPaintColorDone(outputParam!!)
         }
         dismiss()
     }

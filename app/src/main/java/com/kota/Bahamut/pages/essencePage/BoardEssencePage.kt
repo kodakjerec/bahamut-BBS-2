@@ -41,7 +41,7 @@ class BoardEssencePage : TelnetListPage() {
     override fun onPageRefresh() {
         super.onPageRefresh()
         val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData("精華文章", _title, listName)
+        headerView.setData("精華文章", _title, name)
     }
 
     override fun getListType(): Int {
@@ -58,9 +58,9 @@ class BoardEssencePage : TelnetListPage() {
     }
     override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.getInstance().popBoardEssencePage()
+        PageContainer.instance?.popBoardEssencePage()
         navigationController.popViewController()
-        TelnetClient.client!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -69,7 +69,7 @@ class BoardEssencePage : TelnetListPage() {
     }
 
     override fun loadPage(): TelnetListPageBlock {
-        return BoardEssencePageHandler.instance!!.load()
+        return BoardEssencePageHandler.instance?.load()
     }
 
     override fun recycleBlock(aBlock: TelnetListPageBlock?) {
@@ -152,13 +152,13 @@ class BoardEssencePage : TelnetListPage() {
                 ASToast.showShortToast("找沒有了耶...:(")
             } else {
                 // 進入目錄
-                PageContainer.getInstance().pushBoardEssencePage(listName, _title)
-                navigationController.pushViewController(PageContainer.getInstance().boardEssencePage)
+                PageContainer.instance?.pushBoardEssencePage(name, _title)
+                navigationController.pushViewController(PageContainer.instance?.boardEssencePage)
                 super.loadItemAtIndex(index)
             }
         } else {
             // 文章
-            val articleEssencePage = PageContainer.getInstance().articleEssencePage
+            val articleEssencePage = PageContainer.instance?.articleEssencePage
             articleEssencePage.setBoardEssencePage(this)
             articleEssencePage.clear()
             navigationController.pushViewController(articleEssencePage)

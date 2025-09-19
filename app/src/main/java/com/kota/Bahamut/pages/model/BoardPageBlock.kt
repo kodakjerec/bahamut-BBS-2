@@ -5,11 +5,11 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import java.util.Stack
 
 class BoardPageBlock private constructor() : TelnetListPageBlock() {
-    var BoardManager: String? = null
-    var BoardName: String? = null
-    var BoardTitle: String? = null
-    var Type: Int = BoardPageAction.LIST
-    var mode: Int = 0
+    var boardManager: String? = null
+    var boardName: String? = null
+    var boardTitle: String? = null
+    var boardType: Int = BoardPageAction.LIST
+    var boardMode: Int = 0
 
     companion object {
         private val _pool = Stack<BoardPageBlock?>()
@@ -29,7 +29,7 @@ class BoardPageBlock private constructor() : TelnetListPageBlock() {
         fun create(): BoardPageBlock {
             var block: BoardPageBlock? = null
             synchronized(_pool) {
-                if (_pool.size > 0) {
+                if (_pool.isNotEmpty()) {
                     block = _pool.pop()
                 }
             }

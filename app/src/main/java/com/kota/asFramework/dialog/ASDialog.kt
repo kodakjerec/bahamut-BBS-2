@@ -10,11 +10,11 @@ import com.kota.asFramework.pageController.ASViewControllerDisappearListener
 open class ASDialog : Dialog, ASViewControllerDisappearListener {
     private var aSViewController: ASViewController?
     private var backPressedHandler: ASDialogOnBackPressedDelegate?
-    private var _showing: Boolean
+    private var isShowing: Boolean
 
     constructor(theme: Int) : super(ASNavigationController.currentController!!, theme) {
         this.backPressedHandler = null
-        this._showing = false
+        this.isShowing = false
         this.aSViewController = null
     }
 
@@ -23,13 +23,13 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         cancelListener: DialogInterface.OnCancelListener?
     ) : super(ASNavigationController.currentController!!, cancelable, cancelListener) {
         this.backPressedHandler = null
-        this._showing = false
+        this.isShowing = false
         this.aSViewController = null
     }
 
     constructor() : super(ASNavigationController.currentController!!) {
         this.backPressedHandler = null
-        this._showing = false
+        this.isShowing = false
         this.aSViewController = null
     }
 
@@ -37,10 +37,10 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     override fun dismiss() {
         try {
             if (this.aSViewController != null) {
-                this.aSViewController!!.unregisterDisappearListener(this)
+                this.aSViewController?.unregisterDisappearListener(this)
                 this.aSViewController = null
             }
-            this._showing = false
+            this.isShowing = false
             super.dismiss()
         } catch (_: Exception) {
         }
@@ -50,7 +50,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     override fun show() {
         try {
             super.show()
-            this._showing = true
+            this.isShowing = true
         } catch (_: Exception) {
         }
     }
@@ -58,14 +58,14 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     override fun hide() {
         try {
             super.hide()
-            this._showing = false
+            this.isShowing = false
         } catch (_: Exception) {
         }
     }
 
     // android.app.Dialog
     override fun isShowing(): Boolean {
-        return this._showing
+        return this.isShowing
     }
 
     val currentOrientation: Int
@@ -89,7 +89,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     // android.app.Dialog
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this.backPressedHandler == null || !this.backPressedHandler!!.onASDialogBackPressed(this)) {
+        if (this.backPressedHandler == null || !this.backPressedHandler?.onASDialogBackPressed(this)) {
             super.onBackPressed()
         }
     }
@@ -101,18 +101,18 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
 
     fun scheduleDismissOnPageDisappear(aController: ASViewController?): ASDialog {
         if (this.aSViewController != null) {
-            this.aSViewController!!.unregisterDisappearListener(this)
+            this.aSViewController?.unregisterDisappearListener(this)
         }
         this.aSViewController = aController
         if (this.aSViewController != null) {
-            this.aSViewController!!.registerDisappearListener(this)
+            this.aSViewController?.registerDisappearListener(this)
         }
         return this
     }
 
     // com.kota.ASFramework.PageController.ASViewControllerDisappearListener
     override fun onASViewControllerWillDisappear(paramASViewController: ASViewController?) {
-        if (isShowing) {
+        if (this@ASDialog.isShowing) {
             dismiss()
         }
     }

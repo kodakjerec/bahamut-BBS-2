@@ -9,11 +9,8 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ListAdapter
 import android.widget.ListView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteArticle
 import com.kota.Bahamut.command.BahamutCommandSearchArticle
 import com.kota.Bahamut.command.BahamutCommandSendMail
@@ -30,92 +27,90 @@ import com.kota.Bahamut.pages.model.MailBoxPageHandler
 import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageItem.Companion.recycle
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnetUI.TelnetHeaderItemView
 import java.util.Vector
 
 class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
-    DialogSelectArticleListener, SendMailPage_Listener, View.OnClickListener,
+    DialogSelectArticleListener, SendMailPageListener, View.OnClickListener,
     OnLongClickListener {
-    var _back_button: Button? = null
-    var _header_view: TelnetHeaderItemView? = null
-    var _list_empty_view: View? = null
-    var _list_view: ListView? = null
-    var _page_down_button: Button? = null
-    var _page_up_button: Button? = null
+    var backButton: Button? = null
+    var headerItemView: TelnetHeaderItemView? = null
+    var listEmptyView: View? = null
+    var myListView: ListView? = null
+    var pageDownButton: Button? = null
+    var pageUpButton: Button? = null
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_MAIL_BOX
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.mail_box_page
 
     override fun onPageDidLoad() {
         super.onPageDidLoad()
-        _list_view = findViewById(R.id.MailBoxPage_listView) as ListView?
-        _list_empty_view = findViewById(R.id.MailBoxPage_listEmptyView)
-        _list_view!!.setEmptyView(_list_empty_view)
-        listView = _list_view
-        _back_button = findViewById(R.id.Mail_backButton) as Button?
-        _back_button!!.setOnClickListener(this)
-        _back_button!!.setOnLongClickListener(this)
-        _page_up_button = findViewById(R.id.Mail_pageUpButton) as Button?
-        _page_up_button!!.setOnClickListener(this)
-        _page_up_button!!.setOnLongClickListener(this)
-        _page_down_button = findViewById(R.id.Mail_pageDownButton) as Button?
-        _page_down_button!!.setOnClickListener(this)
-        _page_down_button!!.setOnLongClickListener(this)
-        findViewById(R.id.Mail_SearchButton)!!.setOnClickListener(this)
-        _header_view = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView?
+        myListView = findViewById(R.id.MailBoxPage_listView) as ListView?
+        listEmptyView = findViewById(R.id.MailBoxPage_listEmptyView)
+        myListView?.emptyView = listEmptyView
+        listView = myListView
+        backButton = findViewById(R.id.Mail_backButton) as Button?
+        backButton?.setOnClickListener(this)
+        backButton?.setOnLongClickListener(this)
+        pageUpButton = findViewById(R.id.Mail_pageUpButton) as Button?
+        pageUpButton?.setOnClickListener(this)
+        pageUpButton?.setOnLongClickListener(this)
+        pageDownButton = findViewById(R.id.Mail_pageDownButton) as Button?
+        pageDownButton?.setOnClickListener(this)
+        pageDownButton?.setOnLongClickListener(this)
+        findViewById(R.id.Mail_SearchButton)?.setOnClickListener(this)
+        headerItemView = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView?
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     override fun onPageDidDisappear() {
-        _back_button = null
-        _page_up_button = null
-        _page_down_button = null
-        _header_view = null
-        _list_empty_view = null
+        backButton = null
+        pageUpButton = null
+        pageDownButton = null
+        headerItemView = null
+        listEmptyView = null
         super.onPageDidDisappear()
     }
 
-    public override fun loadPage(): TelnetListPageBlock? {
+    override fun loadPage(): TelnetListPageBlock? {
         return MailBoxPageHandler.instance.load()
     }
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        _header_view!!.setData("我的信箱", "您有 " + itemSize + " 封信在信箱內", "")
+        headerItemView?.setData("我的信箱", "您有 $itemSize 封信在信箱內", "")
     }
 
-    override fun clear() {
-        super.clear()
-    }
-
-    protected override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean {
         clear()
-        navigationController!!.popViewController()
+        navigationController.popViewController()
         create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(TelnetKeyboard.LEFT_ARROW)
             .sendToServerInBackground(1)
         return true
     }
 
-    override fun onListViewItemLongClicked(view: View?, index: Int): Boolean {
+    override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         if (isItemCanLoadAtIndex(index)) {
-            onDeleteArticle(view, index + 1)
+            onDeleteArticle(itemView, index + 1)
             return true
         }
         return false
     }
 
-    protected override fun onSearchButtonClicked(): Boolean {
+    override fun onSearchButtonClicked(): Boolean {
         showSelectArticleDialog()
         return true
     }
@@ -126,31 +121,31 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         dialog.show()
     }
 
-    override fun onSearchDialogSearchButtonClickedWithValues(values: Vector<String?>) {
+    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
         pushCommand(
             BahamutCommandSearchArticle(
-                values.get(0)!!,
-                values.get(1),
-                if (values.get(2) == "YES") "y" else "n",
-                values.get(3)
+                vector[0]!!,
+                vector[1],
+                if (vector[2] == "YES") "y" else "n",
+                vector[3]
             )
         )
     }
 
-    override fun onSelectDialogDismissWIthIndex(aIndexString: String) {
-        var item_index = -1
+    override fun onSelectDialogDismissWIthIndex(str: String) {
+        var itemIndex = -1
         try {
-            item_index = aIndexString.toInt() - 1
+            itemIndex = str.toInt() - 1
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
-        if (item_index >= 0) {
-            setListViewSelection(item_index)
+        if (itemIndex >= 0) {
+            setListViewSelection(itemIndex)
         }
     }
 
     override fun onSendMailDialogSendButtonClicked(
-        aDialog: SendMailPage?,
+        sendMailPage: SendMailPage,
         receiver: String,
         title: String,
         content: String
@@ -159,7 +154,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     }
 
     // 點下文章先做檢查
-    public override fun isItemCanLoadAtIndex(index: Int): Boolean {
+    override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val mailBoxPageItem = getItem(index) as MailBoxPageItem?
         if (mailBoxPageItem == null || mailBoxPageItem.isDeleted) {
             showShortToast("此信件已被刪除")
@@ -175,127 +170,130 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
             .setMessage(getContextString(R.string.del_this_mail))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.delete))
-            .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     // data
                     val mailBoxPageItem = getItem(itemIndex - 1) as MailBoxPageItem?
-                    mailBoxPageItem!!.isDeleted = true
+                    mailBoxPageItem?.isDeleted = true
 
-                    _list_view!!.removeViewInLayout(view)
+                    myListView?.removeViewInLayout(view)
 
                     // telnet
                     val command: TelnetCommand = BahamutCommandDeleteArticle(itemIndex)
                     this@MailBoxPage.pushCommand(command)
                 }
-            }).scheduleDismissOnPageDisappear(this).show()
+            }.scheduleDismissOnPageDisappear(this).show()
     }
 
     override fun onLongClick(aView: View): Boolean {
-        val get_id = aView.getId()
-        if (get_id == R.id.Mail_pageDownButton) {
-            return true
+        val getId = aView.id
+        return if (getId == R.id.Mail_pageDownButton) {
+            true
         } else {
-            return get_id == R.id.Mail_pageUpButton
+            getId == R.id.Mail_pageUpButton
         }
     }
 
     override fun onClick(aView: View) {
-        val get_id = aView.getId()
-        if (get_id == R.id.Mail_backButton) {
-            onPostButtonClicked()
-        } else if (get_id == R.id.Mail_pageDownButton) {
-            setManualLoadPage()
-            moveToLastPosition()
-            showShortToast(getContextString(R.string.already_to_bottom))
-        } else if (get_id == R.id.Mail_pageUpButton) {
-            moveToFirstPosition()
-            showShortToast(getContextString(R.string.already_to_top))
-        } else if (get_id == R.id.Mail_SearchButton) {
-            showSelectArticleDialog()
+        val getId = aView.id
+        when (getId) {
+            R.id.Mail_backButton -> {
+                onPostButtonClicked()
+            }
+            R.id.Mail_pageDownButton -> {
+                setManualLoadPage()
+                moveToLastPosition()
+                showShortToast(getContextString(R.string.already_to_bottom))
+            }
+            R.id.Mail_pageUpButton -> {
+                moveToFirstPosition()
+                showShortToast(getContextString(R.string.already_to_top))
+            }
+            R.id.Mail_SearchButton -> {
+                showSelectArticleDialog()
+            }
         }
     }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast(getContextString(R.string._back))
         return true
     }
 
     fun onPostButtonClicked() {
-        val send_main_page = SendMailPage()
-        send_main_page.setListener(this)
-        navigationController!!.pushViewController(send_main_page)
+        val sendMainPage = SendMailPage()
+        sendMainPage.setListener(this)
+        navigationController.pushViewController(sendMainPage)
     }
 
     fun loadPreviousArticle() {
-        val target_number = loadingItemNumber - 1
-        if (target_number < 1) {
+        val targetNumber = loadingItemNumber - 1
+        if (targetNumber < 1) {
             showShortToast(getContextString(R.string.already_to_top))
         } else {
-            loadItemAtNumber(target_number)
+            loadItemAtNumber(targetNumber)
         }
     }
 
     fun loadNextArticle() {
-        val target_index = loadingItemNumber + 1
-        if (target_index > itemSize) {
+        val targetIndex = loadingItemNumber + 1
+        if (targetIndex > itemSize) {
             showShortToast(getContextString(R.string.already_to_bottom))
         } else {
-            loadItemAtNumber(target_index)
+            loadItemAtNumber(targetIndex)
         }
     }
 
-    val isAutoLoadEnable: Boolean
+    override val isAutoLoadEnable: Boolean
         get() = false
 
-    val listName: String?
+    override val name: String?
         get() = "[MailBox]"
 
-    override fun getView(index: Int, view: View?, parentView: ViewGroup?): View? {
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
         var view = view
-        val item_index = index + 1
-        val item_block = ItemUtils.getBlock(item_index)
-        val item = getItem(index) as MailBoxPageItem?
+        val itemIndex = i + 1
+        val itemBlock = ItemUtils.getBlock(itemIndex)
+        val item = getItem(i) as MailBoxPageItem?
         val currentBlock = currentBlock
-        if (item == null && currentBlock != item_block && !isLoadingBlock(item_index)) {
-            loadBoardBlock(item_block)
+        if (item == null && currentBlock != itemBlock && !isLoadingBlock(itemIndex)) {
+            loadBoardBlock(itemBlock)
         }
 
         if (view == null) {
-            view = MailBoxPage_ItemView(context)
-            view.setLayoutParams(
-                AbsListView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+            view = MailBoxPageItemView(context)
+            view.layoutParams = AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 
-        val item_view = view as MailBoxPage_ItemView
-        item_view.setItem(item)
-        item_view.setIndex(item_index)
+        val itemView = view as MailBoxPageItemView
+        itemView.setItem(item)
+        itemView.setIndex(itemIndex)
 
         return view
     }
 
-    public override fun recycleBlock(aBlock: TelnetListPageBlock?) {
-        recycle(aBlock as MailBoxPageBlock?)
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+        recycle(telnetListPageBlock as MailBoxPageBlock?)
     }
 
-    public override fun recycleItem(aItem: TelnetListPageItem?) {
-        recycle(aItem as MailBoxPageItem?)
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+        recycle(telnetListPageItem as MailBoxPageItem?)
     }
 
     fun recoverPost() {
         object : ASRunner() {
-            public override fun run() {
+            override fun run() {
             }
         }.runInMainThread()
     }
 
     fun finishPost() {
         object : ASRunner() {
-            public override fun run() {
+            override fun run() {
             }
         }.runInMainThread()
     }

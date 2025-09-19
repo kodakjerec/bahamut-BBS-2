@@ -113,7 +113,7 @@ class BahaBBSBackgroundService : Service() {
 
         // 斷開 Telnet 連線
         if (telnetClient != null) {
-            telnetClient!!.close()
+            telnetClient?.close()
         }
 
 

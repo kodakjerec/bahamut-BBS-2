@@ -12,27 +12,27 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.model.PostEditText
+import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions.rgbToInt
+import com.kota.Bahamut.service.NotificationSettings
+import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.TempSettings.myContext
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.pages.model.PostEditText
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme
-import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.CommonFunctions.rgbToInt
-import com.kota.Bahamut.service.NotificationSettings
-import com.kota.Bahamut.service.TempSettings
-import com.kota.telnet.model.TelnetRow
-import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
+import com.kota.telnet.model.TelnetRow
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 import com.kota.textEncoder.B2UEncoder
-import java.util.Arrays
 import java.util.Vector
 
 class MessageMain:TelnetPage() {
@@ -45,11 +45,10 @@ class MessageMain:TelnetPage() {
     private var isPostDelayedSuccess = false // 同步用 postDelay
     private var isUnderList = false // 是否正在查詢名單
 
-    override fun getPageLayout(): Int {
-        return R.layout.message_main
-    }
+    override val pageLayout: Int
+        get() = R.layout.message_main
 
-    override fun isPopupPage(): Boolean {
+    fun isPopupPage(): Boolean {
         return true
     }
 
@@ -63,7 +62,7 @@ class MessageMain:TelnetPage() {
     private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (isUnderList) {
-                TelnetClient.client!!.sendDataToServer(
+                TelnetClient.client?.sendDataToServer(
                     TelnetOutputBuilder.create()
                         .pushString("/") // 請輸入勇者代號：
                         .pushKey(TelnetKeyboard.CTRL_Y) // 清除資料
@@ -101,7 +100,7 @@ class MessageMain:TelnetPage() {
             btnSettings.visibility = INVISIBLE
             toolbarList.visibility = VISIBLE
             // 送出查詢指令
-            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
+            TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
         // 切換頁籤
         val theme = getSelectTheme()
@@ -117,20 +116,20 @@ class MessageMain:TelnetPage() {
     }
     /** 上一頁 */
     private val prevPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
     }
     /** 下一頁 */
     private val nextPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
     }
     /** 最前頁 */
     private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.HOME)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.HOME)
         return@OnLongClickListener true
     }
     /** 最後頁 */
     private val endPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.END)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.END)
         return@OnLongClickListener true
     }
 
@@ -142,22 +141,22 @@ class MessageMain:TelnetPage() {
             .addItem(getContextString(R.string.message_main_setting02))
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ): Boolean {
                     return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ) {
-                    if (aTitle == getContextString(R.string.message_main_setting01)) {
+                    if (title == getContextString(R.string.message_main_setting01)) {
                         sendSyncCommand()
-                    } else if (aTitle == getContextString(R.string.message_main_setting02)) {
-                        val db = MessageDatabase(context)
+                    } else if (title == getContextString(R.string.message_main_setting02)) {
+                        val db = MessageDatabase(myContext!!)
                         try {
                             db.clearDb()
                         } catch (e: Exception) {
@@ -230,12 +229,12 @@ class MessageMain:TelnetPage() {
     override fun onBackPressed(): Boolean {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         // 顯示小視窗
         if (TempSettings.getMessageSmall() != null)
-            TempSettings.getMessageSmall()!!.show()
+            TempSettings.getMessageSmall()?.show()
 
         return super.onBackPressed()
     }
@@ -244,7 +243,7 @@ class MessageMain:TelnetPage() {
     fun loadMessageList() {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         messageAsRunner.cancel()
@@ -253,7 +252,7 @@ class MessageMain:TelnetPage() {
         ASProcessingDialog.dismissProcessingDialog()
         TempSettings.isSyncMessageMain = true
 
-        val db = MessageDatabase(context)
+        val db = MessageDatabase(myContext!!)
         try {
             listView.adapter = null
 
@@ -270,7 +269,7 @@ class MessageMain:TelnetPage() {
     /** 收到訊息, 只更新特定人物的最新訊息 */
     fun loadMessageList(item:BahaMessage) {
         var findSender = false
-        var senderView = MessageMainChatItem(context)
+        var senderView = MessageMainChatItem(myContext!!)
         for (i in 0 until listView.childCount) {
             val view = listView.getChildAt(i)
             if (view is MessageMainChatItem) {
@@ -281,7 +280,7 @@ class MessageMain:TelnetPage() {
             }
         }
 
-        val db = MessageDatabase(context)
+        val db = MessageDatabase(myContext!!)
         try {
             val itemSummary = db.getIdNewestMessage(item.senderName)
             object: ASRunner(){
@@ -314,14 +313,14 @@ class MessageMain:TelnetPage() {
             val item = MessageMainListItemStructure()
             val bytes = row.data
             item.index =
-                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 1, 5))
+                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(1, 5))
             item.senderName =
-                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 8, 19))
+                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(8, 19))
             item.nickname =
-                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 21, 37))
-            item.ip = B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 39, 56))
+                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(21, 37))
+            item.ip = B2UEncoder.instance?.encodeToString(bytes.copyOfRange(39, 56))
             item.status =
-                B2UEncoder.getInstance().encodeToString(Arrays.copyOfRange(bytes, 58, 70))
+                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(58, 70))
             userList.add(item)
         }
 
@@ -338,7 +337,7 @@ class MessageMain:TelnetPage() {
     /** 同步BBS訊息到DB */
     private fun sendSyncCommand() {
         // 送出查詢指令
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
+        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
@@ -350,7 +349,7 @@ class MessageMain:TelnetPage() {
         messageAsRunner.postDelayed(3000)
         isPostDelayedSuccess = false
 
-        val db = MessageDatabase(context)
+        val db = MessageDatabase(myContext!!)
         try {
             var senderName: String
             var message: String

@@ -8,7 +8,7 @@ class TelnetContainer<ObjectType> {
 
     fun add(index: Int, `object`: ObjectType?) {
         if (this.objectContainer != null) {
-            this.objectContainer!!.put(index, `object`)
+            this.objectContainer?.put(index, `object`)
             if (index > this.maxIndex) {
                 this.maxIndex = index
             }
@@ -16,7 +16,7 @@ class TelnetContainer<ObjectType> {
     }
 
     fun get(index: Int): ObjectType? {
-        if (index < 0 || index > this.maxIndex || this.objectContainer == null || !this.objectContainer!!.containsKey(
+        if (index < 0 || index > this.maxIndex || this.objectContainer == null || !this.objectContainer?.containsKey(
                 index
             )
         ) {
@@ -34,6 +34,6 @@ class TelnetContainer<ObjectType> {
 
     fun clear() {
         this.maxIndex = 0
-        this.objectContainer!!.clear()
+        this.objectContainer?.clear()
     }
 }
