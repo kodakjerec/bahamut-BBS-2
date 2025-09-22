@@ -412,4 +412,8 @@
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
     <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
     <string name="login_web_sign_in_msg06">需要手動完成驗證，請在網頁中操作</string>
+    <string name="notification_permission_title">開啟通知權限</string>
+    <string name="notification_permission_message">為了讓背景服務正常運作並顯示連線狀態，需要開啟通知權限。是否要前往設定頁面開啟？</string>
+    <string name="notification_permission_goto_settings">前往設定</string>
+    <string name="notification_permission_later">稍後再說</string>
 </resources>

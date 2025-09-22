@@ -6,9 +6,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.Bahamut.BahamutController;
@@ -16,6 +19,7 @@ import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
 
 public class BahaBBSBackgroundService extends Service {
+    private static final String TAG = "BahaBBSService";
     private static final String CHANNEL_ID = "BahaBBSServiceChannel";
     private static final int NOTIFICATION_ID = 1001;
     private static final String ACTION_DISCONNECT = "ACTION_DISCONNECT";
@@ -31,6 +35,16 @@ public class BahaBBSBackgroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        // 檢查通知權限 (Android 13+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                Log.w(TAG, "POST_NOTIFICATIONS permission not granted");
+                // 要求通知權限
+                BahamutController.checkAndRequestNotificationPermission();
+            }
+        }
+
         createNotificationChannel();
     }
 
@@ -47,10 +61,16 @@ public class BahaBBSBackgroundService extends Service {
         this._client = TelnetClient.getClient();
         this._controller = ASNavigationController.getCurrentController();
 
-        // 啟動前景服務
-        startForeground(NOTIFICATION_ID, createNotification());
+        // 嘗試啟動前景服務
+        try {
+            startForeground(NOTIFICATION_ID, createNotification());
+            Log.i(TAG, "BackgroundService started as foreground service.");
+        } catch (Exception e) {
+            // Android 12+ 可能會拋出 ForegroundServiceStartNotAllowedException
+            Log.w(TAG, "Failed to start as foreground service: " + e.getClass().getSimpleName(), e);
+            Log.i(TAG, "BackgroundService running as regular service.");
+        }
 
-        Log.i("BahaBBS", "BackgroundService start as foreground.");
         return START_STICKY; // 確保服務重啟
     }
 
@@ -63,18 +83,20 @@ public class BahaBBSBackgroundService extends Service {
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    "Bahamut BBS 服務",
-                    NotificationManager.IMPORTANCE_LOW);
-            serviceChannel.setDescription("維持 BBS 連線");
-            serviceChannel.setShowBadge(false);
+        NotificationChannel serviceChannel = new NotificationChannel(
+                CHANNEL_ID,
+                "Bahamut BBS 服務",
+                NotificationManager.IMPORTANCE_LOW);
+        serviceChannel.setDescription("維持 BBS 連線");
+        serviceChannel.setShowBadge(false);
+        serviceChannel.enableLights(false);
+        serviceChannel.enableVibration(false);
+        serviceChannel.setSound(null, null);
 
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(serviceChannel);
-            }
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) {
+            manager.createNotificationChannel(serviceChannel);
+            Log.d(TAG, "Notification channel created");
         }
     }
 
@@ -104,13 +126,15 @@ public class BahaBBSBackgroundService extends Service {
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, "關閉", disconnectPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
-                .setBadgeIconType(NotificationCompat.BADGE_ICON_NONE)
-                .setNumber(0)
+                .setAutoCancel(false)
+                .setSilent(true)  // Android 15 要求前台服務通知靜音
+                .setShowWhen(false)
+                .setOnlyAlertOnce(true)
                 .build();
     }
 
     private void disconnectAndStop() {
-        Log.i("BahaBBS", "User requested disconnect from notification");
+        Log.i(TAG, "User requested disconnect from notification");
 
         // 斷開 Telnet 連線
         if (_client != null) {
@@ -118,7 +142,12 @@ public class BahaBBSBackgroundService extends Service {
         }
 
         // 停止服務
-        stopForeground(true);
+        try {
+            stopForeground(true);
+        } catch (Exception e) {
+            // 如果不是前景服務，stopForeground 可能會失敗，這是正常的
+            Log.d(TAG, "Not running as foreground service, continuing with stopSelf()");
+        }
         stopSelf();
     }
 }
