@@ -13,6 +13,7 @@ import androidx.core.app.NotificationCompat
 import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.Bahamut.R
+import com.kota.Bahamut.Service.CommonFunctions.getContextString
 import com.kota.Telnet.TelnetClient
 
 class BahaBBSBackgroundService : Service() {
@@ -147,10 +148,10 @@ class BahaBBSBackgroundService : Service() {
     private fun createNotificationChannel() {
         val serviceChannel = NotificationChannel(
             CHANNEL_ID,
-            "Bahamut BBS 服務",
+            getContextString(R.string.background_service_name),
             NotificationManager.IMPORTANCE_LOW
         )
-        serviceChannel.description = "維持 BBS 連線"
+        serviceChannel.description = getContextString(R.string.background_service_description)
         serviceChannel.setShowBadge(false)
         serviceChannel.enableLights(false)
         serviceChannel.enableVibration(false)
@@ -184,14 +185,14 @@ class BahaBBSBackgroundService : Service() {
         )
 
         return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Bahamut BBS")
-            .setContentText("BBS 連線維持中...")
-            .setSubText("特殊用途服務：BBS 連線管理") // 說明這是 specialUse 服務
+            .setContentTitle(getContextString(R.string.background_service_notification_title))
+            .setContentText(getContextString(R.string.background_service_notification_text))
+            .setSubText(getContextString(R.string.background_service_notification_sub_text)) // 說明這是 specialUse 服務
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(contentIntent)
             .addAction(
                 android.R.drawable.ic_menu_close_clear_cancel,
-                "關閉",
+                getContextString(R.string.close),
                 disconnectPendingIntent
             )
             .setPriority(NotificationCompat.PRIORITY_LOW)

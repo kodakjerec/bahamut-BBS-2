@@ -8,6 +8,7 @@
     <string name="account_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="add">新增</string>
     <string name="reset">重置</string>
+    <string name="close">關閉</string>
     <string name="reset_message">是否確定重置為預設值？</string>
     <string name="reset_ok">已成功重置輸入ID為預設值</string>
     <string name="arrow_down">▼</string>
@@ -416,4 +417,9 @@
     <string name="notification_permission_message">為了讓背景服務正常運作並顯示連線狀態，需要開啟通知權限。是否要前往設定頁面開啟？</string>
     <string name="notification_permission_goto_settings">前往設定</string>
     <string name="notification_permission_later">稍後再說</string>
+    <string name="background_service_name">Bahamut BBS 服務</string>
+    <string name="background_service_description">Bahamut BBS 服務</string>
+    <string name="background_service_notification_title">Bahamut BBS</string>
+    <string name="background_service_notification_text">BBS 連線維持中…</string>
+    <string name="background_service_notification_sub_text">特殊用途服務：BBS 連線管理</string>
 </resources>
