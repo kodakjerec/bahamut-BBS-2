@@ -14,7 +14,7 @@ import android.util.Log;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import com.kota.ASFramework.PageController.ASNavigationController;
-import com.kota.Bahamut.BahamutController;
+import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.R;
 import com.kota.Telnet.TelnetClient;
 
@@ -24,8 +24,10 @@ public class BahaBBSBackgroundService extends Service {
     private static final int NOTIFICATION_ID = 1001;
     private static final String ACTION_DISCONNECT = "ACTION_DISCONNECT";
 
-    TelnetClient _client;
+    TelnetClient myClient;
     ASNavigationController _controller;
+    private boolean _isRunningForeground = false;
+    private ASRunner timeoutRunner = null;
 
     @Override // android.app.Service
     public IBinder onBind(Intent intent) {
@@ -35,16 +37,9 @@ public class BahaBBSBackgroundService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        // 檢查通知權限 (Android 13+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS)
-                    != PackageManager.PERMISSION_GRANTED) {
-                Log.w(TAG, "POST_NOTIFICATIONS permission not granted");
-                // 要求通知權限
-                BahamutController.checkAndRequestNotificationPermission();
-            }
-        }
+        Log.i(TAG, "BackgroundService onCreate() called");
 
+        // 預先創建通知頻道，確保 startForeground 能快速執行
         createNotificationChannel();
     }
 
@@ -58,28 +53,147 @@ public class BahaBBSBackgroundService extends Service {
             return START_NOT_STICKY;
         }
 
-        this._client = TelnetClient.getClient();
-        this._controller = ASNavigationController.getCurrentController();
+        // 檢查並處理通知權限
+        if (!hasNotificationPermission()) {
+            Log.w(TAG, "No notification permission - cannot start foreground service");
 
-        // 嘗試啟動前景服務
+            // 記錄需要顯示權限對話框，但不在 Service 中直接顯示 UI
+            if (!NotificationSettings.getShowNotificationPermissionDialog()) {
+                NotificationSettings.setShowNotificationPermissionDialog(true);
+                Log.i(TAG, "Marked to show notification permission dialog in main activity");
+            }
+
+            // 沒有權限時無法啟動前台服務，直接停止
+            stopSelf();
+            return START_NOT_STICKY;
+        }
+
+        // 立即嘗試啟動前景服務（在處理任何邏輯前）
         try {
             startForeground(NOTIFICATION_ID, createNotification());
+            _isRunningForeground = true;
             Log.i(TAG, "BackgroundService started as foreground service.");
+        } catch (SecurityException e) {
+            Log.e(TAG, "SecurityException: No notification permission", e);
+            _isRunningForeground = false;
+            stopSelf();
+            return START_NOT_STICKY;
         } catch (Exception e) {
             // Android 12+ 可能會拋出 ForegroundServiceStartNotAllowedException
+            _isRunningForeground = false;
             Log.w(TAG, "Failed to start as foreground service: " + e.getClass().getSimpleName(), e);
             Log.i(TAG, "BackgroundService running as regular service.");
+            // 如果無法啟動前景服務，立即停止避免異常
+            stopSelf();
+            return START_NOT_STICKY;
         }
+
+        this.myClient = TelnetClient.getClient();
+        this._controller = ASNavigationController.getCurrentController();
 
         return START_STICKY; // 確保服務重啟
     }
 
+    /**
+     * 檢查是否有通知權限
+     */
+    private boolean hasNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Android 13+ 需要 POST_NOTIFICATIONS 權限
+            boolean hasPermission = ActivityCompat.checkSelfPermission(this,
+                    android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED;
+
+            if (!hasPermission) {
+                Log.w(TAG, "POST_NOTIFICATIONS permission not granted");
+                return true;
+            }
+        }
+
+        // 檢查通知是否被用戶禁用
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        if (notificationManager != null) {
+            boolean areNotificationsEnabled = notificationManager.areNotificationsEnabled();
+            if (!areNotificationsEnabled) {
+                Log.w(TAG, "Notifications are disabled by user");
+                return true;
+            }
+
+            // Android 8.0+ 檢查通知頻道是否被禁用
+            NotificationChannel channel = notificationManager.getNotificationChannel(CHANNEL_ID);
+            if (channel != null && channel.getImportance() == NotificationManager.IMPORTANCE_NONE) {
+                Log.w(TAG, "Notification channel is disabled");
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     @Override // android.app.Service
     public void onDestroy() {
+        Log.i(TAG, "BackgroundService onDestroy() called");
+
+        // 立即取消所有等待中的任務
+        if (timeoutRunner != null) {
+            timeoutRunner.cancel();
+            timeoutRunner = null;
+        }
+
+        // 確保前景服務狀態正確停止（必須在 onDestroy 開始時立即執行）
+        if (_isRunningForeground) {
+            try {
+                stopForeground(true);
+                _isRunningForeground = false;
+                Log.d(TAG, "Foreground service stopped in onDestroy");
+            } catch (Exception e) {
+                Log.w(TAG, "Error stopping foreground service in onDestroy", e);
+                // 即使失敗也要繼續
+            }
+        }
+
+        // 同步快速清理，不使用異步操作
+        try {
+            if (myClient != null) {
+                // 在 onDestroy 中不應該使用異步操作，直接清理引用
+                myClient = null;
+                Log.d(TAG, "Client reference cleared");
+            }
+            _controller = null;
+        } catch (Exception e) {
+            Log.w(TAG, "Error during onDestroy cleanup", e);
+        }
+
         super.onDestroy();
-        this._client = null;
-        this._controller = null;
-        Log.i("BahaBBS", "BackgroundService finish.");
+        Log.i(TAG, "BackgroundService onDestroy() completed quickly");
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.i(TAG, "onTaskRemoved() called - app was swiped away");
+
+        // 當應用被清除時，立即停止前景服務
+        if (_isRunningForeground) {
+            try {
+                stopForeground(true);
+                _isRunningForeground = false;
+                Log.d(TAG, "Foreground service stopped due to task removal");
+            } catch (Exception e) {
+                Log.w(TAG, "Error stopping foreground service in onTaskRemoved", e);
+            }
+        }
+
+        // 快速清理引用並停止服務
+        myClient = null;
+        _controller = null;
+
+        // 取消任何等待中的任務
+        if (timeoutRunner != null) {
+            timeoutRunner.cancel();
+            timeoutRunner = null;
+        }
+
+        stopSelf();
+        super.onTaskRemoved(rootIntent);
     }
 
     private void createNotificationChannel() {
@@ -101,6 +215,12 @@ public class BahaBBSBackgroundService extends Service {
     }
 
     private Notification createNotification() {
+        // 再次檢查權限，防止創建通知時出錯
+        if (!hasNotificationPermission()) {
+            Log.e(TAG, "Cannot create notification - no permission");
+            return null;
+        }
+
         // 創建主要內容的 PendingIntent (點擊通知) - 使用不同方式
         Intent notificationIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (notificationIntent != null) {
@@ -127,7 +247,7 @@ public class BahaBBSBackgroundService extends Service {
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setSilent(true)  // Android 15 要求前台服務通知靜音
+                .setSilent(true) // Android 15 要求前台服務通知靜音
                 .setShowWhen(false)
                 .setOnlyAlertOnce(true)
                 .build();
@@ -135,19 +255,49 @@ public class BahaBBSBackgroundService extends Service {
 
     private void disconnectAndStop() {
         Log.i(TAG, "User requested disconnect from notification");
+        stopServiceGracefully();
+    }
 
-        // 斷開 Telnet 連線
-        if (_client != null) {
-            _client.close();
+    /**
+     * 立即停止服務，確保在時限內完成
+     */
+    private void stopServiceGracefully() {
+        Log.i(TAG, "Gracefully stopping service");
+
+        // 立即停止前景服務狀態以避免超時
+        if (_isRunningForeground) {
+            try {
+                stopForeground(true);
+                _isRunningForeground = false;
+                Log.d(TAG, "Foreground service stopped immediately");
+            } catch (Exception e) {
+                Log.w(TAG, "Error stopping foreground service", e);
+            }
         }
 
-        // 停止服務
+        // 取消任何等待中的任務
+        if (timeoutRunner != null) {
+            timeoutRunner.cancel();
+            timeoutRunner = null;
+        }
+
+        // 快速斷線並立即停止服務
         try {
-            stopForeground(true);
+            if (myClient != null) {
+                // 在背景執行緒快速關閉連線，但不等待完成
+                ASRunner.runInNewThread(() -> {
+                    try {
+                        myClient.close();
+                        Log.d(TAG, "Telnet client closed in background");
+                    } catch (Exception e) {
+                        Log.w(TAG, "Error closing telnet client", e);
+                    }
+                });
+                // 不等待連線關閉，立即置null
+                myClient = null;
+            }
         } catch (Exception e) {
-            // 如果不是前景服務，stopForeground 可能會失敗，這是正常的
-            Log.d(TAG, "Not running as foreground service, continuing with stopSelf()");
+            Log.w(TAG, "Error during client disconnect", e);
         }
-        stopSelf();
     }
 }

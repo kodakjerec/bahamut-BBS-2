@@ -7,10 +7,8 @@ import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
 import android.util.Log;
-import android.app.ForegroundServiceStartNotAllowedException;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
-import com.kota.ASFramework.Dialog.ASAlertDialogListener;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.PageController.ASViewController;
@@ -57,7 +55,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u));
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b));
         } catch (Exception e) {
-            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
+            Log.e(getClass().getSimpleName(), e.getMessage() != null ? e.getMessage() : "");
         }
         // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";
@@ -70,10 +68,10 @@ public class BahamutController extends ASNavigationController implements TelnetC
         // 系統架構
         TelnetClient.construct(BahamutStateHandler.getInstance());
         TelnetClient.getClient().setListener(this);
-        
+
         // 設定 TelnetConnector 的設備控制器
         TelnetClient.getConnector().setDeviceController(getDeviceController());
-        
+
         PageContainer.constructInstance();
 
         // UserSettings
@@ -106,6 +104,12 @@ public class BahamutController extends ASNavigationController implements TelnetC
     @Override
     protected void onResume() {
         checkPurchase();
+        
+        // 檢查是否需要顯示通知權限對話框
+        if (NotificationSettings.getShowNotificationPermissionDialog()) {
+            showNotificationPermissionDialogIfNeeded();
+        }
+        
         super.onResume();
     }
 
@@ -122,7 +126,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
         // 強制關閉連線
         TelnetClient.getClient().close();
-        
+
         // 清理 TelnetConnector 的設備控制器引用
         if (TelnetClient.getConnector() != null) {
             TelnetClient.getConnector().setDeviceController(null);
@@ -131,7 +135,8 @@ public class BahamutController extends ASNavigationController implements TelnetC
         super.onDestroy();
     }
 
-    @Override // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity
+    @Override // com.kota.ASFramework.PageController.ASNavigationController,
+              // android.app.Activity
     protected void onPause() {
         super.onPause();
     }
@@ -146,18 +151,17 @@ public class BahamutController extends ASNavigationController implements TelnetC
         boolean result = true;
         if (TelnetClient.getConnector().isConnecting()) {
             ASAlertDialog dialog = new ASAlertDialog();
+            // from class: com.kota.Bahamut.BahamutController.1
+// com.kota.ASFramework.Dialog.ASAlertDialogListener
             dialog
                     .setMessage("是否確定要強制斷線?")
                     .addButton("取消")
                     .addButton("斷線")
-                    .setListener(new ASAlertDialogListener() { // from class: com.kota.Bahamut.BahamutController.1
-                @Override // com.kota.ASFramework.Dialog.ASAlertDialogListener
-                public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                    if (index == 1) {
-                        TelnetClient.getClient().close();
-                    }
-                }
-            }).show();
+                    .setListener((aDialog, index) -> {
+                        if (index == 1) {
+                            TelnetClient.getClient().close();
+                        }
+                    }).show();
         } else {
             result = false;
         }
@@ -184,26 +188,27 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
+        // 先檢查通知權限
+        checkNotificationPermissionBeforeStartService();
+        
         try {
             Intent intent = new Intent(this, BahaBBSBackgroundService.class);
             startForegroundService(intent);
         } catch (SecurityException e) {
             // Handle permission issues for foreground service
             Log.e(getClass().getSimpleName(), "Failed to start foreground service: SecurityException", e);
-            // Try to start as regular service instead
+            // 顯示權限對話框
+            showNotificationPermissionDialogIfNeeded();
             fallbackToRegularService();
         } catch (IllegalStateException e) {
-            // Handle cases where the app is in background and can't start foreground service
+            // Handle cases where the app is in background and can't start foreground
+            // service
             Log.e(getClass().getSimpleName(), "Failed to start foreground service: IllegalStateException", e);
             fallbackToRegularService();
         } catch (Exception e) {
             // Handle ForegroundServiceStartNotAllowedException and other exceptions
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && 
-                e instanceof ForegroundServiceStartNotAllowedException) {
-                Log.e(getClass().getSimpleName(), "Failed to start foreground service: ForegroundServiceStartNotAllowedException", e);
-            } else {
-                Log.e(getClass().getSimpleName(), "Failed to start foreground service: " + e.getClass().getSimpleName(), e);
-            }
+            Log.e(getClass().getSimpleName(), "Failed to start foreground service: " + e.getClass().getSimpleName(),
+                    e);
             fallbackToRegularService();
         }
     }
@@ -221,6 +226,19 @@ public class BahamutController extends ASNavigationController implements TelnetC
         }
     }
 
+    /**
+     * 安全地停止背景服務，避免 ForegroundServiceDidNotStopInTimeException
+     */
+    private void stopBackgroundServiceSafely() {
+        try {
+            Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+            boolean result = stopService(intent);
+            Log.i(getClass().getSimpleName(), "Stop service result: " + result);
+        } catch (Exception e) {
+            Log.e(getClass().getSimpleName(), "Error stopping background service: " + e.getClass().getSimpleName(), e);
+        }
+    }
+
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionFail(TelnetClient aClient) {
         ASProcessingDialog.dismissProcessingDialog();
@@ -229,8 +247,8 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionClosed(TelnetClient aClient) {
-        Intent intent = new Intent(this, BahaBBSBackgroundService.class);
-        stopService(intent);
+        // 優雅地停止背景服務
+        stopBackgroundServiceSafely();
         new ASRunner() { // from class: com.kota.Bahamut.BahamutController.3
             @Override // com.kota.ASFramework.Thread.ASRunner
             public void run() {
@@ -246,11 +264,11 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 ASProcessingDialog.dismissProcessingDialog();
 
                 if (NotificationSettings.getCloudSave()) {
-                  CloudBackup cloudBackup = new CloudBackup();
-                  cloudBackup.backup();
+                    CloudBackup cloudBackup = new CloudBackup();
+                    cloudBackup.backup();
                 }
 
-                if (TempSettings.getMessageSmall()!=null) {
+                if (TempSettings.getMessageSmall() != null) {
                     getCurrentController().removeForeverView(TempSettings.getMessageSmall());
                     TempSettings.setMessageSmall(null);
                 }
@@ -274,7 +292,8 @@ public class BahamutController extends ASNavigationController implements TelnetC
         setViewControllers(new_controllers);
     }
 
-    @Override // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity, android.content.ComponentCallbacks
+    @Override // com.kota.ASFramework.PageController.ASNavigationController,
+              // android.app.Activity, android.content.ComponentCallbacks
     public void onLowMemory() {
         super.onLowMemory();
         BoardPageBlock.release();
@@ -293,17 +312,39 @@ public class BahamutController extends ASNavigationController implements TelnetC
     }
 
     /**
+     * 在啟動服務前檢查通知權限
+     */
+    private void checkNotificationPermissionBeforeStartService() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                Log.w(getClass().getSimpleName(), "POST_NOTIFICATIONS permission not granted");
+            }
+        }
+    }
+
+    /**
+     * 如果需要的話顯示通知權限對話框
+     */
+    private void showNotificationPermissionDialogIfNeeded() {
+        if (!NotificationSettings.getShowNotificationPermissionDialog()) {
+            NotificationSettings.setShowNotificationPermissionDialog(true);
+            checkAndRequestNotificationPermission();
+        }
+    }
+
+    /**
      * 檢查並要求通知權限 (Android 13+)
      */
     public static void checkAndRequestNotificationPermission() {
         ASNavigationController controller = ASNavigationController.getCurrentController();
-        if (controller == null) return;
+        if (controller == null)
+            return;
 
         // 只在 Android 13+ 需要通知權限
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (controller.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) 
-                != PackageManager.PERMISSION_GRANTED) {
-                
+            if (controller.checkSelfPermission(
+                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+
                 // 顯示對話框詢問使用者
                 ASAlertDialog.createDialog()
                         .setTitle(controller.getString(R.string.notification_permission_title))
@@ -311,24 +352,21 @@ public class BahamutController extends ASNavigationController implements TelnetC
                         .addButton(controller.getString(R.string.notification_permission_later))
                         .addButton(controller.getString(R.string.notification_permission_goto_settings))
                         .setDefaultButtonIndex(1)
-                        .setListener(new ASAlertDialogListener() {
-                            @Override
-                            public void onAlertDialogDismissWithButtonIndex(ASAlertDialog aDialog, int index) {
-                                if (index == 1) {
-                                    // 前往設定頁面
+                        .setListener((aDialog, index) -> {
+                            if (index == 1) {
+                                // 前往設定頁面
+                                try {
+                                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, controller.getPackageName());
+                                    controller.startActivity(intent);
+                                } catch (Exception e) {
+                                    // 如果上面的方法失敗，使用應用設定頁面
                                     try {
-                                        Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                                        intent.putExtra(Settings.EXTRA_APP_PACKAGE, controller.getPackageName());
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        intent.setData(Uri.parse("package:" + controller.getPackageName()));
                                         controller.startActivity(intent);
-                                    } catch (Exception e) {
-                                        // 如果上面的方法失敗，使用應用設定頁面
-                                        try {
-                                            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                            intent.setData(Uri.parse("package:" + controller.getPackageName()));
-                                            controller.startActivity(intent);
-                                        } catch (Exception ex) {
-                                            ASToast.showShortToast("無法開啟設定頁面");
-                                        }
+                                    } catch (Exception ex) {
+                                        ASToast.showShortToast("無法開啟設定頁面");
                                     }
                                 }
                             }
