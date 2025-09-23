@@ -128,13 +128,13 @@ class Bookmark {
 
     fun generateTitle(): String {
         var title = ""
-        if (myKeyword?.trim { it <= ' ' }.isNotEmpty()) {
+        if (myKeyword?.trim { it <= ' ' }?.isNotEmpty() == true) {
             title = getContextString(R.string.title_) + myKeyword
         }
-        if (title.isEmpty() && myAuthor?.trim { it <= ' ' }.isNotEmpty()) {
+        if (title.isEmpty() && myAuthor?.trim { it <= ' ' }?.isNotEmpty() == true) {
             title = getContextString(R.string.author_) + myAuthor
         }
-        if (title.isEmpty() && myGY?.trim { it <= ' ' }.isNotEmpty()) {
+        if (title.isEmpty() && myGY?.trim { it <= ' ' }?.isNotEmpty() == true) {
             title = getContextString(R.string.do_gy_) + myGY
         }
         if (myMark == "y") {

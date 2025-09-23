@@ -8,9 +8,9 @@ class BahamutCommandMoveToLastBlock : BahamutCommandLoadLastBlock() {
         this.action = BahamutCommandDef.Companion.MOVE_TO_LAST_BLOCK
     }
 
-    override fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock?) {
-        super.executeFinished(aListPage, aPageData)
-        aListPage.pushRefreshCommand(1)
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
+        super.executeFinished(telnetListPage, telnetListPageBlock)
+        telnetListPage.pushRefreshCommand(1)
         isDone = true
     }
 

@@ -23,7 +23,7 @@ class BahamutCommandEditArticle(var articleNumber: String?, title: String, conte
     }
 
     override fun execute(telnetListPage: TelnetListPage) {
-        if (articleNumber != null && myContent != null && myContent?.isNotEmpty()) {
+        if (articleNumber != null && myContent != null) {
             // 將內文依照 *[ 切換成多段
             val outputs: MutableList<String> =
                 BahamutCommandPostArticle.Companion.convertContentToStringList(myContent!!)

@@ -81,17 +81,10 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
         }
     }
 
-    override fun executeFinished(
-        telnetListPage: TelnetListPage?,
-        telnetListPageBlock: TelnetListPageBlock?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    open fun executeFinished(aListPage: TelnetListPage, aPageData: TelnetListPageBlock?) {
-        if (aListPage.itemSize > aPageData.maximumItemNumber) {
-            aListPage.itemSize = 0
-            aListPage.cleanAllItem()
+    override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
+        if (telnetListPage.itemSize > telnetListPageBlock!!.maximumItemNumber) {
+            telnetListPage.itemSize = 0
+            telnetListPage.cleanAllItem()
         }
         isDone = true
     }

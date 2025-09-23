@@ -42,8 +42,10 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
     }
 
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
-        if (telnetListPageBlock.selectedItem?.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
-            if (articleIndex == telnetListPageBlock.selectedItemNumber) {
+        if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(
+                telnetListPageBlock?.selectedItem
+            )) {
+            if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
                 object : ASRunner() {
                     override fun run() {
                         telnetListPage.onLoadItemFinished()
@@ -58,7 +60,7 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
                     .sendToServer()
                 isDone = false
             }
-        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock.selectedItemNumber)) {
+        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
             object : ASRunner() {
                 override fun run() {
                     showShortToast("找沒有了耶...:(")

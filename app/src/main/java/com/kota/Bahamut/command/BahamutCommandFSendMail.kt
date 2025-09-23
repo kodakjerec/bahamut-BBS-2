@@ -30,7 +30,7 @@ class BahamutCommandFSendMail(var receiver: String) : TelnetCommand() {
     }
 
     override fun executeFinished(
-        telnetListPage: TelnetListPage?,
+        telnetListPage: TelnetListPage,
         telnetListPageBlock: TelnetListPageBlock?
     ) {
         isDone = true

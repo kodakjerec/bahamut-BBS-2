@@ -44,7 +44,7 @@ class ArticleTempStore {
     fun load() {
         println("load article store from file")
         var loadFromFile = false
-        if (this.filePath != null && this.filePath?.isNotEmpty()) {
+        if (this.filePath != null) {
             val file = File(this.filePath!!)
             if (file.exists()) {
                 try {

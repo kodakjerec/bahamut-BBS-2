@@ -25,6 +25,7 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
+import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetHeaderItemView
 import com.kota.telnetUI.TelnetPage
@@ -37,7 +38,7 @@ open class BookmarkManagePage(
     private val boardExtendOptionalPageListener: BoardExtendOptionalPageListener?
 ) : TelnetPage(), BookmarkClickListener, DialogSearchArticleListener {
     var boardName: String? = null
-    private val bookmarks: MutableList<Bookmark> = MutableList<Bookmark>()
+    private val bookmarks: MutableList<Bookmark?> = Vector()
     protected var headerItemView: TelnetHeaderItemView? = null
     private var selectedButton: Button? = null
     private var bookmarkButton: Button? = null
@@ -49,7 +50,7 @@ open class BookmarkManagePage(
     var historyAdapter: HistoryAdapter? = null
     var bookmarkStore: BookmarkStore? = TempSettings.bookmarkStore
     private var isUnderRecycleView = false
-    private var scale: Float? = 0f
+    private var scale: Float = 0.0f
     override val pageLayout: Int
         get() = R.layout.bookmark_manage_page
     override val pageType: Int
@@ -71,8 +72,8 @@ open class BookmarkManagePage(
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            start = viewHolder.adapterPosition
-            end = target.adapterPosition
+            start = viewHolder.bindingAdapterPosition
+            end = target.bindingAdapterPosition
             if (this@BookmarkManagePage.currentMode == 0) {
                 if (propertiesVIP) {
                     Collections.swap(bookmarks, start, end)
@@ -87,7 +88,7 @@ open class BookmarkManagePage(
         // 左右移動
         @SuppressLint("NotifyDataSetChanged")
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val bookmarkIndex = viewHolder.adapterPosition
+            val bookmarkIndex = viewHolder.bindingAdapterPosition
             if (this@BookmarkManagePage.currentMode == 0) {
                 if (direction == ItemTouchHelper.LEFT) {
                     // 左滑刪除
@@ -109,7 +110,7 @@ open class BookmarkManagePage(
                                 bookmarkAdapter?.notifyDataSetChanged()
                             } else {
                                 // 還原
-                                bookmarkAdapter?.notifyItemChanged(viewHolder.adapterPosition)
+                                bookmarkAdapter?.notifyItemChanged(viewHolder.bindingAdapterPosition)
                             }
                         }
                         .scheduleDismissOnPageDisappear(this@BookmarkManagePage).show()
@@ -121,19 +122,18 @@ open class BookmarkManagePage(
                     } else {
                         showShortToast(getContextString(R.string.vip_only_message))
                         // 還原
-                        bookmarkAdapter?.notifyItemChanged(viewHolder.adapterPosition)
+                        bookmarkAdapter?.notifyItemChanged(viewHolder.bindingAdapterPosition)
                     }
                 }
             } else if (this@BookmarkManagePage.currentMode == 1) {
                 if (direction == ItemTouchHelper.LEFT) {
-                    bookmarkStore?.getBookmarkList(this@BookmarkManagePage.boardName)
-                        .removeHistoryBookmark(bookmarkIndex)
+                    bookmarkStore?.getBookmarkList(this@BookmarkManagePage.boardName)?.removeHistoryBookmark(bookmarkIndex)
                     bookmarkStore?.store()
                     reloadList()
                     historyAdapter?.notifyDataSetChanged()
                 } else {
                     // 還原
-                    historyAdapter?.notifyItemChanged(viewHolder.adapterPosition)
+                    historyAdapter?.notifyItemChanged(viewHolder.bindingAdapterPosition)
                 }
             }
         }
@@ -173,8 +173,8 @@ open class BookmarkManagePage(
                                 bookmarkStore?.getBookmarkList(this@BookmarkManagePage.boardName)
                             bookmarkList?.clear()
                             for (bookmark in bookmarks) {
-                                if (bookmark.index == start) bookmark.index = end
-                                else if (bookmark.index == end) bookmark.index = start
+                                if (bookmark?.index == start) bookmark.index = end
+                                else if (bookmark?.index == end) bookmark.index = start
                                 bookmarkList?.addBookmark(bookmark)
                             }
                             bookmarkStore?.store()
@@ -243,8 +243,8 @@ open class BookmarkManagePage(
     override fun onPageDidLoad() {
         reloadList()
 
-        val recyclerView = findViewById(R.id.recycleView) as RecyclerView?
-        recyclerView?.setLayoutManager(LinearLayoutManager(context))
+        val recyclerView = findViewById(R.id.recycleView) as RecyclerView
+        recyclerView.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
         bookmarkAdapter = BookmarkAdapter(bookmarks)
@@ -262,7 +262,7 @@ open class BookmarkManagePage(
         waterBallButton?.setOnClickListener(buttonClickListener)
         selectedButton = bookmarkButton
         tabButtons = arrayOf<Button>(bookmarkButton!!, historyButton!!, waterBallButton!!)
-        scale = resource?.displayMetrics?.scaledDensity
+        scale = resource?.displayMetrics?.density?.dec()!!
 
         if (currentMode == 0) bookmarkButton?.performClick()
         else historyButton?.performClick()
@@ -334,7 +334,7 @@ open class BookmarkManagePage(
         val controllers = navigationController.viewControllers
         controllers.removeAt(controllers.size - 1)
         controllers.add(page)
-        navigationController.setViewControllers(controllers, true)
+        navigationController.setViewControllers(controllers as Vector<ASViewController>?, true)
         this@BookmarkManagePage.boardExtendOptionalPageListener?.onBoardExtendOptionalPageDidSelectBookmark(bookmark)
     }
 
@@ -371,7 +371,7 @@ open class BookmarkManagePage(
 
     // 搜尋文章完畢
     // 此處修改原本書籤內容
-    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String?>) {
+    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
         val bookmark = bookmarkAdapter?.getItem(editBookmarkIndex)
         if (bookmark == null) return
         bookmark.keyword = vector[0]

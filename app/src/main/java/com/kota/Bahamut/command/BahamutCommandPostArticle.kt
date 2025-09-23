@@ -130,10 +130,10 @@ class BahamutCommandPostArticle(
 
     // com.kota.Bahamut.Command.TelnetCommand
     override fun executeFinished(
-        telnetListPage: TelnetListPage?,
+        telnetListPage: TelnetListPage,
         telnetListPageBlock: TelnetListPageBlock?
     ) {
-        telnetListPage?.pushPreloadCommand(0)
+        telnetListPage.pushPreloadCommand(0)
         isDone = true
     }
 

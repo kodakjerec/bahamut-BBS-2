@@ -40,8 +40,10 @@ class BahamutCommandTheSameTitleDown(fromArticleIndex: Int) : TelnetCommand() {
     }
 
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
-        if (telnetListPageBlock.selectedItem?.isDeleted || telnetListPage.isItemBlocked(telnetListPageBlock.selectedItem)) {
-            if (articleIndex == telnetListPageBlock.selectedItemNumber) {
+        if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(
+                telnetListPageBlock?.selectedItem
+            )) {
+            if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
                 object : ASRunner() {
                     override fun run() {
                         showShortToast("無下一篇同主題文章")
@@ -50,10 +52,10 @@ class BahamutCommandTheSameTitleDown(fromArticleIndex: Int) : TelnetCommand() {
                 }.runInMainThread()
                 isDone = true
             } else {
-                articleIndex = telnetListPageBlock.selectedItemNumber
+                articleIndex = telnetListPageBlock?.selectedItemNumber!!
                 isDone = false
             }
-        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock.selectedItemNumber)) {
+        } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!! )) {
             object : ASRunner() {
                 override fun run() {
                     showShortToast("無下一篇同主題文章")
