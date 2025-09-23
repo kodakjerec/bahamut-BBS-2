@@ -1,16 +1,23 @@
 package com.kota.Bahamut.Pages;
 
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import androidx.core.content.pm.PackageInfoCompat;
+
+import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
+import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
@@ -158,7 +165,58 @@ public class StartPage extends TelnetPage {
 
     /** 按下連線按鈕 */
     public void onConnectButtonClicked() {
-        connect();
+        // 顯示權限對話框
+        if (NotificationSettings.getShowNotificationPermissionDialog()) {
+            connect();
+        } else {
+            NotificationSettings.setShowNotificationPermissionDialog(true);
+            checkAndRequestNotificationPermission();
+        }
+
+    }
+
+    /**
+     * 檢查並要求通知權限 (Android 13+)
+     */
+    public static void checkAndRequestNotificationPermission() {
+        ASNavigationController controller = ASNavigationController.getCurrentController();
+        if (controller == null)
+            return;
+
+        // 只在 Android 13+ 需要通知權限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (controller.checkSelfPermission(
+                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+
+                // 顯示對話框詢問使用者
+                ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string.notification_permission_title))
+                        .setMessage(getContextString(R.string.notification_permission_message))
+                        .addButton(getContextString(R.string.notification_permission_later))
+                        .addButton(getContextString(R.string.notification_permission_goto_settings))
+                        .setDefaultButtonIndex(0)
+                        .setListener((aDialog, index) -> {
+                            if (index == 1) {
+                                // 前往設定頁面
+                                try {
+                                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
+                                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, controller.getPackageName());
+                                    controller.startActivity(intent);
+                                } catch (Exception e) {
+                                    // 如果上面的方法失敗，使用應用設定頁面
+                                    try {
+                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                        intent.setData(Uri.parse("package:" + controller.getPackageName()));
+                                        controller.startActivity(intent);
+                                    } catch (Exception ex) {
+                                        ASToast.showShortToast("無法開啟設定頁面");
+                                    }
+                                }
+                            }
+                        })
+                        .show();
+            }
+        }
     }
 
     /** 連線 */

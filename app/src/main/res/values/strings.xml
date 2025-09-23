@@ -398,8 +398,8 @@
     <string name="message_main_setting01">同步</string>
     <string name="message_main_setting02">清暫存並同步</string>
     <string name="message_sub_send_hero">私訊勇者</string>
-    <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
-    <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
+    <string name="ignoreBattery_msg01">請關閉電池省電設定\n設定>偏好設定>不受電池最佳化限制</string>
+    <string name="ignoreBattery_msg02">已開啟不受電池最佳化限制</string>
     <string name="board_main_vV"> vV</string>
     <string name="board_main_read_all">全部已讀</string>
     <string name="board_main_unread_all">全部未讀</string>

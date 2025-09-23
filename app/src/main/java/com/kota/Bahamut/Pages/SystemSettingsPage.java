@@ -101,13 +101,12 @@ public class SystemSettingsPage extends TelnetPage {
     View.OnClickListener _ignore_battery_listener = view -> {
         PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
         String packageName = getContext().getPackageName();
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
-//            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
             ASToast.showLongToast(getContextString(R.string.ignoreBattery_msg02));
         } else {
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
             intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:"+packageName));
             startActivity(intent);

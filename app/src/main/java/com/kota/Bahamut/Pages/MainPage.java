@@ -4,7 +4,10 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.PowerManager;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -14,6 +17,7 @@ import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASDialog;
 import com.kota.ASFramework.Dialog.ASProcessingDialog;
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
@@ -271,6 +275,8 @@ public class MainPage extends TelnetPage {
     @SuppressLint("BatteryLife")
     private void checkBatteryLife() {
         if (!NotificationSettings.getAlarmIgnoreBatteryOptimizations()) {
+            NotificationSettings.setAlarmIgnoreBatteryOptimizations(true);
+
             PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
             String packageName = getContext().getPackageName();
 
@@ -278,10 +284,21 @@ public class MainPage extends TelnetPage {
                 ASAlertDialog.createDialog()
                         .setTitle(getContextString(R.string._warning))
                         .setMessage(getContextString(R.string.ignoreBattery_msg01))
-                        .addButton(getContextString(R.string.sure))
+                        .addButton(getContextString(R.string.notification_permission_later))
+                        .addButton(getContextString(R.string.notification_permission_goto_settings))
+                        .setDefaultButtonIndex(0)
+                        .setListener((aDialog, index) -> {
+                            if (index == 1) {
+                                // 前往設定頁面
+                                Intent intent = new Intent(Intent.ACTION_VIEW);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+                                intent.setData(Uri.parse("package:"+packageName));
+                                startActivity(intent);
+                            }
+                        })
                         .show();
             }
-            NotificationSettings.setAlarmIgnoreBatteryOptimizations(true);
         }
     };
 }

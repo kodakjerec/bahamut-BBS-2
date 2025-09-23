@@ -33,8 +33,7 @@ import com.kota.Bahamut.Service.UserSettings;
 
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.provider.Settings;
-import android.net.Uri;
+
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
 import com.kota.TelnetUI.TelnetPage;
@@ -104,12 +103,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
     @Override
     protected void onResume() {
         checkPurchase();
-        
-        // 檢查是否需要顯示通知權限對話框
-        if (NotificationSettings.getShowNotificationPermissionDialog()) {
-            showNotificationPermissionDialogIfNeeded();
-        }
-        
+
         super.onResume();
     }
 
@@ -189,27 +183,27 @@ public class BahamutController extends ASNavigationController implements TelnetC
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
         // 先檢查通知權限
-        checkNotificationPermissionBeforeStartService();
-        
-        try {
-            Intent intent = new Intent(this, BahaBBSBackgroundService.class);
-            startForegroundService(intent);
-        } catch (SecurityException e) {
-            // Handle permission issues for foreground service
-            Log.e(getClass().getSimpleName(), "Failed to start foreground service: SecurityException", e);
-            // 顯示權限對話框
-            showNotificationPermissionDialogIfNeeded();
-            fallbackToRegularService();
-        } catch (IllegalStateException e) {
-            // Handle cases where the app is in background and can't start foreground
-            // service
-            Log.e(getClass().getSimpleName(), "Failed to start foreground service: IllegalStateException", e);
-            fallbackToRegularService();
-        } catch (Exception e) {
-            // Handle ForegroundServiceStartNotAllowedException and other exceptions
-            Log.e(getClass().getSimpleName(), "Failed to start foreground service: " + e.getClass().getSimpleName(),
-                    e);
-            fallbackToRegularService();
+        boolean isPermissionGranted = checkNotificationPermissionBeforeStartService();
+
+        if (isPermissionGranted) {
+            try {
+                Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+                startForegroundService(intent);
+            } catch (SecurityException e) {
+                // Handle permission issues for foreground service
+                Log.e(getClass().getSimpleName(), "Failed to start foreground service: SecurityException", e);
+                fallbackToRegularService();
+            } catch (IllegalStateException e) {
+                // Handle cases where the app is in background and can't start foreground
+                // service
+                Log.e(getClass().getSimpleName(), "Failed to start foreground service: IllegalStateException", e);
+                fallbackToRegularService();
+            } catch (Exception e) {
+                // Handle ForegroundServiceStartNotAllowedException and other exceptions
+                Log.e(getClass().getSimpleName(), "Failed to start foreground service: " + e.getClass().getSimpleName(),
+                        e);
+                fallbackToRegularService();
+            }
         }
     }
 
@@ -314,66 +308,14 @@ public class BahamutController extends ASNavigationController implements TelnetC
     /**
      * 在啟動服務前檢查通知權限
      */
-    private void checkNotificationPermissionBeforeStartService() {
+    private boolean checkNotificationPermissionBeforeStartService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
                 Log.w(getClass().getSimpleName(), "POST_NOTIFICATIONS permission not granted");
+                return false;
             }
         }
-    }
-
-    /**
-     * 如果需要的話顯示通知權限對話框
-     */
-    private void showNotificationPermissionDialogIfNeeded() {
-        if (!NotificationSettings.getShowNotificationPermissionDialog()) {
-            NotificationSettings.setShowNotificationPermissionDialog(true);
-            checkAndRequestNotificationPermission();
-        }
-    }
-
-    /**
-     * 檢查並要求通知權限 (Android 13+)
-     */
-    public static void checkAndRequestNotificationPermission() {
-        ASNavigationController controller = ASNavigationController.getCurrentController();
-        if (controller == null)
-            return;
-
-        // 只在 Android 13+ 需要通知權限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (controller.checkSelfPermission(
-                    android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-
-                // 顯示對話框詢問使用者
-                ASAlertDialog.createDialog()
-                        .setTitle(controller.getString(R.string.notification_permission_title))
-                        .setMessage(controller.getString(R.string.notification_permission_message))
-                        .addButton(controller.getString(R.string.notification_permission_later))
-                        .addButton(controller.getString(R.string.notification_permission_goto_settings))
-                        .setDefaultButtonIndex(1)
-                        .setListener((aDialog, index) -> {
-                            if (index == 1) {
-                                // 前往設定頁面
-                                try {
-                                    Intent intent = new Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS);
-                                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, controller.getPackageName());
-                                    controller.startActivity(intent);
-                                } catch (Exception e) {
-                                    // 如果上面的方法失敗，使用應用設定頁面
-                                    try {
-                                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                                        intent.setData(Uri.parse("package:" + controller.getPackageName()));
-                                        controller.startActivity(intent);
-                                    } catch (Exception ex) {
-                                        ASToast.showShortToast("無法開啟設定頁面");
-                                    }
-                                }
-                            }
-                        })
-                        .show();
-            }
-        }
+        return true;
     }
 
     @Override

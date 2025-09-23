@@ -57,12 +57,6 @@ public class BahaBBSBackgroundService extends Service {
         if (!hasNotificationPermission()) {
             Log.w(TAG, "No notification permission - cannot start foreground service");
 
-            // 記錄需要顯示權限對話框，但不在 Service 中直接顯示 UI
-            if (!NotificationSettings.getShowNotificationPermissionDialog()) {
-                NotificationSettings.setShowNotificationPermissionDialog(true);
-                Log.i(TAG, "Marked to show notification permission dialog in main activity");
-            }
-
             // 沒有權限時無法啟動前台服務，直接停止
             stopSelf();
             return START_NOT_STICKY;
@@ -105,7 +99,7 @@ public class BahaBBSBackgroundService extends Service {
 
             if (!hasPermission) {
                 Log.w(TAG, "POST_NOTIFICATIONS permission not granted");
-                return true;
+                return false;
             }
         }
 
@@ -115,18 +109,18 @@ public class BahaBBSBackgroundService extends Service {
             boolean areNotificationsEnabled = notificationManager.areNotificationsEnabled();
             if (!areNotificationsEnabled) {
                 Log.w(TAG, "Notifications are disabled by user");
-                return true;
+                return false;
             }
 
             // Android 8.0+ 檢查通知頻道是否被禁用
             NotificationChannel channel = notificationManager.getNotificationChannel(CHANNEL_ID);
             if (channel != null && channel.getImportance() == NotificationManager.IMPORTANCE_NONE) {
                 Log.w(TAG, "Notification channel is disabled");
-                return true;
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     @Override // android.app.Service
@@ -215,12 +209,6 @@ public class BahaBBSBackgroundService extends Service {
     }
 
     private Notification createNotification() {
-        // 再次檢查權限，防止創建通知時出錯
-        if (!hasNotificationPermission()) {
-            Log.e(TAG, "Cannot create notification - no permission");
-            return null;
-        }
-
         // 創建主要內容的 PendingIntent (點擊通知) - 使用不同方式
         Intent notificationIntent = getPackageManager().getLaunchIntentForPackage(getPackageName());
         if (notificationIntent != null) {
@@ -245,10 +233,8 @@ public class BahaBBSBackgroundService extends Service {
                 .setContentIntent(contentIntent)
                 .addAction(android.R.drawable.ic_menu_close_clear_cancel, "關閉", disconnectPendingIntent)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setOngoing(true)
                 .setAutoCancel(false)
                 .setSilent(true) // Android 15 要求前台服務通知靜音
-                .setShowWhen(false)
                 .setOnlyAlertOnce(true)
                 .build();
     }
