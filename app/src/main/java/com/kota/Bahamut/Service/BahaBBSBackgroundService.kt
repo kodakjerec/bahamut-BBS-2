@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
 import android.util.Log
@@ -47,7 +48,10 @@ class BahaBBSBackgroundService : Service() {
 
         // 立即嘗試啟動前景服務（在處理任何邏輯前）
         try {
-            startForeground(NOTIFICATION_ID, createNotification())
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                startForeground(NOTIFICATION_ID, createNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING)
+            else
+                startForeground(NOTIFICATION_ID, createNotification())
             isRunningForeground = true
             Log.i(TAG, "BackgroundService started as foreground service.")
         } catch (e: SecurityException) {
@@ -187,7 +191,6 @@ class BahaBBSBackgroundService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getContextString(R.string.background_service_notification_title))
             .setContentText(getContextString(R.string.background_service_notification_text))
-            .setSubText(getContextString(R.string.background_service_notification_sub_text)) // 說明這是 specialUse 服務
             .setSmallIcon(R.mipmap.ic_launcher)
             .setContentIntent(contentIntent)
             .addAction(

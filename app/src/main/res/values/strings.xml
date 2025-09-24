@@ -421,5 +421,4 @@
     <string name="background_service_description">Bahamut BBS 服務</string>
     <string name="background_service_notification_title">Bahamut BBS</string>
     <string name="background_service_notification_text">BBS 連線維持中…</string>
-    <string name="background_service_notification_sub_text">特殊用途服務：BBS 連線管理</string>
 </resources>
