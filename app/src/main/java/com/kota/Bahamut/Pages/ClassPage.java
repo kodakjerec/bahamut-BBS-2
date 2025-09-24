@@ -41,7 +41,6 @@ import java.util.TimerTask;
 
 public class ClassPage extends TelnetListPage implements View.OnClickListener, Dialog_SearchBoard_Listener {
     RelativeLayout mainLayout;
-    private final String _detail = "看板列表";
     private String _title = "";
 
     public int getPageType() {
@@ -108,6 +107,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
                 _detail_2.setText(lastVisitBoard);
                 _detail_2.setOnClickListener(v -> TelnetClient.getClient().sendStringToServer("s"+ finalLastVisitBoard));
             }
+            String _detail = "看板列表";
             header_view.setData(title, _detail, "");
         }
     }
@@ -241,7 +241,7 @@ public class ClassPage extends TelnetListPage implements View.OnClickListener, D
         super.loadItemAtIndex(index);
     }
 
-    // 填入看板
+    /** 填入看板 */
     public View getView(int index, View itemView, ViewGroup parentView) {
         int item_index = index + 1;
         int item_block = ItemUtils.getBlock(item_index);

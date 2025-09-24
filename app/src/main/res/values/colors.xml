@@ -5,6 +5,7 @@
     <color name="transparent">#00000000</color>
     <color name="yellow">#FFF0F080</color>
     <color name="red">#FF800000</color>
+    <color name="text_color_link">#FF1F5EFF</color>
     <color name="halfWhite">#FF808080</color>
     <color name="button_label_color_disable">@color/halfWhite</color>
     <color name="button_label_color_focused">@color/black</color>

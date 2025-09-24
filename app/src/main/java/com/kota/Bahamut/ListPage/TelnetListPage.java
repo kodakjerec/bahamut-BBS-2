@@ -5,6 +5,7 @@ import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 import android.annotation.SuppressLint;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
@@ -114,7 +116,7 @@ public abstract class TelnetListPage extends TelnetPage implements ListAdapter, 
                     sleep(1000L);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 run = false;
             }
         }

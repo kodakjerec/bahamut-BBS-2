@@ -60,7 +60,7 @@ public class TelnetHeaderItemView extends LinearLayout {
         }
     }
 
-    public void setMenuButton(View.OnClickListener aListener) {
+    public void setMenuButtonClickListener(View.OnClickListener aListener) {
         if (aListener == null) {
             mMenuDivider.setVisibility(View.GONE);
             mMenuButton.setVisibility(View.GONE);
@@ -94,6 +94,12 @@ public class TelnetHeaderItemView extends LinearLayout {
     public void setDetail1(String aDetail1) {
         if (_detail_1 != null) {
             _detail_1.setText(aDetail1);
+        }
+    }
+    /** 設定點擊功能 detail1 */
+    public void setDetail1ClickListener(View.OnClickListener aListener) {
+        if (aListener != null) {
+            _detail_1.setOnClickListener(aListener);
         }
     }
 

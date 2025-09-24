@@ -39,6 +39,24 @@
             android:paddingLeft="0px"
             android:paddingRight="0px">
 
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:gravity="top"
+                android:layout_gravity="center"
+                android:id="@+id/BlockWebSignIn"
+                android:visibility="gone">
+                <CheckBox
+                    android:id="@+id/LoginWebSignInCheckBox"
+                    style="@style/CheckboxBahamut" />
+                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    style="@style/SystemSettingsCheckboxText"
+                    android:layout_toEndOf="@+id/LoginWebSignInCheckBox"
+                    android:id="@+id/LoginWebSignInLabel"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/login_web_sign_in" />
+            </RelativeLayout>
+
             <LinearLayout
                 style="@style/TouchBlock"
                 android:layout_width="match_parent"
@@ -63,7 +81,6 @@
                     android:inputType="text"
                     android:labelFor="@id/Login_UsernameLabel"
                     android:maxLength="12"
-                    android:singleLine="true"
                     android:textSize="28sp" />
             </LinearLayout>
 
@@ -90,7 +107,6 @@
                     android:labelFor="@id/Login_passwordLabel"
                     android:inputType="textPassword"
                     android:autofillHints="password"
-                    android:singleLine="true"
                     android:textSize="28sp"/>
             </LinearLayout>
 

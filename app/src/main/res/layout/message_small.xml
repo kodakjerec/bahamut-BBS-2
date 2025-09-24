@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/Message_Small_Layout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="48dp"
+    android:layout_height="48dp">
+    <Button
+        android:id="@+id/Message_Small_Icon"
+        style="@style/ToolbarItem"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="3dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginEnd="3dp"
+        android:layout_marginBottom="3dp"
+        android:paddingStart="3dp"
+        android:drawableStart="@drawable/icon_comment"
+        android:background="@color/transparent"
+        tools:ignore="RtlSymmetry" />
+    <TextView
+        android:id="@+id/Message_Small_Badge"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:elevation="10dp"
+        android:background="@drawable/shape_circle_red"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:gravity="center"
+        android:text="@string/number_1"/>
+</RelativeLayout>

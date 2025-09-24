@@ -1,25 +1,29 @@
 package com.kota.ASFramework.Thread;
 
 import android.annotation.SuppressLint;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 
 import androidx.annotation.NonNull;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 public abstract class ASRunner {
   static Looper mainLooper = Looper.getMainLooper();
   static Thread _main_thread = null;
-  static Handler _main_handler = null;
-
+  static Handler mainHandler = null;
   static Runnable runnable;
+  private int token = 0;
+  private static final AtomicInteger tokenGenerator = new AtomicInteger();
 
   public abstract void run();
 
   @SuppressLint("HandlerLeak")
   public static void construct() {
     _main_thread = Thread.currentThread();
-    _main_handler = new Handler(mainLooper) {
+    mainHandler = new Handler(mainLooper) {
       @Override // android.os.Handler
       public void handleMessage(@NonNull Message message) {
         ASRunner runner = (ASRunner) message.obj;
@@ -39,7 +43,7 @@ public abstract class ASRunner {
     } else {
       Message message = new Message();
       message.obj = this;
-      _main_handler.sendMessage(message);
+      mainHandler.sendMessage(message);
     }
     return this;
   }
@@ -52,14 +56,28 @@ public abstract class ASRunner {
 
   /** 延遲執行 */
   public void postDelayed(int delayMillis) {
-    if (runnable == null)
-      runnable = ASRunner.this::run;
-    // Call the actual run method after delay
-    _main_handler.postDelayed(runnable, delayMillis);
+    // 先取消之前的任務
+    cancel();
+
+    token = tokenGenerator.incrementAndGet();
+
+    runnable = this::run;
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      mainHandler.postDelayed(runnable, token, delayMillis);
+    } else {
+      mainHandler.postDelayed(runnable, delayMillis);
+    }
   }
   /** 取消執行 */
   public void cancel() {
-    if (runnable!=null)
-      _main_handler.removeCallbacks(runnable);
+    if (runnable!=null) {
+      mainHandler.removeCallbacks(runnable, token);
+    }
+    runnable = null;
+  }
+
+  /** 釋放資源 */
+  public void release() {
+    cancel();
   }
 }

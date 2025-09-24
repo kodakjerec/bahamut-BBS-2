@@ -1,5 +1,7 @@
 package com.kota.Telnet;
 
+import android.util.Log;
+
 import com.kota.ASFramework.Thread.ASRunner;
 import com.kota.Bahamut.DataModels.UrlDatabase;
 import com.kota.Bahamut.MyApplication;
@@ -9,6 +11,7 @@ import com.kota.Telnet.Reference.TelnetDefs;
 import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.TextEncoder.U2BEncoder;
 import java.io.UnsupportedEncodingException;
+import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -65,7 +68,7 @@ public class TelnetClient implements TelnetConnectorListener {
         try {
             _connector.close(); // 關閉連線
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 
@@ -85,7 +88,7 @@ public class TelnetClient implements TelnetConnectorListener {
             data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (encode_success) {
             sendDataToServer(data, channel);
@@ -104,7 +107,7 @@ public class TelnetClient implements TelnetConnectorListener {
             data = U2BEncoder.getInstance().encodeToBytes(data2, 0);
             encode_success = true;
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (encode_success) {
             sendDataToServerInBackground(data, channel);

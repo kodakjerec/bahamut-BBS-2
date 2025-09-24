@@ -6,6 +6,7 @@ import android.text.style.ForegroundColorSpan;
 
 import com.kota.Bahamut.Pages.BoardPage.BoardPageAction;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Telnet.Model.TelnetModel;
 import com.kota.Telnet.Model.TelnetRow;
 import com.kota.Telnet.Reference.TelnetAnsiCode;
 import com.kota.Telnet.TelnetAnsi;
@@ -111,16 +112,31 @@ public class BoardPageHandler {
         }
         int end_index = 3 + 20;
         int i6 = 3;
-        while (i6 < end_index && (row = TelnetClient.getModel().getRow(i6)) != null && row.toString().trim().length() != 0) {
+
+        TelnetModel rowModel = TelnetClient.getModel();
+        String isMoreThen10w = "";
+        for(TelnetRow getRow : rowModel.getRows()) {
+            String checkChar = getRow.getSpaceString(0, 0).trim();
+            if (checkChar.length() > 0 && checkChar.charAt(0) >= '1' && checkChar.charAt(0) <= '9') {
+                isMoreThen10w = checkChar;
+            }
+        };
+
+        while (i6 < end_index && (row = rowModel.getRow(i6)) != null && row.toString().trim().length() != 0) {
             row.reloadSpace();
             String article_selected = row.getSpaceString(0, 0).trim();
-            int article_number = TelnetUtils.getIntegerFromData(row, 1, 5);
+            String article_number_str = row.getSpaceString(1, 5).trim();
+            // 應對十萬篇
+            if (!isMoreThen10w.equals(""))
+                article_number_str = isMoreThen10w + article_number_str;
+            int article_number = Integer.parseInt(article_number_str);
+            boolean is_selected = false;
+            if (article_selected.length() > 0 && article_selected.equals(">")) {
+                board_package.selectedItemNumber = article_number;
+                is_selected = true;
+            }
+
             if (article_number != 0) {
-                boolean is_selected = false;
-                if (article_selected.length() > 0 && article_selected.charAt(0) == '>') {
-                    board_package.selectedItemNumber = article_number;
-                    is_selected = true;
-                }
                 byte info = row.data[7];
                 int gy = TelnetUtils.getIntegerFromData(row, 8, 9);
                 String date = row.getSpaceString(10, 14).trim();

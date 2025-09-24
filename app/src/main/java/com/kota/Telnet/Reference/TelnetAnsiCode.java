@@ -1,10 +1,13 @@
 package com.kota.Telnet.Reference;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
 import android.view.View;
 
 import androidx.core.internal.view.SupportMenu;
 import androidx.core.view.InputDeviceCompat;
+
+import java.util.Objects;
 
 public class TelnetAnsiCode {
     public static final int[] BACKGROUND_COLOR_NORMAL = {View.MEASURED_STATE_MASK, -8388608, -16744448, -8355840, -16777088, -8388480, -16744320, -4144960};
@@ -58,7 +61,7 @@ public class TelnetAnsiCode {
         try {
             return COLOR_BRIGHT[color_index - 8];
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TelnetAnsiCode.class.getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return -4144960;
         }
     }
@@ -76,7 +79,7 @@ public class TelnetAnsiCode {
         try {
             return COLOR_BRIGHT[color_index - 8];
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(TelnetAnsiCode.class.getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             return -4144960;
         }
     }

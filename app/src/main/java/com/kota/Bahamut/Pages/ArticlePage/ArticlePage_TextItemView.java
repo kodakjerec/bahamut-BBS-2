@@ -1,10 +1,14 @@
 package com.kota.Bahamut.Pages.ArticlePage;
 
+import static androidx.core.content.ContextCompat.startActivity;
 import static com.kota.Bahamut.Service.CommonFunctions.getContextColor;
 
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
+import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -15,14 +19,19 @@ import android.text.style.URLSpan;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.util.TypedValue;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.Model.TelnetRow;
@@ -31,6 +40,7 @@ import com.kota.Telnet.TelnetAnsi;
 import com.kota.Telnet.TelnetArticleItemView;
 import com.kota.TelnetUI.DividerView;
 
+import java.util.Locale;
 import java.util.Vector;
 
 public class ArticlePage_TextItemView extends LinearLayout implements TelnetArticleItemView {
@@ -51,7 +61,8 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     }
 
     private void init() {
-        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.article_page_text_item_view, this);
+        ((LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+                .inflate(R.layout.article_page_text_item_view, this);
         authorLabel = findViewById(R.id.ArticleTextItemView_Title);
         contentLabel = findViewById(R.id.ArticleTextItemView_content);
         dividerView = findViewById(R.id.ArticleTextItemView_DividerView);
@@ -78,7 +89,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
     public void setContent(String content, Vector<TelnetRow> rows) {
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
-            if (myQuote >0) {
+            if (myQuote > 0) {
                 contentLabel.setText(content);
                 stringNewUrlSpan(contentLabel);
             } else {
@@ -108,7 +119,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                 boolean needReplaceTextColor = false;
                 for (int i = 0; i < textColor.length; i++) {
                     if (textColor[i] != paintTextColor) {
-                        if ((i+1)<=ssRawString.length()) {
+                        if ((i + 1) <= ssRawString.length()) {
                             needReplaceTextColor = true;
                         }
                         break;
@@ -140,8 +151,10 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                         // 塗顏色
                         if (!startCatching) {
                             if (paintTextColor != TelnetAnsi.getDefaultTextColor()) {
-                                ForegroundColorSpan colorSpan = new ForegroundColorSpan(TelnetAnsiCode.getTextColor(paintTextColor));
-                                ssRawString.setSpan(colorSpan, startIndex, endIndex+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                ForegroundColorSpan colorSpan = new ForegroundColorSpan(
+                                        TelnetAnsiCode.getTextColor(paintTextColor));
+                                ssRawString.setSpan(colorSpan, startIndex, endIndex + 1,
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
 
                             startIndex = i;
@@ -153,7 +166,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                     }
                 }
                 byte[] backgroundColor = row.getBackgroundColor();
-                startIndex =0;
+                startIndex = 0;
                 endIndex = startIndex;
                 startCatching = false;
                 byte paintBackColor = TelnetAnsi.getDefaultBackgroundColor();
@@ -161,7 +174,7 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                 boolean needReplaceBackColor = false;
                 for (int i = 0; i < backgroundColor.length; i++) {
                     if (backgroundColor[i] != paintBackColor) {
-                        if ((i+1)<=ssRawString.length()) {
+                        if ((i + 1) <= ssRawString.length()) {
                             needReplaceBackColor = true;
                         }
                         break;
@@ -193,8 +206,10 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                         // 塗顏色
                         if (!startCatching) {
                             if (paintBackColor != TelnetAnsi.getDefaultBackgroundColor()) {
-                                BackgroundColorSpan colorSpan = new BackgroundColorSpan(TelnetAnsiCode.getBackgroundColor(paintBackColor));
-                                ssRawString.setSpan(colorSpan, startIndex, endIndex+1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                BackgroundColorSpan colorSpan = new BackgroundColorSpan(
+                                        TelnetAnsiCode.getBackgroundColor(paintBackColor));
+                                ssRawString.setSpan(colorSpan, startIndex, endIndex + 1,
+                                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
                             }
 
                             startIndex = i;
@@ -211,13 +226,14 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         return TextUtils.concat(finalString);
     }
 
-    /** 客製化連結另開新視窗
-     *  替換掉 linkify 原本的連結
-     * */
+    /**
+     * 客製化連結另開新視窗
+     * 替換掉 linkify 原本的連結
+     */
     private void stringNewUrlSpan(TextView target) {
-        Linkify.addLinks(target,  Linkify.WEB_URLS);
+        Linkify.addLinks(target, Linkify.WEB_URLS);
         CharSequence text = target.getText();
-        if (text.length()>0) {
+        if (text.length() > 0) {
             SpannableString ss = (SpannableString) target.getText();
             URLSpan[] spans = target.getUrls();
             for (URLSpan span : spans) {
@@ -235,37 +251,40 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
         LinearLayout mainLayout = (LinearLayout) contentView;
 
         int originalIndex = mainLayout.indexOfChild(contentLabel);
-        Linkify.addLinks(contentLabel,  Linkify.WEB_URLS);
-
-        if (originalIndex>0) {
+        if (originalIndex > 0) {
             // 使用預覽圖
             if (UserSettings.getLinkAutoShow()) {
-                SpannableString originalString = (SpannableString) contentLabel.getText();
-                URLSpan[] urlSpans = contentLabel.getUrls();
-                if (urlSpans.length>0) {
+                // 修正：先處理網址中的 \n
+                String rawText = contentLabel.getText().toString();
+                String fixedText = fixUrlNewlines(rawText);
+                Spannable spannableText = new SpannableString(fixedText);
+
+                Linkify.addLinks(spannableText, Linkify.WEB_URLS);
+                URLSpan[] urlSpans = spannableText.getSpans(0, spannableText.length(), URLSpan.class);
+                if (urlSpans.length > 0) {
                     int previousIndex = 0;
                     for (URLSpan urlSpan : urlSpans) {
                         TextView textView1 = new TextView(getContext());
                         TextView textView2 = new TextView(getContext());
 
                         // partA
-                        int urlSpanEnd = originalString.getSpanEnd(urlSpan);
-                        CharSequence partA = originalString.subSequence(previousIndex, urlSpanEnd);
+                        int urlSpanEnd = spannableText.getSpanEnd(urlSpan);
+                        CharSequence partA = spannableText.subSequence(previousIndex, urlSpanEnd);
                         textView1.setText(partA);
 
                         // check error
-                        if (urlSpanEnd + 1 <= originalString.length())
+                        if (urlSpanEnd + 1 <= spannableText.length())
                             urlSpanEnd = urlSpanEnd + 1;
 
                         // partB
-                        CharSequence partB = originalString.subSequence(urlSpanEnd, originalString.length());
+                        CharSequence partB = spannableText.subSequence(urlSpanEnd, spannableText.length());
                         textView2.setText(partB);
 
                         // 移除原本的文字
                         mainLayout.removeViewAt(originalIndex);
                         // 塞入連結前半段文字, 純文字
                         mainLayout.addView(textView1, originalIndex);
-                        String url = urlSpan.getURL();
+                        String url = urlSpan.getURL().replace("\n", "");
                         Thumbnail_ItemView thumbnail = new Thumbnail_ItemView(getContext());
                         thumbnail.loadUrl(url);
                         // 塞入截圖
@@ -291,14 +310,127 @@ public class ArticlePage_TextItemView extends LinearLayout implements TelnetArti
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content1));
                             else
                                 textView.setTextColor(getContextColor(R.color.article_page_text_item_content0));
+
+                            addMenuItemSearch(textView);
                             stringNewUrlSpan(textView);
                         }
                     }
+                } else {
+                    addMenuItemSearch(contentLabel);
                 }
             } else {
+                addMenuItemSearch(contentLabel);
                 stringNewUrlSpan(contentLabel);
             }
         }
+    }
+
+    private String fixUrlNewlines(String text) {
+        StringBuilder result = new StringBuilder();
+        String[] lines = text.split("\n");
+        StringBuilder urlBuffer = new StringBuilder();
+        boolean inUrl = false;
+
+        for (String line : lines) {
+            if (inUrl) {
+                if (line.length() < 78 ) {
+                    urlBuffer.append(line);
+                    result.append(urlBuffer).append("\n");
+                    urlBuffer.setLength(0);
+                    inUrl = false;
+                } else {
+                    urlBuffer.append(line);
+                }
+            } else {
+                if ( line.contains("http://") || line.contains("https://") ) {
+                    inUrl = true;
+                    // 如果是以 http/https 開頭，直接加入 urlBuffer
+                    if (line.startsWith("http://") || line.startsWith("https://")) {
+                        urlBuffer.append(line);
+                        if (line.length() < 78 ) {
+                            result.append(urlBuffer).append("\n");
+                            urlBuffer.setLength(0);
+                            inUrl = false;
+                        }
+                    } else {
+                        // 如果是在中間，先將前面部分加入 result，再從 http/https 開始加入 urlBuffer
+                        int httpIndex = line.indexOf("http://");
+                        int httpsIndex = line.indexOf("https://");
+                        int urlStartIndex = -1;
+                        
+                        if (httpIndex != -1 && httpsIndex != -1) {
+                            urlStartIndex = Math.min(httpIndex, httpsIndex);
+                        } else if (httpIndex != -1) {
+                            urlStartIndex = httpIndex;
+                        } else if (httpsIndex != -1) {
+                            urlStartIndex = httpsIndex;
+                        }
+                        
+                        if (urlStartIndex > 0) {
+                            result.append(line.substring(0, urlStartIndex)).append("\n");
+                            urlBuffer.append(line.substring(urlStartIndex));
+                        } else {
+                            urlBuffer.append(line);
+                        }
+                    }
+                } else {
+                    result.append(line).append("\n");
+                }
+            }
+        }
+
+        // 如果循環結束時，urlBuffer中還有內容，表示最後一個URL沒有達到78字符或明確結束
+        if (urlBuffer.length() > 0) {
+            result.append(urlBuffer).append("\n");
+        }
+
+        return result.toString();
+    }
+
+    /** 加上右鍵選單 */
+    private void addMenuItemSearch(TextView target) {
+        int selfDefineId = 100;
+
+        // 自定義右鍵選單
+        ActionMode.Callback selfMenu = new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+                menu.add(Menu.NONE, selfDefineId, Menu.NONE, "*搜尋*");
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+                String selectedText = target.getText().toString().substring(
+                        target.getSelectionStart(),
+                        target.getSelectionEnd());
+
+                if (menuItem.getItemId() == selfDefineId) {
+                    try {
+                        Intent intent = new Intent(Intent.ACTION_WEB_SEARCH);
+                        intent.putExtra(SearchManager.QUERY, selectedText);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        getContext().startActivity(intent);
+                    } catch (Exception e) {
+                        ASToast.showShortToast("無法開啟此網址");
+                    }
+                    actionMode.finish();
+                }
+
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode actionMode) {
+
+            }
+        };
+        target.setCustomSelectionActionModeCallback(selfMenu);
     }
 
     public void setQuote(int quote) {

@@ -9,7 +9,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.kota.TelnetUI.TelnetHeaderItemView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+        <com.kota.Bahamut.Pages.BoardPage.BoardHeaderView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
         <FrameLayout android:id="@+id/BoardPage_ListViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:id="@+id/BoardPage_listEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
             <com.kota.ASFramework.UI.ASListView android:id="@+id/BoardPageListView" android:layout_width="match_parent" android:layout_height="match_parent" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
@@ -39,7 +39,7 @@
         <Button
             android:id="@+id/BoardPageFirstPageButton"
             style="@style/ToolbarItem"
-            android:text="@string/first_page" />
+            android:text="@string/prev_page" />
         <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
         <Button
             android:id="@+id/BoardPageLatestPageButton"

@@ -1,6 +1,5 @@
 package com.kota.Bahamut.Service
 
-import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -9,16 +8,11 @@ import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResponseListener
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.TempSettings.setImgurAlbum
-import com.kota.Bahamut.Service.TempSettings.setImgurToken
-import okhttp3.Callback
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -35,9 +29,9 @@ object MyBillingClient {
                 handlePurchase(purchase)
             }
         } else if (billingResult.responseCode == BillingClient.BillingResponseCode.USER_CANCELED) {
-            ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_cancel))
+            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_cancel))
         } else {
-            ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_error))
+            ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_error))
         }
     }
 
@@ -78,7 +72,7 @@ object MyBillingClient {
                     if (!UserSettings.getPropertiesVIP()) {
                         UserSettings.setPropertiesVIP(true)
                     }
-                    ASToast.showShortToast(TempSettings.getApplicationContext().getString(R.string.billing_page_result_success))
+                    ASToast.showShortToast(TempSettings.applicationContext!!.getString(R.string.billing_page_result_success))
                     // 將購買結果塞入雲端
                     if (UserSettings.getPropertiesUsername().isNotEmpty()) {
                         val userId = AESCrypt.encrypt(UserSettings.getPropertiesUsername())
@@ -107,13 +101,12 @@ object MyBillingClient {
     /** 重新確認已購買的商品 */
     @JvmStatic
     fun checkPurchaseHistoryQuery() {
-        var needQueryCloud = false
         try {
-            billingClient.queryPurchaseHistoryAsync(
-                QueryPurchaseHistoryParams.newBuilder()
+            billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder()
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
-            ) { billingResult: BillingResult, list: List<PurchaseHistoryRecord?>? ->
+            ) { billingResult: BillingResult, list: List<Purchase?>? ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
                     // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                     if (list.toTypedArray().isNotEmpty()) {
@@ -139,8 +132,8 @@ object MyBillingClient {
                                 ASRunner.runInNewThread {
                                     try {
                                         client.newCall(request).execute().use { _ -> }
-                                    } catch (e:Exception) {
-                                        needQueryCloud = true
+                                    } catch (_:Exception) {
+                                        checkPurchaseHistoryCloud{ }
                                     }
                                 }
                             }
@@ -148,15 +141,11 @@ object MyBillingClient {
                     } else {
                         // 查不到有可能是函數不能用, 走其他方式
                         UserSettings.setPropertiesVIP(false)
-                        needQueryCloud = true
+                        checkPurchaseHistoryCloud{ }
                     }
                 }
             }
-        }catch (e:Exception) {
-            needQueryCloud = true
-        }
-
-        if (needQueryCloud) {
+        }catch (_:Exception) {
             checkPurchaseHistoryCloud{ }
         }
     }
@@ -177,16 +166,26 @@ object MyBillingClient {
             .post(body)
             .build()
         ASRunner.runInNewThread {
-            client.newCall(request).execute().use { response ->
-                val data = response.body!!.string()
-                val jsonObject = JSONObject(data)
-                val buyQty =  jsonObject.optString("qty", "0").toInt()
-                if (buyQty>0) {
-                    UserSettings.setPropertiesVIP(true)
-                } else {
-                    UserSettings.setPropertiesVIP(false)
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val data = response.body.string()
+                        val jsonObject = JSONObject(data)
+                        val buyQty = jsonObject.optString("qty", "0").toInt()
+                        if (buyQty > 0) {
+                            UserSettings.setPropertiesVIP(true)
+                        } else {
+                            UserSettings.setPropertiesVIP(false)
+                        }
+                        callback(buyQty)
+                    } else {
+                        // HTTP error response
+                        UserSettings.setPropertiesVIP(false)
+                        callback(0)
+                    }
                 }
-                callback(buyQty)
+            } catch (_: Exception) {
+                callback(0)
             }
         }
     }
@@ -209,7 +208,7 @@ object MyBillingClient {
     /** 初始化 BillingClient */
     @JvmStatic
     fun initBillingClient() {
-        billingClient = BillingClient.newBuilder(TempSettings.getApplicationContext())
+        billingClient = BillingClient.newBuilder(TempSettings.applicationContext!!)
             .setListener(purchasesUpdatedListener)
             .enablePendingPurchases(PendingPurchasesParams.newBuilder().enableOneTimeProducts().build())
             .build()

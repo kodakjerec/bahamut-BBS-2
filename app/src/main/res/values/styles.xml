@@ -115,7 +115,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">48dp</item>
-        <item name="android:imeOptions">actionUnspecified</item>
+        <item name="maxLines">1</item>
+        <item name="singleLine">true</item>
     </style>
     <style name="ExtToolbar">
         <item name="android:orientation">horizontal</item>
@@ -183,8 +184,15 @@
     <style name="MyTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <item name="android:windowBackground">@color/black</item>
         <item name="android:windowContentOverlay">@null</item>
-        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:textColorHint">@android:color/tab_indicator_text</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+    </style>
+    <style name="MyTheme.WindowOptOutEdgeToEdge">
+        <!-- 保留舊的主題以向後相容 -->
+        <item name="android:windowLayoutInDisplayCutoutMode">never</item>
     </style>
     <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
@@ -344,5 +352,13 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:gravity">center</item>
+    </style>
+
+    <style name="StartIcon">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">36dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:background">@color/transparent</item>
     </style>
 </resources>

@@ -1,0 +1,109 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_view">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/Message_Sub_Header"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_alignParentTop="true">
+        <TextView
+            android:id="@+id/Message_Sub_Back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            style="@style/TextViewNormal"
+            android:text="@string/_back"/>
+        <TextView
+            android:id="@+id/Message_Sub_Sender"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/author"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/Message_Sub_Back"
+            android:layout_marginStart="10dp"
+            android:textColor="@color/article_page_text_item_author0"
+            style="@style/TextViewNormal"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_below="@+id/Message_Sub_Header"
+        android:layout_above="@+id/Message_Sub_EditField">
+        <com.kota.ASFramework.UI.ASListView
+            android:id="@+id/Message_Sub_Scroll"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@null"/>
+    </LinearLayout>
+    <com.kota.Bahamut.Pages.Model.PostEditText
+        android:id="@+id/Message_Sub_EditField"
+        style="@style/EditTextSingleLine"
+        android:layout_above="@+id/toolbar"
+        android:gravity="top|start|center_vertical|center_horizontal|center"
+        android:hint="@string/input_content_here"
+        android:inputType="text"
+        android:importantForAutofill="no"
+        android:maxLength="59"
+        android:textSize="20sp"
+        android:background="@color/black"
+        android:textColor="@color/white" />
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        android:layout_height="60dp"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal">
+            <TextView
+                android:id="@+id/Message_Sub_Cancel"
+                style="@style/ToolbarItem.Grid"
+                android:text="@string/symbol" />
+
+            <TextView
+                android:id="@+id/Message_Sub_Symbol"
+                style="@style/ToolbarItem.Grid"
+                android:text="@string/face" />
+
+            <LinearLayout
+                android:id="@+id/Message_Sub_ShortenUrl"
+                style="@style/ToolbarItem.Grid"
+                android:clickable="true"
+                android:orientation="vertical"
+                android:text="@string/dialog_shorten_url_title">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_shorten_url_button_text1"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/dialog_shorten_url_button_text2"
+                    android:textColor="@color/white"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/Message_Sub_ShortenImage"
+                style="@style/ToolbarItem.Grid"
+                android:text="@string/dialog_shorten_img_title" />
+
+            <TextView
+                android:id="@+id/Message_Sub_Post"
+                style="@style/ToolbarItem.Grid"
+                android:text="@string/post" />
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

@@ -1,35 +1,16 @@
 package com.kota.Bahamut.Service
 
 import android.annotation.SuppressLint
-import android.app.Activity
-import android.content.Context
 import android.content.pm.ActivityInfo
+import android.util.Log
 import com.kota.Telnet.Reference.TelnetDefs
 import com.kota.TextEncoder.B2UEncoder
 import com.kota.TextEncoder.U2BEncoder
 import java.util.Arrays
+import java.util.Objects
 
 @SuppressLint("StaticFieldLeak")
 object CommonFunctions {
-    private lateinit var myContext: Context
-
-    private lateinit var myActivity: Activity
-
-    @JvmStatic
-    fun initialCFContext(fromContext: Context) {
-        myContext = fromContext
-    }
-
-    @JvmStatic
-    fun initialCFActivity(fromActivity: Activity) {
-        myActivity = fromActivity
-    }
-
-    @JvmStatic
-    fun getActivity(): Activity {
-        return myActivity
-    }
-
     /** 輸入 color int 回傳 顏色內容字串(#FF123456)
      * @param intColor color int
      * @response string
@@ -64,7 +45,7 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextColor(rColorItem: Int): Int {
-        return myContext.getColor(rColorItem)
+        return TempSettings.myContext?.getColor(rColorItem) ?:0
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)
@@ -73,16 +54,16 @@ object CommonFunctions {
      */
     @JvmStatic
     fun getContextString(rStringItem: Int): String {
-        return myContext.getString(rStringItem)
+        return TempSettings.myContext?.getString(rStringItem) ?:""
     }
 
     /** 調整螢幕方向  */
     @JvmStatic
     fun changeScreenOrientation() {
         when (UserSettings.getPropertiesScreenOrientation()) {
-            0 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-            1 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-            2 -> myActivity.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            0 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            1 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+            2 -> TempSettings.myActivity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
         }
     }
 
@@ -91,13 +72,20 @@ object CommonFunctions {
      * @param maxLength 一行最多幾個字元
      */
     @JvmStatic
-    fun judgeDoubleWord(fromContent: String, maxLength: Int): String {
+    fun judgeDoubleWord(fromContent: String, fromMaxLength: Int): String {
+        var oldLineAuthorChar = "" // 記錄前一行開頭是不是引用, 如果本行不是引用擇要加分行
         val returnArrays: MutableList<String> = ArrayList()
         // 分割成字串陣列
         try {
             val arrays = fromContent.split("\n".toRegex()).dropLastWhile { it.isEmpty() }
                 .toTypedArray()
             for (array in arrays) {
+                var maxLength = fromMaxLength
+                // 遇到回應文章, 拉寬限制
+                if (array.startsWith("> > "))
+                    maxLength+=4
+                else if (array.startsWith("> "))
+                    maxLength+=2
                 val data2 = array.toByteArray(charset(TelnetDefs.CHARSET))
                 var data1 = U2BEncoder.getInstance().encodeToBytes(data2, 0)
                 while (data1.size >= maxLength) {
@@ -129,18 +117,23 @@ object CommonFunctions {
                         }
                     }
                     val newCharArray = Arrays.copyOfRange(data1, 0, column)
-                    returnArrays.add(B2UEncoder.getInstance().encodeToString(newCharArray))
+                    var inputString = B2UEncoder.getInstance().encodeToString(newCharArray)
+
+                    inputString+="\n"
+                    returnArrays.add(inputString)
+
                     data1 = Arrays.copyOfRange(data1, column, data1.size)
                 }
                 // 如果data2有資料, 而最後剩餘出來的data1無資料, 代表這是截斷字串後的餘料, 不插入
                 // 如果data2無資料, data1無料, 代表這是空白行
                 if (!(data2.isNotEmpty() && data1.isEmpty())) {
-                    returnArrays.add(B2UEncoder.getInstance().encodeToString(data1))
+                    val inputString = B2UEncoder.getInstance().encodeToString(data1)
+                    returnArrays.add(inputString+"\n")
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(javaClass.simpleName, e.message.toString())
         }
-        return java.lang.String.join("\n", returnArrays)
+        return java.lang.String.join("", returnArrays)
     }
 }

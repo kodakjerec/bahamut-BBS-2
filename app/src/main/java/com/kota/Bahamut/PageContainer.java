@@ -9,9 +9,11 @@ import com.kota.Bahamut.Pages.BoardPage.BoardSearchPage;
 import com.kota.Bahamut.Pages.ClassPage;
 import com.kota.Bahamut.Pages.EssencePage.ArticleEssencePage;
 import com.kota.Bahamut.Pages.EssencePage.BoardEssencePage;
-import com.kota.Bahamut.Pages.LoginPage;
+import com.kota.Bahamut.Pages.Login.LoginPage;
 import com.kota.Bahamut.Pages.MailBoxPage;
 import com.kota.Bahamut.Pages.MainPage;
+import com.kota.Bahamut.Pages.Messages.MessageMain;
+import com.kota.Bahamut.Pages.Messages.MessageSub;
 import com.kota.Bahamut.Pages.PostArticlePage;
 import com.kota.Bahamut.Pages.StartPage;
 import com.kota.Bahamut.Pages.Theme.ThemeManagerPage;
@@ -38,6 +40,8 @@ public class PageContainer {
     private ThemeManagerPage themeManagerPage = null;
     private UserInfoPage userInfoPage = null;
     private UserConfigPage userConfigPage = null;
+    private MessageMain messageMain = null;
+    private MessageSub messageSub = null;
 
     public static PageContainer getInstance() {
         return _instance;
@@ -73,6 +77,8 @@ public class PageContainer {
         cleanThemeManagerPage();
         cleanUserInfoPage();
         cleanUserConfigPage();
+        cleanMessageMain();
+        cleanMessageSub();
     }
 
     public LoginPage getLoginPage() {
@@ -305,6 +311,32 @@ public class PageContainer {
         if (this.userConfigPage != null) {
             this.userConfigPage.clear();
             this.userConfigPage = null;
+        }
+    }
+
+    public MessageMain getMessageMain() {
+        if (this.messageMain == null) {
+            this.messageMain = new MessageMain();
+        }
+        return this.messageMain;
+    }
+    public void cleanMessageMain() {
+        if (this.messageMain != null) {
+            this.messageMain.clear();
+            this.messageMain = null;
+        }
+    }
+
+    public MessageSub getMessageSub() {
+        if (this.messageSub == null) {
+            this.messageSub = new MessageSub();
+        }
+        return this.messageSub;
+    }
+    public void cleanMessageSub() {
+        if (this.messageSub != null) {
+            this.messageSub.clear();
+            this.messageSub = null;
         }
     }
 }

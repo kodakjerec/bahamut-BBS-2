@@ -13,10 +13,10 @@
         android:orientation="vertical"
         android:padding="1dp"
         style="@style/toolbar">
-        <Button android:id="@+id/ToolbarFloating_setting" android:text="@string/number_1" style="@style/ToolbarItem"/>
+        <Button android:id="@+id/ToolbarFloating_setting" android:text="@string/post" style="@style/ToolbarItem"/>
         <View style="@style/HorizontalDivider"/>
-        <Button android:id="@+id/ToolbarFloating_1" android:text="@string/number_2" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>
+        <Button android:id="@+id/ToolbarFloating_1" android:text="@string/prev_page" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>
         <View style="@style/HorizontalDivider"/>
-        <Button android:id="@+id/ToolbarFloating_2" android:text="@string/number_3" style="@style/ToolbarItem"/>
+        <Button android:id="@+id/ToolbarFloating_2" android:text="@string/last_page" style="@style/ToolbarItem"/>
     </LinearLayout>
 </LinearLayout>

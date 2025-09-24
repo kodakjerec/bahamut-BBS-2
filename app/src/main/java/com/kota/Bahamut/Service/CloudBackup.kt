@@ -10,7 +10,6 @@ import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.NotificationSettings.getShowCloudSave
 import com.kota.Bahamut.Service.NotificationSettings.setShowCloudSave
-import com.kota.Bahamut.Service.TempSettings.getBookmarkStore
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -147,7 +146,7 @@ class CloudBackup {
                 .create()
 
             // get bookmark
-            jsonObject.put("bookmark", getBookmarkStore().exportToJSON().toString())
+            jsonObject.put("bookmark", TempSettings.bookmarkStore!!.exportToJSON().toString())
             // get user_settings
             jsonObject.put("user_settings", UserSettings._sharedPref.all)
             // encrypt
@@ -173,22 +172,17 @@ class CloudBackup {
                             ASToast.showShortToast("雲端備份失敗：$error")
                         } else {
                             // 雲端備份的時間
-                            TempSettings.setCloudSaveLastTime(
-                                fromJsonObject.optString(
-                                    "lastTime",
-                                    ""
-                                )
-                            )
+                            TempSettings.cloudSaveLastTime = fromJsonObject.optString("lastTime", "")
                         }
                     }
                 }catch (e: Exception) {
-                    Log.d("CloudBackup", e.toString())
+                    Log.d(javaClass.simpleName, e.toString())
                 } finally {
                     final()
                 }
             }
         } catch (e: Exception) {
-            Log.d("CloudBackup", e.toString())
+            Log.d(javaClass.simpleName, e.toString())
             final()
         }
     }
@@ -230,7 +224,7 @@ class CloudBackup {
                                 .create()
 
                             // 雲端備份的時間
-                            TempSettings.setCloudSaveLastTime(jsonObject.optString("lastTime", ""))
+                            TempSettings.cloudSaveLastTime = jsonObject.optString("lastTime", "")
 
                             val jsonDataString = jsonObject.getString("jsonData")
                             val fromJsonObject = gson.fromJson(
@@ -252,6 +246,10 @@ class CloudBackup {
                                         is Float ->
                                             UserSettings._editor.putFloat(key, value)
 
+                                        is Double -> {
+                                            val insertValue: Int = value.toInt()
+                                            UserSettings._editor.putInt(key, insertValue)
+                                        }
                                         is Int ->
                                             UserSettings._editor.putInt(key, value)
 
@@ -265,18 +263,18 @@ class CloudBackup {
 
                             // set bookmark
                             val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
-                            getBookmarkStore().importFromJSON(bookmark)
+                            TempSettings.bookmarkStore!!.importFromJSON(bookmark)
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("CloudBackup", e.toString())
+                    Log.d(javaClass.simpleName, e.toString())
                 } finally {
                     final()
                 }
             }
 
         } catch (e: java.lang.Exception) {
-            Log.d("CloudBackup", e.toString())
+            Log.d(javaClass.simpleName, e.toString())
             final()
         }
     }

@@ -56,7 +56,7 @@ public class MutableByteBuffer implements Iterable<ByteBuffer> {
 
     public MutableByteBuffer put(byte data) {
         if (this._is_closed) {
-            Log.e("ERROR","This buffer has been closed.");
+            Log.e(getClass().getSimpleName(),"This buffer has been closed.");
             return this;
         }
         if (!this._writing_buffer.hasRemaining()) {

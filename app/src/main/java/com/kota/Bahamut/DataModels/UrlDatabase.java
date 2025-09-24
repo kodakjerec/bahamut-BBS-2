@@ -7,8 +7,11 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.kota.Telnet.TelnetClient;
+
+import java.util.Objects;
 import java.util.Vector;
 
 public class UrlDatabase extends SQLiteOpenHelper {
@@ -36,7 +39,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
             aDatabase.execSQL(CREATE_TABLE_QUERY);
         } catch (SQLException e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
     }
 
@@ -61,7 +64,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
         values.put("isPic", isPic);
         try {
             SQLiteDatabase db = getWritableDatabase();
-            db.insert("urls", null, values);
+            db.insertWithOnConflict("urls", null, values, SQLiteDatabase.CONFLICT_IGNORE);
             db.close();
         } catch (Exception ignored){}
     }
@@ -77,6 +80,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
             Cursor cursor = db.query("urls", columns, selection, selectionArgs, null, null, null);
 
             if (cursor.moveToFirst()) {
+                // 新資料
                 Vector<String> data = new Vector<>();
                 data.add(cursor.getString(cursor.getColumnIndex("url")));
                 data.add(cursor.getString(cursor.getColumnIndex("title")));
@@ -89,6 +93,7 @@ public class UrlDatabase extends SQLiteOpenHelper {
 
                 return data;
             } else {
+                // 已有
                 cursor.close();
                 db.close();
 
@@ -106,8 +111,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
             values.put("title", title);
             values.put("description", description);
             values.put("url", url);
-            int deletedRows = db.delete("shorten_urls", "shorten_url=?", new String[]{shortenUrl});
-            long insertId = db.insert("shorten_urls", null, values);
+            db.delete("shorten_urls", "shorten_url=?", new String[]{shortenUrl});
+            db.insertWithOnConflict("shorten_urls", null, values, SQLiteDatabase.CONFLICT_IGNORE);
             db.close();
         } catch (Exception ignored){}
     }
@@ -183,8 +188,8 @@ public class UrlDatabase extends SQLiteOpenHelper {
     public void clearDb() {
         try {
             SQLiteDatabase db = getWritableDatabase();
-            db.execSQL("DELETE FROM urls ");
-            db.execSQL("DELETE FROM shorten_urls ");
+            db.execSQL("DELETE FROM urls WHERE rowid NOT IN (SELECT rowid FROM urls ORDER BY rowid DESC LIMIT 100) ");
+            db.execSQL("DELETE FROM shorten_urls WHERE rowid NOT IN (SELECT rowid FROM shorten_urls ORDER BY rowid DESC LIMIT 100) ");
             onCreate(db);
         }  catch (Exception ignored){}
     }

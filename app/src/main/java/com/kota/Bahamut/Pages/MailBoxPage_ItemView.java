@@ -34,10 +34,6 @@ public class MailBoxPage_ItemView extends LinearLayout {
         init();
     }
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public void setItem(MailBoxPageItem aItem) {
         if (aItem != null) {
             setTitle(aItem.Title);

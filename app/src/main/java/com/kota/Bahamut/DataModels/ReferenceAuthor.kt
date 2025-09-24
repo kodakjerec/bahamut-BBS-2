@@ -2,7 +2,7 @@ package com.kota.Bahamut.DataModels
 
 class ReferenceAuthor {
     var authorName:String = ""
-    var enabled:Boolean = false
-    var removeBlank:Boolean = false
-    var reservedType:Int = 0
+    var enabled:Boolean = false // 是否啟用
+    var removeBlank:Boolean = false // 是否移除空白
+    var reservedType:Int = 0 // 作者層級
 }

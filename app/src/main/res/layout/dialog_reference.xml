@@ -5,7 +5,7 @@
     android:background="@color/dialog_border_color"
     android:orientation="vertical"
     android:padding="3dp"
-    android:id="@+id/dialog_search_article_layout">
+    android:id="@+id/dialog_reference_layout">
 
     <LinearLayout
         android:layout_width="match_parent"

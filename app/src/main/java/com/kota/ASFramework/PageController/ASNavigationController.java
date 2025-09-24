@@ -5,12 +5,17 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import com.kota.ASFramework.Thread.ASRunner;
+import com.kota.Bahamut.Pages.Messages.MessageSmall;
 import com.kota.Bahamut.Service.NotificationSettings;
+import com.kota.Bahamut.Service.TempSettings;
 import com.kota.Bahamut.Service.UserSettings;
+import com.kota.TelnetUI.TelnetPage;
 
 import java.util.Vector;
 
@@ -100,6 +105,12 @@ public class ASNavigationController extends Activity {
   @Override // android.app.Activity
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    
+    // 啟用 edge-to-edge 支援
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      getWindow().setDecorFitsSystemWindows(false);
+    }
+    
     setNavigationController(this);
 
     getWindowManager().getDefaultDisplay().getMetrics(this._display_metrics);
@@ -114,6 +125,10 @@ public class ASNavigationController extends Activity {
     this._root_view = new ASNavigationControllerView(this);
     this._root_view.setPageController(this);
     setContentView(this._root_view);
+    
+    // 設定 WindowInsets 處理
+    setupWindowInsets();
+    
     onControllerDidLoad();
   }
 
@@ -422,6 +437,8 @@ public class ASNavigationController extends Activity {
         } else {
           ASNavigationController.this.animatedPushViewController(source_controller, target_controller, animated);
         }
+        // 檢查顯示訊息小視窗
+        checkMessageFloatingShow();
       }
     }.runInMainThread();
   }
@@ -502,8 +519,10 @@ public class ASNavigationController extends Activity {
   @Override // android.app.Activity
   public void finish() {
     onControllerWillFinish();
-    getDeviceController().unlockWifi();
-    getDeviceController().unlockWake();
+    // 改善設備控制器的清理
+    if (_device_controller != null) {
+      _device_controller.cleanup();
+    }
     super.finish();
   }
 
@@ -519,12 +538,22 @@ public class ASNavigationController extends Activity {
   protected void onPause() {
     super.onPause();
     this._in_background = true;
+    // 當應用進入背景時，確保連線保持
+    // 這裡不釋放 WiFi 和 CPU lock，讓 telnet 連線保持
   }
 
   @Override // android.app.Activity
   protected void onResume() {
     super.onResume();
     this._in_background = false;
+    // 當應用恢復前景時，檢查網路狀態
+    if (_device_controller != null) {
+      int networkType = _device_controller.isNetworkAvailable();
+      if (networkType == -1) {
+        // 網路已斷開，可能需要重連
+        System.out.println("Network disconnected while in background");
+      }
+    }
   }
 
   public boolean isInBackground() {
@@ -581,5 +610,73 @@ public class ASNavigationController extends Activity {
     }
     this._temp_controllers.clear();
     executePageCommand();
+  }
+
+  /** 加入畫面上永遠存在的View */
+  public void addForeverView(View view) {
+    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+    addContentView(view, layoutParams);
+  }
+  /** 移除畫面上永遠存在的View */
+  public void removeForeverView(View view) {
+    ViewGroup parentViewGroup = (ViewGroup) view.getParent();
+    if (parentViewGroup != null)
+      parentViewGroup.removeView(view);
+  }
+
+  /** 根據最上層頁面決定是否顯示訊息小視窗 */
+  private void checkMessageFloatingShow() {
+    // 如果是PopupPage, 隱藏訊息
+    TelnetPage top_page = (TelnetPage) this.getTopController();
+    if (top_page!= null)
+      if (top_page.isPopupPage()) {
+        // 已經顯示就隱藏
+        if (TempSettings.getMessageSmall()!=null) {
+          MessageSmall messageSmall = TempSettings.getMessageSmall();
+          if (messageSmall.getVisibility()== View.VISIBLE) {
+            messageSmall.hide();
+          }
+        }
+      } else {
+        // 已經隱藏則看設定決定顯示
+        if (NotificationSettings.getShowMessageFloating()) {
+          if (TempSettings.getMessageSmall()!=null) {
+            MessageSmall messageSmall = TempSettings.getMessageSmall();
+            messageSmall.show();
+          }
+        }
+      }
+  }
+
+  /**
+   * 設定 WindowInsets 處理以支援 edge-to-edge
+   */
+  private void setupWindowInsets() {
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+      this._root_view.setOnApplyWindowInsetsListener((v, windowInsets) -> {
+        androidx.core.view.WindowInsetsCompat windowInsetsCompat = 
+            androidx.core.view.WindowInsetsCompat.toWindowInsetsCompat(windowInsets, v);
+        
+        // 獲取系統欄的insets
+        androidx.core.graphics.Insets systemBars = windowInsetsCompat
+            .getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars());
+        
+        // 獲取軟鍵盤的insets
+        androidx.core.graphics.Insets imeInsets = windowInsetsCompat
+            .getInsets(androidx.core.view.WindowInsetsCompat.Type.ime());
+        
+        // 計算總的底部間距（系統欄 + 軟鍵盤）
+        int bottomPadding = Math.max(systemBars.bottom, imeInsets.bottom);
+        
+        // 更新 ASWindowStateHandler 中的狀態
+        ASWindowStateHandler.updateWindowInsets(systemBars.top, bottomPadding, 
+                                               systemBars.left, systemBars.right);
+        
+        // 設定內容區域的 padding 以避免與系統欄和軟鍵盤重疊
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding);
+        
+        return windowInsets;
+      });
+    }
   }
 }

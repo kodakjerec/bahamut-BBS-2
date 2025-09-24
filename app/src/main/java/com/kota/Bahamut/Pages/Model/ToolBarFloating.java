@@ -18,15 +18,15 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class ToolBarFloating extends LinearLayout {
-    private LinearLayout _myView;
-    private Button _btnSetting;
-    private Button _btn1;
-    private Button _btn2;
+    private LinearLayout mainLayout;
+    private Button btnSetting;
+    private Button btn1;
+    private Button btn2;
     private float scale; // 畫面精度
     private Timer timer;
 
-    private float _idle; // 閒置多久
-    private float _alpha; // 閒置不透明度
+    private float idleTime; // 閒置多久
+    private float alphaPercentage; // 閒置不透明度
 
     public ToolBarFloating(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -35,12 +35,12 @@ public class ToolBarFloating extends LinearLayout {
 
     @SuppressLint("ClickableViewAccessibility")
     private void init(Context context) {
-        _idle = UserSettings.getToolbarIdle();
-        _alpha = UserSettings.getToolbarAlpha()/100;
+        idleTime = UserSettings.getToolbarIdle();
+        alphaPercentage = UserSettings.getToolbarAlpha()/100;
         inflate(context, R.layout.toolbar_floating, this);
         scale = getContext().getResources().getDisplayMetrics().density;
 
-        _myView = (LinearLayout) findViewById(R.id.ToolbarFloating);
+        mainLayout = findViewById(R.id.ToolbarFloating);
         // 取得上次紀錄
         List<Float> list = UserSettings.getFloatingLocation();
         if (list.size()>0 && list.get(0)>=0.0f) {
@@ -54,21 +54,20 @@ public class ToolBarFloating extends LinearLayout {
             updateLayout(screenWidth, screenHeight / 2, false);
         }
 
-        _btnSetting = (Button)_myView.findViewById(R.id.ToolbarFloating_setting);
-        _btnSetting.setOnTouchListener(onTouchListener);
-
-        _btn1 = (Button) _myView.findViewById(R.id.ToolbarFloating_1);
-        _btn2 = (Button) _myView.findViewById(R.id.ToolbarFloating_2);
+        btnSetting = mainLayout.findViewById(R.id.ToolbarFloating_setting);
+        btn1 = mainLayout.findViewById(R.id.ToolbarFloating_1);
+        btn2 = mainLayout.findViewById(R.id.ToolbarFloating_2);
+        btnSetting.setOnTouchListener(onTouchListener);
 
         // 啟用定時隱藏
         // 如果之前已經隱藏就不要再讓他顯現出來
         if (TempSettings.isFloatingInvisible)
-            _myView.setAlpha(_alpha);
+            mainLayout.setAlpha(alphaPercentage);
         else
             startInvisible();
 
         // 替換外觀
-        new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.ToolbarFloating));
+        new ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ToolbarFloating));
     }
 
     // 移動toolbar
@@ -94,7 +93,9 @@ public class ToolBarFloating extends LinearLayout {
                 break;
             case MotionEvent.ACTION_UP:
                 if (duration < 200) { // click
-                    _btnSetting.performClick();
+                    if (view instanceof Button btn) {
+                        btn.performClick();
+                    }
                 } else { // 将LinearLayout的位置更新到最终的位置
                     updateLayout(pointX, pointY , false);
                 }
@@ -111,8 +112,8 @@ public class ToolBarFloating extends LinearLayout {
     // 更新toolbar位置
     private void updateLayout(float deltaX, float deltaY, boolean dragging) {
         // 获取LinearLayout的LayoutParams
-        int barWidth = _myView.getLayoutParams().width;
-        int barHeight = _myView.getLayoutParams().height;
+        int barWidth = mainLayout.getLayoutParams().width;
+        int barHeight = mainLayout.getLayoutParams().height;
         float screenWidth = getContext().getResources().getDisplayMetrics().widthPixels;
         float screenHeight = getContext().getResources().getDisplayMetrics().heightPixels;
 
@@ -139,12 +140,12 @@ public class ToolBarFloating extends LinearLayout {
             deltaY = 0;
         }
 
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) _myView.getLayoutParams();
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mainLayout.getLayoutParams();
         // 更新LayoutParams中的leftMargin和topMargin
         params.leftMargin = (int)deltaX;
         params.topMargin = (int)deltaY;
         // 应用新的LayoutParams
-        _myView.setLayoutParams(params);
+        mainLayout.setLayoutParams(params);
         // 儲存位置
         UserSettings.setFloatingLocation(deltaX, deltaY);
 
@@ -152,35 +153,35 @@ public class ToolBarFloating extends LinearLayout {
 
     // 指定按鈕動作和文字 btnSetting
     public void setOnClickListenerSetting(OnClickListener listener) {
-        _btnSetting.setOnClickListener(listener);
+        btnSetting.setOnClickListener(listener);
     }
     public void setTextSetting(String text) {
-        _btnSetting.setText(text);
+        btnSetting.setText(text);
     }
     // 指定按鈕動作和文字 btn1
     public void setOnClickListener1(OnClickListener listener) {
-        _btn1.setOnClickListener(listener);
+        btn1.setOnClickListener(listener);
     }
     public void setOnLongClickListener1(OnLongClickListener listener) {
-        _btn1.setOnLongClickListener(listener);
+        btn1.setOnLongClickListener(listener);
     }
     public void setText1(String text) {
-        _btn1.setText(text);
+        btn1.setText(text);
     }
     // 指定按鈕動作和文字 btn2
     public void setOnClickListener2(OnClickListener listener) {
-        _btn2.setOnClickListener(listener);
+        btn2.setOnClickListener(listener);
     }
     public void setOnLongClickListener2(OnLongClickListener listener) {
-        _btn2.setOnLongClickListener(listener);
+        btn2.setOnLongClickListener(listener);
     }
     public void setText2(String text) {
-        _btn2.setText(text);
+        btn2.setText(text);
     }
 
     // 指定layout顯示
     public void setVisibility(int visibility) {
-        _myView.setVisibility(visibility);
+        mainLayout.setVisibility(visibility);
     }
 
     // 旋轉或變彈出視窗時, 將工具列回到右方預設位置
@@ -201,16 +202,16 @@ public class ToolBarFloating extends LinearLayout {
         TimerTask task1 = new TimerTask() {
             @Override
             public void run() {
-                _myView.setAlpha(_alpha);
+                mainLayout.setAlpha(alphaPercentage);
             }
         };
-        timer.schedule(task1, (int)_idle* 1000L);
+        timer.schedule(task1, (int) idleTime * 1000L);
         TempSettings.isFloatingInvisible = true;
     }
     private void cancelInvisible() {
         if (timer != null)
             timer.cancel();
-        _myView.setAlpha(1);
+        mainLayout.setAlpha(1);
         TempSettings.isFloatingInvisible = false;
     }
 }

@@ -106,6 +106,7 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         return BahamutPage.BAHAMUT_POST_ARTICLE;
     }
 
+    @Override
     public boolean isPopupPage() {
         return true;
     }
@@ -297,8 +298,12 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
             dialog.show();
         } else if (view.getId() == R.id.ArticlePostDialog_ShortenImage) {
             // 縮圖
-            getUrlToken();
-            Intent intent = new Intent(CommonFunctions.getActivity(), DialogShortenImage.class);
+            var shortenTimes = UserSettings.getPropertiesNoVipShortenTimes();
+            if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
+                ASToast.showLongToast(getContextString(R.string.vip_only_message));
+                return;
+            }
+            Intent intent = new Intent(TempSettings.myActivity, DialogShortenImage.class);
             startActivity(intent);
         } else if (view.getId() == R.id.ArticlePostDialog_EditButtons) {
             ASToast.showShortToast(getContextString(R.string.error_under_develop));
@@ -400,22 +405,22 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     /** 讀取暫存檔 */
     public void onFileClicked() {
         ASListDialog.createDialog()
-                .setTitle(getContextString(R.string._article))
-                .addItem(getContextString(R.string.load_temp))
-                .addItem(getContextString(R.string.save_to_temp))
-                .setListener(new ASListDialogItemClickListener() {
-                    public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
-                        return true;
-                    }
-        
-                    public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
-                        if (Objects.equals(aTitle, getContextString(R.string.load_temp))) {
-                            PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
-                        } else if (Objects.equals(aTitle, getContextString(R.string.save_to_temp))) {
-                            PostArticlePage.this.ontSaveArticleToTempButtonClicked();
-                        }
-                    }
-                }).show();
+        .setTitle(getContextString(R.string._article))
+        .addItem(getContextString(R.string.load_temp))
+        .addItem(getContextString(R.string.save_to_temp))
+        .setListener(new ASListDialogItemClickListener() {
+            public boolean onListDialogItemLongClicked(ASListDialog aDialog, int index, String aTitle) {
+                return true;
+            }
+
+            public void onListDialogItemClicked(ASListDialog aDialog, int index, String aTitle) {
+                if (Objects.equals(aTitle, getContextString(R.string.load_temp))) {
+                    PostArticlePage.this.ontLoadArticleFromTempButtonClicked();
+                } else if (Objects.equals(aTitle, getContextString(R.string.save_to_temp))) {
+                    PostArticlePage.this.ontSaveArticleToTempButtonClicked();
+                }
+            }
+        }).show();
     }
 
     /** 按下 讀取暫存檔 */
@@ -643,33 +648,6 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         }
     }
 
-    /** 取得imgur token */
-    void getUrlToken() {
-        String apiUrl = "https://worker-get-imgur-token.kodakjerec.workers.dev/";
-        OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
-                .url(apiUrl)
-                .get()
-                .build();
-        ASRunner.runInNewThread(()->{
-            try{
-                Response response = client.newCall(request).execute();
-                assert response.body() != null;
-                String data = response.body().string();
-                JSONObject jsonObject = new JSONObject(data);
-                String accessToken = jsonObject.getString("accessToken");
-                String albumHash = jsonObject.getString("albumHash");
-                if (!accessToken.isEmpty()) {
-                    TempSettings.setImgurToken(accessToken);
-                    TempSettings.setImgurAlbum(albumHash);
-                }
-            } catch (Exception e) {
-//                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01));
-                Log.e("ShortenImage", e.toString());
-            }
-        });
-    }
-
     /** 設定TelnetArticle, 格式按鈕會使用 */
     public void setTelnetArticle(TelnetArticle article) {
         telnetArticle = article;
@@ -720,7 +698,8 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
     public void referenceBack(List<ReferenceAuthor> authors) {
         // 找出父層內容
         List<String> originParentContent = Arrays.asList(telnetArticle.generateReplyContent().split("\n"));
-        List<String> parentContent = new ArrayList<>();
+        List<String> tempParentContent = new ArrayList<>();
+        List<String> finalParentContent = new ArrayList<>();
 
 
         // 開始篩選
@@ -732,20 +711,24 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
         // 如果有選到後三行, 計算兩個作者總行數
         int author0TotalRows = 0;
         int author1TotalRows = 0;
-        if (author0.getReservedType()==2 || author1.getReservedType()==2) {
-            for (int i = 0; i < originParentContent.size(); i++) {
-                String rowString = originParentContent.get(i);
-                if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+        for (int i = 0; i < originParentContent.size(); i++) {
+            String rowString = originParentContent.get(i);
+            if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+                if (!(author1.getRemoveBlank() && rowString.replaceAll("> > ", "").isEmpty())) {
+                    tempParentContent.add(rowString);
                     author1TotalRows++;
-                } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                }
+            } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                if (!(author0.getRemoveBlank() && rowString.replaceAll("> ", "").isEmpty())) {
+                    tempParentContent.add(rowString);
                     author0TotalRows++;
                 }
             }
         }
 
         boolean needInsert;
-        for(int i=0;i<originParentContent.size();i++) {
-            String rowString = originParentContent.get(i);
+        for(int i=0;i<tempParentContent.size();i++) {
+            String rowString = tempParentContent.get(i);
             needInsert = false;
             if (rowString.startsWith("> ※ ")) {
                 // 前二
@@ -770,18 +753,14 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 needInsert = true;
                         }
                     }
-
-                    if (needInsert && rowString.replaceAll("> > ", "").isEmpty()) {
-                        if (author1.getRemoveBlank()) {
-                            needInsert = false;
-                        }
-                    }
                 }
-            } else if (rowString.startsWith("※ ")) {
+            }
+            else if (rowString.startsWith("※ ")) {
                 // 前一
                 if (author0.getEnabled())
                     needInsert = true;
-            } else if (rowString.startsWith("> ")) {
+            }
+            else if (rowString.startsWith("> ")) {
                 // 前一
                 if (author0.getEnabled()) {
                     switch (author0.getReservedType()) {
@@ -799,18 +778,13 @@ public class PostArticlePage extends TelnetPage implements View.OnClickListener,
                                 needInsert = true;
                         }
                     }
-                    if (needInsert && rowString.replaceAll("> ", "").isEmpty()) {
-                        if (author0.getRemoveBlank()) {
-                            needInsert = false;
-                        }
-                    }
                 }
             }
             if (needInsert) {
-                parentContent.add(originParentContent.get(i));
+                finalParentContent.add(rowString);
             }
         }
-        String joinedParentContent = String.join("\n", parentContent);
+        String joinedParentContent = String.join("\n", finalParentContent);
 
         // 找出自己打的內容
         List<String> originFromContent = Arrays.asList(_content_field.getText().toString().split("\n"));

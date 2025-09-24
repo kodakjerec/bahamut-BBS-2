@@ -2,6 +2,7 @@ package com.kota.Bahamut.DataModels;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.Iterator;
+import java.util.Objects;
 import java.util.Vector;
 
 /*
@@ -63,7 +65,7 @@ public class ArticleTempStore {
                     file.delete();
                     load_from_file = true;
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 }
             }
         }
@@ -88,7 +90,7 @@ public class ArticleTempStore {
                 SharedPreferences perf = this._context.getSharedPreferences("article_temp", 0);
                 perf.edit().putString("save_data", exportToJSON().toString()).commit();
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
             }
         }
     }

@@ -2,6 +2,7 @@ package com.kota.Bahamut.Dialogs
 
 import android.Manifest.permission.CAMERA
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
@@ -11,7 +12,6 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
-import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.view.View.GONE
@@ -31,29 +31,26 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.kota.ASFramework.PageController.ASNavigationController
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
+import com.kota.Bahamut.Dialogs.UploadImgMethod.UploaderLitterCatBox
+import com.kota.Bahamut.Dialogs.UploadImgMethod.UploaderPostimageorg
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.Messages.MessageSub
+import com.kota.Bahamut.Pages.PostArticlePage
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions.getContextString
-import com.kota.Bahamut.Service.TempSettings
 import com.kota.Bahamut.Service.UserSettings
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.ByteArrayOutputStream
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Objects
 
-@Suppress("DEPRECATION")
 class DialogShortenImage : AppCompatActivity(), OnClickListener {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var textView: TextView
@@ -77,7 +74,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         val layoutId = R.layout.dialog_shorten_image
         requestWindowFeature(1)
         setContentView(layoutId)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
         mainLayout = findViewById(R.id.dialog_shorten_image_layout)
         mainLayout.setOnClickListener { _ -> closeProcessingDialog() }
         textView = mainLayout.findViewById(R.id.dialog_shorten_image_hint)
@@ -136,16 +133,8 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     /** 轉檔 */
     @SuppressLint("SimpleDateFormat")
     private var transferListener = OnClickListener {
-        var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
-        if (!UserSettings.getPropertiesVIP() && shortenTimes>30) {
-            ASToast.showLongToast(getContextString(R.string.vip_only_message))
-            return@OnClickListener
-        }
-
         showProcessingDialog()
 
-        val encodedBase64: String
-        val byteArrayOutputStream = ByteArrayOutputStream()
         var finalUri: Uri? = null
         if (selectedImageUri != null) {
             finalUri = selectedImageUri
@@ -157,87 +146,42 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             closeProcessingDialog()
             return@OnClickListener
         }
-        val inputStream = contentResolver.openInputStream(finalUri)
-        BufferedReader(inputStream!!.reader())
-        val buffer = ByteArray(1024)
-        var len: Int
-        while ((inputStream.read(buffer).also { len = it }) !=-1) {
-            byteArrayOutputStream.write(buffer, 0, len)
-        }
-        val byteArray = byteArrayOutputStream.toByteArray()
-        encodedBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
 
-        // error handle
-        if (encodedBase64.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
-            closeProcessingDialog()
-            return@OnClickListener
-        }
-        val accessToken = TempSettings.getImgurToken()
-        val albumHash = TempSettings.getImgurAlbum()
-        if (accessToken.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error01))
-            closeProcessingDialog()
-            return@OnClickListener
-        }
-
-        val apiUrl = "https://api.imgur.com/3/image"
-        val client = OkHttpClient()
-        val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-            .addFormDataPart("image", encodedBase64)
-            .addFormDataPart("type", "base64")
-            .addFormDataPart("title", "bahamutBBS Upload " + SimpleDateFormat("yyyy-MM-dd").format(Date()))
-            .addFormDataPart("description", UserSettings.getPropertiesUsername())
-            .build()
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .addHeader("Authorization", "Bearer $accessToken")
-            .post(body)
-            .build()
+//        val uploaderObj = UploaderPostimageorg(this)
+//        lifecycleScope.launch {
+//            val link = uploaderObj.postImage(finalUri!!)
+//            // 後續處理 link
+//            if (!link.isEmpty()) {
+//                sampleTextView!!.text = link
+//                outputParam = sampleTextView!!.text.toString()
+//                sendButton!!.isEnabled = true
+//                transferButton!!.isEnabled = false
+//                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
+//            }
+//            closeProcessingDialog()
+//        }
         ASRunner.runInNewThread {
             try {
-                client.newCall(request).execute().use { response ->
-                    val data = response.body!!.string()
-                    val jsonObject = JSONObject(data)
-                    val status = jsonObject.getInt("status")
-                    if (status == 200) {
-                        val link = jsonObject.getJSONObject("data").getString("link")
-                        val imageHash = jsonObject.getJSONObject("data").getString("id")
-                        object : ASRunner() {
-                            override fun run() {
-                                sampleTextView!!.text = link
-                                outputParam = sampleTextView!!.text.toString()
-                                sendButton!!.isEnabled = true
-                                transferButton!!.isEnabled = false
-                                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
-                            }
-                        }.runInMainThread()
-
-                        // 把圖片加進相簿
-                        val apiUrlAlbum = "https://api.imgur.com/3/album/$albumHash/add"
-                        val bodyAlbum: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-                            .addFormDataPart("ids[]", imageHash)
-                            .build()
-                        val requestAlbum: Request = Request.Builder()
-                            .url(apiUrlAlbum)
-                            .addHeader("Authorization", "Bearer $accessToken")
-                            .post(bodyAlbum)
-                            .build()
-                        ASRunner.runInNewThread {
-                            try {
-                                client.newCall(requestAlbum).execute().use { }
-                            } catch (e: Exception) {
-                                Log.e("ShortenImage", e.printStackTrace().toString())
-                            }
+                val uploaderObj = UploaderLitterCatBox()
+                // 本地檔案上傳
+                val link = uploaderObj.postImage( finalUri )
+                if (link.startsWith("http")) {
+                    object : ASRunner() {
+                        override fun run() {
+                            sampleTextView!!.text = link
+                            outputParam = sampleTextView!!.text.toString()
+                            sendButton!!.isEnabled = true
+                            transferButton!!.isEnabled = false
+                            var shortenTimes: Int = UserSettings.getPropertiesNoVipShortenTimes()
+                            UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
                         }
-                    } else {
-                        val error = jsonObject.getJSONObject("data").getString("error")
-                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + error)
-                    }
+                    }.runInMainThread()
+                } else {
+                    throw Exception("")
                 }
             } catch (e: Exception) {
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03)+ " " + e.message)
-                Log.e("ShortenImage", e.printStackTrace().toString())
+                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + e.message)
+                Log.e(javaClass.simpleName, e.message.toString())
             } finally {
                 closeProcessingDialog()
             }
@@ -285,7 +229,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 }
                 transferButton!!.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.printStackTrace().toString())
+                Log.d(javaClass.simpleName, e.message.toString())
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
             }
         }
@@ -305,7 +249,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 videoView.requestFocus()
                 transferButton!!.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.printStackTrace().toString())
+                Log.d(javaClass.simpleName, e.message.toString())
             }
         }
     }
@@ -349,10 +293,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     transferButton!!.performClick()
                 }
             } catch (e: IOException) {
-                Log.e("PhotoPicker", "Error loading image/video", e)
+                Log.e(javaClass.simpleName, "Error loading image/video")
             }
         } else {
-            Log.d("PhotoPicker", "No media selected")
+            Log.d(javaClass.simpleName, "No media selected")
         }
     }
 
@@ -390,7 +334,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
             }
         } catch (e: Exception) {
-            Log.d("DialogShortenImage", e.printStackTrace().toString())
+            Log.d(javaClass.simpleName, e.message.toString())
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error04))
             return
         }
@@ -418,8 +362,14 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
     private fun postUrl(str:String) {
         // 最上層是 發文 或 看板
-        val page = PageContainer.getInstance().postArticlePage
-        page.insertString(str)
+        val topPage = ASNavigationController.getCurrentController().topController
+        if (topPage.javaClass == PostArticlePage::class.java) {
+            val aPage = PageContainer.getInstance().postArticlePage
+            aPage.insertString(str)
+        } else if (topPage.javaClass == MessageSub::class.java) {
+            val aPage = PageContainer.getInstance().messageSub
+            aPage.insertString(str)
+        }
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

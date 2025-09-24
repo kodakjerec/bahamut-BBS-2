@@ -8,16 +8,22 @@
             <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/Dialog_hero_step_content1"
                 android:text="@string/zero_word"
+                android:hint="@string/number_1"
+                android:maxLength="48"
                 style="@style/EditTextSingleLine"
                 android:autofillHints="" />
             <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/Dialog_hero_step_content2"
                 android:text="@string/zero_word"
+                android:hint="@string/number_2"
+                android:maxLength="48"
                 style="@style/EditTextSingleLine"
                 android:autofillHints="" />
             <com.kota.Bahamut.Pages.Model.PostEditText
                 android:id="@+id/Dialog_hero_step_content3"
                 android:text="@string/zero_word"
+                android:hint="@string/number_3"
+                android:maxLength="48"
                 style="@style/EditTextSingleLine"
                 android:autofillHints="" />
         </LinearLayout>

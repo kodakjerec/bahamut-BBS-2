@@ -71,7 +71,8 @@ public class ASProcessingDialog extends ASDialog {
   public ASProcessingDialog() {
     requestWindowFeature(1);
     setContentView(R.layout.as_processing_dialog);
-    Objects.requireNonNull(getWindow()).setBackgroundDrawable(null);
+    if (getWindow()!=null)
+            getWindow().setBackgroundDrawable(null);
     buildContentView();
   }
 

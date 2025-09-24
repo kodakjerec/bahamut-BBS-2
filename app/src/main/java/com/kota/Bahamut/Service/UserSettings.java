@@ -9,11 +9,14 @@ import com.kota.Telnet.PropertiesOperator;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class UserSettings {
     static final String PERF_NAME = "user_setting";
     static final String PROPERTIES_ANIMATION_DISABLE = "AnimationDisable"; // 換頁動畫
+    static  final String PROPERTIES_BOARD_MOVE_DISABLE = "BoardMoveDisable"; // 看板上一頁/下一頁
     static final String PROPERTIES_ARTICLE_MOVE_DISABLE = "ArticleModeDisable"; // 文章首篇/末篇
     static final String PROPERTIES_ARTICLE_VIEW_MODE = "ArticleViewMode"; // 0-文字模式 1-telnet模式
     static final String PROPERTIES_GESTURE_ON_BOARD = "GestureOnBoard"; // 滑動手勢
@@ -39,6 +42,7 @@ public class UserSettings {
     static final String PROPERTIES_ARTICLE_HEADS = "ArticleHeaders"; // 文章標題清單
     static final String PROPERTIES_ARTICLE_EXPRESSIONS = "ArticleExpressions"; // 表情符號清單
     static final String PROPERTIES_SHORT_URL_NON_ID = "ShortUrlNonId"; // 短網址,開啟去識別化
+    static final String PROPERTIES_WEB_SIGN_IN = "WebSignIn"; // 開啟網頁登入
 
     // 執行階段比較不重要的設定
     static final String floatingLocationX = "floatingLocationX"; // 浮動工具列位置 X
@@ -93,6 +97,7 @@ public class UserSettings {
                 float floating_location_x = prep.getPropertiesFloat(floatingLocationX);
                 float floating_location_y = prep.getPropertiesFloat(floatingLocationY);
                 int varNoVipShortenTimes = prep.getPropertiesInteger(noVipShortenTimes);
+                int webSignIn = prep.getPropertiesInteger(PROPERTIES_WEB_SIGN_IN);
 
                 _editor.putString(PROPERTIES_USERNAME, username);
                 _editor.putString(PROPERTIES_PASSWORD, password);
@@ -120,6 +125,7 @@ public class UserSettings {
                 _editor.putFloat(floatingLocationX, floating_location_x);
                 _editor.putFloat(floatingLocationY, floating_location_y);
                 _editor.putInt(noVipShortenTimes, varNoVipShortenTimes);
+                _editor.putInt(PROPERTIES_WEB_SIGN_IN, webSignIn);
                 _editor.putInt("upgrade", 1);
                 _editor.commit();
             }
@@ -221,6 +227,15 @@ public class UserSettings {
         return _sharedPref.getBoolean(PROPERTIES_ANIMATION_DISABLE, true);
     }
 
+    /** 看板上一頁/下一頁 */
+    public static void setPropertiesBoardMoveDisable(int isDisable) {
+        _editor.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).apply();
+    }
+    public static int getPropertiesBoardMoveEnable() {
+        return _sharedPref.getInt(PROPERTIES_BOARD_MOVE_DISABLE, 0);
+    }
+
+    /** 文章首篇/末篇 */
     public static void setPropertiesArticleMoveDisable(boolean isDisable) {
         _editor.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply();
     }
@@ -284,8 +299,9 @@ public class UserSettings {
     // 重置黑名單
     public static void resetBlockList() {
         _editor.putString(PROPERTIES_BLOCK_LIST, _blockListDefault).apply();
+        setBlockList(getBlockList());
     }
-    // 更新黑名單
+    // 更新黑名單時同時更新緩存
     public static void setBlockList(List<String> aList) {
         StringBuilder list_string = new StringBuilder();
         if (aList == null || aList.size() == 0) {
@@ -298,25 +314,60 @@ public class UserSettings {
         }
         
         _editor.putString(PROPERTIES_BLOCK_LIST, list_string.toString()).apply();
+        
+        // 更新緩存
+        updateBlockListCache();
     }
 
-    @SuppressLint({"DefaultLocale"})
-    public static boolean isBlockListContains(String aName) {
-        if (aName==null || aName.isEmpty())
-            return false;
-
+    // 更新緩存的輔助方法
+    private static void updateBlockListCache() {
         String blockListString = _sharedPref.getString(PROPERTIES_BLOCK_LIST, _blockListDefault);
         String[] blockStrings = blockListString.split(",");
 
-        boolean containsKeyword = false;
-        for (String keyword : blockStrings) {
-            if (aName.contains(keyword)) {
-                containsKeyword = true;
-                break; // 一旦找到匹配，即可跳出迴圈
+        Set<String> acSets = Set.of(blockStrings);
+        ac = new AhoCorasick(acSets);
+
+        blockListCache = new HashSet<>();
+        for (String s : blockStrings) {
+            if (!s.isEmpty()) {
+                blockListCache.add(s);
             }
         }
+    }
 
-        return containsKeyword;
+    // 加入黑名單緩存
+    private static HashSet<String> blockListCache = null;
+    private static AhoCorasick ac;
+
+    // 檢查是否在黑名單中, 精確比對
+    @SuppressLint({"DefaultLocale"})
+    public static boolean isBlockListContains(String aName) {
+        if (aName == null || aName.isEmpty())
+            return false;
+
+        // 初始化緩存
+        if (blockListCache == null) {
+            updateBlockListCache();
+        }
+
+        // 比對
+        return blockListCache.contains(aName);
+    }
+
+    // 模糊比對
+    @SuppressLint({"DefaultLocale"})
+    public static boolean isBlockListContainsFuzzy(String aName) {
+        if (aName == null || aName.isEmpty())
+            return false;
+
+        // 初始化緩存
+        if (ac == null) {
+            updateBlockListCache();
+        }
+
+        // 比對
+        List<String> matches = ac.search(aName);
+        return matches.size() > 0;
     }
 
     public static void setPropertiesBlockListEnable(boolean enable) {
@@ -345,8 +396,15 @@ public class UserSettings {
     public static List<Float> getFloatingLocation() {
         SharedPreferences pref = _sharedPref;
         List<Float> list = new ArrayList<>();
-        list.add(pref.getFloat(floatingLocationX, (float) -1));
-        list.add(pref.getFloat(floatingLocationY, (float) -1));
+        try {
+            list.add(pref.getFloat(floatingLocationX, (float) -1));
+            list.add(pref.getFloat(floatingLocationY, (float) -1));
+        } catch (Exception ignored) {
+            Integer tempX = pref.getInt(floatingLocationX, -1);
+            list.add(tempX.floatValue());
+            Integer tempY = pref.getInt(floatingLocationY, -1);
+            list.add(tempY.floatValue());
+        }
         return list;
     }
 
@@ -359,13 +417,23 @@ public class UserSettings {
         _editor.putFloat(PROPERTIES_TOOLBAR_IDLE, idle).apply();
     }
     public static float getToolbarIdle() {
-        return _sharedPref.getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
+        try {
+            return _sharedPref.getFloat(PROPERTIES_TOOLBAR_IDLE, 2.0f);
+        } catch (ClassCastException e) {
+            int value = _sharedPref.getInt(PROPERTIES_TOOLBAR_IDLE, 2);
+            return (float) value;
+        }
     }
     public static void setToolbarAlpha(float alpha) {
         _editor.putFloat(PROPERTIES_TOOLBAR_ALPHA, alpha).apply();
     }
     public static float getToolbarAlpha() {
-        return _sharedPref.getFloat(PROPERTIES_TOOLBAR_ALPHA, 20);
+        try {
+            return _sharedPref.getFloat(PROPERTIES_TOOLBAR_ALPHA, 20.0f);
+        } catch (ClassCastException e) {
+            int value = _sharedPref.getInt(PROPERTIES_TOOLBAR_ALPHA, 20);
+            return (float) value;
+        }
     }
     
     public static void setPropertiesLinkAutoShow(boolean enable) {
@@ -374,13 +442,13 @@ public class UserSettings {
     public static boolean getLinkAutoShow() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_AUTO_SHOW, true);
     }
-    public static void setPropertiesLinkShowThumbnail(boolean enable) {
+    public static void setLinkShowThumbnail(boolean enable) {
         _editor.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, enable).apply();
     }
     public static boolean getLinkShowThumbnail() {
         return _sharedPref.getBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, false);
     }
-    public static void setPropertiesLinkShowOnlyWifi(boolean enable) {
+    public static void setLinkShowOnlyWifi(boolean enable) {
         _editor.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, enable).apply();
     }
     public static boolean getLinkShowOnlyWifi() {
@@ -399,5 +467,12 @@ public class UserSettings {
     }
     public static boolean getShortUrlNonId() {
         return _sharedPref.getBoolean(PROPERTIES_SHORT_URL_NON_ID, true);
+    }
+
+    public static void setPropertiesWebSignIn(boolean enable) {
+        _editor.putBoolean(PROPERTIES_WEB_SIGN_IN, enable).apply();
+    }
+    public static boolean getPropertiesWebSignIn() {
+        return _sharedPref.getBoolean(PROPERTIES_WEB_SIGN_IN, false);
     }
 }

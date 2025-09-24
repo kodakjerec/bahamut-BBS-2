@@ -1,13 +1,13 @@
 package com.kota.Bahamut;
 
 import static com.kota.Bahamut.Service.CommonFunctions.changeScreenOrientation;
-import static com.kota.Bahamut.Service.CommonFunctions.initialCFActivity;
-import static com.kota.Bahamut.Service.CommonFunctions.initialCFContext;
 import static com.kota.Bahamut.Service.MyBillingClient.checkPurchase;
 import static com.kota.Bahamut.Service.MyBillingClient.closeBillingClient;
 import static com.kota.Bahamut.Service.MyBillingClient.initBillingClient;
 
 import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 
 import com.kota.ASFramework.Dialog.ASAlertDialog;
 import com.kota.ASFramework.Dialog.ASAlertDialogListener;
@@ -26,11 +26,11 @@ import com.kota.Bahamut.Pages.Model.ClassPageItem;
 import com.kota.Bahamut.Pages.Model.MailBoxPageBlock;
 import com.kota.Bahamut.Pages.Model.MailBoxPageItem;
 import com.kota.Bahamut.Pages.StartPage;
+import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.Service.BahaBBSBackgroundService;
 import com.kota.Bahamut.Service.CloudBackup;
 import com.kota.Bahamut.Service.NotificationSettings;
 import com.kota.Bahamut.Service.TempSettings;
-import com.kota.Bahamut.Pages.Theme.ThemeStore;
 import com.kota.Bahamut.Service.UserSettings;
 import com.kota.Telnet.TelnetClient;
 import com.kota.Telnet.TelnetClientListener;
@@ -40,6 +40,7 @@ import com.kota.TextEncoder.U2BEncoder;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Objects;
 import java.util.TimeZone;
 import java.util.Vector;
 
@@ -51,7 +52,7 @@ public class BahamutController extends ASNavigationController implements TelnetC
             B2UEncoder.constructInstance(getResources().openRawResource(R.raw.b2u));
             U2BEncoder.constructInstance(getResources().openRawResource(R.raw.u2b));
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         // 書籤
         String bookmark_file_path = getFilesDir().getPath() + "/bookmark.dat";
@@ -64,6 +65,10 @@ public class BahamutController extends ASNavigationController implements TelnetC
         // 系統架構
         TelnetClient.construct(BahamutStateHandler.getInstance());
         TelnetClient.getClient().setListener(this);
+        
+        // 設定 TelnetConnector 的設備控制器
+        TelnetClient.getConnector().setDeviceController(getDeviceController());
+        
         PageContainer.constructInstance();
 
         // UserSettings
@@ -74,13 +79,13 @@ public class BahamutController extends ASNavigationController implements TelnetC
         }
 
         // 共用函數
-        initialCFContext(this);
-        initialCFActivity(ASNavigationController.getCurrentController());
+        TempSettings.myContext = this;
+        TempSettings.myActivity = ASNavigationController.getCurrentController();
         changeScreenOrientation();
 
         // 以下需等待 共用函數 設定完畢
         // VIP
-        TempSettings.setApplicationContext(getApplicationContext());
+        TempSettings.applicationContext = getApplicationContext();
         initBillingClient();
 
         // 外觀
@@ -101,7 +106,23 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override
     protected void onDestroy() {
+        // 關閉VIP
         closeBillingClient();
+
+        // 備份雲端
+        if (NotificationSettings.getCloudSave()) {
+            CloudBackup cloudBackup = new CloudBackup();
+            cloudBackup.backup();
+        }
+
+        // 強制關閉連線
+        TelnetClient.getClient().close();
+        
+        // 清理 TelnetConnector 的設備控制器引用
+        if (TelnetClient.getConnector() != null) {
+            TelnetClient.getConnector().setDeviceController(null);
+        }
+
         super.onDestroy();
     }
 
@@ -158,8 +179,30 @@ public class BahamutController extends ASNavigationController implements TelnetC
 
     @Override // com.kota.Telnet.TelnetClientListener
     public void onTelnetClientConnectionSuccess(TelnetClient aClient) {
-        Intent intent = new Intent(this, BahaBBSBackgroundService.class);
-        startService(intent);
+        try {
+            Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(intent);
+            } else {
+                startService(intent);
+            }
+        } catch (SecurityException e) {
+            // Handle permission issues for foreground service
+            Log.e(getClass().getSimpleName(), "Failed to start foreground service: SecurityException", e);
+            // Try to start as regular service instead
+            try {
+                Intent intent = new Intent(this, BahaBBSBackgroundService.class);
+                startService(intent);
+            } catch (Exception fallbackException) {
+                Log.e(getClass().getSimpleName(), "Failed to start service as fallback", fallbackException);
+            }
+        } catch (IllegalStateException e) {
+            // Handle cases where the app is in background and can't start foreground service
+            Log.e(getClass().getSimpleName(), "Failed to start foreground service: IllegalStateException", e);
+        } catch (Exception e) {
+            // Handle any other unexpected exceptions
+            Log.e(getClass().getSimpleName(), "Failed to start service", e);
+        }
     }
 
     @Override // com.kota.Telnet.TelnetClientListener
@@ -179,12 +222,21 @@ public class BahamutController extends ASNavigationController implements TelnetC
                 date_format.setTimeZone(TimeZone.getTimeZone("GMT+8"));
                 String time_string = date_format.format(new Date());
                 System.out.println("BahaBBS connection close:" + time_string);
+
                 BahamutController.this.handleNormalConnectionClosed();
+
                 ASToast.showShortToast("連線已中斷");
+
                 ASProcessingDialog.dismissProcessingDialog();
+
                 if (NotificationSettings.getCloudSave()) {
                   CloudBackup cloudBackup = new CloudBackup();
                   cloudBackup.backup();
+                }
+
+                if (TempSettings.getMessageSmall()!=null) {
+                    getCurrentController().removeForeverView(TempSettings.getMessageSmall());
+                    TempSettings.setMessageSmall(null);
                 }
             }
         }.runInMainThread();

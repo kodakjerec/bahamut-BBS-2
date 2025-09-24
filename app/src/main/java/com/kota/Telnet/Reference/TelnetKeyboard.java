@@ -16,11 +16,13 @@ public class TelnetKeyboard {
     public static final int CTRL_G = 7;
     public static final int CTRL_P = 16;
     public static final int CTRL_Q = 17;
+    public static final int CTRL_R = 18;
+    public static final int CTRL_S = 19;
     public static final int CTRL_U = 21;
     public static final int CTRL_X = 24;
     public static final int CTRL_Y = 25;
     public static final int BACK_ONE_CHAR = 83;
-    public static final int CTRL_S = 115;
+    public static final int SHIFT_M = 115;
 
     public static byte[] getKeyDataWithTimes(int keyCode, int times) {
         byte[] keydata = getKeyData(keyCode);

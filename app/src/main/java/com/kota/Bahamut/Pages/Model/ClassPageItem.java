@@ -48,9 +48,4 @@ public class ClassPageItem extends TelnetListPageItem {
         this.isDirectory = false;
         this.Mode = 0;
     }
-
-    /* access modifiers changed from: protected */
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
 }

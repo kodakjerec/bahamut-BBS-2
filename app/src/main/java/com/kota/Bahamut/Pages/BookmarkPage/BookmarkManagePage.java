@@ -57,7 +57,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
     private final BoardExtendOptionalPageListener _listener;
     BookmarkAdapter bookmarkAdapter;
     HistoryAdapter historyAdapter;
-    BookmarkStore _bookmarkStore = TempSettings.getBookmarkStore();
+    BookmarkStore _bookmarkStore = TempSettings.bookmarkStore;
     private boolean isUnderRecycleView = false;
     private float scale;
     public int getPageLayout() {
@@ -163,7 +163,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                         // the user just dropped the item (after dragging it), and lift their finger off.
                         //
                         if (isSwiped) { // The user used onSwiped()
-                            Log.e("swipe", "swipe is over");
+                            Log.e(getClass().getSimpleName(), "swipe is over");
                         }
                         if (!isSwiped && isDragged) { // The user used onMove()
                             if (dragView != null) { // 解除 選取變色
@@ -295,7 +295,7 @@ public class BookmarkManagePage extends TelnetPage implements BookmarkClickListe
                 recyclerView.setAdapter(bookmarkAdapter);
                 bookmarkAdapter.setOnItemClickListener(BookmarkManagePage.this);
             } else if (aView == BookmarkManagePage.this._water_ball_button) {
-                BookmarkManagePage.this._header_view.setTitle("水球紀錄");
+                BookmarkManagePage.this._header_view.setTitle("訊息紀錄");
                 BookmarkManagePage.this._mode = 2;
                 reloadList();
             } else if (aView == BookmarkManagePage.this._history_button) {

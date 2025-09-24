@@ -16,10 +16,6 @@ public class TelnetModel {
     private int _pushed_data_size = 0;
     private final ByteBuffer _ansi_buffer = ByteBuffer.allocate(1024);
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public TelnetModel(int row) {
         this._row = row;
         initialDataModel();

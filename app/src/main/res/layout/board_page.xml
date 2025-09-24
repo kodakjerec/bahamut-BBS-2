@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/drawer_layout" android:layout_width="match_parent" android:layout_height="match_parent">
+<androidx.drawerlayout.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="end">
     <RelativeLayout android:orientation="vertical" android:id="@+id/content_view" android:layout_width="match_parent" android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <com.kota.TelnetUI.TelnetHeaderItemView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <com.kota.Bahamut.Pages.BoardPage.BoardHeaderView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <FrameLayout android:id="@+id/BoardPage_ListViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
                 <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:id="@+id/BoardPageListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.ASFramework.UI.ASListView android:id="@+id/BoardPageListView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
@@ -35,7 +40,7 @@
             <Button
                 android:id="@+id/BoardPageFirstPageButton"
                 style="@style/ToolbarItem"
-                android:text="@string/first_page" />
+                android:text="@string/prev_page" />
             <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
             <Button
                 android:id="@+id/BoardPageLatestPageButton"

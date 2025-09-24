@@ -11,8 +11,8 @@ import com.kota.Bahamut.PageContainer;
 import com.kota.Bahamut.Pages.Model.BoardPageItem;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.TempSettings;
+import com.kota.Telnet.Reference.TelnetKeyboard;
 import com.kota.Telnet.TelnetClient;
-import com.kota.TelnetUI.TelnetHeaderItemView;
 
 public class BoardSearchPage extends BoardMainPage {
     private String _author = null;
@@ -30,7 +30,7 @@ public class BoardSearchPage extends BoardMainPage {
 
     public synchronized void onPageRefresh() {
         super.onPageRefresh();
-        TelnetHeaderItemView header_view = (TelnetHeaderItemView) findViewById(R.id.BoardPage_HeaderView);
+        BoardHeaderView header_view = (BoardHeaderView) findViewById(R.id.BoardPage_HeaderView);
         if (header_view != null) {
             String board_name = getListName();
             if (board_name == null) {
@@ -61,9 +61,11 @@ public class BoardSearchPage extends BoardMainPage {
                             bookmark.setBoard(BoardSearchPage.this.getListName());
                             bookmark.setKeyword(item.Title);
                             bookmark.setTitle(bookmark.generateTitle());
-                            BookmarkStore store = TempSettings.getBookmarkStore();
-                            store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
-                            store.store();
+                            BookmarkStore store = TempSettings.bookmarkStore;
+                            if (store!=null) {
+                                store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
+                                store.store();
+                            }
                         }
                     }).scheduleDismissOnPageDisappear(this).show();
         }
@@ -96,9 +98,11 @@ public class BoardSearchPage extends BoardMainPage {
                 bookmark.setMark(BoardSearchPage.this._mark);
                 bookmark.setGy(BoardSearchPage.this._gy);
                 bookmark.setTitle(bookmark.generateTitle());
-                BookmarkStore store = TempSettings.getBookmarkStore();
-                store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
-                store.store();
+                BookmarkStore store = TempSettings.bookmarkStore;
+                if (store!=null) {
+                    store.getBookmarkList(BoardSearchPage.this.getListName()).addBookmark(bookmark);
+                    store.store();
+                }
             }
         }).scheduleDismissOnPageDisappear(this).show();
     }
@@ -122,7 +126,7 @@ public class BoardSearchPage extends BoardMainPage {
     protected boolean onBackPressed() {
         clear();
         getNavigationController().popViewController();
-        TelnetClient.getClient().sendKeyboardInputToServerInBackground(256, 1);
+        TelnetClient.getClient().sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1);
         PageContainer.getInstance().cleanBoardSearchPage();
         return true;
     }

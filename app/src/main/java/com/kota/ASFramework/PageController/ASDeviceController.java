@@ -18,10 +18,9 @@ public class ASDeviceController {
   final Context _context;
   
   boolean _wifi_locked = false;
-  boolean _wake_locked = true; // 讓CPU保持開啟, 目前不需要作用
+  boolean _wake_locked = false;
   
   final PowerManager.WakeLock mWakeLock;
-  
   final WifiManager.WifiLock mWifiLock;
   int _transportType = -1;
   
@@ -30,7 +29,7 @@ public class ASDeviceController {
 
     // create wake-lock
     mWakeLock = ((PowerManager)paramContext.getSystemService(Context.POWER_SERVICE)).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, wakeLockKey);
-    mWakeLock.setReferenceCounted(true);
+    mWakeLock.setReferenceCounted(false);
 
     // create wifi-lock
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -38,7 +37,7 @@ public class ASDeviceController {
     } else {
       mWifiLock = ((WifiManager)paramContext.getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL_HIGH_PERF, wifiLockKey);
     }
-    mWifiLock.setReferenceCounted(true);
+    mWifiLock.setReferenceCounted(false);
   }
 
   // 檢查網路狀況
@@ -68,15 +67,42 @@ public class ASDeviceController {
     ((Activity)_context).getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
   }
 
+  // 單獨鎖定 CPU WakeLock
+  public void lockCpuWake() {
+    System.out.println("Lock CPU Wake");
+    if (!_wake_locked) {
+      _wake_locked = true;
+      if (!mWakeLock.isHeld()) {
+        // 移除時間限制，讓 telnet 連線保持
+        mWakeLock.acquire();
+      }
+    }
+  }
+  
   public void lockWifi() {
     System.out.println("Lock Wifi");
     if (!_wifi_locked) {
       _wifi_locked = true;
-      mWifiLock.acquire();
+      if (!mWifiLock.isHeld()) {
+        mWifiLock.acquire();
+      }
     }
-    if (!_wake_locked) {
-      _wake_locked = true;
-      mWakeLock.acquire(60*1000L /*10 minutes*/);
+    // 同時鎖定 CPU，確保 telnet 連線不中斷
+    lockCpuWake();
+  }
+  
+  
+  public void unlockCpuWake() {
+    if (_wake_locked) {
+      System.out.println("Unlock CPU Wake");
+      try {
+        if (mWakeLock.isHeld()) {
+          mWakeLock.release();
+        }
+      } catch (Exception exception) {
+        exception.printStackTrace();
+      }
+      _wake_locked = false;
     }
   }
   
@@ -91,15 +117,27 @@ public class ASDeviceController {
       }
       _wifi_locked = false;
     }
-    if (_wake_locked) {
-      System.out.println("Unlock Wake");
-      try {
-        if (mWakeLock.isHeld())
-          mWakeLock.release();
-      } catch (Exception exception) {
-        exception.printStackTrace();
-      }
-      _wake_locked = false;
-    }
+    // 釋放 CPU WakeLock
+    unlockCpuWake();
+  }
+  
+  // 添加清理方法，避免 memory leak
+  public void cleanup() {
+    unlockWifi();
+  }
+  
+  // 添加強制保持連線方法（用於重要的網路操作）
+  public void forceKeepConnection() {
+    lockWifi();
+    lockCpuWake();
+  }
+  
+  // 檢查是否正在使用鎖定
+  public boolean isWifiLocked() {
+    return _wifi_locked;
+  }
+  
+  public boolean isCpuWakeLocked() {
+    return _wake_locked;
   }
 }

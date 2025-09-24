@@ -8,6 +8,10 @@ export default {
     } catch {
       return Response.json({ "error": "No url " });
     }
+
+    // 連接 D1 資料庫
+    const { DATABASE } = env;
+
     let urlStructure = new URL(url);
     let isTwitter = false;
     let title = "";
@@ -20,6 +24,19 @@ export default {
       "Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-HK;q=0.5",
       "Accept-Charset": "utf-8"
     };
+
+    // 檢查是否有相同 URL 的資料
+    const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
+    const {results } = await stmt.all();
+    if (results && results.length > 0) {
+      return Response.json({
+        title: results[0].title,
+        desc: results[0].desc,
+        imageUrl: results[0].imageUrl,
+        contentType: results[0].contentType
+      });
+    }
+
     const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu"];
     for (let i = 0; i < siteKeywords.length; i++) {
       const keyword = siteKeywords[i];
@@ -32,6 +49,7 @@ export default {
         });
       }
     }
+    // twitter 轉址
     const twitterKeywords = ["x.com", "twitter"];
     twitterKeywords.forEach((keyword) => {
       if (urlStructure.hostname.indexOf(keyword) > -1) {
@@ -39,6 +57,7 @@ export default {
         isTwitter = true;
       }
     });
+    // ptt 加變數
     if (urlStructure.hostname.indexOf("ptt") > -1) {
       headers.cookie = "over18=1";
     }
@@ -49,8 +68,10 @@ export default {
         redirect: "follow"
       });
       contentType = responseFrom.headers.get("content-type");
+      // 指定 charset
       if (contentType.indexOf("charset=") > -1)
         charset = contentType.substring(contentType.indexOf("charset=") + 8).trim().replaceAll("'", "").replaceAll('"', "").toLowerCase();
+      // 特例: shift jis
       if (charset === "windows-31j")
         charset = "shift_jis";
       if (responseFrom.headers.get("target")) {
@@ -61,7 +82,8 @@ export default {
         const html = await responseFrom.json();
         title = html.user_name + " @" + html.user_screen_name;
         desc = html.text;
-        imageUrl = html.media_extended[0].thumbnail_url;
+        if (html.mediaURLs && html.mediaURLs.length > 0)
+          imageUrl = html.mediaURLs[0];
       } else {
         if (contentType.indexOf("text") > -1) {
           let decoder = new TextDecoder(charset);
@@ -103,23 +125,26 @@ export default {
           imageUrl = url;
         }
       }
+
+      // 修改儲存邏輯，使用 UPSERT 語法
+      await DATABASE.prepare(`
+        INSERT INTO urls VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(url) DO UPDATE SET 
+          title = excluded.title,
+          desc = excluded.desc,
+          imageUrl = excluded.imageUrl,
+          contentType = excluded.contentType
+      `).bind(url, title, desc, imageUrl, contentType).run();
+
+      return Response.json({
+        title,
+        desc,
+        imageUrl,
+        contentType
+      });
     } catch (e) {
       console.log(e);
       return Response.json({ "error": " Something got error " });
     }
-    if (title === null || title === void 0)
-      title = "";
-    if (desc === null || desc === void 0)
-      desc = "";
-    if (imageUrl === null || imageUrl === void 0)
-      imageUrl = "";
-    if (contentType === null || contentType === void 0)
-      contentType = "";
-    return Response.json({
-      title,
-      desc,
-      imageUrl,
-      contentType
-    });
   }
 };

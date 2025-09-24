@@ -113,7 +113,7 @@ public class ArticleExpressionListPage extends TelnetPage implements BlockListCl
                     // the user just dropped the item (after dragging it), and lift their finger off.
                     //
                     if (isSwiped) { // The user used onSwiped()
-                        Log.e("swipe", "swipe is over");
+                        Log.e(getClass().getSimpleName(), "swipe is over");
                     }
                     if (!isSwiped && isDragged) { // The user used onMove()
                         if (dragView != null) { // 解除 選取變色

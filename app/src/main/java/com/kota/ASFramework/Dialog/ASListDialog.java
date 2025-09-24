@@ -115,11 +115,7 @@ public class ASListDialog extends ASDialog {
 
   public ASListDialog addItem(String aItemTitle) {
     Button button = createButton();
-    // from class: com.kota.ASFramework.Dialog.ASListDialog.1
-// android.view.View.OnClickListener
     button.setOnClickListener(v -> ASListDialog.this.onItemClicked((Button) v));
-    // from class: com.kota.ASFramework.Dialog.ASListDialog.2
-// android.view.View.OnLongClickListener
     button.setOnLongClickListener(v -> ASListDialog.this.onItemLongClicked((Button) v));
     if (aItemTitle == null) {
       button.setVisibility(View.GONE);

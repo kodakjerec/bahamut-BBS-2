@@ -41,6 +41,10 @@
                     android:layout_height="wrap_content"/>
             </com.kota.ASFramework.UI.ASScrollView>
         </FrameLayout>
+        <LinearLayout
+            android:id="@+id/toolbar_block"
+            style="@style/toolbar">
+        </LinearLayout>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/toolbar"

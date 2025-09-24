@@ -2,6 +2,9 @@ package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.PowerManager;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -15,6 +18,8 @@ import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.BahamutStateHandler;
 import com.kota.Bahamut.Dialogs.DialogHeroStep;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.Messages.MessageDatabase;
+import com.kota.Bahamut.Pages.Messages.MessageMain;
 import com.kota.Bahamut.Pages.Theme.ThemeFunctions;
 import com.kota.Bahamut.R;
 import com.kota.Bahamut.Service.HeroStep;
@@ -28,7 +33,8 @@ import com.kota.TelnetUI.TelnetView;
 import java.util.List;
 
 public class MainPage extends TelnetPage {
-    public String onlinePeople = "";
+    public String onlinePeople = ""; // 線上人數
+    public String bbCallStatus = ""; // 呼叫器
     RelativeLayout mainLayout;
     View.OnClickListener boardsListener = v -> {
         PageContainer.getInstance().pushClassPage("Boards", "佈告討論區");
@@ -63,13 +69,15 @@ public class MainPage extends TelnetPage {
         NotificationSettings.setShowHeroStep(isShowHeroStep);
         mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
     };
+    /** 顯示聊天main */
+    View.OnClickListener showMessageMainListener = v -> {
+        MessageMain aPage = PageContainer.getInstance().getMessageMain();
+        MainPage.this.getNavigationController().pushViewController(aPage);
 
-    private enum LastLoadClass {
-        Unload,
-        Boards,
-        Class,
-        Favorite
-    }
+        // 隱藏小視窗
+        if (TempSettings.getMessageSmall() != null)
+            TempSettings.getMessageSmall().hide();
+    };
 
     public int getPageLayout() {
         return R.layout.main_page;
@@ -87,7 +95,8 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_LogoutButton).setOnClickListener(this.logoutListener);
         mainLayout.findViewById(R.id.Main_MailButton).setOnClickListener(this.mailListener);
         mainLayout.findViewById(R.id.Main_SystemSettingsButton).setOnClickListener(this.systemSettingListener);
-        ((TextView)mainLayout.findViewById(R.id.Main_OnlinePeople)).setText(onlinePeople); // 線上人數
+        TextView mainOnlinePeople = mainLayout.findViewById(R.id.Main_OnlinePeople);
+        mainOnlinePeople.setText(onlinePeople); // 線上人數
 
         // 顯示勇者足跡
         List<HeroStep> heroStepList = TempSettings.getHeroStepList();
@@ -105,8 +114,16 @@ public class MainPage extends TelnetPage {
         mainLayout.findViewById(R.id.Main_Block_HeroStepList).setVisibility(isShowHeroStep?View.VISIBLE:View.GONE);
         mainLayout.findViewById(R.id.Main_HeroStepButton).setOnClickListener(this.showHeroStepListener);
 
+        // 顯示呼叫器
+        TextView txtBBCall = mainLayout.findViewById(R.id.Main_BBCall);
+        txtBBCall.setText(bbCallStatus);
+        mainLayout.findViewById(R.id.Main_BBCall_Layout).setOnClickListener(showMessageMainListener);
+
         // 替換外觀
         new ThemeFunctions().layoutReplaceTheme((LinearLayout)findViewById(R.id.toolbar));
+
+        // 檢查不斷線掛網
+        checkBatteryLife();
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
@@ -128,7 +145,7 @@ public class MainPage extends TelnetPage {
     private void setFrameToTelnetView() {
         TelnetView telnet_view = mainLayout.findViewById(R.id.Main_TelnetView);
         if (telnet_view != null) {
-            if (BahamutStateHandler.getInstance().getCurrentPage() == 5) {
+            if (BahamutStateHandler.getInstance().getCurrentPage() == BahamutPage.BAHAMUT_MAIN) {
                 this._frame_buffer = TelnetClient.getModel().getFrame().clone();
                 for (int i = 12; i < 24; i++) {
                     this._frame_buffer.removeRow(12);
@@ -139,11 +156,6 @@ public class MainPage extends TelnetPage {
                 telnet_view.setFrame(this._frame_buffer);
             }
         }
-    }
-
-    public boolean onPagePreload() {
-        LastLoadClass _last_load_class = LastLoadClass.Unload;
-        return true;
     }
 
     public void onPageWillDisappear() {
@@ -162,6 +174,7 @@ public class MainPage extends TelnetPage {
         return true;
     }
 
+    /** 給其他頁面呼叫訊息 */
     public void onProcessHotMessage() {
         if (this.saveHotMessageDialog == null) {
             this.saveHotMessageDialog = ASAlertDialog.createDialog()
@@ -175,18 +188,26 @@ public class MainPage extends TelnetPage {
                 switch (index) {
                     case 0 -> TelnetClient.getClient().sendStringToServerInBackground("M");
                     case 1 -> TelnetClient.getClient().sendStringToServerInBackground("K");
-                    case 2 -> TelnetClient.getClient().sendStringToServerInBackground("C");
+                    case 2 -> {
+                        TelnetClient.getClient().sendStringToServerInBackground("C");
+                        try(MessageDatabase db = new MessageDatabase(getContext())) {
+                            db.clearDb();
+                        }
+                    }
                     default -> TelnetClient.getClient().sendStringToServerInBackground("K");
                 }
-            }).scheduleDismissOnPageDisappear(this).setOnBackDelegate(aDialog -> {
-                TelnetClient.getClient().sendStringToServerInBackground("K\nQ");
-                MainPage.this.saveHotMessageDialog = null;
-                return false;
+            });
+            this.saveHotMessageDialog.setOnDismissListener( (dialog)-> {
+                // 預設離開
+                if (this.saveHotMessageDialog != null) {
+                    TelnetClient.getClient().sendStringToServerInBackground("K");
+                }
             });
             this.saveHotMessageDialog.show();
         }
     }
 
+    /** 給其他頁面呼叫離開 */
     public void onCheckGoodbye() {
         if (this.goodbyeDialog == null) {
             this.goodbyeDialog = ASAlertDialog.createDialog()
@@ -240,4 +261,27 @@ public class MainPage extends TelnetPage {
     public void setOnlinePeople(String peoples) {
         onlinePeople = peoples;
     }
+
+    /** 設定呼叫器 */
+    public void setBBCall(String status) {
+        bbCallStatus = status;
+    }
+
+    /** 不受電池最佳化限制 */
+    @SuppressLint("BatteryLife")
+    private void checkBatteryLife() {
+        if (!NotificationSettings.getAlarmIgnoreBatteryOptimizations()) {
+            PowerManager powerManager = (PowerManager) getContext().getSystemService(Context.POWER_SERVICE);
+            String packageName = getContext().getPackageName();
+
+            if (!powerManager.isIgnoringBatteryOptimizations(packageName)) {
+                ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string._warning))
+                        .setMessage(getContextString(R.string.ignoreBattery_msg01))
+                        .addButton(getContextString(R.string.sure))
+                        .show();
+            }
+            NotificationSettings.setAlarmIgnoreBatteryOptimizations(true);
+        }
+    };
 }

@@ -8,32 +8,31 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.core.widget.doOnTextChanged
 import com.kota.ASFramework.Thread.ASRunner
 import com.kota.ASFramework.UI.ASToast
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.Pages.Model.PostEditText
-import com.kota.Bahamut.Pages.Theme.ThemeFunctions
 import com.kota.Bahamut.R
 import com.kota.Bahamut.Service.CommonFunctions
-import com.kota.Bahamut.Service.UserSettings
 import com.kota.Telnet.Model.TelnetRow
 import com.kota.Telnet.Reference.TelnetKeyboard
 import com.kota.Telnet.TelnetClient
-import com.kota.Telnet.TelnetOutputBuilder
 import com.kota.TelnetUI.TelnetPage
 import java.util.Vector
 
 class UserConfigPage: TelnetPage() {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var cantExpandLayout: LinearLayout
-
+    
     override fun getPageLayout(): Int {
         return R.layout.bbs_user_config_page
     }
 
     override fun getPageType(): Int {
         return BahamutPage.BAHAMUT_USER_CONFIG_PAGE
+    }
+
+    override fun isPopupPage(): Boolean {
+        return true
     }
 
     override fun onBackPressed(): Boolean {
@@ -53,23 +52,17 @@ class UserConfigPage: TelnetPage() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
         cantExpandLayout = mainLayout.findViewById(R.id.User_Config_Layout_Cant_Expand_Layout)
         mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Layout_Cant).setOnClickListener(showExpandLayoutListener)
-        mainLayout.findViewById<Button>(R.id.User_Config_Page_Reset).setOnClickListener { _->
-            onBackPressed()
-        }
         // 給予操作模式變更的 onCheckListener
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_5).setOnClickListener { _-> changeOperationMode(5) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_6).setOnClickListener { _-> changeOperationMode(6) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_8).setOnClickListener { _-> changeOperationMode(8) }
-        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_9).setOnClickListener { _-> changeOperationMode(9) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).setOnClickListener { _-> changeOperationMode(5) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).setOnClickListener { _-> changeOperationMode(6) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode(8) }
-        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode(9) }
-    }
-
-    override fun onPageDidAppear() {
-        // 取得暱稱資料
-        TelnetClient.getClient().sendStringToServer("C")
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_5).setOnClickListener { _-> changeOperationMode("5") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_6).setOnClickListener { _-> changeOperationMode("6") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_8).setOnClickListener { _-> changeOperationMode("8") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_9).setOnClickListener { _-> changeOperationMode("9") }
+        mainLayout.findViewById<RelativeLayout>(R.id.User_Config_Item_A).setOnClickListener { _-> changeOperationMode("A") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).setOnClickListener { _-> changeOperationMode("5") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).setOnClickListener { _-> changeOperationMode("6") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode("8") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode("9") }
+        mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_A_Enable).setOnClickListener { _-> changeOperationMode("A") }
     }
 
     /** 收到回傳的資料內容 */
@@ -108,8 +101,8 @@ class UserConfigPage: TelnetPage() {
     }
 
     /** 切換操作模式選項 */
-    private fun changeOperationMode(mode: Int) {
-        TelnetClient.getClient().sendStringToServerInBackground(mode.toString())
+    private fun changeOperationMode(mode: String) {
+        TelnetClient.getClient().sendStringToServerInBackground(mode)
         ASToast.showShortToast(CommonFunctions.getContextString(R.string.user_config_msg01))
     }
 }

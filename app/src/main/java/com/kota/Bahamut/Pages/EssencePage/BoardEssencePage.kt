@@ -13,6 +13,7 @@ import com.kota.Bahamut.ListPage.TelnetListPage
 import com.kota.Bahamut.ListPage.TelnetListPageBlock
 import com.kota.Bahamut.ListPage.TelnetListPageItem
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.Pages.BoardPage.BoardHeaderView
 import com.kota.Bahamut.Pages.BoardPage.BoardPageAction
 import com.kota.Bahamut.Pages.Model.BoardEssencePageItem
 import com.kota.Bahamut.Pages.Model.BoardEssencePageItemView
@@ -23,7 +24,6 @@ import com.kota.Bahamut.Service.CommonFunctions
 import com.kota.Telnet.Logic.ItemUtils
 import com.kota.Telnet.Reference.TelnetKeyboard
 import com.kota.Telnet.TelnetClient
-import com.kota.TelnetUI.TelnetHeaderItemView
 
 class BoardEssencePage : TelnetListPage() {
     private lateinit var mainLayout:RelativeLayout
@@ -40,7 +40,7 @@ class BoardEssencePage : TelnetListPage() {
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        val headerView = findViewById(R.id.BoardPage_HeaderView) as TelnetHeaderItemView
+        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
         headerView.setData("精華文章", _title, listName)
     }
 

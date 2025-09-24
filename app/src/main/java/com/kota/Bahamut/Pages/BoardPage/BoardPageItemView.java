@@ -41,10 +41,6 @@ public class BoardPageItemView extends LinearLayout {
         init();
     }
 
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
     public void setItem(BoardPageItem aItem) {
         if (aItem != null) {
             setTitle(aItem.Title);
@@ -198,5 +194,9 @@ public class BoardPageItemView extends LinearLayout {
         } else if (_content_view.getVisibility() != View.GONE) {
             _content_view.setVisibility(View.GONE);
         }
+    }
+
+    public boolean getVisible() {
+        return _content_view.getVisibility() == View.VISIBLE;
     }
 }

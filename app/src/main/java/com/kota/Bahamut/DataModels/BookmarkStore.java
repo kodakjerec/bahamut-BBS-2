@@ -5,6 +5,7 @@ package com.kota.Bahamut.DataModels;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -43,14 +44,15 @@ public class BookmarkStore {
     }
 
     public static void upgrade(Context context, String aFilePath) {
-        BookmarkStore bookmarkStore = new BookmarkStore(context, aFilePath).load();
-        TempSettings.setBookmarkStore(bookmarkStore);
+        TempSettings.bookmarkStore = new BookmarkStore(context, aFilePath).load();
     }
 
     @NonNull
     public BookmarkList getBookmarkList(String aBoardName) {
         if (this._bookmarks.containsKey(aBoardName)) {
-            return Objects.requireNonNull(this._bookmarks.get(aBoardName));
+            BookmarkList item = this._bookmarks.get(aBoardName);
+            if (item!=null)
+                return item;
         }
         BookmarkList list = new BookmarkList(aBoardName);
         this._bookmarks.put(aBoardName, list);
@@ -140,7 +142,7 @@ public class BookmarkStore {
                     input_stream.close();
                     file_input_stream.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
                 }
                 file.delete();
                 load_file = true;
@@ -181,7 +183,7 @@ public class BookmarkStore {
                 addBookmark(new Bookmark(data.getJSONObject(i)));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         sortBookmarks();
         System.out.println("load " + getTotalBookmarkList().size() + " bookmarks.");
@@ -205,7 +207,7 @@ public class BookmarkStore {
             }
             obj.put("data", data);
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         return obj;
     }

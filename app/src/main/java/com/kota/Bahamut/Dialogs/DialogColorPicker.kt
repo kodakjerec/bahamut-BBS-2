@@ -9,9 +9,6 @@ import com.kota.Bahamut.Service.CommonFunctions.rgbToInt
 import com.skydoves.colorpickerview.ColorPickerView
 import com.skydoves.colorpickerview.listeners.ColorListener
 import com.skydoves.colorpickerview.sliders.AlphaSlideBar
-import java.util.Objects
-
-
 class DialogColorPicker : ASDialog() {
     private var colorPickerView: ColorPickerView
     private var textView: PostEditText
@@ -22,7 +19,7 @@ class DialogColorPicker : ASDialog() {
         val layoutId = R.layout.dialog_color_picker
         requestWindowFeature(1)
         setContentView(layoutId)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
 
         colorPickerView = findViewById(R.id.dialog_color_picker_view)
         val alphaSlideBar: AlphaSlideBar = findViewById(R.id.dialog_color_picker_alpha)

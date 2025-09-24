@@ -27,7 +27,7 @@ public class BahamutCommandSendMail extends com.kota.Bahamut.Command.TelnetComma
     public void execute(TelnetListPage aListPage) {
         if (_receiver.length() > 0 && _title.length() > 0 && _content.length() > 0) {
             TelnetOutputBuilder buffer = TelnetOutputBuilder.create();
-            buffer.pushKey(TelnetKeyboard.CTRL_S);
+            buffer.pushKey(TelnetKeyboard.SHIFT_M);
             buffer.pushString(_receiver + "\n");
             buffer.pushString(_title + "\n");
             buffer.pushString("0" + "\n"); // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：

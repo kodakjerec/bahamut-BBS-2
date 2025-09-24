@@ -1,6 +1,7 @@
 package com.kota.Bahamut.Pages;
 
 import static com.kota.Bahamut.Service.CommonFunctions.changeScreenOrientation;
+import static com.kota.Bahamut.Service.CommonFunctions.getContextString;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -23,6 +24,8 @@ import com.kota.ASFramework.PageController.ASNavigationController;
 import com.kota.ASFramework.UI.ASToast;
 import com.kota.Bahamut.BahamutPage;
 import com.kota.Bahamut.PageContainer;
+import com.kota.Bahamut.Pages.BBSUser.UserConfigPage;
+import com.kota.Bahamut.Pages.BBSUser.UserInfoPage;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleExpressionListPage;
 import com.kota.Bahamut.Pages.BlockListPage.ArticleHeaderListPage;
 import com.kota.Bahamut.Pages.BlockListPage.BlockListPage;
@@ -47,6 +50,8 @@ public class SystemSettingsPage extends TelnetPage {
         UserSettings.setPropertiesAnimationEnable(isChecked);
         ASNavigationController.getCurrentController().setAnimationEnable(UserSettings.getPropertiesAnimationEnable());
     };
+    CompoundButton.OnCheckedChangeListener _article_move_enable_board_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBoardMoveDisable(isChecked?1:0);
+    /** 開啟或關閉文章首篇/末篇, checkbox */
     CompoundButton.OnCheckedChangeListener _article_move_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesArticleMoveDisable(isChecked);
     /** 開啟或關閉黑名單, checkbox */
     CompoundButton.OnCheckedChangeListener _block_list_enable_listener = (buttonView, isChecked) -> UserSettings.setPropertiesBlockListEnable(isChecked);
@@ -100,12 +105,13 @@ public class SystemSettingsPage extends TelnetPage {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
         if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
-            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+//            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+            ASToast.showLongToast(getContextString(R.string.ignoreBattery_msg02));
         } else {
             intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
             intent.setData(Uri.parse("package:"+packageName));
+            startActivity(intent);
         }
-        startActivity(intent);
     };
 
     /** 開啟贊助葉面 */
@@ -121,12 +127,14 @@ public class SystemSettingsPage extends TelnetPage {
     };
     /** 開啟BBS個人資料 */
     View.OnClickListener bbsUserInfoListener = v -> {
-        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserInfoPage());
-        TelnetClient.getClient().sendStringToServerInBackground("u");
+        TelnetClient.getClient().sendStringToServerInBackground("u\ni");
+        UserInfoPage page = PageContainer.getInstance().getUserInfoPage();
+        getNavigationController().pushViewController(page);
     };
     View.OnClickListener bbsUserConfigListener = v -> {
-        SystemSettingsPage.this.getNavigationController().pushViewController(PageContainer.getInstance().getUserConfigPage());
-        TelnetClient.getClient().sendStringToServerInBackground("u");
+        TelnetClient.getClient().sendStringToServerInBackground("u\nc");
+        UserConfigPage page = PageContainer.getInstance().getUserConfigPage();
+        getNavigationController().pushViewController(page);
     };
 
     /** 畫面旋轉 */
@@ -203,7 +211,7 @@ public class SystemSettingsPage extends TelnetPage {
             ((CheckBox) mainLayout.findViewById(R.id.SystemSettings_enableLinkShowThumbnail)).setChecked(UserSettings.getLinkShowThumbnail());
             changeLinkOnlyWifiStatus(UserSettings.getLinkShowThumbnail());
         } else {
-            UserSettings.setPropertiesLinkShowThumbnail(false);
+            UserSettings.setLinkShowThumbnail(false);
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowThumbnail).setVisibility(View.GONE);
             changeLinkOnlyWifiStatus(false);
         }
@@ -211,7 +219,7 @@ public class SystemSettingsPage extends TelnetPage {
 
     /** 顯示預覽圖 */
     CompoundButton.OnCheckedChangeListener _link_show_thumbnail_listener = (buttonView, isChecked) -> {
-        UserSettings.setPropertiesLinkShowThumbnail(isChecked);
+        UserSettings.setLinkShowThumbnail(isChecked);
         changeLinkOnlyWifiStatus(isChecked);
     };
     void changeLinkOnlyWifiStatus(boolean enable) {
@@ -219,12 +227,12 @@ public class SystemSettingsPage extends TelnetPage {
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.VISIBLE);
             ((CheckBox) mainLayout.findViewById(R.id.SystemSettings_enableLinkShowOnlyWifi)).setChecked(UserSettings.getLinkShowOnlyWifi());
         } else {
-            UserSettings.setPropertiesLinkShowOnlyWifi(false);
+            UserSettings.setLinkShowOnlyWifi(false);
             mainLayout.findViewById(R.id.SystemSettings_item_enableLinkShowOnlyWifi).setVisibility(View.GONE);
         }
     }
     /** 只在Wifi下預覽 */
-    CompoundButton.OnCheckedChangeListener _link_show_only_wifi_listener = (buttonView, isChecked) -> UserSettings.setPropertiesLinkShowOnlyWifi(isChecked);
+    CompoundButton.OnCheckedChangeListener _link_show_only_wifi_listener = (buttonView, isChecked) -> UserSettings.setLinkShowOnlyWifi(isChecked);
 
     @Override
     public int getPageLayout() {
@@ -267,6 +275,13 @@ public class SystemSettingsPage extends TelnetPage {
         animation_enable_box.setChecked(UserSettings.getPropertiesAnimationEnable());
         animation_enable_box.setOnCheckedChangeListener(_animation_enable_listener);
         mainLayout.findViewById(R.id.SystemSettings_item_animationEnable).setOnClickListener(view -> animation_enable_box.setChecked(!animation_enable_box.isChecked()));
+
+        // 看板上一頁/下一頁
+        CheckBox article_move_enable_board_box = mainLayout.findViewById(R.id.SystemSettings_enableBoardMove);
+        article_move_enable_board_box.setChecked((UserSettings.getPropertiesBoardMoveEnable() > 0));
+        article_move_enable_board_box.setOnCheckedChangeListener(_article_move_enable_board_listener);
+        mainLayout.findViewById(R.id.SystemSettings_item_enableBoardMove).setOnClickListener(view -> article_move_enable_board_box.setChecked(!article_move_enable_board_box.isChecked()));
+
 
         // 文章首篇/末篇
         CheckBox article_move_enable_box = mainLayout.findViewById(R.id.SystemSettings_enableArticleMove);
@@ -378,7 +393,7 @@ public class SystemSettingsPage extends TelnetPage {
             cloud_save_enable_box.setOnCheckedChangeListener(cloud_save_enable_listener);
             mainLayout.findViewById(R.id.SystemSettings_item_cloudSaveEnable).setOnClickListener(view -> cloud_save_enable_box.setChecked(!cloud_save_enable_box.isChecked()));
             TextView cloud_save_last_time = mainLayout.findViewById(R.id.SystemSettings_cloudSaveLastTime);
-            String lastTime = TempSettings.getCloudSaveLastTime();
+            String lastTime = TempSettings.cloudSaveLastTime;
             if (lastTime.isEmpty()) {
                 cloud_save_last_time.setVisibility(View.GONE);
             } else {

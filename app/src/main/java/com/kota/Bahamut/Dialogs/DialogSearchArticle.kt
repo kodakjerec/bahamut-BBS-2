@@ -33,7 +33,7 @@ class DialogSearchArticle : ASDialog(), View.OnClickListener {
     init {
         requestWindowFeature(1)
         setContentView(R.layout.dialog_search_article)
-        Objects.requireNonNull(window)!!.setBackgroundDrawable(null)
+        window!!.setBackgroundDrawable(null)
         setTitle("搜尋文章")
 
         mainLayout = findViewById(R.id.dialog_search_article_layout)

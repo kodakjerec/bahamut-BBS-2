@@ -1,8 +1,11 @@
 package com.kota.TextEncoder;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.Objects;
 
 public class U2BEncoder {
     public static final int CHAR_MAXIMUM = 65535;
@@ -41,7 +44,7 @@ public class U2BEncoder {
             inputStream.close();
             result = true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e(getClass().getSimpleName(), e.getMessage()!=null?e.getMessage():"");
         }
         if (result) {
             System.out.println("read U2B encode data success");
