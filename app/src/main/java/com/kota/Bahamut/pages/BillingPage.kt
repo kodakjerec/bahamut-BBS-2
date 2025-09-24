@@ -46,8 +46,8 @@ class BillingPage : TelnetPage() {
         checkPurchaseHistoryQuery()
 
         // 檢查已購買
-        val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button?
-        button1?.setOnClickListener { view: View? ->
+        val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button
+        button1.setOnClickListener { view: View? ->
             checkPurchaseHistoryCloud { qty: Int? ->
                 val totalMoney = (qty!! * 90).toString()
                 val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
@@ -86,7 +86,7 @@ class BillingPage : TelnetPage() {
                 // check billingResult
                 if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
                     // process returned productDetailsList
-                    for (product in productDetailsList?.productDetailsList) {
+                    for (product in productDetailsList!!.productDetailsList) {
                         object : ASRunner() {
                             override fun run() {
                                 val btn =

@@ -16,7 +16,7 @@ class MailBoxPageBlock : TelnetListPageBlock() {
         }
 
         @JvmStatic
-        fun recycle(block: MailBoxPageBlock?) {
+        fun recycle(block: MailBoxPageBlock) {
             synchronized(myPool) {
                 myPool.push(block)
             }

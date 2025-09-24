@@ -25,19 +25,17 @@ class BoardPageItem private constructor() : TelnetListPageItem() {
         this.title = null
     }
 
-    override fun set(aData: TelnetListPageItem?) {
+    override fun set(aData: TelnetListPageItem) {
         super.set(aData)
-        if (aData != null) {
-            val articleItem = aData as BoardPageItem
-            this.size = articleItem.size
-            this.date = articleItem.date
-            this.author = articleItem.author
-            this.isRead = articleItem.isRead
-            this.isMarked = articleItem.isMarked
-            this.isReply = articleItem.isReply
-            this.gy = articleItem.gy
-            this.title = articleItem.title
-        }
+        val articleItem = aData as BoardPageItem
+        this.size = articleItem.size
+        this.date = articleItem.date
+        this.author = articleItem.author
+        this.isRead = articleItem.isRead
+        this.isMarked = articleItem.isMarked
+        this.isReply = articleItem.isReply
+        this.gy = articleItem.gy
+        this.title = articleItem.title
     }
 
     companion object {

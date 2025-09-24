@@ -7,14 +7,14 @@ import com.kota.telnet.TelnetUtils
 class ClassPageHandler private constructor() {
     fun load(): ClassPageBlock {
         val classPackage: ClassPageBlock = ClassPageBlock.Companion.create()
-        if (TelnetClient.client?.model?.getRowString(2)?.trim { it <= ' ' }.startsWith("編號")) {
+        if (TelnetClient.client?.model?.getRowString(2)?.trim { it <= ' ' }!!.startsWith("編號")) {
             classPackage.mode = 0
         } else {
             classPackage.mode = 1
         }
         val endIndex = 3 + 20
         var i = 3
-        while (i < endIndex && TelnetClient.client?.model?.getRowString(i)?.isNotEmpty()) {
+        while (i < endIndex && TelnetClient.client?.model?.getRowString(i)!!.isNotEmpty()) {
             val row: TelnetRow? = TelnetClient.client?.model?.getRow(i)
             val boardIndex = TelnetUtils.getIntegerFromData(row!!, 1, 5)
             if (i == 3) {

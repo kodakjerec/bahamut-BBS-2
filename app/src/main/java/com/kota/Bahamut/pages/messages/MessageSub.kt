@@ -205,7 +205,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
 
         messageAsRunner.postDelayed(3000)
         // telnet會連續觸發這段兩次
-        if (!isPostDelayedSuccess)
+        if (!isPostDelayedSuccess!!)
         isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */

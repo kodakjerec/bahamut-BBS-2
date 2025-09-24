@@ -80,7 +80,7 @@ class MainPage : TelnetPage() {
         var isShowHeroStep = getShowHeroStep()
         isShowHeroStep = !isShowHeroStep
         setShowHeroStep(isShowHeroStep)
-        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList).visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
+        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList)!!.visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
     }
 
     /** 顯示聊天main  */
@@ -100,23 +100,23 @@ class MainPage : TelnetPage() {
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
-        mainLayout?.findViewById<View>(R.id.Main_BoardsButton)
+        mainLayout?.findViewById<View>(R.id.Main_BoardsButton)!!
             .setOnClickListener(this.boardsListener)
-        mainLayout?.findViewById<View>(R.id.Main_ClassButton)
+        mainLayout?.findViewById<View>(R.id.Main_ClassButton)!!
             .setOnClickListener(this.classListener)
-        mainLayout?.findViewById<View>(R.id.Main_FavoriteButton)
+        mainLayout?.findViewById<View>(R.id.Main_FavoriteButton)!!
             .setOnClickListener(this.favoriteListener)
-        mainLayout?.findViewById<View>(R.id.Main_LogoutButton)
+        mainLayout?.findViewById<View>(R.id.Main_LogoutButton)!!
             .setOnClickListener(this.logoutListener)
-        mainLayout?.findViewById<View>(R.id.Main_MailButton).setOnClickListener(this.mailListener)
-        mainLayout?.findViewById<View>(R.id.Main_SystemSettingsButton)
+        mainLayout?.findViewById<View>(R.id.Main_MailButton)!!.setOnClickListener(this.mailListener)
+        mainLayout?.findViewById<View>(R.id.Main_SystemSettingsButton)!!
             .setOnClickListener(this.systemSettingListener)
-        val mainOnlinePeople = mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)
+        val mainOnlinePeople = mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)!!
         mainOnlinePeople.text = onlinePeople // 線上人數
 
         // 顯示勇者足跡
         val heroStepList: MutableList<HeroStep> = getHeroStepList()
-        val heroStepListLayout = mainLayout?.findViewById<LinearLayout>(R.id.Main_HeroStepList)
+        val heroStepListLayout = mainLayout?.findViewById<LinearLayout>(R.id.Main_HeroStepList)!!
         for (heroStep in heroStepList) {
             val itemView = HeroStepItemView(context)
             itemView.setItem(heroStep)
@@ -127,14 +127,14 @@ class MainPage : TelnetPage() {
             setShowHeroStep(false)
         }
         val isShowHeroStep = getShowHeroStep()
-        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList).visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
-        mainLayout?.findViewById<View>(R.id.Main_HeroStepButton)
+        mainLayout?.findViewById<View>(R.id.Main_Block_HeroStepList)!!.visibility = if (isShowHeroStep) View.VISIBLE else View.GONE
+        mainLayout?.findViewById<View>(R.id.Main_HeroStepButton)!!
             .setOnClickListener(this.showHeroStepListener)
 
         // 顯示呼叫器
-        val txtBBCall = mainLayout?.findViewById<TextView>(R.id.Main_BBCall)
+        val txtBBCall = mainLayout?.findViewById<TextView>(R.id.Main_BBCall)!!
         txtBBCall.text = bbCallStatus
-        mainLayout?.findViewById<View>(R.id.Main_BBCall_Layout)
+        mainLayout?.findViewById<View>(R.id.Main_BBCall_Layout)!!
             .setOnClickListener(showMessageMainListener)
 
         // 替換外觀
@@ -149,7 +149,7 @@ class MainPage : TelnetPage() {
                 override fun run() {
                     showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat))
                     // 進入布告討論區
-                    mainLayout?.findViewById<View>(R.id.Main_BoardsButton).performClick()
+                    mainLayout?.findViewById<View>(R.id.Main_BoardsButton)!!.performClick()
                 }
             }.postDelayed(300)
         }
@@ -265,13 +265,13 @@ class MainPage : TelnetPage() {
 
     override fun clear() {
         if (this.goodbyeDialog != null) {
-            if (this.goodbyeDialog?.isShowing) {
+            if (this.goodbyeDialog?.isShowing!!) {
                 this.goodbyeDialog?.dismiss()
             }
             this.goodbyeDialog = null
         }
         if (this.saveHotMessageDialog != null) {
-            if (this.saveHotMessageDialog?.isShowing) {
+            if (this.saveHotMessageDialog?.isShowing!!) {
                 this.saveHotMessageDialog?.dismiss()
             }
             this.saveHotMessageDialog = null

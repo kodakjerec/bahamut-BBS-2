@@ -9,8 +9,8 @@ class MailBoxPageHandler private constructor() {
         val boardData = MailBoxPageBlock.create()
         val endIndex = 3 + 20
         for (i in 3..<endIndex) {
-            val row: TelnetRow? = TelnetClient.client?.model?.getRow(i)
-            val articleSelected = row?.getSpaceString(0, 0).trim { it <= ' ' }
+            val row: TelnetRow = TelnetClient.client?.model?.getRow(i)!!
+            val articleSelected = row.getSpaceString(0, 0).trim { it <= ' ' }
             val articleIndex = TelnetUtils.getIntegerFromData(row, 1, 5)
             if (articleIndex != 0) {
                 if (articleSelected.isNotEmpty() && articleSelected[0] == '>') {

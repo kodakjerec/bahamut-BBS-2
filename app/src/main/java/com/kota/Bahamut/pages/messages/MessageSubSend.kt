@@ -17,6 +17,7 @@ import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.UserSettings
 import java.text.SimpleDateFormat
 import java.util.Date
+import java.util.Locale
 
 class MessageSubSend(context: Context): RelativeLayout(context) {
     private var txtMessage: TextView
@@ -34,7 +35,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
         myBahaMessage = fromObject
         txtMessage.text = myBahaMessage.message
         // 設定日期格式
-        val sdf = SimpleDateFormat("yyyy:MM:dd HH:mm")
+        val sdf = SimpleDateFormat("yyyy:MM:dd HH:mm", Locale.TRADITIONAL_CHINESE)
         // 將時間戳轉換為 Date 物件
         val date = Date(myBahaMessage.receivedDate)
         txtSendDate.text = sdf.format(date).substring(11)
@@ -96,7 +97,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
 
         Linkify.addLinks(txtMessage, Linkify.WEB_URLS)
         // 使用預覽圖
-        if (UserSettings.getLinkAutoShow()) {
+        if (UserSettings.linkAutoShow) {
             val originalString = txtMessage.text as SpannableString
             val urlSpans: Array<URLSpan> = txtMessage.urls
             if (urlSpans.isNotEmpty()) {

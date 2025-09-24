@@ -82,7 +82,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     fun refreshTitleField() {
         if (titleField != null && myTitle != null) {
             titleField?.setText(myTitle)
-            if (myTitle?.isNotEmpty()) {
+            if (myTitle?.isNotEmpty() == true) {
                 Selection.setSelection(titleField?.text, 1)
             }
             myTitle = null
@@ -99,8 +99,8 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     fun refreshContentField() {
         if (contentField != null && myContent != null) {
             contentField?.setText(myContent)
-            if (myContent?.isNotEmpty()) {
-                Selection.setSelection(contentField?.text, myContent?.length)
+            if (myContent?.isNotEmpty() == true) {
+                Selection.setSelection(contentField?.text, myContent?.length!!)
             }
             myContent = null
         }
@@ -230,8 +230,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
                         paramString: String
                     ) {
                         val symbol = items[paramInt]
-                        contentField?.editableText
-                            .insert(contentField?.selectionStart, symbol)
+                        contentField?.editableText!!.insert(contentField?.selectionStart!!, symbol)
                     }
 
                     override fun onListDialogSettingClicked() {
@@ -304,7 +303,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     override fun onSymbolDialogDismissWithSymbol(str: String) {
-        contentField?.editableText.insert(contentField?.selectionStart, str)
+        contentField?.editableText!!.insert(contentField?.selectionStart!!, str)
     }
 
     fun setReceiver(aReceiver: String?) {
@@ -316,7 +315,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         get() = true
 
     override fun onPaintColorDone(str: String) {
-        contentField?.editableText.insert(contentField?.selectionStart, str)
+        contentField?.editableText!!.insert(contentField?.selectionStart!!, str)
     }
 
     // 讀取暫存檔

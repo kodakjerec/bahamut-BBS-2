@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.database.DataSetObservable
 import android.database.DataSetObserver
-import android.net.Uri
 import android.text.util.Linkify
 import android.util.TypedValue
 import android.view.View
@@ -16,16 +15,13 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASScrollView
-import com.kota.asFramework.ui.ASToast
+import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.command.BahamutCommandFSendMail
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
+import com.kota.Bahamut.command.BahamutCommandFSendMail
+import com.kota.Bahamut.pages.SendMailPage
+import com.kota.Bahamut.pages.SendMailPageListener
 import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
 import com.kota.Bahamut.pages.articlePage.ArticlePage_HeaderItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePage_TelnetItemView
@@ -33,19 +29,23 @@ import com.kota.Bahamut.pages.articlePage.ArticlePage_TextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePage_TimeTimeView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.pages.articlePage.Thumbnail_ItemView
-import com.kota.Bahamut.pages.SendMailPage
-import com.kota.Bahamut.pages.SendMailPageListener
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.ui.ASListView
+import com.kota.asFramework.ui.ASScrollView
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
-class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListener {
+class ArticleEssencePage(override val pageLayout: Int) : TelnetPage(), View.OnClickListener, SendMailPageListener {
     var mainLayout: RelativeLayout? = null
     private var telnetArticle: TelnetArticle? = null
     private var asListView: ASListView? = null
@@ -63,7 +63,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
     private val listAdapter: BaseAdapter = object :BaseAdapter() {
         override fun getCount(): Int {
             return if (telnetArticle != null) {
-                telnetArticle?.itemSize + 2
+                telnetArticle?.itemSize!! + 2
             } else 0
         }
 
@@ -105,12 +105,12 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
                     var title = ""
                     var boardName = ""
                     if (telnetArticle!=null) {
-                        author = telnetArticle?.author
-                        title = telnetArticle?.title
+                        author = telnetArticle?.author!!
+                        title = telnetArticle?.title!!
                         if (telnetArticle?.nickName != null) {
                             author = author + "(" + telnetArticle?.nickName + ")"
                         }
-                        boardName = telnetArticle?.boardName
+                        boardName = telnetArticle?.boardName!!
                     }
                     itemView1.setData(title, author, boardName)
                     itemView1.setMenuButtonClickListener(mMenuListener)
@@ -121,7 +121,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
                     if (item!=null) {
                         itemView2.setAuthor(item.author, item.nickname)
                         itemView2.setQuote(item.quoteLevel)
-                        itemView2.setContent(item.content, item.frame.rows)
+                        itemView2.setContent(item.content, item.frame?.rows!!)
                     }
                     if (itemIndex >= count - 2) {
                         itemView2.setDividerHidden(true)
@@ -158,7 +158,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
             }
             return if (itemIndex == count - 1) {
                 ArticlePageItemType.PostTime
-            } else getItem(itemIndex)?.type
+            } else getItem(itemIndex)?.type!!
         }
 
         override fun getViewTypeCount(): Int {
@@ -190,15 +190,15 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         }
     }
 
-    override fun getPageLayout(): Int {
+    fun getPageLayout(): Int {
         return R.layout.article_essence_page
     }
 
-    override fun getPageType(): Int {
+    fun getPageType(): Int {
         return BahamutPage.BAHAMUT_ARTICLE_ESSENCE
     }
 
-    override fun isPopupPage(): Boolean {
+    fun isPopupPage(): Boolean {
         return true
     }
 
@@ -274,13 +274,13 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
     }
 
     override fun onSendMailDialogSendButtonClicked(
-        aDialog: SendMailPage,
+        sendMailPage: SendMailPage,
         receiver: String,
         title: String,
         content: String
     ) {
-        PageContainer.instance?.mailBoxPage.onSendMailDialogSendButtonClicked(
-            aDialog,
+        PageContainer.instance?.mailBoxPage!!.onSendMailDialogSendButtonClicked(
+            sendMailPage,
             receiver,
             title,
             content
@@ -289,16 +289,16 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
     }
 
     private fun onPageUpButtonClicked() {
-        if (TelnetClient.getConnector().isConnecting) {
-            PageContainer.instance?.boardEssencePage.loadPreviousArticle()
+        if (TelnetClient.client?.connector!!.isConnecting) {
+            PageContainer.instance?.boardEssencePage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
     }
 
     private fun onPageDownButtonClicked() {
-        if (TelnetClient.getConnector().isConnecting) {
-            PageContainer.instance?.boardEssencePage.loadNextArticle()
+        if (TelnetClient.client?.connector!!.isConnecting) {
+            PageContainer.instance?.boardEssencePage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -333,7 +333,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         return true
     }
 
-    override fun isKeepOnOffline(): Boolean {
+    fun isKeepOnOffline(): Boolean {
         return true
     }
 
@@ -349,7 +349,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         OnItemLongClickListener { _: AdapterView<*>?, view: View, itemIndex: Int, _: Long ->
             if (view.javaClass == ArticlePage_TelnetItemView::class.java) {
                 // 開啟切換模式
-                val item: TelnetArticleItem = telnetArticle?.getItem(itemIndex - 1)
+                val item: TelnetArticleItem = telnetArticle?.getItem(itemIndex - 1)!!
                 when (item.type) {
                     0 -> {
                         item.type = 1
@@ -373,7 +373,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
 
 
     private fun onMenuClicked() {
-        if (telnetArticle != null && telnetArticle?.author != null) {
+        if (telnetArticle != null) {
             ASListDialog.createDialog()
                 .addItem(CommonFunctions.getContextString(R.string.change_mode))
                 .addItem(
@@ -387,9 +387,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
                 .setListener(object : ASListDialogItemClickListener {
                     // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
-                        aDialog: ASListDialog,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String
+                        title: String?
                     ) {
                         when (index) {
                             0 -> reloadViewMode()
@@ -403,9 +403,9 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
 
                     // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
-                        aDialog: ASListDialog,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String
+                        title: String?
                     ): Boolean {
                         return true
                     }
@@ -429,26 +429,24 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
                 listDialog.addItem(urlSpan.url)
             }
             listDialog.setListener(object : ASListDialogItemClickListener {
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ): Boolean {
                     return true
                 }
 
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ) {
                     val url2 = urls[index].url
                     val context2 = context
                     if (context2 != null) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url2))
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        val intent = Intent(Intent.ACTION_VIEW, url2.toUri())
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         context2.startActivity(intent)
                     }
                 }
@@ -466,33 +464,31 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         // 內文黑名單
         val len = article.itemSize
         for (i in 0 until len) {
-            val item = article.getItem(i)
+            val item = article.getItem(i)!!
             val author = item.author
             if (author != null && !UserSettings.isBlockListContains(author)) {
                 buffer.add(author)
             }
         }
-        if (buffer.size == 0) {
+        if (buffer.isEmpty()) {
             ASToast.showShortToast("無可加入黑名單的ID")
             return
         }
-        val names = buffer.toTypedArray<String>()
+        val names: Array<String> = buffer.toTypedArray<String>()
         ASListDialog.createDialog().addItems(names)
             .setListener(object : ASListDialogItemClickListener {
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ): Boolean {
                     return true
                 }
 
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String
+                    title: String?
                 ) {
                     onBlockButtonClicked(names[index])
                 }
@@ -508,15 +504,15 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
             .setListener { _: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     val newList =
-                        UserSettings.getBlockList()
+                        UserSettings.blockList!!
                     if (newList.contains(aBlockName)) {
                         ASToast.showShortToast(CommonFunctions.getContextString(R.string.already_have_item))
                     } else {
                         newList.add(aBlockName)
                     }
-                    UserSettings.setBlockList(newList)
+                    UserSettings.blockList = newList
                     UserSettings.notifyDataUpdated()
-                    if (UserSettings.getPropertiesBlockListEnable()) {
+                    if (UserSettings.propertiesBlockListEnable) {
                         if (aBlockName == telnetArticle?.author) {
                             onBackPressed()
                         } else {
@@ -558,7 +554,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
     }
     // 轉寄至信箱
     fun fSendMail() {
-        boardEssencePage?.pushCommand(BahamutCommandFSendMail(UserSettings.getPropertiesUsername()))
+        boardEssencePage?.pushCommand(BahamutCommandFSendMail(UserSettings.propertiesUsername!!))
     }
 
     // 變更telnetView大小
@@ -566,7 +562,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         val textWidth = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
             20.0f,
-            context.resources.displayMetrics
+            context!!.resources.displayMetrics
         ).toInt()
         var telnetViewWidth = textWidth / 2 * 80
         val screenWidth: Int = if (navigationController.currentOrientation == 2) {
@@ -580,7 +576,7 @@ class ArticleEssencePage : TelnetPage(), View.OnClickListener, SendMailPageListe
         } else {
             isFullScreen = false
         }
-        val layoutParams = telnetView?.layoutParams
+        val layoutParams = telnetView?.layoutParams!!
         layoutParams.width = telnetViewWidth
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         telnetView?.layoutParams = layoutParams

@@ -52,7 +52,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
     }
 
     private fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
             .inflate(R.layout.article_page_text_item_view, this)
         authorLabel = findViewById<TextView?>(R.id.ArticleTextItemView_Title)
         contentLabel = findViewById<TextView?>(R.id.ArticleTextItemView_content)
@@ -71,21 +71,21 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                 author_buffer.append("(").append(nickname).append(")")
             }
             if (author != null && !author.isEmpty()) author_buffer.append(" 說:")
-            authorLabel?.setText(author_buffer.toString())
+            authorLabel?.text = author_buffer.toString()
         }
     }
 
     /** 設定內容  */
-    fun setContent(content: String?, rows: Vector<TelnetRow>) {
+    fun setContent(content: String, rows: Vector<TelnetRow>) {
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
             if (myQuote > 0) {
-                contentLabel?.setText(content)
+                contentLabel?.text = content
                 stringNewUrlSpan(contentLabel!!)
             } else {
                 // 塗顏色
                 val colorfulText = stringPaint(rows)
-                contentLabel?.setText(colorfulText)
+                contentLabel?.text = colorfulText
             }
             // 預覽圖
             stringThumbnail()
@@ -228,15 +228,15 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
      */
     private fun stringNewUrlSpan(target: TextView) {
         Linkify.addLinks(target, Linkify.WEB_URLS)
-        val text = target.getText()
+        val text = target.text
         if (text.length > 0) {
-            val ss = target.getText() as SpannableString
-            val spans = target.getUrls()
+            val ss = target.text as SpannableString
+            val spans = target.urls
             for (span in spans) {
                 val start = ss.getSpanStart(span)
                 val end = ss.getSpanEnd(span)
                 ss.removeSpan(span)
-                ss.setSpan(myUrlSpan(span.getURL()), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                ss.setSpan(myUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
@@ -251,7 +251,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
             // 使用預覽圖
             if (linkAutoShow) {
                 // 修正：先處理網址中的 \n
-                val rawText = contentLabel?.getText().toString()
+                val rawText = contentLabel?.text.toString()
                 val fixedText = fixUrlNewlines(rawText)
                 val spannableText: Spannable = SpannableString(fixedText)
 
@@ -261,27 +261,27 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                 if (urlSpans.size > 0) {
                     var previousIndex = 0
                     for (urlSpan in urlSpans) {
-                        val textView1 = TextView(getContext())
-                        val textView2 = TextView(getContext())
+                        val textView1 = TextView(context)
+                        val textView2 = TextView(context)
 
                         // partA
                         var urlSpanEnd = spannableText.getSpanEnd(urlSpan)
                         val partA = spannableText.subSequence(previousIndex, urlSpanEnd)
-                        textView1.setText(partA)
+                        textView1.text = partA
 
                         // check error
                         if (urlSpanEnd + 1 <= spannableText.length) urlSpanEnd = urlSpanEnd + 1
 
                         // partB
                         val partB = spannableText.subSequence(urlSpanEnd, spannableText.length)
-                        textView2.setText(partB)
+                        textView2.text = partB
 
                         // 移除原本的文字
                         mainLayout.removeViewAt(originalIndex)
                         // 塞入連結前半段文字, 純文字
                         mainLayout.addView(textView1, originalIndex)
-                        val url = urlSpan.getURL().replace("\n", "")
-                        val thumbnail = Thumbnail_ItemView(getContext())
+                        val url = urlSpan.url.replace("\n", "")
+                        val thumbnail = Thumbnail_ItemView(context)
                         thumbnail.loadUrl(url)
                         // 塞入截圖
                         mainLayout.addView(thumbnail, originalIndex + 1)
@@ -293,15 +293,15 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                     }
 
                     // 統一指定屬性
-                    for (i in 0..<mainLayout.getChildCount()) {
+                    for (i in 0..<mainLayout.childCount) {
                         val view = mainLayout.getChildAt(i)
                         if (view.javaClass == TextView::class.java) {
                             val textView = view as TextView
                             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-                            textView.setEnabled(true)
+                            textView.isEnabled = true
                             textView.setTextIsSelectable(true)
                             textView.setFocusable(true)
-                            textView.setLongClickable(true)
+                            textView.isLongClickable = true
                             if (myQuote > 0) textView.setTextColor(getContextColor(R.color.article_page_text_item_content1))
                             else textView.setTextColor(getContextColor(R.color.article_page_text_item_content0))
 
@@ -397,17 +397,17 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
             }
 
             override fun onActionItemClicked(actionMode: ActionMode, menuItem: MenuItem): Boolean {
-                val selectedText = target.getText().toString().substring(
-                    target.getSelectionStart(),
-                    target.getSelectionEnd()
+                val selectedText = target.text.toString().substring(
+                    target.selectionStart,
+                    target.selectionEnd
                 )
 
-                if (menuItem.getItemId() == selfDefineId) {
+                if (menuItem.itemId == selfDefineId) {
                     try {
                         val intent = Intent(Intent.ACTION_WEB_SEARCH)
                         intent.putExtra(SearchManager.QUERY, selectedText)
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        getContext().startActivity(intent)
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                        context.startActivity(intent)
                     } catch (e: Exception) {
                         showShortToast("無法開啟此網址")
                     }
@@ -420,7 +420,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
             override fun onDestroyActionMode(actionMode: ActionMode?) {
             }
         }
-        target.setCustomSelectionActionModeCallback(selfMenu)
+        target.customSelectionActionModeCallback = selfMenu
     }
 
     fun setQuote(quote: Int) {
@@ -445,17 +445,17 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setDividerHidden(isHidden: Boolean) {
         if (isHidden) {
-            dividerView?.setVisibility(GONE)
+            dividerView?.visibility = GONE
         } else {
-            dividerView?.setVisibility(VISIBLE)
+            dividerView?.visibility = VISIBLE
         }
     }
 
     fun setVisible(visible: Boolean) {
         if (visible) {
-            contentView?.setVisibility(VISIBLE)
+            contentView?.visibility = VISIBLE
         } else {
-            contentView?.setVisibility(GONE)
+            contentView?.visibility = GONE
         }
     }
 }

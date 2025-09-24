@@ -125,7 +125,7 @@ class ASListDialog : ASDialog() {
         return this
     }
 
-    fun addItems(aItemList: Array<String?>): ASListDialog {
+    fun addItems(aItemList: Array<String>): ASListDialog {
         for (itemTitle in aItemList) {
             addItem(itemTitle)
         }
@@ -236,7 +236,7 @@ class ASListDialog : ASDialog() {
                 this,
                 index,
                 this.itemList[index].title
-            )
+            ) == true
         }
         if (result) {
             dismiss()

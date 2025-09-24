@@ -29,18 +29,16 @@ class MailBoxPageItem private constructor() : TelnetListPageItem() {
         this.title = null
     }
 
-    override fun set(aData: TelnetListPageItem?) {
+    override fun set(aData: TelnetListPageItem) {
         super.set(aData)
-        if (aData != null) {
-            val mailItem = aData as MailBoxPageItem
-            this.size = mailItem.size
-            this.date = mailItem.date
-            this.author = mailItem.author
-            this.isRead = mailItem.isRead
-            this.isReply = mailItem.isReply
-            this.isMarked = mailItem.isMarked
-            this.title = mailItem.title
-        }
+        val mailItem = aData as MailBoxPageItem
+        this.size = mailItem.size
+        this.date = mailItem.date
+        this.author = mailItem.author
+        this.isRead = mailItem.isRead
+        this.isReply = mailItem.isReply
+        this.isMarked = mailItem.isMarked
+        this.title = mailItem.title
     }
 
     companion object {
@@ -54,7 +52,7 @@ class MailBoxPageItem private constructor() : TelnetListPageItem() {
         }
 
         @JvmStatic
-        fun recycle(item: MailBoxPageItem?) {
+        fun recycle(item: MailBoxPageItem) {
             synchronized(_pool) {
                 _pool.push(item)
             }

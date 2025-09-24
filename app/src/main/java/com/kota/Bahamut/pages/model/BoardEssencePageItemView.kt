@@ -54,11 +54,11 @@ class BoardEssencePageItemView : LinearLayout {
             dateLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Date)
             authorLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Author)
             dividerBottom = contentView?.findViewById(R.id.BoardPage_ItemView_DividerBottom)
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_mark).visibility =
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_mark)?.visibility =
                 INVISIBLE
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY_Title).visibility =
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY_Title)?.visibility =
                 INVISIBLE
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY).visibility = INVISIBLE
+            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY)?.visibility = INVISIBLE
         }
     }
 

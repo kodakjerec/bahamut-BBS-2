@@ -73,7 +73,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         backButton?.setOnClickListener(this)
         pageUpButton?.setOnClickListener(this)
         pageDownButton?.setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.Mail_changeModeButton).setOnClickListener(this)
+        mainLayout?.findViewById<View>(R.id.Mail_changeModeButton)!!.setOnClickListener(this)
         resetAdapter()
 
         // 替換外觀
@@ -118,13 +118,13 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
     override fun getCount(): Int {
         if (telnetArticle != null) {
-            return telnetArticle?.itemSize + 2
+            return telnetArticle?.itemSize!! + 2
         }
         return 0
     }
 
-    override fun getItem(itemIndex: Int): TelnetArticleItem? {
-        return telnetArticle?.getItem(itemIndex - 1)
+    override fun getItem(itemIndex: Int): TelnetArticleItem {
+        return telnetArticle?.getItem(itemIndex - 1)!!
     }
 
     override fun getItemId(itemIndex: Int): Long {
@@ -138,7 +138,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         if (itemIndex == getCount() - 1) {
             return 3
         }
-        return getItem(itemIndex)?.type
+        return getItem(itemIndex).type
     }
 
     override fun getView(itemIndex: Int, itemViewFrom: View?, parentView: ViewGroup?): View {
@@ -158,16 +158,16 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         }
 
         if (itemViewOrigin is ArticlePage_TextItemView) {
-            itemViewOrigin.setAuthor(item?.author, item.nickname)
+            itemViewOrigin.setAuthor(item.author, item.nickname)
             itemViewOrigin.setQuote(item.quoteLevel)
-            itemViewOrigin.setContent(item.content, item.frame?.rows)
+            itemViewOrigin.setContent(item.content, item.frame?.rows!!)
             if (itemIndex >= getCount() - 2) {
                 itemViewOrigin.setDividerHidden(true)
             } else {
                 itemViewOrigin.setDividerHidden(false)
             }
         } else if (itemViewOrigin is ArticlePage_TelnetItemView) {
-            if (item != null) itemViewOrigin.setFrame(item.frame)
+            itemViewOrigin.setFrame(item.frame)
             if (itemIndex >= getCount() - 2) {
                 itemViewOrigin.setDividerHidden(true)
             } else {
@@ -236,22 +236,22 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         title: String,
         content: String
     ) {
-        PageContainer.instance?.mailBoxPage
+        PageContainer.instance?.mailBoxPage!!
             .onSendMailDialogSendButtonClicked(sendMailPage, receiver, title, content)
         onBackPressed()
     }
 
     fun onPageUpButtonClicked() {
-        if (TelnetClient.client?.connector?.isConnecting) {
-            PageContainer.instance?.mailBoxPage.loadPreviousArticle()
+        if (TelnetClient.client?.connector?.isConnecting == true) {
+            PageContainer.instance?.mailBoxPage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
     }
 
     fun onPageDownButtonClicked() {
-        if (TelnetClient.client?.connector?.isConnecting) {
-            PageContainer.instance?.mailBoxPage.loadNextArticle()
+        if (TelnetClient.client?.connector?.isConnecting!!) {
+            PageContainer.instance?.mailBoxPage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -313,7 +313,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         val textWidth = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
             20.0f,
-            context?.resources.displayMetrics
+            context?.resources!!.displayMetrics
         ).toInt()
         var telnetViewWidth = (textWidth / 2) * 80
         val screenWidth: Int = if (navigationController.currentOrientation == 2) {
@@ -327,7 +327,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         } else {
             isFullScreen = false
         }
-        val layoutParams = telnetView?.layoutParams
+        val layoutParams = telnetView?.layoutParams!!
         layoutParams.width = telnetViewWidth
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
         telnetView?.layoutParams = layoutParams

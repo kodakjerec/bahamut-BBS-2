@@ -68,7 +68,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     // 移動toolbar
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent? ->
-        val duration = event?.eventTime - event.downTime
+        val duration = event?.eventTime!! - event.downTime
         var pointX = event.rawX
         var pointY = event.rawY
         // 微調手指中心點
@@ -111,8 +111,8 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         // 获取LinearLayout的LayoutParams
         var deltaX = deltaX
         var deltaY = deltaY
-        val barWidth = mainLayout?.layoutParams.width
-        val barHeight = mainLayout?.layoutParams.height
+        val barWidth = mainLayout?.layoutParams?.width!!
+        val barHeight = mainLayout?.layoutParams?.height!!
         val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
         val screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
 

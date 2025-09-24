@@ -53,12 +53,15 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
-        val listView1 = mainLayout?.findViewById<ListView>(R.id.ClassPage_listView)
-        listView1.emptyView = mainLayout?.findViewById(R.id.ClassPage_listEmptyView)
-        listView = listView1
-        mainLayout?.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
+        val listView1: ListView? = mainLayout?.findViewById(R.id.ClassPage_listView)
+        if (listView1!==null) {
+            listView1.emptyView = mainLayout?.findViewById(R.id.ClassPage_listEmptyView)
+            listView = listView1
+            mainLayout?.findViewById<View>(R.id.ClassPage_SearchButton)?.setOnClickListener(this)
+            mainLayout?.findViewById<View>(R.id.ClassPage_FirstPageButton)?.setOnClickListener(this)
+            mainLayout?.findViewById<View>(R.id.ClassPage_LastestPageButton)
+                ?.setOnClickListener(this)
+        }
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
@@ -94,11 +97,13 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     finalLastVisitBoard + getContextString(R.string.toolbar_item_rr)
 
                 val detail2 = mainLayout?.findViewById<TextView>(R.id.ClassPage_lastVisit)
-                detail2.visibility = View.VISIBLE
-                detail2.bringToFront()
-                detail2.text = lastVisitBoard
-                detail2.setOnClickListener { v: View? ->
-                    TelnetClient.client?.sendStringToServer("s$finalLastVisitBoard")
+                if (detail2!==null) {
+                    detail2.visibility = View.VISIBLE
+                    detail2.bringToFront()
+                    detail2.text = lastVisitBoard
+                    detail2.setOnClickListener { v: View? ->
+                        TelnetClient.client?.sendStringToServer("s$finalLastVisitBoard")
+                    }
                 }
             }
             val detail = "看板列表"
@@ -250,7 +255,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             PageContainer.instance?.pushClassPage(item.name, item.title)
             navigationController.pushViewController(PageContainer.instance?.classPage)
         } else {
-            val page = PageContainer.instance?.boardPage
+            val page = PageContainer.instance!!.boardPage
             page.prepareInitial()
             navigationController.pushViewController(page)
         }

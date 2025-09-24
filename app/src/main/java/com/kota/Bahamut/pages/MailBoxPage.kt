@@ -22,10 +22,8 @@ import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
-import com.kota.Bahamut.pages.model.MailBoxPageBlock.recycle
 import com.kota.Bahamut.pages.model.MailBoxPageHandler
 import com.kota.Bahamut.pages.model.MailBoxPageItem
-import com.kota.Bahamut.pages.model.MailBoxPageItem.Companion.recycle
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -277,11 +275,11 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
-        recycle(telnetListPageBlock as MailBoxPageBlock?)
+        MailBoxPageBlock.recycle(telnetListPageBlock as MailBoxPageBlock)
     }
 
     override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
-        recycle(telnetListPageItem as MailBoxPageItem?)
+        MailBoxPageItem.recycle(telnetListPageItem as MailBoxPageItem)
     }
 
     fun recoverPost() {

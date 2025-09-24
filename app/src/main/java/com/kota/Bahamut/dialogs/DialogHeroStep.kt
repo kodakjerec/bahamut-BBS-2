@@ -66,11 +66,11 @@ class DialogHeroStep:ASDialog() {
     private val sendOnClickListener = OnClickListener {_->
         isClickButton = true
         var sendContent = ""
-        if (content1.text?.isNotEmpty())
+        if (content1.text?.isNotEmpty() == true)
             sendContent += content1.text.toString()+"\n"
-        if (content2.text?.isNotEmpty())
+        if (content2.text?.isNotEmpty() == true)
             sendContent += content2.text.toString()+"\n"
-        if (content3.text?.isNotEmpty())
+        if (content3.text?.isNotEmpty() == true)
             sendContent += content3.text.toString()+"\n"
         if (sendContent.isNotEmpty()) {
             val builder = TelnetOutputBuilder.create()

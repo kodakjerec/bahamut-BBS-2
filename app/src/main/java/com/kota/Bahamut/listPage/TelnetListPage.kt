@@ -39,7 +39,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var executingCommand: TelnetCommand? = null
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
-    open var name: String?
+    open val name: String?
         get() = "TelnetListPage"
     @JvmField
     protected var listViewWidget: ListView? = null
@@ -55,12 +55,12 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         private set
     var lastLoadItemIndex: Int = 0
         private set
-    private var _initialed = false
+    private var isInitialed = false
     private var isManualLoadPending = false
 
     @SuppressLint("UseSparseArrays")
     private val blockList: MutableMap<Int?, TelnetListPageBlock?> =
-        HashMap<Int?, TelnetListPageBlock?>()
+        HashMap()
     private val mDataSetObservable = DataSetObservable()
 
     // android.widget.Adapter
@@ -134,7 +134,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     override fun onPageDidRemoveFromNavigationController() {
-        _initialed = false
+        isInitialed = false
         cleanAllItem()
         stopAutoLoad()
     }
@@ -248,9 +248,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     @Synchronized
     override fun onPagePreload(): Boolean {
         val pageData = loadPage()
-        if (!_initialed) {
+        if (!isInitialed) {
             pushPreloadCommand(0)
-            _initialed = true
+            isInitialed = true
         }
         if (pageData == null) return false
         executeCommandFinished(pageData)
@@ -336,7 +336,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             if (listViewWidget == null) {
                 return -1
             }
-            return getBlockIndex(listViewWidget?.firstVisiblePosition)
+            return getBlockIndex(listViewWidget?.firstVisiblePosition!!)
         }
 
     val lastVisibleBlockIndex: Int
@@ -344,7 +344,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             if (listViewWidget == null) {
                 return -1
             }
-            return getBlockIndex(listViewWidget?.lastVisiblePosition)
+            return getBlockIndex(listViewWidget?.lastVisiblePosition!!)
         }
 
     private fun startAutoLoad() {
@@ -417,11 +417,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (executingCommand == null) {
             executingCommand = popCommand()
             if (executingCommand != null) {
-                if (executingCommand?.recordTime) {
+                if (executingCommand?.recordTime!!) {
                     lastLoadTime = System.currentTimeMillis()
                 }
                 executingCommand?.execute(this)
-                if (executingCommand?.isDone) {
+                if (executingCommand?.isDone!!) {
                     executingCommand = null
                     executeCommand()
                 }
@@ -433,7 +433,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun executeCommandFinished(telnetListPageBlock: TelnetListPageBlock) {
         if (executingCommand != null) {
             executingCommand?.executeFinished(this, telnetListPageBlock)
-            if (!executingCommand?.isDone) {
+            if (!executingCommand?.isDone!!) {
                 rePushCommand(executingCommand)
             }
             executingCommand = null
@@ -624,7 +624,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     protected fun saveListState() {
         if (listViewWidget != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
-            state.position = listViewWidget?.firstVisiblePosition
+            state.position = listViewWidget?.firstVisiblePosition!!
             val firstVisibleItemView = listViewWidget?.getChildAt(0)
             if (firstVisibleItemView != null) {
                 state.top = firstVisibleItemView.top

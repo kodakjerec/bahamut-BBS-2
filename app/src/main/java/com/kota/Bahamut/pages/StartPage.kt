@@ -75,55 +75,55 @@ class StartPage : TelnetPage() {
         findViewById(R.id.Start_Icon_Steam)?.setOnClickListener(urlClickListener)
         findViewById(R.id.Start_Icon_Telegram)?.setOnClickListener(urlClickListener)
         // ip位置
-        val radioGroup = findViewById(R.id.radioButtonIP) as RadioGroup?
-        val radioButton1 = findViewById(R.id.radioButtonIP1) as RadioButton?
-        val radioButton2 = findViewById(R.id.radioButtonIP2) as RadioButton?
+        val radioGroup = findViewById(R.id.radioButtonIP) as RadioGroup
+        val radioButton1 = findViewById(R.id.radioButtonIP1) as RadioButton
+        val radioButton2 = findViewById(R.id.radioButtonIP2) as RadioButton
 
         // 連線位址
         val connectIp: String? = checkNotNull(getConnectIpAddress())
-        if (connectIp == radioButton1?.text.toString()) {
+        if (connectIp == radioButton1.text.toString()) {
             radioButton1.isChecked = true
         } else {
-            radioButton2?.isChecked = true
+            radioButton2.isChecked = true
         }
-        radioGroup?.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+        radioGroup.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
             val rb = findViewById(checkedId) as RadioButton?
             setConnectIpAddress(rb?.text.toString())
         }
 
         // 連線方式
-        val connectMethodGroup = findViewById(R.id.radioButtonConnectMethod) as RadioGroup?
-        val connectMethodButton1 = findViewById(R.id.radioButtonConnectMethod1) as RadioButton?
-        val connectMethodButton2 = findViewById(R.id.radioButtonConnectMethod2) as RadioButton?
+        val connectMethodGroup = findViewById(R.id.radioButtonConnectMethod) as RadioGroup
+        val connectMethodButton1 = findViewById(R.id.radioButtonConnectMethod1) as RadioButton
+        val connectMethodButton2 = findViewById(R.id.radioButtonConnectMethod2) as RadioButton
 
         val connectMethod: String? = checkNotNull(getConnectMethod())
-        if (connectMethod == connectMethodButton1?.text.toString()) {
+        if (connectMethod == connectMethodButton1.text.toString()) {
             connectMethodButton1.isChecked = true
         } else {
-            connectMethodButton2?.isChecked = true
+            connectMethodButton2.isChecked = true
         }
-        connectMethodGroup?.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+        connectMethodGroup.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
             val rb = findViewById(checkedId) as RadioButton?
             setConnectMethod(rb?.text.toString())
             updateIPSelectionState(
                 checkedId == R.id.radioButtonConnectMethod2,
                 radioGroup,
                 radioButton1,
-                radioButton2!!
+                radioButton2
             )
         }
 
         // 初始化時設置狀態
         updateIPSelectionState(
-            connectMethodButton2?.isChecked,
+            connectMethodButton2.isChecked,
             radioGroup,
             radioButton1,
-            radioButton2!!
+            radioButton2
         )
 
         val packageInfo: PackageInfo
         try {
-            packageInfo = context?.packageManager.getPackageInfo(context?.packageName, 0)
+            packageInfo = context?.packageManager!!.getPackageInfo(context?.packageName!!, 0)
             val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt()
             val versionName = packageInfo.versionName
             (findViewById(R.id.version) as TelnetTextViewSmall).text = "$versionCode - $versionName"
@@ -169,7 +169,7 @@ class StartPage : TelnetPage() {
 
     /** 連線  */
     fun connect() {
-        val transportType = navigationController.deviceController?.isNetworkAvailable
+        val transportType = navigationController.deviceController?.isNetworkAvailable!!
         TempSettings.transportType = transportType
         if (transportType > -1) {
             showProcessingDialog(
