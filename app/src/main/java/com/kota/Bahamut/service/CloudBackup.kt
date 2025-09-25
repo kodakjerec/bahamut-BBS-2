@@ -176,13 +176,13 @@ class CloudBackup {
                         }
                     }
                 }catch (e: Exception) {
-                    Log.d("CloudBackup", e.toString())
+                    Log.d(javaClass.simpleName, e.toString())
                 } finally {
                     final()
                 }
             }
         } catch (e: Exception) {
-            Log.d("CloudBackup", e.toString())
+            Log.d(javaClass.simpleName, e.toString())
             final()
         }
     }
@@ -267,14 +267,14 @@ class CloudBackup {
                         }
                     }
                 } catch (e: Exception) {
-                    Log.d("CloudBackup", e.toString())
+                    Log.d(javaClass.simpleName, e.toString())
                 } finally {
                     final()
                 }
             }
 
         } catch (e: java.lang.Exception) {
-            Log.d("CloudBackup", e.toString())
+            Log.d(javaClass.simpleName, e.toString())
             final()
         }
     }

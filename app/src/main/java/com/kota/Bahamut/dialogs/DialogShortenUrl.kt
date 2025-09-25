@@ -122,7 +122,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 }
             } catch (e: Exception) {
                 ASToast.showLongToast(e.message.toString())
-                Log.e("ShortenUrl", e.message.toString())
+                Log.e(javaClass.simpleName, e.message.toString())
             } finally {
                 ASProcessingDialog.dismissProcessingDialog()
             }

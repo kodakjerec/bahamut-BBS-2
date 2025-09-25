@@ -177,7 +177,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 }
             } catch (e: Exception) {
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + e.message)
-                Log.e("ShortenImage", e.message.toString())
+                Log.e(javaClass.simpleName, e.message.toString())
             } finally {
                 closeProcessingDialog()
             }
@@ -225,7 +225,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 }
                 transferButton?.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.message.toString())
+                Log.d(javaClass.simpleName, e.message.toString())
                 ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
             }
         }
@@ -245,7 +245,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 videoView.requestFocus()
                 transferButton?.performClick()
             } catch (e:Exception) {
-                Log.d("DialogShortenImage", e.message.toString())
+                Log.d(javaClass.simpleName, e.message.toString())
             }
         }
     }
@@ -288,11 +288,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     videoView.requestFocus()
                     transferButton?.performClick()
                 }
-            } catch (_: IOException) {
-                Log.e("PhotoPicker", "Error loading image/video")
+            } catch (e: IOException) {
+                Log.e(javaClass.simpleName, "Error loading image/video")
             }
         } else {
-            Log.d("PhotoPicker", "No media selected")
+            Log.d(javaClass.simpleName, "No media selected")
         }
     }
 
@@ -330,7 +330,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
             }
         } catch (e: Exception) {
-            Log.d("DialogShortenImage", e.message.toString())
+            Log.d(javaClass.simpleName, e.message.toString())
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error04))
             return
         }

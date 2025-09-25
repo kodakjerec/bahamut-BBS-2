@@ -14,7 +14,6 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
     private var mainLayout: LinearLayout
     private var webView: WebView
     private var btnClose: Button
-    private var isClickButton = false
     private var loginWeb: LoginWeb? = null
 
     init {
@@ -25,8 +24,9 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         mainLayout = findViewById(R.id.dialog_login_signin_layout)
         webView = findViewById(R.id.debug_webview)
         btnClose = findViewById(R.id.debug_btn_close)
+        btnClose.setOnClickListener { dismiss() }
 
-        // 初始設為小尺寸顯示在左上角
+        // 設定 WebView 屬性
         setDialogWidthHeight()
     }
 
@@ -63,22 +63,11 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         return this
     }
 
-    override fun show() {
-        btnClose.setOnClickListener(closeOnClickListener)
-        super.show()
-    }
-
     override fun dismiss() {
         super.dismiss()
         // 清理 LoginWeb 資源
         loginWeb?.cleanup()
         loginWeb = null
-    }
-
-    /** 關閉按鈕 */
-    private val closeOnClickListener = OnClickListener { _ ->
-        isClickButton = true
-        dismiss()
     }
 
     // 變更dialog寬度和高度
