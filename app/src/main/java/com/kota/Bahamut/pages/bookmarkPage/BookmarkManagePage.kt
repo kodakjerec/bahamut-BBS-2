@@ -25,7 +25,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
-import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetHeaderItemView
 import com.kota.telnetUI.TelnetPage
@@ -334,7 +333,7 @@ open class BookmarkManagePage(
         val controllers = navigationController.viewControllers
         controllers.removeAt(controllers.size - 1)
         controllers.add(page)
-        navigationController.setViewControllers(controllers as Vector<ASViewController>?, true)
+        navigationController.setViewControllers(controllers, true)
         this@BookmarkManagePage.boardExtendOptionalPageListener?.onBoardExtendOptionalPageDidSelectBookmark(bookmark)
     }
 

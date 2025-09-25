@@ -1,5 +1,6 @@
 package com.kota.Bahamut.pages.essencePage
 
+import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
@@ -8,7 +9,7 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetUtils
 
 class BoardEssencePageHandler private constructor() {
-    fun load(): BoardPageBlock {
+    fun load(): TelnetListPageBlock {
         var row: TelnetRow
         val boardPageBlock = BoardPageBlock.create()
         val firstRowString = TelnetClient.client?.model?.getRowString(0)
@@ -72,7 +73,7 @@ class BoardEssencePageHandler private constructor() {
 
     companion object {
         private var _instance: BoardEssencePageHandler? = null
-        @kotlin.jvm.JvmStatic
+        @JvmStatic
         val instance: BoardEssencePageHandler?
             get() {
                 if (_instance == null) {

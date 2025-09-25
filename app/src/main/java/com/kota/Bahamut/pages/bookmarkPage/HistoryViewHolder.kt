@@ -38,6 +38,6 @@ class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener
     }
 
     override fun onClick(view: View?) {
-        mListener?.onItemClick(view, adapterPosition)
+        mListener?.onItemClick(view, bindingAdapterPosition)
     }
 }

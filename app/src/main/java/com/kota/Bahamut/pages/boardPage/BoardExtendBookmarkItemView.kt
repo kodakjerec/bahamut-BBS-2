@@ -10,11 +10,11 @@ import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
 
 class BoardExtendBookmarkItemView : LinearLayout {
-    private var _author_label: TextView? = null
-    private var _divider_top: View? = null
-    private var _gy_label: TextView? = null
-    private var _mark_label: TextView? = null
-    private var _title_label: TextView? = null
+    private var authorLabel: TextView? = null
+    private var dividerTop: View? = null
+    private var gyLabel: TextView? = null
+    private var markLevel: TextView? = null
+    private var titleLabel: TextView? = null
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         init()
@@ -36,66 +36,66 @@ class BoardExtendBookmarkItemView : LinearLayout {
     }
 
     private fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
             R.layout.board_extend_optional_page_bookmark_item_view,
             this
         )
-        _title_label = findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
-        _author_label =
-            findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_Author)
-        _mark_label = findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
-        _gy_label = findViewById<TextView?>(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)
-        _divider_top = findViewById<View?>(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop)
+        titleLabel = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
+        authorLabel =
+            findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Author)
+        markLevel = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
+        gyLabel = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)
+        dividerTop = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop)
     }
 
     fun setDividerTopVisible(visible: Boolean) {
-        if (_divider_top == null) {
+        if (dividerTop == null) {
             return
         }
         if (visible) {
-            if (_divider_top?.getVisibility() != VISIBLE) {
-                _divider_top?.setVisibility(VISIBLE)
+            if (dividerTop?.visibility != VISIBLE) {
+                dividerTop?.visibility = VISIBLE
             }
-        } else if (_divider_top?.getVisibility() != GONE) {
-            _divider_top?.setVisibility(GONE)
+        } else if (dividerTop?.visibility != GONE) {
+            dividerTop?.visibility = GONE
         }
     }
 
     fun setTitle(title: String?) {
-        if (_title_label != null) {
-            if (title == null || title.length == 0) {
-                _title_label?.setText("未輸入")
+        if (titleLabel != null) {
+            if (title == null || title.isEmpty()) {
+                titleLabel?.text = "未輸入"
             } else {
-                _title_label?.setText(title)
+                titleLabel?.text = title
             }
         }
     }
 
     fun setAuthor(author: String?) {
-        if (_author_label != null) {
-            if (author == null || author.length == 0) {
-                _author_label?.setText("未輸入")
+        if (authorLabel != null) {
+            if (author == null || author.isEmpty()) {
+                authorLabel?.text = "未輸入"
             } else {
-                _author_label?.setText(author)
+                authorLabel?.text = author
             }
         }
     }
 
     fun setGYNumber(number: String?) {
-        if (_gy_label != null) {
-            if (number == null || number.length == 0) {
-                _gy_label?.setText(Bookmark.OPTIONAL_BOOKMARK)
+        if (gyLabel != null) {
+            if (number == null || number.isEmpty()) {
+                gyLabel?.text = Bookmark.OPTIONAL_BOOKMARK
             } else {
-                _gy_label?.setText(number)
+                gyLabel?.text = number
             }
         }
     }
 
     fun setMark(isMarked: Boolean) {
         if (isMarked) {
-            _mark_label?.setVisibility(VISIBLE)
+            markLevel?.visibility = VISIBLE
         } else {
-            _mark_label?.setVisibility(INVISIBLE)
+            markLevel?.visibility = INVISIBLE
         }
     }
 

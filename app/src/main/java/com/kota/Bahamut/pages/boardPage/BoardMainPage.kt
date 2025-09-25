@@ -395,15 +395,15 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         this@BoardMainPage.changeToolbarLocation()
     }
 
-    val pageLayout: Int
+    open val pageLayout: Int
         // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
         get() = R.layout.board_page
 
-    val pageType: Int
+    open val pageType: Int
         // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
         get() = BahamutPage.BAHAMUT_BOARD
 
-    val isAutoLoadEnable: Boolean
+    open val isAutoLoadEnable: Boolean
         // com.kota.Bahamut.ListPage.TelnetListPage
         get() = true
 

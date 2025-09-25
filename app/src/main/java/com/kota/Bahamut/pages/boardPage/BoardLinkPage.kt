@@ -1,38 +1,39 @@
 package com.kota.Bahamut.pages.boardPage
 
 import android.view.View
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.Bookmark
+import com.kota.Bahamut.pages.PostArticlePage
+import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnet.TelnetClient
+import com.kota.telnet.reference.TelnetKeyboard
+import java.util.Vector
 
 class BoardLinkPage : BoardMainPage() {
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOARD_LINK
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.board_link_page
 
-    val listType: Int
+    override val listType: Int
         get() = BoardPageAction.Companion.LINK_TITLE
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        val header_view = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
-        if (header_view != null) {
-            var board_name = name
-            if (board_name == null) {
-                board_name = getContextString(R.string.loading)
+        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
+        if (headerView != null) {
+            var boardName = name
+            if (boardName == null) {
+                boardName = getContextString(R.string.loading)
             }
-            header_view.setData(this._board_title, "主題串列", board_name)
+            headerView.setData(this._board_title, "主題串列", boardName)
         }
     }
 
@@ -42,8 +43,8 @@ class BoardLinkPage : BoardMainPage() {
     }
 
     // 長按串接到的item
-    override fun onListViewItemLongClicked(itemView: View?, selectedItemIndex: Int): Boolean {
-        val item = this@BoardLinkPage.getItem(selectedItemIndex) as BoardPageItem?
+    override fun onListViewItemLongClicked(view: View?, i: Int): Boolean {
+        val item = this@BoardLinkPage.getItem(i) as BoardPageItem?
 
         if (item != null) {
             ASAlertDialog.createDialog()
@@ -51,7 +52,7 @@ class BoardLinkPage : BoardMainPage() {
                 .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.insert))
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { aDialog: ASAlertDialog?, index: Int ->
                     if (index == 1) {
                         val bookmark = Bookmark()
                         println("add bookmark:" + bookmark.title)
@@ -64,13 +65,13 @@ class BoardLinkPage : BoardMainPage() {
                             store.store()
                         }
                     }
-                }).scheduleDismissOnPageDisappear(this).show()
+                }.scheduleDismissOnPageDisappear(this).show()
         }
         return true
     }
 
-    override fun getListIdFromListName(aName: String?): String? {
-        return aName + "[Board][TitleLinked]"
+    override fun getListIdFromListName(str: String?): String? {
+        return "$str[Board][TitleLinked]"
     }
 
     override fun onPostButtonClicked() {
@@ -83,7 +84,7 @@ class BoardLinkPage : BoardMainPage() {
                     .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
                     .addButton(getContextString(R.string.cancel))
                     .addButton(getContextString(R.string.insert))
-                    .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                    .setListener { aDialog: ASAlertDialog?, index: Int ->
                         if (index == 1) {
                             val bookmark = Bookmark()
                             println("add bookmark:" + bookmark.title)
@@ -97,7 +98,7 @@ class BoardLinkPage : BoardMainPage() {
                                 store.store()
                             }
                         }
-                    }).scheduleDismissOnPageDisappear(this).show()
+                    }.scheduleDismissOnPageDisappear(this).show()
             }
         }
     }
@@ -108,5 +109,30 @@ class BoardLinkPage : BoardMainPage() {
         TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance?.cleanBoardTitleLinkedPage()
         return true
+    }
+
+    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPostDialogEditButtonClicked(
+        postArticlePage: PostArticlePage?,
+        str: String?,
+        str2: String?,
+        str3: String?
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPostDialogSendButtonClicked(
+        postArticlePage: PostArticlePage?,
+        str: String?,
+        str2: String?,
+        str3: String?,
+        str4: String?,
+        str5: String?,
+        boolean6: Boolean?
+    ) {
+        TODO("Not yet implemented")
     }
 }

@@ -145,24 +145,24 @@ class UserSettings(var myContext: Context) {
             get() = mySharedPref?.getInt(
                 PROPERTIES_DRAWER_LOCATION,
                 0
-            )
+            )!!
             set(choice) {
                 myEditor?.putInt(
                     PROPERTIES_DRAWER_LOCATION,
                     choice
-                ).apply()
+                )?.apply()
             }
         @JvmStatic
         var propertiesToolbarLocation: Int
             get() = mySharedPref?.getInt(
                 PROPERTIES_TOOLBAR_LOCATION,
                 0
-            )
+            )!!
             set(choice) {
                 myEditor?.putInt(
                     PROPERTIES_TOOLBAR_LOCATION,
                     choice
-                ).apply()
+                )?.apply()
             }
 
         @JvmStatic
@@ -170,12 +170,12 @@ class UserSettings(var myContext: Context) {
             get() = mySharedPref?.getInt(
                 PROPERTIES_TOOLBAR_ORDER,
                 0
-            )
+            )!!
             set(choice) {
                 myEditor?.putInt(
                     PROPERTIES_TOOLBAR_ORDER,
                     choice
-                ).apply()
+                )?.apply()
             }
         @JvmStatic
         var propertiesScreenOrientation: Int
@@ -379,7 +379,7 @@ class UserSettings(var myContext: Context) {
         }
 
         @JvmStatic
-        var blockList: MutableList<String>?
+        var blockList: MutableList<String>
             // 取出黑名單(格式化後)
             get() {
                 val blockListString: String = mySharedPref?.getString(
@@ -403,7 +403,7 @@ class UserSettings(var myContext: Context) {
             // 更新黑名單時同時更新緩存
             set(aList) {
                 var listString = StringBuilder()
-                if (aList == null || aList.isEmpty()) {
+                if (aList.isEmpty()) {
                     listString = StringBuilder("guest")
                     showLongToast("黑名單至少保留guest，為了政策")
                 } else {
@@ -415,7 +415,7 @@ class UserSettings(var myContext: Context) {
                 myEditor?.putString(
                     PROPERTIES_BLOCK_LIST,
                     listString.toString()
-                ).apply()
+                )?.apply()
 
 
                 // 更新緩存

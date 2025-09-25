@@ -26,26 +26,26 @@ import com.kota.telnetUI.TelnetPage
 import java.util.Collections
 
 class BlockListPage : TelnetPage(), BlockListClickListener {
-    var _inputField: EditText? = null
+    var inputField: EditText? = null
 
     var blockListAdapter: BlockListAdapter? = null
 
     // 按下新增
-    var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (_inputField != null) {
-            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
-            _inputField?.setText("")
-            if (block_name.length > 0) {
-                val new_list: MutableList<String?>? = blockList
-                if (new_list?.contains(block_name)) {
+    var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
+        if (inputField != null) {
+            val blockName = inputField?.text.toString().trim { it <= ' ' }
+            inputField?.setText("")
+            if (blockName.isNotEmpty()) {
+                val newList: MutableList<String?> = blockList
+                if (newList?.contains(blockName)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
                         this@BlockListPage
                     )
                 } else {
-                    new_list.add(block_name)
+                    newList.add(blockName)
                 }
-                blockList = new_list
+                blockList = newList
 
                 notifyDataUpdated()
                 this@BlockListPage.reload()
@@ -65,7 +65,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
                 if (button_index > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField?.setText("")
+                    inputField?.setText("")
                     resetBlockList()
                     this@BlockListPage.reload()
                 }
@@ -86,8 +86,8 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            start = viewHolder.getAdapterPosition()
-            end = target.getAdapterPosition()
+            start = viewHolder.adapterPosition
+            end = target.adapterPosition
             if (propertiesVIP) {
                 Collections.swap(_blockList, start, end)
                 blockListAdapter?.notifyItemMoved(start, end)
@@ -159,8 +159,8 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         recyclerView.setAdapter(blockListAdapter)
         blockListAdapter?.setOnItemClickListener(this)
 
-        _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
+        inputField = findViewById(R.id.BlockList_Input) as EditText?
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(addListener)
         findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
 
         showNotification()
@@ -200,12 +200,12 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         return true
     }
 
-    override fun onBlockListPage_ItemView_clicked(blockListPage_ItemView: BlockListViewHolder?) {
+    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder?) {
     }
 
     // 刪除黑名單
     override fun onBlockListPage_ItemView_delete_clicked(blockListPage_ItemView: BlockListViewHolder) {
-        val deleted_index = blockListPage_ItemView.getAdapterPosition()
+        val deleted_index = blockListPage_ItemView.adapterPosition
         val new_list = this@BlockListPage._blockList
         new_list.removeAt(deleted_index)
 

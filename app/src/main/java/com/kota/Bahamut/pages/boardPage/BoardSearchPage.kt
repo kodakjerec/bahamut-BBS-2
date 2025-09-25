@@ -1,40 +1,41 @@
 package com.kota.Bahamut.pages.boardPage
 
 import android.view.View
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.Bookmark
+import com.kota.Bahamut.pages.PostArticlePage
+import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnet.TelnetClient
+import com.kota.telnet.reference.TelnetKeyboard
+import java.util.Vector
 
 class BoardSearchPage : BoardMainPage() {
-    private var _author: String? = null
-    private var _gy: String? = null
-    private var _keyword: String? = null
-    private var _mark: String? = null
+    private var author: String? = null
+    private var gy: String? = null
+    private var keyword: String? = null
+    private var mark: String? = null
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOARD_SEARCH
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.board_search_page
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        val header_view = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
-        if (header_view != null) {
-            var board_name = name
-            if (board_name == null) {
-                board_name = getContextString(R.string.loading)
+        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
+        if (headerView != null) {
+            var boardName = name
+            if (boardName == null) {
+                boardName = getContextString(R.string.loading)
             }
-            header_view.setData(this._board_title, "文章搜尋", board_name)
+            headerView.setData(this._board_title, "文章搜尋", boardName)
         }
     }
 
@@ -43,8 +44,8 @@ class BoardSearchPage : BoardMainPage() {
         return true
     }
 
-    override fun onListViewItemLongClicked(itemView: View?, selectedIndex: Int): Boolean {
-        val item = this@BoardSearchPage.getItem(selectedIndex) as BoardPageItem?
+    override fun onListViewItemLongClicked(view: View?, i: Int): Boolean {
+        val item = this@BoardSearchPage.getItem(i) as BoardPageItem?
 
         if (item != null) {
             ASAlertDialog.createDialog()
@@ -52,7 +53,7 @@ class BoardSearchPage : BoardMainPage() {
                 .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.insert))
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { aDialog: ASAlertDialog?, index: Int ->
                     if (index == 1) {
                         val bookmark = Bookmark()
                         println("add bookmark:" + bookmark.title)
@@ -66,16 +67,16 @@ class BoardSearchPage : BoardMainPage() {
                             store.store()
                         }
                     }
-                }).scheduleDismissOnPageDisappear(this).show()
+                }.scheduleDismissOnPageDisappear(this).show()
         }
         return true
     }
 
-    val listType: Int
+    override val listType: Int
         get() = BoardPageAction.Companion.SEARCH
 
-    override fun getListIdFromListName(aName: String?): String? {
-        return aName + "[Board][Search]"
+    override fun getListIdFromListName(str: String?): String? {
+        return "$str[Board][Search]"
     }
 
     override fun onPostButtonClicked() {
@@ -84,15 +85,15 @@ class BoardSearchPage : BoardMainPage() {
             .setMessage(getContextString(R.string.insert_this_bookmark_search))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.insert))
-            .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     val bookmark = Bookmark()
                     println("add bookmark:" + bookmark.title)
                     bookmark.board = this@BoardSearchPage.name
-                    bookmark.keyword = this@BoardSearchPage._keyword
-                    bookmark.author = this@BoardSearchPage._author
-                    bookmark.mark = this@BoardSearchPage._mark
-                    bookmark.gy = this@BoardSearchPage._gy
+                    bookmark.keyword = this@BoardSearchPage.keyword
+                    bookmark.author = this@BoardSearchPage.author
+                    bookmark.mark = this@BoardSearchPage.mark
+                    bookmark.gy = this@BoardSearchPage.gy
                     bookmark.title = bookmark.generateTitle()
                     val store = TempSettings.bookmarkStore
                     if (store != null) {
@@ -100,23 +101,23 @@ class BoardSearchPage : BoardMainPage() {
                         store.store()
                     }
                 }
-            }).scheduleDismissOnPageDisappear(this).show()
+            }.scheduleDismissOnPageDisappear(this).show()
     }
 
     fun setKeyword(keyword: String?) {
-        this._keyword = keyword
+        this.keyword = keyword
     }
 
     fun setAuthor(author: String?) {
-        this._author = author
+        this.author = author
     }
 
     fun setMark(mark: String?) {
-        this._mark = mark
+        this.mark = mark
     }
 
     fun setGy(gy: String?) {
-        this._gy = gy
+        this.gy = gy
     }
 
     override fun onBackPressed(): Boolean {
@@ -127,6 +128,31 @@ class BoardSearchPage : BoardMainPage() {
         return true
     }
 
-    val isAutoLoadEnable: Boolean
+    override val isAutoLoadEnable: Boolean
         get() = false
+
+    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPostDialogEditButtonClicked(
+        postArticlePage: PostArticlePage?,
+        str: String?,
+        str2: String?,
+        str3: String?
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onPostDialogSendButtonClicked(
+        postArticlePage: PostArticlePage?,
+        str: String?,
+        str2: String?,
+        str3: String?,
+        str4: String?,
+        str5: String?,
+        boolean6: Boolean?
+    ) {
+        TODO("Not yet implemented")
+    }
 }

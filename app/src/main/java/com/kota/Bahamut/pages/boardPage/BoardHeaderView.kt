@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -39,7 +38,7 @@ class BoardHeaderView : LinearLayout {
         mMenuButton = findViewById(R.id.menu_button)
 
         // 側邊選單
-        val location = UserSettings.getPropertiesDrawerLocation()
+        val location = UserSettings.propertiesDrawerLocation
         if (location == 1) {
             val headerItemView = findViewById<LinearLayout>(R.id.header_item_view)
             // 備份現在的view
@@ -81,8 +80,8 @@ class BoardHeaderView : LinearLayout {
             if (aTitle != null && aTitle.contains("系統精靈送信來了")) {
                 myTitle?.setTextColor(getContextColor(R.color.white))
                 myTitle?.setBackgroundColor(getContextColor(R.color.red))
-                val layoutParams = myTitle?.layoutParams
-                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT
+                val layoutParams = myTitle?.layoutParams!!
+                layoutParams.width = LayoutParams.WRAP_CONTENT
                 myTitle?.layoutParams = layoutParams
             }
         }
@@ -98,8 +97,8 @@ class BoardHeaderView : LinearLayout {
     fun setDetail1ClickListener(aListener: OnClickListener?) {
         if (aListener != null) {
             detail1?.setOnClickListener(aListener)
-            val detailvV = findViewById<TextView>(R.id.detail_vV)
-            detailvV.visibility = VISIBLE
+            val detailVV = findViewById<TextView>(R.id.detail_vV)
+            detailVV.visibility = VISIBLE
         }
     }
 

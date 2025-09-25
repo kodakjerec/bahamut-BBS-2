@@ -27,26 +27,23 @@ import com.kota.telnet.TelnetClient
 
 class BoardEssencePage : TelnetListPage() {
     private lateinit var mainLayout:RelativeLayout
-    private var _title: String = ""
+    private var myTitle: String = ""
 
-    override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_BOARD_ESSENCE
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_BOARD_ESSENCE
 
-    override fun getPageLayout(): Int {
-        return R.layout.board_essence_page
-    }
+    override val pageLayout: Int
+        get() =  R.layout.board_essence_page
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
         val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData("精華文章", _title, name)
+        headerView.setData("精華文章", myTitle, name)
     }
 
-    override fun getListType(): Int {
-        return BoardPageAction.ESSENCE
-    }
+    override val listType: Int
+        get() = BoardPageAction.ESSENCE
 
     override fun getListIdFromListName(aName: String?): String {
         return "[Board][Essence]"
@@ -64,34 +61,31 @@ class BoardEssencePage : TelnetListPage() {
         return true
     }
 
-    override fun isAutoLoadEnable(): Boolean {
-        return false
-    }
+    override val isAutoLoadEnable: Boolean
+        get() = false
 
     override fun loadPage(): TelnetListPageBlock {
-        return BoardEssencePageHandler.instance?.load()
+        return BoardEssencePageHandler.instance?.load()!!
     }
 
-    override fun recycleBlock(aBlock: TelnetListPageBlock?) {
-        BoardPageBlock.recycle(aBlock as BoardPageBlock?)
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+        BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
-    override fun getView(index: Int, view: View?, viewGroup: ViewGroup?): View {
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
         var view1 = view
-        val itemIndex = index + 1
+        val itemIndex = i + 1
         val block = ItemUtils.getBlock(itemIndex)
-        val boardEssencePageItem = getItem(index) as BoardEssencePageItem?
+        val boardEssencePageItem = getItem(i) as BoardEssencePageItem?
         if (boardEssencePageItem == null && currentBlock != block && !isLoadingBlock(itemIndex)) {
             loadBoardBlock(block)
         }
         if (view1 == null) {
             view1 = BoardEssencePageItemView(context)
-            view1.setLayoutParams(
-                AbsListView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+            view1.layoutParams = AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
         val boardEssencePageItemView = view1 as BoardEssencePageItemView
@@ -128,14 +122,12 @@ class BoardEssencePage : TelnetListPage() {
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
-    override fun isItemCanLoadAtIndex(i: Int): Boolean {
-        val boardEssencePageItem = getItem(i) as BoardEssencePageItem
+    override fun isItemCanLoadAtIndex(index: Int): Boolean {
+        val boardEssencePageItem = getItem(index) as BoardEssencePageItem
         return !boardEssencePageItem.isDeleted && boardEssencePageItem.isBBSClickable
     }
 
     // 點下文章
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun loadItemAtIndex(index: Int) {
         val item = getItem(index) as BoardEssencePageItem? ?: return
         if (!item.isBBSClickable) {
@@ -147,18 +139,18 @@ class BoardEssencePage : TelnetListPage() {
             // 目錄
 
             // 如果現在最上層是article essence page, 表示是在內文按上一篇/下一篇
-            val lastPage = ASNavigationController.getCurrentController().viewControllers.lastElement()
+            val lastPage = ASNavigationController.currentController!!.viewControllers.lastElement()!!
             if (lastPage.pageType == BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
                 ASToast.showShortToast("找沒有了耶...:(")
             } else {
                 // 進入目錄
-                PageContainer.instance?.pushBoardEssencePage(name, _title)
+                PageContainer.instance?.pushBoardEssencePage(name, myTitle)
                 navigationController.pushViewController(PageContainer.instance?.boardEssencePage)
                 super.loadItemAtIndex(index)
             }
         } else {
             // 文章
-            val articleEssencePage = PageContainer.instance?.articleEssencePage
+            val articleEssencePage = PageContainer.instance?.articleEssencePage!!
             articleEssencePage.setBoardEssencePage(this)
             articleEssencePage.clear()
             navigationController.pushViewController(articleEssencePage)
@@ -168,9 +160,9 @@ class BoardEssencePage : TelnetListPage() {
 
     //
     // com.kota.Bahamut.ListPage.TelnetListPage
-    override fun isItemBlocked(telnetListPageItem: TelnetListPageItem?): Boolean {
-        return if (telnetListPageItem != null) {
-            val boardEssencePageItem = telnetListPageItem as BoardEssencePageItem
+    override fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
+        return if (aItem != null) {
+            val boardEssencePageItem = aItem as BoardEssencePageItem
             return !boardEssencePageItem.isBBSClickable
         } else
             false
@@ -183,7 +175,7 @@ class BoardEssencePage : TelnetListPage() {
     }
 
     fun setClassTitle(aTitle: String) {
-        _title = aTitle
+        myTitle = aTitle
     }
 
     fun loadPreviousArticle() {

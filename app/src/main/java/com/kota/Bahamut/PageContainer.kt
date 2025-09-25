@@ -33,7 +33,7 @@ class PageContainer private constructor() {
     private var billingPageInstance: BillingPage? = null
     private var postArticlePageInstance: PostArticlePage? = null
     private val boardEssencePageStack = Stack<BoardEssencePage>()
-    private var articleEssencePage: ArticleEssencePage? = null
+    var articleEssencePage: ArticleEssencePage? = null
     private var themeManagerPage: ThemeManagerPage? = null
     private var userInfoPage: UserInfoPage? = null
     private var userConfigPage: UserConfigPage? = null

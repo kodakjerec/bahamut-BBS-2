@@ -16,16 +16,16 @@ import com.kota.Bahamut.service.TempSettings
 import java.util.Objects
 
 class BoardPageItemView : LinearLayout {
-    var _author_label: TextView? = null
-    private var _content_view: ViewGroup? = null
-    private var _date_label: TextView? = null
-    private var _divider_bottom: View? = null
-    private var _gy_label: TextView? = null
-    private var _gy_title_label: TextView? = null
-    private var _mark_label: TextView? = null
-    private var _number_label: TextView? = null
-    private var _status_label: TextView? = null
-    private var _title_label: TextView? = null
+    var authorLabel: TextView? = null
+    private var contentView: ViewGroup? = null
+    private var dateLabel: TextView? = null
+    private var dividerBottom: View? = null
+    private var gyLabel: TextView? = null
+    private var gyTitleLabel: TextView? = null
+    private var markLabel: TextView? = null
+    private var numberLabel: TextView? = null
+    private var statusLabel: TextView? = null
+    private var titleLabel: TextView? = null
 
     constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs) {
         init()
@@ -51,51 +51,49 @@ class BoardPageItemView : LinearLayout {
     }
 
     private fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
             R.layout.board_page_item_view,
             this
         )
-        _content_view = findViewById<ViewGroup?>(R.id.BoardPage_ItemView_contentView)
-        _status_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_Status)
-        _title_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_Title)
-        _number_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_Number)
-        _date_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_Date)
-        _gy_title_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_GY_Title)
-        _gy_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_GY)
-        _mark_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_mark)
-        _author_label = _content_view?.findViewById<TextView?>(R.id.BoardPage_ItemView_Author)
-        _divider_bottom = _content_view?.findViewById<View>(R.id.BoardPage_ItemView_DividerBottom)
+        contentView = findViewById(R.id.BoardPage_ItemView_contentView)
+        statusLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Status)
+        titleLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Title)
+        numberLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Number)
+        dateLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Date)
+        gyTitleLabel = contentView?.findViewById(R.id.BoardPage_ItemView_GY_Title)
+        gyLabel = contentView?.findViewById(R.id.BoardPage_ItemView_GY)
+        markLabel = contentView?.findViewById(R.id.BoardPage_ItemView_mark)
+        authorLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Author)
+        dividerBottom = contentView?.findViewById(R.id.BoardPage_ItemView_DividerBottom)
     }
 
     fun setDividerBottomVisible(visible: Boolean) {
-        if (_divider_bottom == null) {
+        if (dividerBottom == null) {
             return
         }
         if (visible) {
-            if (_divider_bottom?.getVisibility() != VISIBLE) {
-                _divider_bottom?.setVisibility(VISIBLE)
+            if (dividerBottom?.visibility != VISIBLE) {
+                dividerBottom?.visibility = VISIBLE
             }
-        } else if (_divider_bottom?.getVisibility() != GONE) {
-            _divider_bottom?.setVisibility(GONE)
+        } else if (dividerBottom?.visibility != GONE) {
+            dividerBottom?.visibility = GONE
         }
     }
 
     fun setTitle(title: String?) {
-        if (_title_label != null) {
-            _title_label?.setText(
-                Objects.requireNonNullElse<String?>(
-                    title,
-                    getContextString(R.string.loading_)
-                )
+        if (titleLabel != null) {
+            titleLabel?.text = Objects.requireNonNullElse<String?>(
+                title,
+                getContextString(R.string.loading_)
             )
         }
     }
 
     var author: String?
-        get() = _author_label?.getText() as String?
+        get() = authorLabel?.text as String?
         set(author) {
-            if (_author_label != null) {
-                _author_label?.setText(
+            if (authorLabel != null) {
+                authorLabel?.setText(
                     Objects.requireNonNullElse<String?>(
                         author,
                         getContextString(R.string.loading)
@@ -105,83 +103,81 @@ class BoardPageItemView : LinearLayout {
         }
 
     fun setDate(date: String?) {
-        if (_date_label != null) {
-            _date_label?.setText(
-                Objects.requireNonNullElse<String?>(
-                    date,
-                    getContextString(R.string.loading)
-                )
+        if (dateLabel != null) {
+            dateLabel?.text = Objects.requireNonNullElse<String?>(
+                date,
+                getContextString(R.string.loading)
             )
         }
     }
 
     @SuppressLint("DefaultLocale")
     fun setNumber(number: Int) {
-        if (_number_label != null) {
+        if (numberLabel != null) {
             if (number > 0) {
-                _number_label?.setText(String.format("%1$05d", number))
+                numberLabel?.text = String.format("%1$05d", number)
                 return
             }
-            _number_label?.setText(getContextString(R.string.loading))
+            numberLabel?.text = getContextString(R.string.loading)
         }
     }
 
     fun setGYNumber(number: Int) {
-        if (_gy_label == null) {
+        if (gyLabel == null) {
             return
         }
         if (number == 0) {
-            _gy_title_label?.setVisibility(GONE)
-            _gy_label?.setVisibility(GONE)
+            gyTitleLabel?.visibility = GONE
+            gyLabel?.visibility = GONE
             return
         }
-        _gy_title_label?.setVisibility(VISIBLE)
-        _gy_label?.setVisibility(VISIBLE)
-        _gy_label?.setText(number.toString())
+        gyTitleLabel?.visibility = VISIBLE
+        gyLabel?.visibility = VISIBLE
+        gyLabel?.text = number.toString()
     }
 
     @SuppressLint("SetTextI18n")
     fun setReply(isReply: Boolean) {
-        if (_status_label == null) {
+        if (statusLabel == null) {
             return
         }
         // 戰巴哈只要看到第一篇和回應就可
         if (isReply) {
-            _status_label?.setText("Re")
+            statusLabel?.text = "Re"
         } else {
-            _status_label?.setText("◆")
+            statusLabel?.text = "◆"
         }
     }
 
     fun setMark(isMarked: Boolean) {
         if (isMarked) {
-            _mark_label?.setVisibility(VISIBLE)
+            markLabel?.visibility = VISIBLE
         } else {
-            _mark_label?.setVisibility(INVISIBLE)
+            markLabel?.visibility = INVISIBLE
         }
     }
 
     // 設定已讀/未讀
     fun setRead(isRead: Boolean) {
-        if (TempSettings.isBoardFollowTitle((_title_label?.getText() as kotlin.String?)!!)) { // 關注的討論串
-            if (_status_label?.getText() == "◆") { // 首篇文章
+        if (TempSettings.isBoardFollowTitle((titleLabel?.text as String?)!!)) { // 關注的討論串
+            if (statusLabel?.text == "◆") { // 首篇文章
                 if (isRead) {
-                    _title_label?.setTextColor(getContextColor(R.color.board_item_follow_first_read))
+                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_first_read))
                 } else {
-                    _title_label?.setTextColor(getContextColor(R.color.board_item_follow_first))
+                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_first))
                 }
             } else { // 回應文章
                 if (isRead) {
-                    _title_label?.setTextColor(getContextColor(R.color.board_item_follow_other_read))
+                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_other_read))
                 } else {
-                    _title_label?.setTextColor(getContextColor(R.color.board_item_follow_other))
+                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_other))
                 }
             }
         } else { // 其他文章
             if (isRead) {
-                _title_label?.setTextColor(getContextColor(R.color.board_item_normal_read))
+                titleLabel?.setTextColor(getContextColor(R.color.board_item_normal_read))
             } else {
-                _title_label?.setTextColor(getContextColor(R.color.board_item_normal))
+                titleLabel?.setTextColor(getContextColor(R.color.board_item_normal))
             }
         }
     }
@@ -198,18 +194,18 @@ class BoardPageItemView : LinearLayout {
     }
 
     var visible: Boolean
-        get() = _content_view?.getVisibility() == VISIBLE
+        get() = contentView?.visibility == VISIBLE
         set(visible) {
             if (visible) {
-                if (_content_view?.getVisibility() != VISIBLE) {
-                    _content_view?.setVisibility(VISIBLE)
+                if (contentView?.visibility != VISIBLE) {
+                    contentView?.setVisibility(VISIBLE)
                 }
-            } else if (_content_view?.getVisibility() != GONE) {
-                _content_view?.setVisibility(GONE)
+            } else if (contentView?.visibility != GONE) {
+                contentView?.setVisibility(GONE)
             }
         }
 
     companion object {
-        private const val _count = 0
+        private const val COUNT = 0
     }
 }

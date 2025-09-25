@@ -7,12 +7,6 @@ import android.widget.EditText
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -23,32 +17,36 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
 import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetArticleExpressions
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
-import java.util.Arrays
 import java.util.Collections
 
 class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
-    var _inputField: EditText? = null
+    var inputField: EditText? = null
 
     var articleExpressionListAdapter: BlockListAdapter? = null
 
     // 按下新增
-    var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (_inputField != null) {
-            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
-            _inputField?.setText("")
-            if (block_name.length > 0) {
-                val new_list: MutableList<String?> =
-                    ArrayList<String?>(Arrays.asList<String>(*articleExpressions))
-                if (new_list.contains(block_name)) {
+    var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
+        if (inputField != null) {
+            val blockName = inputField?.text.toString().trim { it <= ' ' }
+            inputField?.setText("")
+            if (blockName.isNotEmpty()) {
+                val newList: MutableList<String?> =
+                    ArrayList(listOf(*articleExpressions))
+                if (newList.contains(blockName)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
                         this@ArticleExpressionListPage
                     )
                 } else {
-                    new_list.add(block_name)
+                    newList.add(blockName)
                 }
-                UserSettings.setArticleExpressions(new_list)
+                UserSettings.setArticleExpressions(newList)
 
                 notifyDataUpdated()
                 this@ArticleExpressionListPage.reload()
@@ -62,20 +60,20 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     }
 
     // 按下重置
-    var _resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    var resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
         createDialog()
             .setTitle(getContextString(R.string.reset))
             .setMessage(getContextString(R.string.reset_message))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.sure))
-            .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                if (button_index > 0) {
+            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                if (buttonIndex > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField?.setText("")
+                    inputField?.setText("")
                     resetArticleExpressions()
                     this@ArticleExpressionListPage.reload()
                 }
-            }).show()
+            }.show()
     }
     var itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
@@ -91,10 +89,10 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            start = viewHolder.getAdapterPosition()
-            end = target.getAdapterPosition()
+            start = viewHolder.bindingAdapterPosition
+            end = target.bindingAdapterPosition
             if (propertiesVIP) {
-                Collections.swap(_articleExpressionsList, start, end)
+                Collections.swap(articleExpressionsList, start, end)
                 articleExpressionListAdapter?.notifyItemMoved(start, end)
             } else {
                 showShortToast(getContextString(R.string.vip_only_message))
@@ -134,7 +132,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                             dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
-                        UserSettings.setArticleExpressions(_articleExpressionsList!!)
+                        UserSettings.setArticleExpressions(articleExpressionsList)
                     }
                     isSwiped = false
                     isDragged = false
@@ -144,29 +142,29 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     })
 
 
-    private var _articleExpressionsList: MutableList<String?>? = ArrayList<String?>()
+    private var articleExpressionsList: MutableList<String?> = ArrayList()
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BLOCK_LIST
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.block_list_page
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
-    public override fun onPageDidLoad() {
-        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView?.setLayoutManager(LinearLayoutManager(context))
+    override fun onPageDidLoad() {
+        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView
+        recyclerView.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        articleExpressionListAdapter = BlockListAdapter(_articleExpressionsList)
+        articleExpressionListAdapter = BlockListAdapter(articleExpressionsList)
         recyclerView.setAdapter(articleExpressionListAdapter)
         articleExpressionListAdapter?.setOnItemClickListener(this)
 
-        _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
-        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
+        inputField = findViewById(R.id.BlockList_Input) as EditText?
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(addListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(resetListener)
 
         showNotification()
 
@@ -175,47 +173,47 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
 
     // 第一次進入的提示訊息
     private fun showNotification() {
-        val show_top_bottom_function = getShowExpression()
-        if (!show_top_bottom_function) {
+        val showTopBottomFunction = getShowExpression()
+        if (!showTopBottomFunction) {
             showLongToast(getContextString(R.string.notification_expression))
             setShowExpression(true)
         }
     }
 
-    public override fun onPageWillDisappear() {
+    override fun onPageWillDisappear() {
         notifyDataUpdated()
     }
 
-    public override fun onPageDidDisappear() {
-        _articleExpressionsList = null
+    override fun onPageDidDisappear() {
+        articleExpressionsList = ArrayList()
         super.onPageDidDisappear()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
-        val _temp = Arrays.asList<String?>(*articleExpressions)
-        _articleExpressionsList?.clear()
-        _articleExpressionsList?.addAll(_temp)
+        val elements = listOf(*articleExpressions)
+        articleExpressionsList.clear()
+        articleExpressionsList.addAll(elements)
         articleExpressionListAdapter?.notifyDataSetChanged()
     }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast("返回")
         return true
     }
 
-    override fun onBlockListPage_ItemView_clicked(blockListPage_ItemView: BlockListViewHolder?) {
+    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
     }
 
     // 刪除黑名單
-    override fun onBlockListPage_ItemView_delete_clicked(blockListPage_ItemView: BlockListViewHolder) {
-        val deleted_index = blockListPage_ItemView.getAdapterPosition()
-        val new_list = this@ArticleExpressionListPage._articleExpressionsList
-        new_list?.removeAt(deleted_index)
+    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
+        val deletedIndex = blockListPageItemView.bindingAdapterPosition
+        val newList = this@ArticleExpressionListPage.articleExpressionsList
+        newList.removeAt(deletedIndex)
 
         // 更新
-        UserSettings.setArticleExpressions(_articleExpressionsList!!)
+        UserSettings.setArticleExpressions(articleExpressionsList)
         this@ArticleExpressionListPage.reload()
     }
 }

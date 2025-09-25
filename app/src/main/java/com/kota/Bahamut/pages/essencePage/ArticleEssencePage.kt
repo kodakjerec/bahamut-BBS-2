@@ -45,7 +45,7 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
-class ArticleEssencePage(override val pageLayout: Int) : TelnetPage(), View.OnClickListener, SendMailPageListener {
+class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageListener {
     var mainLayout: RelativeLayout? = null
     private var telnetArticle: TelnetArticle? = null
     private var asListView: ASListView? = null
@@ -190,13 +190,11 @@ class ArticleEssencePage(override val pageLayout: Int) : TelnetPage(), View.OnCl
         }
     }
 
-    fun getPageLayout(): Int {
-        return R.layout.article_essence_page
-    }
+    override val pageLayout: Int
+        get() =  R.layout.article_essence_page
 
-    fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_ARTICLE_ESSENCE
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_ARTICLE_ESSENCE
 
     fun isPopupPage(): Boolean {
         return true

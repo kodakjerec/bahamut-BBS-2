@@ -75,6 +75,6 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     }
 
     override fun onClick(view: View?) {
-        mListener?.onItemClick(view, adapterPosition)
+        mListener?.onItemClick(view, bindingAdapterPosition)
     }
 }

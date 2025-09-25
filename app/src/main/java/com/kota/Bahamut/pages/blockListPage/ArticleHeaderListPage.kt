@@ -7,12 +7,6 @@ import android.widget.EditText
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -23,32 +17,36 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
 import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetArticleHeaders
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
-import java.util.Arrays
 import java.util.Collections
 
 class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
-    var _inputField: EditText? = null
+    var inputField: EditText? = null
 
     var articleHeaderListAdapter: BlockListAdapter? = null
 
     // 按下新增
-    var _addListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (_inputField != null) {
-            val block_name = _inputField?.getText().toString().trim { it <= ' ' }
-            _inputField?.setText("")
-            if (block_name.length > 0) {
-                val new_list: MutableList<String?> =
-                    ArrayList<String?>(Arrays.asList<String>(*articleHeaders))
-                if (new_list.contains(block_name)) {
+    var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
+        if (inputField != null) {
+            val blockName = inputField?.text.toString().trim { it <= ' ' }
+            inputField?.setText("")
+            if (blockName.isNotEmpty()) {
+                val newList: MutableList<String?> =
+                    ArrayList(listOf(*articleHeaders))
+                if (newList.contains(blockName)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
                         this@ArticleHeaderListPage
                     )
                 } else {
-                    new_list.add(block_name)
+                    newList.add(blockName)
                 }
-                UserSettings.setArticleHeaders(new_list)
+                UserSettings.setArticleHeaders(newList)
 
                 notifyDataUpdated()
                 this@ArticleHeaderListPage.reload()
@@ -62,20 +60,20 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     }
 
     // 按下重置
-    var _resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    var resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
         createDialog()
             .setTitle(getContextString(R.string.reset))
             .setMessage(getContextString(R.string.reset_message))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.sure))
-            .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                if (button_index > 0) {
+            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                if (buttonIndex > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
-                    _inputField?.setText("")
+                    inputField?.setText("")
                     resetArticleHeaders()
                     this@ArticleHeaderListPage.reload()
                 }
-            }).show()
+            }.show()
     }
     var itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object :
         ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
@@ -91,13 +89,13 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            start = viewHolder.getAdapterPosition()
-            end = target.getAdapterPosition()
+            start = viewHolder.bindingAdapterPosition
+            end = target.bindingAdapterPosition
             if (propertiesVIP) {
                 if (start == 0 || end == 0) {
                     showShortToast(getContextString(R.string.article_header_zero_error_message))
                 } else {
-                    Collections.swap(_articleHeadersList, start, end)
+                    Collections.swap(articleHeadersList, start, end)
                     articleHeaderListAdapter?.notifyItemMoved(start, end)
                 }
             } else {
@@ -138,7 +136,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                             dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
-                        UserSettings.setArticleHeaders(_articleHeadersList!!)
+                        UserSettings.setArticleHeaders(articleHeadersList)
                     }
                     isSwiped = false
                     isDragged = false
@@ -148,29 +146,29 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     })
 
 
-    private var _articleHeadersList: MutableList<String?>? = ArrayList<String?>()
+    private var articleHeadersList: MutableList<String?> = ArrayList()
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BLOCK_LIST
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.block_list_page
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
-    public override fun onPageDidLoad() {
-        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView?.setLayoutManager(LinearLayoutManager(context))
+    override fun onPageDidLoad() {
+        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView
+        recyclerView.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        articleHeaderListAdapter = BlockListAdapter(_articleHeadersList)
+        articleHeaderListAdapter = BlockListAdapter(articleHeadersList)
         recyclerView.setAdapter(articleHeaderListAdapter)
         articleHeaderListAdapter?.setOnItemClickListener(this)
 
-        _inputField = findViewById(R.id.BlockList_Input) as EditText?
-        findViewById(R.id.BlockList_Add)?.setOnClickListener(_addListener)
-        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
+        inputField = findViewById(R.id.BlockList_Input) as EditText?
+        findViewById(R.id.BlockList_Add)?.setOnClickListener(addListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(resetListener)
 
         showNotification()
 
@@ -179,51 +177,52 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
 
     // 第一次進入的提示訊息
     private fun showNotification() {
-        val show_top_bottom_function = getShowHeader()
-        if (!show_top_bottom_function) {
+        val showTopBottomFunction = getShowHeader()
+        if (!showTopBottomFunction) {
             showLongToast(getContextString(R.string.notification_header))
             setShowHeader(true)
         }
     }
 
-    public override fun onPageWillDisappear() {
+    override fun onPageWillDisappear() {
         notifyDataUpdated()
     }
 
-    public override fun onPageDidDisappear() {
-        _articleHeadersList = null
+    override fun onPageDidDisappear() {
+        articleHeadersList = ArrayList()
         super.onPageDidDisappear()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
-        val _temp = Arrays.asList<String?>(*articleHeaders)
-        _articleHeadersList?.clear()
-        _articleHeadersList?.addAll(_temp)
+        val elements = listOf<String?>(*articleHeaders)
+        articleHeadersList.clear()
+        articleHeadersList.addAll(elements)
         articleHeaderListAdapter?.notifyDataSetChanged()
     }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast("返回")
         return true
     }
 
-    override fun onBlockListPage_ItemView_clicked(blockListPage_ItemView: BlockListViewHolder?) {
-    }
-
     // 刪除黑名單
-    override fun onBlockListPage_ItemView_delete_clicked(blockListPage_ItemView: BlockListViewHolder) {
-        val deleted_index = blockListPage_ItemView.getAdapterPosition()
-        if (deleted_index == 0) {
+    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
+        val deletedIndex = blockListPageItemView.bindingAdapterPosition
+        if (deletedIndex == 0) {
             showShortToast(getContextString(R.string.article_header_zero_error_message))
             return
         }
-        val new_list = this@ArticleHeaderListPage._articleHeadersList
-        new_list?.removeAt(deleted_index)
+        val newList = this@ArticleHeaderListPage.articleHeadersList
+        newList.removeAt(deletedIndex)
 
         // 更新
-        UserSettings.setArticleHeaders(_articleHeadersList!!)
+        UserSettings.setArticleHeaders(articleHeadersList)
         this@ArticleHeaderListPage.reload()
+    }
+
+    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
+        TODO("Not yet implemented")
     }
 }

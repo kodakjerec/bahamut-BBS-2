@@ -420,8 +420,8 @@ open class ASNavigationController : Activity() {
         }.runInMainThread()
     }
 
-    val viewControllers: Vector<ASViewController?>
-        get() = Vector<ASViewController?>(this.controllers)
+    val viewControllers: Vector<ASViewController>
+        get() = Vector<ASViewController>(this.controllers)
 
     fun containsViewController(aController: ASViewController?): Boolean {
         return this.controllers.contains(aController)
@@ -555,7 +555,7 @@ open class ASNavigationController : Activity() {
                         while (this.pageCommands.isNotEmpty() && this.pageCommands.firstElement()?.animated == animated) {
                             this.pageCommands.removeAt(0)?.run()
                         }
-                        exchangeViewControllers(animated)
+                        exchangeViewControllers(animated == true)
                     }
                 }
             }
@@ -593,7 +593,7 @@ open class ASNavigationController : Activity() {
             // 已經顯示就隱藏
             if (getMessageSmall() != null) {
                 val messageSmall = getMessageSmall()
-                if (messageSmall?.isVisible) {
+                if (messageSmall?.isVisible == true) {
                     messageSmall.hide()
                 }
             }
