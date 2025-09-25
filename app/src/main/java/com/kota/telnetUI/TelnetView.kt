@@ -665,7 +665,7 @@ class TelnetView : View {
         val upper = telnetFrame?.getPositionData(row, column)
         val lower = telnetFrame?.getPositionData(row, column + 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
         val textColor = telnetFrame?.getPositionTextColor(row, column)
         val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
@@ -682,7 +682,7 @@ class TelnetView : View {
         val lower = telnetFrame?.getPositionData(row, column)
         val upper = telnetFrame?.getPositionData(row, column - 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
         val textColor = telnetFrame?.getPositionTextColor(row, column)
         val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
@@ -699,7 +699,7 @@ class TelnetView : View {
         val upper = telnetFrame?.getPositionData(row, column)
         val lower = telnetFrame?.getPositionData(row, column + 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
         val textColor = telnetFrame?.getPositionTextColor(row, column)
         val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor
@@ -716,7 +716,7 @@ class TelnetView : View {
         val lower = telnetFrame?.getPositionData(row, column)
         val upper = telnetFrame?.getPositionData(row, column - 1)
         val charData = (upper shl 8) + lower
-        val c: Char = B2UEncoder.instance?.encodeChar(charData.toChar())
+        val c: Char = B2UEncoder.instance!!.encodeChar(charData.toChar())
         val textColor = telnetFrame?.getPositionTextColor(row, column)
         val backgroundColor = telnetFrame?.getPositionBackgroundColor(row, column)
         drawer.textColor = textColor

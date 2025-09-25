@@ -143,7 +143,7 @@ class TelnetRow {
     val rawString: String
         get() {
             if (cachedString == null) {
-                cachedString = B2UEncoder.instance?.encodeToString(data)
+                cachedString = B2UEncoder.instance!!.encodeToString(data)
                 appendRow?.let { cachedString += it.rawString }
             }
             return cachedString!!

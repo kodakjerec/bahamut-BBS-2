@@ -2,15 +2,10 @@ package com.kota.Bahamut
 
 import android.content.Intent
 import android.util.Log
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.pageController.ASViewController
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dataModels.BookmarkStore
+import com.kota.Bahamut.pages.StartPage
+import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.pages.model.BoardPageItem
@@ -18,8 +13,6 @@ import com.kota.Bahamut.pages.model.ClassPageBlock
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageItem
-import com.kota.Bahamut.pages.StartPage
-import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.theme.ThemeStore.upgrade
 import com.kota.Bahamut.service.BahaBBSBackgroundService
 import com.kota.Bahamut.service.CloudBackup
@@ -33,6 +26,13 @@ import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.TempSettings.setMessageSmall
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialogListener
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.pageController.ASViewController
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetClient.Companion.construct
 import com.kota.telnet.TelnetClientListener
@@ -148,7 +148,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                     // from class: com.kota.Bahamut.BahamutController.1
                     // com.kota.ASFramework.Dialog.ASAlertDialogListener
                     override fun onAlertDialogDismissWithButtonIndex(
-                        paramASAlertDialog: ASAlertDialog?,
+                        paramASAlertDialog: ASAlertDialog,
                         paramInt: Int
                     ) {
                         if (paramInt == 1) {
@@ -171,7 +171,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionStart(telnetClient: TelnetClient?) {
+    override fun onTelnetClientConnectionStart(telnetClient: TelnetClient) {
         object : ASRunner() {
             // from class: com.kota.Bahamut.BahamutController.2
             // com.kota.ASFramework.Thread.ASRunner
@@ -182,19 +182,19 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionSuccess(telnetClient: TelnetClient?) {
+    override fun onTelnetClientConnectionSuccess(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         startForegroundService(intent)
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionFail(telnetClient: TelnetClient?) {
+    override fun onTelnetClientConnectionFail(telnetClient: TelnetClient) {
         dismissProcessingDialog()
         showShortToast("連線失敗，請檢查網路連線或稍後再試")
     }
 
     // com.kota.Telnet.TelnetClientListener
-    override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient?) {
+    override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
         object : ASRunner() {
@@ -225,7 +225,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     private fun handleNormalConnectionClosed() {
-        val pages: Vector<ASViewController?> = currentController?.viewControllers
+        val pages: Vector<ASViewController> = currentController!!.viewControllers
         val newControllers = Vector<ASViewController>()
         for (controller in pages) {
             val telnetPage = controller as TelnetPage

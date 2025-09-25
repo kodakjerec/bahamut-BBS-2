@@ -313,14 +313,14 @@ class MessageMain:TelnetPage() {
             val item = MessageMainListItemStructure()
             val bytes = row.data
             item.index =
-                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(1, 5))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))!!
             item.senderName =
-                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(8, 19))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))!!
             item.nickname =
-                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(21, 37))!!
-            item.ip = B2UEncoder.instance?.encodeToString(bytes.copyOfRange(39, 56))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))!!
+            item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56))!!
             item.status =
-                B2UEncoder.instance?.encodeToString(bytes.copyOfRange(58, 70))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))!!
             userList.add(item)
         }
 

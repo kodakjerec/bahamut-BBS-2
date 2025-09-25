@@ -47,7 +47,7 @@ class AhoCorasick(dictionary: MutableSet<String?>) {
         while (!queue.isEmpty()) {
             val current = queue.poll()
 
-            for (entry in current?.children.entries) {
+            for (entry in current!!.children.entries) {
                 val ch: Char = entry.key!!
                 val child = entry.value
 
@@ -77,13 +77,13 @@ class AhoCorasick(dictionary: MutableSet<String?>) {
             current = current.children.getOrDefault(ch, root)
 
             // check if we found a word
-            var temp: TrieNode? = current
+            var temp: TrieNode = current
             while (temp !== root) {
-                if (temp?.isEndOfWord) {
+                if (temp.isEndOfWord) {
                     found.add(temp.word)
                     return found
                 }
-                temp = temp.fail
+                temp = temp.fail!!
             }
         }
 

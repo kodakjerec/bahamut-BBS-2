@@ -10,9 +10,9 @@ import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryPurchasesParams
+import com.kota.Bahamut.R
 import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.R
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -122,7 +122,7 @@ object MyBillingClient {
                                         .addFormDataPart("userId", userId)
                                         .addFormDataPart("buyType", "history")
                                         .addFormDataPart("qty", record?.quantity.toString())
-                                        .addFormDataPart("purchaseData", record.originalJson)
+                                        .addFormDataPart("purchaseData", record!!.originalJson)
                                         .build()
                                 val request: Request = Request.Builder()
                                     .url(apiUrl)

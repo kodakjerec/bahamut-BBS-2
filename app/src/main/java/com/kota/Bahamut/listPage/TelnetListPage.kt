@@ -39,7 +39,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var executingCommand: TelnetCommand? = null
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
-    open val name: String?
+    open var name: String?
         get() = "TelnetListPage"
     @JvmField
     protected var listViewWidget: ListView? = null
