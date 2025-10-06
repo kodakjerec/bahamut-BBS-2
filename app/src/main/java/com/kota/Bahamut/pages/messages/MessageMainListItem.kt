@@ -60,7 +60,7 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                     title: String?
                 ) {
                     if (title == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.client?.sendDataToServer(
+                        TelnetClient.myInstance?.sendDataToServer(
                             TelnetOutputBuilder.create()
                                 .pushString(txtIndex.text.toString()+"\n")
                                 .pushKey(TelnetKeyboard.CTRL_Q)

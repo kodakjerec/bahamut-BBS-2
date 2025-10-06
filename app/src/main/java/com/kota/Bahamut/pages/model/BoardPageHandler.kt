@@ -10,7 +10,7 @@ class BoardPageHandler private constructor() {
     fun load(): BoardPageBlock {
         var row: TelnetRow? = null
         val boardPackage: BoardPageBlock = BoardPageBlock.Companion.create()
-        val firstRowString: String = TelnetClient.client?.model?.getRowString(0)!!
+        val firstRowString: String = TelnetClient.model.getRowString(0)!!
         val rowChar = firstRowString.toCharArray()
         var boardManagerStart = 0
         var boardManagerEnd = 0
@@ -97,7 +97,7 @@ class BoardPageHandler private constructor() {
         val endIndex = 3 + 20
         var i6 = 3
 
-        val rowModel: TelnetModel? = TelnetClient.client?.model
+        val rowModel: TelnetModel? = TelnetClient.model
         var isMoreThen10w = ""
         for (getRow in rowModel?.rows!!) {
             val checkChar = getRow.getSpaceString(0, 0).trim { it <= ' ' }

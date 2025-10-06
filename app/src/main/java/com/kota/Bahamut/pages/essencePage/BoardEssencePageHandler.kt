@@ -12,7 +12,7 @@ class BoardEssencePageHandler private constructor() {
     fun load(): TelnetListPageBlock {
         var row: TelnetRow
         val boardPageBlock = BoardPageBlock.create()
-        val firstRowString = TelnetClient.client?.model?.getRowString(0)
+        val firstRowString = TelnetClient.model.getRowString(0)
 
         // 沒有版主, 沒有看板標題
         boardPageBlock.boardManager = ""
@@ -32,7 +32,7 @@ class BoardEssencePageHandler private constructor() {
         }
         val endIndex = 3 + 20
         var i6 = 3
-        row = TelnetClient.client?.model?.getRow(i6)!!
+        row = TelnetClient.model.getRow(i6)!!
         while (i6 < endIndex && row.toString().isNotEmpty()) {
             row.reloadSpace()
             val articleSelected = row.getSpaceString(0, 0).trim()
@@ -66,7 +66,7 @@ class BoardEssencePageHandler private constructor() {
                 }
             }
             i6++
-            row = TelnetClient.client?.model?.getRow(i6)!!
+            row = TelnetClient.model.getRow(i6)!!
         }
         return boardPageBlock
     }

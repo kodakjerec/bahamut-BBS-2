@@ -123,7 +123,7 @@ class BoardSearchPage : BoardMainPage() {
     override fun onBackPressed(): Boolean {
         clear()
         navigationController.popViewController()
-        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance?.cleanBoardSearchPage()
         return true
     }

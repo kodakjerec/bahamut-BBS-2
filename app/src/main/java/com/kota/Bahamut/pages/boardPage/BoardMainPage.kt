@@ -218,13 +218,13 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                         val data = create()
                             .pushString("vV\n")
                             .build()
-                        TelnetClient.client?.sendDataToServer(data)
+                        TelnetClient.myInstance?.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_read_all_msg01))
                     } else if (title == getContextString(R.string.board_main_unread_all)) {
                         val data = create()
                             .pushString("vU\n")
                             .build()
-                        TelnetClient.client?.sendDataToServer(data)
+                        TelnetClient.myInstance?.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_unread_all_msg01))
                     }
                 }
@@ -559,7 +559,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         this.lastListAction = BoardPageAction.Companion.ESSENCE
         PageContainer.instance!!.pushBoardEssencePage(name, boardTitle!!)
         navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
-        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
 
     /** 變更工具列位置  */
@@ -749,7 +749,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         }
         clear()
         navigationController.popViewController()
-        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance?.cleanBoardPage()
         return true
     }

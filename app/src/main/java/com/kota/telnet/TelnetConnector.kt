@@ -109,13 +109,13 @@ class TelnetConnector : TelnetChannelListener {
         }
     }
 
-    fun connect(serverIp: String, serverPort: Int) {
+    fun connect(serverIp: String?, serverPort: Int) {
         // 使用設定中的連線方式
         val connectMethod = getConnectMethod()
         if ("webSocket" == connectMethod) {
             connectWebSocket(serverIp, serverPort)
         } else {
-            connectTelnet(serverIp, serverPort)
+            connectTelnet(serverIp!!, serverPort)
         }
     }
 
@@ -221,11 +221,7 @@ class TelnetConnector : TelnetChannelListener {
     private fun getChannel(channel: Int): TelnetChannel? {
         val telnetChannel: TelnetChannel?
         synchronized(this) {
-            telnetChannel = if (this.telnetChannels != null) {
-                this.telnetChannels[channel]
-            } else {
-                null
-            }
+            telnetChannel = this.telnetChannels[channel]
         }
         return telnetChannel
     }

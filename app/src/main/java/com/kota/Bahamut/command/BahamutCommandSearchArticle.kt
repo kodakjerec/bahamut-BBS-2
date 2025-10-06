@@ -15,7 +15,7 @@ class BahamutCommandSearchArticle(
     }
 
     override fun execute(telnetListPage: TelnetListPage) {
-        TelnetClient.client!!
+        TelnetClient.myInstance!!
             .sendStringToServerInBackground("~$keyword\n$author\n$mark\n$gy")
     }
 

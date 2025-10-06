@@ -208,7 +208,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     }
 
     // 刪除黑名單
-    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
+    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
         val deletedIndex = blockListPageItemView.bindingAdapterPosition
         if (deletedIndex == 0) {
             showShortToast(getContextString(R.string.article_header_zero_error_message))
@@ -222,7 +222,6 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
         this@ArticleHeaderListPage.reload()
     }
 
-    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
-        TODO("Not yet implemented")
+    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
     }
 }

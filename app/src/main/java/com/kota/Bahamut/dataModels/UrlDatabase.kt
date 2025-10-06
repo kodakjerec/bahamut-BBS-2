@@ -13,7 +13,7 @@ import java.util.Vector
 
 class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     context,
-    TelnetClient.client?.username?.lowercase(getDefault())?.trim() + "_database",
+    TelnetClient.myInstance?.username?.lowercase(getDefault())?.trim() + "_database",
     null,
     1
 ) {

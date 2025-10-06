@@ -44,7 +44,7 @@ class BahamutCommandEditArticle(var articleNumber: String?, title: String, conte
             if (myTitle != null) {
                 builder.pushString("T").pushData(25.toByte()).pushString("$myTitle\nY\n")
             }
-            TelnetClient.client?.sendDataToServer(builder.build())
+            TelnetClient.myInstance?.sendDataToServer(builder.build())
         }
     }
 

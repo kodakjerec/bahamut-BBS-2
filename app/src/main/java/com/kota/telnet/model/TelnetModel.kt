@@ -122,7 +122,7 @@ class TelnetModel {
                 if (ansiState.textBright) {
                     textColor = (textColor + 8).toByte()
                 }
-                row?.getTextColorArray()[this.cursor.column] = textColor
+                row?.myTextColorArray[this.cursor.column] = textColor
                 row?.myBackgroundColor[this.cursor.column] = ansiState.backgroundColor
                 row?.blink[this.cursor.column] = ansiState.textBlink
                 row?.italic[this.cursor.column] = ansiState.textItalic

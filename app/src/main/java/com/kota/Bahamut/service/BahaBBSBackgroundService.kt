@@ -69,7 +69,7 @@ class BahaBBSBackgroundService : Service() {
             return START_NOT_STICKY
         }
 
-        this.myClient = TelnetClient.client!!
+        this.myClient = TelnetClient.myInstance!!
         this.myController = ASNavigationController.currentController
 
         return START_STICKY // 確保服務重啟

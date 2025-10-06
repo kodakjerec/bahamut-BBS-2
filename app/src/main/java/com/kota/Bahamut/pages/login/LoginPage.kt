@@ -1,4 +1,4 @@
-package com.kota.Bahamut.pages.Login
+package com.kota.Bahamut.pages.login
 
 import android.util.Log
 import android.view.View
@@ -6,16 +6,10 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.login.LoginWebDebugView
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getCloudSave
@@ -24,6 +18,11 @@ import com.kota.Bahamut.service.TempSettings.clearTempSettings
 import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.TempSettings.setWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
@@ -128,7 +127,7 @@ class LoginPage : TelnetPage() {
 
     // 按下返回
     override fun onBackPressed(): Boolean {
-        TelnetClient.client!!.close()
+        TelnetClient.myInstance!!.close()
         return true
     }
 
@@ -162,8 +161,8 @@ class LoginPage : TelnetPage() {
     }
 
     fun handleNormalState(): Boolean {
-        val row23 = TelnetClient.client!!.model!!.getRowString(23)
-        val cursor = TelnetClient.client!!.model!!.cursor
+        val row23 = TelnetClient.model.getRowString(23)
+        val cursor = TelnetClient.model.cursor
         if (row23.endsWith("再見 ...")) {
             onLoginAccountOverLimit()
             return false
@@ -173,12 +172,12 @@ class LoginPage : TelnetPage() {
         } else if (row23.startsWith("★ 密碼輸入錯誤") && cursor.row == 23) {
             errorCount++
             onPasswordError()
-            TelnetClient.client!!.sendStringToServer("")
+            TelnetClient.myInstance!!.sendStringToServer("")
             return false
         } else if (row23.startsWith("★ 錯誤的使用者代號") && cursor.row == 23) {
             errorCount++
             onUsernameError()
-            TelnetClient.client!!.sendStringToServer("")
+            TelnetClient.myInstance!!.sendStringToServer("")
             return false
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
@@ -233,7 +232,7 @@ class LoginPage : TelnetPage() {
      * 設定TelnetView的畫面
      */
     fun setFrameToTelnetView() {
-        val frame = TelnetClient.client!!.model!!.frame!!.clone()
+        val frame = TelnetClient.model.frame!!.clone()
         frame.removeRow(23)
         frame.removeRow(22)
         telnetView!!.frame = frame
@@ -245,7 +244,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
         ASRunner.runInNewThread {
-            TelnetClient.client!!
+            TelnetClient.myInstance!!
                 .sendStringToServerInBackground(this@LoginPage.username)
         }
     }
@@ -265,14 +264,14 @@ class LoginPage : TelnetPage() {
                         .addButton("是")
                         .setListener { aDialog: ASAlertDialog?, index: Int ->
                             if (index == 0) {
-                                TelnetClient.client!!.sendStringToServerInBackground("n")
+                                TelnetClient.myInstance!!.sendStringToServerInBackground("n")
                             } else {
-                                TelnetClient.client!!.sendStringToServerInBackground("y")
+                                TelnetClient.myInstance!!.sendStringToServerInBackground("y")
                             }
                             this@LoginPage.dialogRemoveLoginUser = null
                             ASProcessingDialog.showProcessingDialog("登入中")
                         }.setOnBackDelegate { aDialog: ASDialog? ->
-                            TelnetClient.client!!.sendStringToServerInBackground("n")
+                            TelnetClient.myInstance!!.sendStringToServerInBackground("n")
                             if (this@LoginPage.dialogRemoveLoginUser != null) {
                                 this@LoginPage.dialogRemoveLoginUser!!.dismiss()
                                 this@LoginPage.dialogRemoveLoginUser = null
@@ -339,7 +338,7 @@ class LoginPage : TelnetPage() {
      * 傳送密碼
      */
     fun sendPassword() {
-        TelnetClient.client!!.sendStringToServer(password)
+        TelnetClient.myInstance!!.sendStringToServer(password)
     }
 
     /**
@@ -347,7 +346,7 @@ class LoginPage : TelnetPage() {
      */
     fun onLoginSuccess() {
         // 存檔客戶資料
-        TelnetClient.client!!.username = username
+        TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
 
         // 讀取雲端
@@ -480,8 +479,8 @@ class LoginPage : TelnetPage() {
                     .addButton("放棄").addButton("寫入暫存檔")
                     .setListener { aDialog: ASAlertDialog?, index: Int ->
                         when (index) {
-                            0 -> TelnetClient.client!!.sendStringToServer("Q")
-                            1 -> TelnetClient.client!!.sendStringToServer("S")
+                            0 -> TelnetClient.myInstance!!.sendStringToServer("Q")
+                            1 -> TelnetClient.myInstance!!.sendStringToServer("S")
                         }
                         this@LoginPage.dialogSaveUnfinishedArticle = null
                     }.scheduleDismissOnPageDisappear(this)

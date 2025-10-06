@@ -13,7 +13,7 @@ import java.util.Date
 import java.util.Locale
 
 class MessageDatabase(context: Context?) :
-    SQLiteOpenHelper(context, TelnetClient.client?.username?.lowercase(
+    SQLiteOpenHelper(context, TelnetClient.myInstance?.username?.lowercase(
         Locale.getDefault()
     )?.trim { it <= ' ' } + "_database_msg", null, 1) {
     override fun onCreate(aDatabase: SQLiteDatabase) {

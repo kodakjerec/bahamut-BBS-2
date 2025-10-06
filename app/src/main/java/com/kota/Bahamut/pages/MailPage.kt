@@ -123,8 +123,8 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         return 0
     }
 
-    override fun getItem(itemIndex: Int): TelnetArticleItem {
-        return telnetArticle?.getItem(itemIndex - 1)!!
+    override fun getItem(itemIndex: Int): TelnetArticleItem? {
+        return telnetArticle?.getItem(itemIndex - 1)
     }
 
     override fun getItemId(itemIndex: Int): Long {
@@ -138,7 +138,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         if (itemIndex == getCount() - 1) {
             return 3
         }
-        return getItem(itemIndex).type
+        return getItem(itemIndex)!!.type
     }
 
     override fun getView(itemIndex: Int, itemViewFrom: View?, parentView: ViewGroup?): View {
@@ -157,7 +157,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             itemViewOrigin = ArticlePageTextItemView(context)
         }
 
-        if (itemViewOrigin is ArticlePageTextItemView) {
+        if (itemViewOrigin is ArticlePageTextItemView && item!==null) {
             itemViewOrigin.setAuthor(item.author, item.nickname)
             itemViewOrigin.setQuote(item.quoteLevel)
             itemViewOrigin.setContent(item.content, item.frame?.rows!!)
@@ -166,7 +166,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             } else {
                 itemViewOrigin.setDividerHidden(false)
             }
-        } else if (itemViewOrigin is ArticlePageTelnetItemView) {
+        } else if (itemViewOrigin is ArticlePageTelnetItemView && item!==null) {
             itemViewOrigin.setFrame(item.frame!!)
             if (itemIndex >= getCount() - 2) {
                 itemViewOrigin.setDividerHidden(true)
@@ -242,7 +242,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageUpButtonClicked() {
-        if (TelnetClient.client?.telnetConnector?.isConnecting == true) {
+        if (TelnetClient.myInstance?.telnetConnector?.isConnecting == true) {
             PageContainer.instance?.mailBoxPage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
@@ -250,7 +250,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageDownButtonClicked() {
-        if (TelnetClient.client?.telnetConnector?.isConnecting!!) {
+        if (TelnetClient.myInstance?.telnetConnector?.isConnecting!!) {
             PageContainer.instance?.mailBoxPage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()

@@ -261,7 +261,7 @@ class ArticlePage : TelnetPage() {
             v?.removeCallbacks(topAction)
             topAction = null
         }
-        if (!TelnetClient.client!!.telnetConnector!!.isConnecting || boardMainPage == null) {
+        if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
             boardMainPage?.loadTheSameTitleUp()
@@ -290,7 +290,7 @@ class ArticlePage : TelnetPage() {
             v?.removeCallbacks(bottomAction)
             bottomAction = null
         }
-        if (!TelnetClient.client!!.telnetConnector!!.isConnecting || boardMainPage == null) {
+        if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
             boardMainPage?.loadTheSameTitleDown()
@@ -620,7 +620,7 @@ class ArticlePage : TelnetPage() {
     }
 
     fun moveToTopArticle() {
-        if (TelnetClient.client!!.telnetConnector!!.isConnecting && boardMainPage != null) {
+        if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting && boardMainPage != null) {
             boardMainPage?.loadTheSameTitleTop()
         } else {
             showConnectionClosedToast()
@@ -628,7 +628,7 @@ class ArticlePage : TelnetPage() {
     }
 
     fun moveToBottomArticle() {
-        if (TelnetClient.client!!.telnetConnector!!.isConnecting && boardMainPage != null) {
+        if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting && boardMainPage != null) {
             boardMainPage?.loadTheSameTitleBottom()
         } else {
             showConnectionClosedToast()
@@ -674,7 +674,7 @@ class ArticlePage : TelnetPage() {
 
     /** 回覆文章  */
     var replyListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (TelnetClient.client!!.telnetConnector!!.isConnecting) {
+        if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting) {
             if (telnetArticle != null) {
                 val page = PageContainer.instance!!.postArticlePage
                 val replyTitle = telnetArticle!!.generateReplyTitle()

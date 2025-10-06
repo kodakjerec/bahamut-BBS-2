@@ -11,7 +11,7 @@ class BahamutCommandListArticle(var articleIndex: Int) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (this.articleIndex > 0) {
-            TelnetClient.client!!
+            TelnetClient.myInstance!!
                 .sendDataToServer((this.articleIndex.toString() + "\nS").toByteArray())
         }
     }

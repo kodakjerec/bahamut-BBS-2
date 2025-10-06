@@ -42,32 +42,32 @@ class MainPage : TelnetPage() {
         this@MainPage.navigationController.pushViewController(
             PageContainer.instance?.classPage
         )
-        TelnetClient.client?.sendStringToServerInBackground("b")
+        TelnetClient.myInstance?.sendStringToServerInBackground("b")
     }
     var classListener: View.OnClickListener = View.OnClickListener { v: View? ->
         PageContainer.instance?.pushClassPage("Class", "分組討論區")
         this@MainPage.navigationController.pushViewController(
             PageContainer.instance?.classPage
         )
-        TelnetClient.client?.sendStringToServerInBackground("c")
+        TelnetClient.myInstance?.sendStringToServerInBackground("c")
     }
     var favoriteListener: View.OnClickListener = View.OnClickListener { v: View? ->
         PageContainer.instance?.pushClassPage("Favorite", "我的最愛")
         this@MainPage.navigationController.pushViewController(
             PageContainer.instance?.classPage
         )
-        TelnetClient.client?.sendStringToServerInBackground("f")
+        TelnetClient.myInstance?.sendStringToServerInBackground("f")
     }
     var telnetFrameBuffer: TelnetFrame? = null
     var goodbyeDialog: ASDialog? = null
     var logoutListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.client?.sendStringToServerInBackground("g")
+        TelnetClient.myInstance?.sendStringToServerInBackground("g")
     }
     var mailListener: View.OnClickListener = View.OnClickListener { v: View? ->
         this@MainPage.navigationController.pushViewController(
             PageContainer.instance?.mailBoxPage
         )
-        TelnetClient.client?.sendStringToServerInBackground("m\nr")
+        TelnetClient.myInstance?.sendStringToServerInBackground("m\nr")
     }
     var saveHotMessageDialog: ASDialog? = null
     var systemSettingListener: View.OnClickListener = View.OnClickListener { v: View? ->
@@ -163,7 +163,7 @@ class MainPage : TelnetPage() {
         val telnetView = mainLayout?.findViewById<TelnetView?>(R.id.Main_TelnetView)
         if (telnetView != null) {
             if (BahamutStateHandler.bahamutStateHandler?.currentPage == BahamutPage.BAHAMUT_MAIN) {
-                this.telnetFrameBuffer = TelnetClient.client?.model?.frame?.clone()
+                this.telnetFrameBuffer = TelnetClient.model.frame?.clone()
                 for (i in 12..23) {
                     this.telnetFrameBuffer?.removeRow(12)
                 }
@@ -203,22 +203,22 @@ class MainPage : TelnetPage() {
                 .setListener { aDialog: ASAlertDialog?, index: Int ->
                     this@MainPage.saveHotMessageDialog = null
                     when (index) {
-                        0 -> TelnetClient.client?.sendStringToServerInBackground("M")
-                        1 -> TelnetClient.client?.sendStringToServerInBackground("K")
+                        0 -> TelnetClient.myInstance?.sendStringToServerInBackground("M")
+                        1 -> TelnetClient.myInstance?.sendStringToServerInBackground("K")
                         2 -> {
-                            TelnetClient.client?.sendStringToServerInBackground("C")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("C")
                             MessageDatabase(context).use { db ->
                                 db.clearDb()
                             }
                         }
 
-                        else -> TelnetClient.client?.sendStringToServerInBackground("K")
+                        else -> TelnetClient.myInstance?.sendStringToServerInBackground("K")
                     }
                 }
             this.saveHotMessageDialog?.setOnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.saveHotMessageDialog != null) {
-                    TelnetClient.client?.sendStringToServerInBackground("K")
+                    TelnetClient.myInstance?.sendStringToServerInBackground("K")
                 }
             }
             this.saveHotMessageDialog?.show()
@@ -238,16 +238,16 @@ class MainPage : TelnetPage() {
                     this@MainPage.goodbyeDialog = null
                     when (index) {
                         2 ->  // 確定
-                            TelnetClient.client?.sendStringToServerInBackground("G")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("G")
 
                         1 -> { // 勇者足跡
-                            TelnetClient.client?.sendStringToServerInBackground("N")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("N")
                             val dialogHeroStep = DialogHeroStep()
                             dialogHeroStep.show()
                         }
 
                         0 ->  // 取消
-                            TelnetClient.client?.sendStringToServerInBackground("Q")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("Q")
 
                         else -> {}
                     }
@@ -256,7 +256,7 @@ class MainPage : TelnetPage() {
             this.goodbyeDialog?.setOnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.goodbyeDialog != null) {
-                    TelnetClient.client?.sendStringToServerInBackground("G")
+                    TelnetClient.myInstance?.sendStringToServerInBackground("G")
                 }
             }
         }

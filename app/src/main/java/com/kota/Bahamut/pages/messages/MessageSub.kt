@@ -169,7 +169,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
-        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
+        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         // 更新db
         val db = MessageDatabase(context)
@@ -198,7 +198,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aSenderName\n")
                 .build()
-            TelnetClient.client?.sendDataToServer(builder)
+            TelnetClient.myInstance?.sendDataToServer(builder)
         }
 
         messageAsRunner.postDelayed(3000)
@@ -218,7 +218,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aMessage\n")
                 .build()
-            TelnetClient.client?.sendDataToServer(builder)
+            TelnetClient.myInstance?.sendDataToServer(builder)
 
             // 更新db
             val db = MessageDatabase(context)

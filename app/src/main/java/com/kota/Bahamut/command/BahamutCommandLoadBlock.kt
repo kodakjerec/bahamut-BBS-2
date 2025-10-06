@@ -22,7 +22,7 @@ class BahamutCommandLoadBlock(aBlock: Int) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (this.block >= 0) {
-            TelnetClient.client?.sendStringToServer(((this.block * 20) + 1).toString())
+            TelnetClient.myInstance?.sendStringToServer(((this.block * 20) + 1).toString())
         }
     }
 

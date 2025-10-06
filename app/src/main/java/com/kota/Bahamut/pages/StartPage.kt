@@ -188,12 +188,12 @@ class StartPage : TelnetPage() {
             ASProcessingDialog.showProcessingDialog(
                 "連線中"
             ) { aDialog: ASProcessingDialog? ->
-                TelnetClient.client!!.close()
+                TelnetClient.myInstance!!.close()
                 false
             }
             val connectIpAddress = getConnectIpAddress()
             ASRunner.runInNewThread {
-                TelnetClient.client!!.connect(connectIpAddress, 23)
+                TelnetClient.myInstance!!.connect(connectIpAddress, 23)
             }
             return
         }

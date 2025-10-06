@@ -5,7 +5,6 @@ import com.kota.Bahamut.command.BahamutCommandLoadArticleEnd
 import com.kota.Bahamut.command.BahamutCommandLoadArticleEndForSearch
 import com.kota.Bahamut.command.BahamutCommandLoadMoreArticle
 import com.kota.Bahamut.pages.ClassPage
-import com.kota.Bahamut.pages.Login.LoginPage
 import com.kota.Bahamut.pages.MailBoxPage
 import com.kota.Bahamut.pages.MailPage
 import com.kota.Bahamut.pages.MainPage
@@ -19,6 +18,7 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.boardPage.BoardSearchPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
+import com.kota.Bahamut.pages.login.LoginPage
 import com.kota.Bahamut.pages.messages.BahaMessage
 import com.kota.Bahamut.pages.messages.MessageDatabase
 import com.kota.Bahamut.pages.messages.MessageMain
@@ -88,7 +88,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
         telnetRows.clear()
         // 從 TelnetClient 獲取當前的行資料
-        TelnetClient.client?.model?.let { model ->
+        TelnetClient.model.let { model ->
             for (i in 0 until model.rows.size) {
                 model.getRow(i)?.let { row ->
                     telnetRows.add(row)
@@ -104,7 +104,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
      */
     fun detectMessage() {
         val column = this.telnetCursor?.column
-        val row: TelnetRow? = TelnetClient.client?.model?.getRow(23)
+        val row: TelnetRow? = TelnetClient.model.getRow(23)
         val nameBuffer = ByteArrayOutputStream(80)
         val msgBuffer = ByteArrayOutputStream(80)
         var endPoint = -1
@@ -184,7 +184,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         // 本文
         var runPass2 = true
         if (this.rowStringFinal.contains("您有一篇文章尚未完成")) {
-            TelnetClient.client?.sendStringToServer("S\n1\n")
+            TelnetClient.myInstance?.sendStringToServer("S\n1\n")
             runPass2 = false
         }
         if (runPass2 && this.rowStringFinal.contains("[請按任意鍵繼續]") && currentPage != BahamutPage.Companion.BAHAMUT_LOGIN) {
@@ -200,7 +200,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 val data = create()
                     .pushKey(TelnetKeyboard.SPACE)
                     .build()
-                TelnetClient.client?.sendDataToServer(data)
+                TelnetClient.myInstance?.sendDataToServer(data)
                 val topPage =
                     ASNavigationController.currentController?.topController as TelnetPage?
                 if (topPage is MailBoxPage) {
@@ -237,11 +237,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 }
                 return false
             }
-            TelnetClient.client?.sendStringToServer("")
+            TelnetClient.myInstance?.sendStringToServer("")
             return false
         } else if (this.rowStringFinal.contains("要新增資料嗎？(Y/N) [N]")) {
             showShortToast("此看板無文章")
-            TelnetClient.client?.sendStringToServer("N")
+            TelnetClient.myInstance?.sendStringToServer("N")
             return false
         } else if (this.rowStringFinal.contains("● 請按任意鍵繼續 ●")) {
             if (this.rowString00.contains("順利貼出佈告")) {
@@ -266,7 +266,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 insertHeroSteps()
             }
 
-            TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+            TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             return false
         } else if (this.rowStringFinal.contains("請按 [SPACE] 繼續觀賞") && this.rowString00.contains(
                 "過  路  勇  者  的  足  跡"
@@ -274,7 +274,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         ) {
             // 逐行塞入勇者足跡
             insertHeroSteps()
-            TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+            TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             return false
         } else if (this.rowStringFinal.startsWith("★") && !this.rowStringFinal.substring(1, 2)
                 .isEmpty()
@@ -421,11 +421,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     fun handleSearchBoard() {
         if (this.rowStringFinal.startsWith("★ 列表") && this.telnetCursor!!.equals(23, 29)) {
             SearchBoardHandler.instance.read()
-            TelnetClient.client?.sendKeyboardInputToServer(67)
+            TelnetClient.myInstance?.sendKeyboardInputToServer(67)
         } else if (this.telnetCursor?.row == 1) {
             SearchBoardHandler.instance.read()
             val data = create().pushKey(TelnetKeyboard.CTRL_Y).pushString("\n\n").build()
-            TelnetClient.client?.sendDataToServer(data)
+            TelnetClient.myInstance?.sendDataToServer(data)
             object : ASRunner() {
                 override fun run() {
                     val page: ClassPage = PageContainer.instance!!.classPage
@@ -545,7 +545,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     // com.kota.telnet.TelnetStateHandler
     override fun handleState() {
         loadState()
-        this.telnetCursor = TelnetClient.client?.model?.cursor
+        this.telnetCursor = TelnetClient.model.cursor
         val topPage =
             ASNavigationController.currentController?.topController as TelnetPage?
 
@@ -558,7 +558,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 val userData = Vector<String>()
                 this.telnetRows.forEach(Consumer { row: TelnetRow? -> userData.add(row.toString()) })
                 page.ctrlQUser(userData)
-                TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+                TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (this.rowString00.startsWith("【網友列表】")) {
                 // 載入名單
                 object : ASRunner() {
@@ -573,7 +573,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             } else if (this.rowStringFinal.contains("● 請按任意鍵繼續 ●")) {
                 // 訊息最後一頁, 還有回到原本的那頁
                 topPage.receiveSyncCommand(telnetRows)
-                TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+                TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
 
                 object : ASRunner() {
                     override fun run() {
@@ -591,11 +591,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             if (this.rowStringFinal.contains("對方關掉呼叫器了")) {
                 topPage.sendMessageFail(MessageStatus.CloseBBCall)
                 showLongToast("對方關掉呼叫器了")
-                TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+                TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (this.rowStringFinal.contains("對方已經離去")) {
                 topPage.sendMessageFail(MessageStatus.Escape)
                 showLongToast("對方已經離去")
-                TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+                TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (getRowString(22).trim { it <= ' ' }.startsWith("★熱訊：")) {
                 // 送出給對方的訊息
                 // 一定要在"傳訊給"判斷之前, 因為這兩個判斷會同時出現
@@ -606,7 +606,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 topPage.sendMessagePart2()
             } else if (getRowString(22).trim { it <= ' ' }.contains("熱訊回應")) {
                 // 我方發出ctrl+S, 但是被熱訊回應卡住, 送出Enter指令接傳訊給對方id
-                TelnetClient.client?.sendStringToServer("")
+                TelnetClient.myInstance?.sendStringToServer("")
             } else if (this.rowStringFinal.startsWith("★") && !this.rowStringFinal.substring(
                     1,
                     2
@@ -662,7 +662,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 if (this.rowString01.contains("請輸入看板名稱")) {
                     handleSearchBoard()
                 } else if (this.rowString02.contains("總數")) {
-                    TelnetClient.client?.sendKeyboardInputToServer(99)
+                    TelnetClient.myInstance?.sendKeyboardInputToServer(99)
                 } else {
                     handleClassPage()
                 }
@@ -689,9 +689,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             } else if (this.rowString00.contains("【個人設定】")) {
                 handleUserPage()
             } else if (this.rowStringFinal.contains("您要刪除上述記錄嗎")) {
-                TelnetClient.client?.sendStringToServer("n")
+                TelnetClient.myInstance?.sendStringToServer("n")
             } else if (this.rowStringFinal == "● 請按任意鍵繼續 ●") {
-                TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
+                TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (this.lastHeader == "您想") {
                 object : ASRunner() {
                     override fun run() {
@@ -702,22 +702,22 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     }
                 }.runInMainThread()
             } else if (this.rowStringFinal.contains("★ 請閱讀最新公告")) {
-                TelnetClient.client?.sendStringToServer("")
+                TelnetClient.myInstance?.sendStringToServer("")
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader == "--") {
                 // TODO: 不知道甚麼狀況
                 currentPage = BahamutPage.Companion.BAHAMUT_INSTRUCTIONS
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
-                    TelnetClient.client?.sendStringToServer("")
+                    TelnetClient.myInstance?.sendStringToServer("")
                 }
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader == "□□") {
                 currentPage = BahamutPage.Companion.BAHAMUT_SYSTEM_ANNOUNCEMENT
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
-                    TelnetClient.client?.sendStringToServer("")
+                    TelnetClient.myInstance?.sendStringToServer("")
                 }
             } else if (this.firstHeader == "【過") {
                 currentPage = BahamutPage.Companion.BAHAMUT_PASSED_SIGNATURE
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
-                    TelnetClient.client?.sendStringToServer("")
+                    TelnetClient.myInstance?.sendStringToServer("")
                 }
             }
         }
@@ -729,12 +729,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun onReadArticlePage() {
-        this.articleHandler.loadPage(TelnetClient.client?.model)
+        this.articleHandler.loadPage(TelnetClient.model)
         cleanFrame()
     }
 
     fun onReadArticleFinished() {
-        this.articleHandler.loadLastPage(TelnetClient.client?.model)
+        this.articleHandler.loadLastPage(TelnetClient.model)
         this.articleHandler.build()
         val article = this.articleHandler.article
         this.articleHandler.newArticle()

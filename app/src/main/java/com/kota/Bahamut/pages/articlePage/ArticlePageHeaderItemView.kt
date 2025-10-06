@@ -53,7 +53,7 @@ class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(contex
                     title: String?
                 ) {
                     if (title == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.client?.sendDataToServer(
+                        TelnetClient.myInstance?.sendDataToServer(
                             create()
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()

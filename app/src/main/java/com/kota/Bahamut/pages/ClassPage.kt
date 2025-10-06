@@ -73,7 +73,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             val timer = Timer()
             val task1: TimerTask = object : TimerTask() {
                 override fun run() {
-                    TelnetClient.client?.sendStringToServerInBackground("sChat")
+                    TelnetClient.myInstance?.sendStringToServerInBackground("sChat")
                 }
             }
             timer.schedule(task1, 300)
@@ -102,7 +102,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     detail2.bringToFront()
                     detail2.text = lastVisitBoard
                     detail2.setOnClickListener { v: View? ->
-                        TelnetClient.client?.sendStringToServer("s$finalLastVisitBoard")
+                        TelnetClient.myInstance?.sendStringToServer("s$finalLastVisitBoard")
                     }
                 }
             }
@@ -115,7 +115,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         clear()
         PageContainer.instance?.popClassPage()
         navigationController.popViewController()
-        TelnetClient.client?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -162,7 +162,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index1: Int ->
                     if (index1 == 1) {
-                        TelnetClient.client!!
+                        TelnetClient.myInstance!!
                             .sendStringToServerInBackground("$itemIndex\nd")
                         this@ClassPage.loadLastBlock()
                     }
@@ -176,7 +176,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index12: Int ->
                     if (index12 == 1) {
-                        TelnetClient.client!!
+                        TelnetClient.myInstance!!
                             .sendStringToServerInBackground("$itemIndex2\na")
                     }
                 }.show()
@@ -205,7 +205,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }
-                    TelnetClient.client?.sendStringToServerInBackground("s$board")
+                    TelnetClient.myInstance?.sendStringToServerInBackground("s$board")
 
                     SearchBoardHandler.instance.clear()
                 }
@@ -231,7 +231,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         .sendToServerInBackground()
                     return@setListener
                 }
-                TelnetClient.client?.sendStringToServerInBackground("s$boardName")
+                TelnetClient.myInstance?.sendStringToServerInBackground("s$boardName")
                 SearchBoardHandler.instance.clear()
             }.scheduleDismissOnPageDisappear(this).show()
     }

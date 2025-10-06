@@ -286,7 +286,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     private fun onPageUpButtonClicked() {
-        if (TelnetClient.client?.telnetConnector!!.isConnecting) {
+        if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
             PageContainer.instance?.boardEssencePage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
@@ -294,7 +294,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     private fun onPageDownButtonClicked() {
-        if (TelnetClient.client?.telnetConnector!!.isConnecting) {
+        if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
             PageContainer.instance?.boardEssencePage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
@@ -345,22 +345,23 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         OnItemLongClickListener { _: AdapterView<*>?, view: View, itemIndex: Int, _: Long ->
             if (view.javaClass == ArticlePageTelnetItemView::class.java) {
                 // 開啟切換模式
-                val item: TelnetArticleItem = telnetArticle?.getItem(itemIndex - 1)!!
-                when (item.type) {
-                    0 -> {
-                        item.type = 1
-                        listAdapter.notifyDataSetChanged()
-                        return@OnItemLongClickListener true
+                val item: TelnetArticleItem? = telnetArticle?.getItem(itemIndex - 1)
+                if (item!==null)
+                    when (item.type) {
+                        0 -> {
+                            item.type = 1
+                            listAdapter.notifyDataSetChanged()
+                            return@OnItemLongClickListener true
+                        }
+                        1 -> {
+                            item.type = 0
+                            listAdapter.notifyDataSetChanged()
+                            return@OnItemLongClickListener true
+                        }
+                        else -> {
+                            return@OnItemLongClickListener true
+                        }
                     }
-                    1 -> {
-                        item.type = 0
-                        listAdapter.notifyDataSetChanged()
-                        return@OnItemLongClickListener true
-                    }
-                    else -> {
-                        return@OnItemLongClickListener true
-                    }
-                }
             }
 
             // 不是telnetView繼續往下運行事件
@@ -460,10 +461,12 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         // 內文黑名單
         val len = article.itemSize
         for (i in 0 until len) {
-            val item = article.getItem(i)!!
-            val author = item.author
-            if (author != null && !UserSettings.isBlockListContains(author)) {
-                buffer.add(author)
+            val item = article.getItem(i)
+            if (item!==null) {
+                val author = item.author
+                if (author != null && !UserSettings.isBlockListContains(author)) {
+                    buffer.add(author)
+                }
             }
         }
         if (buffer.isEmpty()) {
