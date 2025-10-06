@@ -1,8 +1,8 @@
 package com.kota.telnet.model
 
-import com.kota.telnet.reference.TelnetAnsiCode
 import com.kota.telnet.TelnetAnsi
 import com.kota.telnet.TelnetCursor
+import com.kota.telnet.reference.TelnetAnsiCode
 import java.nio.ByteBuffer
 import java.util.Vector
 
@@ -62,12 +62,12 @@ class TelnetModel {
     }
 
     fun getTextColor(row: Int, column: Int): Int {
-        val data = this.telnetFrame!!.getRow(row).textColor[column]
+        val data = this.telnetFrame!!.getRow(row).getTextColorArray()[column]
         return TelnetAnsiCode.getTextColor(data)
     }
 
     fun getBackgroundColor(row: Int, column: Int): Int {
-        val data = this.telnetFrame?.getRow(row)?.backgroundColor[column]
+        val data = this.telnetFrame?.getRow(row)?.myBackgroundColor[column]
         return TelnetAnsiCode.getBackgroundColor(data!!)
     }
 
@@ -122,8 +122,8 @@ class TelnetModel {
                 if (ansiState.textBright) {
                     textColor = (textColor + 8).toByte()
                 }
-                row?.textColor[this.cursor.column] = textColor
-                row?.backgroundColor[this.cursor.column] = ansiState.backgroundColor
+                row?.getTextColorArray()[this.cursor.column] = textColor
+                row?.myBackgroundColor[this.cursor.column] = ansiState.backgroundColor
                 row?.blink[this.cursor.column] = ansiState.textBlink
                 row?.italic[this.cursor.column] = ansiState.textItalic
             }

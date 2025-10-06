@@ -2,7 +2,6 @@ package com.kota.Bahamut
 
 import android.app.Application
 import android.webkit.WebView
-import com.kota.Bahamut.BahamutStateHandler.Companion.instance
 
 class MyApplication : Application() {
     init {

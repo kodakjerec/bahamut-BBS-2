@@ -64,12 +64,12 @@ class TelnetFrame {
     }
 
     fun getPositionTextColor(row: Int, column: Int): Int {
-        val colorIndex = getRow(row).textColor[column]
+        val colorIndex = getRow(row).getTextColorArray()[column]
         return TelnetAnsiCode.getTextColor(colorIndex)
     }
 
     fun getPositionBackgroundColor(row: Int, column: Int): Int {
-        val colorIndex = getRow(row).backgroundColor[column]
+        val colorIndex = getRow(row).myBackgroundColor[column]
         return TelnetAnsiCode.getBackgroundColor(colorIndex)
     }
 

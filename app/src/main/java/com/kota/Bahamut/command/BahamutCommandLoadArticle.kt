@@ -13,7 +13,7 @@ class BahamutCommandLoadArticle(var articleIndex: Int) : TelnetCommand() {
     override fun execute(telnetListPage: TelnetListPage) {
         if (this.articleIndex > 0) {
             val articleNumber = this.articleIndex.toString()
-            BahamutStateHandler.instance?.setArticleNumber(articleNumber)
+            BahamutStateHandler.bahamutStateHandler?.setArticleNumber(articleNumber)
             TelnetClient.client?.sendStringToServerInBackground(articleNumber + "\n")
         }
     }

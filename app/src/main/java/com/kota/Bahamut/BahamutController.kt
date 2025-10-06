@@ -69,7 +69,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
 
         // 設定 TelnetConnector 的設備控制器
-        TelnetClient.client?.connector?.setDeviceController(deviceController)
+        TelnetClient.client?.telnetConnector?.setDeviceController(deviceController)
 
         PageContainer.Companion.constructInstance()
 
@@ -120,8 +120,8 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
 
         // 清理 TelnetConnector 的設備控制器引用
-        if (TelnetClient.client?.connector != null) {
-            TelnetClient.client?.connector?.setDeviceController(null)
+        if (TelnetClient.client?.telnetConnector != null) {
+            TelnetClient.client?.telnetConnector?.setDeviceController(null)
         }
 
         super.onDestroy()
@@ -138,7 +138,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     // com.kota.asFramework.pageController.ASNavigationController
     override fun onBackLongPressed(): Boolean {
         var result = true
-        if (TelnetClient.client?.connector?.isConnecting == true) {
+        if (TelnetClient.client?.telnetConnector?.isConnecting == true) {
             val dialog = ASAlertDialog()
             dialog
                 .setMessage("是否確定要強制斷線?")

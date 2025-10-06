@@ -31,17 +31,17 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
+import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderLitterCatBox
+import com.kota.Bahamut.pages.PostArticlePage
+import com.kota.Bahamut.pages.messages.MessageSub
+import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderLitterCatBox
-import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.messages.MessageSub
-import com.kota.Bahamut.pages.PostArticlePage
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.UserSettings
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
@@ -363,7 +363,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             val aPage = PageContainer.instance?.postArticlePage!!
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.instance?.messageSub!!
+            val aPage = PageContainer.instance?.myMessageSub!!
             aPage.insertString(str)
         }
     }

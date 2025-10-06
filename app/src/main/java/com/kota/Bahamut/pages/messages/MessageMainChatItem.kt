@@ -52,7 +52,7 @@ class MessageMainChatItem(context: Context): LinearLayout(context) {
     }
 
     private val itemClickListener = OnClickListener { _->
-        val aPage = PageContainer.instance?.messageSub
+        val aPage = PageContainer.instance?.myMessageSub
         ASNavigationController.currentController?.pushViewController(aPage)
 
         aPage?.setSenderName(txtSenderName.text.toString())

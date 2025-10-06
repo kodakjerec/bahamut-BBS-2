@@ -8,17 +8,13 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
-import com.kota.Bahamut.dialogs.DialogHeroStep
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
+import com.kota.Bahamut.dialogs.DialogHeroStep
 import com.kota.Bahamut.pages.messages.MessageDatabase
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.HeroStep
 import com.kota.Bahamut.service.NotificationSettings.getAlarmIgnoreBatteryOptimizations
@@ -28,13 +24,17 @@ import com.kota.Bahamut.service.NotificationSettings.setShowHeroStep
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
-import com.kota.telnet.model.TelnetFrame
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.thread.ASRunner
 import com.kota.telnet.TelnetClient
+import com.kota.telnet.model.TelnetFrame
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
 class MainPage : TelnetPage() {
-    var onlinePeople: String? = "" // 線上人數
+    var onlinePeopleCount: String? = "" // 線上人數
     var bbCallStatus: String? = "" // 呼叫器
     var mainLayout: RelativeLayout? = null
     var boardsListener: View.OnClickListener = View.OnClickListener { v: View? ->
@@ -112,7 +112,7 @@ class MainPage : TelnetPage() {
         mainLayout?.findViewById<View>(R.id.Main_SystemSettingsButton)!!
             .setOnClickListener(this.systemSettingListener)
         val mainOnlinePeople = mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)!!
-        mainOnlinePeople.text = onlinePeople // 線上人數
+        mainOnlinePeople.text = onlinePeopleCount // 線上人數
 
         // 顯示勇者足跡
         val heroStepList: MutableList<HeroStep> = getHeroStepList()
@@ -162,7 +162,7 @@ class MainPage : TelnetPage() {
     private fun setFrameToTelnetView() {
         val telnetView = mainLayout?.findViewById<TelnetView?>(R.id.Main_TelnetView)
         if (telnetView != null) {
-            if (BahamutStateHandler.instance?.currentPage == BahamutPage.BAHAMUT_MAIN) {
+            if (BahamutStateHandler.bahamutStateHandler?.currentPage == BahamutPage.BAHAMUT_MAIN) {
                 this.telnetFrameBuffer = TelnetClient.client?.model?.frame?.clone()
                 for (i in 12..23) {
                     this.telnetFrameBuffer?.removeRow(12)
@@ -170,7 +170,7 @@ class MainPage : TelnetPage() {
                 this.telnetFrameBuffer?.removeRow(0)
             }
             if (this.telnetFrameBuffer != null) {
-                telnetView.frame = this.telnetFrameBuffer
+                telnetView.frame = this.telnetFrameBuffer!!
             }
         }
     }
@@ -280,7 +280,7 @@ class MainPage : TelnetPage() {
 
     /** 設定線上人數  */
     fun setOnlinePeople(peoples: String?) {
-        onlinePeople = peoples
+        onlinePeopleCount = peoples
     }
 
     /** 設定呼叫器  */

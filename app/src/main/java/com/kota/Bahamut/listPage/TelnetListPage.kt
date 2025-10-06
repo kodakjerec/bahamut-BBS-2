@@ -11,26 +11,22 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.ListAdapter
 import android.widget.ListView
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandLoadArticle
 import com.kota.Bahamut.command.BahamutCommandLoadBlock
 import com.kota.Bahamut.command.BahamutCommandLoadLastBlock
 import com.kota.Bahamut.command.BahamutCommandMoveToLastBlock
 import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.thread.ASRunner
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnetUI.TelnetPage
 import java.util.Arrays
 import java.util.Stack
 import java.util.Vector
-import kotlin.collections.HashMap
-import kotlin.collections.HashSet
-import kotlin.collections.MutableMap
-import kotlin.collections.MutableSet
 
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
@@ -39,7 +35,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var executingCommand: TelnetCommand? = null
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
-    open val name: String?
+    open var name: String? = ""
         get() = "TelnetListPage"
     @JvmField
     protected var listViewWidget: ListView? = null

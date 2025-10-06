@@ -1,12 +1,12 @@
 package com.kota.telnet
 
 import android.util.Log
-import com.kota.asFramework.pageController.ASDeviceController
 import com.kota.Bahamut.service.NotificationSettings.getConnectMethod
+import com.kota.asFramework.pageController.ASDeviceController
 import java.io.IOException
 
 class TelnetConnector : TelnetChannelListener {
-    private val telnetChannels: Array<TelnetChannel?>? = arrayOfNulls(2)
+    private val telnetChannels: Array<TelnetChannel?> = arrayOfNulls(2)
     private var holderThread: HolderThread? = null
     var isConnecting: Boolean = false
         private set
@@ -19,7 +19,7 @@ class TelnetConnector : TelnetChannelListener {
 
     fun clear() {
         synchronized(this) {
-            this.telnetChannels!![0] = null
+            this.telnetChannels[0] = null
             this.telnetChannels[1] = null
         }
         if (this.holderThread != null) {
@@ -137,7 +137,7 @@ class TelnetConnector : TelnetChannelListener {
             println("Connect to Telnet $serverIp:$serverPort")
             this.socketChannel = TelnetDefaultSocketChannel(serverIp, serverPort)
             synchronized(this) {
-                this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
+                this.telnetChannels[0] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[0]?.setListener(this)
                 this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[1]?.setListener(this)
@@ -183,7 +183,7 @@ class TelnetConnector : TelnetChannelListener {
             println("Connect to WebSocket $wsUrl")
             this.socketChannel = TelnetWebSocketChannel(wsUrl)
             synchronized(this) {
-                this.telnetChannels!![0] = TelnetChannel(this.socketChannel!!)
+                this.telnetChannels[0] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[0]?.setListener(this)
                 this.telnetChannels[1] = TelnetChannel(this.socketChannel!!)
                 this.telnetChannels[1]?.setListener(this)

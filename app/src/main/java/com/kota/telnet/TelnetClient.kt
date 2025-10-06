@@ -12,8 +12,8 @@ import java.util.concurrent.Executors
 
 class TelnetClient private constructor(private val stateHandler: TelnetStateHandler) :
     TelnetConnectorListener {
-    var connector: TelnetConnector? = null
-        get() = client?.connector
+    var telnetConnector: TelnetConnector? = null
+        get() = client?.telnetConnector
         private set
     var model: TelnetModel? = null
         get() = client?.model
@@ -25,25 +25,25 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
 
     init {
         this.model = TelnetModel()
-        this.connector = TelnetConnector()
-        connector?.setListener(this)
-        _receiver = TelnetReceiver(this.connector, this.model)
+        this.telnetConnector = TelnetConnector()
+        telnetConnector?.setListener(this)
+        _receiver = TelnetReceiver(this.telnetConnector, this.model)
     }
 
     fun clear() {
         stateHandler.clear()
-        connector?.clear()
+        telnetConnector!!.clear()
         model?.clear()
         _receiver?.stopReceiver()
     }
 
     fun connect(serverIp: String?, serverPort: Int) {
-        connector?.connect(serverIp, serverPort)
+        telnetConnector!!.connect(serverIp!!, serverPort)
     }
 
     fun close() {
         try {
-            connector?.close() // 關閉連線
+            telnetConnector!!.close() // 關閉連線
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
@@ -114,17 +114,17 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     fun sendDataToServer(data: ByteArray?, channel: Int) {
-        if (data != null && connector?.isConnecting) {
-            connector?.writeData(data, channel)
-            connector?.sendData(channel)
+        if (data != null && telnetConnector!!.isConnecting) {
+            telnetConnector!!.writeData(data, channel)
+            telnetConnector!!.sendData(channel)
         }
     }
 
     fun sendDataToServerInBackground(data: ByteArray?, channel: Int) {
-        if (data != null && connector?.isConnecting) {
+        if (data != null && telnetConnector!!.isConnecting) {
             sendExecutor.submit {
-                this@TelnetClient.connector?.writeData(data, channel)
-                this@TelnetClient.connector?.sendData(channel)
+                this@TelnetClient.telnetConnector!!.writeData(data, channel)
+                this@TelnetClient.telnetConnector!!.sendData(channel)
             }
         }
     }
@@ -134,14 +134,14 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectStart(telnetConnector: TelnetConnector?) {
+    override fun onTelnetConnectorConnectStart(telnetConnector: TelnetConnector) {
         if (clientListener != null) {
             clientListener?.onTelnetClientConnectionStart(this)
         }
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorClosed(telnetConnector: TelnetConnector?) {
+    override fun onTelnetConnectorClosed(telnetConnector: TelnetConnector) {
         clear()
         if (clientListener != null) {
             clientListener?.onTelnetClientConnectionClosed(this)
@@ -149,7 +149,7 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectSuccess(telnetConnector: TelnetConnector?) {
+    override fun onTelnetConnectorConnectSuccess(telnetConnector: TelnetConnector) {
         _receiver?.startReceiver()
         if (clientListener != null) {
             clientListener?.onTelnetClientConnectionSuccess(this)
@@ -157,7 +157,7 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorConnectFail(telnetConnector: TelnetConnector?) {
+    override fun onTelnetConnectorConnectFail(telnetConnector: TelnetConnector) {
         clear()
         if (clientListener != null) {
             clientListener?.onTelnetClientConnectionFail(this)
@@ -165,14 +165,14 @@ class TelnetClient private constructor(private val stateHandler: TelnetStateHand
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorReceiveDataStart(telnetConnector: TelnetConnector?) {
+    override fun onTelnetConnectorReceiveDataStart(telnetConnector: TelnetConnector) {
         model?.cleanCachedData()
         stateHandler.handleState()
     }
 
     // com.kota.telnet.TelnetConnectorListener
-    override fun onTelnetConnectorReceiveDataFinished(telnetConnector: TelnetConnector?) {
-        connector?.cleanReadDataSize()
+    override fun onTelnetConnectorReceiveDataFinished(telnetConnector: TelnetConnector) {
+        this@TelnetClient.telnetConnector!!.cleanReadDataSize()
     }
 
     var username: String?

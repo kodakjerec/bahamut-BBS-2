@@ -7,21 +7,20 @@ import android.widget.EditText
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getShowBlockList
 import com.kota.Bahamut.service.NotificationSettings.setShowBlockList
-import com.kota.Bahamut.service.UserSettings.Companion.blockList
+import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetBlockList
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
+import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
 import java.util.Collections
 
@@ -36,8 +35,8 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             val blockName = inputField?.text.toString().trim { it <= ' ' }
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
-                val newList: MutableList<String?> = blockList
-                if (newList?.contains(blockName)) {
+                val newList: MutableList<String> = UserSettings.Companion.blockList
+                if (newList.contains(blockName)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
                         this@BlockListPage
@@ -45,7 +44,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 } else {
                     newList.add(blockName)
                 }
-                blockList = newList
+                UserSettings.Companion.blockList = newList
 
                 notifyDataUpdated()
                 this@BlockListPage.reload()
@@ -56,20 +55,20 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     }
 
     // 按下重置
-    var _resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    var resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
         createDialog()
             .setTitle(getContextString(R.string.reset))
             .setMessage(getContextString(R.string.reset_message))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.sure))
-            .setListener(ASAlertDialogListener { aDialog1: ASAlertDialog?, button_index: Int ->
-                if (button_index > 0) {
+            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+                if (buttonIndex > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
                     inputField?.setText("")
                     resetBlockList()
                     this@BlockListPage.reload()
                 }
-            }).show()
+            }.show()
     }
 
     var itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object :
@@ -86,10 +85,10 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            start = viewHolder.adapterPosition
-            end = target.adapterPosition
+            start = viewHolder.bindingAdapterPosition
+            end = target.bindingAdapterPosition
             if (propertiesVIP) {
-                Collections.swap(_blockList, start, end)
+                Collections.swap(this@BlockListPage.blockList, start, end)
                 blockListAdapter?.notifyItemMoved(start, end)
             } else {
                 showShortToast(getContextString(R.string.vip_only_message))
@@ -129,7 +128,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                             dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
-                        blockList = _blockList
+                        UserSettings.Companion.blockList = this@BlockListPage.blockList
                     }
                     isSwiped = false
                     isDragged = false
@@ -139,29 +138,29 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     })
 
 
-    private var _blockList: MutableList<String?> = ArrayList<String?>()
+    private var blockList: MutableList<String> = ArrayList()
 
-    val pageType: Int
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BLOCK_LIST
 
-    val pageLayout: Int
+    override val pageLayout: Int
         get() = R.layout.block_list_page
 
-    val isKeepOnOffline: Boolean
+    override val isKeepOnOffline: Boolean
         get() = true
 
-    public override fun onPageDidLoad() {
-        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView?
-        recyclerView?.setLayoutManager(LinearLayoutManager(context))
+    override fun onPageDidLoad() {
+        val recyclerView = findViewById(R.id.BlockList_list) as RecyclerView
+        recyclerView.setLayoutManager(LinearLayoutManager(context))
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        blockListAdapter = BlockListAdapter(_blockList)
+        blockListAdapter = BlockListAdapter(this@BlockListPage.blockList)
         recyclerView.setAdapter(blockListAdapter)
         blockListAdapter?.setOnItemClickListener(this)
 
         inputField = findViewById(R.id.BlockList_Input) as EditText?
         findViewById(R.id.BlockList_Add)?.setOnClickListener(addListener)
-        findViewById(R.id.BlockList_Reset)?.setOnClickListener(_resetListener)
+        findViewById(R.id.BlockList_Reset)?.setOnClickListener(resetListener)
 
         showNotification()
 
@@ -170,47 +169,48 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
 
     // 第一次進入的提示訊息
     private fun showNotification() {
-        val show_top_bottom_function = getShowBlockList()
-        if (!show_top_bottom_function) {
+        val showTopBottomFunction = getShowBlockList()
+        if (!showTopBottomFunction) {
             showLongToast(getContextString(R.string.notification_block_list))
             setShowBlockList(true)
         }
     }
 
-    public override fun onPageWillDisappear() {
+    override fun onPageWillDisappear() {
         notifyDataUpdated()
     }
 
-    public override fun onPageDidDisappear() {
-        _blockList = ArrayList<String?>()
+    override fun onPageDidDisappear() {
+        this@BlockListPage.blockList = ArrayList()
         super.onPageDidDisappear()
     }
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
-        val _temp: MutableList<String?>? = blockList
-        _blockList.clear()
-        _blockList.addAll(_temp!!)
+        val temp: MutableList<String> = UserSettings.Companion.blockList
+        blockList.clear()
+        blockList.addAll(temp)
         blockListAdapter?.notifyDataSetChanged()
     }
 
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
         showShortToast("返回")
         return true
     }
 
-    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder?) {
+    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
+        TODO("Not yet implemented")
     }
 
     // 刪除黑名單
-    override fun onBlockListPage_ItemView_delete_clicked(blockListPage_ItemView: BlockListViewHolder) {
-        val deleted_index = blockListPage_ItemView.adapterPosition
-        val new_list = this@BlockListPage._blockList
-        new_list.removeAt(deleted_index)
+    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
+        val deletedIndex = blockListPageItemView.bindingAdapterPosition
+        val newList = this@BlockListPage.blockList
+        newList.removeAt(deletedIndex)
 
         // 更新
-        blockList = _blockList
+        UserSettings.Companion.blockList = this@BlockListPage.blockList
         this@BlockListPage.reload()
     }
 }

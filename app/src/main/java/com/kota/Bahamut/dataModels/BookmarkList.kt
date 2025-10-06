@@ -4,18 +4,18 @@ package com.kota.Bahamut.dataModels
  書籤元件 清單
 */
 class BookmarkList(private val myBoard: String?) {
-    private val bookmarks: MutableList<Bookmark?> = ArrayList()
-    private val historyBookmarks: MutableList<Bookmark?> = ArrayList()
+    private val bookmarks: MutableList<Bookmark> = ArrayList()
+    private val historyBookmarks: MutableList<Bookmark> = ArrayList()
     var limit: Int = 40
 
     val bookmarkSize: Int
         get() = bookmarks.size
 
-    fun getBookmark(index: Int): Bookmark? {
+    fun getBookmark(index: Int): Bookmark {
         return bookmarks[index]
     }
 
-    fun addBookmark(bookmark: Bookmark?) {
+    fun addBookmark(bookmark: Bookmark) {
         bookmarks.add(bookmark)
     }
 
@@ -23,12 +23,12 @@ class BookmarkList(private val myBoard: String?) {
         bookmarks.removeAt(index)
     }
 
-    fun loadBookmarkList(aList: MutableList<Bookmark?>) {
+    fun loadBookmarkList(aList: MutableList<Bookmark>) {
         aList.clear()
         aList.addAll(bookmarks)
     }
 
-    fun updateBookmark(index: Int, bookmark: Bookmark?) {
+    fun updateBookmark(index: Int, bookmark: Bookmark) {
         bookmarks[index] = bookmark
     }
 
@@ -39,7 +39,7 @@ class BookmarkList(private val myBoard: String?) {
     val historyBookmarkSize: Int
         get() = historyBookmarks.size
 
-    fun getHistoryBookmark(index: Int): Bookmark? {
+    fun getHistoryBookmark(index: Int): Bookmark {
         return historyBookmarks[index]
     }
 
@@ -54,7 +54,7 @@ class BookmarkList(private val myBoard: String?) {
                 break
             }
             val bookmark = it.next()
-            if (bookmark?.keyword == keyWord) {
+            if (bookmark.keyword == keyWord) {
                 newBookmark = bookmark
                 historyBookmarks.remove(bookmark)
                 break
@@ -81,7 +81,7 @@ class BookmarkList(private val myBoard: String?) {
                 break
             }
             val bookmark = it.next()
-            if (bookmark?.keyword == aBookmark.keyword) {
+            if (bookmark.keyword == aBookmark.keyword) {
                 historyBookmarks.remove(bookmark)
                 break
             }
@@ -96,23 +96,23 @@ class BookmarkList(private val myBoard: String?) {
         historyBookmarks.removeAt(index)
     }
 
-    fun loadHistoryList(aList: MutableList<Bookmark?>) {
+    fun loadHistoryList(aList: MutableList<Bookmark>) {
         aList.clear()
         aList.addAll(historyBookmarks)
     }
 
     fun sort() {
-        bookmarks.sortWith(Comparator { o1: Bookmark?, o2: Bookmark? ->
-                    if (o1?.index == 0 && o2?.index == 0) {
+        bookmarks.sortWith(Comparator { o1: Bookmark, o2: Bookmark ->
+                    if (o1.index == 0 && o2.index == 0) {
                         println("error")
                     }
-                    o1?.index!!.compareTo(o2?.index!!)
+                    o1.index.compareTo(o2.index)
                 })
-        historyBookmarks.sortWith(Comparator { o1: Bookmark?, o2: Bookmark? ->
-                    if (o1?.index == 0 && o2?.index == 0) {
+        historyBookmarks.sortWith(Comparator { o1: Bookmark, o2: Bookmark ->
+                    if (o1.index == 0 && o2.index == 0) {
                         println("error")
                     }
-                    o1?.index!!.compareTo(o2?.index!!)
+                    o1.index.compareTo(o2.index)
                 })
     }
 }

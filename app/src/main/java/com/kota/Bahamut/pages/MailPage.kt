@@ -11,22 +11,22 @@ import android.widget.LinearLayout
 import android.widget.ListAdapter
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
+import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
+import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
+import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
+import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
+import com.kota.Bahamut.pages.articlePage.ArticleViewMode
+import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showShortToast
-import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
-import com.kota.Bahamut.pages.articlePage.ArticlePage_HeaderItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TelnetItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TextItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TimeTimeView
-import com.kota.Bahamut.pages.articlePage.ArticleViewMode
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetClient
@@ -103,8 +103,8 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     fun setArticle(aArticle: TelnetArticle?) {
         clear()
         telnetArticle = aArticle
-        telnetView?.frame = telnetArticle?.frame
-        telnetView?.layoutParams = telnetView?.layoutParams
+        telnetView!!.frame = telnetArticle!!.frame!!
+        telnetView!!.layoutParams = telnetView?.layoutParams
         telnetViewBlock?.scrollTo(0, 0)
         dismissProcessingDialog()
         resetAdapter()
@@ -148,16 +148,16 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
         if (itemViewOrigin == null) {
             itemViewOrigin = when (type) {
-                ArticlePageItemType.Sign -> ArticlePage_TelnetItemView(context)
-                ArticlePageItemType.Header -> ArticlePage_HeaderItemView(context)
-                ArticlePageItemType.PostTime -> ArticlePage_TimeTimeView(context)
-                else -> ArticlePage_TextItemView(context)
+                ArticlePageItemType.Sign -> ArticlePageTelnetItemView(context)
+                ArticlePageItemType.Header -> ArticlePageHeaderItemView(context)
+                ArticlePageItemType.PostTime -> ArticlePageTimeTimeView(context)
+                else -> ArticlePageTextItemView(context)
             }
         } else if (type == ArticlePageItemType.Content) {
-            itemViewOrigin = ArticlePage_TextItemView(context)
+            itemViewOrigin = ArticlePageTextItemView(context)
         }
 
-        if (itemViewOrigin is ArticlePage_TextItemView) {
+        if (itemViewOrigin is ArticlePageTextItemView) {
             itemViewOrigin.setAuthor(item.author, item.nickname)
             itemViewOrigin.setQuote(item.quoteLevel)
             itemViewOrigin.setContent(item.content, item.frame?.rows!!)
@@ -166,20 +166,20 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             } else {
                 itemViewOrigin.setDividerHidden(false)
             }
-        } else if (itemViewOrigin is ArticlePage_TelnetItemView) {
-            itemViewOrigin.setFrame(item.frame)
+        } else if (itemViewOrigin is ArticlePageTelnetItemView) {
+            itemViewOrigin.setFrame(item.frame!!)
             if (itemIndex >= getCount() - 2) {
                 itemViewOrigin.setDividerHidden(true)
             } else {
                 itemViewOrigin.setDividerHidden(false)
             }
-        } else if (itemViewOrigin is ArticlePage_HeaderItemView) {
+        } else if (itemViewOrigin is ArticlePageHeaderItemView) {
             var author = telnetArticle?.author
             if (telnetArticle?.nickName != null) {
                 author = author + "(" + telnetArticle?.nickName + ")"
             }
             itemViewOrigin.setData(telnetArticle?.title, author, telnetArticle?.boardName)
-        } else if (itemViewOrigin is ArticlePage_TimeTimeView) {
+        } else if (itemViewOrigin is ArticlePageTimeTimeView) {
             itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
             itemViewOrigin.setIP(telnetArticle?.fromIP)
         }
@@ -242,7 +242,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageUpButtonClicked() {
-        if (TelnetClient.client?.connector?.isConnecting == true) {
+        if (TelnetClient.client?.telnetConnector?.isConnecting == true) {
             PageContainer.instance?.mailBoxPage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
@@ -250,7 +250,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageDownButtonClicked() {
-        if (TelnetClient.client?.connector?.isConnecting!!) {
+        if (TelnetClient.client?.telnetConnector?.isConnecting!!) {
             PageContainer.instance?.mailBoxPage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()

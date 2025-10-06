@@ -3,13 +3,13 @@ package com.kota.Bahamut.dialogs
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
+import com.kota.asFramework.dialog.ASDialog
 
 class DialogSelectSign : ASDialog(), View.OnClickListener {
     var cancelButton: Button
     var confirmButton: Button
-    var listener: DialogSelectSignListener? = null
+    var dialogSelectSignListener: DialogSelectSignListener? = null
     var signField: EditText
 
     override val name: String?
@@ -28,13 +28,13 @@ class DialogSelectSign : ASDialog(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        if (view === this.confirmButton && this.listener != null) {
-            this.listener?.onSelectSign(this.signField.text.toString().replace("\n", ""))
+        if (view === this.confirmButton && this.dialogSelectSignListener != null) {
+            this.dialogSelectSignListener?.onSelectSign(this.signField.text.toString().replace("\n", ""))
         }
         dismiss()
     }
 
     fun setListener(listener: DialogSelectSignListener?) {
-        this.listener = listener
+        this.dialogSelectSignListener = listener
     }
 }

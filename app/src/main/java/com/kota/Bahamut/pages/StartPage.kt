@@ -12,15 +12,11 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.core.content.pm.PackageInfoCompat
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast
+import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getConnectIpAddress
 import com.kota.Bahamut.service.NotificationSettings.getConnectMethod
@@ -29,10 +25,14 @@ import com.kota.Bahamut.service.NotificationSettings.setConnectIpAddress
 import com.kota.Bahamut.service.NotificationSettings.setConnectMethod
 import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissionDialog
 import com.kota.Bahamut.service.TempSettings
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.textView.TelnetTextViewSmall
-import androidx.core.net.toUri
 
 class StartPage : TelnetPage() {
     /** 連線  */
@@ -143,7 +143,7 @@ class StartPage : TelnetPage() {
     }
 
     override fun onPageWillAppear() {
-        val pageContainer = PageContainer.instance
+        val pageContainer = PageContainer.instance!!
         pageContainer.cleanStartPage()
     }
 
@@ -182,7 +182,7 @@ class StartPage : TelnetPage() {
 
     /** 連線  */
     fun connect() {
-        val transportType = navigationController.deviceController.isNetworkAvailable()
+        val transportType = navigationController.deviceController!!.isNetworkAvailable
         TempSettings.transportType = transportType
         if (transportType > -1) {
             ASProcessingDialog.showProcessingDialog(

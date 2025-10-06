@@ -34,10 +34,8 @@ class ASListDialog : ASDialog() {
         return this
     }
 
-    // com.kota.asFramework.dialog.ASDialog
-    fun getName(): String {
-        return "ListDialog"
-    }
+    override val name: String?
+        get() = "ListDialog"
 
     init {
         requestWindowFeature(1)

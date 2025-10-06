@@ -7,7 +7,6 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -15,6 +14,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -25,17 +26,17 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
-import com.kota.asFramework.thread.ASRunner
-import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
+import com.kota.asFramework.thread.ASRunner
 import java.util.Vector
 import kotlin.math.min
 
-class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
+class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     var mainLayout: LinearLayout? = null
     var viewWidth: Int
     var viewHeight: Int
@@ -76,25 +77,25 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                 myDescription = findUrl[2]
                 myImageUrl = findUrl[3]
                 isPic = findUrl[4] != "0"
-                picOrUrl_changeStatus(isPic)
+                picoUrlChangeStatus(isPic)
             }
-        } catch (ignored: Exception) {
+        } catch (_: Exception) {
             object : ASRunner() {
                 // com.kota.asFramework.thread.ASRunner
                 override fun run() {
-                    set_fail()
+                    setFail()
                 }
             }.runInMainThread()
         }
     }
 
     /** 判斷是圖片或連結, 改變顯示狀態  */
-    fun picOrUrl_changeStatus(_isPic: Boolean) {
+    fun picoUrlChangeStatus(isPic: Boolean) {
         loadThumbnailImg = linkShowThumbnail
         loadOnlyWifi = linkShowOnlyWifi
-        val _transportType = TempSettings.transportType
+        val transportType = TempSettings.transportType
 
-        if (_isPic) { // 純圖片
+        if (isPic) { // 純圖片
             object : ASRunner() {
                 // com.kota.asFramework.thread.ASRunner
                 override fun run() {
@@ -102,8 +103,8 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
                     // 圖片
                     layoutPic?.visibility = VISIBLE
-                    if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
-                        prepare_load_image()
+                    if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                        prepareLoadImage()
                     } else if (myImageUrl == "") {
                         imageViewButton?.visibility = GONE
                     }
@@ -120,28 +121,28 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
                     // 圖片
                     layoutPic?.visibility = VISIBLE
-                    if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
-                        prepare_load_image()
+                    if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                        prepareLoadImage()
                     } else if (myImageUrl == "") {
                         imageViewButton?.visibility = GONE
                     }
 
                     // 內容
                     layoutNormal?.visibility = VISIBLE
-                    set_normal()
+                    setNormal()
                 }
             }.runInMainThread()
         }
     }
 
     /** 純圖片  */
-    fun prepare_load_image() {
+    fun prepareLoadImage() {
         if (imgLoaded) return
 
-        if (isPic) {
-            viewHeight = viewHeight / 2
+        viewHeight = if (isPic) {
+            viewHeight / 2
         } else {
-            viewHeight = viewHeight / 4
+            viewHeight / 4
         }
         photoViewPic?.minimumHeight = viewHeight
         loadImage()
@@ -149,7 +150,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
     }
 
     /** 內容網址  */
-    private fun set_normal() {
+    private fun setNormal() {
         if (!myTitle.isEmpty()) {
             titleView?.text = myTitle
             titleView?.visibility = VISIBLE
@@ -162,7 +163,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
     }
 
     /** 意外處理  */
-    private fun set_fail() {
+    private fun setFail() {
         layoutDefault?.visibility = GONE
 
         // 圖片
@@ -200,7 +201,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
                     photoViewPic?.setImageDrawable(circularProgressDrawable)
 
-                    Glide.with(this@Thumbnail_ItemView)
+                    Glide.with(this@ThumbnailItemView)
                         .load(myImageUrl)
                         .listener(object : RequestListener<Drawable?> {
                             override fun onLoadFailed(
@@ -212,17 +213,17 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                                 object : ASRunner() {
                                     // com.kota.asFramework.thread.ASRunner
                                     override fun run() {
-                                        set_fail()
+                                        setFail()
                                     }
                                 }.runInMainThread()
                                 return false
                             }
 
                             override fun onResourceReady(
-                                resource: Drawable,
-                                model: Any,
+                                resource: Drawable?,
+                                model: Any?,
                                 target: Target<Drawable?>?,
-                                dataSource: DataSource,
+                                dataSource: DataSource?,
                                 isFirstResource: Boolean
                             ): Boolean {
                                 return false
@@ -259,19 +260,14 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                                         resource.startFromFirstFrame()
                                         photoViewPic?.setImageDrawable(resource)
                                     } else {
-                                        val newBitmap = Bitmap.createScaledBitmap(
-                                            bitmap,
-                                            targetWidth,
-                                            targetHeight,
-                                            true
-                                        )
+                                        val newBitmap = bitmap.scale(targetWidth, targetHeight)
                                         photoViewPic?.setImageBitmap(newBitmap)
                                     }
-                                } catch (ignored: Exception) {
+                                } catch (_: Exception) {
                                     object : ASRunner() {
                                         // com.kota.asFramework.thread.ASRunner
                                         override fun run() {
-                                            set_fail()
+                                            setFail()
                                         }
                                     }.runInMainThread()
                                 }
@@ -280,11 +276,11 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                             override fun onLoadCleared(placeholder: Drawable?) {
                             }
                         })
-                } catch (ignored: Exception) {
+                } catch (_: Exception) {
                     object : ASRunner() {
                         // com.kota.asFramework.thread.ASRunner
                         override fun run() {
-                            set_fail()
+                            setFail()
                         }
                     }.runInMainThread()
                 }
@@ -292,12 +288,10 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         }.runInMainThread()
     }
 
-    var openUrlListener: OnClickListener = object : OnClickListener {
-        override fun onClick(view: View?) {
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(myUrl))
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            myContext.startActivity(intent)
-        }
+    var openUrlListener: OnClickListener = OnClickListener {
+        val intent = Intent(Intent.ACTION_VIEW, myUrl.toUri())
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        myContext.startActivity(intent)
     }
 
     var titleListener: OnClickListener = OnClickListener { view: View? ->
@@ -334,7 +328,7 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         photoViewPic?.mediumScale = 3.0f
 
         imageViewButton = mainLayout?.findViewById(R.id.thumbnail_image_button)
-        imageViewButton?.setOnClickListener(OnClickListener { view: View? -> prepare_load_image() })
+        imageViewButton?.setOnClickListener { view: View? -> prepareLoadImage() }
 
         layoutNormal = mainLayout?.findViewById(R.id.thumbnail_normal)
         titleView = mainLayout?.findViewById(R.id.thumbnail_title)

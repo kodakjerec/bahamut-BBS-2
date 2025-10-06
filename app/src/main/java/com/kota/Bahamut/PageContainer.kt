@@ -2,6 +2,7 @@ package com.kota.Bahamut
 
 import com.kota.Bahamut.pages.BillingPage
 import com.kota.Bahamut.pages.ClassPage
+import com.kota.Bahamut.pages.Login.LoginPage
 import com.kota.Bahamut.pages.MailBoxPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
@@ -14,7 +15,6 @@ import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.boardPage.BoardSearchPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
-import com.kota.Bahamut.pages.login.LoginPage
 import com.kota.Bahamut.pages.messages.MessageMain
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeManagerPage
@@ -33,12 +33,12 @@ class PageContainer private constructor() {
     private var billingPageInstance: BillingPage? = null
     private var postArticlePageInstance: PostArticlePage? = null
     private val boardEssencePageStack = Stack<BoardEssencePage>()
-    var articleEssencePage: ArticleEssencePage? = null
+    var myArticleEssencePage: ArticleEssencePage? = null
     private var themeManagerPage: ThemeManagerPage? = null
     private var userInfoPage: UserInfoPage? = null
     private var userConfigPage: UserConfigPage? = null
-    var messageMain: MessageMain? = null
-    var messageSub: MessageSub? = null
+    var myMessageMain: MessageMain? = null
+    var myMessageSub: MessageSub? = null
 
     val startPage: StartPage
         get() {
@@ -201,16 +201,16 @@ class PageContainer private constructor() {
     }
 
     fun getArticleEssencePage(): ArticleEssencePage {
-        if (this.articleEssencePage == null) {
-            this.articleEssencePage = ArticleEssencePage()
+        if (this.myArticleEssencePage == null) {
+            this.myArticleEssencePage = ArticleEssencePage()
         }
-        return this.articleEssencePage!!
+        return this.myArticleEssencePage!!
     }
 
     fun cleanArticleEssencePage() {
-        if (this.articleEssencePage != null) {
-            this.articleEssencePage?.clear()
-            this.articleEssencePage = null
+        if (this.myArticleEssencePage != null) {
+            this.myArticleEssencePage?.clear()
+            this.myArticleEssencePage = null
         }
     }
 
@@ -317,30 +317,30 @@ class PageContainer private constructor() {
     }
 
     fun getMessageMain(): MessageMain {
-        if (this.messageMain == null) {
-            this.messageMain = MessageMain()
+        if (this.myMessageMain == null) {
+            this.myMessageMain = MessageMain()
         }
-        return this.messageMain!!
+        return this.myMessageMain!!
     }
 
     fun cleanMessageMain() {
-        if (this.messageMain != null) {
-            this.messageMain?.clear()
-            this.messageMain = null
+        if (this.myMessageMain != null) {
+            this.myMessageMain?.clear()
+            this.myMessageMain = null
         }
     }
 
     fun getMessageSub(): MessageSub {
-        if (this.messageSub == null) {
-            this.messageSub = MessageSub()
+        if (this.myMessageSub == null) {
+            this.myMessageSub = MessageSub()
         }
-        return this.messageSub!!
+        return this.myMessageSub!!
     }
 
     fun cleanMessageSub() {
-        if (this.messageSub != null) {
-            this.messageSub?.clear()
-            this.messageSub = null
+        if (this.myMessageSub != null) {
+            this.myMessageSub?.clear()
+            this.myMessageSub = null
         }
     }
 

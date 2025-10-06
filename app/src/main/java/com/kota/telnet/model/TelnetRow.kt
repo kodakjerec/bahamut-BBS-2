@@ -8,19 +8,18 @@ class TelnetRow {
     private var myEmptySpace: Int
     private var myQuoteLevel: Int
     private var myQuoteSpace: Int
-    @JvmField
-    var backgroundColor: ByteArray
+    var myTextColorArray: ByteArray
+    var myBackgroundColor: ByteArray
     var bitSpace: ByteArray
     var blink: BooleanArray
     @JvmField
     var data: ByteArray
     var italic: BooleanArray
-    var textColor: ByteArray
 
     constructor() {
         data = ByteArray(80)
-        textColor = ByteArray(80)
-        backgroundColor = ByteArray(80)
+        myTextColorArray = ByteArray(80)
+        myBackgroundColor = ByteArray(80)
         blink = BooleanArray(80)
         italic = BooleanArray(80)
         bitSpace = ByteArray(80)
@@ -34,8 +33,8 @@ class TelnetRow {
 
     constructor(aRow: TelnetRow) {
         data = ByteArray(80)
-        textColor = ByteArray(80)
-        backgroundColor = ByteArray(80)
+        myTextColorArray = ByteArray(80)
+        myBackgroundColor = ByteArray(80)
         blink = BooleanArray(80)
         italic = BooleanArray(80)
         bitSpace = ByteArray(80)
@@ -57,8 +56,8 @@ class TelnetRow {
 
     fun cleanColumn(column: Int) {
         data[column] = 0
-        textColor[column] = 0
-        backgroundColor[column] = 0
+        myTextColorArray[column] = 0
+        myBackgroundColor[column] = 0
         bitSpace[column] = 0
         blink[column] = false
         italic[column] = false
@@ -72,8 +71,8 @@ class TelnetRow {
     fun set(aRow: TelnetRow): TelnetRow {
         for (i in 0..79) {
             data[i] = aRow.data[i]
-            textColor[i] = aRow.textColor[i]
-            backgroundColor[i] = aRow.backgroundColor[i]
+            myTextColorArray[i] = aRow.myTextColorArray[i]
+            myBackgroundColor[i] = aRow.myBackgroundColor[i]
             bitSpace[i] = aRow.bitSpace[i]
             blink[i] = aRow.blink[i]
             italic[i] = aRow.italic[i]
@@ -201,9 +200,9 @@ class TelnetRow {
         while (column < 80) {
             val data = this.data[column].toInt() and 255
             if (data > 127 && column < 79) {
-                val textColorDiff = this.textColor[column] != this.textColor[column + 1]
+                val textColorDiff = this.myTextColorArray[column] != this.myTextColorArray[column + 1]
                 val backgroundColorDiff =
-                    this.backgroundColor[column] != this.backgroundColor[column + 1]
+                    this.myBackgroundColor[column] != this.myBackgroundColor[column + 1]
                 if (textColorDiff || backgroundColorDiff) {
                     this.bitSpace[column] = BitSpaceType.Companion.DOUBLE_BIT_SPACE_2_1
                     this.bitSpace[column + 1] = BitSpaceType.Companion.DOUBLE_BIT_SPACE_2_2
@@ -220,7 +219,7 @@ class TelnetRow {
     }
 
     /** 回傳對應雙字元的前景色, 單雙字元已經轉換完成  */
-    fun getTextColor(): ByteArray? {
+    fun getTextColorArray(): ByteArray {
         val colors = ByteArray(80)
         var nowIndex = -1
         var bitIndex: Byte = 0
@@ -228,11 +227,11 @@ class TelnetRow {
             nowIndex++
             if (bitSpace[bitIndex.toInt()] > 0) {
                 // 雙字元
-                colors[nowIndex] = textColor[bitIndex.toInt()]
+                colors[nowIndex] = myTextColorArray[bitIndex.toInt()]
                 bitIndex++
             } else {
                 // 單字元
-                colors[nowIndex] = textColor[bitIndex.toInt()]
+                colors[nowIndex] = myTextColorArray[bitIndex.toInt()]
             }
             bitIndex++
         }
@@ -241,7 +240,7 @@ class TelnetRow {
     }
 
     /** 回傳對應雙字元的背景色, 單雙字元已經轉換完成  */
-    fun getBackgroundColor(): ByteArray? {
+    fun getBackgroundColor(): ByteArray {
         val colors = ByteArray(80)
         var nowIndex = -1
         var bitIndex: Byte = 0
@@ -249,11 +248,11 @@ class TelnetRow {
             nowIndex++
             if (bitSpace[bitIndex.toInt()] > 0) {
                 // 雙字元
-                colors[nowIndex] = backgroundColor[bitIndex.toInt()]
+                colors[nowIndex] = myBackgroundColor[bitIndex.toInt()]
                 bitIndex++
             } else {
                 // 單字元
-                colors[nowIndex] = backgroundColor[bitIndex.toInt()]
+                colors[nowIndex] = myBackgroundColor[bitIndex.toInt()]
             }
             bitIndex++
         }

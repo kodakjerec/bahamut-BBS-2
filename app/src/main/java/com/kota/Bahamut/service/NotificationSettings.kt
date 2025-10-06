@@ -26,6 +26,9 @@ object NotificationSettings {
     private const val DIALOG_REFERENCE_AUTHOR_1_REMOVE_BLANK = "dialogReferenceAuthor1RemoveBlank"
     private const val DIALOG_REFERENCE_AUTHOR_1_RESERVED_TYPE = "dialogReferenceAuthor1ReservedType"
 
+    private const val SHOW_NOTIFICATION_PERMISSION_DIALOG = "showNotificationPermissionDialog" // 是否已顯示過通知權限提示對話框
+
+
     @JvmStatic
     fun upgrade(activity: Activity) {
         perf = activity.getSharedPreferences(PERF_NAME, 0)
@@ -178,5 +181,29 @@ object NotificationSettings {
     @JvmStatic
     fun setDialogReferenceAuthor1ReservedType(index: Int) {
         perf?.edit { putInt(DIALOG_REFERENCE_AUTHOR_1_RESERVED_TYPE, index) }
+    }
+
+
+    /**
+     * 取得是否已顯示過通知權限提示對話框
+     * @return true-已顯示過, false-未顯示過
+     */
+    @JvmStatic
+    fun getShowNotificationPermissionDialog(): Boolean {
+        return perf!!.getBoolean(SHOW_NOTIFICATION_PERMISSION_DIALOG, false)
+    }
+
+    /**
+     * 設定是否已顯示過通知權限提示對話框
+     * @param isShown true-已顯示過, false-未顯示過
+     */
+    @JvmStatic
+    fun setShowNotificationPermissionDialog(isShown: Boolean) {
+        perf!!.edit {
+            putBoolean(
+                SHOW_NOTIFICATION_PERMISSION_DIALOG,
+                isShown
+            )
+        }
     }
 }

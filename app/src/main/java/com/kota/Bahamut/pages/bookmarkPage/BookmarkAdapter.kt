@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
 
-class BookmarkAdapter(private val _bookmarks: MutableList<Bookmark?>) :
+class BookmarkAdapter(private val _bookmarks: MutableList<Bookmark>) :
     RecyclerView.Adapter<BookmarkViewHolder?>() {
     private var mClickListener: BookmarkClickListener? = null
 
@@ -21,7 +21,7 @@ class BookmarkAdapter(private val _bookmarks: MutableList<Bookmark?>) :
         holder.setBookmark(bookmark)
     }
 
-    fun getItem(position: Int): Bookmark? {
+    fun getItem(position: Int): Bookmark {
         return this._bookmarks[position]
     }
 

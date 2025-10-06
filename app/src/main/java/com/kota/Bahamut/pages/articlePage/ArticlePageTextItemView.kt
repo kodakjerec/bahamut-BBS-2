@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Canvas
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -23,20 +22,20 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
+import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.telnet.TelnetAnsi
+import com.kota.telnet.TelnetArticleItemView
 import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.reference.TelnetAnsiCode.getBackgroundColor
 import com.kota.telnet.reference.TelnetAnsiCode.getTextColor
-import com.kota.telnet.TelnetAnsi
-import com.kota.telnet.TelnetArticleItemView
 import com.kota.telnetUI.DividerView
 import java.util.Vector
 import kotlin.math.min
 
-class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
+class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     var authorLabel: TextView? = null
     var contentLabel: TextView? = null
     var contentView: ViewGroup? = null
@@ -54,24 +53,24 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
     private fun init() {
         (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
             .inflate(R.layout.article_page_text_item_view, this)
-        authorLabel = findViewById<TextView?>(R.id.ArticleTextItemView_Title)
-        contentLabel = findViewById<TextView?>(R.id.ArticleTextItemView_content)
-        dividerView = findViewById<DividerView?>(R.id.ArticleTextItemView_DividerView)
-        contentView = findViewById<ViewGroup?>(R.id.ArticleTextItemView_contentView)
+        authorLabel = findViewById(R.id.ArticleTextItemView_Title)
+        contentLabel = findViewById(R.id.ArticleTextItemView_content)
+        dividerView = findViewById(R.id.ArticleTextItemView_DividerView)
+        contentView = findViewById(R.id.ArticleTextItemView_contentView)
         setBackgroundResource(R.color.transparent)
     }
 
     fun setAuthor(author: String?, nickname: String?) {
         if (authorLabel != null) {
-            val author_buffer = StringBuilder()
+            val authorBuffer = StringBuilder()
             if (author != null) {
-                author_buffer.append(author)
+                authorBuffer.append(author)
             }
             if (nickname != null && !nickname.isEmpty()) {
-                author_buffer.append("(").append(nickname).append(")")
+                authorBuffer.append("(").append(nickname).append(")")
             }
-            if (author != null && !author.isEmpty()) author_buffer.append(" 說:")
-            authorLabel?.text = author_buffer.toString()
+            if (author != null && !author.isEmpty()) authorBuffer.append(" 說:")
+            authorLabel?.text = authorBuffer.toString()
         }
     }
 
@@ -96,14 +95,14 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
     private fun stringPaint(rows: Vector<TelnetRow>): CharSequence? {
         val finalString = arrayOfNulls<SpannableStringBuilder>(rows.size)
         for (rowIndex in rows.indices) {
-            val row = rows.get(rowIndex)
+            val row = rows[rowIndex]
             row.reloadSpace()
             val ssRawString = SpannableStringBuilder(row.rawString)
-            if (ssRawString.length > 0) {
+            if (ssRawString.isNotEmpty()) {
                 var startIndex = 0
-                val textColor: ByteArray = row.getTextColor()!!
-                var endIndex = startIndex
-                var paintTextColor: Byte = TelnetAnsi.getDefaultTextColor()
+                val textColor: ByteArray = row.getTextColorArray()!!
+                var endIndex = 0
+                var paintTextColor: Byte = TelnetAnsi.DEFAULT_TEXT_COLOR
                 var startCatching = false
                 // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
                 var needReplaceTextColor = false
@@ -140,7 +139,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                         }
                         // 塗顏色
                         if (!startCatching) {
-                            if (paintTextColor != TelnetAnsi.getDefaultTextColor()) {
+                            if (paintTextColor != TelnetAnsi.DEFAULT_TEXT_COLOR) {
                                 val colorSpan = ForegroundColorSpan(
                                     getTextColor(paintTextColor)
                                 )
@@ -153,19 +152,19 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                             startIndex = i
                             paintTextColor = textColor[i]
 
-                            if (textColor[i] != TelnetAnsi.getDefaultTextColor()) startCatching =
+                            if (textColor[i] != TelnetAnsi.DEFAULT_TEXT_COLOR) startCatching =
                                 true
                         }
                     }
                 }
                 val backgroundColor = row.getBackgroundColor()
                 startIndex = 0
-                endIndex = startIndex
+                endIndex = 0
                 startCatching = false
-                var paintBackColor: Byte = TelnetAnsi.getDefaultBackgroundColor()
+                var paintBackColor: Byte = TelnetAnsi.DEFAULT_BACKGROUND_COLOR
                 // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
                 var needReplaceBackColor = false
-                for (i in backgroundColor?.indices) {
+                for (i in backgroundColor!!.indices) {
                     if (backgroundColor[i] != paintBackColor) {
                         if ((i + 1) <= ssRawString.length) {
                             needReplaceBackColor = true
@@ -198,7 +197,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                         }
                         // 塗顏色
                         if (!startCatching) {
-                            if (paintBackColor != TelnetAnsi.getDefaultBackgroundColor()) {
+                            if (paintBackColor != TelnetAnsi.DEFAULT_BACKGROUND_COLOR) {
                                 val colorSpan = BackgroundColorSpan(
                                     getBackgroundColor(paintBackColor)
                                 )
@@ -211,7 +210,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                             startIndex = i
                             paintBackColor = backgroundColor[i]
 
-                            if (backgroundColor[i] != TelnetAnsi.getDefaultBackgroundColor()) startCatching =
+                            if (backgroundColor[i] != TelnetAnsi.DEFAULT_BACKGROUND_COLOR) startCatching =
                                 true
                         }
                     }
@@ -257,7 +256,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
 
                 Linkify.addLinks(spannableText, Linkify.WEB_URLS)
                 val urlSpans =
-                    spannableText.getSpans<URLSpan?>(0, spannableText.length, URLSpan::class.java)
+                    spannableText.getSpans(0, spannableText.length, URLSpan::class.java)
                 if (urlSpans.size > 0) {
                     var previousIndex = 0
                     for (urlSpan in urlSpans) {
@@ -280,8 +279,8 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                         mainLayout.removeViewAt(originalIndex)
                         // 塞入連結前半段文字, 純文字
                         mainLayout.addView(textView1, originalIndex)
-                        val url = urlSpan.url.replace("\n", "")
-                        val thumbnail = Thumbnail_ItemView(context)
+                        val url = urlSpan!!.url.replace("\n", "")
+                        val thumbnail = ThumbnailItemView(context)
                         thumbnail.loadUrl(url)
                         // 塞入截圖
                         mainLayout.addView(thumbnail, originalIndex + 1)
@@ -374,7 +373,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
         }
 
         // 如果循環結束時，urlBuffer中還有內容，表示最後一個URL沒有達到78字符或明確結束
-        if (urlBuffer.length > 0) {
+        if (urlBuffer.isNotEmpty()) {
             result.append(urlBuffer).append("\n")
         }
 
@@ -408,7 +407,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
                         intent.putExtra(SearchManager.QUERY, selectedText)
                         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                         context.startActivity(intent)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         showShortToast("無法開啟此網址")
                     }
                     actionMode.finish()
@@ -436,11 +435,7 @@ class ArticlePage_TextItemView : LinearLayout, TelnetArticleItemView {
         }
     }
 
-    override fun draw(canvas: Canvas) {
-        super.draw(canvas)
-    }
-
-    val type: Int
+    override val type: Int
         get() = ArticlePageItemType.Companion.Content
 
     fun setDividerHidden(isHidden: Boolean) {

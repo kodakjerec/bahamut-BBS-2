@@ -3,10 +3,10 @@ package com.kota.Bahamut.dialogs
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.ui.ASToast.showShortToast
 
 class DialogSelectArticle : ASDialog(), View.OnClickListener {
     var button0p: Button
@@ -23,7 +23,7 @@ class DialogSelectArticle : ASDialog(), View.OnClickListener {
     var cancelButton: Button
     var content: TextView
     var contentString: String = ""
-    var listener: DialogSelectArticleListener? = null
+    var dialogSelectArticleListener: DialogSelectArticleListener? = null
     var searchButton: Button
 
     override val name: String?
@@ -94,8 +94,8 @@ class DialogSelectArticle : ASDialog(), View.OnClickListener {
                 showShortToast(getContextString(R.string.please_input_article_number))
                 return
             }
-            if (this.listener != null) {
-                this.listener?.onSelectDialogDismissWIthIndex(this.contentString)
+            if (this.dialogSelectArticleListener != null) {
+                this.dialogSelectArticleListener?.onSelectDialogDismissWIthIndex(this.contentString)
             }
             dismiss()
         } else if (view === this.cancelButton) {
@@ -108,7 +108,7 @@ class DialogSelectArticle : ASDialog(), View.OnClickListener {
     }
 
     fun setListener(listener: DialogSelectArticleListener?) {
-        this.listener = listener
+        this.dialogSelectArticleListener = listener
     }
 
     public override fun show() {

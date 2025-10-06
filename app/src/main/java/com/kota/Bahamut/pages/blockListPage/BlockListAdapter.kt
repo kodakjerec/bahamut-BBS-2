@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.R
 
-class BlockListAdapter(private val _blocklist: MutableList<String?>) :
+class BlockListAdapter(private val blocklist: MutableList<String>) :
     RecyclerView.Adapter<BlockListViewHolder?>() {
     private var mClickListener: BlockListClickListener? = null
 
@@ -21,11 +21,11 @@ class BlockListAdapter(private val _blocklist: MutableList<String?>) :
     }
 
     fun getItem(position: Int): String? {
-        return this._blocklist[position]
+        return this.blocklist[position]
     }
 
     override fun getItemCount(): Int {
-        return _blocklist.size
+        return blocklist.size
     }
 
     fun setOnItemClickListener(listener: BlockListClickListener?) {

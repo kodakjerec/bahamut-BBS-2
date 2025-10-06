@@ -13,9 +13,9 @@ import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.Spinner
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.asFramework.dialog.ASDialog
 import com.kota.telnet.reference.TelnetAnsiCode.getBackgroundColor
 import com.kota.telnet.reference.TelnetAnsiCode.getTextColor
 
@@ -26,7 +26,7 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
     var frontColor: Int = 0
     var backColor: Int = 0
     var outputParam: String? = null
-    var listener: DialogPaintColorListener? = null
+    var dialogPaintColorListener: DialogPaintColorListener? = null
     var recoveryCheckBox: CheckBox
     var highlightCheckBox: CheckBox
     var frontColorSpinner: Spinner
@@ -222,12 +222,12 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
     }
 
     fun setListener(listener: DialogPaintColorListener?) {
-        this@DialogPaintColor.listener = listener
+        this@DialogPaintColor.dialogPaintColorListener = listener
     }
 
     override fun onClick(view: View?) {
-        if (view === snedButton && listener != null) {
-            listener?.onPaintColorDone(outputParam!!)
+        if (view === snedButton && dialogPaintColorListener != null) {
+            dialogPaintColorListener?.onPaintColorDone(outputParam!!)
         }
         dismiss()
     }

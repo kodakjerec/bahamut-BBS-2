@@ -37,7 +37,7 @@ open class BookmarkManagePage(
     private val boardExtendOptionalPageListener: BoardExtendOptionalPageListener?
 ) : TelnetPage(), BookmarkClickListener, DialogSearchArticleListener {
     var boardName: String? = null
-    private val bookmarks: MutableList<Bookmark?> = Vector()
+    private val bookmarks: MutableList<Bookmark> = Vector()
     protected var headerItemView: TelnetHeaderItemView? = null
     private var selectedButton: Button? = null
     private var bookmarkButton: Button? = null
@@ -172,8 +172,8 @@ open class BookmarkManagePage(
                                 bookmarkStore?.getBookmarkList(this@BookmarkManagePage.boardName)
                             bookmarkList?.clear()
                             for (bookmark in bookmarks) {
-                                if (bookmark?.index == start) bookmark.index = end
-                                else if (bookmark?.index == end) bookmark.index = start
+                                if (bookmark.index == start) bookmark.index = end
+                                else if (bookmark.index == end) bookmark.index = start
                                 bookmarkList?.addBookmark(bookmark)
                             }
                             bookmarkStore?.store()
@@ -276,10 +276,6 @@ open class BookmarkManagePage(
         }
     }
 
-    fun setBoardName(aBoardName: String?) {
-        boardName = aBoardName
-    }
-
     var buttonClickListener: View.OnClickListener = View.OnClickListener { aView ->
         val recyclerView = findViewById(R.id.recycleView) as RecyclerView?
         if (aView === this@BookmarkManagePage.bookmarkButton) {
@@ -348,7 +344,7 @@ open class BookmarkManagePage(
     private var editBookmarkIndex = -1
 
     init {
-        setBoardName(aBoardName)
+        boardName = aBoardName
     }
 
     // 修改書籤

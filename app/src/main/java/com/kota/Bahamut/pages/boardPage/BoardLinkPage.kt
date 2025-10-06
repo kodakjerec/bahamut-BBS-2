@@ -33,7 +33,7 @@ class BoardLinkPage : BoardMainPage() {
             if (boardName == null) {
                 boardName = getContextString(R.string.loading)
             }
-            headerView.setData(this._board_title, "主題串列", boardName)
+            headerView.setData(this.boardTitle, "主題串列", boardName)
         }
     }
 

@@ -22,13 +22,13 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandFSendMail
 import com.kota.Bahamut.pages.SendMailPage
 import com.kota.Bahamut.pages.SendMailPageListener
+import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
-import com.kota.Bahamut.pages.articlePage.ArticlePage_HeaderItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TelnetItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TextItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePage_TimeTimeView
+import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
+import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
+import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
-import com.kota.Bahamut.pages.articlePage.Thumbnail_ItemView
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
@@ -86,21 +86,21 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
             if (itemViewOrigin == null) {
                 itemViewOrigin = when (type) {
                     ArticlePageItemType.Header ->
-                        ArticlePage_HeaderItemView(context)
+                        ArticlePageHeaderItemView(context)
                     ArticlePageItemType.Sign ->
-                        ArticlePage_TelnetItemView(context)
+                        ArticlePageTelnetItemView(context)
                     ArticlePageItemType.PostTime ->
-                        ArticlePage_TimeTimeView(context)
+                        ArticlePageTimeTimeView(context)
                     else ->
-                        ArticlePage_TextItemView(context)
+                        ArticlePageTextItemView(context)
                 }
             } else if (type == ArticlePageItemType.Content) {
-                itemViewOrigin = ArticlePage_TextItemView(context)
+                itemViewOrigin = ArticlePageTextItemView(context)
             }
 
             when (getItemViewType(itemIndex)) {
                 ArticlePageItemType.Header -> {
-                    val itemView1 = itemViewOrigin as ArticlePage_HeaderItemView
+                    val itemView1 = itemViewOrigin as ArticlePageHeaderItemView
                     var author = ""
                     var title = ""
                     var boardName = ""
@@ -117,7 +117,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                 }
 
                 ArticlePageItemType.Content -> {
-                    val itemView2 = itemViewOrigin as ArticlePage_TextItemView
+                    val itemView2 = itemViewOrigin as ArticlePageTextItemView
                     if (item!=null) {
                         itemView2.setAuthor(item.author, item.nickname)
                         itemView2.setQuote(item.quoteLevel)
@@ -131,9 +131,9 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                 }
 
                 ArticlePageItemType.Sign -> {
-                    val itemView3 = itemViewOrigin as ArticlePage_TelnetItemView
+                    val itemView3 = itemViewOrigin as ArticlePageTelnetItemView
                     if (item!=null) {
-                        itemView3.setFrame(item.frame)
+                        itemView3.setFrame(item.frame!!)
                     }
                     if (itemIndex >= count - 2) {
                         itemView3.setDividerHidden(true)
@@ -143,7 +143,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                 }
 
                 ArticlePageItemType.PostTime -> {
-                    val itemView4 = itemViewOrigin as ArticlePage_TimeTimeView
+                    val itemView4 = itemViewOrigin as ArticlePageTimeTimeView
                     itemView4.setTime("《" + telnetArticle?.dateTime + "》")
                     itemView4.setIP(telnetArticle?.fromIP)
                 }
@@ -196,9 +196,8 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_ARTICLE_ESSENCE
 
-    fun isPopupPage(): Boolean {
-        return true
-    }
+    override val isPopupPage: Boolean
+        get() = true
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
@@ -244,8 +243,8 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     fun setArticle(aArticle: TelnetArticle?) {
         clear()
         telnetArticle = aArticle
-        telnetView?.frame = telnetArticle?.frame
-        telnetView?.layoutParams = telnetView?.layoutParams
+        telnetView!!.frame = telnetArticle!!.frame!!
+        telnetView!!.layoutParams = telnetView?.layoutParams
         telnetViewBlock?.scrollTo(0, 0)
         ASProcessingDialog.dismissProcessingDialog()
         resetAdapter()
@@ -287,7 +286,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     private fun onPageUpButtonClicked() {
-        if (TelnetClient.client?.connector!!.isConnecting) {
+        if (TelnetClient.client?.telnetConnector!!.isConnecting) {
             PageContainer.instance?.boardEssencePage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
@@ -295,7 +294,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     private fun onPageDownButtonClicked() {
-        if (TelnetClient.client?.connector!!.isConnecting) {
+        if (TelnetClient.client?.telnetConnector!!.isConnecting) {
             PageContainer.instance?.boardEssencePage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
@@ -331,9 +330,8 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         return true
     }
 
-    fun isKeepOnOffline(): Boolean {
-        return true
-    }
+    override val isKeepOnOffline: Boolean
+        get() = true
 
     /** 給 state handler 更改讀取進度 */
     @SuppressLint("SetTextI18n")
@@ -345,7 +343,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     // 長按內文
     private var listLongClickListener =
         OnItemLongClickListener { _: AdapterView<*>?, view: View, itemIndex: Int, _: Long ->
-            if (view.javaClass == ArticlePage_TelnetItemView::class.java) {
+            if (view.javaClass == ArticlePageTelnetItemView::class.java) {
                 // 開啟切換模式
                 val item: TelnetArticleItem = telnetArticle?.getItem(itemIndex - 1)!!
                 when (item.type) {
@@ -528,14 +526,14 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         val childCount = listView.childCount
         for (childIndex in 0 until childCount) {
             val view = listView.getChildAt(childIndex)
-            if (view.javaClass == ArticlePage_TextItemView::class.java) {
-                val firstLLayout = (view as ArticlePage_TextItemView).getChildAt(0) as LinearLayout
+            if (view.javaClass == ArticlePageTextItemView::class.java) {
+                val firstLLayout = (view as ArticlePageTextItemView).getChildAt(0) as LinearLayout
                 val secondLLayout = firstLLayout.getChildAt(0) as LinearLayout
                 val childCount2 = secondLLayout.childCount
                 for (childIndex2 in 0 until childCount2) {
                     val view1 = secondLLayout.getChildAt(childIndex2)
-                    if (view1.javaClass == Thumbnail_ItemView::class.java) {
-                        (view1 as Thumbnail_ItemView).prepare_load_image()
+                    if (view1.javaClass == ThumbnailItemView::class.java) {
+                        (view1 as ThumbnailItemView).prepareLoadImage()
                     }
                 }
             }

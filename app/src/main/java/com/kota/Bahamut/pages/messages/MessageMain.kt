@@ -48,9 +48,8 @@ class MessageMain:TelnetPage() {
     override val pageLayout: Int
         get() = R.layout.message_main
 
-    fun isPopupPage(): Boolean {
-        return true
-    }
+    override val isPopupPage: Boolean
+        get() = true
 
     /** 顯示聊天小視窗  */
     private val showHideFloating = CompoundButton.OnCheckedChangeListener {

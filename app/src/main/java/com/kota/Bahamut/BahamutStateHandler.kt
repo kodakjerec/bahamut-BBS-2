@@ -5,6 +5,7 @@ import com.kota.Bahamut.command.BahamutCommandLoadArticleEnd
 import com.kota.Bahamut.command.BahamutCommandLoadArticleEndForSearch
 import com.kota.Bahamut.command.BahamutCommandLoadMoreArticle
 import com.kota.Bahamut.pages.ClassPage
+import com.kota.Bahamut.pages.Login.LoginPage
 import com.kota.Bahamut.pages.MailBoxPage
 import com.kota.Bahamut.pages.MailPage
 import com.kota.Bahamut.pages.MainPage
@@ -18,7 +19,6 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.boardPage.BoardSearchPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
-import com.kota.Bahamut.pages.login.LoginPage
 import com.kota.Bahamut.pages.messages.BahaMessage
 import com.kota.Bahamut.pages.messages.MessageDatabase
 import com.kota.Bahamut.pages.messages.MessageMain
@@ -56,7 +56,7 @@ import java.util.function.Consumer
 import java.util.regex.Pattern
 
 class BahamutStateHandler internal constructor() : TelnetStateHandler() {
-    var articleNumber: String? = null
+    var myArticleNumber: String? = null
     var nowStep: Int = 0
     var telnetRows: Vector<TelnetRow> = Vector<TelnetRow>() // debug用
     var rowString00: String = ""
@@ -71,7 +71,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     /** 設定文章編號  */
     fun setArticleNumber(aArticleNumber: String?) {
-        this.articleNumber = aArticleNumber
+        this.myArticleNumber = aArticleNumber
     }
 
     fun loadState() {
@@ -113,7 +113,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             if (i >= row?.data!!.size) {
                 break
             }
-            val backgroundColor = row.backgroundColor[i]
+            val backgroundColor = row.myBackgroundColor[i]
             val data = row.data[i]
             if (backgroundColor.toInt() == 6) {
                 nameBuffer.write(data.toInt())
@@ -258,7 +258,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 }
             } else if (this.rowString02.contains("HP：") && this.rowString02.contains("MP：")) {
                 val page: ArticlePage = PageContainer.instance!!.articlePage
-                val userData = Vector<String?>()
+                val userData = Vector<String>()
                 this.telnetRows.forEach(Consumer { row: TelnetRow? -> userData.add(row.toString()) })
                 page.ctrlQUser(userData)
             } else if (this.rowString00.contains("過  路  勇  者  的  足  跡")) {
@@ -555,7 +555,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             // HP:MP:會跟網友列表同時發生, 所以判斷要在之前
             if (this.rowString02.contains("HP：") && this.rowString02.contains("MP：")) {
                 val page: ArticlePage = PageContainer.instance!!.articlePage
-                val userData = Vector<String?>()
+                val userData = Vector<String>()
                 this.telnetRows.forEach(Consumer { row: TelnetRow? -> userData.add(row.toString()) })
                 page.ctrlQUser(userData)
                 TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
@@ -739,8 +739,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         val article = this.articleHandler.article
         this.articleHandler.newArticle()
 
-        if (this.articleNumber != null) {
-            article.myNumber = this.articleNumber!!.toInt()
+        if (this.myArticleNumber != null) {
+            article.myNumber = this.myArticleNumber!!.toInt()
         }
         if (this.rowStringFinal.contains("魚雁往返")) {
             showMail(article)
@@ -753,7 +753,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     // 顯示文章內文
-    fun showArticle(aArticle: TelnetArticle?) {
+    fun showArticle(aArticle: TelnetArticle) {
         object : ASRunner() {
             override fun run() {
                 try {
@@ -858,14 +858,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         const val STEP_CONNECTING: Int = 0
         const val STEP_WORKING: Int = 1
         const val UNKNOWN: Int = -1
-        var instance: BahamutStateHandler? = null
+        var bahamutStateHandler: BahamutStateHandler? = null
 
         /** 回傳instance給其他頁面使用  */
         fun getInstance(): BahamutStateHandler {
-            if (instance == null) {
-                instance = BahamutStateHandler()
+            if (bahamutStateHandler == null) {
+                bahamutStateHandler = BahamutStateHandler()
             }
-            return instance!!
+            return bahamutStateHandler!!
         }
     }
 }

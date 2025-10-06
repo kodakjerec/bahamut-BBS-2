@@ -150,7 +150,7 @@ class BoardEssencePage : TelnetListPage() {
             }
         } else {
             // 文章
-            val articleEssencePage = PageContainer.instance?.articleEssencePage!!
+            val articleEssencePage = PageContainer.instance?.myArticleEssencePage!!
             articleEssencePage.setBoardEssencePage(this)
             articleEssencePage.clear()
             navigationController.pushViewController(articleEssencePage)

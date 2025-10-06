@@ -7,8 +7,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dialogs.DialogInsertExpression
 import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
@@ -18,8 +18,8 @@ import com.kota.Bahamut.dialogs.DialogPaintColor
 import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
+import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
@@ -29,9 +29,9 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     var contentField: EditText? = null
     var hideTitleButton: Button? = null
     var paintColorButton: Button? = null
-    var listener: SendMailPageListener? = null
+    var sendMailPageListener: SendMailPageListener? = null
     var postButton: Button? = null
-    var receiver: String? = null
+    var receiver1: String? = null
     var receiverField: EditText? = null
     var receiverFieldBackground: TextView? = null
     var symbolButton: Button? = null
@@ -46,7 +46,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         get() = "BahamutSendMailDialog"
 
     fun setListener(aListener: SendMailPageListener?) {
-        listener = aListener
+        sendMailPageListener = aListener
     }
 
     override val pageLayout: Int
@@ -90,9 +90,9 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     fun refreshReceiverField() {
-        if (receiverField != null && receiver != null) {
-            receiverField?.setText(receiver)
-            receiver = null
+        if (receiverField != null && receiver1 != null) {
+            receiverField?.setText(receiver1)
+            receiver1 = null
         }
     }
 
@@ -154,7 +154,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         if (contentField != null) {
             contentField?.setText("")
         }
-        listener = null
+        sendMailPageListener = null
     }
 
     fun setPostTitle(aTitle: String?) {
@@ -169,7 +169,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
 
     override fun onClick(view: View) {
         if (view === postButton) {
-            if (listener != null) {
+            if (sendMailPageListener != null) {
                 val receiver = receiverField?.text.toString().replace("\n", "")
                 val title = titleField?.text.toString().replace("\n", "")
                 val content = contentField?.text.toString()
@@ -207,7 +207,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
                     .setMessage("您是否確定要送出此信件?")
                     .setListener { aDialog: ASAlertDialog?, index: Int ->
                         if (index == 1) {
-                            listener?.onSendMailDialogSendButtonClicked(
+                            sendMailPageListener?.onSendMailDialogSendButtonClicked(
                                 this@SendMailPage,
                                 sendReceiver,
                                 sendTitle,
@@ -307,7 +307,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     fun setReceiver(aReceiver: String?) {
-        receiver = aReceiver
+        receiver1 = aReceiver
         refreshReceiverField()
     }
 

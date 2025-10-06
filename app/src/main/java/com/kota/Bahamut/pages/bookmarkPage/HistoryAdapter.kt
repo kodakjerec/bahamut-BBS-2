@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
 
-class HistoryAdapter(private val bookmarks: MutableList<Bookmark?>) :
+class HistoryAdapter(private val bookmarks: MutableList<Bookmark>) :
     RecyclerView.Adapter<HistoryViewHolder?>() {
     private var mClickListener: BookmarkClickListener? = null
 
@@ -21,7 +21,7 @@ class HistoryAdapter(private val bookmarks: MutableList<Bookmark?>) :
         holder.setBookmark(bookmark)
     }
 
-    fun getItem(position: Int): Bookmark? {
+    fun getItem(position: Int): Bookmark {
         return this.bookmarks[position]
     }
 

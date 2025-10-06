@@ -70,7 +70,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
 
         Linkify.addLinks(txtContent, Linkify.WEB_URLS)
         // 使用預覽圖
-        if (UserSettings.getLinkAutoShow()) {
+        if (UserSettings.linkAutoShow) {
             val originalString = txtContent.text as SpannableString
             val urlSpans: Array<URLSpan> = txtContent.urls
             if (urlSpans.isNotEmpty()) {
@@ -96,7 +96,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
                     // 塞入連結前半段文字, 純文字
                     mainLayout.addView(textView1, originalIndex)
                     val url = urlSpan.url
-                    val thumbnail = Thumbnail_ItemView(context)
+                    val thumbnail = ThumbnailItemView(context)
                     thumbnail.loadUrl(url)
                     // 塞入截圖
                     mainLayout.addView(thumbnail, originalIndex + 1)
@@ -131,7 +131,6 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
         txtFloor.text = " [ $floor 樓]"
     }
 
-    override fun getType(): Int {
-        return ArticlePageItemType.Push
-    }
+    override val type: Int
+        get() = ArticlePageItemType.Push
 }

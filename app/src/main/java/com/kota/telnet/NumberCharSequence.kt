@@ -36,10 +36,6 @@ class NumberCharSequence : CharSequence {
         val number6 = number5 / 10
     }
 
-    fun charAt(index: Int): Char {
-        return this.myData[index]
-    }
-
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {
         // 参数校验，确保 startIndex 和 endIndex 是有效的
         if (startIndex < 0 || endIndex > length || startIndex > endIndex) {

@@ -35,7 +35,7 @@ class BoardSearchPage : BoardMainPage() {
             if (boardName == null) {
                 boardName = getContextString(R.string.loading)
             }
-            headerView.setData(this._board_title, "文章搜尋", boardName)
+            headerView.setData(this.boardTitle, "文章搜尋", boardName)
         }
     }
 

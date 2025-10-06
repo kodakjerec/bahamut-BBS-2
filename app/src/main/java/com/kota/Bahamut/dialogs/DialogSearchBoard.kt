@@ -3,13 +3,13 @@ package com.kota.Bahamut.dialogs
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
+import com.kota.asFramework.dialog.ASDialog
 
 class DialogSearchBoard : ASDialog(), View.OnClickListener {
     var cancelButton: Button
     var keywordLabel: EditText
-    var listener: DialogSearchBoardListener? = null
+    var dialogSearchBoardListener: DialogSearchBoardListener? = null
     var searchButton: Button
 
     override val name: String?
@@ -28,8 +28,8 @@ class DialogSearchBoard : ASDialog(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        if (view === this.searchButton && this.listener != null) {
-            this.listener?.onSearchButtonClickedWithKeyword(
+        if (view === this.searchButton && this.dialogSearchBoardListener != null) {
+            this.dialogSearchBoardListener?.onSearchButtonClickedWithKeyword(
                 this.keywordLabel.text.toString().replace("\n", "")
             )
         }
@@ -37,6 +37,6 @@ class DialogSearchBoard : ASDialog(), View.OnClickListener {
     }
 
     fun setListener(listener: DialogSearchBoardListener?) {
-        this.listener = listener
+        this.dialogSearchBoardListener = listener
     }
 }

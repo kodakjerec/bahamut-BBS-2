@@ -6,7 +6,6 @@ import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnLongClickListener
-import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.AdapterView
@@ -98,23 +97,23 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     ASListViewExtentOptionalDelegate {
     var mainDrawerLayout: DrawerLayout? = null
     var mainLayout: RelativeLayout? = null
-    protected var _board_title: String? = null
-    protected var _board_manager: String? = null
+    protected var boardTitle: String? = null
+    protected var boardManager: String? = null
     var lastListAction: Int = BoardPageAction.Companion.LIST
-    var _initialed: Boolean = false
-    var _refresh_header_view: Boolean = false // 正在更新標題列
+    var initialed: Boolean = false
+    var isRefreshHeaderView: Boolean = false // 正在更新標題列
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    var isItemBlockEnable: Boolean = false // 是否啟用黑名單
+    override var isItemBlockEnable: Boolean = false // 是否啟用黑名單
     var blockListForTitle: Boolean = false // 是否啟用黑名單套用至標題
-    var _isDrawerOpening: Boolean = false // 側邊選單正在開啟中
-    val _bookmarkList: MutableList<Bookmark> = ArrayList<Bookmark>()
-    var _drawerListView: ListView? = null
-    var _drawerListViewNone: TextView? = null
-    var _mode: Int = 0 // 現在開啟的是 0-書籤 1-紀錄
-    var _tab_buttons: Array<Button>
-    var _show_bookmark_button: Button? = null // 顯示書籤按鈕
-    var _show_history_button: Button? = null // 顯示記錄按鈕
+    var isDrawerOpening: Boolean = false // 側邊選單正在開啟中
+    val myBookmarkList: MutableList<Bookmark> = ArrayList<Bookmark>()
+    var drawerListView: ListView? = null
+    var drawerListViewNone: TextView? = null
+    var myMode: Int = 0 // 現在開啟的是 0-書籤 1-紀錄
+    lateinit var tabButtons: Array<Button>
+    var showBookmarkButton: Button? = null // 顯示書籤按鈕
+    var showHistoryButton: Button? = null // 顯示記錄按鈕
     var drawerLocation: Int = GravityCompat.END // 抽屜最後位置
     private var isPostDelayedSuccess = false
 
@@ -130,8 +129,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 前一頁  */
     val mPrevPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listViewWidget?.getFirstVisiblePosition()
-        val endIndex = listViewWidget?.getLastVisiblePosition()
+        var firstIndex = listViewWidget?.firstVisiblePosition!!
+        val endIndex = listViewWidget?.lastVisiblePosition!!
         val moveIndex = abs(endIndex - firstIndex)
         firstIndex -= moveIndex
         if (firstIndex < 0) firstIndex = 0
@@ -142,8 +141,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     private val lastEndIndexes = IntArray(3) // 最後頁的結束位置
     private var endIndexCheckCount = 0 // 結束位置檢查次數
     val mNextPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listViewWidget?.getFirstVisiblePosition()
-        val endIndex = listViewWidget?.getLastVisiblePosition()
+        var firstIndex = listViewWidget?.firstVisiblePosition!!
+        val endIndex = listViewWidget?.lastVisiblePosition!!
         val moveIndex = abs(endIndex - firstIndex)
         firstIndex += moveIndex
 
@@ -192,10 +191,10 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 } else {
                     drawerLocation = GravityCompat.START
                 }
-                val menu_view = mainDrawerLayout?.findViewById<LinearLayout>(R.id.menu_view)
-                val layoutParams_drawer = menu_view.getLayoutParams() as DrawerLayout.LayoutParams
-                layoutParams_drawer.gravity = drawerLocation
-                menu_view.setLayoutParams(layoutParams_drawer)
+                val menuView = mainDrawerLayout!!.findViewById<LinearLayout>(R.id.menu_view)!!
+                val layoutParamsDrawer = menuView.layoutParams as DrawerLayout.LayoutParams
+                layoutParamsDrawer.gravity = drawerLocation
+                menuView.layoutParams = layoutParamsDrawer
                 drawerLayout.openDrawer(drawerLocation, propertiesAnimationEnable)
             }
         }
@@ -208,32 +207,34 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             .addItem(getContextString(R.string.board_main_read_all))
             .addItem(getContextString(R.string.board_main_unread_all))
             .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
-                    index: Int,
-                    aTitle: String?
-                ): Boolean {
-                    return@OnClickListener true
-                }
+                
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ) {
-                    if (aTitle == getContextString(R.string.board_main_read_all)) {
+                    if (title == getContextString(R.string.board_main_read_all)) {
                         val data = create()
                             .pushString("vV\n")
                             .build()
                         TelnetClient.client?.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_read_all_msg01))
-                    } else if (aTitle == getContextString(R.string.board_main_unread_all)) {
+                    } else if (title == getContextString(R.string.board_main_unread_all)) {
                         val data = create()
                             .pushString("vU\n")
                             .build()
                         TelnetClient.client?.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_unread_all_msg01))
                     }
+                }
+
+                override fun onListDialogItemLongClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ): Boolean {
+                    TODO("Not yet implemented")
                 }
             }).show()
     }
@@ -246,12 +247,12 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
         // android.widget.Adapter
         override fun getCount(): Int {
-            return this@BoardMainPage._bookmarkList.size
+            return this@BoardMainPage.myBookmarkList.size
         }
 
         // android.widget.Adapter
         override fun getItem(i: Int): Bookmark? {
-            return this@BoardMainPage._bookmarkList.get(i)
+            return this@BoardMainPage.myBookmarkList[i]
         }
 
         /** 顯示側邊選單書籤  */
@@ -276,12 +277,12 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
         // android.widget.Adapter
         override fun getCount(): Int {
-            return this@BoardMainPage._bookmarkList.size
+            return this@BoardMainPage.myBookmarkList.size
         }
 
         // android.widget.Adapter
         override fun getItem(i: Int): Bookmark? {
-            return this@BoardMainPage._bookmarkList.get(i)
+            return this@BoardMainPage.myBookmarkList[i]
         }
 
         /** 顯示側邊選單書籤  */
@@ -299,7 +300,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     /** 側邊選單 mListener  */
-    var _drawer_listener: DrawerListener = object : DrawerListener {
+    var drawerListener: DrawerListener = object : DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
 
         override fun onDrawerOpened(drawerView: View) {}
@@ -307,108 +308,101 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         override fun onDrawerClosed(drawerView: View) {}
 
         override fun onDrawerStateChanged(newState: Int) {
-            _isDrawerOpening = newState != DrawerLayout.STATE_IDLE
+            isDrawerOpening = newState != DrawerLayout.STATE_IDLE
 
             // 側邊選單未完全開啟 or 正要啟動狀態
-            if (!this.isDrawerOpen || _isDrawerOpening) {
+            if (isDrawerOpening) {
                 this@BoardMainPage.reloadBookmark()
             }
         }
     }
 
     /** 點書籤  */
-    var _bookmark_listener: OnItemClickListener =
+    var bookmarkListener: OnItemClickListener =
         OnItemClickListener { adapterView: AdapterView<*>?, view: View?, i: Int, j: Long ->
             this@BoardMainPage.closeDrawer()
-            val bookmark = this@BoardMainPage._bookmarkList.get(i)
+            val bookmark = this@BoardMainPage.myBookmarkList[i]
             searchArticle(bookmark.keyword!!, bookmark.author, bookmark.mark, bookmark.gy)
         }
 
     /** 切換成書籤清單  */
-    var buttonClickListener: View.OnClickListener = object : View.OnClickListener {
-        override fun onClick(aView: View?) {
-            if (aView === _show_bookmark_button) {
-                _mode = 0
-            } else {
-                _mode = 1
-            }
-            if (_drawerListView != null) {
-                if (_mode == 0) _drawerListView?.setAdapter(_bookmark_adapter)
-                else _drawerListView?.setAdapter(_history_adapter)
-                if (_drawerListView?.getOnItemClickListener() == null) _drawerListView?.setOnItemClickListener(
-                    _bookmark_listener
-                )
-            }
-            reloadBookmark()
+    var buttonClickListener: View.OnClickListener = View.OnClickListener { aView ->
+        if (aView === showBookmarkButton) {
+            myMode = 0
+        } else {
+            myMode = 1
+        }
+        if (drawerListView != null) {
+            if (myMode == 0) drawerListView?.adapter = _bookmark_adapter
+            else drawerListView?.adapter = _history_adapter
+            if (drawerListView?.onItemClickListener == null) drawerListView?.onItemClickListener =
+                bookmarkListener
+        }
+        reloadBookmark()
 
-            // 切換頁籤
-            val theme = getSelectTheme()
-            for (tab_button in this@BoardMainPage._tab_buttons) {
-                if (tab_button === aView) {
-                    tab_button.setTextColor(rgbToInt(theme.textColor))
-                    tab_button.setBackgroundColor(rgbToInt(theme.backgroundColor))
-                } else {
-                    tab_button.setTextColor(rgbToInt(theme.textColorDisabled))
-                    tab_button.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
-                }
+        // 切換頁籤
+        val theme = getSelectTheme()
+        for (tabButton in this@BoardMainPage.tabButtons) {
+            if (tabButton === aView) {
+                tabButton.setTextColor(rgbToInt(theme.textColor))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColor))
+            } else {
+                tabButton.setTextColor(rgbToInt(theme.textColorDisabled))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
             }
         }
     }
 
     /** 搜尋文章  */
-    var _search_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var searchListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.showSearchArticleDialog()
     }
 
     /** 選擇文章  */
-    var _select_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var selectListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.showSelectArticleDialog()
     }
 
     /** 啟用/停用 黑名單  */
-    var _enable_block_listener: View.OnClickListener =
+    var enableBlockListener: View.OnClickListener =
         View.OnClickListener { view: View? -> this@BoardMainPage.onChangeBlockStateButtonClicked() }
 
     /** 修改黑名單  */
-    var _edit_block_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var editBlockListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.onEditBlockListButtonClicked()
     }
 
     /** 開啟書籤管理  */
-    var _edit_bookmark_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var editBookmarkListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.onBookmarkButtonClicked()
     }
 
     /** 靠左對其  */
-    var _btnLL_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnLLListener: View.OnClickListener = View.OnClickListener { view: View? ->
         propertiesToolbarLocation = 1
         this@BoardMainPage.changeToolbarLocation()
     }
 
     /** 靠右對其  */
-    var _btnRR_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnRRListener: View.OnClickListener = View.OnClickListener { view: View? ->
         propertiesToolbarLocation = 2
         this@BoardMainPage.changeToolbarLocation()
     }
 
-    open val pageLayout: Int
-        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
+    override val pageLayout: Int
         get() = R.layout.board_page
 
-    open val pageType: Int
-        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOARD
 
-    open val isAutoLoadEnable: Boolean
-        // com.kota.Bahamut.ListPage.TelnetListPage
+    override val isAutoLoadEnable: Boolean
         get() = true
-
-    // com.kota.asFramework.ui.ASListViewExtentOptionalDelegate
-    override fun onASListViewHandleExtentOptional(aSListView: ASListView?, i: Int): Boolean {
+    
+    override fun onASListViewHandleExtentOptional(paramASListView: ASListView?, i: Int): Boolean {
         return false
     }
 
@@ -419,28 +413,28 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         mainDrawerLayout = findViewById(R.id.drawer_layout) as DrawerLayout?
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
-        val aSListView = mainLayout?.findViewById<ASListView>(R.id.BoardPageListView)
+        val aSListView = mainLayout!!.findViewById<ASListView>(R.id.BoardPageListView)
         aSListView.extendOptionalDelegate = this
-        aSListView.setEmptyView(mainLayout?.findViewById<View>(R.id.BoardPageListEmptyView))
+        aSListView.emptyView = mainLayout!!.findViewById<View>(R.id.BoardPageListEmptyView)
         listView = aSListView
 
-        mainLayout?.findViewById<View>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
-        mainLayout?.findViewById<View>(R.id.BoardPageFirstPageButton)
+        mainLayout!!.findViewById<View>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageFirstPageButton)
             .setOnClickListener(mPrevPageClickListener)
-        mainLayout?.findViewById<View>(R.id.BoardPageFirstPageButton)
+        mainLayout!!.findViewById<View>(R.id.BoardPageFirstPageButton)
             .setOnLongClickListener(mFirstPageClickListener)
         // 下一頁
         val boardPageLatestPageButton =
-            mainLayout?.findViewById<Button>(R.id.BoardPageLatestPageButton)
+            mainLayout!!.findViewById<Button>(R.id.BoardPageLatestPageButton)
         if (propertiesBoardMoveEnable > 0) {
-            boardPageLatestPageButton.setText(getContextString(R.string.next_page))
+            boardPageLatestPageButton.text = getContextString(R.string.next_page)
             boardPageLatestPageButton.setOnClickListener(mNextPageClickListener)
             boardPageLatestPageButton.setOnLongClickListener(mLastPageLongClickListener)
         } else {
             boardPageLatestPageButton.setOnClickListener(mLastPageClickListener)
         }
-        mainLayout?.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
-        mainLayout?.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
 
         // 側邊選單
         if (mainDrawerLayout != null) {
@@ -449,76 +443,68 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
             val drawerLayout = mainDrawerLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
             if (drawerLayout != null) {
-                val menu_view = mainDrawerLayout?.findViewById<LinearLayout>(R.id.menu_view)
-                val layoutParams_drawer = menu_view.getLayoutParams() as DrawerLayout.LayoutParams
-                layoutParams_drawer.gravity = drawerLocation
-                menu_view.setLayoutParams(layoutParams_drawer)
-                drawerLayout.addDrawerListener(_drawer_listener)
+                val menuView = mainDrawerLayout?.findViewById<LinearLayout>(R.id.menu_view)!!
+                val layoutParamsDrawer = menuView.layoutParams as DrawerLayout.LayoutParams
+                layoutParamsDrawer.gravity = drawerLocation
+                menuView.layoutParams = layoutParamsDrawer
+                drawerLayout.addDrawerListener(drawerListener)
                 // 根據手指位置設定側邊選單位置
-                aSListView.setOnTouchListener(OnTouchListener { view: View?, motionEvent: MotionEvent? ->
-                    if (_isDrawerOpening) return@setOnTouchListener false
+                aSListView.setOnTouchListener { view: View?, motionEvent: MotionEvent? ->
+                    if (isDrawerOpening) return@setOnTouchListener false
                     val screenWidth: Int =
-                        context.getResources().getDisplayMetrics().widthPixels / 2
-                    if (motionEvent?.getX() < screenWidth) layoutParams_drawer.gravity =
+                        context!!.resources.displayMetrics.widthPixels / 2
+                    if (motionEvent!!.x < screenWidth) layoutParamsDrawer.gravity =
                         GravityCompat.START
-                    else layoutParams_drawer.gravity = GravityCompat.END
-                    drawerLocation = layoutParams_drawer.gravity
-                    menu_view.setLayoutParams(layoutParams_drawer)
+                    else layoutParamsDrawer.gravity = GravityCompat.END
+                    drawerLocation = layoutParamsDrawer.gravity
+                    menuView!!.layoutParams = layoutParamsDrawer
                     false
-                })
+                }
             }
-            val search_article_button =
+            val searchArticleButton =
                 mainDrawerLayout?.findViewById<View>(R.id.search_article_button)
-            if (search_article_button != null) {
-                search_article_button.setOnClickListener(_search_listener)
-            }
-            val select_article_button =
+            searchArticleButton?.setOnClickListener(searchListener)
+            val selectArticleButton =
                 mainDrawerLayout?.findViewById<View>(R.id.select_article_button)
-            if (select_article_button != null) {
-                select_article_button.setOnClickListener(_select_listener)
-            }
-            val block_enable_checkbox =
+            selectArticleButton?.setOnClickListener(selectListener)
+            val blockEnableCheckbox =
                 mainDrawerLayout?.findViewById<CheckBox?>(R.id.block_enable_button_checkbox)
-            if (block_enable_checkbox != null) {
-                block_enable_checkbox.setChecked(propertiesBlockListEnable)
-                block_enable_checkbox.setOnClickListener(_enable_block_listener)
+            if (blockEnableCheckbox != null) {
+                blockEnableCheckbox.isChecked = propertiesBlockListEnable
+                blockEnableCheckbox.setOnClickListener(enableBlockListener)
 
-                val text_checkbox =
-                    mainDrawerLayout?.findViewById<TelnetTextViewLarge>(R.id.block_enable_button_checkbox_label)
-                text_checkbox.setOnClickListener(_enable_block_listener)
+                val textCheckbox =
+                    mainDrawerLayout?.findViewById<TelnetTextViewLarge>(R.id.block_enable_button_checkbox_label)!!
+                textCheckbox.setOnClickListener(enableBlockListener)
             }
-            val block_setting_button =
+            val blockSettingButton =
                 mainDrawerLayout?.findViewById<View>(R.id.block_setting_button)
-            if (block_setting_button != null) {
-                block_setting_button.setOnClickListener(_edit_block_listener)
-            }
+            blockSettingButton?.setOnClickListener(editBlockListener)
             val bookmark_edit_button =
                 mainDrawerLayout?.findViewById<View>(R.id.bookmark_edit_button)
-            if (bookmark_edit_button != null) {
-                bookmark_edit_button.setOnClickListener(_edit_bookmark_listener)
-            }
+            bookmark_edit_button?.setOnClickListener(editBookmarkListener)
             // 側邊選單內的書籤
-            _drawerListView = mainDrawerLayout?.findViewById<ListView?>(R.id.bookmark_list_view)
-            _drawerListViewNone =
+            drawerListView = mainDrawerLayout?.findViewById<ListView?>(R.id.bookmark_list_view)
+            drawerListViewNone =
                 mainDrawerLayout?.findViewById<TextView>(R.id.bookmark_list_view_none)
-            if (_drawerListView != null) {
-                _show_bookmark_button =
+            if (drawerListView != null) {
+                showBookmarkButton =
                     mainDrawerLayout?.findViewById<Button>(R.id.show_bookmark_button)
-                _show_history_button =
+                showHistoryButton =
                     mainDrawerLayout?.findViewById<Button>(R.id.show_history_button)
-                _tab_buttons = arrayOf<Button>(_show_bookmark_button!!, _show_history_button!!)
-                _show_bookmark_button?.setOnClickListener(buttonClickListener)
-                _show_history_button?.setOnClickListener(buttonClickListener)
-                if (_mode == 0) _show_bookmark_button?.performClick()
-                else _show_history_button?.performClick()
+                tabButtons = arrayOf<Button>(showBookmarkButton!!, showHistoryButton!!)
+                showBookmarkButton?.setOnClickListener(buttonClickListener)
+                showHistoryButton?.setOnClickListener(buttonClickListener)
+                if (myMode == 0) showBookmarkButton?.performClick()
+                else showHistoryButton?.performClick()
             }
-            mainDrawerLayout?.findViewById<View>(R.id.bookmark_tab_button)
+            mainDrawerLayout?.findViewById<View>(R.id.bookmark_tab_button)!!
                 .setOnClickListener(toEssencePageClickListener)
         }
 
         // 標題
         val boardPageHeaderView =
-            mainLayout?.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
+            mainLayout!!.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
         if (pageType == BahamutPage.BAHAMUT_BOARD) {
             boardPageHeaderView.setMenuButtonClickListener(mMenuButtonListener)
             boardPageHeaderView.setDetail1ClickListener(mReadAllListener)
@@ -571,39 +557,39 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 按下精華區  */
     var toEssencePageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this.lastListAction = BoardPageAction.Companion.ESSENCE
-        PageContainer.instance?.pushBoardEssencePage(name, _board_title)
-        navigationController.pushViewController(PageContainer.instance?.getBoardEssencePage())
-        TelnetClient.client?.sendKeyboardInputToServer(TelnetKeyboard.TAB)
+        PageContainer.instance!!.pushBoardEssencePage(name, boardTitle!!)
+        navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
+        TelnetClient.client!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
 
     /** 變更工具列位置  */
     fun changeToolbarLocation() {
-        val toolbar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)
-        val toolbarBlock = mainLayout?.findViewById<LinearLayout>(R.id.toolbar_block)
+        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbarBlock = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar_block)
         val toolBarFloating =
-            mainLayout?.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
-        toolBarFloating.setVisibility(View.GONE)
+            mainLayout!!.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
+        toolBarFloating.visibility = View.GONE
 
         // 最左邊最右邊
-        val _btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
-        val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-        val _btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
-        val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-        _btnLL.setVisibility(View.GONE)
-        _btnLLDivider.setVisibility(View.GONE)
-        _btnRR.setVisibility(View.GONE)
-        _btnRRDivider.setVisibility(View.GONE)
+        val btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
+        val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
+        val btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
+        val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
+        btnLL.visibility = View.GONE
+        btnLLDivider.visibility = View.GONE
+        btnRR.visibility = View.GONE
+        btnRRDivider.visibility = View.GONE
 
-        val layoutParams = toolbar.getLayoutParams() as RelativeLayout.LayoutParams
-        val choice_toolbar_location = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
-        when (choice_toolbar_location) {
+        val layoutParams = toolbar.layoutParams as RelativeLayout.LayoutParams
+        val choiceToolbarLocation = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
+        when (choiceToolbarLocation) {
             1 -> {
                 // 底部-最左邊
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
                 layoutParams.addRule(RelativeLayout.ALIGN_START)
-                _btnRR.setVisibility(View.VISIBLE)
-                _btnRRDivider.setVisibility(View.VISIBLE)
+                btnRR.visibility = View.VISIBLE
+                btnRRDivider.visibility = View.VISIBLE
             }
 
             2 -> {
@@ -611,22 +597,22 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 layoutParams.removeRule(RelativeLayout.ALIGN_START)
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-                _btnLL.setVisibility(View.VISIBLE)
-                _btnLLDivider.setVisibility(View.VISIBLE)
+                btnLL.visibility = View.VISIBLE
+                btnLLDivider.visibility = View.VISIBLE
             }
 
             3 -> {
                 // 浮動
                 // 去除 原本工具列
-                toolbar.setVisibility(View.GONE)
+                toolbar.visibility = View.GONE
                 // 去除底部卡位用view
-                toolbarBlock.setVisibility(View.GONE)
+                toolbarBlock.visibility = View.GONE
                 // 浮動工具列
-                toolBarFloating.setVisibility(View.VISIBLE)
+                toolBarFloating.visibility = View.VISIBLE
                 // button setting
                 toolBarFloating.setOnClickListenerSetting(mPostListener)
-                val OriginalBtn = mainLayout?.findViewById<Button>(R.id.BoardPagePostButton)
-                toolBarFloating.setTextSetting(OriginalBtn.getText().toString())
+                val OriginalBtn = mainLayout!!.findViewById<Button>(R.id.BoardPagePostButton)
+                toolBarFloating.setTextSetting(OriginalBtn.text.toString())
                 // button 1
                 toolBarFloating.setOnClickListener1(mPrevPageClickListener)
                 toolBarFloating.setOnLongClickListener1(mFirstPageClickListener)
@@ -649,24 +635,24 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             }
         }
 
-        toolbar.setLayoutParams(layoutParams)
+        toolbar.layoutParams = layoutParams
     }
 
     /** 反轉按鈕順序  */
     fun changeToolbarOrder() {
-        val toolbar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
 
-        val choice_toolbar_order = propertiesToolbarOrder
-        if (choice_toolbar_order == 1) {
+        val choiceToolbarOrder = propertiesToolbarOrder
+        if (choiceToolbarOrder == 1) {
             // 最左邊最右邊
-            val _btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-            val _btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
+            val btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
+            val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
+            val btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
+            val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
 
             // 擷取中間的元素
             val allViews = ArrayList<View?>()
-            for (i in toolbar.getChildCount() - 3 downTo 2) {
+            for (i in toolbar.childCount - 3 downTo 2) {
                 val view = toolbar.getChildAt(i)
                 allViews.add(view)
             }
@@ -675,69 +661,67 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             toolbar.removeAllViews()
 
             // 插入
-            toolbar.addView(_btnLL)
-            toolbar.addView(_btnLLDivider)
+            toolbar.addView(btnLL)
+            toolbar.addView(btnLLDivider)
             for (j in allViews.indices) {
-                toolbar.addView(allViews.get(j))
+                toolbar.addView(allViews[j])
             }
-            toolbar.addView(_btnRRDivider)
-            toolbar.addView(_btnRR)
+            toolbar.addView(btnRRDivider)
+            toolbar.addView(btnRR)
         }
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    protected override fun onMenuButtonClicked(): Boolean {
+    override fun onMenuButtonClicked(): Boolean {
         mMenuButtonListener.onClick(null)
         return true
     }
 
     /** 更新headerView  */
     fun refreshHeaderView() {
-        var board_title = _board_title
-        board_title =
-            if (board_title == null || board_title.isEmpty()) getContextString(R.string.loading) else board_title
-        var board_manager = _board_manager
-        board_manager =
-            if (board_manager == null || board_manager.isEmpty()) getContextString(R.string.loading) else board_manager
-        val board_name = name
-        val header_view = mainLayout?.findViewById<BoardHeaderView?>(R.id.BoardPage_HeaderView)
-        if (header_view != null) {
-            header_view.setData(board_title, board_name, board_manager)
-        }
+        var boardTitle1 = boardTitle
+        boardTitle1 =
+            if (boardTitle1 == null || boardTitle1.isEmpty()) getContextString(R.string.loading) else boardTitle1
+        var boardManager1 = boardManager
+        boardManager1 =
+            if (boardManager1 == null || boardManager1.isEmpty()) getContextString(R.string.loading) else boardManager1
+        val boardName = name
+        val headerView = mainLayout!!.findViewById<BoardHeaderView?>(R.id.BoardPage_HeaderView)!!
+        headerView.setData(boardTitle1, boardName, boardManager1)
     }
 
-    public override fun getListIdFromListName(str: String?): String? {
-        return str + "[Board]"
+    override fun getListIdFromListName(aName: String?): String? {
+        return "$aName[Board]"
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    public override fun loadPage(): TelnetListPageBlock {
-        val load = BoardPageHandler.instance?.load()
-        if (!_initialed) {
-            val _lastVisitBoard = TempSettings.lastVisitBoard
-            if (_lastVisitBoard != load.boardName) {
+    override fun loadPage(): TelnetListPageBlock {
+        val load = BoardPageHandler.instance.load()
+        if (!initialed) {
+            val visitBoard = TempSettings.lastVisitBoard
+            if (visitBoard != load.boardName) {
                 // 紀錄最後瀏覽的看板
-                TempSettings.lastVisitBoard = load.boardName
+                TempSettings.lastVisitBoard = load.boardName.toString()
                 clear()
                 if (load.boardType == BoardPageAction.Companion.SEARCH) {
                     pushRefreshCommand(0)
                 }
             }
-            _board_manager = load.boardManager
-            _board_title = load.boardTitle
+            boardManager = load.boardManager
+            boardTitle = load.boardTitle
             name = load.boardName
-            _refresh_header_view = true
-            _initialed = true
+            isRefreshHeaderView = true
+            initialed = true
         }
         return load
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    public override fun isItemCanLoadAtIndex(i: Int): Boolean {
+    override fun isItemCanLoadAtIndex(i: Int): Boolean {
         val boardPageItem = getItem(i) as BoardPageItem?
         if (boardPageItem != null) {
             // 紀錄正在看的討論串標題
-            TempSettings.boardFollowTitle = boardPageItem.title
+            TempSettings.boardFollowTitle = boardPageItem.title.toString()
             TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
@@ -750,15 +734,15 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     @Synchronized  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
         super.onPageRefresh()
-        if (_refresh_header_view) {
+        if (isRefreshHeaderView) {
             refreshHeaderView()
-            _refresh_header_view = false
+            isRefreshHeaderView = false
         }
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    protected override fun onBackPressed(): Boolean {
-        val drawerLayout = mainLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
+    override fun onBackPressed(): Boolean {
+        val drawerLayout = mainLayout!!.findViewById<DrawerLayout?>(R.id.drawer_layout)
         if (drawerLayout != null && drawerLayout.isDrawerOpen(drawerLocation)) {
             drawerLayout.closeDrawer(drawerLocation)
             return true
@@ -777,49 +761,47 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    protected override fun onSearchButtonClicked(): Boolean {
+    override fun onSearchButtonClicked(): Boolean {
         showSearchArticleDialog()
         return true
     }
 
     fun showSearchArticleDialog() {
-        val dialog_SearchArticle = DialogSearchArticle()
-        dialog_SearchArticle.setListener(this)
-        dialog_SearchArticle.show()
+        val dialogSearcharticle = DialogSearchArticle()
+        dialogSearcharticle.setListener(this)
+        dialogSearcharticle.show()
     }
 
     protected fun showSelectArticleDialog() {
-        val dialog_SelectArticle = DialogSelectArticle()
-        dialog_SelectArticle.setListener(this)
-        dialog_SelectArticle.show()
+        val dialogSelectArticle = DialogSelectArticle()
+        dialogSelectArticle.setListener(this)
+        dialogSelectArticle.show()
     }
 
     // com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener
-    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String?>) {
+    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
         searchArticle(
-            vector.get(0)!!,
-            vector.get(1),
-            if (vector.get(2) == "YES") "y" else "n",
-            vector.get(3)
+            vector[0]!!,
+            vector[1],
+            if (vector[2] == "YES") "y" else "n",
+            vector[3]
         )
     }
 
     /** 搜尋文章  */
-    fun searchArticle(_keyword: String, _author: String?, _mark: String?, _gy: String?) {
+    fun searchArticle(keyword: String, author: String?, mark: String?, _gy: String?) {
         this.lastListAction = BoardPageAction.Companion.SEARCH
-        val board_Search_Page = PageContainer.instance?.getBoardSearchPage()
-        board_Search_Page.clear()
-        navigationController.pushViewController(board_Search_Page)
-        val state = instance.getState(board_Search_Page.getListIdFromListName(name))
-        if (state != null) {
-            state.top = 0
-            state.position = 0
-        }
-        board_Search_Page.setKeyword(_keyword)
-        board_Search_Page.setAuthor(_author)
-        board_Search_Page.setMark(_mark)
-        board_Search_Page.setGy(_gy)
-        pushCommand(BahamutCommandSearchArticle(_keyword, _author, _mark, _gy))
+        val boardSearchPage = PageContainer.instance!!.boardSearchPage
+        boardSearchPage.clear()
+        navigationController.pushViewController(boardSearchPage)
+        val state = instance.getState(boardSearchPage.getListIdFromListName(name))
+        state.top = 0
+        state.position = 0
+        boardSearchPage.setKeyword(keyword)
+        boardSearchPage.setAuthor(author)
+        boardSearchPage.setMark(mark)
+        boardSearchPage.setGy(_gy)
+        pushCommand(BahamutCommandSearchArticle(keyword, author, mark, _gy))
     }
 
     /** 選擇文章  */
@@ -844,21 +826,19 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 長按串接文章  */
     fun onListArticle(i: Int) {
         this.lastListAction = BoardPageAction.Companion.LINK_TITLE
-        val board_Linked_Title_Page = PageContainer.instance?.getBoardLinkedTitlePage()
-        board_Linked_Title_Page.clear()
-        navigationController.pushViewController(board_Linked_Title_Page)
-        val state = instance.getState(board_Linked_Title_Page.getListIdFromListName(name))
-        if (state != null) {
-            state.top = 0
-            state.position = 0
-        }
+        val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage!!
+        boardLinkedTitlePage.clear()
+        navigationController.pushViewController(boardLinkedTitlePage)
+        val state = instance.getState(boardLinkedTitlePage.getListIdFromListName(name))
+        state.top = 0
+        state.position = 0
         pushCommand(BahamutCommandListArticle(i))
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         if (propertiesGestureOnBoardEnable) {
-            if (this.isDrawerOpen || _isDrawerOpening) {
+            if (this.isDrawerOpen || isDrawerOpening) {
                 return false
             }
             onBackPressed()
@@ -869,7 +849,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 發文  */
     protected open fun onPostButtonClicked() {
-        val postArticlePage = PageContainer.instance?.getPostArticlePage()
+        val postArticlePage = PageContainer.instance!!.postArticlePage!!
         postArticlePage.setBoardPage(this)
         postArticlePage.setListener(this)
         navigationController.pushViewController(postArticlePage)
@@ -909,7 +889,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 沒有開啟推文小視窗, 視為沒開放功能  */
     var pushArticleAsRunner: ASRunner = object : ASRunner() {
-        public override fun run() {
+        override fun run() {
             if (!isPostDelayedSuccess) {
                 onPagePreload()
                 showLongToast("沒反應，看板未開放推文")
@@ -953,7 +933,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    public override fun isItemBlocked(telnetListPageItem: TelnetListPageItem?): Boolean {
+    override fun isItemBlocked(telnetListPageItem: TelnetListPageItem?): Boolean {
         if (telnetListPageItem != null) {
             return this.isItemBlockEnable && isBlockListContains((telnetListPageItem as BoardPageItem).author)
         }
@@ -966,9 +946,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         notifyDataUpdated()
         this.isItemBlockEnable = propertiesBlockListEnable
         if (mainDrawerLayout != null) {
-            val block_enable_checkbox =
-                mainDrawerLayout?.findViewById<CheckBox>(R.id.block_enable_button_checkbox)
-            block_enable_checkbox.setChecked(this.isItemBlockEnable)
+            val blockEnableCheckbox =
+                mainDrawerLayout?.findViewById<CheckBox>(R.id.block_enable_button_checkbox)!!
+            blockEnableCheckbox.isChecked = this.isItemBlockEnable
         }
         reloadListView()
     }
@@ -978,9 +958,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     /** 點下文章  */
-    public override fun loadItemAtIndex(index: Int) {
+    override fun loadItemAtIndex(index: Int) {
         if (isItemCanLoadAtIndex(index)) {
-            val articlePage = PageContainer.instance?.getArticlePage()
+            val articlePage = PageContainer.instance!!.articlePage
             articlePage.setBoardPage(this)
             articlePage.clear()
             navigationController.pushViewController(articlePage)
@@ -990,7 +970,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     fun prepareInitial() {
-        _initialed = false
+        initialed = false
     }
 
     /** 書籤管理->按下書籤  */
@@ -1010,27 +990,25 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
-    public override fun getView(index: Int, view: View?, viewGroup: ViewGroup?): View? {
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
         var view = view
-        val item_index = index + 1
-        val block = ItemUtils.getBlock(item_index)
-        val boardPageItem = getItem(index) as BoardPageItem?
-        if (boardPageItem == null && currentBlock != block && !isLoadingBlock(item_index)) {
+        val itemIndex = i + 1
+        val block = ItemUtils.getBlock(itemIndex)
+        val boardPageItem = getItem(i) as BoardPageItem?
+        if (boardPageItem == null && currentBlock != block && !isLoadingBlock(itemIndex)) {
             loadBoardBlock(block)
         }
         if (view == null) {
             view = BoardPageItemView(context)
-            view.setLayoutParams(
-                AbsListView.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
+            view.layoutParams = AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
             )
         }
 
         val boardPageItemView = view as BoardPageItemView
         boardPageItemView.setItem(boardPageItem)
-        boardPageItemView.setNumber(item_index)
+        boardPageItemView.setNumber(itemIndex)
 
         if (boardPageItem != null && this.isItemBlockEnable) {
             if (isBlockListContains(boardPageItem.author)) {
@@ -1041,33 +1019,32 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 boardPageItem.isBlocked = false
             }
 
-            if (boardPageItem.isBlocked) boardPageItemView.setVisible(false)
+            if (boardPageItem.isBlocked) boardPageItemView.visible = false
         } else {
-            boardPageItemView.setVisible(true)
+            boardPageItemView.visible = true
         }
 
         return view
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    public override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    public override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }
 
     // 修改文章 訊息發出
-    // com.kota.Bahamut.pages.PostArticlePage_Listener
     override fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
-        str2: String,
-        str3: String
+        str2: String?,
+        str3: String?
     ) {
-        pushCommand(BahamutCommandEditArticle(str, str2, str3))
+        pushCommand(BahamutCommandEditArticle(str, str2!!, str3!!))
     }
 
     var timer: Timer? = null
@@ -1076,14 +1053,14 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     // com.kota.Bahamut.pages.PostArticlePage_Listener
     override fun onPostDialogSendButtonClicked(
         postArticlePage: PostArticlePage?,
-        str: String,
-        str2: String,
+        str: String?,
+        str2: String?,
         str3: String?,
         str4: String?,
         str5: String?,
-        boolean6: Boolean
+        boolean6: Boolean?
     ) {
-        pushCommand(BahamutCommandPostArticle(this, str, str2, str3, str4, str5, boolean6))
+        pushCommand(BahamutCommandPostArticle(this, str!!, str2!!, str3, str4, str5, boolean6!!))
         // 回應到作者信箱
         if (str3 != null && str3 == "M") {
             return
@@ -1109,9 +1086,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 引言過多, 回逤發文時的設定  */
     fun recoverPost() {
         object : ASRunner() {
-            public override fun run() {
+            override fun run() {
                 cleanCommand() // 清除引言過多留下的command buffer
-                val page = PageContainer.instance?.getPostArticlePage()
+                val page = PageContainer.instance?.postArticlePage!!
                 page.setRecover()
             }
         }.runInMainThread()
@@ -1126,9 +1103,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 完成發文  */
     fun finishPost() {
         object : ASRunner() {
-            public override fun run() {
-                val page = PageContainer.instance?.getPostArticlePage()
-                if (page != null) page.closeArticle()
+            override fun run() {
+                val page = PageContainer.instance?.postArticlePage
+                page?.closeArticle()
             }
         }.runInMainThread()
         if (timer != null) {
@@ -1140,7 +1117,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
-    public override fun onPageDidAppear() {
+    override fun onPageDidAppear() {
         super.onPageDidAppear()
         _bookmark_adapter.notifyDataSetChanged()
         _history_adapter.notifyDataSetChanged()
@@ -1148,45 +1125,43 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     fun reloadBookmark() {
         val listName = name
-        val context: Context = context
+        val context: Context = context!!
         if (context == null) {
             return
         }
         val store = TempSettings.bookmarkStore
         if (store != null) {
-            if (_mode == 0) {
-                store.getBookmarkList(listName).loadBookmarkList(_bookmarkList)
+            if (myMode == 0) {
+                store.getBookmarkList(listName).loadBookmarkList(myBookmarkList)
                 if (isPageAppeared) {
                     _bookmark_adapter.notifyDataSetChanged()
                 }
             } else {
-                store.getBookmarkList(listName).loadHistoryList(_bookmarkList)
+                store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
                 if (isPageAppeared) {
                     _history_adapter.notifyDataSetChanged()
                 }
             }
         }
-        if (_bookmarkList.size == 0) {
-            _drawerListView?.setVisibility(View.GONE)
-            _drawerListViewNone?.setVisibility(View.VISIBLE)
+        if (myBookmarkList.isEmpty()) {
+            drawerListView?.visibility = View.GONE
+            drawerListViewNone?.visibility = View.VISIBLE
         } else {
-            _drawerListView?.setVisibility(View.VISIBLE)
-            _drawerListViewNone?.setVisibility(View.GONE)
+            drawerListView?.visibility = View.VISIBLE
+            drawerListViewNone?.visibility = View.GONE
         }
     }
 
     fun closeDrawer() {
-        val drawerLayout = mainLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
-        if (drawerLayout != null) {
-            drawerLayout.closeDrawers()
-        }
+        val drawerLayout = mainLayout!!.findViewById<DrawerLayout?>(R.id.drawer_layout)
+        drawerLayout?.closeDrawers()
     }
 
     val isDrawerOpen: Boolean
         /** 側邊選單已開啟 或 正在開啟中  */
         get() {
             val drawerLayout =
-                mainLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
+                mainLayout!!.findViewById<DrawerLayout?>(R.id.drawer_layout)
             if (drawerLayout != null) {
                 return drawerLayout.isDrawerOpen(drawerLocation)
             }

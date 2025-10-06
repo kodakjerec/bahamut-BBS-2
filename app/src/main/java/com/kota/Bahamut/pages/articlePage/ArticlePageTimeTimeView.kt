@@ -8,7 +8,7 @@ import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.telnet.TelnetArticleItemView
 
-class ArticlePage_TimeTimeView : RelativeLayout, TelnetArticleItemView {
+class ArticlePageTimeTimeView : RelativeLayout, TelnetArticleItemView {
     var timeLabel: TextView? = null
     var ipLabel: TextView? = null
 
@@ -49,6 +49,6 @@ class ArticlePage_TimeTimeView : RelativeLayout, TelnetArticleItemView {
         }
     }
 
-    val type: Int
+    override val type: Int
         get() = ArticlePageItemType.Companion.PostTime
 }

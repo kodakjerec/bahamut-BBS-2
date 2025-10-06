@@ -5,24 +5,24 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.dialogs.DialogShortenImage
-import com.kota.Bahamut.dialogs.DialogShortenUrl
-import com.kota.Bahamut.dialogs.DialogShortenUrlListener
+import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogInsertExpression
 import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
 import com.kota.Bahamut.dialogs.DialogInsertSymbol
+import com.kota.Bahamut.dialogs.DialogShortenImage
+import com.kota.Bahamut.dialogs.DialogShortenUrl
+import com.kota.Bahamut.dialogs.DialogShortenUrlListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.model.PostEditText
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASListView
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 
 class MessageSub: TelnetPage(), View.OnClickListener {
@@ -41,13 +41,11 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         return true
     }
 
-    fun isTopPage(): Boolean {
-        return true
-    }
+    override val isTopPage: Boolean
+        get() = true
 
-    fun isPopupPage(): Boolean {
-        return true
-    }
+    override val isPopupPage: Boolean
+        get() = true
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout

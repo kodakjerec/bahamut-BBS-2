@@ -10,7 +10,7 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.asFramework.thread.ASRunner
-import com.kota.Bahamut.pages.articlePage.Thumbnail_ItemView
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.articlePage.myUrlSpan
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
@@ -124,7 +124,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                     // 塞入連結前半段文字, 純文字
                     mainLayout.addView(textView1, originalIndex)
                     val url = urlSpan.url
-                    val thumbnail = Thumbnail_ItemView(context)
+                    val thumbnail = ThumbnailItemView(context)
                     thumbnail.loadUrl(url)
                     // 塞入截圖
                     mainLayout.addView(thumbnail, originalIndex + 1)
@@ -148,8 +148,8 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                         textView.background = txtMessageBackgroundColor
                         textView.maxWidth = txtMessageMaxWidth
                         stringNewUrlSpan(textView)
-                    } else if (view.javaClass == Thumbnail_ItemView::class.java) {
-                        val thumbnail = view as Thumbnail_ItemView
+                    } else if (view.javaClass == ThumbnailItemView::class.java) {
+                        val thumbnail = view as ThumbnailItemView
                         thumbnail.layoutParams.width = txtMessageMaxWidth
                     }
                 }

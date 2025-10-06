@@ -3,8 +3,8 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.telnet.PropertiesOperator
 import java.io.File
 
@@ -12,9 +12,9 @@ class UserSettings(var myContext: Context) {
     fun upgrade() {
         val settingsFilePath = myContext.filesDir.path + "/default_login.properties"
         mySharedPref = myContext.getSharedPreferences(PERF_NAME, 0)
-        myEditor = mySharedPref?.edit()
+        myEditor = mySharedPref!!.edit()
         if (File(settingsFilePath).exists()) {
-            if (mySharedPref?.getInt("upgrade", 0) != 1) {
+            if (mySharedPref!!.getInt("upgrade", 0) != 1) {
                 val prep = PropertiesOperator(settingsFilePath)
                 if (prep.load()) {
                     // 使用新的泛型方法讀取設定值
@@ -47,35 +47,35 @@ class UserSettings(var myContext: Context) {
                     val webSignIn = prep.getProperty(PROPERTIES_WEB_SIGN_IN, 0)
 
                     // 將讀取到的設定值遷移到 SharedPreferences
-                    myEditor?.putString(PROPERTIES_USERNAME, username)
-                    myEditor?.putString(PROPERTIES_PASSWORD, password)
-                    myEditor?.putBoolean(PROPERTIES_SAVE_LOGON_USER, saveLogonUser)
-                    myEditor?.putInt(PROPERTIES_ARTICLE_VIEW_MODE, articleViewMode)
-                    myEditor?.putString(PROPERTIES_BLOCK_LIST, blockList)
-                    myEditor?.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, blockListEnable)
-                    myEditor?.putBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE, blockListForTitle)
-                    myEditor?.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, keepWifi)
-                    myEditor?.putBoolean(PROPERTIES_ANIMATION_DISABLE, animationDisable)
-                    myEditor?.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extraToolbar)
-                    myEditor?.putBoolean(PROPERTIES_GESTURE_ON_BOARD, gestureOnBoard)
-                    myEditor?.putBoolean(PROPERTIES_AUTO_TO_CHAT, autoToChat)
-                    myEditor?.putBoolean(PROPERTIES_VIP, isVip)
-                    myEditor?.putInt(PROPERTIES_TOOLBAR_LOCATION, toolbarLocation)
-                    myEditor?.putInt(PROPERTIES_TOOLBAR_ORDER, toolbarOrder)
-                    myEditor?.putInt(PROPERTIES_DRAWER_LOCATION, drawerLocation)
-                    myEditor?.putFloat(PROPERTIES_TOOLBAR_IDLE, toolbarIdle)
-                    myEditor?.putFloat(PROPERTIES_TOOLBAR_ALPHA, toolbarAlpha)
-                    myEditor?.putBoolean(PROPERTIES_LINK_AUTO_SHOW, linkAutoShow)
-                    myEditor?.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, linkShowThumbnail)
-                    myEditor?.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, linkShowOnlyWifi)
-                    myEditor?.putString(PROPERTIES_ARTICLE_HEADS, articleHeaders)
-                    myEditor?.putBoolean(PROPERTIES_SHORT_URL_NON_ID, shortUrlNonId)
-                    myEditor?.putFloat(FLOATING_LOCATION_X, floatingLocationX)
-                    myEditor?.putFloat(FLOATING_LOCATION_Y, floatingLocationY)
-                    myEditor?.putInt(NON_VIP_SHORTEN_TIMES_LIMIT, varNoVipShortenTimes)
-                    myEditor?.putInt(PROPERTIES_WEB_SIGN_IN, webSignIn)
-                    myEditor?.putInt("upgrade", 1)
-                    myEditor?.commit()
+                    myEditor!!.putString(PROPERTIES_USERNAME, username)
+                    myEditor!!.putString(PROPERTIES_PASSWORD, password)
+                    myEditor!!.putBoolean(PROPERTIES_SAVE_LOGON_USER, saveLogonUser)
+                    myEditor!!.putInt(PROPERTIES_ARTICLE_VIEW_MODE, articleViewMode)
+                    myEditor!!.putString(PROPERTIES_BLOCK_LIST, blockList)
+                    myEditor!!.putBoolean(PROPERTIES_BLOCK_LIST_ENABLE, blockListEnable)
+                    myEditor!!.putBoolean(PROPERTIES_BLOCK_LIST_FOR_TITLE, blockListForTitle)
+                    myEditor!!.putBoolean(PROPERTIES_KEEP_WIFI_ENABLE, keepWifi)
+                    myEditor!!.putBoolean(PROPERTIES_ANIMATION_DISABLE, animationDisable)
+                    myEditor!!.putBoolean(PROPERTIES_EXTRA_TOOLBAR_ENABLE, extraToolbar)
+                    myEditor!!.putBoolean(PROPERTIES_GESTURE_ON_BOARD, gestureOnBoard)
+                    myEditor!!.putBoolean(PROPERTIES_AUTO_TO_CHAT, autoToChat)
+                    myEditor!!.putBoolean(PROPERTIES_VIP, isVip)
+                    myEditor!!.putInt(PROPERTIES_TOOLBAR_LOCATION, toolbarLocation)
+                    myEditor!!.putInt(PROPERTIES_TOOLBAR_ORDER, toolbarOrder)
+                    myEditor!!.putInt(PROPERTIES_DRAWER_LOCATION, drawerLocation)
+                    myEditor!!.putFloat(PROPERTIES_TOOLBAR_IDLE, toolbarIdle)
+                    myEditor!!.putFloat(PROPERTIES_TOOLBAR_ALPHA, toolbarAlpha)
+                    myEditor!!.putBoolean(PROPERTIES_LINK_AUTO_SHOW, linkAutoShow)
+                    myEditor!!.putBoolean(PROPERTIES_LINK_SHOW_THUMBNAIL, linkShowThumbnail)
+                    myEditor!!.putBoolean(PROPERTIES_LINK_SHOW_ONLY_WIFI, linkShowOnlyWifi)
+                    myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, articleHeaders)
+                    myEditor!!.putBoolean(PROPERTIES_SHORT_URL_NON_ID, shortUrlNonId)
+                    myEditor!!.putFloat(FLOATING_LOCATION_X, floatingLocationX)
+                    myEditor!!.putFloat(FLOATING_LOCATION_Y, floatingLocationY)
+                    myEditor!!.putInt(NON_VIP_SHORTEN_TIMES_LIMIT, varNoVipShortenTimes)
+                    myEditor!!.putInt(PROPERTIES_WEB_SIGN_IN, webSignIn)
+                    myEditor!!.putInt("upgrade", 1)
+                    myEditor!!.commit()
                 }
             }
         }
@@ -142,24 +142,24 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesDrawerLocation: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_DRAWER_LOCATION,
                 0
-            )!!
+            )
             set(choice) {
-                myEditor?.putInt(
+                myEditor!!.putInt(
                     PROPERTIES_DRAWER_LOCATION,
                     choice
                 )?.apply()
             }
         @JvmStatic
         var propertiesToolbarLocation: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_TOOLBAR_LOCATION,
                 0
-            )!!
+            )
             set(choice) {
-                myEditor?.putInt(
+                myEditor!!.putInt(
                     PROPERTIES_TOOLBAR_LOCATION,
                     choice
                 )?.apply()
@@ -167,36 +167,36 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesToolbarOrder: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_TOOLBAR_ORDER,
                 0
-            )!!
+            )
             set(choice) {
-                myEditor?.putInt(
+                myEditor!!.putInt(
                     PROPERTIES_TOOLBAR_ORDER,
                     choice
                 )?.apply()
             }
         @JvmStatic
         var propertiesScreenOrientation: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_SCREEN_ORIENTATION,
                 0
             )
             set(choice) {
-                myEditor?.putInt(
+                myEditor!!.putInt(
                     PROPERTIES_SCREEN_ORIENTATION,
                     choice
                 ).apply()
             }
         @JvmStatic
         var propertiesVIP: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_VIP,
                 false
             )
             set(isEnable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_VIP,
                     isEnable
                 ).apply()
@@ -204,12 +204,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesAutoToChat: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_AUTO_TO_CHAT,
                 false
             )
             set(isEnable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_AUTO_TO_CHAT,
                     isEnable
                 ).apply()
@@ -217,12 +217,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesGestureOnBoardEnable: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_GESTURE_ON_BOARD,
                 true
             )
             set(isEnable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_GESTURE_ON_BOARD,
                     isEnable
                 ).apply()
@@ -230,12 +230,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesExternalToolbarEnable: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_EXTRA_TOOLBAR_ENABLE,
                 false
             )
             set(isEnable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_EXTRA_TOOLBAR_ENABLE,
                     isEnable
                 ).apply()
@@ -243,12 +243,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesUsername: String?
-            get() = mySharedPref?.getString(
+            get() = mySharedPref!!.getString(
                 PROPERTIES_USERNAME,
                 ""
             )
             set(username) {
-                myEditor?.putString(
+                myEditor!!.putString(
                     PROPERTIES_USERNAME,
                     username
                 ).apply()
@@ -256,12 +256,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesPassword: String?
-            get() = mySharedPref?.getString(
+            get() = mySharedPref!!.getString(
                 PROPERTIES_PASSWORD,
                 ""
             )
             set(password) {
-                myEditor?.putString(
+                myEditor!!.putString(
                     PROPERTIES_PASSWORD,
                     password
                 ).apply()
@@ -269,12 +269,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesSaveLogonUser: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_SAVE_LOGON_USER,
                 false
             )
             set(save) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_SAVE_LOGON_USER,
                     save
                 ).apply()
@@ -282,12 +282,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesAnimationEnable: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_ANIMATION_DISABLE,
                 true
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_ANIMATION_DISABLE,
                     enable
                 ).apply()
@@ -296,12 +296,12 @@ class UserSettings(var myContext: Context) {
         /** 看板上一頁/下一頁  */
         @JvmStatic
         fun setPropertiesBoardMoveDisable(isDisable: Int) {
-            myEditor?.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).apply()
+            myEditor!!.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).apply()
         }
 
         @JvmStatic
         val propertiesBoardMoveEnable: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_BOARD_MOVE_DISABLE,
                 0
             )
@@ -309,23 +309,23 @@ class UserSettings(var myContext: Context) {
         /** 文章首篇/末篇  */
         @JvmStatic
         fun setPropertiesArticleMoveDisable(isDisable: Boolean) {
-            myEditor?.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply()
+            myEditor!!.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply()
         }
 
         @JvmStatic
         val propertiesArticleMoveEnable: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_ARTICLE_MOVE_DISABLE,
                 true
             )
 
         fun setPropertiesArticleViewState(state: Int) {
-            myEditor?.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state).apply()
+            myEditor!!.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state).apply()
         }
 
         @JvmStatic
         val propertiesArticleViewMode: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 PROPERTIES_ARTICLE_VIEW_MODE,
                 0
             )
@@ -339,7 +339,7 @@ class UserSettings(var myContext: Context) {
         val articleHeaders: Array<String>
             // 取出所有符號
             get() {
-                val source: String = mySharedPref?.getString(
+                val source: String = mySharedPref!!.getString(
                     PROPERTIES_ARTICLE_HEADS,
                     HEADERS_DEFAULT
                 )!!
@@ -348,12 +348,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun resetArticleHeaders() {
-            myEditor?.putString(PROPERTIES_ARTICLE_HEADS, HEADERS_DEFAULT).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, HEADERS_DEFAULT).apply()
         }
 
-        fun setArticleHeaders(stringList: MutableList<String?>) {
+        fun setArticleHeaders(stringList: MutableList<String>) {
             val saveString = java.lang.String.join(",", stringList)
-            myEditor?.putString(PROPERTIES_ARTICLE_HEADS, saveString).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, saveString).apply()
         }
 
 
@@ -361,7 +361,7 @@ class UserSettings(var myContext: Context) {
         val articleExpressions: Array<String>
             // 取出所有表情
             get() {
-                val source: String = mySharedPref?.getString(
+                val source: String = mySharedPref!!.getString(
                     PROPERTIES_ARTICLE_EXPRESSIONS,
                     EXPRESSIONS_DEFAULT
                 )!!
@@ -370,19 +370,19 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun resetArticleExpressions() {
-            myEditor?.putString(PROPERTIES_ARTICLE_EXPRESSIONS, EXPRESSIONS_DEFAULT).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, EXPRESSIONS_DEFAULT).apply()
         }
 
-        fun setArticleExpressions(stringList: MutableList<String?>) {
+        fun setArticleExpressions(stringList: MutableList<String>) {
             val saveString = java.lang.String.join(",", stringList)
-            myEditor?.putString(PROPERTIES_ARTICLE_EXPRESSIONS, saveString).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, saveString).apply()
         }
 
         @JvmStatic
         var blockList: MutableList<String>
             // 取出黑名單(格式化後)
             get() {
-                val blockListString: String = mySharedPref?.getString(
+                val blockListString: String = mySharedPref!!.getString(
                     PROPERTIES_BLOCK_LIST,
                     blockListDefault
                 )!!
@@ -412,7 +412,7 @@ class UserSettings(var myContext: Context) {
                     }
                 }
 
-                myEditor?.putString(
+                myEditor!!.putString(
                     PROPERTIES_BLOCK_LIST,
                     listString.toString()
                 )?.apply()
@@ -425,13 +425,13 @@ class UserSettings(var myContext: Context) {
         // 重置黑名單
         @JvmStatic
         fun resetBlockList() {
-            myEditor?.putString(PROPERTIES_BLOCK_LIST, blockListDefault).apply()
+            myEditor!!.putString(PROPERTIES_BLOCK_LIST, blockListDefault).apply()
             blockList = blockList
         }
 
         // 更新緩存的輔助方法
         private fun updateBlockListCache() {
-            val blockListString: String = mySharedPref?.getString(
+            val blockListString: String = mySharedPref!!.getString(
                 PROPERTIES_BLOCK_LIST,
                 blockListDefault
             )!!
@@ -465,7 +465,7 @@ class UserSettings(var myContext: Context) {
             }
 
             // 比對
-            return blockListCache?.contains(aName)
+            return blockListCache!!.contains(aName)
         }
 
         // 模糊比對
@@ -480,18 +480,18 @@ class UserSettings(var myContext: Context) {
             }
 
             // 比對
-            val matches: MutableList<String?> = ac?.search(aName)
+            val matches: MutableList<String?> = ac!!.search(aName)
             return matches.isNotEmpty()
         }
 
         @JvmStatic
         var propertiesBlockListEnable: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_BLOCK_LIST_ENABLE,
                 false
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_BLOCK_LIST_ENABLE,
                     enable
                 ).apply()
@@ -499,12 +499,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesBlockListForTitle: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_BLOCK_LIST_FOR_TITLE,
                 false
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_BLOCK_LIST_FOR_TITLE,
                     enable
                 ).apply()
@@ -512,12 +512,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesKeepWifi: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_KEEP_WIFI_ENABLE,
                 true
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_KEEP_WIFI_ENABLE,
                     enable
                 ).apply()
@@ -543,20 +543,20 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun setFloatingLocation(x: Float, y: Float) {
-            myEditor?.putFloat(FLOATING_LOCATION_X, x)
-            myEditor?.putFloat(FLOATING_LOCATION_Y, y).apply()
+            myEditor!!.putFloat(FLOATING_LOCATION_X, x)
+            myEditor!!.putFloat(FLOATING_LOCATION_Y, y).apply()
         }
 
         @JvmStatic
         var toolbarIdle: Float
             get() {
                 try {
-                    return mySharedPref?.getFloat(
+                    return mySharedPref!!.getFloat(
                         PROPERTIES_TOOLBAR_IDLE,
                         2.0f
                     )
                 } catch (_: ClassCastException) {
-                    val value: Int = mySharedPref?.getInt(
+                    val value: Int = mySharedPref!!.getInt(
                         PROPERTIES_TOOLBAR_IDLE,
                         2
                     )
@@ -564,7 +564,7 @@ class UserSettings(var myContext: Context) {
                 }
             }
             set(idle) {
-                myEditor?.putFloat(
+                myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_IDLE,
                     idle
                 ).apply()
@@ -573,12 +573,12 @@ class UserSettings(var myContext: Context) {
         var toolbarAlpha: Float
             get() {
                 try {
-                    return mySharedPref?.getFloat(
+                    return mySharedPref!!.getFloat(
                         PROPERTIES_TOOLBAR_ALPHA,
                         20.0f
                     )
                 } catch (_: ClassCastException) {
-                    val value: Int = mySharedPref?.getInt(
+                    val value: Int = mySharedPref!!.getInt(
                         PROPERTIES_TOOLBAR_ALPHA,
                         20
                     )
@@ -586,7 +586,7 @@ class UserSettings(var myContext: Context) {
                 }
             }
             set(alpha) {
-                myEditor?.putFloat(
+                myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_ALPHA,
                     alpha
                 ).apply()
@@ -594,35 +594,35 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun setPropertiesLinkAutoShow(enable: Boolean) {
-            myEditor?.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable).apply()
+            myEditor!!.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable).apply()
         }
 
         @JvmStatic
         val linkAutoShow: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_LINK_AUTO_SHOW,
                 true
             )
         @JvmStatic
         var linkShowThumbnail: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_LINK_SHOW_THUMBNAIL,
                 false
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_LINK_SHOW_THUMBNAIL,
                     enable
                 ).apply()
             }
         @JvmStatic
         var linkShowOnlyWifi: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_LINK_SHOW_ONLY_WIFI,
                 false
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_LINK_SHOW_ONLY_WIFI,
                     enable
                 ).apply()
@@ -630,35 +630,35 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesNoVipShortenTimes: Int
-            get() = mySharedPref?.getInt(
+            get() = mySharedPref!!.getInt(
                 NON_VIP_SHORTEN_TIMES_LIMIT,
                 0
             )
             set(times) {
-                myEditor?.putInt(
+                myEditor!!.putInt(
                     NON_VIP_SHORTEN_TIMES_LIMIT,
                     times
                 ).apply()
             }
 
         fun setPropertiesShortUrlNonId(enable: Boolean) {
-            myEditor?.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).apply()
+            myEditor!!.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).apply()
         }
 
         val shortUrlNonId: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_SHORT_URL_NON_ID,
                 true
             )
 
         @JvmStatic
         var propertiesWebSignIn: Boolean
-            get() = mySharedPref?.getBoolean(
+            get() = mySharedPref!!.getBoolean(
                 PROPERTIES_WEB_SIGN_IN,
                 false
             )
             set(enable) {
-                myEditor?.putBoolean(
+                myEditor!!.putBoolean(
                     PROPERTIES_WEB_SIGN_IN,
                     enable
                 ).apply()

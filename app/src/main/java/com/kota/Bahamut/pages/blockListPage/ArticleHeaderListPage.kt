@@ -36,7 +36,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             val blockName = inputField?.text.toString().trim { it <= ' ' }
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
-                val newList: MutableList<String?> =
+                val newList: MutableList<String> =
                     ArrayList(listOf(*articleHeaders))
                 if (newList.contains(blockName)) {
                     showErrorDialog(
@@ -146,7 +146,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     })
 
 
-    private var articleHeadersList: MutableList<String?> = ArrayList()
+    private var articleHeadersList: MutableList<String> = ArrayList()
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_BLOCK_LIST
@@ -195,7 +195,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
-        val elements = listOf<String?>(*articleHeaders)
+        val elements = listOf(*articleHeaders)
         articleHeadersList.clear()
         articleHeadersList.addAll(elements)
         articleHeaderListAdapter?.notifyDataSetChanged()

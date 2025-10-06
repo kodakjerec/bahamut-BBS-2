@@ -5,13 +5,13 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.RadioGroup
 import android.widget.Spinner
-import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
+import com.kota.asFramework.dialog.ASDialog
 import com.kota.telnet.TelnetArticle
 
 class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
     var cancelButton: Button
-    var listener: DialogPostArticleListener? = null
+    var dialogPostArticleListener: DialogPostArticleListener? = null
     var postTargetRadioGroup: RadioGroup
     var sendButton: Button
     var signSpinner: Spinner
@@ -49,7 +49,7 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         val target: String?
-        if (view === this.sendButton && this.listener != null) {
+        if (view === this.sendButton && this.dialogPostArticleListener != null) {
             val checkedId = this.postTargetRadioGroup.checkedRadioButtonId
             val selectedSign = this.signSpinner.selectedItemPosition
             var sign = ""
@@ -67,12 +67,12 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
                     "F"
                 }
             }
-            this.listener?.onPostArticleDoneWithTarget(target, sign)
+            this.dialogPostArticleListener?.onPostArticleDoneWithTarget(target, sign)
         }
         dismiss()
     }
 
     fun setListener(listener: DialogPostArticleListener?) {
-        this.listener = listener
+        this.dialogPostArticleListener = listener
     }
 }

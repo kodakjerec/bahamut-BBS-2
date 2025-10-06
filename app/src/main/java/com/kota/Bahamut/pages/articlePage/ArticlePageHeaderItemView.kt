@@ -3,31 +3,30 @@ package com.kota.Bahamut.pages.articlePage
 import android.content.Context
 import android.view.View
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.pageController.ASNavigationController.pushViewController
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.telnet.TelnetArticleItemView
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetHeaderItemView
 
-class ArticlePage_HeaderItemView(context: Context?) : TelnetHeaderItemView(context),
+class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(context),
     TelnetArticleItemView {
-    var titleTextView: TextView
+    var titleTextView: TextView = this.findViewById(R.id.title)
     var detailTextView1: TextView
 
-    val type: Int
+    override val type: Int
         get() = ArticlePageItemType.Companion.Header
 
     /** 點標題  */
     var titleClickListener: OnClickListener = OnClickListener { view: View? ->
-        if (titleTextView.getMaxLines() == 1) titleTextView.setMaxLines(3)
-        else titleTextView.setMaxLines(1)
+        if (titleTextView.maxLines == 1) titleTextView.maxLines = 3
+        else titleTextView.maxLines = 1
     }
 
     /** 長按標題  */
@@ -36,47 +35,46 @@ class ArticlePage_HeaderItemView(context: Context?) : TelnetHeaderItemView(conte
     /** 點作者  */
     var authorClickListener: OnClickListener = OnClickListener { view: View? ->
         ASListDialog.createDialog()
-            .setTitle(detailTextView1.getText().toString())
+            .setTitle(detailTextView1.text.toString())
             .addItem(getContextString(R.string.dialog_query_hero))
             .addItem(getContextString(R.string.message_sub_send_hero))
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ): Boolean {
-                    return@OnClickListener true
+                    return true
                 }
 
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ) {
-                    if (aTitle == getContextString(R.string.dialog_query_hero)) {
+                    if (title == getContextString(R.string.dialog_query_hero)) {
                         TelnetClient.client?.sendDataToServer(
                             create()
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
                         )
-                    } else if (aTitle == getContextString(R.string.message_sub_send_hero)) {
+                    } else if (title == getContextString(R.string.message_sub_send_hero)) {
                         val aPage = PageContainer.instance?.getMessageSub()
-                        ASNavigationController.getCurrentController().pushViewController(aPage)
-                        var authorId = detailTextView1.getText().toString()
+                        ASNavigationController.currentController!!.pushViewController(aPage)
+                        var authorId = detailTextView1.text.toString()
                         if (authorId.contains("(")) authorId =
                             authorId.substring(0, authorId.indexOf("("))
-                        aPage.setSenderName(authorId)
+                        aPage!!.setSenderName(authorId)
                     }
                 }
             }).show()
     }
 
     init {
-        titleTextView = this.findViewById<TextView>(R.id.title)
         titleTextView.setOnClickListener(titleClickListener)
         titleTextView.setOnLongClickListener(titleLongClickListener)
 
-        detailTextView1 = this.findViewById<TextView>(R.id.detail_1)
+        detailTextView1 = this.findViewById(R.id.detail_1)
         detailTextView1.setOnClickListener(authorClickListener)
     }
 }

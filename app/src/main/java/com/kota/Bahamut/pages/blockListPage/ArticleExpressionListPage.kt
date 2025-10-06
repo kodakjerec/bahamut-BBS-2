@@ -36,7 +36,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
             val blockName = inputField?.text.toString().trim { it <= ' ' }
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
-                val newList: MutableList<String?> =
+                val newList: MutableList<String> =
                     ArrayList(listOf(*articleExpressions))
                 if (newList.contains(blockName)) {
                     showErrorDialog(
@@ -142,7 +142,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     })
 
 
-    private var articleExpressionsList: MutableList<String?> = ArrayList()
+    private var articleExpressionsList: MutableList<String> = ArrayList()
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_BLOCK_LIST

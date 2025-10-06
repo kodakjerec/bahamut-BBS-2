@@ -1,9 +1,7 @@
 package com.kota.Bahamut.pages.articlePage
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.text.util.Linkify
 import android.util.Log
 import android.util.TypedValue
@@ -17,27 +15,18 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASScrollView
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
+import androidx.core.net.toUri
+import androidx.core.view.size
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteArticle
 import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.dialogs.DialogQueryHero
-import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.model.ToolBarFloating
-import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
 import com.kota.Bahamut.service.NotificationSettings.setShowTopBottomButton
@@ -54,11 +43,19 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardE
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASListView
+import com.kota.asFramework.ui.ASScrollView
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetClient
-import com.kota.telnet.TelnetClient.connector
-import com.kota.telnet.TelnetConnector.isConnecting
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 import java.util.Locale
@@ -69,20 +66,20 @@ class ArticlePage : TelnetPage() {
     var telnetArticle: TelnetArticle? = null
     var telnetView: TelnetView? = null
     var listEmptyView: TextView? = null
-    var _board_page: BoardMainPage? = null
+    var boardMainPage: BoardMainPage? = null
     var isFullScreen: Boolean = false
-    var _action_delay: Long = 500
-    var _top_action: Runnable? = null
-    var _bottom_action: Runnable? = null
+    var actionDelay: Long = 500
+    var topAction: Runnable? = null
+    var bottomAction: Runnable? = null
     var listAdapter: BaseAdapter = object : BaseAdapter() {
         private var pushLength = 0 // 推文長度
 
         // android.widget.Adapter
         override fun getCount(): Int {
             if (telnetArticle != null) {
-                pushLength = telnetArticle?.pushSize
+                pushLength = telnetArticle!!.pushSize
                 // 內文個數 + header + PostTime + push
-                return telnetArticle?.itemSize + 2 + pushLength
+                return telnetArticle!!.itemSize.plus(2) + pushLength
             }
             return 0
         }
@@ -92,7 +89,7 @@ class ArticlePage : TelnetPage() {
             if (telnetArticle == null) {
                 return null
             }
-            return telnetArticle?.getItem(itemIndex - 1)
+            return telnetArticle!!.getItem(itemIndex - 1)
         }
 
         // android.widget.Adapter
@@ -113,8 +110,7 @@ class ArticlePage : TelnetPage() {
             }
             // content
             val returnItem = getItem(itemIndex)
-            if (returnItem != null) return returnItem.type
-            else return ArticlePageItemType.Companion.Content
+            return returnItem?.type ?: ArticlePageItemType.Companion.Content
         }
 
         // android.widget.Adapter
@@ -127,31 +123,31 @@ class ArticlePage : TelnetPage() {
             if (itemViewOrigin == null) {
                 when (type) {
                     ArticlePageItemType.Companion.Sign -> itemViewOrigin =
-                        ArticlePage_TelnetItemView(context)
+                        ArticlePageTelnetItemView(context)
 
                     ArticlePageItemType.Companion.Header -> itemViewOrigin =
-                        ArticlePage_HeaderItemView(context)
+                        ArticlePageHeaderItemView(context)
 
                     ArticlePageItemType.Companion.PostTime -> itemViewOrigin =
-                        ArticlePage_TimeTimeView(context)
+                        ArticlePageTimeTimeView(context)
 
                     ArticlePageItemType.Companion.Push -> itemViewOrigin =
-                        ArticlePagePushItemView(context)
+                        ArticlePagePushItemView(context!!)
 
                     else -> {
                         type = ArticlePageItemType.Companion.Content
-                        itemViewOrigin = ArticlePage_TextItemView(context)
+                        itemViewOrigin = ArticlePageTextItemView(context)
                     }
                 }
             } else if (type == ArticlePageItemType.Companion.Content) {
-                itemViewOrigin = ArticlePage_TextItemView(context)
+                itemViewOrigin = ArticlePageTextItemView(context)
             }
 
-            if (itemViewOrigin is ArticlePage_TextItemView) {
+            if (itemViewOrigin is ArticlePageTextItemView) {
                 if (item != null) {
                     itemViewOrigin.setAuthor(item.author, item.nickname)
                     itemViewOrigin.setQuote(item.quoteLevel)
-                    itemViewOrigin.setContent(item.content, item.frame?.rows)
+                    itemViewOrigin.setContent(item.content, item.frame!!.rows)
                     // 分隔線
                     itemViewOrigin.setDividerHidden(itemIndex >= getCount() - 2)
                     // 黑名單檢查
@@ -161,30 +157,30 @@ class ArticlePage : TelnetPage() {
                         )
                     )
                 }
-            } else if (itemViewOrigin is ArticlePage_TelnetItemView) {
-                if (item != null) itemViewOrigin.setFrame(item.frame)
+            } else if (itemViewOrigin is ArticlePageTelnetItemView) {
+                if (item != null) itemViewOrigin.setFrame(item.frame!!)
                 // 分隔線
                 itemViewOrigin.setDividerHidden(itemIndex >= getCount() - 2)
-            } else if (itemViewOrigin is ArticlePage_HeaderItemView) {
+            } else if (itemViewOrigin is ArticlePageHeaderItemView) {
                 var author: String? = null
                 var title: String? = null
-                var board_name: String? = null
+                var boardName: String? = null
                 if (telnetArticle != null) {
-                    author = telnetArticle?.author
-                    title = telnetArticle?.title
-                    board_name = telnetArticle?.boardName
-                    if (telnetArticle?.nickName != null) {
-                        author = author + "(" + telnetArticle?.nickName + ")"
+                    author = telnetArticle!!.author
+                    title = telnetArticle!!.title
+                    boardName = telnetArticle!!.boardName
+                    if (telnetArticle!!.nickName != null) {
+                        author = author + "(" + telnetArticle!!.nickName + ")"
                     }
                 }
-                itemViewOrigin.setData(title, author, board_name)
+                itemViewOrigin.setData(title, author, boardName)
                 itemViewOrigin.setMenuButtonClickListener(mMenuListener)
-            } else if (itemViewOrigin is ArticlePage_TimeTimeView) {
-                itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
-                itemViewOrigin.setIP(telnetArticle?.fromIP)
+            } else if (itemViewOrigin is ArticlePageTimeTimeView) {
+                itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
+                itemViewOrigin.setIP(telnetArticle!!.fromIP)
             } else if (itemViewOrigin is ArticlePagePushItemView) {
                 val tempIndex = itemIndex - (getCount() - pushLength) // itemIndex - 本文長度
-                val itemPush = telnetArticle?.getPush(tempIndex)
+                val itemPush = telnetArticle!!.getPush(tempIndex)
                 if (itemPush != null) {
                     itemViewOrigin.setContent(itemPush)
                     itemViewOrigin.setFloor(tempIndex + 1)
@@ -219,21 +215,25 @@ class ArticlePage : TelnetPage() {
     /** 長按內文  */
     var listLongClickListener: OnItemLongClickListener =
         OnItemLongClickListener { var1: AdapterView<*>?, view: View?, itemIndex: Int, pressTime: Long ->
-            if (view?.javaClass == ArticlePage_TelnetItemView::class.java) {
+            if (view?.javaClass == ArticlePageTelnetItemView::class.java) {
                 // 開啟切換模式
-                val item = telnetArticle?.getItem(itemIndex - 1)
+                val item = telnetArticle!!.getItem(itemIndex - 1)
 
                 val viewMode = item?.type
-                if (viewMode == 0) {
-                    item.type = 1
-                    listAdapter.notifyDataSetChanged()
-                    return@OnItemLongClickListener true
-                } else if (viewMode == 1) {
-                    item.type = 0
-                    listAdapter.notifyDataSetChanged()
-                    return@OnItemLongClickListener true
-                } else {
-                    return@OnItemLongClickListener true
+                when (viewMode) {
+                    0 -> {
+                        item.type = 1
+                        listAdapter.notifyDataSetChanged()
+                        return@OnItemLongClickListener true
+                    }
+                    1 -> {
+                        item.type = 0
+                        listAdapter.notifyDataSetChanged()
+                        return@OnItemLongClickListener true
+                    }
+                    else -> {
+                        return@OnItemLongClickListener true
+                    }
                 }
             }
             false
@@ -242,58 +242,58 @@ class ArticlePage : TelnetPage() {
     /** 最前篇  */
     var pageTopListener: OnLongClickListener = OnLongClickListener { v: View? ->
         if (propertiesArticleMoveEnable) {
-            if (_top_action != null) {
-                v?.removeCallbacks(_top_action)
+            if (topAction != null) {
+                v?.removeCallbacks(topAction)
             }
 
-            _top_action = Runnable? {
-                _top_action = null
+            topAction = Runnable {
+                topAction = null
                 moveToTopArticle()
             }
-            v?.postDelayed(_top_action, _action_delay)
+            v?.postDelayed(topAction, actionDelay)
         }
         true
     }
 
     /** 上一篇  */
     var pageUpListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (_top_action != null) {
-            v?.removeCallbacks(_top_action)
-            _top_action = null
+        if (topAction != null) {
+            v?.removeCallbacks(topAction)
+            topAction = null
         }
-        if (!TelnetClient.connector.isConnecting || _board_page == null) {
+        if (!TelnetClient.client!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
-            _board_page?.loadTheSameTitleUp()
+            boardMainPage?.loadTheSameTitleUp()
         }
     }
 
     /** 最後篇  */
     var pageBottomListener: OnLongClickListener = OnLongClickListener { v: View? ->
         if (propertiesArticleMoveEnable) {
-            if (_bottom_action != null) {
-                v?.removeCallbacks(_bottom_action)
+            if (bottomAction != null) {
+                v?.removeCallbacks(bottomAction)
             }
 
-            _bottom_action = Runnable? {
-                _bottom_action = null
+            bottomAction = Runnable {
+                bottomAction = null
                 moveToBottomArticle()
             }
-            v?.postDelayed(_bottom_action, _action_delay)
+            v?.postDelayed(bottomAction, actionDelay)
         }
         true
     }
 
     /** 下一篇  */
     var pageDownListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (_bottom_action != null) {
-            v?.removeCallbacks(_bottom_action)
-            _bottom_action = null
+        if (bottomAction != null) {
+            v?.removeCallbacks(bottomAction)
+            bottomAction = null
         }
-        if (!TelnetClient.connector.isConnecting || _board_page == null) {
+        if (!TelnetClient.client!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
-            _board_page?.loadTheSameTitleDown()
+            boardMainPage?.loadTheSameTitleDown()
         }
     }
 
@@ -315,75 +315,62 @@ class ArticlePage : TelnetPage() {
         View.OnClickListener { v: View? -> onOpenLinkClicked() }
 
     /** 靠左對其  */
-    var _btnLL_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnLLListener: View.OnClickListener = View.OnClickListener { view: View? ->
         propertiesToolbarLocation = 1
         this@ArticlePage.changeToolbarLocation()
     }
 
     /** 靠右對其  */
-    var _btnRR_listener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnRRListener: View.OnClickListener = View.OnClickListener { view: View? ->
         propertiesToolbarLocation = 2
         this@ArticlePage.changeToolbarLocation()
     }
 
-    val pageType: Int
-        // com.kota.asFramework.pageController.ASViewController
+    override val pageType: Int
         get() = BahamutPage.BAHAMUT_ARTICLE
 
-    val pageLayout: Int
-        // com.kota.asFramework.pageController.ASViewController
+    override val pageLayout: Int
         get() = R.layout.article_page
 
-    val isPopupPage: Boolean
-        // com.kota.telnetUI.TelnetPage
+    override val isPopupPage: Boolean
         get() = true
 
-    // com.kota.asFramework.pageController.ASViewController
-    public override fun onPageDidLoad() {
+    override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
-        telnetView = mainLayout?.findViewById<TelnetView?>(R.id.Article_contentTelnetView)
+        telnetView = mainLayout!!.findViewById(R.id.Article_contentTelnetView)
         reloadTelnetLayout()
-        val listView = mainLayout?.findViewById<ASListView>(R.id.Article_contentList)
-        listEmptyView = mainLayout?.findViewById<TextView?>(R.id.Article_listEmptyView)
-        listView.setAdapter(listAdapter)
-        listView.setEmptyView(listEmptyView)
-        listView.setOnItemLongClickListener(listLongClickListener)
+        val listView = mainLayout!!.findViewById<ASListView>(R.id.Article_contentList)
+        listEmptyView = mainLayout!!.findViewById(R.id.Article_listEmptyView)
+        listView.adapter = listAdapter
+        listView.emptyView = listEmptyView
+        listView.onItemLongClickListener = listLongClickListener
 
-        val back_button = mainLayout?.findViewById<Button>(R.id.Article_backButton)
-        back_button.setOnClickListener(replyListener)
+        val backButton = mainLayout!!.findViewById<Button>(R.id.Article_backButton)
+        backButton.setOnClickListener(replyListener)
 
-        val page_up_button = mainLayout?.findViewById<Button>(R.id.Article_pageUpButton)
-        page_up_button.setOnClickListener(pageUpListener)
-        page_up_button.setOnLongClickListener(pageTopListener)
+        val pageUpButton = mainLayout!!.findViewById<Button>(R.id.Article_pageUpButton)!!
+        pageUpButton.setOnClickListener(pageUpListener)
+        pageUpButton.setOnLongClickListener(pageTopListener)
 
-        val page_down_button = mainLayout?.findViewById<Button>(R.id.Article_pageDownButton)
-        page_down_button.setOnClickListener(pageDownListener)
-        page_down_button.setOnLongClickListener(pageBottomListener)
+        val pageDownButton = mainLayout!!.findViewById<Button>(R.id.Article_pageDownButton)!!
+        pageDownButton.setOnClickListener(pageDownListener)
+        pageDownButton.setOnLongClickListener(pageBottomListener)
 
-        val do_gy_button = mainLayout?.findViewById<Button?>(R.id.do_gy)
-        if (do_gy_button != null) {
-            do_gy_button.setOnClickListener(mDoGyListener)
-        }
-        val change_mode_button = mainLayout?.findViewById<Button?>(R.id.change_mode)
-        if (change_mode_button != null) {
-            change_mode_button.setOnClickListener(mChangeModeListener)
-        }
-        val show_link_button = mainLayout?.findViewById<Button?>(R.id.show_link)
-        if (show_link_button != null) {
-            show_link_button.setOnClickListener(mShowLinkListener)
-        }
+        val doGyButton = mainLayout!!.findViewById<Button?>(R.id.do_gy)!!
+        doGyButton.setOnClickListener(mDoGyListener)
+        val changeModeButton = mainLayout!!.findViewById<Button?>(R.id.change_mode)!!
+        changeModeButton.setOnClickListener(mChangeModeListener)
+        val showLinkButton = mainLayout!!.findViewById<Button?>(R.id.show_link)!!
+        showLinkButton.setOnClickListener(mShowLinkListener)
 
-        mainLayout?.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(_btnLL_listener)
-        mainLayout?.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(_btnRR_listener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
+        mainLayout!!.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ext_toolbar) as LinearLayout?)
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
 
-        if (telnetView?.frame == null && telnetArticle != null) {
-            telnetView?.frame = telnetArticle?.frame
-        }
         refreshExternalToolbar()
         showNotification()
 
@@ -394,32 +381,32 @@ class ArticlePage : TelnetPage() {
 
     /** 變更工具列位置  */
     fun changeToolbarLocation() {
-        val toolbar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)
-        val toolbarBlock = mainLayout?.findViewById<LinearLayout>(R.id.toolbar_block)
+        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbarBlock = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar_block)
         val toolBarFloating =
-            mainLayout?.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
-        toolBarFloating.setVisibility(View.GONE)
+            mainLayout!!.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
+        toolBarFloating.visibility = View.GONE
 
         // 最左邊最右邊
-        val _btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
-        val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-        val _btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
-        val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-        _btnLL.setVisibility(View.GONE)
-        _btnLLDivider.setVisibility(View.GONE)
-        _btnRR.setVisibility(View.GONE)
-        _btnRRDivider.setVisibility(View.GONE)
+        val btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
+        val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
+        val btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
+        val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
+        btnLL.visibility = View.GONE
+        btnLLDivider.visibility = View.GONE
+        btnRR.visibility = View.GONE
+        btnRRDivider.visibility = View.GONE
 
-        val layoutParams = toolbar.getLayoutParams() as RelativeLayout.LayoutParams
-        val choice_toolbar_location = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
-        when (choice_toolbar_location) {
+        val layoutParams = toolbar!!.layoutParams as RelativeLayout.LayoutParams
+        val choiceToolbarLocation = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
+        when (choiceToolbarLocation) {
             1 -> {
                 // 底部-最左邊
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
                 layoutParams.addRule(RelativeLayout.ALIGN_START)
-                _btnRR.setVisibility(View.VISIBLE)
-                _btnRRDivider.setVisibility(View.VISIBLE)
+                btnRR.visibility = View.VISIBLE
+                btnRRDivider.visibility = View.VISIBLE
             }
 
             2 -> {
@@ -427,18 +414,18 @@ class ArticlePage : TelnetPage() {
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
                 layoutParams.removeRule(RelativeLayout.ALIGN_START)
                 layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-                _btnLL.setVisibility(View.VISIBLE)
-                _btnLLDivider.setVisibility(View.VISIBLE)
+                btnLL.visibility = View.VISIBLE
+                btnLLDivider.visibility = View.VISIBLE
             }
 
             3 -> {
                 // 浮動
                 // 去除 原本工具列
-                toolbar.setVisibility(View.GONE)
+                toolbar.visibility = View.GONE
                 // 去除底部卡位用view
-                toolbarBlock.setVisibility(View.GONE)
+                toolbarBlock.visibility = View.GONE
                 // 浮動工具列
-                toolBarFloating.setVisibility(View.VISIBLE)
+                toolBarFloating.visibility = View.VISIBLE
                 // button setting
                 toolBarFloating.setOnClickListenerSetting(replyListener)
                 toolBarFloating.setTextSetting(getContextString(R.string.reply))
@@ -459,24 +446,24 @@ class ArticlePage : TelnetPage() {
             }
         }
 
-        toolbar.setLayoutParams(layoutParams)
+        toolbar.layoutParams = layoutParams
     }
 
     /** 反轉按鈕順序  */
     fun changeToolbarOrder() {
-        val toolbar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
 
-        val choice_toolbar_order = propertiesToolbarOrder
-        if (choice_toolbar_order == 1) {
+        val choiceToolbarOrder = propertiesToolbarOrder
+        if (choiceToolbarOrder == 1) {
             // 最左邊最右邊
-            val _btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val _btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-            val _btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val _btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
+            val btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
+            val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
+            val btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
+            val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
 
             // 擷取中間的元素
             val allViews = ArrayList<View?>()
-            for (i in toolbar.getChildCount() - 3 downTo 2) {
+            for (i in toolbar.size - 3 downTo 2) {
                 val view = toolbar.getChildAt(i)
                 allViews.add(view)
             }
@@ -485,66 +472,66 @@ class ArticlePage : TelnetPage() {
             toolbar.removeAllViews()
 
             // 插入
-            toolbar.addView(_btnLL)
-            toolbar.addView(_btnLLDivider)
+            toolbar.addView(btnLL)
+            toolbar.addView(btnLLDivider)
             for (j in allViews.indices) {
-                toolbar.addView(allViews.get(j))
+                toolbar.addView(allViews[j])
             }
-            toolbar.addView(_btnRRDivider)
-            toolbar.addView(_btnRR)
+            toolbar.addView(btnRRDivider)
+            toolbar.addView(btnRR)
         }
     }
 
     /** 第一次進入的提示訊息  */
     fun showNotification() {
-        val show_top_bottom_function = getShowTopBottomButton()
-        if (!show_top_bottom_function) {
+        val showTopBottomFunction = getShowTopBottomButton()
+        if (!showTopBottomFunction) {
             showLongToast(getContextString(R.string.notification_article_top_bottom_function))
             setShowTopBottomButton(true)
         }
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    public override fun onPageWillAppear() {
+    override fun onPageWillAppear() {
         reloadViewMode()
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    public override fun onPageDidDisappear() {
+    override fun onPageDidDisappear() {
         telnetView = null
         super.onPageDidDisappear()
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    protected override fun onBackPressed(): Boolean {
+    override fun onBackPressed(): Boolean {
         navigationController.popViewController()
         PageContainer.instance?.cleanArticlePage()
         return true
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    protected override fun onMenuButtonClicked(): Boolean {
+    override fun onMenuButtonClicked(): Boolean {
         onMenuClicked()
         return true
     }
 
     fun onMenuClicked() {
-        if (telnetArticle != null && telnetArticle?.author != null) {
-            val author = telnetArticle?.author.lowercase(Locale.getDefault())
-            val logon_user = propertiesUsername?.trim { it <= ' ' }.lowercase(Locale.getDefault())
-            val is_board = _board_page?.pageType == BahamutPage.BAHAMUT_BOARD
-            val ext_toolbar_enable = propertiesExternalToolbarEnable
-            val external_toolbar_enable_title =
-                if (ext_toolbar_enable) getContextString(R.string.hide_toolbar) else getContextString(
+        if (telnetArticle != null) {
+            val author = telnetArticle!!.author.lowercase(Locale.getDefault())
+            val logonUser = propertiesUsername!!.trim { it <= ' ' }.lowercase(Locale.getDefault())
+            val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD
+            val extToolbarEnable = propertiesExternalToolbarEnable
+            val externalToolbarEnableTitle =
+                if (extToolbarEnable) getContextString(R.string.hide_toolbar) else getContextString(
                     R.string.open_toolbar
                 )
             ASListDialog.createDialog()
                 .addItem(getContextString(R.string.do_gy))
                 .addItem(getContextString(R.string.do_push))
                 .addItem(getContextString(R.string.change_mode))
-                .addItem(if (is_board && author == logon_user) getContextString(R.string.edit_article) else null)
-                .addItem(if (author == logon_user) getContextString(R.string.delete_article) else null)
-                .addItem(external_toolbar_enable_title)
+                .addItem(if (isBoard && author == logonUser) getContextString(R.string.edit_article) else null)
+                .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null)
+                .addItem(externalToolbarEnableTitle)
                 .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
                 .addItem(getContextString(R.string.open_url))
                 .addItem(getContextString(R.string.board_page_item_long_click_1))
@@ -552,9 +539,9 @@ class ArticlePage : TelnetPage() {
                 .setListener(object : ASListDialogItemClickListener {
                     // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
-                        aDialog: ASListDialog?,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String?
+                        title: String?
                     ) {
                         when (index) {
                             0 -> onGYButtonClicked()
@@ -569,7 +556,7 @@ class ArticlePage : TelnetPage() {
                             5 -> onExternalToolbarClicked()
                             6 -> onAddBlockListClicked()
                             7 -> onOpenLinkClicked()
-                            8 -> _board_page?.FSendMail()
+                            8 -> boardMainPage?.FSendMail()
                             9 -> onLoadAllImageClicked()
                             else -> {}
                         }
@@ -577,9 +564,9 @@ class ArticlePage : TelnetPage() {
 
                     // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
-                        aDialog: ASListDialog?,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String?
+                        title: String?
                     ): Boolean {
                         return true
                     }
@@ -589,18 +576,18 @@ class ArticlePage : TelnetPage() {
 
     /** 載入全部圖片  */
     fun onLoadAllImageClicked() {
-        val list_view = mainLayout?.findViewById<ASListView>(R.id.Article_contentList)
-        val childCount = list_view.getChildCount()
+        val listView = mainLayout!!.findViewById<ASListView>(R.id.Article_contentList)
+        val childCount = listView.size
         for (childIndex in 0..<childCount) {
-            val view = list_view.getChildAt(childIndex)
-            if (view.javaClass == ArticlePage_TextItemView::class.java) {
-                val firstLLayout = (view as ArticlePage_TextItemView).getChildAt(0) as LinearLayout
+            val view = listView.getChildAt(childIndex)
+            if (view.javaClass == ArticlePageTextItemView::class.java) {
+                val firstLLayout = (view as ArticlePageTextItemView).getChildAt(0) as LinearLayout
                 val secondLLayout = firstLLayout.getChildAt(0) as LinearLayout
-                val childCount2 = secondLLayout.getChildCount()
+                val childCount2 = secondLLayout.childCount
                 for (childIndex2 in 0..<childCount2) {
                     val view1 = secondLLayout.getChildAt(childIndex2)
-                    if (view1.javaClass == Thumbnail_ItemView::class.java) {
-                        (view1 as Thumbnail_ItemView).prepare_load_image()
+                    if (view1.javaClass == ThumbnailItemView::class.java) {
+                        (view1 as ThumbnailItemView).prepareLoadImage()
                     }
                 }
             }
@@ -609,17 +596,16 @@ class ArticlePage : TelnetPage() {
 
     /** 變更telnetView大小  */
     fun reloadTelnetLayout() {
-        val screenWidth: Int
         val textWidth = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_SP,
             20.0f,
-            context.getResources().getDisplayMetrics()
+            context!!.resources.displayMetrics
         ).toInt()
         var telnetViewWidth = (textWidth / 2) * 80
-        if (navigationController.currentOrientation == 2) {
-            screenWidth = navigationController.screenHeight
+        val screenWidth: Int = if (navigationController.currentOrientation == 2) {
+            navigationController.screenHeight
         } else {
-            screenWidth = navigationController.screenWidth
+            navigationController.screenWidth
         }
         if (telnetViewWidth <= screenWidth) {
             telnetViewWidth = -1
@@ -627,23 +613,23 @@ class ArticlePage : TelnetPage() {
         } else {
             isFullScreen = false
         }
-        val layoutParams = telnetView?.getLayoutParams()
+        val layoutParams = telnetView!!.layoutParams!!
         layoutParams.width = telnetViewWidth
         layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        telnetView?.setLayoutParams(layoutParams)
+        telnetView?.layoutParams = layoutParams
     }
 
     fun moveToTopArticle() {
-        if (TelnetClient.connector.isConnecting && _board_page != null) {
-            _board_page?.loadTheSameTitleTop()
+        if (TelnetClient.client!!.telnetConnector!!.isConnecting && boardMainPage != null) {
+            boardMainPage?.loadTheSameTitleTop()
         } else {
             showConnectionClosedToast()
         }
     }
 
     fun moveToBottomArticle() {
-        if (TelnetClient.connector.isConnecting && _board_page != null) {
-            _board_page?.loadTheSameTitleBottom()
+        if (TelnetClient.client!!.telnetConnector!!.isConnecting && boardMainPage != null) {
+            boardMainPage?.loadTheSameTitleBottom()
         } else {
             showConnectionClosedToast()
         }
@@ -655,50 +641,50 @@ class ArticlePage : TelnetPage() {
 
     /** 推薦  */
     fun onGYButtonClicked() {
-        if (_board_page != null) {
-            _board_page?.goodLoadingArticle()
+        if (boardMainPage != null) {
+            boardMainPage?.goodLoadingArticle()
         }
     }
 
     /** 推文  */
     fun onPushArticleButtonClicked() {
-        if (_board_page != null) {
-            _board_page?.pushArticle()
+        if (boardMainPage != null) {
+            boardMainPage?.pushArticle()
         }
     }
 
     /** 刪除文章  */
     fun onDeleteButtonClicked() {
-        if (telnetArticle != null && _board_page != null) {
-            val item_number = telnetArticle?.myNumber
+        if (telnetArticle != null && boardMainPage != null) {
+            val itemNumber = telnetArticle!!.myNumber
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.delete))
                 .setMessage(getContextString(R.string.del_this_article))
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.delete))
-                .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { aDialog: ASAlertDialog?, index: Int ->
                     if (index == 1) {
-                        val command: TelnetCommand = BahamutCommandDeleteArticle(item_number)
-                        _board_page?.pushCommand(command)
+                        val command: TelnetCommand = BahamutCommandDeleteArticle(itemNumber)
+                        boardMainPage?.pushCommand(command)
                         onBackPressed()
                     }
-                }).scheduleDismissOnPageDisappear(this).show()
+                }.scheduleDismissOnPageDisappear(this).show()
         }
     }
 
     /** 回覆文章  */
     var replyListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (TelnetClient.connector.isConnecting) {
+        if (TelnetClient.client!!.telnetConnector!!.isConnecting) {
             if (telnetArticle != null) {
-                val page = PageContainer.instance?.getPostArticlePage()
-                val reply_title = telnetArticle?.generateReplyTitle()
-                val reply_content = telnetArticle?.generateReplyContent()
-                page.setBoardPage(_board_page)
+                val page = PageContainer.instance!!.postArticlePage
+                val replyTitle = telnetArticle!!.generateReplyTitle()
+                val replyContent = telnetArticle!!.generateReplyContent()
+                page.setBoardPage(boardMainPage)
                 page.setOperationMode(PostArticlePage.OperationMode.Reply)
-                page.setArticleNumber(telnetArticle?.myNumber.toString())
-                page.setPostTitle(reply_title)
-                page.setPostContent(reply_content + "\n\n\n")
-                page.setListener(_board_page)
+                page.setArticleNumber(telnetArticle!!.myNumber.toString())
+                page.setPostTitle(replyTitle)
+                page.setPostContent(replyContent + "\n\n\n")
+                page.setListener(boardMainPage)
                 page.setHeaderHidden(true)
                 page.setTelnetArticle(telnetArticle)
                 navigationController.pushViewController(page)
@@ -712,17 +698,17 @@ class ArticlePage : TelnetPage() {
     /** 修改文章  */
     fun onEditButtonClicked() {
         if (telnetArticle != null) {
-            val page = PageContainer.instance?.getPostArticlePage()
-            val edit_title = telnetArticle?.generateEditTitle()
-            val edit_content = telnetArticle?.generateEditContent()
-            val edit_format = telnetArticle?.generateEditFormat()
-            page.setBoardPage(_board_page)
-            page.setArticleNumber(telnetArticle?.myNumber.toString())
+            val page = PageContainer.instance!!.postArticlePage
+            val editTitle = telnetArticle!!.generateEditTitle()
+            val editContent = telnetArticle!!.generateEditContent()
+            val editFormat = telnetArticle!!.generateEditFormat()
+            page.setBoardPage(boardMainPage)
+            page.setArticleNumber(telnetArticle!!.myNumber.toString())
             page.setOperationMode(PostArticlePage.OperationMode.Edit)
-            page.setPostTitle(edit_title)
-            page.setPostContent(edit_content)
-            page.setEditFormat(edit_format)
-            page.setListener(_board_page)
+            page.setPostTitle(editTitle)
+            page.setPostContent(editContent)
+            page.setEditFormat(editFormat)
+            page.setListener(boardMainPage)
             page.setHeaderHidden(true)
             page.setTelnetArticle(telnetArticle)
             navigationController.pushViewController(page)
@@ -737,33 +723,33 @@ class ArticlePage : TelnetPage() {
     }
 
     fun reloadViewMode() {
-        val text_content_view = mainLayout?.findViewById<ViewGroup?>(R.id.Article_TextContentView)
+        val textContentView = mainLayout!!.findViewById<ViewGroup?>(R.id.Article_TextContentView)
         val telnetViewBlock =
-            mainLayout?.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
+            mainLayout!!.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
         // 文字模式
         if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT) {
-            if (text_content_view != null) {
-                text_content_view.setVisibility(View.VISIBLE)
+            if (textContentView != null) {
+                textContentView.visibility = View.VISIBLE
             }
             if (telnetViewBlock != null) {
-                telnetViewBlock.setVisibility(View.GONE)
+                telnetViewBlock.visibility = View.GONE
                 return
             }
             return
         }
 
         // telnet模式
-        if (text_content_view != null) {
-            text_content_view.setVisibility(View.GONE)
+        if (textContentView != null) {
+            textContentView.visibility = View.GONE
         }
         if (telnetViewBlock != null) {
-            telnetViewBlock.setVisibility(View.VISIBLE)
+            telnetViewBlock.visibility = View.VISIBLE
             telnetViewBlock.invalidate()
         }
     }
 
     // com.kota.asFramework.pageController.ASViewController
-    public override fun onReceivedGestureRight(): Boolean {
+    override fun onReceivedGestureRight(): Boolean {
         if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT || isFullScreen) {
             if (propertiesGestureOnBoardEnable) onBackPressed()
             return true
@@ -771,8 +757,7 @@ class ArticlePage : TelnetPage() {
         return true
     }
 
-    val isKeepOnOffline: Boolean
-        // com.kota.telnetUI.TelnetPage
+    override val isKeepOnOffline: Boolean
         get() = true
 
     fun onExternalToolbarClicked() {
@@ -783,15 +768,15 @@ class ArticlePage : TelnetPage() {
 
     fun refreshExternalToolbar() {
         var enable = propertiesExternalToolbarEnable
-        val article_mode = propertiesArticleViewMode
-        if (article_mode == ArticleViewMode.Companion.MODE_TELNET) {
+        val articleMode = propertiesArticleViewMode
+        if (articleMode == ArticleViewMode.Companion.MODE_TELNET) {
             enable = true
         }
-        println("enable:" + enable)
-        println("article_mode:" + article_mode)
-        val toolbar_view = mainLayout?.findViewById<View>(R.id.ext_toolbar)
-        if (toolbar_view != null) {
-            toolbar_view.setVisibility(if (enable) View.VISIBLE else View.GONE)
+        println("enable:$enable")
+        println("article_mode:$articleMode")
+        val toolbarView = mainLayout!!.findViewById<View>(R.id.ext_toolbar)
+        if (toolbarView != null) {
+            toolbarView.visibility = if (enable) View.VISIBLE else View.GONE
         }
     }
 
@@ -799,44 +784,41 @@ class ArticlePage : TelnetPage() {
         if (telnetArticle != null) {
             // 擷取文章內的所有連結
             val textView = TextView(context)
-            textView.setText(telnetArticle?.fullText)
+            textView.text = telnetArticle!!.fullText
             Linkify.addLinks(textView, Linkify.WEB_URLS)
 
-            val urls = textView.getUrls()
+            val urls = textView.urls
             if (urls.size == 0) {
                 showShortToast(getContextString(R.string.no_url))
                 return
             }
-            val list_dialog = ASListDialog.createDialog()
+            val listDialog = ASListDialog.createDialog()
             for (urlspan in urls) {
-                list_dialog.addItem(urlspan.getURL())
+                listDialog.addItem(urlspan.url)
             }
-            list_dialog.setListener(object : ASListDialogItemClickListener {
+            listDialog.setListener(object : ASListDialogItemClickListener {
                 // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemLongClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ): Boolean {
                     return true
                 }
 
                 // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemClicked(
-                    aDialog: ASListDialog?,
+                    paramASListDialog: ASListDialog?,
                     index: Int,
-                    aTitle: String?
+                    title: String?
                 ) {
-                    val url2 = urls[index].getURL()
-                    val context2: Context = context
-                    if (context2 != null) {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url2))
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                        startActivity(intent)
-                    }
+                    val url2 = urls[index].url
+                    val intent = Intent(Intent.ACTION_VIEW, url2.toUri())
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                    startActivity(intent)
                 }
             })
-            list_dialog.show()
+            listDialog.show()
         }
     }
 
@@ -844,7 +826,7 @@ class ArticlePage : TelnetPage() {
     fun onAddBlockListClicked() {
         val article = telnetArticle
         if (article != null) {
-            val buffer: MutableSet<String?> = HashSet<String?>()
+            val buffer: MutableSet<String> = HashSet()
             // 作者黑名單
             buffer.add(article.author)
             // 內文黑名單
@@ -856,29 +838,29 @@ class ArticlePage : TelnetPage() {
                     buffer.add(author)
                 }
             }
-            if (buffer.size == 0) {
+            if (buffer.isEmpty()) {
                 showShortToast("無可加入黑名單的ID")
                 return
             }
-            val names = buffer.toTypedArray<String?>()
+            val names = buffer.toTypedArray<String>()
             ASListDialog.createDialog().addItems(names)
                 .setListener(object : ASListDialogItemClickListener {
                     // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
-                        aDialog: ASListDialog?,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String?
+                        title: String?
                     ): Boolean {
                         return true
                     }
 
                     // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
-                        aDialog: ASListDialog?,
+                        paramASListDialog: ASListDialog?,
                         index: Int,
-                        aTitle: String?
+                        title: String?
                     ) {
-                        onBlockButtonClicked(names[index]!!)
+                        onBlockButtonClicked(names[index])
                     }
                 }).show()
         }
@@ -887,59 +869,57 @@ class ArticlePage : TelnetPage() {
     fun onBlockButtonClicked(aBlockName: String) {
         ASAlertDialog.createDialog()
             .setTitle("加入黑名單")
-            .setMessage("是否要將\"" + aBlockName + "\"加入黑名單?")
+            .setMessage("是否要將\"$aBlockName\"加入黑名單?")
             .addButton("取消")
             .addButton("加入")
-            .setListener(ASAlertDialogListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
                 if (index == 1) {
-                    val new_list: MutableList<String?>? = blockList
-                    if (new_list?.contains(aBlockName)) {
+                    val newList: MutableList<String> = blockList
+                    if (newList.contains(aBlockName)) {
                         showShortToast(getContextString(R.string.already_have_item))
                     } else {
-                        new_list.add(aBlockName)
+                        newList.add(aBlockName)
                     }
 
-                    blockList = new_list
+                    blockList = newList
                     notifyDataUpdated()
 
                     if (propertiesBlockListEnable) {
-                        if (aBlockName == telnetArticle?.author) {
+                        if (aBlockName == telnetArticle!!.author) {
                             onBackPressed()
                         } else {
                             listAdapter.notifyDataSetChanged()
                         }
                     }
                 }
-            }).scheduleDismissOnPageDisappear(this).show()
+            }.scheduleDismissOnPageDisappear(this).show()
     }
 
     /** 給其他頁面託付使用  */
-    fun setBoardPage(aBoardMainPage: BoardMainPage?) {
-        _board_page = aBoardMainPage
+    fun setBoardPage(aBoardMainPage: BoardMainPage) {
+        boardMainPage = aBoardMainPage
     }
 
     /** 給其他網頁顯示文章使用  */
-    fun setArticle(aArticle: TelnetArticle?) {
+    fun setArticle(aArticle: TelnetArticle) {
         telnetArticle = aArticle
         if (telnetArticle != null) {
-            val board_name = _board_page?.name
+            val boardName = boardMainPage?.name
             // 加入歷史紀錄
             val store = TempSettings.bookmarkStore
             if (store != null) {
-                val bookmark_list = store.getBookmarkList(board_name)
-                bookmark_list.addHistoryBookmark(telnetArticle?.title)
+                val bookmarkList = store.getBookmarkList(boardName)
+                bookmarkList.addHistoryBookmark(telnetArticle!!.title)
                 store.storeWithoutCloud()
             }
 
             // 關係到 telnetView
-            telnetView?.frame = telnetArticle?.frame
+            telnetView!!.frame = telnetArticle!!.frame!!
 
             reloadTelnetLayout()
-            val telnet_content_view =
-                mainLayout?.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
-            if (telnet_content_view != null) {
-                telnet_content_view.scrollTo(0, 0)
-            }
+            val telnetContentView =
+                mainLayout!!.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
+            telnetContentView?.scrollTo(0, 0)
             listAdapter.notifyDataSetChanged()
         }
         dismissProcessingDialog()
@@ -952,10 +932,10 @@ class ArticlePage : TelnetPage() {
     }
 
     /** 查詢勇者  */
-    fun ctrlQUser(fromStrings: Vector<String?>) {
+    fun ctrlQUser(fromStrings: Vector<String>) {
         try {
             object : ASRunner() {
-                public override fun run() {
+                override fun run() {
                     val dialogQueryHero = DialogQueryHero()
                     dialogQueryHero.show()
                     dialogQueryHero.getData(fromStrings)

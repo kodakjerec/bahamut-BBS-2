@@ -7,18 +7,18 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
-import com.kota.telnet.model.TelnetRow
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
+import com.kota.telnet.model.TelnetRow
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
@@ -28,17 +28,14 @@ class UserInfoPage: TelnetPage() {
     private lateinit var btnUpdate: Button
     private lateinit var txnOthers: TextView
 
-    override fun getPageLayout(): Int {
-        return R.layout.bbs_user_info_page
-    }
+    override val pageLayout: Int
+        get() = R.layout.bbs_user_info_page
 
-    override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_USER_INFO_PAGE
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_USER_INFO_PAGE
 
-    override fun isPopupPage(): Boolean {
-        return true
-    }
+    override val isPopupPage: Boolean
+        get() = true
 
     override fun onBackPressed(): Boolean {
         // 返回
@@ -69,7 +66,7 @@ class UserInfoPage: TelnetPage() {
 
     /** 收到回傳的資料內容 */
     fun updateUserInfoPageContent(rows: Vector<TelnetRow>) {
-        val rowString4 = rows[4].toContentString();
+        val rowString4 = rows[4].toContentString()
         val realName = rows[5].toContentString()
         val address = rows[6].toContentString()
         val eMail = rows[7].toContentString()
@@ -90,7 +87,7 @@ class UserInfoPage: TelnetPage() {
 
 
                     txnNickName.doOnTextChanged { content, _, _, _ ->
-                        if (content?.trim().isEmpty())
+                        if (content!!.trim().isEmpty())
                             paintBtnUpdate(false)
                         else
                             paintBtnUpdate(true)
@@ -108,7 +105,7 @@ class UserInfoPage: TelnetPage() {
         val builder = TelnetOutputBuilder.create()
             .pushString("I\n")
             .pushString("Y\n")
-            .pushString(UserSettings.getPropertiesPassword()+"\n") // 請確認密碼：
+            .pushString(UserSettings.propertiesPassword+"\n") // 請確認密碼：
             .pushString("\n") // 設定新密碼(不改請按 Enter)
             .pushKey(TelnetKeyboard.CTRL_Y) // 暱    稱：
             .pushString(txnNickName.text.toString()+"\n")
