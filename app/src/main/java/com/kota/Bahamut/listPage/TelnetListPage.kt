@@ -548,9 +548,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return blockList[blockIndex]
     }
 
-    val blockSize: Int
-        get() = blockList.size
-
     @Synchronized  // android.widget.Adapter
     override fun getItem(index: Int): TelnetListPageItem? {
         val item: TelnetListPageItem?
@@ -565,37 +562,30 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return item
     }
 
-    // android.widget.Adapter
     override fun getItemId(index: Int): Long {
         return (index + 1).toLong()
     }
 
-    // android.widget.Adapter
     override fun getItemViewType(index: Int): Int {
         return 0
     }
 
-    // android.widget.Adapter
     override fun getViewTypeCount(): Int {
         return 1
     }
 
-    // android.widget.Adapter
     override fun hasStableIds(): Boolean {
         return false
     }
 
-    // android.widget.Adapter
     override fun isEmpty(): Boolean {
         return getCount() == 0
     }
 
-    // android.widget.ListAdapter
     override fun areAllItemsEnabled(): Boolean {
         return false
     }
 
-    // android.widget.ListAdapter
     override fun isEnabled(index: Int): Boolean {
         return true
     }

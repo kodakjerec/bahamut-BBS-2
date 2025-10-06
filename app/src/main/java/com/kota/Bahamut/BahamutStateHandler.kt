@@ -187,7 +187,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             TelnetClient.myInstance?.sendStringToServer("S\n1\n")
             runPass2 = false
         }
-        if (runPass2 && this.rowStringFinal.contains("[請按任意鍵繼續]") && currentPage != BahamutPage.Companion.BAHAMUT_LOGIN) {
+        if (runPass2 && this.rowStringFinal.contains("[請按任意鍵繼續]") && currentPage != BahamutPage.BAHAMUT_LOGIN) {
             val continueMessage = cutOffContinueMessage(this.rowStringFinal)
             if (!continueMessage.isEmpty()) {
                 if (continueMessage.contains("推文") || continueMessage.contains("請稍後片刻")) {
@@ -330,7 +330,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleLoginPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_LOGIN
+        currentPage = BahamutPage.BAHAMUT_LOGIN
         val page: LoginPage = PageContainer.instance!!.loginPage
         if (page.onPagePreload()) {
             showPage(page)
@@ -340,7 +340,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     fun handleMainPage() {
         this.nowStep = STEP_WORKING
 
-        if (currentPage < BahamutPage.Companion.BAHAMUT_MAIN) {
+        if (currentPage < BahamutPage.BAHAMUT_MAIN) {
             PageContainer.instance!!.loginPage.onLoginSuccess()
 
             // 開啟訊息小視窗
@@ -369,7 +369,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
         }
 
-        currentPage = BahamutPage.Companion.BAHAMUT_MAIN
+        currentPage = BahamutPage.BAHAMUT_MAIN
         val page: MainPage = PageContainer.instance!!.mainPage
         if (page.onPagePreload()) {
             showPage(page)
@@ -409,7 +409,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleMailBoxPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_MAIL_BOX
+        currentPage = BahamutPage.BAHAMUT_MAIL_BOX
         if (this.telnetCursor?.column == 1) {
             val page: MailBoxPage = PageContainer.instance!!.mailBoxPage
             if (page.onPagePreload()) {
@@ -436,11 +436,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleClassPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_CLASS
+        currentPage = BahamutPage.BAHAMUT_CLASS
     }
 
     fun handleBoardPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_BOARD
+        currentPage = BahamutPage.BAHAMUT_BOARD
         if (this.telnetCursor?.column == 1) {
             val page: BoardMainPage = PageContainer.instance!!.boardPage
             if (page.onPagePreload()) {
@@ -450,7 +450,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleBoardSearchPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_BOARD_SEARCH
+        currentPage = BahamutPage.BAHAMUT_BOARD_SEARCH
         if (this.telnetCursor?.column == 1) {
             val page: BoardSearchPage = PageContainer.instance!!.boardSearchPage
             if (page.onPagePreload()) {
@@ -460,7 +460,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleBoardEssencePage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_BOARD_ESSENCE
+        currentPage = BahamutPage.BAHAMUT_BOARD_ESSENCE
         if (this.telnetCursor?.column == 1) {
             val page: BoardEssencePage = PageContainer.instance!!.boardEssencePage
             if (page.onPagePreload()) {
@@ -470,7 +470,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun handleBoardTitleLinkedPage() {
-        currentPage = BahamutPage.Companion.BAHAMUT_BOARD_LINK
+        currentPage = BahamutPage.BAHAMUT_BOARD_LINK
         if (this.telnetCursor?.column == 1) {
             val page: BoardLinkPage = PageContainer.instance!!.boardLinkedTitlePage
             if (page.onPagePreload()) {
@@ -483,12 +483,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     fun handleUserPage() {
         // 傳給個人設定, 頁面更新資料
         if (this.rowStringFinal.contains("修改資料(Y/N)?[N]")) {
-            currentPage = BahamutPage.Companion.BAHAMUT_USER_INFO_PAGE
+            currentPage = BahamutPage.BAHAMUT_USER_INFO_PAGE
             // 個人資料
             val page: UserInfoPage = PageContainer.instance!!.getUserInfoPage()
             page.updateUserInfoPageContent(telnetRows)
         } else if (this.rowStringFinal.contains("請按鍵切換設定，或按")) {
-            currentPage = BahamutPage.Companion.BAHAMUT_USER_CONFIG_PAGE
+            currentPage = BahamutPage.BAHAMUT_USER_CONFIG_PAGE
             // 操作模式
             val page: UserConfigPage = PageContainer.instance!!.getUserConfigPage()
             page.updateUserConfigPageContent(telnetRows)
@@ -500,15 +500,15 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             ASNavigationController.currentController?.topController as TelnetPage?
         when (topPage) {
             is BoardMainPage -> {
-                currentPage = BahamutPage.Companion.BAHAMUT_ARTICLE
+                currentPage = BahamutPage.BAHAMUT_ARTICLE
             }
 
             is MailBoxPage -> {
-                currentPage = BahamutPage.Companion.BAHAMUT_MAIL
+                currentPage = BahamutPage.BAHAMUT_MAIL
             }
 
             is BoardEssencePage -> {
-                currentPage = BahamutPage.Companion.BAHAMUT_ARTICLE_ESSENCE
+                currentPage = BahamutPage.BAHAMUT_ARTICLE_ESSENCE
             }
         }
 
@@ -615,12 +615,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 detectMessage()
             }
         } else if (handleNonPageSwitching()) {
-            if (currentPage == BahamutPage.Companion.BAHAMUT_CLASS && this.rowStringFinal.contains(
+            if (currentPage == BahamutPage.BAHAMUT_CLASS && this.rowStringFinal.contains(
                     "瀏覽 P."
                 ) && this.rowStringFinal.endsWith("結束")
             ) {
                 BahamutCommandLoadMoreArticle().execute()
-            } else if (currentPage > BahamutPage.Companion.BAHAMUT_MAIL_BOX && this.rowStringFinal.contains(
+            } else if (currentPage > BahamutPage.BAHAMUT_MAIL_BOX && this.rowStringFinal.contains(
                     "文章選讀"
                 ) && this.rowStringFinal.endsWith("搜尋作者")
             ) {
@@ -628,9 +628,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 onReadArticleFinished()
                 // 串接文章狀況下, 文章讀取完畢指令不同, 但是第23行內容一樣,會誤判,因此根據之前最後一頁判斷狀況
                 val lastPage = currentPage
-                if (lastPage == BahamutPage.Companion.BAHAMUT_ARTICLE) BahamutCommandLoadArticleEnd().execute()
+                if (lastPage == BahamutPage.BAHAMUT_ARTICLE) BahamutCommandLoadArticleEnd().execute()
                 else BahamutCommandLoadArticleEndForSearch().execute()
-            } else if (currentPage > BahamutPage.Companion.BAHAMUT_CLASS && this.rowStringFinal.contains(
+            } else if (currentPage > BahamutPage.BAHAMUT_CLASS && this.rowStringFinal.contains(
                     "瀏覽 P."
                 ) && this.rowStringFinal.endsWith("結束")
             ) {
@@ -638,14 +638,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 onReadArticlePage()
                 handleArticlePercentage()
                 BahamutCommandLoadMoreArticle().execute()
-            } else if (currentPage > BahamutPage.Companion.BAHAMUT_CLASS && this.rowStringFinal.contains(
+            } else if (currentPage > BahamutPage.BAHAMUT_CLASS && this.rowStringFinal.contains(
                     "魚雁往返"
                 ) && this.rowStringFinal.endsWith("標記")
             ) {
                 handleArticle()
                 onReadArticleFinished()
                 BahamutCommandLoadArticleEnd().execute()
-            } else if (currentPage > BahamutPage.Companion.BAHAMUT_CLASS && this.rowStringFinal.contains(
+            } else if (currentPage > BahamutPage.BAHAMUT_CLASS && this.rowStringFinal.contains(
                     "閱讀精華"
                 ) && this.rowStringFinal.trim { it <= ' ' }.endsWith("離開")
             ) {
@@ -705,17 +705,17 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 TelnetClient.myInstance?.sendStringToServer("")
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader == "--") {
                 // TODO: 不知道甚麼狀況
-                currentPage = BahamutPage.Companion.BAHAMUT_INSTRUCTIONS
+                currentPage = BahamutPage.BAHAMUT_INSTRUCTIONS
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
                     TelnetClient.myInstance?.sendStringToServer("")
                 }
             } else if (this.nowStep == STEP_CONNECTING && this.firstHeader == "□□") {
-                currentPage = BahamutPage.Companion.BAHAMUT_SYSTEM_ANNOUNCEMENT
+                currentPage = BahamutPage.BAHAMUT_SYSTEM_ANNOUNCEMENT
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
                     TelnetClient.myInstance?.sendStringToServer("")
                 }
             } else if (this.firstHeader == "【過") {
-                currentPage = BahamutPage.Companion.BAHAMUT_PASSED_SIGNATURE
+                currentPage = BahamutPage.BAHAMUT_PASSED_SIGNATURE
                 if (this.lastHeader == "●請" || this.lastHeader == "請按") {
                     TelnetClient.myInstance?.sendStringToServer("")
                 }
@@ -757,7 +757,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         object : ASRunner() {
             override fun run() {
                 try {
-                    PageContainer.instance!!.articlePage.setArticle(aArticle)
+                    PageContainer.instance?.articlePage!!.setArticle(aArticle)
                 } catch (e: Exception) {
                     Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }
@@ -766,7 +766,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     // 顯示郵件內文
-    fun showMail(aArticle: TelnetArticle?) {
+    fun showMail(aArticle: TelnetArticle) {
         object : ASRunner() {
             override fun run() {
                 val mailPage: MailPage?
@@ -775,7 +775,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                         ASNavigationController.currentController!!.viewControllers.lastElement() as TelnetPage?
                     // 檢查最上層的頁面是不是 mail page
                     // 如果不是=>就把mail page推到最上層
-                    if (lastPage == null || lastPage.pageType != BahamutPage.Companion.BAHAMUT_MAIL) {
+                    if (lastPage == null || lastPage.pageType != BahamutPage.BAHAMUT_MAIL) {
                         mailPage = MailPage()
                         ASNavigationController.currentController!!.pushViewController(mailPage)
                     } else {
@@ -799,7 +799,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                             .lastElement() as TelnetPage?
                     // 檢查最上層的頁面是不是 mail page
                     // 如果不是=>就把mail page推到最上層
-                    if (lastPage == null || lastPage.pageType != BahamutPage.Companion.BAHAMUT_ARTICLE_ESSENCE) {
+                    if (lastPage == null || lastPage.pageType != BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
                         articleEssencePage = ArticleEssencePage()
                         ASNavigationController.currentController!!.pushViewController(articleEssencePage)
                     } else {
@@ -834,7 +834,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     // com.kota.telnet.TelnetStateHandler
     override fun clear() {
         this.nowStep = STEP_CONNECTING
-        currentPage = BahamutPage.Companion.UNKNOWN
+        currentPage = BahamutPage.UNKNOWN
     }
 
     fun cutOffContinueMessage(aMessage: String): String {

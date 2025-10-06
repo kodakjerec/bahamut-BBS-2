@@ -25,7 +25,7 @@ class ClassPageItem private constructor() : TelnetListPageItem() {
 
     companion object {
         private const val COUNT = 0
-        private val _pool = Stack<ClassPageItem?>()
+        private val _pool = Stack<ClassPageItem>()
         @JvmStatic
         fun release() {
             synchronized(_pool) {
@@ -34,7 +34,7 @@ class ClassPageItem private constructor() : TelnetListPageItem() {
         }
 
         @JvmStatic
-        fun recycle(item: ClassPageItem?) {
+        fun recycle(item: ClassPageItem) {
             synchronized(_pool) {
                 _pool.push(item)
             }

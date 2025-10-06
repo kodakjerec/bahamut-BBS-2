@@ -7,39 +7,39 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogSearchBoard
 import com.kota.Bahamut.dialogs.DialogSearchBoardListener
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
-import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.pages.model.ClassPageBlock
 import com.kota.Bahamut.pages.model.ClassPageBlock.Companion.recycle
 import com.kota.Bahamut.pages.model.ClassPageHandler
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.ClassPageItem.Companion.recycle
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.telnet.TelnetClient
+import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.logic.SearchBoardHandler
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnet.TelnetClient
-import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnetUI.TelnetHeaderItemView
 import java.util.Timer
 import java.util.TimerTask
 
 class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
-    var mainLayout: RelativeLayout? = null
+    lateinit var mainLayout: RelativeLayout
     private var title: String? = ""
 
     override val pageType: Int
@@ -51,17 +51,15 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     override fun onPageDidLoad() {
         super.onPageDidLoad()
 
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        val listView1: ListView? = mainLayout?.findViewById(R.id.ClassPage_listView)
-        if (listView1!==null) {
-            listView1.emptyView = mainLayout?.findViewById(R.id.ClassPage_listEmptyView)
-            listView = listView1
-            mainLayout?.findViewById<View>(R.id.ClassPage_SearchButton)?.setOnClickListener(this)
-            mainLayout?.findViewById<View>(R.id.ClassPage_FirstPageButton)?.setOnClickListener(this)
-            mainLayout?.findViewById<View>(R.id.ClassPage_LastestPageButton)
-                ?.setOnClickListener(this)
-        }
+        val listView1: ListView = mainLayout.findViewById(R.id.ClassPage_listView)
+        listView1.emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
+        listView = listView1
+        mainLayout.findViewById<View>(R.id.ClassPage_SearchButton)?.setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton)?.setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton)
+            ?.setOnClickListener(this)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
@@ -89,14 +87,14 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         }
 
         val headerView =
-            mainLayout?.findViewById<TelnetHeaderItemView?>(R.id.ClassPage_headerView)
+            mainLayout.findViewById<TelnetHeaderItemView?>(R.id.ClassPage_headerView)
         if (headerView != null) {
             if (!TempSettings.lastVisitBoard.isEmpty()) {
                 val finalLastVisitBoard = TempSettings.lastVisitBoard
                 val lastVisitBoard =
                     finalLastVisitBoard + getContextString(R.string.toolbar_item_rr)
 
-                val detail2 = mainLayout?.findViewById<TextView>(R.id.ClassPage_lastVisit)
+                val detail2 = mainLayout.findViewById<TextView>(R.id.ClassPage_lastVisit)
                 if (detail2!==null) {
                     detail2.visibility = View.VISIBLE
                     detail2.bringToFront()
@@ -248,8 +246,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     override fun loadItemAtIndex(index: Int) {
-        val item = getItem(index) as ClassPageItem?
-        if (item == null) return
+        val item = getItem(index) as ClassPageItem
 
         if (item.isDirectory) {
             PageContainer.instance?.pushClassPage(item.name, item.title)
@@ -280,10 +277,10 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
-        recycle(telnetListPageBlock as ClassPageBlock?)
+        recycle(telnetListPageBlock as ClassPageBlock)
     }
 
     override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
-        recycle(telnetListPageItem as ClassPageItem?)
+        recycle(telnetListPageItem as ClassPageItem)
     }
 }

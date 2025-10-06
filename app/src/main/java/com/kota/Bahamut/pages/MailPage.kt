@@ -34,7 +34,7 @@ import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
 class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageListener {
-    var mainLayout: RelativeLayout? = null
+    lateinit var mainLayout: RelativeLayout
     var telnetArticle: TelnetArticle? = null
     var backButton: Button? = null
     var listView: ASListView? = null
@@ -58,22 +58,22 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         get() = true
 
     override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        telnetViewBlock = mainLayout?.findViewById(R.id.Mail_contentTelnetViewBlock)
-        telnetView = mainLayout?.findViewById(R.id.Mail_contentTelnetView)
+        telnetViewBlock = mainLayout.findViewById(R.id.Mail_contentTelnetViewBlock)
+        telnetView = mainLayout.findViewById(R.id.Mail_contentTelnetView)
         reloadTelnetLayout()
-        listView = mainLayout?.findViewById(R.id.Mail_contentList)
-        listEmptyView = mainLayout?.findViewById(R.id.Mail_listEmptyView)
+        listView = mainLayout.findViewById(R.id.Mail_contentList)
+        listEmptyView = mainLayout.findViewById(R.id.Mail_listEmptyView)
         listView?.emptyView = listEmptyView
 
-        backButton = mainLayout?.findViewById(R.id.Mail_backButton)
-        pageUpButton = mainLayout?.findViewById(R.id.Mail_pageUpButton)
-        pageDownButton = mainLayout?.findViewById(R.id.Mail_pageDownButton)
+        backButton = mainLayout.findViewById(R.id.Mail_backButton)
+        pageUpButton = mainLayout.findViewById(R.id.Mail_pageUpButton)
+        pageDownButton = mainLayout.findViewById(R.id.Mail_pageDownButton)
         backButton?.setOnClickListener(this)
         pageUpButton?.setOnClickListener(this)
         pageDownButton?.setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.Mail_changeModeButton)!!.setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.Mail_changeModeButton)!!.setOnClickListener(this)
         resetAdapter()
 
         // 替換外觀
@@ -100,7 +100,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         return true
     }
 
-    fun setArticle(aArticle: TelnetArticle?) {
+    fun setArticle(aArticle: TelnetArticle) {
         clear()
         telnetArticle = aArticle
         telnetView!!.frame = telnetArticle!!.frame!!
@@ -294,9 +294,6 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         }
         onBackPressed()
         return true
-    }
-
-    fun refresh() {
     }
 
     override val isKeepOnOffline: Boolean

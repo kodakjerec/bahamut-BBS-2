@@ -29,7 +29,7 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
 
     @Throws(TelnetConnectionClosedException::class, IOException::class)
     private fun readData(): Byte {
-        return this.telnetConnector!!.readData(0)
+        return this.telnetConnector?.readData(0)!!
     }
 
     private fun receiveData(): Boolean {

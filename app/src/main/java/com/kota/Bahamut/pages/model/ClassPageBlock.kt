@@ -7,7 +7,7 @@ class ClassPageBlock private constructor() : TelnetListPageBlock() {
     var mode: Int = 0
 
     companion object {
-        private val _pool = Stack<ClassPageBlock?>()
+        private val _pool = Stack<ClassPageBlock>()
         @JvmStatic
         fun release() {
             synchronized(_pool) {
@@ -16,7 +16,7 @@ class ClassPageBlock private constructor() : TelnetListPageBlock() {
         }
 
         @JvmStatic
-        fun recycle(block: ClassPageBlock?) {
+        fun recycle(block: ClassPageBlock) {
             synchronized(_pool) {
                 _pool.push(block)
             }
