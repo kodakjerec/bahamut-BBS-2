@@ -29,7 +29,7 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
 
     @Throws(TelnetConnectionClosedException::class, IOException::class)
     private fun readData(): Byte {
-        return this.telnetConnector?.readData(0)
+        return this.telnetConnector!!.readData(0)
     }
 
     private fun receiveData(): Boolean {
@@ -74,7 +74,7 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
 
             Log.v("SocketChannel", "receiveData Exception")
             result = false
-            if (this.telnetConnector != null && this.telnetConnector?.isConnecting) {
+            if (this.telnetConnector != null && this.telnetConnector!!.isConnecting) {
                 this.telnetConnector?.close()
             }
         }

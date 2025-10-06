@@ -36,7 +36,7 @@ class BillingPage : TelnetPage() {
         get() = true
 
     override val isKeepOnOffline: Boolean
-        // com.kota.TelnetUI.TelnetPage
+        // com.kota.telnetUI.TelnetPage
         get() = true
 
     override fun onPageDidLoad() {

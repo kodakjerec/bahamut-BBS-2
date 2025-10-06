@@ -26,7 +26,7 @@ class DialogQueryHero : ASDialog() {
             """.trimIndent().toRegex()
 
             val match = regex.find(fromStrings[2])!!
-            id = match.groups[1]?.value
+            id = match.groups[1]?.value!!
             val nick = match.groups[2]?.value
             val hp = match.groups[3]?.value
             val mp = match.groups[4]?.value

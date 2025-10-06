@@ -25,12 +25,12 @@ class ASProcessingDialog : ASDialog() {
         messageLabel?.setText(R.string.zero_word)
     }
 
-    // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
+    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
     override fun show() {
         super.show()
     }
 
-    // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog, android.content.DialogInterface
+    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog, android.content.DialogInterface
     override fun dismiss() {
         super.dismiss()
     }
@@ -39,10 +39,10 @@ class ASProcessingDialog : ASDialog() {
         this.onBackDelegate = onBackDelegate
     }
 
-    // com.kota.ASFramework.Dialog.ASDialog, android.app.Dialog
+    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this.onBackDelegate == null || !this.onBackDelegate?.onASProcessingDialogOnBackDetected(
+        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(
                 this
             )
         ) {
@@ -75,8 +75,8 @@ class ASProcessingDialog : ASDialog() {
                                 constructInstance()
                             }
                             setMessage(aMessage)
-                            aSProcessingDialog?.setOnBackDelegate(onBackDelegate)
-                            if (!aSProcessingDialog?.isShowing) {
+                            aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
+                            if (!aSProcessingDialog!!.isShowing) {
                                 aSProcessingDialog?.show()
                             }
                         }

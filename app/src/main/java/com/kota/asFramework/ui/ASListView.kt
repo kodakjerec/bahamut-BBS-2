@@ -88,7 +88,7 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
                         i++
                     } else {
                         val index = firstVisiblePosition + i
-                        if (this.extendOptionalDelegate?.onASListViewHandleExtentOptional(
+                        if (this.extendOptionalDelegate!!.onASListViewHandleExtentOptional(
                                 this,
                                 index
                             )

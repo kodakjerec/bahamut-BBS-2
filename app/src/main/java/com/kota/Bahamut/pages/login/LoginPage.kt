@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Pages.Login
+package com.kota.Bahamut.pages.Login
 
 import android.util.Log
 import android.view.View
@@ -6,33 +6,33 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.kota.ASFramework.Dialog.ASAlertDialog
-import com.kota.ASFramework.Dialog.ASDialog
-import com.kota.ASFramework.Dialog.ASProcessingDialog
-import com.kota.ASFramework.Thread.ASRunner
-import com.kota.ASFramework.UI.ASToast
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.DataModels.UrlDatabase
-import com.kota.Bahamut.Pages.Theme.ThemeFunctions
+import com.kota.Bahamut.dataModels.UrlDatabase
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.CloudBackup
-import com.kota.Bahamut.Service.CommonFunctions.getContextString
-import com.kota.Bahamut.Service.NotificationSettings.getCloudSave
-import com.kota.Bahamut.Service.TempSettings
-import com.kota.Bahamut.Service.TempSettings.clearTempSettings
-import com.kota.Bahamut.Service.TempSettings.getWebAutoLoginSuccessTime
-import com.kota.Bahamut.Service.TempSettings.setWebAutoLoginSuccessTime
-import com.kota.Bahamut.Service.UserSettings
-import com.kota.Telnet.TelnetClient
-import com.kota.TelnetUI.TelnetPage
-import com.kota.TelnetUI.TelnetView
+import com.kota.Bahamut.pages.login.LoginWebDebugView
+import com.kota.Bahamut.service.CloudBackup
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.TempSettings.clearTempSettings
+import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
+import com.kota.Bahamut.service.TempSettings.setWebAutoLoginSuccessTime
+import com.kota.Bahamut.service.UserSettings
+import com.kota.telnet.TelnetClient
+import com.kota.telnetUI.TelnetPage
+import com.kota.telnetUI.TelnetView
 import java.util.Calendar
 
 class LoginPage : TelnetPage() {
     var cacheTelnetView: Boolean = false
     var errorCount: Int = 0
     var loginListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val errMessage: String?
         this@LoginPage.username =
             (this@LoginPage.findViewById(R.id.Login_UsernameEdit) as EditText).text
                 .toString().trim { it <= ' ' }
@@ -46,7 +46,7 @@ class LoginPage : TelnetPage() {
             (this@LoginPage.findViewById(R.id.LoginWebSignInCheckBox) as CheckBox)
                 .isChecked
 
-        errMessage = if (this@LoginPage.username.isEmpty() && this@LoginPage.password.isEmpty()) {
+        val errMessage = if (this@LoginPage.username.isEmpty() && this@LoginPage.password.isEmpty()) {
             "帳號、密碼不可為空，請重新輸入。"
         } else if (this@LoginPage.username.isEmpty()) {
             "帳號不可為空，請重新輸入。"
@@ -70,13 +70,11 @@ class LoginPage : TelnetPage() {
     var telnetView: TelnetView? = null // Telnet視圖
     var dailyCheckThread: Thread? = null // 每日檢查執行緒
 
-    override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_LOGIN
-    }
+    override val pageLayout: Int
+        get() = R.layout.login_page
 
-    override fun getPageLayout(): Int {
-        return R.layout.login_page
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_LOGIN
 
     override fun onPageDidLoad() {
         // 清空暫存和執行中變數
@@ -91,19 +89,19 @@ class LoginPage : TelnetPage() {
 
         // 登入
         navigationController.setNavigationTitle("勇者登入")
-        findViewById(R.id.Login_loginButton).setOnClickListener(loginListener)
+        findViewById(R.id.Login_loginButton)!!.setOnClickListener(loginListener)
         // checkbox區塊點擊
         val checkBox = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        findViewById(R.id.loginRememberLabel).setOnClickListener { view: View? ->
+        findViewById(R.id.loginRememberLabel)!!.setOnClickListener { view: View? ->
             checkBox.isChecked = !checkBox.isChecked
-            UserSettings.setPropertiesSaveLogonUser(checkBox.isChecked)
+            UserSettings.propertiesSaveLogonUser = checkBox.isChecked
             UserSettings.notifyDataUpdated()
         }
         // web登入
         val webLoginCheckBox = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        findViewById(R.id.LoginWebSignInLabel).setOnClickListener { view: View? ->
+        findViewById(R.id.LoginWebSignInLabel)!!.setOnClickListener { view: View? ->
             webLoginCheckBox.isChecked = !webLoginCheckBox.isChecked
-            UserSettings.setPropertiesWebSignIn(webLoginCheckBox.isChecked)
+            UserSettings.propertiesWebSignIn = webLoginCheckBox.isChecked
             UserSettings.notifyDataUpdated()
         }
         // TelnetView
@@ -113,7 +111,7 @@ class LoginPage : TelnetPage() {
         loadLogonUser()
 
         // VIP
-        if (UserSettings.getPropertiesVIP()) {
+        if (UserSettings.propertiesVIP) {
             val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as RelativeLayout
             blockWebSignIn.visibility = View.VISIBLE
         }
@@ -129,8 +127,8 @@ class LoginPage : TelnetPage() {
     }
 
     // 按下返回
-    protected override fun onBackPressed(): Boolean {
-        TelnetClient.getClient().close()
+    override fun onBackPressed(): Boolean {
+        TelnetClient.client!!.close()
         return true
     }
 
@@ -164,8 +162,8 @@ class LoginPage : TelnetPage() {
     }
 
     fun handleNormalState(): Boolean {
-        val row23 = TelnetClient.getModel().getRowString(23)
-        val cursor = TelnetClient.getModel().cursor
+        val row23 = TelnetClient.client!!.model!!.getRowString(23)
+        val cursor = TelnetClient.client!!.model!!.cursor
         if (row23.endsWith("再見 ...")) {
             onLoginAccountOverLimit()
             return false
@@ -175,16 +173,16 @@ class LoginPage : TelnetPage() {
         } else if (row23.startsWith("★ 密碼輸入錯誤") && cursor.row == 23) {
             errorCount++
             onPasswordError()
-            TelnetClient.getClient().sendStringToServer("")
+            TelnetClient.client!!.sendStringToServer("")
             return false
         } else if (row23.startsWith("★ 錯誤的使用者代號") && cursor.row == 23) {
             errorCount++
             onUsernameError()
-            TelnetClient.getClient().sendStringToServer("")
+            TelnetClient.client!!.sendStringToServer("")
             return false
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
-            if (UserSettings.getPropertiesAutoToChat()) {
+            if (UserSettings.propertiesAutoToChat) {
                 TempSettings.isUnderAutoToChat = true
             }
             sendPassword()
@@ -202,14 +200,14 @@ class LoginPage : TelnetPage() {
         val loginPasswordField = findViewById(R.id.Login_passwordEdit) as EditText
         val loginRemember = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
         val loginWebSignIn = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        val username = UserSettings.getPropertiesUsername()
-        val password = UserSettings.getPropertiesPassword()
-        val username2 = username.trim { it <= ' ' }
-        val password2 = password.trim { it <= ' ' }
+        val username = UserSettings.propertiesUsername
+        val password = UserSettings.propertiesPassword
+        val username2 = username!!.trim { it <= ' ' }
+        val password2 = password!!.trim { it <= ' ' }
         loginUsernameField.setText(username2)
         loginPasswordField.setText(password2)
-        loginRemember.isChecked = UserSettings.getPropertiesSaveLogonUser()
-        loginWebSignIn.isChecked = UserSettings.getPropertiesWebSignIn()
+        loginRemember.isChecked = UserSettings.propertiesSaveLogonUser
+        loginWebSignIn.isChecked = UserSettings.propertiesWebSignIn
     }
 
     /**
@@ -223,11 +221,11 @@ class LoginPage : TelnetPage() {
             .trim { it <= ' ' }
 
         if (isLoginRemember.isChecked) {
-            UserSettings.setPropertiesUsername(username)
-            UserSettings.setPropertiesPassword(password)
+            UserSettings.propertiesUsername = username
+            UserSettings.propertiesPassword = password
         } else {
-            UserSettings.setPropertiesUsername("")
-            UserSettings.setPropertiesPassword("")
+            UserSettings.propertiesUsername = ""
+            UserSettings.propertiesPassword = ""
         }
     }
 
@@ -235,10 +233,10 @@ class LoginPage : TelnetPage() {
      * 設定TelnetView的畫面
      */
     fun setFrameToTelnetView() {
-        val frame = TelnetClient.getModel().frame.clone()
+        val frame = TelnetClient.client!!.model!!.frame!!.clone()
         frame.removeRow(23)
         frame.removeRow(22)
-        telnetView!!.setFrame(frame)
+        telnetView!!.frame = frame
     }
 
     /**
@@ -247,7 +245,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
         ASRunner.runInNewThread {
-            TelnetClient.getClient()
+            TelnetClient.client!!
                 .sendStringToServerInBackground(this@LoginPage.username)
         }
     }
@@ -267,14 +265,14 @@ class LoginPage : TelnetPage() {
                         .addButton("是")
                         .setListener { aDialog: ASAlertDialog?, index: Int ->
                             if (index == 0) {
-                                TelnetClient.getClient().sendStringToServerInBackground("n")
+                                TelnetClient.client!!.sendStringToServerInBackground("n")
                             } else {
-                                TelnetClient.getClient().sendStringToServerInBackground("y")
+                                TelnetClient.client!!.sendStringToServerInBackground("y")
                             }
                             this@LoginPage.dialogRemoveLoginUser = null
                             ASProcessingDialog.showProcessingDialog("登入中")
                         }.setOnBackDelegate { aDialog: ASDialog? ->
-                            TelnetClient.getClient().sendStringToServerInBackground("n")
+                            TelnetClient.client!!.sendStringToServerInBackground("n")
                             if (this@LoginPage.dialogRemoveLoginUser != null) {
                                 this@LoginPage.dialogRemoveLoginUser!!.dismiss()
                                 this@LoginPage.dialogRemoveLoginUser = null
@@ -341,7 +339,7 @@ class LoginPage : TelnetPage() {
      * 傳送密碼
      */
     fun sendPassword() {
-        TelnetClient.getClient().sendStringToServer(password)
+        TelnetClient.client!!.sendStringToServer(password)
     }
 
     /**
@@ -349,7 +347,7 @@ class LoginPage : TelnetPage() {
      */
     fun onLoginSuccess() {
         // 存檔客戶資料
-        TelnetClient.getClient().username = username
+        TelnetClient.client!!.username = username
         saveLogonUserToProperties()
 
         // 讀取雲端
@@ -371,7 +369,7 @@ class LoginPage : TelnetPage() {
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
 
                             // 使用 LoginWebDebugView 來顯示和處理自動登入
-                            val debugView = LoginWebDebugView(context)
+                            val debugView = LoginWebDebugView(context!!)
                             debugView.startAutoLogin {
                                 // 記錄web自動簽到成功時間
                                 setWebAutoLoginSuccessTime()
@@ -403,7 +401,7 @@ class LoginPage : TelnetPage() {
                                         ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
 
                                         // 使用 LoginWebDebugView 來處理自動簽到
-                                        val debugView = LoginWebDebugView(context)
+                                        val debugView = LoginWebDebugView(context!!)
                                         debugView.startAutoLogin {
                                             // 記錄web自動簽到成功時間
                                             setWebAutoLoginSuccessTime()
@@ -482,8 +480,8 @@ class LoginPage : TelnetPage() {
                     .addButton("放棄").addButton("寫入暫存檔")
                     .setListener { aDialog: ASAlertDialog?, index: Int ->
                         when (index) {
-                            0 -> TelnetClient.getClient().sendStringToServer("Q")
-                            1 -> TelnetClient.getClient().sendStringToServer("S")
+                            0 -> TelnetClient.client!!.sendStringToServer("Q")
+                            1 -> TelnetClient.client!!.sendStringToServer("S")
                         }
                         this@LoginPage.dialogSaveUnfinishedArticle = null
                     }.scheduleDismissOnPageDisappear(this)

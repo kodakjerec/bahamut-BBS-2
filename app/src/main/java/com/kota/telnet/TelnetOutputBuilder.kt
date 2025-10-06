@@ -53,7 +53,7 @@ class TelnetOutputBuilder {
     fun pushString(str: String): TelnetOutputBuilder {
         try {
             pushData(
-                U2BEncoder.instance?.encodeToBytes(str.toByteArray(charset(TelnetDef.CHARSET)), 0)
+                U2BEncoder.instance!!.encodeToBytes(str.toByteArray(charset(TelnetDef.CHARSET)), 0)
             )
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)

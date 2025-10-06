@@ -4,6 +4,13 @@ class NumberCharSequence : CharSequence {
     private val myData = CharArray(5)
     private var myString: String? = null
 
+    override val length: Int
+        get() = myData.size
+
+    override fun get(index: Int): Char {
+        return this.myData[index]
+    }
+
     init {
         clear()
         this.myString = String(this.myData)
@@ -31,10 +38,6 @@ class NumberCharSequence : CharSequence {
 
     fun charAt(index: Int): Char {
         return this.myData[index]
-    }
-
-    fun length(): Int {
-        return 5
     }
 
     override fun subSequence(startIndex: Int, endIndex: Int): CharSequence {

@@ -252,7 +252,7 @@ class TelnetView : View {
     private fun startBlink() {
         if (myHandler == null) {
             myHandler = object : Handler(Looper.getMainLooper()) {
-                // from class: com.kota.TelnetUI.TelnetView.1
+                // from class: com.kota.telnetUI.TelnetView.1
                 // android.os.Handler
                 override fun handleMessage(msg: Message) {
                     this@TelnetView.blink = !this@TelnetView.blink

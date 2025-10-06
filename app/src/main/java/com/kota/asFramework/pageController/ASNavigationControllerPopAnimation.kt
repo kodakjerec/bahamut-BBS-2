@@ -25,7 +25,7 @@ open class ASNavigationControllerPopAnimation(
             val fadeOutAnimation = ASPageAnimation.fadeOutTtRightAnimation
             fadeOutAnimation?.duration = animationDuration.toLong()
             fadeOutAnimation?.setAnimationListener(object : Animation.AnimationListener {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPopAnimation.1
+                // from class: com.kota.asFramework.pageController.ASNavigationControllerPopAnimation.1
                 // android.view.animation.Animation.AnimationListener
                 override fun onAnimationStart(animation: Animation?) {
                 }
@@ -55,7 +55,7 @@ open class ASNavigationControllerPopAnimation(
             val targetAnimation = ASPageAnimation.fadeInFromLeftAnimation
             targetAnimation?.duration = animationDuration.toLong()
             targetAnimation?.setAnimationListener(object : Animation.AnimationListener {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPopAnimation.2
+                // from class: com.kota.asFramework.pageController.ASNavigationControllerPopAnimation.2
                 // android.view.animation.Animation.AnimationListener
                 override fun onAnimationStart(animation: Animation?) {
                 }
@@ -92,8 +92,8 @@ open class ASNavigationControllerPopAnimation(
     private fun finish() {
         if (!this.isFinished) {
             object : ASRunner() {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPopAnimation.3
-                // com.kota.ASFramework.Thread.ASRunner
+                // from class: com.kota.asFramework.pageController.ASNavigationControllerPopAnimation.3
+                // com.kota.asFramework.thread.ASRunner
                 override fun run() {
                     this@ASNavigationControllerPopAnimation.onAnimationFinished()
                 }

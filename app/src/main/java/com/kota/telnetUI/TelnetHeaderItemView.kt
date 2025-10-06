@@ -82,7 +82,7 @@ open class TelnetHeaderItemView : LinearLayout {
                 myTitle?.setTextColor(getContextColor(R.color.white))
                 myTitle?.setBackgroundColor(getContextColor(R.color.red))
                 val layoutParams = myTitle?.layoutParams
-                layoutParams.width = LayoutParams.WRAP_CONTENT
+                layoutParams!!.width = LayoutParams.WRAP_CONTENT
                 myTitle?.layoutParams = layoutParams
             }
         }

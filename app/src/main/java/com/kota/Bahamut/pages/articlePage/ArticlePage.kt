@@ -327,18 +327,18 @@ class ArticlePage : TelnetPage() {
     }
 
     val pageType: Int
-        // com.kota.ASFramework.PageController.ASViewController
+        // com.kota.asFramework.pageController.ASViewController
         get() = BahamutPage.BAHAMUT_ARTICLE
 
     val pageLayout: Int
-        // com.kota.ASFramework.PageController.ASViewController
+        // com.kota.asFramework.pageController.ASViewController
         get() = R.layout.article_page
 
     val isPopupPage: Boolean
-        // com.kota.TelnetUI.TelnetPage
+        // com.kota.telnetUI.TelnetPage
         get() = true
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     public override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
@@ -504,25 +504,25 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     public override fun onPageWillAppear() {
         reloadViewMode()
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     public override fun onPageDidDisappear() {
         telnetView = null
         super.onPageDidDisappear()
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     protected override fun onBackPressed(): Boolean {
         navigationController.popViewController()
         PageContainer.instance?.cleanArticlePage()
         return true
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     protected override fun onMenuButtonClicked(): Boolean {
         onMenuClicked()
         return true
@@ -550,7 +550,7 @@ class ArticlePage : TelnetPage() {
                 .addItem(getContextString(R.string.board_page_item_long_click_1))
                 .addItem(getContextString(R.string.board_page_item_load_all_image))
                 .setListener(object : ASListDialogItemClickListener {
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
                         aDialog: ASListDialog?,
                         index: Int,
@@ -575,7 +575,7 @@ class ArticlePage : TelnetPage() {
                         }
                     }
 
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
                         aDialog: ASListDialog?,
                         index: Int,
@@ -762,7 +762,7 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     public override fun onReceivedGestureRight(): Boolean {
         if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT || isFullScreen) {
             if (propertiesGestureOnBoardEnable) onBackPressed()
@@ -772,7 +772,7 @@ class ArticlePage : TelnetPage() {
     }
 
     val isKeepOnOffline: Boolean
-        // com.kota.TelnetUI.TelnetPage
+        // com.kota.telnetUI.TelnetPage
         get() = true
 
     fun onExternalToolbarClicked() {
@@ -812,7 +812,7 @@ class ArticlePage : TelnetPage() {
                 list_dialog.addItem(urlspan.getURL())
             }
             list_dialog.setListener(object : ASListDialogItemClickListener {
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemLongClicked(
                     aDialog: ASListDialog?,
                     index: Int,
@@ -821,7 +821,7 @@ class ArticlePage : TelnetPage() {
                     return true
                 }
 
-                // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemClicked(
                     aDialog: ASListDialog?,
                     index: Int,
@@ -863,7 +863,7 @@ class ArticlePage : TelnetPage() {
             val names = buffer.toTypedArray<String?>()
             ASListDialog.createDialog().addItems(names)
                 .setListener(object : ASListDialogItemClickListener {
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
                         aDialog: ASListDialog?,
                         index: Int,
@@ -872,7 +872,7 @@ class ArticlePage : TelnetPage() {
                         return true
                     }
 
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
                         aDialog: ASListDialog?,
                         index: Int,

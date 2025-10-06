@@ -89,7 +89,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     // android.app.Dialog
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this.backPressedHandler == null || !this.backPressedHandler?.onASDialogBackPressed(this)) {
+        if (this.backPressedHandler == null || !this.backPressedHandler!!.onASDialogBackPressed(this)) {
             super.onBackPressed()
         }
     }
@@ -110,14 +110,14 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         return this
     }
 
-    // com.kota.ASFramework.PageController.ASViewControllerDisappearListener
+    // com.kota.asFramework.pageController.ASViewControllerDisappearListener
     override fun onASViewControllerWillDisappear(paramASViewController: ASViewController?) {
         if (this@ASDialog.isShowing) {
             dismiss()
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewControllerDisappearListener
+    // com.kota.asFramework.pageController.ASViewControllerDisappearListener
     override fun onASViewControllerDidDisappear(paramASViewController: ASViewController?) {
     }
 

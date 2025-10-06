@@ -2,14 +2,15 @@ package com.kota.telnet.logic
 
 import com.kota.telnet.TelnetClient
 import java.util.Vector
+import kotlin.collections.toTypedArray
 
 class SearchBoardHandler private constructor() {
-    private val _boards = Vector<String?>()
+    private val _boards = Vector<String>()
 
     fun read() {
         var i = 3
         while (i < 23) {
-            val content = TelnetClient.client?.model?.getRowString(i).trim { it <= ' ' }
+            val content = TelnetClient.client!!.model!!.getRowString(i).trim { it <= ' ' }
             if (content.isNotEmpty()) {
                 for (board in content.split(" +".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()) {
@@ -35,8 +36,8 @@ class SearchBoardHandler private constructor() {
         return this._boards[index]
     }
 
-    val boards: Array<String?>
-        get() = this._boards.toTypedArray<String?>()
+    val boards: Array<String>
+        get() = this._boards.toTypedArray<String>()
 
     companion object {
         private var _instance: SearchBoardHandler? = null

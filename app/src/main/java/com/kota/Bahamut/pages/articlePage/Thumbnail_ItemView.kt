@@ -26,19 +26,12 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
 import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.thread.ASRunner.Companion.runInNewThread
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
-import okhttp3.MultipartBody
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
-import org.json.JSONObject
-import org.jsoup.Jsoup
 import java.util.Vector
 import kotlin.math.min
 
@@ -75,129 +68,20 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         myUrl = url
 
         try {
-            UrlDatabase(getContext()).use { urlDatabase ->
-                val findUrl: Vector<String>? = urlDatabase.getUrl(myUrl)
-                urlView?.setText(myUrl)
+            UrlDatabase(context).use { urlDatabase ->
+                val findUrl: Vector<String> = urlDatabase.getUrl(myUrl)
+                urlView?.text = myUrl
                 // 已經有URL資料
-                if (findUrl != null) {
-                    myTitle = findUrl.get(1)
-                    myDescription = findUrl.get(2)
-                    myImageUrl = findUrl.get(3)
-                    isPic = findUrl.get(4) != "0"
-                    picOrUrl_changeStatus(isPic)
-                } else {
-                    val apiUrl = "https://worker-get-url-content.kodakjerec.workers.dev/"
-                    val client = OkHttpClient()
-                    val body: RequestBody = MultipartBody.Builder()
-                        .setType(MultipartBody.Companion.FORM)
-                        .addFormDataPart("url", myUrl)
-                        .build()
-                    val request = Request.Builder()
-                        .url(apiUrl)
-                        .post(body)
-                        .build()
-
-                    // 尋找URL資料
-                    runInNewThread(Runnable {
-                        try {
-                            // load heads
-                            val response = client.newCall(request).execute()
-                            checkNotNull(response.body)
-                            val data = response.body.string()
-                            val jsonObject = JSONObject(data)
-
-                            var contentType = jsonObject.getString("contentType")
-
-                            if (contentType.contains("image") || contentType.contains("video") || contentType.contains(
-                                    "audio"
-                                )
-                            ) {
-                                isPic = true
-                            }
-                            myTitle = jsonObject.getString("title")
-                            myDescription = jsonObject.getString("desc")
-                            myImageUrl = jsonObject.getString("imageUrl")
-
-                            // 非圖片類比較會有擷取問題
-                            if (!isPic && (myTitle == "" || myDescription == "")) {
-                                var userAgent = System.getProperty("http.agent")
-                                if (myUrl.contains("youtu") || myUrl.contains("amazon")) userAgent =
-                                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
-
-                                // cookie
-                                // Create a new Map to store cookies
-                                val cookies: MutableMap<String?, String?> =
-                                    HashMap<String?, String?>()
-                                if (myUrl.contains("ptt")) cookies.put(
-                                    "over18",
-                                    "1"
-                                ) // Add the over18 cookie with value 1
-
-
-                                val resp = Jsoup
-                                    .connect(myUrl)
-                                    .header("User-Agent", userAgent!!)
-                                    .cookies(cookies)
-                                    .execute()
-                                contentType = resp.contentType()
-
-                                if (contentType.contains("image/") || contentType.contains("video/")) {
-                                    isPic = true
-                                }
-                                // 域名判斷
-                                if (url.contains("i.imgur")) {
-                                    isPic = true
-                                }
-
-                                // 圖片處理
-                                if (isPic) {
-                                    myTitle = myUrl
-                                    myDescription = ""
-                                    myImageUrl = myUrl
-                                } else {
-                                    // 文字處理
-                                    val document = resp.parse()
-
-                                    myTitle = document.title()
-                                    if (myTitle.isEmpty()) myTitle =
-                                        document.select("meta[property=og:title]").attr("content")
-
-                                    myDescription =
-                                        document.select("meta[name=description]").attr("content")
-                                    if (myDescription.isEmpty()) myDescription =
-                                        document.select("meta[property=og:description]")
-                                            .attr("content")
-
-                                    myImageUrl =
-                                        document.select("meta[property=og:image]").attr("content")
-                                    if (myImageUrl.isEmpty()) myImageUrl =
-                                        document.select("meta[property=og:image]").attr("content")
-                                    if (myImageUrl.isEmpty()) myImageUrl =
-                                        document.select("meta[property=og:images]").attr("content")
-                                    if (myImageUrl.isEmpty()) myImageUrl =
-                                        document.select("#landingImage").attr("src")
-                                }
-                            }
-
-                            // 圖片處理
-                            picOrUrl_changeStatus(isPic)
-
-                            urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
-                        } catch (ignored: Exception) {
-                            object : ASRunner() {
-                                // com.kota.ASFramework.Thread.ASRunner
-                                public override fun run() {
-                                    set_fail()
-                                }
-                            }.runInMainThread()
-                        }
-                    })
-                }
+                myTitle = findUrl[1]
+                myDescription = findUrl[2]
+                myImageUrl = findUrl[3]
+                isPic = findUrl[4] != "0"
+                picOrUrl_changeStatus(isPic)
             }
         } catch (ignored: Exception) {
             object : ASRunner() {
-                // com.kota.ASFramework.Thread.ASRunner
-                public override fun run() {
+                // com.kota.asFramework.thread.ASRunner
+                override fun run() {
                     set_fail()
                 }
             }.runInMainThread()
@@ -212,38 +96,38 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
         if (_isPic) { // 純圖片
             object : ASRunner() {
-                // com.kota.ASFramework.Thread.ASRunner
-                public override fun run() {
-                    layoutDefault?.setVisibility(GONE)
+                // com.kota.asFramework.thread.ASRunner
+                override fun run() {
+                    layoutDefault?.visibility = GONE
 
                     // 圖片
-                    layoutPic?.setVisibility(VISIBLE)
+                    layoutPic?.visibility = VISIBLE
                     if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image()
                     } else if (myImageUrl == "") {
-                        imageViewButton?.setVisibility(GONE)
+                        imageViewButton?.visibility = GONE
                     }
 
                     // 內容
-                    layoutNormal?.setVisibility(GONE)
+                    layoutNormal?.visibility = GONE
                 }
             }.runInMainThread()
         } else { // 內容網址
             object : ASRunner() {
-                // com.kota.ASFramework.Thread.ASRunner
-                public override fun run() {
-                    layoutDefault?.setVisibility(GONE)
+                // com.kota.asFramework.thread.ASRunner
+                override fun run() {
+                    layoutDefault?.visibility = GONE
 
                     // 圖片
-                    layoutPic?.setVisibility(VISIBLE)
+                    layoutPic?.visibility = VISIBLE
                     if (loadThumbnailImg && (!loadOnlyWifi || _transportType == 1)) {
                         prepare_load_image()
                     } else if (myImageUrl == "") {
-                        imageViewButton?.setVisibility(GONE)
+                        imageViewButton?.visibility = GONE
                     }
 
                     // 內容
-                    layoutNormal?.setVisibility(VISIBLE)
+                    layoutNormal?.visibility = VISIBLE
                     set_normal()
                 }
             }.runInMainThread()
@@ -259,33 +143,33 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         } else {
             viewHeight = viewHeight / 4
         }
-        photoViewPic?.setMinimumHeight(viewHeight)
+        photoViewPic?.minimumHeight = viewHeight
         loadImage()
-        urlView?.setText(myImageUrl)
+        urlView?.text = myImageUrl
     }
 
     /** 內容網址  */
     private fun set_normal() {
         if (!myTitle.isEmpty()) {
-            titleView?.setText(myTitle)
-            titleView?.setVisibility(VISIBLE)
+            titleView?.text = myTitle
+            titleView?.visibility = VISIBLE
         }
         if (!myDescription.isEmpty()) {
-            descriptionView?.setText(myDescription)
-            descriptionView?.setVisibility(VISIBLE)
+            descriptionView?.text = myDescription
+            descriptionView?.visibility = VISIBLE
         }
-        urlView?.setText(myUrl)
+        urlView?.text = myUrl
     }
 
     /** 意外處理  */
     private fun set_fail() {
-        layoutDefault?.setVisibility(GONE)
+        layoutDefault?.visibility = GONE
 
         // 圖片
-        layoutPic?.setVisibility(GONE)
+        layoutPic?.visibility = GONE
 
         // 內容
-        layoutNormal?.setVisibility(GONE)
+        layoutNormal?.visibility = GONE
     }
 
     /** 讀取圖片  */
@@ -293,18 +177,18 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
         imgLoaded = true
         object : ASRunner() {
             @SuppressLint("ResourceType")
-            public override fun run() {
-                imageViewButton?.setVisibility(GONE)
-                photoViewPic?.setVisibility(VISIBLE)
-                photoViewPic?.setContentDescription(myDescription)
+            override fun run() {
+                imageViewButton?.visibility = GONE
+                photoViewPic?.visibility = VISIBLE
+                photoViewPic?.contentDescription = myDescription
                 try {
-                    val circularProgressDrawable = CircularProgressDrawable(getContext())
+                    val circularProgressDrawable = CircularProgressDrawable(context)
                     circularProgressDrawable.setStrokeWidth(10f)
                     circularProgressDrawable.setCenterRadius(60f)
                     // progress bar color
                     val typedValue = TypedValue()
 
-                    getContext().getTheme()
+                    context.theme
                         .resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true)
                     circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId))
                     // progress bar start
@@ -326,8 +210,8 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                                 isFirstResource: Boolean
                             ): Boolean {
                                 object : ASRunner() {
-                                    // com.kota.ASFramework.Thread.ASRunner
-                                    public override fun run() {
+                                    // com.kota.asFramework.thread.ASRunner
+                                    override fun run() {
                                         set_fail()
                                     }
                                 }.runInMainThread()
@@ -351,10 +235,10 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                             ) {
                                 try {
                                     val bitmap: Bitmap
-                                    if (resource is GifDrawable) bitmap = resource.getFirstFrame()
-                                    else bitmap = (resource as BitmapDrawable).getBitmap()
-                                    val picHeight = bitmap.getHeight()
-                                    val picWidth = bitmap.getWidth()
+                                    if (resource is GifDrawable) bitmap = resource.firstFrame
+                                    else bitmap = (resource as BitmapDrawable).bitmap
+                                    val picHeight = bitmap.height
+                                    val picWidth = bitmap.width
                                     var targetHeight = viewHeight
                                     var targetWidth = viewWidth
 
@@ -365,11 +249,11 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
 
                                     val tempHeight = (picHeight * scale).toInt()
                                     targetHeight = min(tempHeight, targetHeight)
-                                    photoViewPic?.setMinimumHeight(targetHeight)
+                                    photoViewPic?.minimumHeight = targetHeight
 
                                     val tempWidth = (picWidth * scale).toInt()
                                     targetWidth = min(tempWidth, targetWidth)
-                                    photoViewPic?.setMinimumWidth(targetWidth)
+                                    photoViewPic?.minimumWidth = targetWidth
 
                                     if (resource is GifDrawable) {
                                         resource.startFromFirstFrame()
@@ -385,8 +269,8 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                                     }
                                 } catch (ignored: Exception) {
                                     object : ASRunner() {
-                                        // com.kota.ASFramework.Thread.ASRunner
-                                        public override fun run() {
+                                        // com.kota.asFramework.thread.ASRunner
+                                        override fun run() {
                                             set_fail()
                                         }
                                     }.runInMainThread()
@@ -398,8 +282,8 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
                         })
                 } catch (ignored: Exception) {
                     object : ASRunner() {
-                        // com.kota.ASFramework.Thread.ASRunner
-                        public override fun run() {
+                        // com.kota.asFramework.thread.ASRunner
+                        override fun run() {
                             set_fail()
                         }
                     }.runInMainThread()
@@ -411,52 +295,52 @@ class Thumbnail_ItemView(var myContext: Context) : LinearLayout(myContext) {
     var openUrlListener: OnClickListener = object : OnClickListener {
         override fun onClick(view: View?) {
             val intent = Intent(Intent.ACTION_VIEW, Uri.parse(myUrl))
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             myContext.startActivity(intent)
         }
     }
 
     var titleListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
-        if (textView.getMaxLines() == 2) textView.setMaxLines(9)
-        else textView.setMaxLines(2)
+        if (textView.maxLines == 2) textView.maxLines = 9
+        else textView.maxLines = 2
     }
     var descriptionListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
-        if (textView.getMaxLines() == 1) textView.setMaxLines(9)
-        else textView.setMaxLines(1)
+        if (textView.maxLines == 1) textView.maxLines = 9
+        else textView.maxLines = 1
     }
 
     init {
         val metrics = DisplayMetrics()
-        (myContext as Activity).getWindowManager().getDefaultDisplay().getMetrics(metrics)
+        (myContext as Activity).windowManager.defaultDisplay.getMetrics(metrics)
         viewWidth = metrics.widthPixels
         viewHeight = metrics.heightPixels
         init()
     }
 
     private fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
             R.layout.thumbnail,
             this
         )
-        mainLayout = findViewById<LinearLayout>(R.id.thumbnail_content_view)
-        layoutDefault = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_default)
+        mainLayout = findViewById(R.id.thumbnail_content_view)
+        layoutDefault = mainLayout?.findViewById(R.id.thumbnail_default)
 
-        layoutPic = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_pic)
-        photoViewPic = mainLayout?.findViewById<PhotoView>(R.id.thumbnail_image_pic)
+        layoutPic = mainLayout?.findViewById(R.id.thumbnail_pic)
+        photoViewPic = mainLayout?.findViewById(R.id.thumbnail_image_pic)
         photoViewPic?.setOnClickListener(openUrlListener)
-        photoViewPic?.setMaximumScale(20.0f)
-        photoViewPic?.setMediumScale(3.0f)
+        photoViewPic?.maximumScale = 20.0f
+        photoViewPic?.mediumScale = 3.0f
 
-        imageViewButton = mainLayout?.findViewById<Button>(R.id.thumbnail_image_button)
+        imageViewButton = mainLayout?.findViewById(R.id.thumbnail_image_button)
         imageViewButton?.setOnClickListener(OnClickListener { view: View? -> prepare_load_image() })
 
-        layoutNormal = mainLayout?.findViewById<LinearLayout>(R.id.thumbnail_normal)
-        titleView = mainLayout?.findViewById<TextView>(R.id.thumbnail_title)
+        layoutNormal = mainLayout?.findViewById(R.id.thumbnail_normal)
+        titleView = mainLayout?.findViewById(R.id.thumbnail_title)
         titleView?.setOnClickListener(titleListener)
-        descriptionView = mainLayout?.findViewById<TextView>(R.id.thumbnail_description)
+        descriptionView = mainLayout?.findViewById(R.id.thumbnail_description)
         descriptionView?.setOnClickListener(descriptionListener)
-        urlView = mainLayout?.findViewById<TextView>(R.id.thumbnail_url)
+        urlView = mainLayout?.findViewById(R.id.thumbnail_url)
     }
 }

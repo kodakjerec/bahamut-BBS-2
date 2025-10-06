@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Pages
+package com.kota.Bahamut.pages
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -12,26 +12,26 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.core.content.pm.PackageInfoCompat
-import com.kota.ASFramework.Dialog.ASAlertDialog
-import com.kota.ASFramework.Dialog.ASProcessingDialog
-import com.kota.ASFramework.PageController.ASNavigationController
-import com.kota.ASFramework.Thread.ASRunner
-import com.kota.ASFramework.UI.ASToast
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
-import com.kota.Bahamut.Pages.Theme.ThemeFunctions
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.CommonFunctions.getContextString
-import com.kota.Bahamut.Service.NotificationSettings.getConnectIpAddress
-import com.kota.Bahamut.Service.NotificationSettings.getConnectMethod
-import com.kota.Bahamut.Service.NotificationSettings.getShowNotificationPermissionDialog
-import com.kota.Bahamut.Service.NotificationSettings.setConnectIpAddress
-import com.kota.Bahamut.Service.NotificationSettings.setConnectMethod
-import com.kota.Bahamut.Service.NotificationSettings.setShowNotificationPermissionDialog
-import com.kota.Bahamut.Service.TempSettings
-import com.kota.Telnet.TelnetClient
-import com.kota.TelnetUI.TelnetPage
-import com.kota.TelnetUI.TextView.TelnetTextViewSmall
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.NotificationSettings.getConnectIpAddress
+import com.kota.Bahamut.service.NotificationSettings.getConnectMethod
+import com.kota.Bahamut.service.NotificationSettings.getShowNotificationPermissionDialog
+import com.kota.Bahamut.service.NotificationSettings.setConnectIpAddress
+import com.kota.Bahamut.service.NotificationSettings.setConnectMethod
+import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissionDialog
+import com.kota.Bahamut.service.TempSettings
+import com.kota.telnet.TelnetClient
+import com.kota.telnetUI.TelnetPage
+import com.kota.telnetUI.textView.TelnetTextViewSmall
 import androidx.core.net.toUri
 
 class StartPage : TelnetPage() {
@@ -62,26 +62,24 @@ class StartPage : TelnetPage() {
     }
 
     /** 避難所  */
-    override fun getPageLayout(): Int {
-        return R.layout.start_page
-    }
+    override val pageLayout: Int
+        get() = R.layout.start_page
 
-    override fun getPageType(): Int {
-        return BahamutPage.START
-    }
+    override val pageType: Int
+        get() = BahamutPage.START
 
     @SuppressLint("SetTextI18n")
     override fun onPageDidLoad() {
         navigationController.setNavigationTitle("勇者入口")
-        findViewById(R.id.Start_exitButton).setOnClickListener(exitListener)
-        findViewById(R.id.Start_connectButton).setOnClickListener(connectListener)
-        findViewById(R.id.Start_instructions).setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_exitButton)!!.setOnClickListener(exitListener)
+        findViewById(R.id.Start_connectButton)!!.setOnClickListener(connectListener)
+        findViewById(R.id.Start_instructions)!!.setOnClickListener(urlClickListener)
         // url
-        findViewById(R.id.Start_Icon_Discord).setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Facebook).setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Reddit).setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Steam).setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Telegram).setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_Icon_Discord)!!.setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_Icon_Facebook)!!.setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_Icon_Reddit)!!.setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_Icon_Steam)!!.setOnClickListener(urlClickListener)
+        findViewById(R.id.Start_Icon_Telegram)!!.setOnClickListener(urlClickListener)
         // ip位置
         val radioGroup = findViewById(R.id.radioButtonIP) as RadioGroup
         val radioButton1 = findViewById(R.id.radioButtonIP1) as RadioButton
@@ -132,7 +130,7 @@ class StartPage : TelnetPage() {
         val packageInfo: PackageInfo
         try {
             packageInfo =
-                context.packageManager.getPackageInfo(context.packageName, 0)
+                context!!.packageManager.getPackageInfo(context!!.packageName, 0)
             val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt()
             val versionName = packageInfo.versionName
             (findViewById(R.id.version) as TelnetTextViewSmall).text = "$versionCode - $versionName"
@@ -145,7 +143,7 @@ class StartPage : TelnetPage() {
     }
 
     override fun onPageWillAppear() {
-        val pageContainer = PageContainer.getInstance()
+        val pageContainer = PageContainer.instance
         pageContainer.cleanStartPage()
     }
 
@@ -190,12 +188,12 @@ class StartPage : TelnetPage() {
             ASProcessingDialog.showProcessingDialog(
                 "連線中"
             ) { aDialog: ASProcessingDialog? ->
-                TelnetClient.getClient().close()
+                TelnetClient.client!!.close()
                 false
             }
             val connectIpAddress = getConnectIpAddress()
             ASRunner.runInNewThread {
-                TelnetClient.getClient().connect(connectIpAddress, 23)
+                TelnetClient.client!!.connect(connectIpAddress, 23)
             }
             return
         }
@@ -229,7 +227,7 @@ class StartPage : TelnetPage() {
          * 檢查並要求通知權限 (Android 13+)
          */
         fun checkAndRequestNotificationPermission() {
-            val controller = ASNavigationController.getCurrentController()
+            val controller = ASNavigationController.currentController
             if (controller == null) return
 
             // 只在 Android 13+ 需要通知權限

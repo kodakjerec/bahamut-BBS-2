@@ -383,7 +383,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                 .addItem(CommonFunctions.getContextString(R.string.board_page_item_long_click_1))
                 .addItem(CommonFunctions.getContextString(R.string.board_page_item_load_all_image))
                 .setListener(object : ASListDialogItemClickListener {
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
                         paramASListDialog: ASListDialog?,
                         index: Int,
@@ -399,7 +399,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                         }
                     }
 
-                    // com.kota.ASFramework.Dialog.ASListDialogItemClickListener
+                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
                         paramASListDialog: ASListDialog?,
                         index: Int,

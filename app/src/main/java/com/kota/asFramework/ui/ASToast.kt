@@ -9,14 +9,14 @@ object ASToast {
     @JvmStatic
     fun showShortToast(aToastMessage: String?) {
         object : ASRunner() {
-            // from class: com.kota.ASFramework.UI.ASToast.1
-            // com.kota.ASFramework.Thread.ASRunner
+            // from class: com.kota.asFramework.ui.ASToast.1
+            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 if (previousToast != null) {
                     previousToast?.cancel()
                 }
                 previousToast = Toast.makeText(
-                    ASNavigationController.getCurrentController(),
+                    ASNavigationController.currentController,
                     aToastMessage,
                     Toast.LENGTH_SHORT
                 )
@@ -28,14 +28,14 @@ object ASToast {
     @JvmStatic
     fun showLongToast(aToastMessage: String?) {
         object : ASRunner() {
-            // from class: com.kota.ASFramework.UI.ASToast.2
-            // com.kota.ASFramework.Thread.ASRunner
+            // from class: com.kota.asFramework.ui.ASToast.2
+            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 if (previousToast != null) {
                     previousToast?.cancel()
                 }
                 previousToast = Toast.makeText(
-                    ASNavigationController.getCurrentController(),
+                    ASNavigationController.currentController,
                     aToastMessage,
                     Toast.LENGTH_LONG
                 )

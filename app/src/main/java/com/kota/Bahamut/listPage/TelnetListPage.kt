@@ -39,7 +39,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var executingCommand: TelnetCommand? = null
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
-    open var name: String?
+    open val name: String?
         get() = "TelnetListPage"
     @JvmField
     protected var listViewWidget: ListView? = null
@@ -127,7 +127,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         isManualLoadPending = true
     }
 
-    // com.kota.TelnetUI.TelnetPage, com.kota.ASFramework.PageController.ASViewController
+    // com.kota.telnetUI.TelnetPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidUnload() {
         stopAutoLoad()
         super.onPageDidUnload()
@@ -215,7 +215,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun setListViewSelection(selection: Int) {
         object : ASRunner() {
             // from class: com.kota.Bahamut.ListPage.TelnetListPage.1
-            // com.kota.ASFramework.Thread.ASRunner
+            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 if (this@TelnetListPage.listViewWidget != null) {
                     if (selection == -1) {
@@ -260,7 +260,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return true
     }
 
-    @Synchronized  // com.kota.ASFramework.PageController.ASViewController
+    @Synchronized  // com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
         listCount = this.itemSize
         reloadListView()

@@ -226,8 +226,8 @@ open class ASNavigationController : Activity() {
             aAddPage.notifyPageWillAppear()
         }
         object : ASNavigationControllerPopAnimation(aRemovePage, aAddPage) {
-            // from class: com.kota.ASFramework.PageController.ASNavigationController.4
-            // com.kota.ASFramework.PageController.ASNavigationControllerPopAnimation
+            // from class: com.kota.asFramework.pageController.ASNavigationController.4
+            // com.kota.asFramework.pageController.ASNavigationControllerPopAnimation
             override fun onAnimationFinished() {
                 aRemovePage?.onPageDidDisappear()
                 val removeList = Vector<View?>()

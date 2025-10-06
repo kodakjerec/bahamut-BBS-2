@@ -13,14 +13,14 @@ class TelnetReceiver {
     }
 
     fun startReceiver() {
-        this.receiverThread = TelnetReceiverThread(this.telnetConnector, this.telnetModel)
-        this.receiverThread?.isDaemon = true
-        this.receiverThread?.start()
+        this.receiverThread = TelnetReceiverThread(this.telnetConnector!!, this.telnetModel!!)
+        this.receiverThread!!.isDaemon = true
+        this.receiverThread!!.start()
     }
 
     fun stopReceiver() {
         if (this.receiverThread != null) {
-            this.receiverThread?.close()
+            this.receiverThread!!.close()
             this.receiverThread = null
         }
     }

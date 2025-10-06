@@ -542,7 +542,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // com.kota.Telnet.TelnetStateHandler
+    // com.kota.telnet.TelnetStateHandler
     override fun handleState() {
         loadState()
         this.telnetCursor = TelnetClient.client?.model?.cursor
@@ -831,7 +831,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // com.kota.Telnet.TelnetStateHandler
+    // com.kota.telnet.TelnetStateHandler
     override fun clear() {
         this.nowStep = STEP_CONNECTING
         currentPage = BahamutPage.Companion.UNKNOWN

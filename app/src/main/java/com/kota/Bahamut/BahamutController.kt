@@ -46,7 +46,7 @@ import java.util.TimeZone
 import java.util.Vector
 
 class BahamutController : ASNavigationController(), TelnetClientListener {
-    // com.kota.ASFramework.PageController.ASNavigationController
+    // com.kota.asFramework.pageController.ASNavigationController
     override fun onControllerWillLoad() {
         requestWindowFeature(1)
         try {
@@ -94,7 +94,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         upgrade(this)
     }
 
-    // com.kota.ASFramework.PageController.ASNavigationController
+    // com.kota.asFramework.pageController.ASNavigationController
     override fun onControllerDidLoad() {
         val startPage: StartPage? = PageContainer.instance?.startPage
         pushViewController(startPage, false)
@@ -132,10 +132,10 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     override val controllerName: String?
-        // com.kota.ASFramework.PageController.ASNavigationController
+        // com.kota.asFramework.pageController.ASNavigationController
         get() = R.string.app_name.toString()
 
-    // com.kota.ASFramework.PageController.ASNavigationController
+    // com.kota.asFramework.pageController.ASNavigationController
     override fun onBackLongPressed(): Boolean {
         var result = true
         if (TelnetClient.client?.connector?.isConnecting == true) {
@@ -146,7 +146,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                 .addButton("斷線")
                 .setListener(object : ASAlertDialogListener {
                     // from class: com.kota.Bahamut.BahamutController.1
-                    // com.kota.ASFramework.Dialog.ASAlertDialogListener
+                    // com.kota.asFramework.dialog.ASAlertDialogListener
                     override fun onAlertDialogDismissWithButtonIndex(
                         paramASAlertDialog: ASAlertDialog,
                         paramInt: Int
@@ -170,30 +170,30 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         println("BahaBBS connection start:$timeString")
     }
 
-    // com.kota.Telnet.TelnetClientListener
+    // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionStart(telnetClient: TelnetClient) {
         object : ASRunner() {
             // from class: com.kota.Bahamut.BahamutController.2
-            // com.kota.ASFramework.Thread.ASRunner
+            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 this@BahamutController.showConnectionStartMessage()
             }
         }.runInMainThread()
     }
 
-    // com.kota.Telnet.TelnetClientListener
+    // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionSuccess(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         startForegroundService(intent)
     }
 
-    // com.kota.Telnet.TelnetClientListener
+    // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionFail(telnetClient: TelnetClient) {
         dismissProcessingDialog()
         showShortToast("連線失敗，請檢查網路連線或稍後再試")
     }
 
-    // com.kota.Telnet.TelnetClientListener
+    // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
@@ -240,7 +240,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         setViewControllers(newControllers)
     }
 
-    // com.kota.ASFramework.PageController.ASNavigationController, android.app.Activity, android.content.ComponentCallbacks
+    // com.kota.asFramework.pageController.ASNavigationController, android.app.Activity, android.content.ComponentCallbacks
     override fun onLowMemory() {
         super.onLowMemory()
         BoardPageBlock.release()
@@ -254,7 +254,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     override var isAnimationEnable: Boolean = false
-        // com.kota.ASFramework.PageController.ASNavigationController
+        // com.kota.asFramework.pageController.ASNavigationController
         get() = propertiesAnimationEnable
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

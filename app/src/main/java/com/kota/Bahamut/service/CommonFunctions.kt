@@ -84,7 +84,7 @@ object CommonFunctions {
                 else if (array.startsWith("> "))
                     maxLength+=2
                 val data2 = array.toByteArray(charset(TelnetDef.CHARSET))
-                var data1 = U2BEncoder.instance?.encodeToBytes(data2, 0)
+                var data1 = U2BEncoder.instance?.encodeToBytes(data2, 0)!!
                 while (data1.size >= maxLength) {
                     var isControlCode = false
                     var column = 0 // 現在取得的字元index

@@ -1,4 +1,4 @@
-package com.kota.Bahamut.Service
+package com.kota.Bahamut.service
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -11,11 +11,11 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.kota.ASFramework.PageController.ASNavigationController
-import com.kota.ASFramework.Thread.ASRunner
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
-import com.kota.Bahamut.Service.CommonFunctions.getContextString
-import com.kota.Telnet.TelnetClient
+import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.telnet.TelnetClient
 
 class BahaBBSBackgroundService : Service() {
     var myClient: TelnetClient? = null
@@ -69,8 +69,8 @@ class BahaBBSBackgroundService : Service() {
             return START_NOT_STICKY
         }
 
-        this.myClient = TelnetClient.getClient()
-        this.myController = ASNavigationController.getCurrentController()
+        this.myClient = TelnetClient.client!!
+        this.myController = ASNavigationController.currentController
 
         return START_STICKY // 確保服務重啟
     }

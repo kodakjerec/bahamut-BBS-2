@@ -8,7 +8,7 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import kotlin.math.abs
 
-class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
+class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
     GestureDetector.OnGestureListener {
     private var gestureViewDelegate: ASGestureViewDelegate? = null
 
@@ -20,7 +20,7 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
         filter = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             550.0f,
-            paramContext.resources.displayMetrics
+            paramContext!!.resources.displayMetrics
         ).toInt()
     }
 
@@ -41,17 +41,17 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext),
             val f1 = abs(paramFloat2)
             if (f2 > filter && f2 > range * f1) {
                 bool1 = if (paramFloat1 > 0.0f) {
-                    this.gestureViewDelegate?.onASGestureReceivedGestureRight()
+                    this.gestureViewDelegate!!.onASGestureReceivedGestureRight()
                 } else {
-                    this.gestureViewDelegate?.onASGestureReceivedGestureLeft()
+                    this.gestureViewDelegate!!.onASGestureReceivedGestureLeft()
                 }
             } else {
                 if (f1 > filter) {
-                    if (f1 > range * f2) bool1 = if (paramFloat2 > 0.0f) {
-                        this.gestureViewDelegate?.onASGestureReceivedGestureDown()
+                    if (f1 > range * f2) bool1 = (if (paramFloat2 > 0.0f) {
+                        this.gestureViewDelegate!!.onASGestureReceivedGestureDown()
                     } else {
-                        this.gestureViewDelegate?.onASGestureReceivedGestureUp()
-                    }
+                        this.gestureViewDelegate!!.onASGestureReceivedGestureUp()
+                    }) == true
                 }
             }
         }

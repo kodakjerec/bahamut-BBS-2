@@ -53,22 +53,22 @@ class TelnetModel {
     }
 
     fun getBlink(row: Int, column: Int): Boolean {
-        return this.telnetFrame?.getRow(row)?.blink[column]
+        return this.telnetFrame!!.getRow(row).blink[column]
     }
 
     fun getData(row: Int, column: Int): Int {
-        val data = this.telnetFrame?.getRow(row)?.data[column].toInt()
+        val data = this.telnetFrame!!.getRow(row).data[column].toInt()
         return data and 255
     }
 
     fun getTextColor(row: Int, column: Int): Int {
-        val data = this.telnetFrame?.getRow(row)?.textColor[column]
+        val data = this.telnetFrame!!.getRow(row).textColor[column]
         return TelnetAnsiCode.getTextColor(data)
     }
 
     fun getBackgroundColor(row: Int, column: Int): Int {
         val data = this.telnetFrame?.getRow(row)?.backgroundColor[column]
-        return TelnetAnsiCode.getBackgroundColor(data)
+        return TelnetAnsiCode.getBackgroundColor(data!!)
     }
 
     private fun cleanCursor(row: Int, column: Int) {
@@ -150,13 +150,13 @@ class TelnetModel {
     }
 
     val rows: Vector<TelnetRow>
-        get() = this.telnetFrame?.rows
+        get() = this.telnetFrame!!.rows
 
     val lastRow: TelnetRow
-        get() = this.telnetFrame?.latestRow
+        get() = this.telnetFrame!!.latestRow
 
     val firstRow: TelnetRow
-        get() = this.telnetFrame?.firstRow
+        get() = this.telnetFrame!!.firstRow
 
     var frame: TelnetFrame?
         get() = this.telnetFrame

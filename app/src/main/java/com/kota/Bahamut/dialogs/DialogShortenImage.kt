@@ -360,11 +360,11 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         // 最上層是 發文 或 看板
         val topPage = ASNavigationController.currentController?.topController
         if ((topPage as Any).javaClass == PostArticlePage::class.java) {
-            val aPage = PageContainer.instance?.postArticlePage
+            val aPage = PageContainer.instance?.postArticlePage!!
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.instance?.messageSub
-            aPage?.insertString(str)
+            val aPage = PageContainer.instance?.messageSub!!
+            aPage.insertString(str)
         }
     }
 

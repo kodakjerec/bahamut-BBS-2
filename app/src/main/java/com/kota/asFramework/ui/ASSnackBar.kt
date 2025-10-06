@@ -29,8 +29,8 @@ object ASSnackBar {
     @JvmStatic
     fun show(largeMessage: String, normalMessage: String?) {
         object : ASRunner() {
-            // from class: com.kota.ASFramework.UI.ASToast.1
-            // com.kota.ASFramework.Thread.ASRunner
+            // from class: com.kota.asFramework.ui.ASToast.1
+            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 if (previousSnackBar != null) {
                     previousSnackBar?.dismiss()
@@ -87,7 +87,7 @@ object ASSnackBar {
                     
                     // 靠上對齊
                     val view = previousSnackBar?.view
-                    val params = view.layoutParams as FrameLayout.LayoutParams
+                    val params = view!!.layoutParams as FrameLayout.LayoutParams
                     params.gravity = Gravity.TOP
                     if (TempSettings.myActivity != null) {
                         view.setBackgroundColor(

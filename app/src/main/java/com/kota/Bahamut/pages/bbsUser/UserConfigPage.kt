@@ -21,18 +21,15 @@ import java.util.Vector
 class UserConfigPage: TelnetPage() {
     private lateinit var mainLayout: RelativeLayout
     private lateinit var cantExpandLayout: LinearLayout
-    
-    override fun getPageLayout(): Int {
-        return R.layout.bbs_user_config_page
-    }
 
-    override fun getPageType(): Int {
-        return BahamutPage.BAHAMUT_USER_CONFIG_PAGE
-    }
+    override val pageLayout: Int
+        get() = R.layout.bbs_user_config_page
 
-    override fun isPopupPage(): Boolean {
-        return true
-    }
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_USER_CONFIG_PAGE
+
+    override val isPopupPage: Boolean
+        get() = true
 
     override fun onBackPressed(): Boolean {
         // 返回

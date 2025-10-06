@@ -88,8 +88,8 @@ open class ASNavigationControllerPushAnimation(
     private fun finish() {
         if (!this.isFinished) {
             object : ASRunner() {
-                // from class: com.kota.ASFramework.PageController.ASNavigationControllerPushAnimation.3
-                // com.kota.ASFramework.Thread.ASRunner
+                // from class: com.kota.asFramework.pageController.ASNavigationControllerPushAnimation.3
+                // com.kota.asFramework.thread.ASRunner
                 override fun run() {
                     this@ASNavigationControllerPushAnimation.onAnimationFinished()
                 }

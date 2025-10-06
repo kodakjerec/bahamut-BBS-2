@@ -70,7 +70,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     }
 
     @SuppressLint("Range")
-    fun getUrl(url: String?): Vector<String?>? {
+    fun getUrl(url: String): Vector<String> {
         try {
             val db = readableDatabase
             val columns = arrayOf<String?>("url", "title", "description", "imageUrl", "isPic")
@@ -81,7 +81,7 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
 
             if (cursor.moveToFirst()) {
                 // 新資料
-                val data = Vector<String?>()
+                val data = Vector<String>()
                 data.add(cursor.getString(cursor.getColumnIndex("url")))
                 data.add(cursor.getString(cursor.getColumnIndex("title")))
                 data.add(cursor.getString(cursor.getColumnIndex("description")))
@@ -97,10 +97,10 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
                 cursor.close()
                 db.close()
 
-                return null
+                return Vector<String>()
             }
         } catch (_: Exception) {
-            return null
+            return Vector<String>()
         }
     }
 

@@ -21,14 +21,14 @@ abstract class TelnetStateHandler {
     }
 
     fun getRowString(row: Int): String {
-        if (TelnetClient.client?.model != null) {
-            return TelnetClient.client?.model?.getRowString(row)
+        if (TelnetClient.client!!.model != null) {
+            return TelnetClient.client!!.model!!.getRowString(row)
         }
         return ""
     }
 
     val rows: Vector<TelnetRow>
-        get() = TelnetClient.client?.model?.rows
+        get() = TelnetClient.client!!.model!!.rows
 
     open fun clear() {
     }

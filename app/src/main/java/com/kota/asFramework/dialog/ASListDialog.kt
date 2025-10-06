@@ -34,7 +34,7 @@ class ASListDialog : ASDialog() {
         return this
     }
 
-    // com.kota.ASFramework.Dialog.ASDialog
+    // com.kota.asFramework.dialog.ASDialog
     fun getName(): String {
         return "ListDialog"
     }

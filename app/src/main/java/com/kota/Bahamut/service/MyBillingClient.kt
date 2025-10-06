@@ -173,14 +173,14 @@ object MyBillingClient {
                         val jsonObject = JSONObject(data)
                         val buyQty = jsonObject.optString("qty", "0").toInt()
                         if (buyQty > 0) {
-                            UserSettings.setPropertiesVIP(true)
+                            UserSettings.propertiesVIP = true
                         } else {
-                            UserSettings.setPropertiesVIP(false)
+                            UserSettings.propertiesVIP = false
                         }
                         callback(buyQty)
                     } else {
                         // HTTP error response
-                        UserSettings.setPropertiesVIP(false)
+                        UserSettings.propertiesVIP = false
                         callback(0)
                     }
                 }

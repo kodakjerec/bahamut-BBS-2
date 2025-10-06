@@ -16,7 +16,7 @@ class TelnetContainer<ObjectType> {
     }
 
     fun get(index: Int): ObjectType? {
-        if (index < 0 || index > this.maxIndex || this.objectContainer == null || !this.objectContainer?.containsKey(
+        if (index < 0 || index > this.maxIndex || this.objectContainer == null || !this.objectContainer!!.containsKey(
                 index
             )
         ) {

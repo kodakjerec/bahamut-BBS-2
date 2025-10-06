@@ -28,8 +28,8 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer?> {
             Log.e("ERROR", "This buffer has been closed.")
             return this
         }
-        if (!this.writingBuffer?.hasRemaining()) {
-            this.writingBuffer?.flip()
+        if (!this.writingBuffer!!.hasRemaining()) {
+            this.writingBuffer!!.flip()
             this.writtenBuffers.add(this.writingBuffer)
             this.writingBuffer = createByteBuffer()
         }
@@ -74,7 +74,7 @@ class MutableByteBuffer private constructor() : Iterable<ByteBuffer?> {
         var position = 0
         try {
             for (buffer in this) {
-                for (i in 0..<buffer?.limit()) {
+                for (i in 0..<buffer!!.limit()) {
                     data[position] = buffer.get(i)
                     position++
                     if (position == this.bufferSize) {

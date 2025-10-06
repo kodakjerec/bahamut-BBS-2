@@ -396,23 +396,23 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     open val pageLayout: Int
-        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
+        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
         get() = R.layout.board_page
 
     open val pageType: Int
-        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
+        // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
         get() = BahamutPage.BAHAMUT_BOARD
 
     open val isAutoLoadEnable: Boolean
         // com.kota.Bahamut.ListPage.TelnetListPage
         get() = true
 
-    // com.kota.ASFramework.UI.ASListViewExtentOptionalDelegate
+    // com.kota.asFramework.ui.ASListViewExtentOptionalDelegate
     override fun onASListViewHandleExtentOptional(aSListView: ASListView?, i: Int): Boolean {
         return false
     }
 
-    @SuppressLint("ClickableViewAccessibility")  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
+    @SuppressLint("ClickableViewAccessibility")  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidLoad() {
         super.onPageDidLoad()
 
@@ -685,7 +685,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     protected override fun onMenuButtonClicked(): Boolean {
         mMenuButtonListener.onClick(null)
         return true
@@ -747,7 +747,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         return false
     }
 
-    @Synchronized  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
+    @Synchronized  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
         super.onPageRefresh()
         if (_refresh_header_view) {
@@ -756,7 +756,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         }
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     protected override fun onBackPressed(): Boolean {
         val drawerLayout = mainLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
         if (drawerLayout != null && drawerLayout.isDrawerOpen(drawerLocation)) {
@@ -776,7 +776,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         return true
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     protected override fun onSearchButtonClicked(): Boolean {
         showSearchArticleDialog()
         return true
@@ -855,7 +855,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         pushCommand(BahamutCommandListArticle(i))
     }
 
-    // com.kota.ASFramework.PageController.ASViewController
+    // com.kota.asFramework.pageController.ASViewController
     public override fun onReceivedGestureRight(): Boolean {
         if (propertiesGestureOnBoardEnable) {
             if (this.isDrawerOpen || _isDrawerOpening) {
@@ -1060,7 +1060,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     // 修改文章 訊息發出
-    // com.kota.Bahamut.Pages.PostArticlePage_Listener
+    // com.kota.Bahamut.pages.PostArticlePage_Listener
     override fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -1073,7 +1073,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     var timer: Timer? = null
 
     /** 發表文章/回覆文章 訊息發出  */
-    // com.kota.Bahamut.Pages.PostArticlePage_Listener
+    // com.kota.Bahamut.pages.PostArticlePage_Listener
     override fun onPostDialogSendButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String,
@@ -1139,7 +1139,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         dismissProcessingDialog()
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.ASFramework.PageController.ASViewController
+    // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     public override fun onPageDidAppear() {
         super.onPageDidAppear()
         _bookmark_adapter.notifyDataSetChanged()

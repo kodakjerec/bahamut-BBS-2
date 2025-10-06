@@ -51,25 +51,25 @@ class TelnetFrame {
     }
 
     fun getPositionBitSpace(row: Int, column: Int): Byte {
-        return getRow(row)?.bitSpace[column]
+        return getRow(row).bitSpace[column]
     }
 
     fun getPositionBlink(row: Int, column: Int): Boolean {
-        return getRow(row)?.blink[column]
+        return getRow(row).blink[column]
     }
 
     fun getPositionData(row: Int, column: Int): Int {
-        val data = getRow(row)?.data[column].toInt()
+        val data = getRow(row).data[column].toInt()
         return data and 255
     }
 
     fun getPositionTextColor(row: Int, column: Int): Int {
-        val colorIndex = getRow(row)?.textColor[column]
+        val colorIndex = getRow(row).textColor[column]
         return TelnetAnsiCode.getTextColor(colorIndex)
     }
 
     fun getPositionBackgroundColor(row: Int, column: Int): Int {
-        val colorIndex = getRow(row)?.backgroundColor[column]
+        val colorIndex = getRow(row).backgroundColor[column]
         return TelnetAnsiCode.getBackgroundColor(colorIndex)
     }
 

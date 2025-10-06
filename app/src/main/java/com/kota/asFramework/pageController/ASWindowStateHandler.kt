@@ -51,18 +51,18 @@ object ASWindowStateHandler {
         // 使用適合的 API 獲取顯示器指標
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // API 30+ 使用 WindowMetrics
-            val windowMetrics = activity?.windowManager.currentWindowMetrics
+            val windowMetrics = activity!!.windowManager.currentWindowMetrics
             val bounds = windowMetrics.bounds
             screenWidthPx = bounds.width()
             screenHeightPx = bounds.height()
             // 從 resources 獲取 density 相關資訊
-            displayMetrics.density = activity?.resources.displayMetrics.density
-            displayMetrics.xdpi = activity?.resources.displayMetrics.xdpi
-            displayMetrics.ydpi = activity?.resources.displayMetrics.ydpi
+            displayMetrics.density = activity!!.resources.displayMetrics.density
+            displayMetrics.xdpi = activity!!.resources.displayMetrics.xdpi
+            displayMetrics.ydpi = activity!!.resources.displayMetrics.ydpi
         } else {
             // API 29 及以下使用傳統方法
             @Suppress("DEPRECATION")
-            activity?.windowManager.defaultDisplay.getMetrics(displayMetrics)
+            activity!!.windowManager.defaultDisplay.getMetrics(displayMetrics)
             screenWidthPx = displayMetrics.widthPixels
             screenHeightPx = displayMetrics.heightPixels
         }
@@ -84,7 +84,7 @@ object ASWindowStateHandler {
             // 舊版本的處理方式
             val rect = Rect()
             val window = activity?.window
-            window.decorView.getWindowVisibleDisplayFrame(rect)
+            window!!.decorView.getWindowVisibleDisplayFrame(rect)
             statusBarHeight = rect.top
             val contentView = window.findViewById<View>(id.content)
             val i = contentView?.top ?: 0

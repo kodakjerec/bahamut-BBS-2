@@ -60,7 +60,7 @@ class DialogPushArticle:ASDialog() {
     private val sendOnClickListener = OnClickListener {_->
         isClickButton = true
         var sendContent = ""
-        if (content1.text?.isNotEmpty())
+        if (content1.text?.isNotEmpty() == true)
             sendContent += content1.text.toString()
         if (sendContent.isNotEmpty()) {
             val builder = TelnetOutputBuilder.create()

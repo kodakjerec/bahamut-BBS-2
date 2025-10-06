@@ -124,7 +124,7 @@ class TelnetChannel(aSocketChannel: TelnetSocketChannel) {
         val data = ByteArray(this.outputBuffer.size())
         var position = 0
         for (outputBuffer in this.outputBuffer) {
-            for (i in 0..<outputBuffer?.limit()) {
+            for (i in 0..<outputBuffer!!.limit()) {
                 data[position] = outputBuffer.array()[i]
                 position++
             }

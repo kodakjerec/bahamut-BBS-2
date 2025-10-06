@@ -70,39 +70,39 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
         }
     }
 
-    // com.kota.ASFramework.PageController.ASGestureViewDelegate
+    // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureDisPathTouchEvent(paramMotionEvent: MotionEvent?) {
         this.contentView?.dispatchTouchEvent(paramMotionEvent)
     }
 
-    // com.kota.ASFramework.PageController.ASGestureViewDelegate
+    // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureUp(): Boolean {
         if (this.pageController != null) {
-            return this.pageController?.onReceivedGestureUp()
+            return this.pageController!!.onReceivedGestureUp()
         }
         return false
     }
 
-    // com.kota.ASFramework.PageController.ASGestureViewDelegate
+    // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureDown(): Boolean {
         if (this.pageController != null) {
-            return this.pageController?.onReceivedGestureDown()
+            return this.pageController!!.onReceivedGestureDown()
         }
         return false
     }
 
-    // com.kota.ASFramework.PageController.ASGestureViewDelegate
+    // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureLeft(): Boolean {
         if (this.pageController != null) {
-            return this.pageController?.onReceivedGestureLeft()
+            return this.pageController!!.onReceivedGestureLeft()
         }
         return false
     }
 
-    // com.kota.ASFramework.PageController.ASGestureViewDelegate
+    // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureReceivedGestureRight(): Boolean {
         if (this.pageController != null) {
-            return this.pageController?.onReceivedGestureRight()
+            return this.pageController!!.onReceivedGestureRight()
         }
         return false
     }
