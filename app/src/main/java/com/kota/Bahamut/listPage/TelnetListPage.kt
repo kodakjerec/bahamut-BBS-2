@@ -540,7 +540,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return itemIndex / 20
     }
 
-    fun setBlock(blockIndex: Int, aBlock: TelnetListPageBlock?) {
+    fun setBlock(blockIndex: Int, aBlock: TelnetListPageBlock) {
         blockList.put(blockIndex, aBlock)
     }
 

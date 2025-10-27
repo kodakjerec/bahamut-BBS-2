@@ -556,7 +556,7 @@ class ArticlePage : TelnetPage() {
                             5 -> onExternalToolbarClicked()
                             6 -> onAddBlockListClicked()
                             7 -> onOpenLinkClicked()
-                            8 -> boardMainPage?.FSendMail()
+                            8 -> boardMainPage?.funSendMail()
                             9 -> onLoadAllImageClicked()
                             else -> {}
                         }

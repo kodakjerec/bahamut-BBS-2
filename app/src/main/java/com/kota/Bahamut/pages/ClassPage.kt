@@ -56,10 +56,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         val listView1: ListView = mainLayout.findViewById(R.id.ClassPage_listView)
         listView1.emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
         listView = listView1
-        mainLayout.findViewById<View>(R.id.ClassPage_SearchButton)?.setOnClickListener(this)
-        mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton)?.setOnClickListener(this)
-        mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton)
-            ?.setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
+        mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
@@ -71,7 +70,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             val timer = Timer()
             val task1: TimerTask = object : TimerTask() {
                 override fun run() {
-                    TelnetClient.myInstance?.sendStringToServerInBackground("sChat")
+                    TelnetClient.myInstance!!.sendStringToServerInBackground("sChat")
                 }
             }
             timer.schedule(task1, 300)
@@ -87,7 +86,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         }
 
         val headerView =
-            mainLayout.findViewById<TelnetHeaderItemView?>(R.id.ClassPage_headerView)
+            mainLayout.findViewById<TelnetHeaderItemView>(R.id.ClassPage_headerView)
         if (headerView != null) {
             if (!TempSettings.lastVisitBoard.isEmpty()) {
                 val finalLastVisitBoard = TempSettings.lastVisitBoard
@@ -100,7 +99,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     detail2.bringToFront()
                     detail2.text = lastVisitBoard
                     detail2.setOnClickListener { v: View? ->
-                        TelnetClient.myInstance?.sendStringToServer("s$finalLastVisitBoard")
+                        TelnetClient.myInstance!!.sendStringToServer("s$finalLastVisitBoard")
                     }
                 }
             }
@@ -111,9 +110,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
     override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.instance?.popClassPage()
+        PageContainer.instance!!.popClassPage()
         navigationController.popViewController()
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -160,8 +159,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index1: Int ->
                     if (index1 == 1) {
-                        TelnetClient.myInstance!!
-                            .sendStringToServerInBackground("$itemIndex\nd")
+                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex\nd")
                         this@ClassPage.loadLastBlock()
                     }
                 }.scheduleDismissOnPageDisappear(this).show()
@@ -174,8 +172,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index12: Int ->
                     if (index12 == 1) {
-                        TelnetClient.myInstance!!
-                            .sendStringToServerInBackground("$itemIndex2\na")
+                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex2\na")
                     }
                 }.show()
             return true
@@ -203,7 +200,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }
-                    TelnetClient.myInstance?.sendStringToServerInBackground("s$board")
+                    TelnetClient.myInstance!!.sendStringToServerInBackground("s$board")
 
                     SearchBoardHandler.instance.clear()
                 }
@@ -229,7 +226,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         .sendToServerInBackground()
                     return@setListener
                 }
-                TelnetClient.myInstance?.sendStringToServerInBackground("s$boardName")
+                TelnetClient.myInstance!!.sendStringToServerInBackground("s$boardName")
                 SearchBoardHandler.instance.clear()
             }.scheduleDismissOnPageDisappear(this).show()
     }
@@ -249,8 +246,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         val item = getItem(index) as ClassPageItem
 
         if (item.isDirectory) {
-            PageContainer.instance?.pushClassPage(item.name, item.title)
-            navigationController.pushViewController(PageContainer.instance?.classPage)
+            PageContainer.instance!!.pushClassPage(item.name, item.title)
+            navigationController.pushViewController(PageContainer.instance!!.classPage)
         } else {
             val page = PageContainer.instance!!.boardPage
             page.prepareInitial()

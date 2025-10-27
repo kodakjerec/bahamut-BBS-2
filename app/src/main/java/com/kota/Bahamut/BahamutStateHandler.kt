@@ -103,7 +103,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
      * 接收到訊息
      */
     fun detectMessage() {
-        val column = this.telnetCursor?.column
+        val column = this.telnetCursor!!.column
         val row: TelnetRow? = TelnetClient.model.getRow(23)
         val nameBuffer = ByteArrayOutputStream(80)
         val msgBuffer = ByteArrayOutputStream(80)
@@ -410,7 +410,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleMailBoxPage() {
         currentPage = BahamutPage.BAHAMUT_MAIL_BOX
-        if (this.telnetCursor?.column == 1) {
+        if (this.telnetCursor!!.column == 1) {
             val page: MailBoxPage = PageContainer.instance!!.mailBoxPage
             if (page.onPagePreload()) {
                 showPage(page)
@@ -422,7 +422,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         if (this.rowStringFinal.startsWith("★ 列表") && this.telnetCursor!!.equals(23, 29)) {
             SearchBoardHandler.instance.read()
             TelnetClient.myInstance?.sendKeyboardInputToServer(67)
-        } else if (this.telnetCursor?.row == 1) {
+        } else if (this.telnetCursor!!.row == 1) {
             SearchBoardHandler.instance.read()
             val data = create().pushKey(TelnetKeyboard.CTRL_Y).pushString("\n\n").build()
             TelnetClient.myInstance?.sendDataToServer(data)
@@ -437,11 +437,17 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleClassPage() {
         currentPage = BahamutPage.BAHAMUT_CLASS
+        if (this.telnetCursor!!.column == 1) {
+            val page: ClassPage = PageContainer.instance!!.classPage
+            if (page.onPagePreload()) {
+                showPage(page)
+            }
+        }
     }
 
     fun handleBoardPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD
-        if (this.telnetCursor?.column == 1) {
+        if (this.telnetCursor!!.column == 1) {
             val page: BoardMainPage = PageContainer.instance!!.boardPage
             if (page.onPagePreload()) {
                 showPage(page)
@@ -451,7 +457,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleBoardSearchPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_SEARCH
-        if (this.telnetCursor?.column == 1) {
+        if (this.telnetCursor!!.column == 1) {
             val page: BoardSearchPage = PageContainer.instance!!.boardSearchPage
             if (page.onPagePreload()) {
                 showPage(page)
@@ -461,7 +467,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleBoardEssencePage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_ESSENCE
-        if (this.telnetCursor?.column == 1) {
+        if (this.telnetCursor!!.column == 1) {
             val page: BoardEssencePage = PageContainer.instance!!.boardEssencePage
             if (page.onPagePreload()) {
                 showPage(page)
@@ -471,7 +477,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     fun handleBoardTitleLinkedPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_LINK
-        if (this.telnetCursor?.column == 1) {
+        if (this.telnetCursor!!.column == 1) {
             val page: BoardLinkPage = PageContainer.instance!!.boardLinkedTitlePage
             if (page.onPagePreload()) {
                 showPage(page)
