@@ -44,7 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Dialogs.DialogShortenImage"
+        <activity android:name=".dialogs.DialogShortenImage"
             android:theme="@style/Dialog.NoTitleBar"
             android:configChanges="orientation|screenSize" />
         <receiver
@@ -59,7 +59,7 @@
         </receiver>
 
         <service
-            android:name=".Service.BahaBBSBackgroundService"
+            android:name=".service.BahaBBSBackgroundService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="remoteMessaging" />

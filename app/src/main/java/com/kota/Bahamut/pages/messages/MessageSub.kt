@@ -156,7 +156,6 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                     // 送出訊息指令
                     sendMessagePart1()
 
-
                     // 預設送出完畢
                     contentField.setText("")
                 }

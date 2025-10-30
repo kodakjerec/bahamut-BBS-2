@@ -5,25 +5,25 @@ import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
-import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.pages.boardPage.BoardHeaderView
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardEssencePageItemView
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.ui.ASListView
+import com.kota.asFramework.ui.ASToast
+import com.kota.telnet.TelnetClient
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnet.TelnetClient
 
 class BoardEssencePage : TelnetListPage() {
     private lateinit var mainLayout:RelativeLayout
@@ -55,9 +55,9 @@ class BoardEssencePage : TelnetListPage() {
     }
     override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.instance?.popBoardEssencePage()
+        PageContainer.instance!!.popBoardEssencePage()
         navigationController.popViewController()
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -65,7 +65,7 @@ class BoardEssencePage : TelnetListPage() {
         get() = false
 
     override fun loadPage(): TelnetListPageBlock {
-        return BoardEssencePageHandler.instance?.load()!!
+        return BoardEssencePageHandler.instance!!.load()!!
     }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
@@ -144,13 +144,13 @@ class BoardEssencePage : TelnetListPage() {
                 ASToast.showShortToast("找沒有了耶...:(")
             } else {
                 // 進入目錄
-                PageContainer.instance?.pushBoardEssencePage(name, myTitle)
-                navigationController.pushViewController(PageContainer.instance?.boardEssencePage)
+                PageContainer.instance!!.pushBoardEssencePage(name, myTitle)
+                navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
                 super.loadItemAtIndex(index)
             }
         } else {
             // 文章
-            val articleEssencePage = PageContainer.instance?.myArticleEssencePage!!
+            val articleEssencePage = PageContainer.instance!!.getArticleEssencePage()
             articleEssencePage.setBoardEssencePage(this)
             articleEssencePage.clear()
             navigationController.pushViewController(articleEssencePage)

@@ -35,7 +35,7 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
     private fun receiveData(): Boolean {
         var result = true
         try {
-            val data = readData()
+            val data: Byte = readData()
             if (data.toInt() == -1) {
                 val action = readData()
                 val option = readData()
