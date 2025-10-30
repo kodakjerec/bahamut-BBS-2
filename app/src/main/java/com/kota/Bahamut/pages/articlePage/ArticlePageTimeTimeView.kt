@@ -29,26 +29,26 @@ class ArticlePageTimeTimeView : RelativeLayout, TelnetArticleItemView {
     }
 
     fun init() {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
+        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
             R.layout.article_page_time_item_view,
             this
         )
-        timeLabel = findViewById<TextView?>(R.id.ArticleTimeItemView_Time)
-        ipLabel = findViewById<TextView?>(R.id.ArticleTimeItemView_IP)
+        timeLabel = findViewById(R.id.ArticleTimeItemView_Time)
+        ipLabel = findViewById(R.id.ArticleTimeItemView_IP)
     }
 
-    fun setTime(aTime: String?) {
+    fun setTime(aTime: String) {
         if (timeLabel != null) {
-            timeLabel?.setText(aTime)
+            timeLabel?.text = aTime
         }
     }
 
-    fun setIP(aIP: String?) {
+    fun setIP(aIP: String) {
         if (ipLabel != null) {
-            ipLabel?.setText(aIP)
+            ipLabel?.text = aIP
         }
     }
 
     override val type: Int
-        get() = ArticlePageItemType.Companion.PostTime
+        get() = ArticlePageItemType.Companion.POST_TIME
 }

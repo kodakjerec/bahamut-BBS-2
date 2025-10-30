@@ -148,12 +148,12 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
         if (itemViewOrigin == null) {
             itemViewOrigin = when (type) {
-                ArticlePageItemType.Sign -> ArticlePageTelnetItemView(context)
-                ArticlePageItemType.Header -> ArticlePageHeaderItemView(context)
-                ArticlePageItemType.PostTime -> ArticlePageTimeTimeView(context)
+                ArticlePageItemType.SIGN -> ArticlePageTelnetItemView(context)
+                ArticlePageItemType.HEADER -> ArticlePageHeaderItemView(context)
+                ArticlePageItemType.POST_TIME -> ArticlePageTimeTimeView(context)
                 else -> ArticlePageTextItemView(context)
             }
-        } else if (type == ArticlePageItemType.Content) {
+        } else if (type == ArticlePageItemType.CONTENT) {
             itemViewOrigin = ArticlePageTextItemView(context)
         }
 
@@ -181,7 +181,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             itemViewOrigin.setData(telnetArticle?.title, author, telnetArticle?.boardName)
         } else if (itemViewOrigin is ArticlePageTimeTimeView) {
             itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
-            itemViewOrigin.setIP(telnetArticle?.fromIP)
+            itemViewOrigin.setIP(telnetArticle?.fromIP!!)
         }
         return itemViewOrigin
     }

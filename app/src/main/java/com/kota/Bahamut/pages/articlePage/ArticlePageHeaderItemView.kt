@@ -21,7 +21,7 @@ class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(contex
     var detailTextView1: TextView
 
     override val type: Int
-        get() = ArticlePageItemType.Companion.Header
+        get() = ArticlePageItemType.Companion.HEADER
 
     /** 點標題  */
     var titleClickListener: OnClickListener = OnClickListener { view: View? ->

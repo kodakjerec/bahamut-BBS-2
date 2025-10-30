@@ -1,19 +1,19 @@
 package com.kota.telnet.logic
 
-import com.kota.telnet.model.TelnetModel
-import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetArticleItemInfo
 import com.kota.telnet.TelnetArticlePage
 import com.kota.telnet.TelnetArticlePush
+import com.kota.telnet.model.TelnetModel
+import com.kota.telnet.model.TelnetRow
 import java.util.Vector
 import java.util.regex.Pattern
 
 class ArticleHandler {
     var article: TelnetArticle = TelnetArticle()
-    var articlePage: TelnetArticlePage? = null
-    var pages: Vector<TelnetArticlePage?>? = Vector<TelnetArticlePage?>()
+    var lastPage: TelnetArticlePage? = null
+    var pages: Vector<TelnetArticlePage> = Vector<TelnetArticlePage>()
 
     fun loadPage(aModel: TelnetModel?) {
         var pageIndex: Int = -1
@@ -26,12 +26,12 @@ class ArticleHandler {
             for (sourceIndex in startLine..22) {
                 page.addRow(aModel.getRow(sourceIndex)!!)
             }
-            pages?.add(page)
+            pages.add(page)
         }
     }
 
     fun loadLastPage(aModel: TelnetModel?) {
-        var start = if (pages!!.isNotEmpty()) 1 else 0
+        var start = if (pages.isNotEmpty()) 1 else 0
         var end = 23
         while (start < 23 && aModel?.getRow(start)?.isEmpty == true) {
             start++
@@ -39,21 +39,18 @@ class ArticleHandler {
         while (end > start && aModel?.getRow(end)?.isEmpty == true) {
             end--
         }
-        var page = articlePage
-        if (page == null) {
-            page = TelnetArticlePage()
-        }
+        val page: TelnetArticlePage = lastPage ?: TelnetArticlePage()
         page.clear()
         for (i in start..<end) {
             page.addRow(aModel!!.getRow(i)!!)
         }
-        articlePage = page
+        lastPage = page
     }
 
     fun clear() {
         article.clear()
-        pages?.clear()
-        articlePage = null
+        pages.clear()
+        lastPage = null
     }
 
     /** 分析每行內容  */
@@ -338,24 +335,24 @@ class ArticleHandler {
     }
 
     private fun buildRows(rows: Vector<TelnetRow>) {
-        synchronized(pages!!) {
-            if (pages != null && pages!!.isNotEmpty()) {
-                val pageCount = pages?.size
-                for (pageIndex in 0..<pageCount!!) {
-                    addPage(pages!![pageIndex], rows)
+        synchronized(pages) {
+            if (pages != null && pages.isNotEmpty()) {
+                val pageCount = pages.size
+                for (pageIndex in 0..<pageCount) {
+                    addPage(pages[pageIndex], rows)
                 }
             }
-            if (articlePage != null) {
-                addPage(articlePage, rows)
+            if (lastPage != null) {
+                addPage(lastPage, rows)
             }
         }
     }
 
     private fun trimRows(rows: Vector<TelnetRow>) {
-        for (i in rows.indices) {
+        for (i in rows.size - 1 downTo 0) {
             val currentRow = rows[i]
-            if (currentRow.data[79].toInt() != 0 && i < rows.size - 1) {
-                val testRow = rows[i + 1]
+            if (currentRow!!.data[79].toInt() != 0 && i < rows.size - 1) {
+                val testRow: TelnetRow = rows[i + 1]
                 if (testRow.quoteSpace == 0 && testRow.quoteSpace < currentRow.quoteSpace) {
                     currentRow.append(testRow)
                     rows.removeAt(i + 1)

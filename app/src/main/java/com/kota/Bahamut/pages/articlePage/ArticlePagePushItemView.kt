@@ -55,7 +55,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
                 val start = ss.getSpanStart(span)
                 val end = ss.getSpanEnd(span)
                 ss.removeSpan(span)
-                ss.setSpan(myUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                ss.setSpan(MyUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
@@ -132,5 +132,5 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
     }
 
     override val type: Int
-        get() = ArticlePageItemType.Push
+        get() = ArticlePageItemType.PUSH
 }

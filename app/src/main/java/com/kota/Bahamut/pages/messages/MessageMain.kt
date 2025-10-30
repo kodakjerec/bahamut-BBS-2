@@ -306,7 +306,6 @@ class MessageMain:TelnetPage() {
         // 创建一个新的列表，并复制传入的 rows 的内容
         val rows: Vector<TelnetRow> = Vector(fromRows)
 
-        rows.forEach { row -> println(row) }
         for (i in 3 until rows.size step 1) {
             val row = rows[i]
             val item = MessageMainListItemStructure()

@@ -100,17 +100,17 @@ class ArticlePage : TelnetPage() {
         override fun getItemViewType(itemIndex: Int): Int {
             if (itemIndex == 0) {
                 // header
-                return ArticlePageItemType.Companion.Header
+                return ArticlePageItemType.Companion.HEADER
             } else if (itemIndex == getCount() - 1 - pushLength) {
                 // postTime
-                return ArticlePageItemType.Companion.PostTime
+                return ArticlePageItemType.Companion.POST_TIME
             } else if (itemIndex >= getCount() - pushLength) {
                 // push
-                return ArticlePageItemType.Companion.Push
+                return ArticlePageItemType.Companion.PUSH
             }
             // content
             val returnItem = getItem(itemIndex)
-            return returnItem?.type ?: ArticlePageItemType.Companion.Content
+            return returnItem?.type ?: ArticlePageItemType.Companion.CONTENT
         }
 
         // android.widget.Adapter
@@ -122,24 +122,24 @@ class ArticlePage : TelnetPage() {
 
             if (itemViewOrigin == null) {
                 when (type) {
-                    ArticlePageItemType.Companion.Sign -> itemViewOrigin =
+                    ArticlePageItemType.Companion.SIGN -> itemViewOrigin =
                         ArticlePageTelnetItemView(context)
 
-                    ArticlePageItemType.Companion.Header -> itemViewOrigin =
+                    ArticlePageItemType.Companion.HEADER -> itemViewOrigin =
                         ArticlePageHeaderItemView(context)
 
-                    ArticlePageItemType.Companion.PostTime -> itemViewOrigin =
+                    ArticlePageItemType.Companion.POST_TIME -> itemViewOrigin =
                         ArticlePageTimeTimeView(context)
 
-                    ArticlePageItemType.Companion.Push -> itemViewOrigin =
+                    ArticlePageItemType.Companion.PUSH -> itemViewOrigin =
                         ArticlePagePushItemView(context!!)
 
                     else -> {
-                        type = ArticlePageItemType.Companion.Content
+                        type = ArticlePageItemType.Companion.CONTENT
                         itemViewOrigin = ArticlePageTextItemView(context)
                     }
                 }
-            } else if (type == ArticlePageItemType.Companion.Content) {
+            } else if (type == ArticlePageItemType.Companion.CONTENT) {
                 itemViewOrigin = ArticlePageTextItemView(context)
             }
 
@@ -772,8 +772,7 @@ class ArticlePage : TelnetPage() {
         if (articleMode == ArticleViewMode.Companion.MODE_TELNET) {
             enable = true
         }
-        println("enable:$enable")
-        println("article_mode:$articleMode")
+
         val toolbarView = mainLayout!!.findViewById<View>(R.id.ext_toolbar)
         if (toolbarView != null) {
             toolbarView.visibility = if (enable) View.VISIBLE else View.GONE
@@ -793,8 +792,8 @@ class ArticlePage : TelnetPage() {
                 return
             }
             val listDialog = ASListDialog.createDialog()
-            for (urlspan in urls) {
-                listDialog.addItem(urlspan.url)
+            for (url in urls) {
+                listDialog.addItem(url.url)
             }
             listDialog.setListener(object : ASListDialogItemClickListener {
                 // com.kota.asFramework.dialog.ASListDialogItemClickListener

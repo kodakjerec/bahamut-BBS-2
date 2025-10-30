@@ -7,8 +7,8 @@ import com.kota.Bahamut.R
 
 class DialogShortenUrlViewHolder(view: View, var mListener: DialogShortenUrlItemViewListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
-    private val title: TextView? = view.findViewById(R.id.thumbnail_title)
-    private val description: TextView? = view.findViewById(R.id.thumbnail_description)
+    private val title: TextView? = view.findViewById(R.id.shorten_url_title)
+    private val description: TextView? = view.findViewById(R.id.shorten_url_description)
     var index: Int = 0
 
     init {

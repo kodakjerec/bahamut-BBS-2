@@ -1,14 +1,13 @@
 package com.kota.Bahamut.pages.login
 
 import android.content.Context
-import android.view.View.OnClickListener
 import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.LinearLayout
+import com.kota.Bahamut.R
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.R
 
 class LoginWebDebugView(private val context: Context) : ASDialog() {
     private var mainLayout: LinearLayout
@@ -74,7 +73,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
     private fun setDialogWidthHeight() {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val screenHeight = context.resources.displayMetrics.heightPixels
-        val dialogWidth = (screenWidth * 0.7).toInt()
+        val dialogWidth = (screenWidth * 0.8).toInt()
         val dialogHeight = (screenHeight * 0.8).toInt()
         val oldLayoutParams: ViewGroup.LayoutParams = mainLayout.layoutParams
         oldLayoutParams.width = dialogWidth

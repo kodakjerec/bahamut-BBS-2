@@ -99,6 +99,9 @@ class MainPage : TelnetPage() {
         get() = BahamutPage.BAHAMUT_MAIN
 
     override fun onPageDidLoad() {
+        // 重置設定
+        BahamutStateHandler.getInstance().duringReadingArticle = false
+
         mainLayout = findViewById(R.id.content_view) as RelativeLayout?
         mainLayout?.findViewById<View>(R.id.Main_BoardsButton)!!
             .setOnClickListener(this.boardsListener)

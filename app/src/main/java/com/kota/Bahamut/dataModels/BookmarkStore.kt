@@ -3,6 +3,7 @@ package com.kota.Bahamut.dataModels
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.NotificationSettings.getCloudSave
 import com.kota.Bahamut.service.TempSettings
@@ -15,7 +16,6 @@ import java.io.IOException
 import java.io.InputStream
 import java.io.ObjectInputStream
 import java.util.Vector
-import androidx.core.content.edit
 
 /*
  書籤清單的儲存
@@ -52,16 +52,16 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
                 for (i in 0..<bookmarkList.bookmarkSize) {
                     val bookmark =
                         bookmarkList.getBookmark(i)
-                    bookmark?.index = i
-                    bookmark?.optional =
+                    bookmark.index = i
+                    bookmark.optional =
                         Bookmark.Companion.OPTIONAL_BOOKMARK
                     totalList.add(bookmark)
                 }
                 for (i2 in 0..<bookmarkList.historyBookmarkSize) {
                     val bookmark2 =
                         bookmarkList.getHistoryBookmark(i2)
-                    bookmark2?.index = i2
-                    bookmark2?.optional =
+                    bookmark2.index = i2
+                    bookmark2.optional =
                         Bookmark.Companion.OPTIONAL_STORY
                     totalList.add(bookmark2)
                 }
@@ -69,7 +69,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
             for (i3 in 0..<this.globalBookmarks.bookmarkSize) {
                 val bookmark3 =
                     this.globalBookmarks.getBookmark(i3)
-                bookmark3?.index = i3
+                bookmark3.index = i3
                 totalList.add(bookmark3)
             }
             return totalList
@@ -150,8 +150,8 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         ) {
             try {
                 importFromJSON(JSONObject(saveData!!))
-            } catch (e2: JSONException) {
-                e2.printStackTrace()
+            } catch (_: JSONException) {
+//                e2.printStackTrace()
             }
         }
         return this

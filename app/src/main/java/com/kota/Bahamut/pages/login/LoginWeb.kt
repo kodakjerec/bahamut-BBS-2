@@ -9,10 +9,9 @@ import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
-
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.thread.ASRunner
 
 class LoginWeb(private val context: Context, private val externalWebView: WebView? = null) {
     
@@ -123,8 +122,10 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                 // 統一的簽到對話框檢測函數
                 window.startSigningCheck = function() {
                     console.log('開始檢測簽到對話框...');
-                    if (typeof Signing !== 'undefined') {
-                        Signing.mobile();
+                    
+                    // 呼叫簽到框
+                    if (typeof Signin !== 'undefined') {
+                        Signin.showSigninMap();
                     }
 
                     var startTime = Date.now();

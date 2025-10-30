@@ -32,7 +32,7 @@ class ArticlePageTelnetItemView(context: Context?) : LinearLayout(context), Teln
     }
 
     override val type: Int
-        get() = ArticlePageItemType.Companion.Sign
+        get() = ArticlePageItemType.Companion.SIGN
 
     fun setDividerHidden(isHidden: Boolean) {
         if (isHidden) {

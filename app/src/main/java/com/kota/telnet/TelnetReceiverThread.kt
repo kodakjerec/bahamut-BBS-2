@@ -69,7 +69,8 @@ class TelnetReceiverThread(aConnector: TelnetConnector, aModel: TelnetModel) : T
         } catch (e: Exception) {
             if (BuildConfig.DEBUG) Log.e(
                 javaClass.simpleName,
-                (if (e.message != null) e.message else "")!!
+                (if (e.message != null) e.message else "")!!,
+                e
             )
 
             Log.v("SocketChannel", "receiveData Exception")

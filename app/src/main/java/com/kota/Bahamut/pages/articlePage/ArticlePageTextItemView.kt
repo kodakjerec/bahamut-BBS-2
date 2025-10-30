@@ -100,7 +100,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             val ssRawString = SpannableStringBuilder(row.rawString)
             if (ssRawString.isNotEmpty()) {
                 var startIndex = 0
-                val textColor: ByteArray = row.getTextColorArray()!!
+                val textColor: ByteArray = row.getTextColorArray()
                 var endIndex = 0
                 var paintTextColor: Byte = TelnetAnsi.DEFAULT_TEXT_COLOR
                 var startCatching = false
@@ -164,7 +164,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                 var paintBackColor: Byte = TelnetAnsi.DEFAULT_BACKGROUND_COLOR
                 // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
                 var needReplaceBackColor = false
-                for (i in backgroundColor!!.indices) {
+                for (i in backgroundColor.indices) {
                     if (backgroundColor[i] != paintBackColor) {
                         if ((i + 1) <= ssRawString.length) {
                             needReplaceBackColor = true
@@ -235,7 +235,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                 val start = ss.getSpanStart(span)
                 val end = ss.getSpanEnd(span)
                 ss.removeSpan(span)
-                ss.setSpan(myUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                ss.setSpan(MyUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }
@@ -436,7 +436,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     }
 
     override val type: Int
-        get() = ArticlePageItemType.Companion.Content
+        get() = ArticlePageItemType.Companion.CONTENT
 
     fun setDividerHidden(isHidden: Boolean) {
         if (isHidden) {

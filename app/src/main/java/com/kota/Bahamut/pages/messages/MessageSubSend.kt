@@ -11,7 +11,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
-import com.kota.Bahamut.pages.articlePage.myUrlSpan
+import com.kota.Bahamut.pages.articlePage.MyUrlSpan
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.UserSettings
@@ -78,7 +78,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                 val start = ss.getSpanStart(span)
                 val end = ss.getSpanEnd(span)
                 ss.removeSpan(span)
-                ss.setSpan(myUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                ss.setSpan(MyUrlSpan(span.url), start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
             }
         }
     }

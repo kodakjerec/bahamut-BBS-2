@@ -85,21 +85,21 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
             // 2-標題 0-本文 1-簽名檔 3-發文時間
             if (itemViewOrigin == null) {
                 itemViewOrigin = when (type) {
-                    ArticlePageItemType.Header ->
+                    ArticlePageItemType.HEADER ->
                         ArticlePageHeaderItemView(context)
-                    ArticlePageItemType.Sign ->
+                    ArticlePageItemType.SIGN ->
                         ArticlePageTelnetItemView(context)
-                    ArticlePageItemType.PostTime ->
+                    ArticlePageItemType.POST_TIME ->
                         ArticlePageTimeTimeView(context)
                     else ->
                         ArticlePageTextItemView(context)
                 }
-            } else if (type == ArticlePageItemType.Content) {
+            } else if (type == ArticlePageItemType.CONTENT) {
                 itemViewOrigin = ArticlePageTextItemView(context)
             }
 
             when (getItemViewType(itemIndex)) {
-                ArticlePageItemType.Header -> {
+                ArticlePageItemType.HEADER -> {
                     val itemView1 = itemViewOrigin as ArticlePageHeaderItemView
                     var author = ""
                     var title = ""
@@ -116,7 +116,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                     itemView1.setMenuButtonClickListener(mMenuListener)
                 }
 
-                ArticlePageItemType.Content -> {
+                ArticlePageItemType.CONTENT -> {
                     val itemView2 = itemViewOrigin as ArticlePageTextItemView
                     if (item!=null) {
                         itemView2.setAuthor(item.author, item.nickname)
@@ -130,7 +130,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                     }
                 }
 
-                ArticlePageItemType.Sign -> {
+                ArticlePageItemType.SIGN -> {
                     val itemView3 = itemViewOrigin as ArticlePageTelnetItemView
                     if (item!=null) {
                         itemView3.setFrame(item.frame!!)
@@ -142,10 +142,10 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                     }
                 }
 
-                ArticlePageItemType.PostTime -> {
+                ArticlePageItemType.POST_TIME -> {
                     val itemView4 = itemViewOrigin as ArticlePageTimeTimeView
                     itemView4.setTime("《" + telnetArticle?.dateTime + "》")
-                    itemView4.setIP(telnetArticle?.fromIP)
+                    itemView4.setIP(telnetArticle?.fromIP!!)
                 }
             }
             return itemViewOrigin
@@ -154,10 +154,10 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
 
         override fun getItemViewType(itemIndex: Int): Int {
             if (itemIndex == 0) {
-                return ArticlePageItemType.Header
+                return ArticlePageItemType.HEADER
             }
             return if (itemIndex == count - 1) {
-                ArticlePageItemType.PostTime
+                ArticlePageItemType.POST_TIME
             } else getItem(itemIndex)?.type!!
         }
 

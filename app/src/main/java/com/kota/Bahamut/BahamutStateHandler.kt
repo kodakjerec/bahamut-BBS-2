@@ -871,6 +871,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             if (bahamutStateHandler == null) {
                 bahamutStateHandler = BahamutStateHandler()
             }
+
             return bahamutStateHandler!!
         }
     }
