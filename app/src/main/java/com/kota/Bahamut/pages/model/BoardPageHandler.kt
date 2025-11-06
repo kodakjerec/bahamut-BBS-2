@@ -38,7 +38,7 @@ class BoardPageHandler private constructor() {
         }
         if (boardManagerEnd > boardManagerStart) {
             var boardManager = firstRowString.substring(boardManagerStart, boardManagerEnd)
-                .trim { it <= ' ' }
+                .trim()
             if (boardManager.length > 3 && boardManager.startsWith("板主：")) {
                 boardManager = boardManager.substring(3)
             }
@@ -70,7 +70,7 @@ class BoardPageHandler private constructor() {
         }
         if (boardNameEnd > boardNameStart) {
             boardPackage.boardName =
-                firstRowString.substring(boardNameStart, boardNameEnd).trim { it <= ' ' }
+                firstRowString.substring(boardNameStart, boardNameEnd).trim()
         }
         val boardTitleStart = boardManagerEnd + 1
         var boardTitleEnd = rowChar.size - 1
@@ -87,7 +87,7 @@ class BoardPageHandler private constructor() {
         }
         if (boardTitleEnd > boardTitleStart) {
             boardPackage.boardTitle =
-                firstRowString.substring(boardTitleStart, boardTitleEnd).trim { it <= ' ' }
+                firstRowString.substring(boardTitleStart, boardTitleEnd).trim()
         }
         if (boardPackage.boardManager == null || boardPackage.boardManager != "主題串列") {
             boardPackage.boardType = BoardPageAction.LIST
@@ -100,7 +100,7 @@ class BoardPageHandler private constructor() {
         val rowModel: TelnetModel = TelnetClient.model
         var isMoreThen10w = ""
         for (getRow in rowModel.rows) {
-            val checkChar = getRow.getSpaceString(0, 0).trim { it <= ' ' }
+            val checkChar = getRow.getSpaceString(0, 0).trim()
             if (checkChar.isNotEmpty() && checkChar[0] >= '1' && checkChar[0] <= '9') {
                 isMoreThen10w = checkChar
             }
@@ -115,8 +115,8 @@ class BoardPageHandler private constructor() {
             if (row==null) continue
 
             row.reloadSpace()
-            val articleSelected = row.getSpaceString(0, 0).trim { it <= ' ' }
-            var articleNumberStr = row.getSpaceString(1, 5).trim { it <= ' ' }
+            val articleSelected = row.getSpaceString(0, 0).trim()
+            var articleNumberStr = row.getSpaceString(1, 5).trim()
             // 應對十萬篇
             if (isMoreThen10w != "") articleNumberStr = isMoreThen10w + articleNumberStr
 
@@ -130,10 +130,10 @@ class BoardPageHandler private constructor() {
             if (articleNumber != 0) {
                 val info = row.data[7]
                 val gy = TelnetUtils.getIntegerFromData(row, 8, 9)
-                val date = row.getSpaceString(10, 14).trim { it <= ' ' }
-                val author = row.getSpaceString(16, 27).trim { it <= ' ' }
-                val originMark = row.getSpaceString(29, 30).trim { it <= ' ' }
-                val title = row.getSpaceString(31, 79).trim { it <= ' ' }
+                val date = row.getSpaceString(10, 14).trim()
+                val author = row.getSpaceString(16, 27).trim()
+                val originMark = row.getSpaceString(29, 30).trim()
+                val title = row.getSpaceString(31, 79).trim()
                 val item: BoardPageItem = BoardPageItem.Companion.create()
                 if (i6 == 3) {
                     boardPackage.minimumItemNumber = articleNumber

@@ -205,8 +205,6 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             .addItem(getContextString(R.string.board_main_read_all))
             .addItem(getContextString(R.string.board_main_unread_all))
             .setListener(object : ASListDialogItemClickListener {
-                
-
                 override fun onListDialogItemClicked(
                     paramASListDialog: ASListDialog?,
                     index: Int,
@@ -232,7 +230,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                     index: Int,
                     title: String?
                 ): Boolean {
-                    TODO("Not yet implemented")
+                    return true
                 }
             }).show()
     }

@@ -150,7 +150,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putInt(
                     PROPERTIES_DRAWER_LOCATION,
                     choice
-                )?.apply()
+                )?.commit()
             }
         @JvmStatic
         var propertiesToolbarLocation: Int
@@ -162,7 +162,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putInt(
                     PROPERTIES_TOOLBAR_LOCATION,
                     choice
-                )?.apply()
+                )?.commit()
             }
 
         @JvmStatic
@@ -175,7 +175,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putInt(
                     PROPERTIES_TOOLBAR_ORDER,
                     choice
-                )?.apply()
+                )?.commit()
             }
         @JvmStatic
         var propertiesScreenOrientation: Int
@@ -187,7 +187,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putInt(
                     PROPERTIES_SCREEN_ORIENTATION,
                     choice
-                ).apply()
+                ).commit()
             }
         @JvmStatic
         var propertiesVIP: Boolean
@@ -199,7 +199,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_VIP,
                     isEnable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -212,7 +212,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_AUTO_TO_CHAT,
                     isEnable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -225,7 +225,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_GESTURE_ON_BOARD,
                     isEnable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -238,7 +238,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_EXTRA_TOOLBAR_ENABLE,
                     isEnable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -251,7 +251,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putString(
                     PROPERTIES_USERNAME,
                     username
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -264,7 +264,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putString(
                     PROPERTIES_PASSWORD,
                     password
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -277,7 +277,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_SAVE_LOGON_USER,
                     save
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -290,13 +290,13 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_ANIMATION_DISABLE,
                     enable
-                ).apply()
+                ).commit()
             }
 
         /** 看板上一頁/下一頁  */
         @JvmStatic
         fun setPropertiesBoardMoveDisable(isDisable: Int) {
-            myEditor!!.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).apply()
+            myEditor!!.putInt(PROPERTIES_BOARD_MOVE_DISABLE, isDisable).commit()
         }
 
         @JvmStatic
@@ -309,7 +309,7 @@ class UserSettings(var myContext: Context) {
         /** 文章首篇/末篇  */
         @JvmStatic
         fun setPropertiesArticleMoveDisable(isDisable: Boolean) {
-            myEditor!!.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).apply()
+            myEditor!!.putBoolean(PROPERTIES_ARTICLE_MOVE_DISABLE, isDisable).commit()
         }
 
         @JvmStatic
@@ -320,7 +320,7 @@ class UserSettings(var myContext: Context) {
             )
 
         fun setPropertiesArticleViewState(state: Int) {
-            myEditor!!.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state).apply()
+            myEditor!!.putInt(PROPERTIES_ARTICLE_VIEW_MODE, state).commit()
         }
 
         @JvmStatic
@@ -348,12 +348,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun resetArticleHeaders() {
-            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, HEADERS_DEFAULT).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, HEADERS_DEFAULT).commit()
         }
 
         fun setArticleHeaders(stringList: MutableList<String>) {
             val saveString = java.lang.String.join(",", stringList)
-            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, saveString).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_HEADS, saveString).commit()
         }
 
 
@@ -370,12 +370,12 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         fun resetArticleExpressions() {
-            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, EXPRESSIONS_DEFAULT).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, EXPRESSIONS_DEFAULT).commit()
         }
 
         fun setArticleExpressions(stringList: MutableList<String>) {
             val saveString = java.lang.String.join(",", stringList)
-            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, saveString).apply()
+            myEditor!!.putString(PROPERTIES_ARTICLE_EXPRESSIONS, saveString).commit()
         }
 
         @JvmStatic
@@ -408,14 +408,14 @@ class UserSettings(var myContext: Context) {
                     showLongToast("黑名單至少保留guest，為了政策")
                 } else {
                     for (s in aList) {
-                        listString.append(s.trim { it <= ' ' }).append(",")
+                        listString.append(s.trim()).append(",")
                     }
                 }
 
                 myEditor!!.putString(
                     PROPERTIES_BLOCK_LIST,
                     listString.toString()
-                )?.apply()
+                )?.commit()
 
 
                 // 更新緩存
@@ -425,7 +425,7 @@ class UserSettings(var myContext: Context) {
         // 重置黑名單
         @JvmStatic
         fun resetBlockList() {
-            myEditor!!.putString(PROPERTIES_BLOCK_LIST, blockListDefault).apply()
+            myEditor!!.putString(PROPERTIES_BLOCK_LIST, blockListDefault).commit()
             blockList = blockList
         }
 
@@ -494,7 +494,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_BLOCK_LIST_ENABLE,
                     enable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -507,7 +507,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_BLOCK_LIST_FOR_TITLE,
                     enable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -520,7 +520,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_KEEP_WIFI_ENABLE,
                     enable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -544,7 +544,7 @@ class UserSettings(var myContext: Context) {
         @JvmStatic
         fun setFloatingLocation(x: Float, y: Float) {
             myEditor!!.putFloat(FLOATING_LOCATION_X, x)
-            myEditor!!.putFloat(FLOATING_LOCATION_Y, y).apply()
+            myEditor!!.putFloat(FLOATING_LOCATION_Y, y).commit()
         }
 
         @JvmStatic
@@ -567,7 +567,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_IDLE,
                     idle
-                ).apply()
+                ).commit()
             }
         @JvmStatic
         var toolbarAlpha: Float
@@ -589,12 +589,12 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_ALPHA,
                     alpha
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
         fun setPropertiesLinkAutoShow(enable: Boolean) {
-            myEditor!!.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable).apply()
+            myEditor!!.putBoolean(PROPERTIES_LINK_AUTO_SHOW, enable).commit()
         }
 
         @JvmStatic
@@ -613,7 +613,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_LINK_SHOW_THUMBNAIL,
                     enable
-                ).apply()
+                ).commit()
             }
         @JvmStatic
         var linkShowOnlyWifi: Boolean
@@ -625,7 +625,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_LINK_SHOW_ONLY_WIFI,
                     enable
-                ).apply()
+                ).commit()
             }
 
         @JvmStatic
@@ -638,11 +638,11 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putInt(
                     NON_VIP_SHORTEN_TIMES_LIMIT,
                     times
-                ).apply()
+                ).commit()
             }
 
         fun setPropertiesShortUrlNonId(enable: Boolean) {
-            myEditor!!.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).apply()
+            myEditor!!.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).commit()
         }
 
         val shortUrlNonId: Boolean
@@ -661,7 +661,7 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putBoolean(
                     PROPERTIES_WEB_SIGN_IN,
                     enable
-                ).apply()
+                ).commit()
             }
     }
 }

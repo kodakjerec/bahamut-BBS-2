@@ -5,14 +5,12 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.Bookmark
-import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
-import java.util.Vector
 
 class BoardSearchPage : BoardMainPage() {
     private var author: String? = null
@@ -130,29 +128,4 @@ class BoardSearchPage : BoardMainPage() {
 
     override val isAutoLoadEnable: Boolean
         get() = false
-
-    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPostDialogEditButtonClicked(
-        postArticlePage: PostArticlePage?,
-        str: String?,
-        str2: String?,
-        str3: String?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPostDialogSendButtonClicked(
-        postArticlePage: PostArticlePage?,
-        str: String?,
-        str2: String?,
-        str3: String?,
-        str4: String?,
-        str5: String?,
-        boolean6: Boolean?
-    ) {
-        TODO("Not yet implemented")
-    }
 }

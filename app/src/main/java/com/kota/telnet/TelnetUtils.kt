@@ -17,7 +17,7 @@ object TelnetUtils {
     @JvmStatic
     fun getIntegerFromData(aRow: TelnetRow, from: Int, to: Int): Int {
         try {
-            val temp = aRow.getSpaceString(from, to).trim { it <= ' ' }
+            val temp = aRow.getSpaceString(from, to).trim()
             if (temp.isNotEmpty()) {
                 return temp.toInt()
             }

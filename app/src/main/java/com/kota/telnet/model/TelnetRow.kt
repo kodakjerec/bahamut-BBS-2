@@ -132,7 +132,7 @@ class TelnetRow {
     }
 
     override fun toString(): String {
-        return this.rawString.substring(this.quoteSpace).trim { it <= ' ' }
+        return this.rawString.substring(this.quoteSpace).trim()
     }
 
     fun toContentString(): String {

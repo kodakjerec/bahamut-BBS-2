@@ -110,29 +110,4 @@ class BoardLinkPage : BoardMainPage() {
         PageContainer.instance?.cleanBoardTitleLinkedPage()
         return true
     }
-
-    override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPostDialogEditButtonClicked(
-        postArticlePage: PostArticlePage?,
-        str: String?,
-        str2: String?,
-        str3: String?
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onPostDialogSendButtonClicked(
-        postArticlePage: PostArticlePage?,
-        str: String?,
-        str2: String?,
-        str3: String?,
-        str4: String?,
-        str5: String?,
-        boolean6: Boolean?
-    ) {
-        TODO("Not yet implemented")
-    }
 }

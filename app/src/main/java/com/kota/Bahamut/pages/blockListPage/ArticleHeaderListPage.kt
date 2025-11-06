@@ -33,7 +33,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
     // 按下新增
     var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (inputField != null) {
-            val blockName = inputField?.text.toString().trim { it <= ' ' }
+            val blockName = inputField?.text.toString().trim()
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
                 val newList: MutableList<String> =

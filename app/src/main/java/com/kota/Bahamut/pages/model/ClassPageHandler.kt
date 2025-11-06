@@ -7,7 +7,7 @@ import com.kota.telnet.TelnetUtils
 class ClassPageHandler private constructor() {
     fun load(): ClassPageBlock {
         val classPackage: ClassPageBlock = ClassPageBlock.Companion.create()
-        if (TelnetClient.model.getRowString(2)?.trim { it <= ' ' }!!.startsWith("編號")) {
+        if (TelnetClient.model.getRowString(2)?.trim()!!.startsWith("編號")) {
             classPackage.mode = 0
         } else {
             classPackage.mode = 1
@@ -20,7 +20,7 @@ class ClassPageHandler private constructor() {
             if (i == 3) {
                 classPackage.minimumItemNumber = boardIndex
             }
-            val boardSelected = row.getSpaceString(0, 0).trim { it <= ' ' }
+            val boardSelected = row.getSpaceString(0, 0).trim()
             if (boardSelected.isNotEmpty() && boardSelected[0] == '>') {
                 classPackage.selectedItemNumber = boardIndex
             }
@@ -32,11 +32,11 @@ class ClassPageHandler private constructor() {
             }
             var boardManagerStart = 65
             // 看板英文名稱
-            var boardName = row.getSpaceString(9, boardNameEnd).trim { it <= ' ' }
+            var boardName = row.getSpaceString(9, boardNameEnd).trim()
             // 看板中文名稱
             // 先取得除英文名稱外全字串, 扣除版主群後, 剩下的就是看板中文名稱
             var boardTitle =
-                row.getSpaceString(boardNameEnd + 1, row.data.size - 1).trim { it <= ' ' }
+                row.getSpaceString(boardNameEnd + 1, row.data.size - 1).trim()
             for (bb in boardTitle.length - 1 downTo 0) {
                 if (boardTitle[bb].code == 32) {
                     boardManagerStart = bb

@@ -100,7 +100,7 @@ class ArticleHandler {
                     }
                 }
                 if (authorEnd > authorStart) {
-                    author = rowString.substring(authorStart, authorEnd).trim { it <= ' ' }
+                    author = rowString.substring(authorStart, authorEnd).trim()
                 }
                 val authorWords = author.toCharArray()
                 var nicknameStart = 0
@@ -112,12 +112,12 @@ class ArticleHandler {
                     nicknameEnd--
                 }
                 if (nicknameEnd > nicknameStart + 1) {
-                    nickname = author.substring(nicknameStart + 1, nicknameEnd).trim { it <= ' ' }
+                    nickname = author.substring(nicknameStart + 1, nicknameEnd).trim()
                 }
                 if (nickname.isNotEmpty()) {
                     author = author.substring(0, nicknameStart)
                 }
-                val author2 = author.trim { it <= ' ' }
+                val author2 = author.trim()
                 val itemInfo = TelnetArticleItemInfo()
                 itemInfo.author = author2
                 itemInfo.nickname = nickname
@@ -186,7 +186,7 @@ class ArticleHandler {
                         }
                     }
                     if (authorEnd2 > 0) {
-                        author3 = rowString.substring(0, authorEnd2).trim { it <= ' ' }
+                        author3 = rowString.substring(0, authorEnd2).trim()
                     }
                     var datetimeStart = 0
                     var datetimeEnd = 0
@@ -225,7 +225,7 @@ class ArticleHandler {
                     val contentEnd = datetimeStart - 1
                     if (contentEnd > contentStart) {
                         content =
-                            rowString.substring(contentStart, contentEnd).trim { it <= ' ' }
+                            rowString.substring(contentStart, contentEnd).trim()
                     }
                     val push = TelnetArticlePush()
                     push.author = author3
@@ -250,7 +250,7 @@ class ArticleHandler {
         val row0 = rows[0]
         val row1 = rows[1]
         val row2 = rows[2]
-        val authorString = row0.getSpaceString(7, 58).trim { it <= ' ' }
+        val authorString = row0.getSpaceString(7, 58).trim()
         var author = ""
         var nickname = ""
         if (row0.toContentString().contains("作者")) {
@@ -269,7 +269,7 @@ class ArticleHandler {
                     }
                 }
                 if (authorEnd > 0) {
-                    author = authorString.substring(0, authorEnd).trim { it <= ' ' }
+                    author = authorString.substring(0, authorEnd).trim()
                 }
                 val nicknameStart = authorEnd + 1
                 var nicknameEnd = nicknameStart
@@ -286,7 +286,7 @@ class ArticleHandler {
                 }
                 if (nicknameEnd > nicknameStart) {
                     nickname =
-                        authorString.substring(nicknameStart, nicknameEnd).trim { it <= ' ' }
+                        authorString.substring(nicknameStart, nicknameEnd).trim()
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -297,12 +297,12 @@ class ArticleHandler {
 
         var boardName = ""
         if (row0.toContentString().contains("看板")) boardName =
-            row0.getSpaceString(66, 78).trim { it <= ' ' }
+            row0.getSpaceString(66, 78).trim()
         article.boardName = boardName
 
         var titleString = ""
         if (row1.toContentString().contains("標題")) {
-            titleString = row1.getSpaceString(7, 78).trim { it <= ' ' }
+            titleString = row1.getSpaceString(7, 78).trim()
             if (titleString.startsWith("Re: ")) {
                 article.title = titleString.substring(4)
                 article.articleType = TelnetArticle.REPLY
@@ -314,7 +314,7 @@ class ArticleHandler {
 
         var dateTime = ""
         if (row2.toContentString().contains("時間")) {
-            dateTime = row2.getSpaceString(7, 30).trim { it <= ' ' }
+            dateTime = row2.getSpaceString(7, 30).trim()
         }
         article.dateTime = dateTime
         // 只要任意一個屬性有值, 就應正常顯示

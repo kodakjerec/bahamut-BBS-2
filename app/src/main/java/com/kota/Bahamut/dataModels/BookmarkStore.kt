@@ -81,7 +81,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
     }
 
     fun addBookmark(aBookmark: Bookmark) {
-        val boardName = aBookmark.board?.trim { it <= ' ' }
+        val boardName = aBookmark.board?.trim()
         if (boardName?.isEmpty() == true) {
             this.globalBookmarks.addBookmark(aBookmark)
         } else if (aBookmark.optional == Bookmark.Companion.OPTIONAL_STORY) {

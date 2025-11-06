@@ -10,7 +10,7 @@ class SearchBoardHandler private constructor() {
     fun read() {
         var i = 3
         while (i < 23) {
-            val content = TelnetClient.model.getRowString(i).trim { it <= ' ' }
+            val content = TelnetClient.model.getRowString(i).trim()
             if (content.isNotEmpty()) {
                 for (board in content.split(" +".toRegex()).dropLastWhile { it.isEmpty() }
                     .toTypedArray()) {

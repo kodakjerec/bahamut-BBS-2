@@ -75,14 +75,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     fun loadState() {
-        this.rowString00 = getRowString(0).trim { it <= ' ' }
-        this.rowString01 = getRowString(1).trim { it <= ' ' }
-        this.rowString02 = getRowString(2).trim { it <= ' ' }
+        this.rowString00 = getRowString(0).trim()
+        this.rowString01 = getRowString(1).trim()
+        this.rowString02 = getRowString(2).trim()
         // 隨然是取row 23, 但是偶爾遇到排版不正確情況, 取row 22, 以此類推
         // row 2 已經有使用, 當作界線
         var i = 23
         while (i > 2) {
-            this.rowStringFinal = getRowString(i).trim { it <= ' ' }
+            this.rowStringFinal = getRowString(i).trim()
             if (!this.rowStringFinal.isEmpty()) i = 0
             i--
         }
@@ -129,8 +129,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             val name: String = B2UEncoder.instance!!.encodeToString(nameBuffer.toByteArray())
             val msg: String = B2UEncoder.instance!!.encodeToString(msgBuffer.toByteArray())
             if (endPoint == column && name.startsWith("★")) {
-                val name2 = name.substring(1, name.length - 1).trim { it <= ' ' }
-                val msg2 = msg.substring(1).trim { it <= ' ' }
+                val name2 = name.substring(1, name.length - 1).trim()
+                val msg2 = msg.substring(1).trim()
                 // 因為BBS會更新畫面, 會重複出現相同訊息. 只要最後接收的訊息一樣就不顯示
                 if (TempSettings.lastReceivedMessage != name2 + msg2) {
                     // 更新未讀取訊息
@@ -321,8 +321,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     countRows = 0
                     val rawString = fromRow.rawString
                     val nameLastIndex = rawString.indexOf(")")
-                    val authorName = rawString.substring(0, nameLastIndex + 1).trim { it <= ' ' }
-                    val datetime = rawString.substring(nameLastIndex + 2).trim { it <= ' ' }
+                    val authorName = rawString.substring(0, nameLastIndex + 1).trim()
+                    val datetime = rawString.substring(nameLastIndex + 2).trim()
                     heroStep = HeroStep(authorName, datetime, "")
                 }
             }
@@ -399,12 +399,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             var startIndex = rowStringFinal.indexOf("[訪客]") + 4
             var endIndex = rowStringFinal.indexOf(" 人")
             page.setOnlinePeople(
-                this.rowStringFinal.substring(startIndex, endIndex).trim { it <= ' ' })
+                this.rowStringFinal.substring(startIndex, endIndex).trim())
 
             // 紀錄呼叫器
             startIndex = rowStringFinal.indexOf("[呼叫器]") + 5
             endIndex = rowStringFinal.length
-            page.setBBCall(this.rowStringFinal.substring(startIndex, endIndex).trim { it <= ' ' })
+            page.setBBCall(this.rowStringFinal.substring(startIndex, endIndex).trim())
         }
     }
 
@@ -602,7 +602,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 topPage.sendMessageFail(MessageStatus.Escape)
                 showLongToast("對方已經離去")
                 TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
-            } else if (getRowString(22).trim { it <= ' ' }.startsWith("★熱訊：")) {
+            } else if (getRowString(22).trim().startsWith("★熱訊：")) {
                 // 送出給對方的訊息
                 // 一定要在"傳訊給"判斷之前, 因為這兩個判斷會同時出現
                 topPage.sendMessagePart3()
@@ -610,7 +610,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 // 送出對方id
                 // 一定要在"熱訊回應"判斷之前, 因為這兩個判斷會同時出現
                 topPage.sendMessagePart2()
-            } else if (getRowString(22).trim { it <= ' ' }.contains("熱訊回應")) {
+            } else if (getRowString(22).trim().contains("熱訊回應")) {
                 // 我方發出ctrl+S, 但是被熱訊回應卡住, 送出Enter指令接傳訊給對方id
                 TelnetClient.myInstance?.sendStringToServer("")
             } else if (this.rowStringFinal.startsWith("★") && !this.rowStringFinal.substring(
@@ -653,7 +653,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 BahamutCommandLoadArticleEnd().execute()
             } else if (currentPage > BahamutPage.BAHAMUT_CLASS && this.rowStringFinal.contains(
                     "閱讀精華"
-                ) && this.rowStringFinal.trim { it <= ' ' }.endsWith("離開")
+                ) && this.rowStringFinal.trim().endsWith("離開")
             ) {
                 handleArticle()
                 onReadArticleFinished()
@@ -857,7 +857,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         if (end <= start) {
             return ""
         }
-        return aMessage.substring(start, end).trim { it <= ' ' }
+        return aMessage.substring(start, end).trim()
     }
 
     companion object {

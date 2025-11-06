@@ -32,24 +32,15 @@ class LoginPage : TelnetPage() {
     var cacheTelnetView: Boolean = false
     var errorCount: Int = 0
     var loginListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        this@LoginPage.username =
-            (this@LoginPage.findViewById(R.id.Login_UsernameEdit) as EditText).text
-                .toString().trim { it <= ' ' }
-        this@LoginPage.password =
-            (this@LoginPage.findViewById(R.id.Login_passwordEdit) as EditText).text
-                .toString().trim { it <= ' ' }
-        this@LoginPage.isSaveLoginUser =
-            (this@LoginPage.findViewById(R.id.Login_loginRememberCheckBox) as CheckBox)
-                .isChecked
-        this@LoginPage.checkWebSignIn =
-            (this@LoginPage.findViewById(R.id.LoginWebSignInCheckBox) as CheckBox)
-                .isChecked
+        username = (findViewById(R.id.Login_UsernameEdit) as EditText).text.toString().trim()
+        password = (findViewById(R.id.Login_passwordEdit) as EditText).text.toString().trim()
+        checkWebSignIn = (findViewById(R.id.LoginWebSignInCheckBox) as CheckBox).isChecked
 
-        val errMessage = if (this@LoginPage.username.isEmpty() && this@LoginPage.password.isEmpty()) {
+        val errMessage = if (username.isEmpty() && password.isEmpty()) {
             "帳號、密碼不可為空，請重新輸入。"
-        } else if (this@LoginPage.username.isEmpty()) {
+        } else if (username.isEmpty()) {
             "帳號不可為空，請重新輸入。"
-        } else if (this@LoginPage.password.isEmpty()) {
+        } else if (password.isEmpty()) {
             "密碼不可為空，請重新輸入。"
         } else {
             null
@@ -57,12 +48,11 @@ class LoginPage : TelnetPage() {
         if (errMessage != null) {
             ASAlertDialog.showErrorDialog(errMessage, this@LoginPage)
         } else {
-            this@LoginPage.login()
+            login()
         }
     }
     var username: String = "" // 使用者名稱
     var password: String = "" // 密碼
-    var isSaveLoginUser: Boolean = false // 是否儲存登入使用者
     var checkWebSignIn: Boolean = false // 是否勾選Web登入
     var dialogRemoveLoginUser: ASAlertDialog? = null // 刪除重複登入對話框
     var dialogSaveUnfinishedArticle: ASDialog? = null // 儲存未完成文章對話框
@@ -125,7 +115,7 @@ class LoginPage : TelnetPage() {
         return handleNormalState()
     }
 
-    // 按下返回
+    /** 按下返回 */
     override fun onBackPressed(): Boolean {
         TelnetClient.myInstance!!.close()
         return true
@@ -201,8 +191,8 @@ class LoginPage : TelnetPage() {
         val loginWebSignIn = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
         val username = UserSettings.propertiesUsername
         val password = UserSettings.propertiesPassword
-        val username2 = username!!.trim { it <= ' ' }
-        val password2 = password!!.trim { it <= ' ' }
+        val username2 = username!!.trim()
+        val password2 = password!!.trim()
         loginUsernameField.setText(username2)
         loginPasswordField.setText(password2)
         loginRemember.isChecked = UserSettings.propertiesSaveLogonUser
@@ -214,10 +204,10 @@ class LoginPage : TelnetPage() {
      */
     fun saveLogonUserToProperties() {
         val isLoginRemember = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        val username = (findViewById(R.id.Login_UsernameEdit) as EditText).text.toString()
-            .trim { it <= ' ' }
-        val password = (findViewById(R.id.Login_passwordEdit) as EditText).text.toString()
-            .trim { it <= ' ' }
+        val username =
+            (findViewById(R.id.Login_UsernameEdit) as EditText).text.toString().trim()
+        val password =
+            (findViewById(R.id.Login_passwordEdit) as EditText).text.toString().trim()
 
         if (isLoginRemember.isChecked) {
             UserSettings.propertiesUsername = username
@@ -244,8 +234,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
         ASRunner.runInNewThread {
-            TelnetClient.myInstance!!
-                .sendStringToServerInBackground(this@LoginPage.username)
+            TelnetClient.myInstance!!.sendStringToServerInBackground(username)
         }
     }
 
@@ -256,31 +245,28 @@ class LoginPage : TelnetPage() {
         object : ASRunner() {
             override fun run() {
                 ASProcessingDialog.dismissProcessingDialog()
-                if (this@LoginPage.dialogRemoveLoginUser == null) {
-                    this@LoginPage.dialogRemoveLoginUser = ASAlertDialog.createDialog()
-                        .setTitle("提示")
-                        .setMessage("您想刪除其他重複的登入嗎？")
-                        .addButton("否")
-                        .addButton("是")
+                if (dialogRemoveLoginUser == null) {
+                    dialogRemoveLoginUser = ASAlertDialog.createDialog().setTitle("提示")
+                        .setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是")
                         .setListener { aDialog: ASAlertDialog?, index: Int ->
                             if (index == 0) {
                                 TelnetClient.myInstance!!.sendStringToServerInBackground("n")
                             } else {
                                 TelnetClient.myInstance!!.sendStringToServerInBackground("y")
                             }
-                            this@LoginPage.dialogRemoveLoginUser = null
+                            dialogRemoveLoginUser = null
                             ASProcessingDialog.showProcessingDialog("登入中")
                         }.setOnBackDelegate { aDialog: ASDialog? ->
                             TelnetClient.myInstance!!.sendStringToServerInBackground("n")
-                            if (this@LoginPage.dialogRemoveLoginUser != null) {
-                                this@LoginPage.dialogRemoveLoginUser!!.dismiss()
-                                this@LoginPage.dialogRemoveLoginUser = null
+                            if (dialogRemoveLoginUser != null) {
+                                dialogRemoveLoginUser!!.dismiss()
+                                dialogRemoveLoginUser = null
                             }
                             ASProcessingDialog.showProcessingDialog("登入中")
                             true
                         } as ASAlertDialog?
                 }
-                this@LoginPage.dialogRemoveLoginUser!!.show()
+                dialogRemoveLoginUser!!.show()
             }
         }.runInMainThread()
     }
@@ -377,8 +363,7 @@ class LoginPage : TelnetPage() {
                         } catch (e: Exception) {
                             ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
                             Log.e(
-                                javaClass.simpleName,
-                                (if (e.message != null) e.message else "")!!
+                                javaClass.simpleName, (if (e.message != null) e.message else "")!!
                             )
                         }
                     }
@@ -418,8 +403,7 @@ class LoginPage : TelnetPage() {
                         }
                     } catch (e: InterruptedException) {
                         Log.e(
-                            javaClass.simpleName,
-                            (if (e.message != null) e.message else "")!!
+                            javaClass.simpleName, (if (e.message != null) e.message else "")!!
                         )
                         Thread.currentThread().interrupt()
                         break
@@ -482,7 +466,7 @@ class LoginPage : TelnetPage() {
                             0 -> TelnetClient.myInstance!!.sendStringToServer("Q")
                             1 -> TelnetClient.myInstance!!.sendStringToServer("S")
                         }
-                        this@LoginPage.dialogSaveUnfinishedArticle = null
+                        dialogSaveUnfinishedArticle = null
                     }.scheduleDismissOnPageDisappear(this)
             dialogSaveUnfinishedArticle!!.show()
         }

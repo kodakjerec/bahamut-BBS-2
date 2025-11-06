@@ -32,7 +32,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     // 按下新增
     var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (inputField != null) {
-            val blockName = inputField?.text.toString().trim { it <= ' ' }
+            val blockName = inputField?.text.toString().trim()
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
                 val newList: MutableList<String> = UserSettings.Companion.blockList
@@ -200,7 +200,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     }
 
     override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {
-        TODO("Not yet implemented")
+//        super.onBlockListPageItemViewClicked(blockListPageItemView)
     }
 
     // 刪除黑名單

@@ -10,17 +10,17 @@ class MailBoxPageHandler private constructor() {
         val endIndex = 3 + 20
         for (i in 3..<endIndex) {
             val row: TelnetRow = TelnetClient.model.getRow(i)!!
-            val articleSelected = row.getSpaceString(0, 0).trim { it <= ' ' }
+            val articleSelected = row.getSpaceString(0, 0).trim()
             val articleIndex = TelnetUtils.getIntegerFromData(row, 1, 5)
             if (articleIndex != 0) {
                 if (articleSelected.isNotEmpty() && articleSelected[0] == '>') {
                     boardData.selectedItemNumber = articleIndex
                 }
                 val info = row.data[6]
-                val date = row.getSpaceString(8, 12).trim { it <= ' ' }
-                val author = row.getSpaceString(14, 25).trim { it <= ' ' }
-                val originMark = row.getSpaceString(27, 28).trim { it <= ' ' }
-                val title = row.getSpaceString(30, 79).trim { it <= ' ' }
+                val date = row.getSpaceString(8, 12).trim()
+                val author = row.getSpaceString(14, 25).trim()
+                val originMark = row.getSpaceString(27, 28).trim()
+                val title = row.getSpaceString(30, 79).trim()
                 val item: MailBoxPageItem = MailBoxPageItem.Companion.create()
                 if (i == 3) {
                     boardData.minimumItemNumber = articleIndex
