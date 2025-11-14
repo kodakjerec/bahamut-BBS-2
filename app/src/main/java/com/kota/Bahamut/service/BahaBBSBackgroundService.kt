@@ -11,10 +11,10 @@ import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASRunner
 import com.kota.telnet.TelnetClient
 
 class BahaBBSBackgroundService : Service() {
@@ -163,8 +163,22 @@ class BahaBBSBackgroundService : Service() {
 
         val manager = getSystemService(NotificationManager::class.java)
         if (manager != null) {
-            manager.createNotificationChannel(serviceChannel)
-            Log.d(TAG, "Notification channel created")
+            try {
+                manager.createNotificationChannel(serviceChannel)
+                Log.d(TAG, "Notification channel created successfully")
+            } catch (e: IllegalArgumentException) {
+                Log.e(TAG, "Failed to create notification channel: ${e.message}", e)
+                // Optionally create a minimal fallback channel
+                val fallbackChannel = NotificationChannel(
+                    CHANNEL_ID,
+                    "Bahamut BBS 服務",
+                    NotificationManager.IMPORTANCE_LOW
+                )
+                manager.createNotificationChannel(fallbackChannel)
+                Log.d(TAG, "Fallback notification channel created")
+            }
+        } else {
+            Log.e(TAG, "NotificationManager is null")
         }
     }
 
