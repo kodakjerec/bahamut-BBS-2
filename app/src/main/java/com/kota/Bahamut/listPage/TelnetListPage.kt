@@ -118,7 +118,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             }
         }
     }
-
     fun setManualLoadPage() {
         isManualLoadPending = true
     }
