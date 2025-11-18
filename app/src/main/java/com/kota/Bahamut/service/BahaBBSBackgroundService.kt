@@ -32,8 +32,13 @@ class BahaBBSBackgroundService : Service() {
         super.onCreate()
         Log.i(TAG, "BackgroundService onCreate() called")
 
-        // 預先創建通知頻道，確保 startForeground 能快速執行
-        createNotificationChannel()
+        // 延遲創建通知頻道，或使用 try-catch 包裝
+        try {
+            createNotificationChannel()
+        } catch (e: Exception) {
+            Log.w(TAG, "Failed to create notification channel in onCreate, will retry later", e)
+            // 不要讓 onCreate 失敗，稍後在 onStartCommand 重試
+        }
     }
 
     // android.app.Service
@@ -44,6 +49,13 @@ class BahaBBSBackgroundService : Service() {
         if (ACTION_DISCONNECT == action) {
             disconnectAndStop()
             return START_NOT_STICKY
+        }
+
+        // 確保通知頻道存在（如果 onCreate 失敗的話）
+        try {
+            createNotificationChannel()
+        } catch (e: Exception) {
+            Log.w(TAG, "Still failed to create notification channel", e)
         }
 
         // 立即嘗試啟動前景服務（在處理任何邏輯前）
@@ -150,35 +162,43 @@ class BahaBBSBackgroundService : Service() {
     }
 
     private fun createNotificationChannel() {
-        val serviceChannel = NotificationChannel(
-            CHANNEL_ID,
-            getContextString(R.string.background_service_name),
-            NotificationManager.IMPORTANCE_LOW
-        )
-        serviceChannel.description = getContextString(R.string.background_service_description)
-        serviceChannel.setShowBadge(false)
-        serviceChannel.enableLights(false)
-        serviceChannel.enableVibration(false)
-        serviceChannel.setSound(null, null)
+        try {
+            // 使用 fallback 字串，避免資源載入問題
+            val channelName = try {
+                getContextString(R.string.background_service_name)
+            } catch (e: Exception) {
+                "Bahamut BBS 服務" // fallback
+            }
 
-        val manager = getSystemService(NotificationManager::class.java)
-        if (manager != null) {
-            try {
+            val channelDescription = try {
+                getContextString(R.string.background_service_description)
+            } catch (e: Exception) {
+                "維持 BBS 連線的背景服務" // fallback
+            }
+
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                channelName,
+                NotificationManager.IMPORTANCE_LOW
+            )
+            
+            serviceChannel.description = channelDescription
+            serviceChannel.setShowBadge(false)
+            serviceChannel.enableLights(false)
+            serviceChannel.enableVibration(false)
+            serviceChannel.setSound(null, null)
+
+            val manager = getSystemService(NotificationManager::class.java)
+            if (manager != null) {
                 manager.createNotificationChannel(serviceChannel)
                 Log.d(TAG, "Notification channel created successfully")
-            } catch (e: IllegalArgumentException) {
-                Log.e(TAG, "Failed to create notification channel: ${e.message}", e)
-                // Optionally create a minimal fallback channel
-                val fallbackChannel = NotificationChannel(
-                    CHANNEL_ID,
-                    "Bahamut BBS 服務",
-                    NotificationManager.IMPORTANCE_LOW
-                )
-                manager.createNotificationChannel(fallbackChannel)
-                Log.d(TAG, "Fallback notification channel created")
+            } else {
+                Log.e(TAG, "NotificationManager is null")
+                throw IllegalStateException("NotificationManager not available")
             }
-        } else {
-            Log.e(TAG, "NotificationManager is null")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to create notification channel: ${e.message}", e)
+            throw e // 重新拋出異常讓調用者處理
         }
     }
 
