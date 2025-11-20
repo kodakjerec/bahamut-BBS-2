@@ -246,7 +246,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     override val isAutoLoadEnable: Boolean
         get() = false
 
-    override var name: String? = null
+    override var listName: String? = null
         get() = "[MailBox]"
 
     override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {

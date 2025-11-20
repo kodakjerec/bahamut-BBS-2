@@ -39,7 +39,7 @@ class BoardEssencePage : TelnetListPage() {
     override fun onPageRefresh() {
         super.onPageRefresh()
         val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData("精華文章", myTitle, name)
+        headerView.setData("精華文章", myTitle, listName)
     }
 
     override val listType: Int
@@ -144,7 +144,7 @@ class BoardEssencePage : TelnetListPage() {
                 ASToast.showShortToast("找沒有了耶...:(")
             } else {
                 // 進入目錄
-                PageContainer.instance!!.pushBoardEssencePage(name, myTitle)
+                PageContainer.instance!!.pushBoardEssencePage(listName, myTitle)
                 navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
                 super.loadItemAtIndex(index)
             }

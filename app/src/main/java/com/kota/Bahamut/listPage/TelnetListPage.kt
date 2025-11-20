@@ -35,8 +35,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var executingCommand: TelnetCommand? = null
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
-    open var name: String? = ""
-        get() = "TelnetListPage"
+    open var listName: String? = ""
     @JvmField
     protected var listViewWidget: ListView? = null
     private var isListLoaded = false
@@ -194,6 +193,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         this.itemSize = 0
         lastLoadTime = 0L
         lastSendTime = 0L
+        listName = null
     }
 
     var listView: ListView?
@@ -645,7 +645,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         get() = false
 
     val listId: String?
-        get() = getListIdFromListName(this.name)
+        get() = getListIdFromListName(this.listName)
 
     open fun getListIdFromListName(aName: String?): String? {
         return aName

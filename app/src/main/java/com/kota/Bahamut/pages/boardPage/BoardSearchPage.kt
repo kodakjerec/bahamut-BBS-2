@@ -29,7 +29,7 @@ class BoardSearchPage : BoardMainPage() {
         super.onPageRefresh()
         val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
         if (headerView != null) {
-            var boardName = name
+            var boardName = listName
             if (boardName == null) {
                 boardName = getContextString(R.string.loading)
             }
@@ -55,12 +55,12 @@ class BoardSearchPage : BoardMainPage() {
                     if (index == 1) {
                         val bookmark = Bookmark()
                         println("add bookmark:" + bookmark.title)
-                        bookmark.board = this@BoardSearchPage.name
+                        bookmark.board = this@BoardSearchPage.listName
                         bookmark.keyword = item.title
                         bookmark.title = bookmark.generateTitle()
                         val store = TempSettings.bookmarkStore
                         if (store != null) {
-                            store.getBookmarkList(this@BoardSearchPage.name)
+                            store.getBookmarkList(this@BoardSearchPage.listName)
                                 .addBookmark(bookmark)
                             store.store()
                         }
@@ -87,7 +87,7 @@ class BoardSearchPage : BoardMainPage() {
                 if (index == 1) {
                     val bookmark = Bookmark()
                     println("add bookmark:" + bookmark.title)
-                    bookmark.board = this@BoardSearchPage.name
+                    bookmark.board = this@BoardSearchPage.listName
                     bookmark.keyword = this@BoardSearchPage.keyword
                     bookmark.author = this@BoardSearchPage.author
                     bookmark.mark = this@BoardSearchPage.mark
@@ -95,7 +95,7 @@ class BoardSearchPage : BoardMainPage() {
                     bookmark.title = bookmark.generateTitle()
                     val store = TempSettings.bookmarkStore
                     if (store != null) {
-                        store.getBookmarkList(this@BoardSearchPage.name).addBookmark(bookmark)
+                        store.getBookmarkList(this@BoardSearchPage.listName).addBookmark(bookmark)
                         store.store()
                     }
                 }
