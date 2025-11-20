@@ -746,7 +746,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         clear()
         navigationController.popViewController()
         TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
-        PageContainer.instance?.cleanBoardPage()
+        PageContainer.instance!!.cleanBoardPage()
         return true
     }
 
@@ -1084,7 +1084,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         object : ASRunner() {
             override fun run() {
                 cleanCommand() // 清除引言過多留下的command buffer
-                val page = PageContainer.instance?.postArticlePage!!
+                val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
             }
         }.runInMainThread()
@@ -1100,8 +1100,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     fun finishPost() {
         object : ASRunner() {
             override fun run() {
-                val page = PageContainer.instance?.postArticlePage
-                page?.closeArticle()
+                val page = PageContainer.instance!!.postArticlePage
+                page.closeArticle()
             }
         }.runInMainThread()
         if (timer != null) {

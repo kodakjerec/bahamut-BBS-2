@@ -387,7 +387,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         }
         clear()
         navigationController.popToViewController(boardMainPage)
-        PageContainer.instance?.cleanPostArticlePage()
+        PageContainer.instance!!.cleanPostArticlePage()
     }
 
     override fun onItemSelected(adapterView: AdapterView<*>?, aView: View?, index: Int, id: Long) {

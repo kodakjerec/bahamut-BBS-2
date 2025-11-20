@@ -79,7 +79,7 @@ class MessageSmall(context: Context): LinearLayout(context) {
         when (event.action) {
             MotionEvent.ACTION_UP -> {
                 if (duration < 200) { // click
-                    val aPage = PageContainer.instance?.myMessageMain
+                    val aPage = PageContainer.instance!!.myMessageMain
                     ASNavigationController.currentController?.pushViewController(aPage)
                     BahamutStateHandler.bahamutStateHandler?.currentPage =
                         BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE

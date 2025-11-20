@@ -96,7 +96,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
     // com.kota.asFramework.pageController.ASNavigationController
     override fun onControllerDidLoad() {
-        val startPage: StartPage? = PageContainer.instance?.startPage
+        val startPage: StartPage? = PageContainer.instance!!.startPage
         pushViewController(startPage, false)
     }
 
@@ -233,7 +233,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                 newControllers.add(telnetPage)
             }
         }
-        val startPage: StartPage? = PageContainer.instance?.startPage
+        val startPage: StartPage? = PageContainer.instance!!.startPage
         if (!newControllers.contains(startPage)) {
             newControllers.insertElementAt(startPage, 0)
         }

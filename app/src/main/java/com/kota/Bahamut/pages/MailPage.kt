@@ -236,14 +236,14 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         title: String,
         content: String
     ) {
-        PageContainer.instance?.mailBoxPage!!
+        PageContainer.instance!!.mailBoxPage
             .onSendMailDialogSendButtonClicked(sendMailPage, receiver, title, content)
         onBackPressed()
     }
 
     fun onPageUpButtonClicked() {
         if (TelnetClient.myInstance?.telnetConnector?.isConnecting == true) {
-            PageContainer.instance?.mailBoxPage!!.loadPreviousArticle()
+            PageContainer.instance!!.mailBoxPage.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -251,7 +251,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
     fun onPageDownButtonClicked() {
         if (TelnetClient.myInstance?.telnetConnector?.isConnecting!!) {
-            PageContainer.instance?.mailBoxPage!!.loadNextArticle()
+            PageContainer.instance!!.mailBoxPage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }

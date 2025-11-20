@@ -59,7 +59,7 @@ class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(contex
                                 .build()
                         )
                     } else if (title == getContextString(R.string.message_sub_send_hero)) {
-                        val aPage = PageContainer.instance?.getMessageSub()
+                        val aPage = PageContainer.instance!!.getMessageSub()
                         ASNavigationController.currentController!!.pushViewController(aPage)
                         var authorId = detailTextView1.text.toString()
                         if (authorId.contains("(")) authorId =

@@ -164,25 +164,25 @@ class SystemSettingsPage : TelnetPage() {
 
     /** 開啟贊助葉面  */
     var billingPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance?.billingPage
+        val page = PageContainer.instance!!.billingPage
         navigationController.pushViewController(page)
     }
 
     /** 開啟外觀管理  */
     var themeManagerPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance?.getThemeManagerPage()
+        val page = PageContainer.instance!!.getThemeManagerPage()
         navigationController.pushViewController(page)
     }
 
     /** 開啟BBS個人資料  */
     var bbsUserInfoListener: View.OnClickListener = View.OnClickListener { v: View? ->
         TelnetClient.myInstance?.sendStringToServerInBackground("u\ni")
-        val page = PageContainer.instance?.getUserInfoPage()
+        val page = PageContainer.instance!!.getUserInfoPage()
         navigationController.pushViewController(page)
     }
     var bbsUserConfigListener: View.OnClickListener = View.OnClickListener { v: View? ->
         TelnetClient.myInstance?.sendStringToServerInBackground("u\nc")
-        val page = PageContainer.instance?.getUserConfigPage()
+        val page = PageContainer.instance!!.getUserConfigPage()
         navigationController.pushViewController(page)
     }
 

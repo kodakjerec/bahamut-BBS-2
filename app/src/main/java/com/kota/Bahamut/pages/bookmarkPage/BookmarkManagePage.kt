@@ -315,7 +315,7 @@ open class BookmarkManagePage(
     // 實際動作由看板頁去實作
     override fun onItemClick(view: View?, position: Int) {
         val bookmark = this@BookmarkManagePage.bookmarkAdapter?.getItem(position)
-        val page = PageContainer.instance?.boardSearchPage
+        val page = PageContainer.instance!!.boardSearchPage
         if (bookmark == null || page == null) return
         page.clear()
         val state =

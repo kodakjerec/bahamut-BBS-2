@@ -67,7 +67,7 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                                 .build()
                         )
                     } else if (title == getContextString(R.string.message_sub_send_hero)) {
-                        val aPage = PageContainer.instance?.myMessageSub
+                        val aPage = PageContainer.instance!!.myMessageSub
                         ASNavigationController.currentController?.pushViewController(aPage)
                         var authorId: String = txtSenderName.text.toString()
                         if (authorId.contains("(")) authorId =

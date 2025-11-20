@@ -34,10 +34,10 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
     var textViewParam: TextView
     var textViewSample: TextView
 
-    var snedButton: Button
+    var sendButton: Button
     var cancelButton: Button
 
-    var recovertListener: CompoundButton.OnCheckedChangeListener =
+    var recoverListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             isRecovery = isChecked
             if (isChecked) {
@@ -114,7 +114,7 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
 
         // 還原
         recoveryCheckBox = mainLayout.findViewById<CheckBox>(R.id.dialog_paint_color_check_recovery)
-        recoveryCheckBox.setOnCheckedChangeListener(recovertListener)
+        recoveryCheckBox.setOnCheckedChangeListener(recoverListener)
         mainLayout.findViewById<View>(R.id.dialog_paint_color_check_recovery_item)
             .setOnClickListener { view: View? ->
                 recoveryCheckBox.isChecked = !recoveryCheckBox.isChecked
@@ -157,8 +157,8 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
         textViewSample = mainLayout.findViewById<TextView>(R.id.dialog_paint_color_sample)
 
         // 按鈕
-        snedButton = mainLayout.findViewById<Button>(R.id.send)
-        snedButton.setOnClickListener(this)
+        sendButton = mainLayout.findViewById<Button>(R.id.send)
+        sendButton.setOnClickListener(this)
         cancelButton = mainLayout.findViewById<Button>(R.id.cancel)
         cancelButton.setOnClickListener(this)
 
@@ -226,7 +226,7 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
     }
 
     override fun onClick(view: View?) {
-        if (view === snedButton && dialogPaintColorListener != null) {
+        if (view === sendButton && dialogPaintColorListener != null) {
             dialogPaintColorListener?.onPaintColorDone(outputParam!!)
         }
         dismiss()

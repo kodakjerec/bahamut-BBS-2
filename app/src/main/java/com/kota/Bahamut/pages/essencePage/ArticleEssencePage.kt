@@ -276,7 +276,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         title: String,
         content: String
     ) {
-        PageContainer.instance?.mailBoxPage!!.onSendMailDialogSendButtonClicked(
+        PageContainer.instance!!.mailBoxPage!!.onSendMailDialogSendButtonClicked(
             sendMailPage,
             receiver,
             title,
@@ -287,7 +287,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
 
     private fun onPageUpButtonClicked() {
         if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
-            PageContainer.instance?.boardEssencePage!!.loadPreviousArticle()
+            PageContainer.instance!!.boardEssencePage!!.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -295,7 +295,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
 
     private fun onPageDownButtonClicked() {
         if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
-            PageContainer.instance?.boardEssencePage!!.loadNextArticle()
+            PageContainer.instance!!.boardEssencePage!!.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }

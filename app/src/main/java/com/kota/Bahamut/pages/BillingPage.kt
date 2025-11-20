@@ -128,7 +128,7 @@ class BillingPage : TelnetPage() {
 
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        PageContainer.instance?.cleanBillingPage()
+        PageContainer.instance!!.cleanBillingPage()
         showShortToast("返回")
         return true
     }

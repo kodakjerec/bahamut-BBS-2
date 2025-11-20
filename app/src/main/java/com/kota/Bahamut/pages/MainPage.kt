@@ -38,23 +38,23 @@ class MainPage : TelnetPage() {
     var bbCallStatus: String? = "" // 呼叫器
     var mainLayout: RelativeLayout? = null
     var boardsListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.instance?.pushClassPage("Boards", "佈告討論區")
+        PageContainer.instance!!.pushClassPage("Boards", "佈告討論區")
         this@MainPage.navigationController.pushViewController(
-            PageContainer.instance?.classPage
+            PageContainer.instance!!.classPage
         )
         TelnetClient.myInstance?.sendStringToServerInBackground("b")
     }
     var classListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.instance?.pushClassPage("Class", "分組討論區")
+        PageContainer.instance!!.pushClassPage("Class", "分組討論區")
         this@MainPage.navigationController.pushViewController(
-            PageContainer.instance?.classPage
+            PageContainer.instance!!.classPage
         )
         TelnetClient.myInstance?.sendStringToServerInBackground("c")
     }
     var favoriteListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        PageContainer.instance?.pushClassPage("Favorite", "我的最愛")
+        PageContainer.instance!!.pushClassPage("Favorite", "我的最愛")
         this@MainPage.navigationController.pushViewController(
-            PageContainer.instance?.classPage
+            PageContainer.instance!!.classPage
         )
         TelnetClient.myInstance?.sendStringToServerInBackground("f")
     }
@@ -65,7 +65,7 @@ class MainPage : TelnetPage() {
     }
     var mailListener: View.OnClickListener = View.OnClickListener { v: View? ->
         this@MainPage.navigationController.pushViewController(
-            PageContainer.instance?.mailBoxPage
+            PageContainer.instance!!.mailBoxPage
         )
         TelnetClient.myInstance?.sendStringToServerInBackground("m\nr")
     }
@@ -85,7 +85,7 @@ class MainPage : TelnetPage() {
 
     /** 顯示聊天main  */
     var showMessageMainListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val aPage = PageContainer.instance?.getMessageMain()
+        val aPage = PageContainer.instance!!.getMessageMain()
         this@MainPage.navigationController.pushViewController(aPage)
 
         // 隱藏小視窗

@@ -142,20 +142,6 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             closeProcessingDialog()
             return@OnClickListener
         }
-
-//        val uploaderObj = UploaderPostimageorg(this)
-//        lifecycleScope.launch {
-//            val link = uploaderObj.postImage(finalUri!!)
-//            // 後續處理 link
-//            if (!link.isEmpty()) {
-//                sampleTextView?.text = link
-//                outputParam = sampleTextView?.text.toString()
-//                sendButton?.isEnabled = true
-//                transferButton?.isEnabled = false
-//                UserSettings.setPropertiesNoVipShortenTimes(++shortenTimes)
-//            }
-//            closeProcessingDialog()
-//        }
         ASRunner.runInNewThread {
             try {
                 val uploaderObj = UploaderLitterCatBox()
@@ -288,7 +274,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     videoView.requestFocus()
                     transferButton?.performClick()
                 }
-            } catch (e: IOException) {
+            } catch (_: IOException) {
                 Log.e(javaClass.simpleName, "Error loading image/video")
             }
         } else {
@@ -360,10 +346,10 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         // 最上層是 發文 或 看板
         val topPage = ASNavigationController.currentController?.topController
         if ((topPage as Any).javaClass == PostArticlePage::class.java) {
-            val aPage = PageContainer.instance?.postArticlePage!!
+            val aPage = PageContainer.instance!!.postArticlePage
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.instance?.myMessageSub!!
+            val aPage = PageContainer.instance!!.myMessageSub!!
             aPage.insertString(str)
         }
     }

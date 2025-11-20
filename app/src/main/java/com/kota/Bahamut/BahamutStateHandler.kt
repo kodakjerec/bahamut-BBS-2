@@ -763,7 +763,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         object : ASRunner() {
             override fun run() {
                 try {
-                    PageContainer.instance?.articlePage!!.setArticle(aArticle)
+                    PageContainer.instance!!.articlePage.setArticle(aArticle)
                 } catch (e: Exception) {
                     Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
                 }

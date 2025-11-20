@@ -505,7 +505,7 @@ class ArticlePage : TelnetPage() {
     // com.kota.asFramework.pageController.ASViewController
     override fun onBackPressed(): Boolean {
         navigationController.popViewController()
-        PageContainer.instance?.cleanArticlePage()
+        PageContainer.instance!!.cleanArticlePage()
         return true
     }
 

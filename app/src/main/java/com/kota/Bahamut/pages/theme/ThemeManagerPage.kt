@@ -196,7 +196,7 @@ class ThemeManagerPage: TelnetPage() {
     }
 
     override fun onBackPressed(): Boolean {
-        PageContainer.instance?.cleanThemeManagerPage()
+        PageContainer.instance!!.cleanThemeManagerPage()
         return super.onBackPressed()
     }
 
