@@ -23,7 +23,7 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
         when (aListPage.listType) {
             BoardPageAction.LINK_TITLE -> return OperationMode.LeftSEnd
             BoardPageAction.SEARCH, BoardPageAction.ESSENCE -> {
-                if (aListPage.selectedIndex != aListPage.itemSize) {
+                if (aListPage.selectedIndex != aListPage.listCount) {
                     return OperationMode.End
                 }
                 if (aListPage.selectedIndex > 1) {
@@ -34,11 +34,11 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
 
             else -> {
                 // 目前的文章index != 所有文章
-                if (aListPage.selectedIndex != aListPage.itemSize) {
+                if (aListPage.selectedIndex != aListPage.listCount) {
                     return OperationMode.End
                 }
                 // 只有一篇 看板/文章
-                if (aListPage.itemSize == 1) {
+                if (aListPage.listCount == 1) {
                     return OperationMode.LeftRightEnd
                 }
                 return OperationMode.HomeEnd
@@ -82,8 +82,8 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
     }
 
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
-        if (telnetListPage.itemSize > telnetListPageBlock!!.maximumItemNumber) {
-            telnetListPage.itemSize = 0
+        if (telnetListPage.listCount > telnetListPageBlock!!.maximumItemNumber) {
+            telnetListPage.listCount = 0
             telnetListPage.cleanAllItem()
         }
         isDone = true

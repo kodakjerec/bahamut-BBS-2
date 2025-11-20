@@ -2,7 +2,7 @@ package com.kota.Bahamut
 
 import com.kota.Bahamut.pages.BillingPage
 import com.kota.Bahamut.pages.ClassPage
-import com.kota.Bahamut.pages.MailBoxPage
+import com.kota.Bahamut.pages.mailPage.MailBoxPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.StartPage

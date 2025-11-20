@@ -1,4 +1,4 @@
-package com.kota.Bahamut.pages
+package com.kota.Bahamut.pages.mailPage
 
 import android.text.Selection
 import android.view.View
@@ -23,24 +23,27 @@ import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
+/**
+ * 寫信畫面, 有 標題、收件人
+ */
 class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     DialogInsertSymbolListener, DialogPaintColorListener {
     var myContent: String? = null
-    var contentField: EditText? = null
-    var hideTitleButton: Button? = null
-    var paintColorButton: Button? = null
+    lateinit var contentField: EditText // 內文
     var sendMailPageListener: SendMailPageListener? = null
-    var postButton: Button? = null
-    var receiver1: String? = null
-    var receiverField: EditText? = null
-    var receiverFieldBackground: TextView? = null
-    var symbolButton: Button? = null
-    var myTitle: String? = null
-    var titleBlock: View? = null
-    var isTitleBlockHidden: Boolean = false
-    var titleField: EditText? = null
-    var titleFieldBackground: TextView? = null
-    var recover: Boolean = false
+    lateinit var insertSymbolButton: Button // 符號按鈕 
+    lateinit var paintColorButton: Button // 上色按鈕
+    lateinit var postButton: Button // 發信按鈕
+    lateinit var insertExpressionButton: Button // 表情按鈕
+    lateinit var fromReceiver: String // 外部傳來的收件人
+    lateinit var receiverField: EditText // 寫信時, 收件人
+    lateinit var receiverFieldBackground: TextView // 閱讀時, 收件人
+    lateinit var fromTitle: String // 外部傳來的標題
+    lateinit var titleBlock: View // 標題和收件人所處的區塊
+    var isTitleBlockHidden: Boolean = false // 判斷區塊是否隱藏
+    lateinit var titleField: EditText // 寫信時, 標題
+    lateinit var titleFieldBackground: TextView // 閱讀時, 標題
+    var recover: Boolean = false // 內文過長時標記使用
 
     val name: String
         get() = "BahamutSendMailDialog"
@@ -66,41 +69,24 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         }
     }
 
-    override fun onPageDidDisappear() {
-        titleField = null
-        titleFieldBackground = null
-        receiverField = null
-        receiverFieldBackground = null
-        contentField = null
-        postButton = null
-        symbolButton = null
-        hideTitleButton = null
-        titleBlock = null
-        super.onPageDidDisappear()
-    }
-
     fun refreshTitleField() {
-        if (titleField != null && myTitle != null) {
-            titleField?.setText(myTitle)
-            if (myTitle?.isNotEmpty() == true) {
-                Selection.setSelection(titleField?.text, 1)
-            }
-            myTitle = null
+        titleField.setText(fromTitle)
+        if (fromTitle.isNotEmpty()) {
+            Selection.setSelection(titleField.text, 1)
         }
+        fromTitle = ""
     }
 
     fun refreshReceiverField() {
-        if (receiverField != null && receiver1 != null) {
-            receiverField?.setText(receiver1)
-            receiver1 = null
-        }
+        receiverField.setText(fromReceiver)
+        fromReceiver = ""
     }
 
     fun refreshContentField() {
-        if (contentField != null && myContent != null) {
-            contentField?.setText(myContent)
-            if (myContent?.isNotEmpty() == true) {
-                Selection.setSelection(contentField?.text, myContent?.length!!)
+        if (myContent != null) {
+            contentField.setText(myContent)
+            if (myContent!!.isNotEmpty()) {
+                Selection.setSelection(contentField.text, myContent?.length!!)
             }
             myContent = null
         }
@@ -113,31 +99,31 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     fun initial() {
-        titleField = findViewById(R.id.SendMail_TitleField) as EditText?
-        titleField?.onFocusChangeListener = this
-        titleFieldBackground = findViewById(R.id.SendMail_TitleFieldBackground) as TextView?
+        titleField = findViewById(R.id.SendMail_TitleField) as EditText
+        titleField.onFocusChangeListener = this
+        titleFieldBackground = findViewById(R.id.SendMail_TitleFieldBackground) as TextView
 
-        receiverField = findViewById(R.id.SendMail_ReceiverField) as EditText?
-        receiverField?.onFocusChangeListener = this
+        receiverField = findViewById(R.id.SendMail_ReceiverField) as EditText
+        receiverField.onFocusChangeListener = this
         receiverFieldBackground =
-            findViewById(R.id.SendMail_ReceiverFieldBackground) as TextView?
+            findViewById(R.id.SendMail_ReceiverFieldBackground) as TextView
 
-        contentField = findViewById(R.id.SendMailDialog_EditField) as EditText?
+        contentField = findViewById(R.id.SendMailDialog_EditField) as EditText
 
-        postButton = findViewById(R.id.SendMailDialog_Post) as Button?
-        postButton?.setOnClickListener(this)
+        postButton = findViewById(R.id.SendMailDialog_Post) as Button
+        postButton.setOnClickListener(this)
 
-        symbolButton = findViewById(R.id.SendMailDialog_Symbol) as Button?
-        symbolButton?.setOnClickListener(this)
+        insertExpressionButton = findViewById(R.id.SendMailDialog_Symbol) as Button
+        insertExpressionButton.setOnClickListener(this)
 
-        hideTitleButton = findViewById(R.id.SendMailDialog_Cancel) as Button?
-        hideTitleButton?.setOnClickListener(this)
+        insertSymbolButton = findViewById(R.id.SendMailDialog_Cancel) as Button
+        insertSymbolButton.setOnClickListener(this)
 
-        paintColorButton = findViewById(R.id.ArticlePostDialog_Color) as Button?
-        paintColorButton?.setOnClickListener(this)
+        paintColorButton = findViewById(R.id.ArticlePostDialog_Color) as Button
+        paintColorButton.setOnClickListener(this)
 
         findViewById(R.id.SendMailDialog_change)?.setOnClickListener(this)
-        titleBlock = findViewById(R.id.SendMail_TitleBlock)
+        titleBlock = findViewById(R.id.SendMail_TitleBlock) as View
         refresh()
 
         // 替換外觀
@@ -145,24 +131,18 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     override fun clear() {
-        if (receiverField != null) {
-            receiverField?.setText("")
-        }
-        if (titleField != null) {
-            titleField?.setText("")
-        }
-        if (contentField != null) {
-            contentField?.setText("")
-        }
+        receiverField.setText("")
+        titleField.setText("")
+        contentField.setText("")
         sendMailPageListener = null
     }
 
-    fun setPostTitle(aTitle: String?) {
-        myTitle = aTitle
+    fun setPostTitle(aTitle: String) {
+        fromTitle = aTitle
         refreshTitleField()
     }
 
-    fun setPostContent(aContent: String?) {
+    fun setPostContent(aContent: String) {
         myContent = aContent
         refreshContentField()
     }
@@ -170,9 +150,9 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     override fun onClick(view: View) {
         if (view === postButton) {
             if (sendMailPageListener != null) {
-                val receiver = receiverField?.text.toString().replace("\n", "")
-                val title = titleField?.text.toString().replace("\n", "")
-                val content = contentField?.text.toString()
+                val receiver = receiverField.text.toString().replace("\n", "")
+                val title = titleField.text.toString().replace("\n", "")
+                val content = contentField.text.toString()
                 val errMsg = StringBuilder()
                 val empty = Vector<String?>()
                 if (receiver.isEmpty()) {
@@ -218,7 +198,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
                         }
                     }.show()
             }
-        } else if (view === symbolButton) {
+        } else if (view === insertExpressionButton) {
             // 表情符號
 
             val items: Array<String> = articleExpressions
@@ -230,7 +210,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
                         paramString: String
                     ) {
                         val symbol = items[paramInt]
-                        contentField?.editableText!!.insert(contentField?.selectionStart!!, symbol)
+                        contentField.editableText!!.insert(contentField.selectionStart, symbol)
                     }
 
                     override fun onListDialogSettingClicked() {
@@ -239,7 +219,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
                         navigationController.pushViewController(ArticleExpressionListPage())
                     }
                 }).scheduleDismissOnPageDisappear(this).show()
-        } else if (view === hideTitleButton) {
+        } else if (view === insertSymbolButton) {
             onInsertSymbolButtonClicked()
         } else if (view === paintColorButton) {
             val dialog = DialogPaintColor()
@@ -257,38 +237,38 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
 
     fun refresh() {
         if (isTitleBlockHidden) {
-            titleBlock?.visibility = View.GONE
+            titleBlock.visibility = View.GONE
         } else {
-            titleBlock?.visibility = View.VISIBLE
+            titleBlock.visibility = View.VISIBLE
         }
     }
 
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
         if (v === receiverField) {
             if (hasFocus) {
-                receiverField?.isSingleLine = false
-                receiverFieldBackground?.setTextColor(0)
-                receiverField?.setTextColor(-1)
+                receiverField.isSingleLine = false
+                receiverFieldBackground.setTextColor(0)
+                receiverField.setTextColor(-1)
             } else {
-                receiverField?.isSingleLine = true
-                receiverField?.setTextColor(0)
-                receiverFieldBackground?.setTextColor(-1)
-                receiverFieldBackground?.text = receiverField?.text.toString()
+                receiverField.isSingleLine = true
+                receiverField.setTextColor(0)
+                receiverFieldBackground.setTextColor(-1)
+                receiverFieldBackground.text = receiverField.text.toString()
             }
         }
         if (v !== titleField) {
             return
         }
         if (hasFocus) {
-            titleField?.isSingleLine = false
-            titleField?.setTextColor(-1)
-            titleFieldBackground?.setTextColor(0)
+            titleField.isSingleLine = false
+            titleField.setTextColor(-1)
+            titleFieldBackground.setTextColor(0)
             return
         }
-        titleField?.isSingleLine = true
-        titleField?.setTextColor(0)
-        titleFieldBackground?.setTextColor(-1)
-        titleFieldBackground?.text = titleField?.text.toString()
+        titleField.isSingleLine = true
+        titleField.setTextColor(0)
+        titleFieldBackground.setTextColor(-1)
+        titleFieldBackground.text = titleField.text.toString()
     }
 
     fun changeViewMode() {
@@ -303,11 +283,11 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     override fun onSymbolDialogDismissWithSymbol(str: String) {
-        contentField?.editableText!!.insert(contentField?.selectionStart!!, str)
+        contentField.editableText!!.insert(contentField.selectionStart, str)
     }
 
-    fun setReceiver(aReceiver: String?) {
-        receiver1 = aReceiver
+    fun setReceiver(aReceiver: String) {
+        fromReceiver = aReceiver
         refreshReceiverField()
     }
 
@@ -315,15 +295,15 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         get() = true
 
     override fun onPaintColorDone(str: String) {
-        contentField?.editableText!!.insert(contentField?.selectionStart!!, str)
+        contentField.editableText!!.insert(contentField.selectionStart, str)
     }
 
     // 讀取暫存檔
     private fun loadTempArticle(index: Int) {
         val articleTemp = ArticleTempStore(context).articles[index]
-        receiverField?.setText(articleTemp.header)
-        titleField?.setText(articleTemp.title)
-        contentField?.setText(articleTemp.content)
+        receiverField.setText(articleTemp.header)
+        titleField.setText(articleTemp.title)
+        contentField.setText(articleTemp.content)
     }
 
     // 儲存暫存檔
@@ -331,11 +311,11 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         val store = ArticleTempStore(context)
         val articleTemp = store.articles[index]
         // 收信者
-        articleTemp.header = receiverField?.text.toString()
+        articleTemp.header = receiverField.text.toString()
         // 標題
-        articleTemp.title = titleField?.text.toString()
+        articleTemp.title = titleField.text.toString()
         // 內文
-        articleTemp.content = contentField?.text.toString()
+        articleTemp.content = contentField.text.toString()
 
         // 存檔
         store.store()

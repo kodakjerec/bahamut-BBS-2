@@ -18,8 +18,21 @@
                 <FrameLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                     <com.kota.telnetUI.textView.TelnetTextViewNormal
                         android:textColor="@color/item_background_color" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_ReceiverFieldBackground" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:singleLine="true" style="@style/TextViewNormal"/>
+
                     <com.kota.Bahamut.pages.model.PostEditText
-                        android:textColor="@color/white" android:ellipsize="end" android:gravity="center_vertical" android:id="@+id/SendMail_ReceiverField" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="54dp" android:hint="@string/input_receiver_here" android:singleLine="true" style="@style/TextViewNormal" android:inputType="textMultiLine" android:autofillHints=""/>
+                        android:id="@+id/SendMail_ReceiverField"
+                        style="@style/TextViewNormal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints=""
+                        android:background="@color/item_background_color"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:hint="@string/input_receiver_here"
+                        android:inputType="textMultiLine"
+                        android:minHeight="54dp"
+                        android:singleLine="true"
+                        android:textColor="@color/white" />
                 </FrameLayout>
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>

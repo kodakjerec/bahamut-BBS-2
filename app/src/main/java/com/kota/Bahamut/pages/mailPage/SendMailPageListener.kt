@@ -1,4 +1,4 @@
-package com.kota.Bahamut.pages
+package com.kota.Bahamut.pages.mailPage
 
 interface SendMailPageListener {
     fun onSendMailDialogSendButtonClicked(

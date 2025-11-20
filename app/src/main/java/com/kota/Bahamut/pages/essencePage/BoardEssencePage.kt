@@ -189,7 +189,7 @@ class BoardEssencePage : TelnetListPage() {
 
     fun loadNextArticle() {
         val targetIndex = loadingItemNumber + 1
-        if (targetIndex > itemSize) {
+        if (targetIndex > listCount) {
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.already_to_bottom))
         } else {
             loadItemAtNumber(targetIndex)

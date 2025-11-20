@@ -1,4 +1,4 @@
-package com.kota.Bahamut.pages
+package com.kota.Bahamut.pages.mailPage
 
 import android.annotation.SuppressLint
 import android.database.DataSetObservable
@@ -230,6 +230,9 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         }
     }
 
+    /**
+     * 按下寄信
+     */
     override fun onSendMailDialogSendButtonClicked(
         sendMailPage: SendMailPage,
         receiver: String,

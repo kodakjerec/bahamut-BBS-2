@@ -42,8 +42,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var lastLoadTime: Long = 0
     private var lastSendTime: Long = 0
     private var autoLoadThread: AutoLoadThread? = null
-    var listCount = 0
-    var itemSize: Int = 0
+    var listCount: Int = 0 // 信件量
     var selectedIndex: Int = 0
         private set
     var currentBlock: Int = 0
@@ -190,7 +189,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         isListLoaded = false
         this.selectedIndex = 0
         this.currentBlock = 0
-        this.itemSize = 0
+        this.listCount = 0
         lastLoadTime = 0L
         lastSendTime = 0L
         listName = null
@@ -209,8 +208,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun setListViewSelection(selection: Int) {
         object : ASRunner() {
-            // from class: com.kota.Bahamut.ListPage.TelnetListPage.1
-            // com.kota.asFramework.thread.ASRunner
             override fun run() {
                 if (this@TelnetListPage.listViewWidget != null) {
                     if (selection == -1) {
@@ -257,7 +254,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     @Synchronized  // com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
-        listCount = this.itemSize
         reloadListView()
         executeRefreshCommand()
     }
@@ -267,7 +263,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             setListViewSelection(0)
         }
         if (pageRefreshCommand[1]) {
-            setListViewSelection(this.itemSize - 1)
+            setListViewSelection(this.listCount - 1)
         }
         cleanRefreshCommand()
     }
@@ -321,8 +317,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             this.selectedIndex = telnetListPageBlock.selectedItemNumber
             this.currentBlock = ItemUtils.getBlock(this.selectedIndex)
         }
-        if (telnetListPageBlock.maximumItemNumber > this.itemSize) {
-            this.itemSize = telnetListPageBlock.maximumItemNumber
+        if (telnetListPageBlock.maximumItemNumber > this.listCount) {
+            this.listCount = telnetListPageBlock.maximumItemNumber
         }
     }
 
@@ -527,7 +523,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     // android.widget.Adapter
     override fun getCount(): Int {
-        val intValue: Int = listCount
+        val intValue: Int = this.listCount
         return intValue
     }
 

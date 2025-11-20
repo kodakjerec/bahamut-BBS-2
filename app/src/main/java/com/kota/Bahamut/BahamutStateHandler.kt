@@ -5,8 +5,8 @@ import com.kota.Bahamut.command.BahamutCommandLoadArticleEnd
 import com.kota.Bahamut.command.BahamutCommandLoadArticleEndForSearch
 import com.kota.Bahamut.command.BahamutCommandLoadMoreArticle
 import com.kota.Bahamut.pages.ClassPage
-import com.kota.Bahamut.pages.MailBoxPage
-import com.kota.Bahamut.pages.MailPage
+import com.kota.Bahamut.pages.mailPage.MailBoxPage
+import com.kota.Bahamut.pages.mailPage.MailPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.articlePage.ArticlePage

@@ -1,4 +1,4 @@
-package com.kota.Bahamut.pages
+package com.kota.Bahamut.pages.mailPage
 
 import android.util.Log
 import android.view.View
@@ -38,12 +38,12 @@ import java.util.Vector
 class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     DialogSelectArticleListener, SendMailPageListener, View.OnClickListener,
     OnLongClickListener {
-    var backButton: Button? = null
-    var headerItemView: TelnetHeaderItemView? = null
-    var listEmptyView: View? = null
-    var myListView: ListView? = null
-    var pageDownButton: Button? = null
-    var pageUpButton: Button? = null
+    lateinit var backButton: Button
+    lateinit var headerItemView: TelnetHeaderItemView
+    lateinit var listEmptyView: View
+    lateinit var myListView: ListView
+    lateinit var pageDownButton: Button
+    lateinit var pageUpButton: Button
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_MAIL_BOX
@@ -53,33 +53,24 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
 
     override fun onPageDidLoad() {
         super.onPageDidLoad()
-        myListView = findViewById(R.id.MailBoxPage_listView) as ListView?
-        listEmptyView = findViewById(R.id.MailBoxPage_listEmptyView)
-        myListView?.emptyView = listEmptyView
+        myListView = findViewById(R.id.MailBoxPage_listView) as ListView
+        listEmptyView = findViewById(R.id.MailBoxPage_listEmptyView) as View
+        myListView.emptyView = listEmptyView
         listView = myListView
-        backButton = findViewById(R.id.Mail_backButton) as Button?
-        backButton?.setOnClickListener(this)
-        backButton?.setOnLongClickListener(this)
-        pageUpButton = findViewById(R.id.Mail_pageUpButton) as Button?
-        pageUpButton?.setOnClickListener(this)
-        pageUpButton?.setOnLongClickListener(this)
-        pageDownButton = findViewById(R.id.Mail_pageDownButton) as Button?
-        pageDownButton?.setOnClickListener(this)
-        pageDownButton?.setOnLongClickListener(this)
+        backButton = findViewById(R.id.Mail_backButton) as Button
+        backButton.setOnClickListener(this)
+        backButton.setOnLongClickListener(this)
+        pageUpButton = findViewById(R.id.Mail_pageUpButton) as Button
+        pageUpButton.setOnClickListener(this)
+        pageUpButton.setOnLongClickListener(this)
+        pageDownButton = findViewById(R.id.Mail_pageDownButton) as Button
+        pageDownButton.setOnClickListener(this)
+        pageDownButton.setOnLongClickListener(this)
         findViewById(R.id.Mail_SearchButton)?.setOnClickListener(this)
-        headerItemView = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView?
+        headerItemView = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
-    }
-
-    override fun onPageDidDisappear() {
-        backButton = null
-        pageUpButton = null
-        pageDownButton = null
-        headerItemView = null
-        listEmptyView = null
-        super.onPageDidDisappear()
     }
 
     override fun loadPage(): TelnetListPageBlock? {
@@ -89,7 +80,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        headerItemView?.setData("我的信箱", "您有 $itemSize 封信在信箱內", "")
+        headerItemView.setData("我的信箱", "您有 $listCount 封信在信箱內", "")
     }
 
     override fun onBackPressed(): Boolean {
@@ -108,11 +99,9 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         return false
     }
 
-    override fun onSearchButtonClicked(): Boolean {
-        showSelectArticleDialog()
-        return true
-    }
-
+    /**
+     * 顯示選擇文章視窗
+     */
     fun showSelectArticleDialog() {
         val dialog = DialogSelectArticle()
         dialog.setListener(this)
@@ -151,7 +140,9 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         pushCommand(BahamutCommandSendMail(receiver, title, content))
     }
 
-    // 點下文章先做檢查
+    /**
+     * 點下文章先做檢查
+     */
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val mailBoxPageItem = getItem(index) as MailBoxPageItem?
         if (mailBoxPageItem == null || mailBoxPageItem.isDeleted) {
@@ -161,7 +152,9 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         return true
     }
 
-    // 刪除文章
+    /**
+     * 刪除文章
+     */
     fun onDeleteArticle(view: View?, itemIndex: Int) {
         ASAlertDialog.createDialog()
             .setTitle(getContextString(R.string.delete))
@@ -174,7 +167,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                     val mailBoxPageItem = getItem(itemIndex - 1) as MailBoxPageItem?
                     mailBoxPageItem?.isDeleted = true
 
-                    myListView?.removeViewInLayout(view)
+                    myListView.removeViewInLayout(view)
 
                     // telnet
                     val command: TelnetCommand = BahamutCommandDeleteArticle(itemIndex)
@@ -220,9 +213,9 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     }
 
     fun onPostButtonClicked() {
-        val sendMainPage = SendMailPage()
-        sendMainPage.setListener(this)
-        navigationController.pushViewController(sendMainPage)
+        val sendMailPage = SendMailPage()
+        sendMailPage.setListener(this)
+        navigationController.pushViewController(sendMailPage)
     }
 
     fun loadPreviousArticle() {
@@ -236,7 +229,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
 
     fun loadNextArticle() {
         val targetIndex = loadingItemNumber + 1
-        if (targetIndex > itemSize) {
+        if (targetIndex > listCount) {
             showShortToast(getContextString(R.string.already_to_bottom))
         } else {
             loadItemAtNumber(targetIndex)
