@@ -5,14 +5,12 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.Bookmark
-import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
-import java.util.Vector
 
 class BoardLinkPage : BoardMainPage() {
     override val pageType: Int
@@ -29,7 +27,7 @@ class BoardLinkPage : BoardMainPage() {
         super.onPageRefresh()
         val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView?
         if (headerView != null) {
-            var boardName = name
+            var boardName = listName
             if (boardName == null) {
                 boardName = getContextString(R.string.loading)
             }
@@ -56,12 +54,12 @@ class BoardLinkPage : BoardMainPage() {
                     if (index == 1) {
                         val bookmark = Bookmark()
                         println("add bookmark:" + bookmark.title)
-                        bookmark.board = this@BoardLinkPage.name
+                        bookmark.board = this@BoardLinkPage.listName
                         bookmark.keyword = item.title
                         bookmark.title = bookmark.generateTitle()
                         val store = TempSettings.bookmarkStore
                         if (store != null) {
-                            store.getBookmarkList(this@BoardLinkPage.name).addBookmark(bookmark)
+                            store.getBookmarkList(this@BoardLinkPage.listName).addBookmark(bookmark)
                             store.store()
                         }
                     }
@@ -88,12 +86,12 @@ class BoardLinkPage : BoardMainPage() {
                         if (index == 1) {
                             val bookmark = Bookmark()
                             println("add bookmark:" + bookmark.title)
-                            bookmark.board = this@BoardLinkPage.name
+                            bookmark.board = this@BoardLinkPage.listName
                             bookmark.keyword = item.title
                             bookmark.title = bookmark.generateTitle()
                             val store = TempSettings.bookmarkStore
                             if (store != null) {
-                                store.getBookmarkList(this@BoardLinkPage.name)
+                                store.getBookmarkList(this@BoardLinkPage.listName)
                                     .addBookmark(bookmark)
                                 store.store()
                             }

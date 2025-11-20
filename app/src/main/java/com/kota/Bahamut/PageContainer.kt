@@ -100,7 +100,7 @@ class PageContainer private constructor() {
 
     fun pushClassPage(aClassName: String?, aClassTitle: String?) {
         val classPage1 = ClassPage()
-        classPage1.name = aClassName
+        classPage1.listName = aClassName
         classPage1.setClassTitle(aClassTitle)
         this.classPageStack.push(classPage1)
     }
@@ -189,7 +189,7 @@ class PageContainer private constructor() {
     fun pushBoardEssencePage(aClassName: String?, aClassTitle: String) {
         val boardEssencePage = BoardEssencePage()
         boardEssencePage.clear()
-        boardEssencePage.name = aClassName
+        boardEssencePage.listName = aClassName
         boardEssencePage.setClassTitle(aClassTitle)
         this.boardEssencePageStack.push(boardEssencePage)
     }

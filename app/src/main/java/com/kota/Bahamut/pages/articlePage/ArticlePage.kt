@@ -903,7 +903,7 @@ class ArticlePage : TelnetPage() {
     fun setArticle(aArticle: TelnetArticle) {
         telnetArticle = aArticle
         if (telnetArticle != null) {
-            val boardName = boardMainPage?.name
+            val boardName = boardMainPage?.listName
             // 加入歷史紀錄
             val store = TempSettings.bookmarkStore
             if (store != null) {

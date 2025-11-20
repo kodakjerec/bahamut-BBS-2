@@ -153,7 +153,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
-        if (name != null && name == "Favorite") {
+        if (listName != null && listName == "Favorite") {
             val itemIndex = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消")
                 .addButton("確定")
@@ -196,7 +196,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     title: String?
                 ) {
                     val board = SearchBoardHandler.instance.getBoard(index)
-                    if (this@ClassPage.name == "Favorite") {
+                    if (this@ClassPage.listName == "Favorite") {
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }

@@ -553,7 +553,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 按下精華區  */
     var toEssencePageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this.lastListAction = BoardPageAction.Companion.ESSENCE
-        PageContainer.instance!!.pushBoardEssencePage(name, boardTitle!!)
+        PageContainer.instance!!.pushBoardEssencePage(listName, boardTitle!!)
         navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
@@ -681,7 +681,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         var boardManager1 = boardManager
         boardManager1 =
             if (boardManager1 == null || boardManager1.isEmpty()) getContextString(R.string.loading) else boardManager1
-        val boardName = name
+        val boardName = listName
         val headerView = mainLayout!!.findViewById<BoardHeaderView?>(R.id.BoardPage_HeaderView)!!
         headerView.setData(boardTitle1, boardName, boardManager1)
     }
@@ -705,7 +705,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             }
             boardManager = load.boardManager
             boardTitle = load.boardTitle
-            name = load.boardName
+            listName = load.boardName
             isRefreshHeaderView = true
             initialed = true
         }
@@ -790,7 +790,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         val boardSearchPage = PageContainer.instance!!.boardSearchPage
         boardSearchPage.clear()
         navigationController.pushViewController(boardSearchPage)
-        val state = instance.getState(boardSearchPage.getListIdFromListName(name))
+        val state = instance.getState(boardSearchPage.getListIdFromListName(listName))
         state.top = 0
         state.position = 0
         boardSearchPage.setKeyword(keyword)
@@ -816,7 +816,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     fun onBookmarkButtonClicked() {
-        navigationController.pushViewController(BookmarkManagePage(name, this))
+        navigationController.pushViewController(BookmarkManagePage(listName, this))
     }
 
     /** 長按串接文章  */
@@ -825,7 +825,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage
         boardLinkedTitlePage.clear()
         navigationController.pushViewController(boardLinkedTitlePage)
-        val state = instance.getState(boardLinkedTitlePage.getListIdFromListName(name))
+        val state = instance.getState(boardLinkedTitlePage.getListIdFromListName(listName))
         state.top = 0
         state.position = 0
         pushCommand(BahamutCommandListArticle(i))
@@ -1120,7 +1120,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     fun reloadBookmark() {
-        val listName = name
+        val listName = listName
         val store = TempSettings.bookmarkStore
         if (store != null) {
             if (myMode == 0) {

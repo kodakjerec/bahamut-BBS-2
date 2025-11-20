@@ -11,7 +11,7 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 36 // 更新到36以支援Android 16的edge-to-edge
-        versionCode 50
+        versionCode 51
         versionName "3.0.0"
     }
 
