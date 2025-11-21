@@ -106,8 +106,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     var blockListForTitle: Boolean = false // 是否啟用黑名單套用至標題
     var isDrawerOpening: Boolean = false // 側邊選單正在開啟中
     val myBookmarkList: MutableList<Bookmark> = ArrayList<Bookmark>()
-    var drawerListView: ListView? = null
-    var drawerListViewNone: TextView? = null
+    lateinit var drawerListView: ListView
+    lateinit var drawerListViewNone: TextView
     var myMode: Int = 0 // 現在開啟的是 0-書籤 1-紀錄
     lateinit var tabButtons: Array<Button>
     var showBookmarkButton: Button? = null // 顯示書籤按鈕
@@ -195,6 +195,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 menuView.layoutParams = layoutParamsDrawer
                 drawerLayout.openDrawer(drawerLocation, propertiesAnimationEnable)
             }
+            reloadBookmark()
         }
     }
 
@@ -328,25 +329,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         } else {
             1
         }
-        if (drawerListView != null) {
-            if (myMode == 0) drawerListView?.adapter = bookmarkAdapter
-            else drawerListView?.adapter = historyAdapter
-            if (drawerListView?.onItemClickListener == null) drawerListView?.onItemClickListener =
-                bookmarkListener
-        }
-        reloadBookmark()
-
-        // 切換頁籤
-        val theme = getSelectTheme()
-        for (tabButton in this@BoardMainPage.tabButtons) {
-            if (tabButton === aView) {
-                tabButton.setTextColor(rgbToInt(theme.textColor))
-                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColor))
-            } else {
-                tabButton.setTextColor(rgbToInt(theme.textColorDisabled))
-                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
-            }
-        }
+        reloadBookmark(aView)
     }
 
     /** 搜尋文章  */
@@ -480,20 +463,16 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 mainDrawerLayout?.findViewById<View>(R.id.bookmark_edit_button)
             bookmarkEditButton?.setOnClickListener(editBookmarkListener)
             // 側邊選單內的書籤
-            drawerListView = mainDrawerLayout?.findViewById<ListView?>(R.id.bookmark_list_view)
+            drawerListView = mainDrawerLayout?.findViewById<ListView>(R.id.bookmark_list_view)!!
             drawerListViewNone =
-                mainDrawerLayout?.findViewById<TextView>(R.id.bookmark_list_view_none)
-            if (drawerListView != null) {
-                showBookmarkButton =
-                    mainDrawerLayout?.findViewById<Button>(R.id.show_bookmark_button)
-                showHistoryButton =
-                    mainDrawerLayout?.findViewById<Button>(R.id.show_history_button)
-                tabButtons = arrayOf<Button>(showBookmarkButton!!, showHistoryButton!!)
-                showBookmarkButton?.setOnClickListener(buttonClickListener)
-                showHistoryButton?.setOnClickListener(buttonClickListener)
-                if (myMode == 0) showBookmarkButton?.performClick()
-                else showHistoryButton?.performClick()
-            }
+                mainDrawerLayout?.findViewById<TextView>(R.id.bookmark_list_view_none)!!
+            showBookmarkButton =
+                mainDrawerLayout?.findViewById<Button>(R.id.show_bookmark_button)
+            showHistoryButton =
+                mainDrawerLayout?.findViewById<Button>(R.id.show_history_button)
+            tabButtons = arrayOf<Button>(showBookmarkButton!!, showHistoryButton!!)
+            showBookmarkButton?.setOnClickListener(buttonClickListener)
+            showHistoryButton?.setOnClickListener(buttonClickListener)
             mainDrawerLayout?.findViewById<View>(R.id.bookmark_tab_button)!!
                 .setOnClickListener(toEssencePageClickListener)
         }
@@ -1119,8 +1098,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         historyAdapter.notifyDataSetChanged()
     }
 
-    fun reloadBookmark() {
-        val listName = listName
+    fun reloadBookmark(aView: View? = null) {
         val store = TempSettings.bookmarkStore
         if (store != null) {
             if (myMode == 0) {
@@ -1136,11 +1114,34 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             }
         }
         if (myBookmarkList.isEmpty()) {
-            drawerListView?.visibility = View.GONE
-            drawerListViewNone?.visibility = View.VISIBLE
+            drawerListView.visibility = View.GONE
+            drawerListViewNone.visibility = View.VISIBLE
         } else {
-            drawerListView?.visibility = View.VISIBLE
-            drawerListViewNone?.visibility = View.GONE
+            drawerListView.visibility = View.VISIBLE
+            drawerListViewNone.visibility = View.GONE
+        }
+
+        // 切換View本體
+        if (myMode == 0)
+            drawerListView.adapter = bookmarkAdapter
+        else
+            drawerListView.adapter = historyAdapter
+        if (drawerListView.onItemClickListener == null)
+            drawerListView.onItemClickListener =
+                bookmarkListener
+
+        // 填上顏色: 書籤. 紀錄
+        var selectedView = aView
+        if(selectedView == null) selectedView = tabButtons[myMode]
+        val theme = getSelectTheme()
+        for (tabButton in this@BoardMainPage.tabButtons) {
+            if (tabButton === selectedView) {
+                tabButton.setTextColor(rgbToInt(theme.textColor))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColor))
+            } else {
+                tabButton.setTextColor(rgbToInt(theme.textColorDisabled))
+                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
+            }
         }
     }
 

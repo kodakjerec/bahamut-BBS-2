@@ -192,7 +192,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         this.listCount = 0
         lastLoadTime = 0L
         lastSendTime = 0L
-        listName = null
+        listName = ""
     }
 
     var listView: ListView?
