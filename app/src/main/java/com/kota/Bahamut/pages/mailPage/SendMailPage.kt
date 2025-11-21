@@ -8,6 +8,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dialogs.DialogInsertExpression

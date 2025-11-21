@@ -1,5 +1,6 @@
 package com.kota.Bahamut.command
 
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.telnet.reference.TelnetKeyboard
@@ -15,7 +16,12 @@ class BahamutCommandSendMail(var receiver: String, var title: String, var conten
     override fun execute(telnetListPage: TelnetListPage) {
         if (receiver.isNotEmpty() && title.isNotEmpty() && content.isNotEmpty()) {
             val buffer = create()
-            buffer.pushKey(TelnetKeyboard.SHIFT_M)
+            if(BahamutStateHandler.bahamutStateHandler!!.rowString00.contains("電子郵件")) {
+                buffer.pushKey(TelnetKeyboard.SHIFT_M) // 移動到 (M)ail       站內寄信
+                buffer.pushString("\n")
+            } else {
+                buffer.pushKey(TelnetKeyboard.KEY_S)
+            }
             buffer.pushString(receiver + "\n")
             buffer.pushString(title + "\n")
             buffer.pushString("0" + "\n") // 選擇簽名檔 (1 ~ 9, 0=不加)[0]：
