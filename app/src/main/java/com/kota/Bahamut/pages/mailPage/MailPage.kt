@@ -266,6 +266,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
     fun onReplyButtonClicked() {
         val sendMailPage = SendMailPage()
+        navigationController.pushViewController(sendMailPage)
         if (telnetArticle != null) {
             val replyTitle = telnetArticle!!.generateReplyTitle()
             val replyContent = telnetArticle!!.generateReplyContent()
@@ -274,7 +275,6 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             sendMailPage.setReceiver(telnetArticle!!.author)
             sendMailPage.setListener(this)
         }
-        navigationController.pushViewController(sendMailPage)
     }
 
     fun reloadViewMode() {
