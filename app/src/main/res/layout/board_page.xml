@@ -10,10 +10,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
-            <com.kota.Bahamut.Pages.BoardPage.BoardHeaderView android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            <com.kota.Bahamut.pages.boardPage.BoardHeaderView
+                android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <FrameLayout android:id="@+id/BoardPage_ListViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:id="@+id/BoardPageListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
-                <com.kota.ASFramework.UI.ASListView android:id="@+id/BoardPageListView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
+                <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
+                    android:textColor="@color/white" android:gravity="center" android:id="@+id/BoardPageListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                <com.kota.asFramework.ui.ASListView
+                    android:id="@+id/BoardPageListView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
             </FrameLayout>
             <LinearLayout
                 android:id="@+id/toolbar_block"
@@ -53,7 +56,7 @@
                 style="@style/ToolbarItemLR"
                 android:text="@string/toolbar_item_rr"/>
         </LinearLayout>
-        <com.kota.Bahamut.Pages.Model.ToolBarFloating
+        <com.kota.Bahamut.pages.model.ToolBarFloating
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/ToolbarFloatingComponent"/>
@@ -73,7 +76,7 @@
                 android:text="@string/bookmark_manager"
                 style="@style/ToolbarItem.RightMenu"
                 android:layout_weight="2"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
         <TextView
@@ -144,7 +147,7 @@
                 style="@style/CheckboxBahamut"
                 android:layout_height="match_parent"
                 android:layout_width="40dp"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:id="@+id/block_enable_button_checkbox_label"
                 style="@style/TextViewLarge"
                 android:layout_height="match_parent"
@@ -154,7 +157,7 @@
                 android:gravity="center_vertical"/>
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>
             <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:layout_weight="1" android:text="@string/system_setting_page_chapter_blocklist" style="@style/ToolbarItem.RightMenu"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -1,0 +1,15 @@
+package com.kota.Bahamut.command
+
+import com.kota.telnet.TelnetClient
+import com.kota.telnet.reference.TelnetKeyboard
+
+class BahamutCommandLoadMoreArticle {
+    fun execute() {
+        print(toString() + " ")
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.PAGE_DOWN, 1)
+    }
+
+    override fun toString(): String {
+        return "[LoadMoreArticle]"
+    }
+}

@@ -15,34 +15,39 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/User_Config_Main_Layout">
-            <com.kota.TelnetUI.TextView.TelnetTextView
+            <com.kota.telnetUI.textView.TelnetTextView
                 style="@style/SystemSettingsChapter"
                 android:text="@string/user_config"/>
             <RelativeLayout android:id="@+id/User_Config_Item_5" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_5" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/user_config_5" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/User_Config_Item_5_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
             </RelativeLayout>
             <RelativeLayout android:id="@+id/User_Config_Item_6" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_6" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/user_config_6" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/User_Config_Item_6_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
             </RelativeLayout>
             <RelativeLayout android:id="@+id/User_Config_Item_8" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_8" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/user_config_8" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/User_Config_Item_8_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
             </RelativeLayout>
             <RelativeLayout android:id="@+id/User_Config_Item_9" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_9" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/user_config_9" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/User_Config_Item_9_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
             </RelativeLayout>
             <RelativeLayout android:id="@+id/User_Config_Item_A" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_A" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/user_config_A" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/User_Config_Item_A_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
             </RelativeLayout>
             <RelativeLayout
                 android:id="@+id/User_Config_Layout_Cant"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     style="@style/SystemSettingsChapter"
                     android:text="@string/user_config_cant"/>
                 <TextView
@@ -62,31 +67,38 @@
                 android:orientation="vertical"
                 android:visibility="gone">
                 <RelativeLayout android:id="@+id/User_Config_Item_0" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_0" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_0" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_0_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_1" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_1" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_1" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_1_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_2" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_2" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_2" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_2_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_3" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_3" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_3" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_3_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_4" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_4" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_4" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_4_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_7" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_7" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_7" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_7_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/User_Config_Item_B" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/user_config_B" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/user_config_B" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:enabled="false" android:id="@+id/User_Config_Item_B_Enable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/zero_word" />
                 </RelativeLayout>
             </LinearLayout>

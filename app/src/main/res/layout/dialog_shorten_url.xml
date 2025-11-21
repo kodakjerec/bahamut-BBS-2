@@ -15,7 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:id="@+id/dialog_title"
                 android:textColor="@color/white"
                 android:background="#202020"
@@ -44,7 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical">
-                    <com.kota.Bahamut.Pages.Model.PostEditText
+                    <com.kota.Bahamut.pages.model.PostEditText
                         android:id="@+id/dialog_shorten_url_content"
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"
@@ -65,7 +65,7 @@
                             android:id="@+id/dialog_shorten_url_non_id_checkbox"
                             style="@style/CheckboxBahamut"
                             android:layout_centerVertical="true"/>
-                        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                        <com.kota.telnetUI.textView.TelnetTextViewLarge
                             style="@style/SystemSettingsCheckboxText"
                             android:layout_toEndOf="@+id/dialog_shorten_url_non_id_checkbox"
                             android:id="@+id/dialog_shorten_url_non_id_label"
@@ -94,7 +94,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
             </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        <com.kota.telnetUI.textView.TelnetTextViewSmall
             android:id="@+id/dialog_shorten_url_sample"
             style="@style/TextViewSmall"
             android:layout_width="match_parent"

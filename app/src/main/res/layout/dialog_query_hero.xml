@@ -11,7 +11,8 @@
         android:orientation="vertical"
         android:background="@color/black"
         android:layout_margin="3dp">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
+            android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
         <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="match_parent">
                 <TextView

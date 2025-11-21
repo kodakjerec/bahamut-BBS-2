@@ -8,20 +8,29 @@
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
         <LinearLayout android:orientation="vertical" android:id="@+id/BoardPage_ItemView_backgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/board_page_item_view_status" android:layout_gravity="start|center_vertical|center_horizontal|center" android:id="@+id/BoardPage_ItemView_Status" android:layout_width="30dp" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/board_page_item_view_title" android:ellipsize="end" android:id="@+id/BoardPage_ItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
+                <com.kota.telnetUI.textView.TelnetTextViewNormal
+                    android:textColor="@color/board_page_item_view_status" android:layout_gravity="start|center_vertical|center_horizontal|center" android:id="@+id/BoardPage_ItemView_Status" android:layout_width="30dp" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
+                <com.kota.telnetUI.textView.TelnetTextViewNormal
+                    android:textColor="@color/board_page_item_view_title" android:ellipsize="end" android:id="@+id/BoardPage_ItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_number" android:id="@+id/BoardPage_ItemView_Number" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_mark" android:id="@+id/BoardPage_ItemView_mark" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/word_m" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_date" android:id="@+id/BoardPage_ItemView_Date" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/article_page_text_item_content0" android:id="@+id/BoardPage_ItemView_GY_Title" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/gy_" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_gy" android:id="@+id/BoardPage_ItemView_GY" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_author" android:gravity="end" android:id="@+id/BoardPage_ItemView_Author" android:paddingStart="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/board_page_item_view_number" android:id="@+id/BoardPage_ItemView_Number" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/board_page_item_view_mark" android:id="@+id/BoardPage_ItemView_mark" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/word_m" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/board_page_item_view_date" android:id="@+id/BoardPage_ItemView_Date" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/article_page_text_item_content0" android:id="@+id/BoardPage_ItemView_GY_Title" android:paddingStart="12dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/gy_" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/board_page_item_view_gy" android:id="@+id/BoardPage_ItemView_GY" android:layout_width="wrap_content" android:layout_height="wrap_content" style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="@color/board_page_item_view_author" android:gravity="end" android:id="@+id/BoardPage_ItemView_Author" android:paddingStart="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
             </LinearLayout>
         </LinearLayout>
         <View style="@style/ItemViewDividerVertical"/>
-        <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/BoardPage_ItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+        <com.kota.telnetUI.textView.TelnetTextViewSmall
+            android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/BoardPage_ItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
     </LinearLayout>
     <View android:id="@+id/BoardPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

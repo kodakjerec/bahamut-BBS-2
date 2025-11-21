@@ -8,6 +8,7 @@
     <string name="account_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="add">新增</string>
     <string name="reset">重置</string>
+    <string name="close">關閉</string>
     <string name="reset_message">是否確定重置為預設值？</string>
     <string name="reset_ok">已成功重置輸入ID為預設值</string>
     <string name="arrow_down">▼</string>
@@ -398,8 +399,8 @@
     <string name="message_main_setting01">同步</string>
     <string name="message_main_setting02">清暫存並同步</string>
     <string name="message_sub_send_hero">私訊勇者</string>
-    <string name="ignoreBattery_msg01">未開啟不斷線掛網\n設定>偏好設定>不受電池最佳化限制</string>
-    <string name="ignoreBattery_msg02">已開啟不斷線掛網</string>
+    <string name="ignoreBattery_msg01">請關閉電池省電設定\n設定>偏好設定>不受電池最佳化限制</string>
+    <string name="ignoreBattery_msg02">已開啟不受電池最佳化限制</string>
     <string name="board_main_vV"> vV</string>
     <string name="board_main_read_all">全部已讀</string>
     <string name="board_main_unread_all">全部未讀</string>
@@ -412,4 +413,12 @@
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
     <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
     <string name="login_web_sign_in_msg06">需要手動完成驗證，請在網頁中操作</string>
+    <string name="notification_permission_title">開啟通知權限</string>
+    <string name="notification_permission_message">為了讓背景服務正常運作並顯示連線狀態，需要開啟通知權限。是否要前往設定頁面開啟？</string>
+    <string name="notification_permission_goto_settings">前往設定</string>
+    <string name="notification_permission_later">稍後再說</string>
+    <string name="background_service_name">Bahamut BBS 服務</string>
+    <string name="background_service_description">Bahamut BBS 服務</string>
+    <string name="background_service_notification_title">Bahamut BBS</string>
+    <string name="background_service_notification_text">BBS 連線維持中…</string>
 </resources>

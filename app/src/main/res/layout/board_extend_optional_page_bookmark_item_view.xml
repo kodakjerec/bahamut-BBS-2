@@ -3,14 +3,20 @@
     <View android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
     <LinearLayout android:orientation="vertical" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_BackgroundView" android:background="@color/list_page_item_content_background" android:paddingLeft="10dp" android:paddingRight="10dp" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TouchBlock">
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:textColor="@color/board_page_item_view_title" android:ellipsize="end" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/un_input" android:maxLines="2" style="@style/TextViewNormal"/>
+            <com.kota.telnetUI.textView.TelnetTextViewNormal
+                android:textColor="@color/board_page_item_view_title" android:ellipsize="end" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/un_input" android:maxLines="2" style="@style/TextViewNormal"/>
         </LinearLayout>
         <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_ex_page_item_view_author_title" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Author_Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/author_" android:singleLine="true" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_ex_page_item_view_author" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Author" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/un_input" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_mark" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Mark" android:visibility="invisible" android:layout_width="30dp" android:layout_height="wrap_content" android:text="@string/word_m" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_gy_title" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_GY_Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12dp" android:text="@string/gy_" style="@style/TextViewSmall"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall android:textColor="@color/board_page_item_view_gy" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_GY" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/number_0" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/board_ex_page_item_view_author_title" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Author_Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/author_" android:singleLine="true" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/board_ex_page_item_view_author" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Author" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/un_input" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/board_page_item_view_mark" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Mark" android:visibility="invisible" android:layout_width="30dp" android:layout_height="wrap_content" android:text="@string/word_m" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/board_page_item_view_gy_title" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_GY_Title" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="12dp" android:text="@string/gy_" style="@style/TextViewSmall"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
+                android:textColor="@color/board_page_item_view_gy" android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_GY" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/number_0" style="@style/TextViewSmall"/>
         </LinearLayout>
     </LinearLayout>
     <View android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>

@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:background="@color/black"
         android:layout_margin="3dp">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:id="@+id/dialog_title"
             style="@style/TextViewLarge"
             android:layout_width="match_parent"
@@ -87,7 +87,7 @@
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+        <com.kota.telnetUI.textView.TelnetTextViewSmall
             android:id="@+id/dialog_shorten_image_sample"
             style="@style/TextViewSmall"
             android:layout_width="match_parent"

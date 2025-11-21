@@ -12,21 +12,21 @@
         android:orientation="vertical"
         android:id="@+id/User_Info_Main_Layout">
 
-        <com.kota.TelnetUI.TextView.TelnetTextView
+        <com.kota.telnetUI.textView.TelnetTextView
             style="@style/SystemSettingsChapter"
             android:text="@string/user_info"/>
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="90dp"
             android:orientation="horizontal">
-            <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge
+            <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
                 style="@style/TextViewUltraLarge"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/user_info_nick_name"/>
-            <com.kota.Bahamut.Pages.Model.PostEditText
+            <com.kota.Bahamut.pages.model.PostEditText
                 style="@style/EditTextSingleLine"
                 android:id="@+id/User_Info_Page_Nick_Name"
                 android:layout_width="0dp"
@@ -52,8 +52,9 @@
             android:text="@string/theme_manager_page_chapter_update" />
     </LinearLayout>
 
-    <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+    <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/User_Info_Others"
+        style="@style/TextViewSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/toolbar" />

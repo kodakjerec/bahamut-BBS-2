@@ -5,8 +5,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/TouchBlock">
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal android:id="@+id/ArticleTextItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
-        <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+        <com.kota.telnetUI.textView.TelnetTextViewNormal
+            android:id="@+id/ArticleTextItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
+        <com.kota.telnetUI.textView.TelnetTextViewNormal
             android:id="@+id/ArticleTextItemView_content"
             style="@style/TextViewNormal"
             android:layout_width="match_parent"
@@ -17,7 +18,7 @@
             android:longClickable="true" />
     </LinearLayout>
 
-    <com.kota.TelnetUI.DividerView
+    <com.kota.telnetUI.DividerView
         android:id="@+id/ArticleTextItemView_DividerView"
         android:layout_width="match_parent"
         android:layout_height="1px" />

@@ -15,7 +15,7 @@
             android:minWidth="100dp"
             android:padding="6dp"
             android:text="@string/reset"/>
-        <com.kota.Bahamut.Pages.Model.PostEditText
+        <com.kota.Bahamut.pages.model.PostEditText
             android:id="@+id/BlockList_Input"
             style="@style/TextViewLarge"
             android:layout_width="0dp"

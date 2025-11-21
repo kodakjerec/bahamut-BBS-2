@@ -29,7 +29,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/message_small_show_float"
@@ -45,7 +45,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <com.kota.Bahamut.Pages.Model.PostEditText
+            <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/Message_Main_Search"
                 style="@style/EditTextSingleLine"
                 android:layout_alignParentStart="true"
@@ -70,7 +70,7 @@
                 tools:ignore="RelativeOverlap" />
         </RelativeLayout>
     </LinearLayout>
-    <com.kota.ASFramework.UI.ASListView
+    <com.kota.asFramework.ui.ASListView
         android:layout_below="@+id/Message_Main_Header"
         android:layout_above="@+id/toolbar_List"
         android:id="@+id/Message_Main_Scroll"

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <com.kota.TelnetUI.TelnetView android:id="@+id/ArticlePage_TelnetItemView_TelnetView" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_marginBottom="10dp"/>
-    <com.kota.TelnetUI.DividerView android:id="@+id/ArticlePage_TelnetItemView_DividerView" android:layout_width="match_parent" android:layout_height="1px"/>
+    <com.kota.telnetUI.TelnetView
+        android:id="@+id/ArticlePage_TelnetItemView_TelnetView" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_marginBottom="10dp"/>
+    <com.kota.telnetUI.DividerView
+        android:id="@+id/ArticlePage_TelnetItemView_DividerView" android:layout_width="match_parent" android:layout_height="1px"/>
 </LinearLayout>

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <com.kota.TelnetUI.TelnetHeaderItemView android:id="@+id/MailBox_headerView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <com.kota.telnetUI.TelnetHeaderItemView
+        android:id="@+id/MailBox_headerView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
     <FrameLayout android:id="@+id/MailBoxPage_listViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:textColor="@color/white" android:gravity="center" android:id="@+id/MailBoxPage_listEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/mainbox_no_mail" style="@style/TextViewUltraLarge"/>
+        <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
+            android:textColor="@color/white" android:gravity="center" android:id="@+id/MailBoxPage_listEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/mainbox_no_mail" style="@style/TextViewUltraLarge"/>
         <ListView android:id="@+id/MailBoxPage_listView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
     </FrameLayout>
     <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">

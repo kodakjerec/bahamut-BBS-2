@@ -11,7 +11,7 @@
         android:orientation="vertical"
         android:background="@color/black"
         android:layout_margin="3dp">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:id="@+id/dialog_title"
             android:textColor="@color/white"
             android:background="#202020"
@@ -42,7 +42,7 @@
                 app:selector_AlphaSlideBar="@drawable/colorpickerview_wheel"
                 app:borderSize_AlphaSlideBar="3"
                 android:layout_marginTop="10dp" />
-            <com.kota.Bahamut.Pages.Model.PostEditText
+            <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/dialog_color_picker_sample"
                 style="@style/EditTextSingleLine"
                 android:autofillHints="username"

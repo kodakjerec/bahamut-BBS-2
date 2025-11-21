@@ -11,7 +11,7 @@
         android:layout_height="match_parent"
         android:background="@color/item_background_color" />
 
-    <com.kota.TelnetUI.TelnetView
+    <com.kota.telnetUI.TelnetView
         android:id="@+id/Main_TelnetView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -55,14 +55,14 @@
                 android:layout_weight="2"
                 android:orientation="vertical">
 
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     style="@style/TextViewSmall"
                     android:layout_width="match_parent"
                     android:layout_height="30dp"
                     android:gravity="center"
                     android:text="@string/main_online_people" />
 
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Main_OnlinePeople"
                     style="@style/TextViewNormal"
                     android:layout_width="match_parent"
@@ -78,7 +78,7 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent"
                 android:orientation="vertical">
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Main_BBCall_Layout_text"
                     style="@style/TextViewSmall"
                     android:layout_width="wrap_content"
@@ -97,7 +97,7 @@
                     android:scaleX="0.4"
                     android:scaleY="0.4"
                     tools:ignore="RelativeOverlap" />
-                <com.kota.TelnetUI.TextView.TelnetTextView
+                <com.kota.telnetUI.textView.TelnetTextView
                     android:id="@+id/Main_BBCall"
                     style="@style/TextViewNormal"
                     android:layout_width="match_parent"

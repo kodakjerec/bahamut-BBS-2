@@ -1,0 +1,40 @@
+package com.kota.Bahamut.pages.messages
+
+import android.view.View
+import android.view.ViewGroup
+import android.widget.BaseAdapter
+import com.kota.Bahamut.service.TempSettings
+
+class MessageMainChatAdapter(list: MutableList<BahaMessageSummarize>): BaseAdapter() {
+    private var myList: MutableList<BahaMessageSummarize> = ArrayList()
+
+    init {
+        myList = list
+    }
+
+    override fun getCount(): Int {
+        return myList.size
+    }
+
+    override fun getItem(index: Int): BahaMessageSummarize {
+        return myList[index]
+    }
+
+    override fun getItemId(index: Int): Long {
+        return index.toLong()
+    }
+
+    override fun getView(index: Int, convertView: View?, viewGroup: ViewGroup?): View {
+
+        val myView = MessageMainChatItem(TempSettings.myContext!!)
+        myView.setContent(getItem(index))
+
+        return myView
+    }
+
+    // 新增資料
+    fun addItem(item:BahaMessageSummarize) {
+        myList.add(item)
+        notifyDataSetChanged()
+    }
+}

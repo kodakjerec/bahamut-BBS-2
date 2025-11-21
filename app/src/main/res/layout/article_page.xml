@@ -26,8 +26,9 @@
                 android:id="@+id/Article_TextContentView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
-                <com.kota.TelnetUI.TextView.TelnetTextViewUltraLarge android:id="@+id/Article_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
-                <com.kota.ASFramework.UI.ASListView
+                <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
+                    android:id="@+id/Article_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                <com.kota.asFramework.ui.ASListView
                     android:id="@+id/Article_contentList"
                     android:scrollbars="vertical"
                     android:layout_width="match_parent"
@@ -37,9 +38,11 @@
                     android:dividerHeight="0dp" style="@style/List"/>
             </FrameLayout>
             <!-- telnet模式 -->
-            <com.kota.ASFramework.UI.ASScrollView android:id="@+id/Article_contentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
-                <com.kota.TelnetUI.TelnetView android:id="@+id/Article_contentTelnetView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-            </com.kota.ASFramework.UI.ASScrollView>
+            <com.kota.asFramework.ui.ASScrollView
+                android:id="@+id/Article_contentTelnetViewBlock" android:visibility="gone" android:layout_width="match_parent" android:layout_height="match_parent">
+                <com.kota.telnetUI.TelnetView
+                    android:id="@+id/Article_contentTelnetView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            </com.kota.asFramework.ui.ASScrollView>
         </FrameLayout>
         <LinearLayout
             android:id="@+id/toolbar_block"
@@ -79,7 +82,7 @@
             style="@style/ToolbarItemLR"
             android:text="@string/toolbar_item_rr"/>
     </LinearLayout>
-    <com.kota.Bahamut.Pages.Model.ToolBarFloating
+    <com.kota.Bahamut.pages.model.ToolBarFloating
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/ToolbarFloatingComponent"/>

@@ -7,7 +7,7 @@
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:id="@+id/content_view">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_bbs"/>
         <View style="@style/HorizontalDivider"/>
@@ -16,7 +16,7 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/user_info" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_goBBSUserConfig"
@@ -24,9 +24,9 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/user_config" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/theme"/>
         <View style="@style/HorizontalDivider"/>
@@ -35,19 +35,21 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/theme_manager_page" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_blocklist"/>
         <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_blockListEnable" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/switch_on_block_list" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_blockListEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_blocklist_hint" />
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_blockListForTitle" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_on_block_list_for_title" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/switch_on_block_list_for_title" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_blockListForTitle" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_blocklistForTitle_hint" />
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
@@ -56,23 +58,26 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/block_list_setting" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_board_article"/>
         <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableBoardMove" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_board_move" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_enable_board_move" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableBoardMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_board_move_hint"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableGestureOnBoard" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_gesture_on_board" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_enable_gesture_on_board" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableGestureOnBoard" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_gesture_hint"/>
         </RelativeLayout>
         <RelativeLayout
@@ -81,7 +86,7 @@
             android:id="@+id/SystemSettings_item_toolbar_location">
             <View style="@style/HorizontalDivider"/>
             <LinearLayout style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_toolbar_location"
                     style="@style/SystemSettingsSpinnerText"/>
                 <Spinner
@@ -96,7 +101,7 @@
             <View style="@style/HorizontalDivider"/>
             <LinearLayout style="@style/SystemSettingsItem"
                 android:id="@+id/SystemSettings_item_toolbar_order_item_1">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_toolbar_order"
                     style="@style/SystemSettingsSpinnerText"/>
                 <Spinner
@@ -106,11 +111,11 @@
             <LinearLayout style="@style/SystemSettingsItem"
                 android:id="@+id/SystemSettings_item_toolbar_order_item_2"
                 android:layout_below="@+id/SystemSettings_item_toolbar_order_item_1">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_toolbar_idle"
                     style="@style/SystemSettingsSpinnerText"
                     android:layout_weight="3"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/system_setting_page_toolbar_idle_text"
                     android:text="@string/zero_word"
                     style="@style/SystemSettingsSpinnerText"
@@ -127,11 +132,11 @@
             <LinearLayout style="@style/SystemSettingsItem"
                 android:id="@+id/SystemSettings_item_toolbar_order_item_3"
                 android:layout_below="@+id/SystemSettings_item_toolbar_order_item_2">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_toolbar_alpha"
                     style="@style/SystemSettingsSpinnerText"
                     android:layout_weight="3"/>
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/system_setting_page_toolbar_alpha_text"
                     android:text="@string/zero_word"
                     style="@style/SystemSettingsSpinnerText"
@@ -152,7 +157,7 @@
             android:id="@+id/SystemSettings_item_drawer_location">
             <View style="@style/HorizontalDivider"/>
             <LinearLayout style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_drawer_location"
                     style="@style/SystemSettingsSpinnerText"/>
                 <Spinner
@@ -166,7 +171,7 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/article_header_setting" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_ArticleExpressionSetting"
@@ -174,47 +179,53 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/article_expression_setting" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_link"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableLinkAutoShow" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_chapter_link_auto_show" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_chapter_link_auto_show" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableLinkAutoShow" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_auto_show"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableLinkShowThumbnail" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_chapter_link_show_thumbnail" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_chapter_link_show_thumbnail" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableLinkShowThumbnail" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_show_thumbnail"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableLinkShowOnlyWifi" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_chapter_link_show_only_wifi" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_chapter_link_show_only_wifi" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableLinkShowOnlyWifi" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_show_only_wifi"/>
         </RelativeLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_preference"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_enableAutoToChat" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_auto_to_chat" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_enable_auto_to_chat" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_enableAutoToChat" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_auto_chat_hint"/>
         </RelativeLayout>
         <RelativeLayout android:id="@+id/SystemSettings_item_animationEnable" style="@style/SystemSettingsItem">
             <View style="@style/HorizontalDivider"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_enable_page_animation" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_enable_page_animation" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_animationEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_animation_hint"/>
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
         <RelativeLayout android:id="@+id/SystemSettings_item_keepWifi" style="@style/SystemSettingsItem" android:visibility="gone">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/system_setting_page_keep_wifi_on_sleep" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/system_setting_page_keep_wifi_on_sleep" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_keepWifi" style="@style/SystemSettingsCheckbox"/>
         </RelativeLayout>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_item_screen_orientation" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:text="@string/system_setting_page_screen_orientation"
                 style="@style/SystemSettingsSpinnerText"/>
             <Spinner
@@ -223,13 +234,14 @@
         </LinearLayout>
         <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/SystemSettings_item_IgnoreBatteryOptimizations" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:text="@string/system_setting_page_ignore_battery_optimizations"
                 style="@style/SystemSettingsSpinnerText"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
         <RelativeLayout android:visibility="gone" android:id="@+id/SystemSettings_item_AutoConnectionRecover" style="@style/SystemSettingsItem">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/switch_connect_recovery" style="@style/SystemSettingsCheckboxText"/>
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:text="@string/switch_connect_recovery" style="@style/SystemSettingsCheckboxText"/>
             <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" style="@style/SystemSettingsCheckbox"/>
         </RelativeLayout>
         <LinearLayout
@@ -237,15 +249,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:id="@+id/SystemSettings_item_cloud_save_layout">
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/cloud_save"/>
             <View style="@style/HorizontalDivider"/>
             <RelativeLayout android:id="@+id/SystemSettings_item_cloudSaveEnable" style="@style/SystemSettingsItem">
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/cloud_save_setting_switch" style="@style/SystemSettingsCheckboxText"/>
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/cloud_save_setting_switch" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_cloudSaveEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_cloud_save_hint" />
             </RelativeLayout>
-            <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:id="@+id/SystemSettings_cloudSaveLastTime"
                 style="@style/TextViewLarge"
                 android:layout_width="match_parent"
@@ -253,7 +266,7 @@
                 android:gravity="center"
                 android:text="@string/zero_word"/>
         </LinearLayout>
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
             style="@style/SystemSettingsChapter"
             android:text="@string/system_setting_page_chapter_donation"/>
         <View style="@style/HorizontalDivider"/>
@@ -262,7 +275,7 @@
             style="@style/SystemSettingsItem">
             <TextView android:text="@string/system_setting_page_goBillingPage" style="@style/SystemSettingsDirectoryText"/>
             <View style="@style/ItemViewDividerVertical"/>
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

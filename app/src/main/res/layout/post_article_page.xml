@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+            <com.kota.telnetUI.textView.TelnetTextViewNormal
                 android:id="@+id/ArticlePostDialog_TitleFieldBackground"
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
@@ -36,7 +36,7 @@
                 android:singleLine="true"
                 android:textColor="@color/item_background_color"/>
 
-            <com.kota.Bahamut.Pages.Model.PostEditText
+            <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/ArticlePostDialog_TitleField"
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
@@ -64,7 +64,7 @@
         android:layout_below="@+id/Post_MiddleDivider"
         android:orientation="horizontal">
 
-        <com.kota.Bahamut.Pages.Model.PostEditText
+        <com.kota.Bahamut.pages.model.PostEditText
             android:id="@+id/ArticlePostDialog_EditField"
             style="@style/TextViewNormal"
             android:layout_width="0dp"

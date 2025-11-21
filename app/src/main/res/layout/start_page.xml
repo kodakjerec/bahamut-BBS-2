@@ -22,14 +22,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
                     style="@style/TextViewLarge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/notices"
                     android:textColor="@android:color/white" />
 
-                <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/version"
                     style="@style/TextViewSmall"
                     android:layout_width="wrap_content"
@@ -37,13 +37,13 @@
                     android:layout_alignParentEnd="true" />
             </RelativeLayout>
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+            <com.kota.telnetUI.textView.TelnetTextViewNormal
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/start_msg_1" />
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+            <com.kota.telnetUI.textView.TelnetTextViewNormal
                 style="@style/TextViewLarge"
                 android:textColor="@android:color/white"
                 android:layout_width="match_parent"
@@ -51,7 +51,7 @@
                 android:gravity="start"
                 android:text="@string/start_msg_2" />
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -60,7 +60,7 @@
                 android:gravity="center_horizontal"
                 android:text="@string/StartPage_open_account" />
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
                 android:textColor="@android:color/white"
                 android:layout_width="match_parent"
@@ -92,7 +92,7 @@
                     android:text="@string/start_connect_ip2" />
             </RadioGroup>
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -125,7 +125,7 @@
 
             </RadioGroup>
 
-            <com.kota.TelnetUI.TextView.TelnetTextViewSmall
+            <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

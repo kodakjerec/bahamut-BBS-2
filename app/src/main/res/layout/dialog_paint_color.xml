@@ -12,19 +12,22 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@color/black">
-        <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
+            android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
         <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <RelativeLayout android:id="@+id/dialog_paint_color_check_recovery_item" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/post_article_page_paint_color_recovery" style="@style/SystemSettingsCheckboxText"/>
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/post_article_page_paint_color_recovery2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_recovery" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_recovery2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
                     <CheckBox android:id="@+id/dialog_paint_color_check_recovery" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/post_article_page_paint_color_recovery" android:checked="true" />
                 </RelativeLayout>
                 <RelativeLayout style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/post_article_page_paint_color_front"
                         style="@style/SystemSettingsCheckboxText"/>
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/post_article_page_paint_color_front2"
                         style="@style/SystemSettingsCheckboxText"
                         android:paddingStart="60dp"
@@ -35,10 +38,10 @@
                         android:layout_width="90dp" />
                 </RelativeLayout>
                 <RelativeLayout style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/post_article_page_paint_color_back"
                         style="@style/SystemSettingsCheckboxText"/>
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/post_article_page_paint_color_back2"
                         style="@style/SystemSettingsCheckboxText"
                         android:paddingStart="60dp"
@@ -50,8 +53,10 @@
                         android:layout_width="90dp"/>
                 </RelativeLayout>
                 <RelativeLayout android:id="@+id/dialog_paint_color_check_highlight_item" style="@style/SystemSettingsItem">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/post_article_page_paint_color_highlight" style="@style/SystemSettingsCheckboxText"/>
-                    <com.kota.TelnetUI.TextView.TelnetTextViewLarge android:text="@string/post_article_page_paint_color_highlight2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_highlight" style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_highlight2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
                     <CheckBox android:id="@+id/dialog_paint_color_check_highlight" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/post_article_page_paint_color_highlight" />
                 </RelativeLayout>
                 <View style="@style/BlockDividerHorizontal"/>
@@ -60,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp">
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <com.kota.telnetUI.textView.TelnetTextViewNormal
                         android:id="@+id/dialog_paint_color_param"
                         style="@style/TextViewNormal"
                         android:layout_width="0dp"
@@ -68,7 +73,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="@string/zero_word" />
-                    <com.kota.TelnetUI.TextView.TelnetTextViewNormal
+                    <com.kota.telnetUI.textView.TelnetTextViewNormal
                         android:id="@+id/dialog_paint_color_sample"
                         style="@style/TextViewNormal"
                         android:layout_width="0dp"
