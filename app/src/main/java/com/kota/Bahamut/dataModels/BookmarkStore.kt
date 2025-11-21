@@ -7,6 +7,7 @@ import androidx.core.content.edit
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.NotificationSettings.getCloudSave
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.UserSettings
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,7 +25,7 @@ import java.util.Vector
 class BookmarkStore(val context: Context?, var filePath: String?) {
     val bookmarks: MutableMap<String?, BookmarkList?> = HashMap()
     val globalBookmarks: BookmarkList = BookmarkList("")
-    var owner: String? = ""
+    var owner: String = UserSettings.propertiesUsername
     var version: Int = 1
 
     init {
@@ -93,10 +94,13 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
 
     /** 儲存書籤  */
     fun store() {
-        val obj: JSONObject? = null
+        val obj: JSONObject = exportToJSON()
         println("save bookmark store to file")
-        this.context?.getSharedPreferences("bookmark", 0)?.edit {
-            putString("save_data", obj.toString())
+        this.context?.getSharedPreferences("bookmark", 0)?.edit(commit = true) {
+            putString(
+                "save_data",
+                obj.toString()
+            )
         }
 
         // 雲端備份
@@ -108,7 +112,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
 
     /** 儲存書籤, 但是不通知雲端  */
     fun storeWithoutCloud() {
-        val obj: JSONObject? = null
+        val obj: JSONObject = exportToJSON()
         println("save bookmark store to file")
         this.context?.getSharedPreferences("bookmark", 0)?.edit {
             putString("save_data", obj.toString())
@@ -117,7 +121,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
 
     private fun load(): BookmarkStore {
         var perf: SharedPreferences? = null
-        var saveData: String? = ""
+        var saveData = ""
         println("load bookmark store from file")
         var loadFile = false
         if (this.filePath == null) {
@@ -142,16 +146,22 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         if (loadFile) {
             store()
         }
-        if (!loadFile && this.context != null && (this.context.getSharedPreferences(
-                "bookmark",
-                0
-            ).also { perf = it }) != null && (perf?.getString("save_data", "")
-                .also { saveData = it }) != null
+        if (
+            !loadFile
+            && this.context != null
+            && (this.context.getSharedPreferences("bookmark", 0)) != null
         ) {
-            try {
-                importFromJSON(JSONObject(saveData!!))
-            } catch (_: JSONException) {
-//                e2.printStackTrace()
+            perf = this.context.getSharedPreferences("bookmark", 0)
+            saveData = perf.getString("save_data", "").toString()
+            if (saveData.isNotEmpty()) {
+                // 檢查格式是否正確
+                try {
+                    JSONObject(saveData)
+                } catch (_: JSONException) {
+                    saveData = "{}"
+                }
+
+                importFromJSON(JSONObject(saveData))
             }
         }
         return this
@@ -160,21 +170,32 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
     @Throws(IOException::class)
     fun importFromStream(aStream: ObjectInputStream) {
         cleanBookmark()
-        this.version = aStream.readInt()
-        this.owner = aStream.readUTF()
-        val size = aStream.readInt()
-        for (i in 0..<size) {
-            addBookmark(Bookmark(aStream))
+        try {
+            this.version = aStream.readInt()
+            this.owner = aStream.readUTF()
+            if (this.owner.isEmpty()) this.owner = UserSettings.propertiesUsername
+
+            val size = aStream.readInt()
+            for (i in 0..<size) {
+                addBookmark(Bookmark(aStream))
+            }
+            val extData = ByteArray(aStream.readInt())
+            aStream.read(extData)
+        } catch (e: Exception) {
+            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
-        val extData = ByteArray(aStream.readInt())
-        aStream.read(extData)
+        sortBookmarks()
+        println("load " + this.totalBookmarkList.size + " bookmarks.")
     }
 
     fun importFromJSON(obj: JSONObject) {
         cleanBookmark()
         try {
             this.version = obj.getInt("version")
+
             this.owner = obj.getString("owner")
+            if (this.owner.isEmpty()) this.owner = UserSettings.propertiesUsername
+
             val data = obj.getJSONArray("data")
             for (i in 0..<data.length()) {
                 addBookmark(Bookmark(data.getJSONObject(i)))

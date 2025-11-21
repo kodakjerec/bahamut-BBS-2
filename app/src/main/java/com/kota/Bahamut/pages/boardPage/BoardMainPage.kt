@@ -901,7 +901,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 轉寄至信箱  */
     fun funSendMail() {
-        pushCommand(BahamutCommandFSendMail(propertiesUsername!!))
+        pushCommand(BahamutCommandFSendMail(propertiesUsername))
     }
 
     /** 最前篇  */

@@ -191,8 +191,8 @@ class LoginPage : TelnetPage() {
         val loginWebSignIn = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
         val username = UserSettings.propertiesUsername
         val password = UserSettings.propertiesPassword
-        val username2 = username!!.trim()
-        val password2 = password!!.trim()
+        val username2 = username.trim()
+        val password2 = password.trim()
         loginUsernameField.setText(username2)
         loginPasswordField.setText(password2)
         loginRemember.isChecked = UserSettings.propertiesSaveLogonUser

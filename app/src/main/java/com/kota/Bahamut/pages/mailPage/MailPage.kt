@@ -266,12 +266,14 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
     fun onReplyButtonClicked() {
         val sendMailPage = SendMailPage()
-        val replyTitle = telnetArticle?.generateReplyTitle()
-        val replyContent = telnetArticle?.generateReplyContent()
-        sendMailPage.setPostTitle(replyTitle)
-        sendMailPage.setPostContent(replyContent)
-        sendMailPage.setReceiver(telnetArticle?.author)
-        sendMailPage.setListener(this)
+        if (telnetArticle != null) {
+            val replyTitle = telnetArticle!!.generateReplyTitle()
+            val replyContent = telnetArticle!!.generateReplyContent()
+            sendMailPage.setPostTitle(replyTitle)
+            sendMailPage.setPostContent(replyContent)
+            sendMailPage.setReceiver(telnetArticle!!.author)
+            sendMailPage.setListener(this)
+        }
         navigationController.pushViewController(sendMailPage)
     }
 

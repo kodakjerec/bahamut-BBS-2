@@ -518,7 +518,7 @@ class ArticlePage : TelnetPage() {
     fun onMenuClicked() {
         if (telnetArticle != null) {
             val author = telnetArticle!!.author.lowercase(Locale.getDefault())
-            val logonUser = propertiesUsername!!.trim().lowercase(Locale.getDefault())
+            val logonUser = propertiesUsername.lowercase(Locale.getDefault())
             val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD
             val extToolbarEnable = propertiesExternalToolbarEnable
             val externalToolbarEnableTitle =

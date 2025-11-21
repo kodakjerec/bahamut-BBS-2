@@ -74,7 +74,7 @@ object MyBillingClient {
                     }
                     ASToast.showShortToast(TempSettings.applicationContext?.getString(R.string.billing_page_result_success))
                     // 將購買結果塞入雲端
-                    if (UserSettings.propertiesUsername?.isNotEmpty() == true) {
+                    if (UserSettings.propertiesUsername.isNotEmpty()) {
                         val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
                         val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
                         val client = OkHttpClient()
@@ -112,7 +112,7 @@ object MyBillingClient {
                     if (list.toTypedArray().isNotEmpty()) {
                         UserSettings.propertiesVIP = true
                         // 將購買結果塞入雲端
-                        if (UserSettings.propertiesUsername?.isNotEmpty() == true) {
+                        if (UserSettings.propertiesUsername.isNotEmpty()) {
                             list.forEach { record ->
                                 val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
                                 val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"

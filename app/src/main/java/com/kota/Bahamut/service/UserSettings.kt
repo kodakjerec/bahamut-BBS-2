@@ -242,11 +242,11 @@ class UserSettings(var myContext: Context) {
             }
 
         @JvmStatic
-        var propertiesUsername: String?
+        var propertiesUsername: String
             get() = mySharedPref!!.getString(
                 PROPERTIES_USERNAME,
                 ""
-            )
+            ).toString()
             set(username) {
                 myEditor!!.putString(
                     PROPERTIES_USERNAME,
@@ -255,11 +255,11 @@ class UserSettings(var myContext: Context) {
             }
 
         @JvmStatic
-        var propertiesPassword: String?
+        var propertiesPassword: String
             get() = mySharedPref!!.getString(
                 PROPERTIES_PASSWORD,
                 ""
-            )
+            ).toString()
             set(password) {
                 myEditor!!.putString(
                     PROPERTIES_PASSWORD,
