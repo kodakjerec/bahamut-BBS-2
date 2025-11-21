@@ -35,10 +35,10 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     lateinit var paintColorButton: Button // 上色按鈕
     lateinit var postButton: Button // 發信按鈕
     lateinit var insertExpressionButton: Button // 表情按鈕
-    lateinit var fromReceiver: String // 外部傳來的收件人
+    var fromReceiver: String = "" // 外部傳來的收件人
     lateinit var receiverField: EditText // 寫信時, 收件人
     lateinit var receiverFieldBackground: TextView // 閱讀時, 收件人
-    lateinit var fromTitle: String // 外部傳來的標題
+    var fromTitle: String = "" // 外部傳來的標題
     lateinit var titleBlock: View // 標題和收件人所處的區塊
     var isTitleBlockHidden: Boolean = false // 判斷區塊是否隱藏
     lateinit var titleField: EditText // 寫信時, 標題
