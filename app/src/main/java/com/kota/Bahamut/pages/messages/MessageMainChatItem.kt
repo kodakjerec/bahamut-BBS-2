@@ -5,9 +5,9 @@ import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
+import com.kota.asFramework.pageController.ASNavigationController
 import java.text.SimpleDateFormat
 import java.util.Date
 
@@ -18,8 +18,8 @@ class MessageMainChatItem(context: Context): LinearLayout(context) {
     private var txtReceivedDate: TextView
     private var txtUnReadCount: TextView
     init {
-        inflate(context, R.layout.message_main_chat_item, this)
-        mainLayout = findViewById(R.id.content_view)
+        val root = inflate(context, R.layout.message_main_chat_item, this)
+        mainLayout = root.findViewById(R.id.content_view)
         txtSenderName = mainLayout.findViewById(R.id.mmiSenderName)
         txtMessage = mainLayout.findViewById(R.id.mmiMessage)
         txtReceivedDate = mainLayout.findViewById(R.id.mmiReceivedDate)
@@ -51,10 +51,10 @@ class MessageMainChatItem(context: Context): LinearLayout(context) {
         return myObject
     }
 
-    private val itemClickListener = OnClickListener { _->
-        val aPage = PageContainer.instance!!.myMessageSub
+    private val itemClickListener = OnClickListener { _ ->
+        val aPage = PageContainer.instance!!.getMessageSub()
         ASNavigationController.currentController?.pushViewController(aPage)
 
-        aPage?.setSenderName(txtSenderName.text.toString())
+        aPage.setSenderName(txtSenderName.text.toString())
     }
 }

@@ -382,7 +382,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                 .pushKey(TelnetKeyboard.CTRL_X)
                 .pushString("a\n")
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(data)
+            TelnetClient.myInstance!!.sendDataToServer(data)
             recover = false
         }
         clear()

@@ -61,7 +61,7 @@ class MessageMain:TelnetPage() {
     private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (isUnderList) {
-                TelnetClient.myInstance?.sendDataToServer(
+                TelnetClient.myInstance!!.sendDataToServer(
                     TelnetOutputBuilder.create()
                         .pushString("/") // 請輸入勇者代號：
                         .pushKey(TelnetKeyboard.CTRL_Y) // 清除資料
@@ -99,7 +99,7 @@ class MessageMain:TelnetPage() {
             btnSettings.visibility = INVISIBLE
             toolbarList.visibility = VISIBLE
             // 送出查詢指令
-            TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
         // 切換頁籤
         val theme = getSelectTheme()
@@ -115,20 +115,20 @@ class MessageMain:TelnetPage() {
     }
     /** 上一頁 */
     private val prevPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
     }
     /** 下一頁 */
     private val nextPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
     }
     /** 最前頁 */
     private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.HOME)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.HOME)
         return@OnLongClickListener true
     }
     /** 最後頁 */
     private val endPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.END)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.END)
         return@OnLongClickListener true
     }
 
@@ -228,7 +228,7 @@ class MessageMain:TelnetPage() {
     override fun onBackPressed(): Boolean {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         // 顯示小視窗
@@ -242,7 +242,7 @@ class MessageMain:TelnetPage() {
     fun loadMessageList() {
         // 離開名單
         if (isUnderList) {
-            TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
         messageAsRunner.cancel()
@@ -311,14 +311,14 @@ class MessageMain:TelnetPage() {
             val item = MessageMainListItemStructure()
             val bytes = row.data
             item.index =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))
             item.senderName =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))
             item.nickname =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))!!
-            item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))
+            item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56))
             item.status =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))!!
+                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))
             userList.add(item)
         }
 
@@ -335,7 +335,7 @@ class MessageMain:TelnetPage() {
     /** 同步BBS訊息到DB */
     private fun sendSyncCommand() {
         // 送出查詢指令
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 

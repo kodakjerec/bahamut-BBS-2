@@ -12,14 +12,14 @@ import java.io.ObjectInputStream
 */
 
 class Bookmark {
-    var myAuthor: String? = ""
-    var myBoard: String? = ""
+    var myAuthor: String = ""
+    var myBoard: String = ""
     var myDetail: String = ""
     var myExtData: ByteArray = ByteArray(0)
-    var myGY: String? = ""
-    var myKeyword: String? = ""
-    var myMark: String? = "n"
-    var myTitle: String? = ""
+    var myGY: String = ""
+    var myKeyword: String = ""
+    var myMark: String = "n"
+    var myTitle: String = ""
     @JvmField
     var index: Int = 0
     var optional: String = OPTIONAL_BOOKMARK
@@ -86,55 +86,55 @@ class Bookmark {
         aStream.read(myExtData)
     }
 
-    var title: String?
+    var title: String
         get() = myTitle
         set(title) {
-            myTitle = title ?: ""
+            myTitle = title
         }
 
-    var keyword: String?
+    var keyword: String
         get() = myKeyword
         set(keyword) {
-            myKeyword = keyword ?: ""
+            myKeyword = keyword
         }
 
-    var author: String?
+    var author: String
         get() = myAuthor
         set(author) {
-            myAuthor = author ?: ""
+            myAuthor = author
         }
 
-    var mark: String?
+    var mark: String
         get() = myMark
         set(mark) {
-            myMark = if (mark == null || mark != "y") {
+            myMark = if (mark != "y") {
                 "n"
             } else {
                 mark
             }
         }
 
-    var gy: String?
+    var gy: String
         get() = myGY
         set(gy) {
-            myGY = gy ?: ""
+            myGY = gy
         }
 
-    var board: String?
+    var board: String
         get() = myBoard
         set(board) {
-            myBoard = board ?: ""
+            myBoard = board
         }
 
     fun generateTitle(): String {
         var title = ""
-        if (myKeyword?.trim()?.isNotEmpty() == true) {
+        if (myKeyword.trim().isNotEmpty()) {
             title = getContextString(R.string.title_) + myKeyword
         }
-        if (title.isEmpty() && myAuthor?.trim()?.isNotEmpty() == true) {
+        if (title.isEmpty() && myAuthor.trim().isNotEmpty()) {
             title = getContextString(R.string.author_) + myAuthor
         }
-        if (title.isEmpty() && myGY?.trim()?.isNotEmpty() == true) {
+        if (title.isEmpty() && myGY.trim().isNotEmpty()) {
             title = getContextString(R.string.do_gy_) + myGY
         }
         if (myMark == "y") {

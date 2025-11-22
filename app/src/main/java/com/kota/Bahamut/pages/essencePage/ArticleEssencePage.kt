@@ -20,8 +20,6 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandFSendMail
-import com.kota.Bahamut.pages.mailPage.SendMailPage
-import com.kota.Bahamut.pages.mailPage.SendMailPageListener
 import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
@@ -29,6 +27,8 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
+import com.kota.Bahamut.pages.mailPage.SendMailPage
+import com.kota.Bahamut.pages.mailPage.SendMailPageListener
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
@@ -276,7 +276,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         title: String,
         content: String
     ) {
-        PageContainer.instance!!.mailBoxPage!!.onSendMailDialogSendButtonClicked(
+        PageContainer.instance!!.mailBoxPage.onSendMailDialogSendButtonClicked(
             sendMailPage,
             receiver,
             title,
@@ -286,16 +286,16 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     private fun onPageUpButtonClicked() {
-        if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
-            PageContainer.instance!!.boardEssencePage!!.loadPreviousArticle()
+        if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting) {
+            PageContainer.instance!!.boardEssencePage.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
         }
     }
 
     private fun onPageDownButtonClicked() {
-        if (TelnetClient.myInstance?.telnetConnector!!.isConnecting) {
-            PageContainer.instance!!.boardEssencePage!!.loadNextArticle()
+        if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting) {
+            PageContainer.instance!!.boardEssencePage.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }
@@ -503,7 +503,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
             .setListener { _: ASAlertDialog?, index: Int ->
                 if (index == 1) {
                     val newList =
-                        UserSettings.blockList!!
+                        UserSettings.blockList
                     if (newList.contains(aBlockName)) {
                         ASToast.showShortToast(CommonFunctions.getContextString(R.string.already_have_item))
                     } else {
@@ -553,7 +553,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
     // 轉寄至信箱
     fun fSendMail() {
-        boardEssencePage?.pushCommand(BahamutCommandFSendMail(UserSettings.propertiesUsername!!))
+        boardEssencePage?.pushCommand(BahamutCommandFSendMail(UserSettings.propertiesUsername))
     }
 
     // 變更telnetView大小

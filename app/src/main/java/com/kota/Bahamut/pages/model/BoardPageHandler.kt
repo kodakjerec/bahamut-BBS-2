@@ -10,7 +10,7 @@ class BoardPageHandler private constructor() {
     fun load(): BoardPageBlock {
         var row: TelnetRow? = null
         val boardPackage: BoardPageBlock = BoardPageBlock.Companion.create()
-        val firstRowString: String = TelnetClient.model.getRowString(0)!!
+        val firstRowString: String = TelnetClient.model.getRowString(0)
         val rowChar = firstRowString.toCharArray()
         var boardManagerStart = 0
         var boardManagerEnd = 0

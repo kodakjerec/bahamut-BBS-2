@@ -3,7 +3,7 @@ package com.kota.Bahamut.dataModels
 /*
  書籤元件 清單
 */
-class BookmarkList(private val myBoard: String?) {
+class BookmarkList(private val myBoard: String) {
     private val bookmarks: MutableList<Bookmark> = ArrayList()
     private val historyBookmarks: MutableList<Bookmark> = ArrayList()
     var limit: Int = 40
@@ -46,7 +46,7 @@ class BookmarkList(private val myBoard: String?) {
     /*
     傳入 string 新增 bookmark
      */
-    fun addHistoryBookmark(keyWord: String?) {
+    fun addHistoryBookmark(keyWord: String) {
         var newBookmark: Bookmark? = null
         val it = historyBookmarks.iterator()
         while (true) {
