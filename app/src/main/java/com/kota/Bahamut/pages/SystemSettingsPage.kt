@@ -176,12 +176,12 @@ class SystemSettingsPage : TelnetPage() {
 
     /** 開啟BBS個人資料  */
     var bbsUserInfoListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.myInstance?.sendStringToServerInBackground("u\ni")
+        TelnetClient.myInstance!!.sendStringToServerInBackground("u\ni")
         val page = PageContainer.instance!!.getUserInfoPage()
         navigationController.pushViewController(page)
     }
     var bbsUserConfigListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.myInstance?.sendStringToServerInBackground("u\nc")
+        TelnetClient.myInstance!!.sendStringToServerInBackground("u\nc")
         val page = PageContainer.instance!!.getUserConfigPage()
         navigationController.pushViewController(page)
     }

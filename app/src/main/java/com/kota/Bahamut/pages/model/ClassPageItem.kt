@@ -5,20 +5,20 @@ import java.util.Stack
 
 class ClassPageItem private constructor() : TelnetListPageItem() {
     @JvmField
-    var manager: String? = null
+    var manager: String = ""
     var mode: Int = 0
     @JvmField
-    var name: String? = null
+    var name: String = ""
     @JvmField
-    var title: String? = null
+    var title: String = ""
     @JvmField
     var isDirectory: Boolean = false
 
     override fun clear() {
         super.clear()
-        this.manager = null
-        this.name = null
-        this.title = null
+        this.manager = ""
+        this.name = ""
+        this.title = ""
         this.isDirectory = false
         this.mode = 0
     }

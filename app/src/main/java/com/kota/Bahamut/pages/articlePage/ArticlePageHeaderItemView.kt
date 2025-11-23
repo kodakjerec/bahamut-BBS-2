@@ -53,7 +53,7 @@ class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(contex
                     title: String?
                 ) {
                     if (title == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.myInstance?.sendDataToServer(
+                        TelnetClient.myInstance!!.sendDataToServer(
                             create()
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
@@ -64,7 +64,7 @@ class ArticlePageHeaderItemView(context: Context?) : TelnetHeaderItemView(contex
                         var authorId = detailTextView1.text.toString()
                         if (authorId.contains("(")) authorId =
                             authorId.substring(0, authorId.indexOf("("))
-                        aPage!!.setSenderName(authorId)
+                        aPage.setSenderName(authorId)
                     }
                 }
             }).show()

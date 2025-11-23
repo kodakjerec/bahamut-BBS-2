@@ -65,11 +65,11 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
         // 系統架構
         construct(BahamutStateHandler.Companion.getInstance())
-        TelnetClient.myInstance?.setListener(this)
+        TelnetClient.myInstance!!.setListener(this)
 
 
         // 設定 TelnetConnector 的設備控制器
-        TelnetClient.myInstance?.telnetConnector?.setDeviceController(deviceController)
+        TelnetClient.myInstance!!.telnetConnector?.setDeviceController(deviceController)
 
         PageContainer.Companion.constructInstance()
 
@@ -116,12 +116,12 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         }
 
         // 強制關閉連線
-        TelnetClient.myInstance?.close()
+        TelnetClient.myInstance!!.close()
 
 
         // 清理 TelnetConnector 的設備控制器引用
-        if (TelnetClient.myInstance?.telnetConnector != null) {
-            TelnetClient.myInstance?.telnetConnector?.setDeviceController(null)
+        if (TelnetClient.myInstance!!.telnetConnector != null) {
+            TelnetClient.myInstance!!.telnetConnector?.setDeviceController(null)
         }
 
         super.onDestroy()
@@ -138,7 +138,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     // com.kota.asFramework.pageController.ASNavigationController
     override fun onBackLongPressed(): Boolean {
         var result = true
-        if (TelnetClient.myInstance?.telnetConnector?.isConnecting == true) {
+        if (TelnetClient.myInstance!!.telnetConnector?.isConnecting == true) {
             val dialog = ASAlertDialog()
             dialog
                 .setMessage("是否確定要強制斷線?")
@@ -152,7 +152,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                         paramInt: Int
                     ) {
                         if (paramInt == 1) {
-                            TelnetClient.myInstance?.close()
+                            TelnetClient.myInstance!!.close()
                         }
                     }
                 }).show()

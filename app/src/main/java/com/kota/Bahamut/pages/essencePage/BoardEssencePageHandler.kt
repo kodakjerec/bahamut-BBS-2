@@ -4,9 +4,9 @@ import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
-import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetUtils
+import com.kota.telnet.model.TelnetRow
 
 class BoardEssencePageHandler private constructor() {
     fun load(): TelnetListPageBlock {
@@ -22,10 +22,10 @@ class BoardEssencePageHandler private constructor() {
         val boardName = regexBoardName.find(firstRowString.toString())
 
         if (boardName!=null) {
-            boardPageBlock.boardTitle = boardName.groups[1]?.value
+            boardPageBlock.boardTitle = boardName.groups[1]?.value.toString()
         }
 
-        if (boardPageBlock.boardManager == null || boardPageBlock.boardManager != "主題串列") {
+        if (boardPageBlock.boardManager != "主題串列") {
             boardPageBlock.boardType = BoardPageAction.LIST
         } else {
             boardPageBlock.boardType = BoardPageAction.SEARCH

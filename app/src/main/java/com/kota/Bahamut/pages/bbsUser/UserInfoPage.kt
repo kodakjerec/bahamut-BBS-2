@@ -39,7 +39,7 @@ class UserInfoPage: TelnetPage() {
 
     override fun onBackPressed(): Boolean {
         // 返回
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return super.onBackPressed()
     }
 
@@ -97,7 +97,7 @@ class UserInfoPage: TelnetPage() {
         }.runInMainThread()
 
         // 返回
-        TelnetClient.myInstance?.sendStringToServer("N")
+        TelnetClient.myInstance!!.sendStringToServer("N")
     }
 
     /** 套用新設定 */
@@ -113,7 +113,7 @@ class UserInfoPage: TelnetPage() {
             .pushString("\n") // 居住地址：
             .pushString("Y\n") // 請您確定(Y/N)
             .build()
-        TelnetClient.myInstance?.sendDataToServer(builder)
+        TelnetClient.myInstance!!.sendDataToServer(builder)
 
         ASToast.showShortToast(CommonFunctions.getContextString(R.string.user_info_msg01))
         paintBtnUpdate(false)

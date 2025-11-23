@@ -33,8 +33,8 @@ class UserConfigPage: TelnetPage() {
 
     override fun onBackPressed(): Boolean {
         // 返回
-        TelnetClient.myInstance?.sendStringToServerInBackground("")
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendStringToServerInBackground("")
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return super.onBackPressed()
     }
 
@@ -98,7 +98,7 @@ class UserConfigPage: TelnetPage() {
 
     /** 切換操作模式選項 */
     private fun changeOperationMode(mode: String) {
-        TelnetClient.myInstance?.sendStringToServerInBackground(mode)
+        TelnetClient.myInstance!!.sendStringToServerInBackground(mode)
         ASToast.showShortToast(CommonFunctions.getContextString(R.string.user_config_msg01))
     }
 }

@@ -349,7 +349,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             val aPage = PageContainer.instance!!.postArticlePage
             aPage.insertString(str)
         } else if (topPage.javaClass == MessageSub::class.java) {
-            val aPage = PageContainer.instance!!.myMessageSub!!
+            val aPage = PageContainer.instance!!.getMessageSub()
             aPage.insertString(str)
         }
     }

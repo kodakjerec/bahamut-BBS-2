@@ -60,14 +60,14 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                     title: String?
                 ) {
                     if (title == getContextString(R.string.dialog_query_hero)) {
-                        TelnetClient.myInstance?.sendDataToServer(
+                        TelnetClient.myInstance!!.sendDataToServer(
                             TelnetOutputBuilder.create()
                                 .pushString(txtIndex.text.toString()+"\n")
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
                         )
                     } else if (title == getContextString(R.string.message_sub_send_hero)) {
-                        val aPage = PageContainer.instance!!.myMessageSub
+                        val aPage = PageContainer.instance!!.getMessageSub()
                         ASNavigationController.currentController?.pushViewController(aPage)
                         var authorId: String = txtSenderName.text.toString()
                         if (authorId.contains("(")) authorId =

@@ -5,9 +5,9 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import java.util.Stack
 
 class BoardPageBlock private constructor() : TelnetListPageBlock() {
-    var boardManager: String? = null
-    var boardName: String? = null
-    var boardTitle: String? = null
+    var boardManager: String = ""
+    var boardName: String = ""
+    var boardTitle: String = ""
     var boardType: Int = BoardPageAction.LIST
     var boardMode: Int = 0
 

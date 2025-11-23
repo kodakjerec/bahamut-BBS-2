@@ -42,7 +42,7 @@ class DialogPushArticle:ASDialog() {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(builder)
+            TelnetClient.myInstance!!.sendDataToServer(builder)
         }
     }
 
@@ -52,7 +52,7 @@ class DialogPushArticle:ASDialog() {
         val builder = TelnetOutputBuilder.create()
             .pushString("\n") // 按[Enter]結束
             .build()
-        TelnetClient.myInstance?.sendDataToServer(builder)
+        TelnetClient.myInstance!!.sendDataToServer(builder)
         dismiss()
     }
 
@@ -67,13 +67,13 @@ class DialogPushArticle:ASDialog() {
                 .pushString(sendContent)
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(builder)
+            TelnetClient.myInstance!!.sendDataToServer(builder)
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_push_article_success01))
         } else {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(builder)
+            TelnetClient.myInstance!!.sendDataToServer(builder)
         }
         dismiss()
     }

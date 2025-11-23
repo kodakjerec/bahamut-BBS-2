@@ -130,7 +130,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowMessageFloating(): Boolean {
-        return perf?.getBoolean(SHOW_MESSAGE_FLOATING, true)!!
+        return perf?.getBoolean(SHOW_MESSAGE_FLOATING, false)!!
     }
 
     @JvmStatic
