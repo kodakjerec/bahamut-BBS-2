@@ -7,13 +7,13 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.NotificationSettings
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASRunner
 
 class MessageSmall(context: Context): LinearLayout(context) {
     private var mainLayout: RelativeLayout
@@ -79,7 +79,7 @@ class MessageSmall(context: Context): LinearLayout(context) {
         when (event.action) {
             MotionEvent.ACTION_UP -> {
                 if (duration < 200) { // click
-                    val aPage = PageContainer.instance!!.myMessageMain
+                    val aPage = PageContainer.instance!!.getMessageMain()
                     ASNavigationController.currentController?.pushViewController(aPage)
                     BahamutStateHandler.bahamutStateHandler?.currentPage =
                         BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE

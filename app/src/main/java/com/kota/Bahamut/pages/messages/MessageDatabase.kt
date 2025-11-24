@@ -13,9 +13,9 @@ import java.util.Date
 import java.util.Locale
 
 class MessageDatabase(context: Context?) :
-    SQLiteOpenHelper(context, TelnetClient.myInstance?.username?.lowercase(
+    SQLiteOpenHelper(context, TelnetClient.myInstance!!.username.lowercase(
         Locale.getDefault()
-    )?.trim() + "_database_msg", null, 1) {
+    ).trim() + "_database_msg", null, 1), AutoCloseable {
     override fun onCreate(aDatabase: SQLiteDatabase) {
         try {
             val createTableQuery = "CREATE TABLE IF NOT EXISTS messages (" +
@@ -283,5 +283,9 @@ class MessageDatabase(context: Context?) :
             onCreate(db)
         } catch (_: Exception) {
         }
+    }
+
+    override fun close() {
+        super.close()
     }
 }

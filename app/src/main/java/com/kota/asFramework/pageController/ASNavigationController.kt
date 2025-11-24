@@ -576,6 +576,7 @@ open class ASNavigationController : Activity() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        layoutParams.setMargins(60, 120, 0, 0)
         addContentView(view, layoutParams)
     }
 

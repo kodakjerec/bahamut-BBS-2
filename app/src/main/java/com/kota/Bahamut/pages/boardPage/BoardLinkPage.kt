@@ -35,8 +35,8 @@ class BoardLinkPage : BoardMainPage() {
     }
 
     // 長按串接到的item
-    override fun onListViewItemLongClicked(view: View?, i: Int): Boolean {
-        val item = this@BoardLinkPage.getItem(i) as BoardPageItem?
+    override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
+        val item = this@BoardLinkPage.getItem(index) as BoardPageItem?
 
         if (item != null) {
             ASAlertDialog.createDialog()
@@ -62,8 +62,8 @@ class BoardLinkPage : BoardMainPage() {
         return true
     }
 
-    override fun getListIdFromListName(str: String?): String? {
-        return "$str[Board][TitleLinked]"
+    override fun getListIdFromListName(aName: String?): String? {
+        return "$aName[Board][TitleLinked]"
     }
 
     override fun onPostButtonClicked() {
@@ -98,7 +98,7 @@ class BoardLinkPage : BoardMainPage() {
     override fun onBackPressed(): Boolean {
         clear()
         navigationController.popViewController()
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardTitleLinkedPage()
         return true
     }

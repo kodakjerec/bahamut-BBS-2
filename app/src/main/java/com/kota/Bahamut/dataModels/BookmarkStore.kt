@@ -23,7 +23,7 @@ import java.util.Vector
 */
 
 class BookmarkStore(val context: Context?, var filePath: String?) {
-    val bookmarks: MutableMap<String?, BookmarkList?> = HashMap()
+    val bookmarks: MutableMap<String, BookmarkList> = HashMap()
     val globalBookmarks: BookmarkList = BookmarkList("")
     var owner: String = UserSettings.propertiesUsername
     var version: Int = 1
@@ -34,7 +34,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         }
     }
 
-    fun getBookmarkList(aBoardName: String?): BookmarkList {
+    fun getBookmarkList(aBoardName: String): BookmarkList {
         if (this.bookmarks.containsKey(aBoardName)) {
             val item = this.bookmarks[aBoardName]
             if (item != null) return item
@@ -82,8 +82,8 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
     }
 
     fun addBookmark(aBookmark: Bookmark) {
-        val boardName = aBookmark.board?.trim()
-        if (boardName?.isEmpty() == true) {
+        val boardName = aBookmark.board.trim()
+        if (boardName.isEmpty()) {
             this.globalBookmarks.addBookmark(aBookmark)
         } else if (aBookmark.optional == Bookmark.Companion.OPTIONAL_STORY) {
             getBookmarkList(boardName).addHistoryBookmark(aBookmark)

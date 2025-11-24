@@ -13,10 +13,10 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
 
 class BoardSearchPage : BoardMainPage() {
-    private var author: String? = null
-    private var gy: String? = null
-    private var keyword: String? = null
-    private var mark: String? = null
+    private var author: String = ""
+    private var gy: String = ""
+    private var keyword: String = ""
+    private var mark: String = ""
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOARD_SEARCH
@@ -36,8 +36,8 @@ class BoardSearchPage : BoardMainPage() {
         return true
     }
 
-    override fun onListViewItemLongClicked(view: View?, i: Int): Boolean {
-        val item = this@BoardSearchPage.getItem(i) as BoardPageItem?
+    override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
+        val item = this@BoardSearchPage.getItem(index) as BoardPageItem?
 
         if (item != null) {
             ASAlertDialog.createDialog()
@@ -67,8 +67,8 @@ class BoardSearchPage : BoardMainPage() {
     override val listType: Int
         get() = BoardPageAction.Companion.SEARCH
 
-    override fun getListIdFromListName(str: String?): String? {
-        return "$str[Board][Search]"
+    override fun getListIdFromListName(aName: String?): String? {
+        return "$aName[Board][Search]"
     }
 
     override fun onPostButtonClicked() {
@@ -96,26 +96,26 @@ class BoardSearchPage : BoardMainPage() {
             }.scheduleDismissOnPageDisappear(this).show()
     }
 
-    fun setKeyword(keyword: String?) {
+    fun setKeyword(keyword: String) {
         this.keyword = keyword
     }
 
-    fun setAuthor(author: String?) {
+    fun setAuthor(author: String) {
         this.author = author
     }
 
-    fun setMark(mark: String?) {
+    fun setMark(mark: String) {
         this.mark = mark
     }
 
-    fun setGy(gy: String?) {
+    fun setGy(gy: String) {
         this.gy = gy
     }
 
     override fun onBackPressed(): Boolean {
         clear()
         navigationController.popViewController()
-        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardSearchPage()
         return true
     }

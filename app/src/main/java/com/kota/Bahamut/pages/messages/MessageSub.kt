@@ -168,7 +168,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     private fun sendMessagePart1() {
         val aSenderName = senderNameField.text.toString().trim()
         val aMessage = contentField.text.toString().trim()
-        TelnetClient.myInstance?.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         // 更新db
         val db = MessageDatabase(context)
@@ -197,13 +197,13 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aSenderName\n")
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(builder)
+            TelnetClient.myInstance!!.sendDataToServer(builder)
         }
 
         messageAsRunner.postDelayed(3000)
         // telnet會連續觸發這段兩次
-        if (!isPostDelayedSuccess!!)
-        isPostDelayedSuccess = false
+        if (!isPostDelayedSuccess)
+            isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */
     fun sendMessagePart3() {
@@ -217,7 +217,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aMessage\n")
                 .build()
-            TelnetClient.myInstance?.sendDataToServer(builder)
+            TelnetClient.myInstance!!.sendDataToServer(builder)
 
             // 更新db
             val db = MessageDatabase(context)

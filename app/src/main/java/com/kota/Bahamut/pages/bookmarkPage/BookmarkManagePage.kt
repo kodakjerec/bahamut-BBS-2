@@ -33,16 +33,16 @@ import java.util.Vector
 import kotlin.math.abs
 
 open class BookmarkManagePage(
-    aBoardName: String?,
+    aBoardName: String,
     private val boardExtendOptionalPageListener: BoardExtendOptionalPageListener?
 ) : TelnetPage(), BookmarkClickListener, DialogSearchArticleListener {
-    var boardName: String? = null
+    var boardName: String = ""
     private val bookmarks: MutableList<Bookmark> = Vector()
     protected var headerItemView: TelnetHeaderItemView? = null
-    private var selectedButton: Button? = null
-    private var bookmarkButton: Button? = null
-    private var historyButton: Button? = null
-    private var waterBallButton: Button? = null
+    lateinit var selectedButton: Button
+    lateinit var bookmarkButton: Button
+    lateinit var historyButton: Button
+    lateinit var waterBallButton: Button
     private lateinit var tabButtons: Array<Button>
     private var currentMode = 0
     var bookmarkAdapter: BookmarkAdapter? = null
@@ -253,18 +253,20 @@ open class BookmarkManagePage(
         headerItemView =
             findViewById(R.id.BoardExtendOptionalPage_headerView) as TelnetHeaderItemView?
         headerItemView?.setData("我的書籤", boardName, "左滑刪除,右滑修改")
-        bookmarkButton = findViewById(R.id.BoardExtendOptionalPage_bookmarkButton) as Button?
-        historyButton = findViewById(R.id.BoardExtendOptionalPage_historyButton) as Button?
-        waterBallButton = findViewById(R.id.BoardExtendOptionalPage_waterBallButton) as Button?
-        bookmarkButton?.setOnClickListener(buttonClickListener)
-        historyButton?.setOnClickListener(buttonClickListener)
-        waterBallButton?.setOnClickListener(buttonClickListener)
+        bookmarkButton = findViewById(R.id.BoardExtendOptionalPage_bookmarkButton) as Button
+        historyButton = findViewById(R.id.BoardExtendOptionalPage_historyButton) as Button
+        waterBallButton = findViewById(R.id.BoardExtendOptionalPage_waterBallButton) as Button
+        bookmarkButton.setOnClickListener(buttonClickListener)
+        historyButton.setOnClickListener(buttonClickListener)
+        waterBallButton.setOnClickListener(buttonClickListener)
         selectedButton = bookmarkButton
-        tabButtons = arrayOf<Button>(bookmarkButton!!, historyButton!!, waterBallButton!!)
+        tabButtons = arrayOf<Button>(bookmarkButton, historyButton, waterBallButton)
         scale = resource?.displayMetrics?.density?.dec()!!
 
-        if (currentMode == 0) bookmarkButton?.performClick()
-        else historyButton?.performClick()
+        if (currentMode == 0)
+            bookmarkButton.performClick()
+        else
+            historyButton.performClick()
     }
 
     private fun reloadList() {
@@ -316,7 +318,7 @@ open class BookmarkManagePage(
     override fun onItemClick(view: View?, position: Int) {
         val bookmark = this@BookmarkManagePage.bookmarkAdapter?.getItem(position)
         val page = PageContainer.instance!!.boardSearchPage
-        if (bookmark == null || page == null) return
+        if (bookmark == null) return
         page.clear()
         val state =
             instance.getState(page.getListIdFromListName(this@BookmarkManagePage.boardName))

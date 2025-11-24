@@ -62,10 +62,10 @@ import java.util.Locale
 import java.util.Vector
 
 class ArticlePage : TelnetPage() {
-    var mainLayout: RelativeLayout? = null
+    lateinit var mainLayout: RelativeLayout
     var telnetArticle: TelnetArticle? = null
     var telnetView: TelnetView? = null
-    var listEmptyView: TextView? = null
+    lateinit var listEmptyView: TextView
     var boardMainPage: BoardMainPage? = null
     var isFullScreen: Boolean = false
     var actionDelay: Long = 500
@@ -336,40 +336,40 @@ class ArticlePage : TelnetPage() {
         get() = true
 
     override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        telnetView = mainLayout!!.findViewById(R.id.Article_contentTelnetView)
+        telnetView = mainLayout.findViewById(R.id.Article_contentTelnetView)
         reloadTelnetLayout()
-        val listView = mainLayout!!.findViewById<ASListView>(R.id.Article_contentList)
-        listEmptyView = mainLayout!!.findViewById(R.id.Article_listEmptyView)
+        val listView = mainLayout.findViewById<ASListView>(R.id.Article_contentList)
+        listEmptyView = mainLayout.findViewById(R.id.Article_listEmptyView)
         listView.adapter = listAdapter
         listView.emptyView = listEmptyView
         listView.onItemLongClickListener = listLongClickListener
 
-        val backButton = mainLayout!!.findViewById<Button>(R.id.Article_backButton)
+        val backButton = mainLayout.findViewById<Button>(R.id.Article_backButton)
         backButton.setOnClickListener(replyListener)
 
-        val pageUpButton = mainLayout!!.findViewById<Button>(R.id.Article_pageUpButton)!!
+        val pageUpButton = mainLayout.findViewById<Button>(R.id.Article_pageUpButton)
         pageUpButton.setOnClickListener(pageUpListener)
         pageUpButton.setOnLongClickListener(pageTopListener)
 
-        val pageDownButton = mainLayout!!.findViewById<Button>(R.id.Article_pageDownButton)!!
+        val pageDownButton = mainLayout.findViewById<Button>(R.id.Article_pageDownButton)
         pageDownButton.setOnClickListener(pageDownListener)
         pageDownButton.setOnLongClickListener(pageBottomListener)
 
-        val doGyButton = mainLayout!!.findViewById<Button?>(R.id.do_gy)!!
+        val doGyButton = mainLayout.findViewById<Button>(R.id.do_gy)
         doGyButton.setOnClickListener(mDoGyListener)
-        val changeModeButton = mainLayout!!.findViewById<Button?>(R.id.change_mode)!!
+        val changeModeButton = mainLayout.findViewById<Button>(R.id.change_mode)
         changeModeButton.setOnClickListener(mChangeModeListener)
-        val showLinkButton = mainLayout!!.findViewById<Button?>(R.id.show_link)!!
+        val showLinkButton = mainLayout.findViewById<Button>(R.id.show_link)
         showLinkButton.setOnClickListener(mShowLinkListener)
 
-        mainLayout!!.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
-        mainLayout!!.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
+        mainLayout.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
+        mainLayout.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ext_toolbar) as LinearLayout?)
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ext_toolbar) as LinearLayout)
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
 
         refreshExternalToolbar()
         showNotification()
@@ -381,10 +381,10 @@ class ArticlePage : TelnetPage() {
 
     /** 變更工具列位置  */
     fun changeToolbarLocation() {
-        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
-        val toolbarBlock = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar_block)
+        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbarBlock = mainLayout.findViewById<LinearLayout>(R.id.toolbar_block)
         val toolBarFloating =
-            mainLayout!!.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
+            mainLayout.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
         toolBarFloating.visibility = View.GONE
 
         // 最左邊最右邊
@@ -451,7 +451,7 @@ class ArticlePage : TelnetPage() {
 
     /** 反轉按鈕順序  */
     fun changeToolbarOrder() {
-        val toolbar = mainLayout!!.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
 
         val choiceToolbarOrder = propertiesToolbarOrder
         if (choiceToolbarOrder == 1) {
@@ -576,7 +576,7 @@ class ArticlePage : TelnetPage() {
 
     /** 載入全部圖片  */
     fun onLoadAllImageClicked() {
-        val listView = mainLayout!!.findViewById<ASListView>(R.id.Article_contentList)
+        val listView = mainLayout.findViewById<ASListView>(R.id.Article_contentList)
         val childCount = listView.size
         for (childIndex in 0..<childCount) {
             val view = listView.getChildAt(childIndex)
@@ -723,9 +723,9 @@ class ArticlePage : TelnetPage() {
     }
 
     fun reloadViewMode() {
-        val textContentView = mainLayout!!.findViewById<ViewGroup?>(R.id.Article_TextContentView)
+        val textContentView = mainLayout.findViewById<ViewGroup?>(R.id.Article_TextContentView)
         val telnetViewBlock =
-            mainLayout!!.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
+            mainLayout.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
         // 文字模式
         if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT) {
             if (textContentView != null) {
@@ -773,7 +773,7 @@ class ArticlePage : TelnetPage() {
             enable = true
         }
 
-        val toolbarView = mainLayout!!.findViewById<View>(R.id.ext_toolbar)
+        val toolbarView = mainLayout.findViewById<View>(R.id.ext_toolbar)
         if (toolbarView != null) {
             toolbarView.visibility = if (enable) View.VISIBLE else View.GONE
         }
@@ -903,7 +903,7 @@ class ArticlePage : TelnetPage() {
     fun setArticle(aArticle: TelnetArticle) {
         telnetArticle = aArticle
         if (telnetArticle != null) {
-            val boardName = boardMainPage?.listName
+            val boardName = boardMainPage?.listName!!
             // 加入歷史紀錄
             val store = TempSettings.bookmarkStore
             if (store != null) {
@@ -917,7 +917,7 @@ class ArticlePage : TelnetPage() {
 
             reloadTelnetLayout()
             val telnetContentView =
-                mainLayout!!.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
+                mainLayout.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
             telnetContentView?.scrollTo(0, 0)
             listAdapter.notifyDataSetChanged()
         }

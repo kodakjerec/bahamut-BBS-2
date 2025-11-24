@@ -4,11 +4,11 @@ import com.kota.Bahamut.listPage.TelnetListPageItem
 import java.util.Stack
 
 class BoardPageItem private constructor() : TelnetListPageItem() {
-    var author: String? = null
-    var date: String? = null
+    var author: String = ""
+    var date: String = ""
     var gy: Int = 0
     var size: Int = 0
-    var title: String? = null
+    var title: String = ""
     var isMarked: Boolean = false
     var isRead: Boolean = false
     var isReply: Boolean = false
@@ -20,9 +20,9 @@ class BoardPageItem private constructor() : TelnetListPageItem() {
         this.isMarked = false
         this.isReply = false
         this.gy = 0
-        this.date = null
-        this.author = null
-        this.title = null
+        this.date = ""
+        this.author = ""
+        this.title = ""
     }
 
     override fun set(aData: TelnetListPageItem) {

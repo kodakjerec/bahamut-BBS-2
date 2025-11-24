@@ -2,7 +2,6 @@ package com.kota.Bahamut
 
 import com.kota.Bahamut.pages.BillingPage
 import com.kota.Bahamut.pages.ClassPage
-import com.kota.Bahamut.pages.mailPage.MailBoxPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.StartPage
@@ -15,6 +14,7 @@ import com.kota.Bahamut.pages.boardPage.BoardSearchPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
 import com.kota.Bahamut.pages.login.LoginPage
+import com.kota.Bahamut.pages.mailPage.MailBoxPage
 import com.kota.Bahamut.pages.messages.MessageMain
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeManagerPage
@@ -98,7 +98,7 @@ class PageContainer private constructor() {
         }
     }
 
-    fun pushClassPage(aClassName: String?, aClassTitle: String?) {
+    fun pushClassPage(aClassName: String, aClassTitle: String) {
         val classPage1 = ClassPage()
         classPage1.listName = aClassName
         classPage1.setClassTitle(aClassTitle)
@@ -186,7 +186,7 @@ class PageContainer private constructor() {
         this.boardEssencePageStack.clear()
     }
 
-    fun pushBoardEssencePage(aClassName: String?, aClassTitle: String) {
+    fun pushBoardEssencePage(aClassName: String, aClassTitle: String) {
         val boardEssencePage = BoardEssencePage()
         boardEssencePage.clear()
         boardEssencePage.listName = aClassName
