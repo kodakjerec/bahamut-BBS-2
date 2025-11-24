@@ -235,10 +235,10 @@ class CloudBackup {
                             // set user_settings
                             // 不要還原的key: 使用者帳密, 在登入前的設定
                             val notRestoreKeys: List<String> =
-                                listOf("Username", "Password", "SaveLogonUser")
+                                listOf("username", "password", "savelogonuser")
                             userSettings.forEach { (keyObject, value) ->
                                 val key = keyObject.toString()
-                                if (value != null && !notRestoreKeys.contains(key)) {
+                                if (value != null && !notRestoreKeys.contains(key.lowercase())) {
                                     when (value) {
                                         is String ->
                                             UserSettings.myEditor?.putString(key, value)

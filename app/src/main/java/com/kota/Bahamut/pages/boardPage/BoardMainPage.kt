@@ -127,8 +127,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 前一頁  */
     val mPrevPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listViewWidget?.firstVisiblePosition!!
-        val endIndex = listViewWidget?.lastVisiblePosition!!
+        var firstIndex = listView?.firstVisiblePosition!!
+        val endIndex = listView?.lastVisiblePosition!!
         val moveIndex = abs(endIndex - firstIndex)
         firstIndex -= moveIndex
         if (firstIndex < 0) firstIndex = 0
@@ -139,8 +139,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     private val lastEndIndexes = IntArray(3) // 最後頁的結束位置
     private var endIndexCheckCount = 0 // 結束位置檢查次數
     val mNextPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listViewWidget?.firstVisiblePosition!!
-        val endIndex = listViewWidget?.lastVisiblePosition!!
+        var firstIndex = listView?.firstVisiblePosition!!
+        val endIndex = listView?.lastVisiblePosition!!
         val moveIndex = abs(endIndex - firstIndex)
         firstIndex += moveIndex
 
@@ -237,23 +237,19 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     var bookmarkAdapter: BaseAdapter = object : BaseAdapter() {
-        // android.widget.Adapter
         override fun getItemId(i: Int): Long {
             return i.toLong()
         }
 
-        // android.widget.Adapter
         override fun getCount(): Int {
             return this@BoardMainPage.myBookmarkList.size
         }
 
-        // android.widget.Adapter
         override fun getItem(i: Int): Bookmark? {
             return this@BoardMainPage.myBookmarkList[i]
         }
 
         /** 顯示側邊選單書籤  */
-        // android.widget.Adapter
         override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
             var view = view
             if (view == null) {
@@ -267,23 +263,19 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     var historyAdapter: BaseAdapter = object : BaseAdapter() {
-        // android.widget.Adapter
         override fun getItemId(i: Int): Long {
             return i.toLong()
         }
 
-        // android.widget.Adapter
         override fun getCount(): Int {
             return this@BoardMainPage.myBookmarkList.size
         }
 
-        // android.widget.Adapter
         override fun getItem(i: Int): Bookmark? {
             return this@BoardMainPage.myBookmarkList[i]
         }
 
         /** 顯示側邊選單書籤  */
-        // android.widget.Adapter
         override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
             var view = view
             if (view == null) {
@@ -319,7 +311,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         OnItemClickListener { adapterView: AdapterView<*>?, view: View?, i: Int, j: Long ->
             this@BoardMainPage.closeDrawer()
             val bookmark = this@BoardMainPage.myBookmarkList[i]
-            searchArticle(bookmark.keyword!!, bookmark.author, bookmark.mark, bookmark.gy)
+            searchArticle(bookmark.keyword, bookmark.author, bookmark.mark, bookmark.gy)
         }
 
     /** 切換成書籤清單  */
@@ -394,8 +386,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
         val aSListView = mainLayout!!.findViewById<ASListView>(R.id.BoardPageListView)
         aSListView.extendOptionalDelegate = this
-        aSListView.emptyView = mainLayout!!.findViewById<View>(R.id.BoardPageListEmptyView)
-        listView = aSListView
+        aSListView.emptyView = mainLayout.findViewById<View>(R.id.BoardPageListEmptyView)
+        bindListView(aSListView)
 
         mainLayout!!.findViewById<View>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
         mainLayout!!.findViewById<View>(R.id.BoardPageFirstPageButton)
@@ -955,7 +947,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             this.lastListAction = BoardPageAction.Companion.SEARCH
             pushCommand(
                 BahamutCommandSearchArticle(
-                    bookmark.keyword!!,
+                    bookmark.keyword,
                     bookmark.author,
                     bookmark.mark,
                     bookmark.gy
@@ -964,7 +956,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         }
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
+    // android.widget.Adapter
     override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
         var myView = view
         val itemIndex = i + 1
@@ -1091,7 +1083,6 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         dismissProcessingDialog()
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidAppear() {
         super.onPageDidAppear()
         bookmarkAdapter.notifyDataSetChanged()
@@ -1103,14 +1094,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         if (store != null) {
             if (myMode == 0) {
                 store.getBookmarkList(listName).loadBookmarkList(myBookmarkList)
-                if (isPageAppeared) {
-                    bookmarkAdapter.notifyDataSetChanged()
-                }
+
             } else {
                 store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
-                if (isPageAppeared) {
-                    historyAdapter.notifyDataSetChanged()
-                }
             }
         }
         if (myBookmarkList.isEmpty()) {
@@ -1126,9 +1112,12 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             drawerListView.adapter = bookmarkAdapter
         else
             drawerListView.adapter = historyAdapter
+        if (isPageAppeared) {
+            bookmarkAdapter.notifyDataSetChanged()
+            historyAdapter.notifyDataSetChanged()
+        }
         if (drawerListView.onItemClickListener == null)
-            drawerListView.onItemClickListener =
-                bookmarkListener
+            drawerListView.onItemClickListener = bookmarkListener
 
         // 填上顏色: 書籤. 紀錄
         var selectedView = aView

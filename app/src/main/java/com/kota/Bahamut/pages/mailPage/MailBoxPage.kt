@@ -56,7 +56,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         myListView = findViewById(R.id.MailBoxPage_listView) as ListView
         listEmptyView = findViewById(R.id.MailBoxPage_listEmptyView) as View
         myListView.emptyView = listEmptyView
-        listView = myListView
+        bindListView(myListView)
         backButton = findViewById(R.id.Mail_backButton) as Button
         backButton.setOnClickListener(this)
         backButton.setOnLongClickListener(this)

@@ -55,7 +55,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
         val listView1: ListView = mainLayout.findViewById(R.id.ClassPage_listView)
         listView1.emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
-        listView = listView1
+        bindListView(listView1)
         mainLayout.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
