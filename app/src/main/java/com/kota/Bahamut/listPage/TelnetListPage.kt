@@ -86,27 +86,25 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     private inner class AutoLoadThread : Thread() {
-        var run: Boolean = true
+        var running = true
 
         // java.lang.Thread, java.lang.Runnable
         override fun run() {
-            var sendCommand: Boolean
+            var shallSendCommand: Boolean
             try {
                 sleep(10000L)
-                while (run) {
+                while (running) {
                     val currentTime = System.currentTimeMillis()
                     val totalOffset = currentTime - this@TelnetListPage.lastLoadTime
                     val spanOffset = currentTime - this@TelnetListPage.lastSendTime
-                    sendCommand = if (totalOffset > 900000) {
-                        spanOffset > 60000
-                    } else if (totalOffset > 180000) {
-                        spanOffset > 30000
-                    } else if (totalOffset > 10000 && totalOffset > spanOffset) {
-                        true
-                    } else {
-                        false
+                    shallSendCommand = when {
+                        totalOffset > 900000 -> spanOffset > 60000
+                        totalOffset > 180000 -> spanOffset > 30000
+                        totalOffset > 10000 && totalOffset > spanOffset -> true
+                        else -> false
                     }
-                    if ((sendCommand || this@TelnetListPage.isManualLoadPending) && run) {
+
+                    if ((shallSendCommand || this@TelnetListPage.isManualLoadPending) && running) {
                         this@TelnetListPage.loadLastBlock(false)
                         this@TelnetListPage.lastSendTime = currentTime
                     }
@@ -115,7 +113,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                 }
             } catch (e: Exception) {
                 Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
-                run = false
+                running = false
             }
         }
     }
@@ -368,7 +366,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     private fun stopAutoLoad() {
         if (autoLoadThread != null) {
-            autoLoadThread?.run = false
+            autoLoadThread?.running = false
             autoLoadThread = null
         }
     }
