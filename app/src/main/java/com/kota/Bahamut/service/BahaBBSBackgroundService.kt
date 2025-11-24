@@ -198,7 +198,6 @@ class BahaBBSBackgroundService : Service() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to create notification channel: ${e.message}", e)
-            throw e // 重新拋出異常讓調用者處理
         }
     }
 

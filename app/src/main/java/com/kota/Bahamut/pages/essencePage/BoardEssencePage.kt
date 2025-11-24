@@ -106,7 +106,7 @@ class BoardEssencePage : TelnetListPage() {
 
         val aSListView = mainLayout.findViewById<ASListView>(R.id.BoardPageListView)
         aSListView.emptyView = mainLayout.findViewById(R.id.BoardPageListEmptyView)
-        listView = aSListView
+        bindListView(aSListView)
         aSListView.onItemClickListener
 
         // 上一篇

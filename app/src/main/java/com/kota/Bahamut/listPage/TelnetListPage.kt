@@ -36,8 +36,15 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private val pagePreloadCommand = BooleanArray(1)
     private val pageRefreshCommand = BooleanArray(2)
     open var listName: String = ""
-    @JvmField
-    protected var listViewWidget: ListView? = null
+    var listView: ListView? = null
+    fun bindListView(aListView: ListView) {
+        listView = aListView
+        if (listView != null) {
+            listView!!.onItemClickListener = this
+            listView!!.onItemLongClickListener = this
+            listView!!.adapter = this
+        }
+    }
     private var isListLoaded = false
     private var lastLoadTime: Long = 0
     private var lastSendTime: Long = 0
@@ -49,7 +56,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         private set
     var lastLoadItemIndex: Int = 0
         private set
-    private var isInitialed = false
+    var isInitialed = false
     private var isManualLoadPending = false
 
     @SuppressLint("UseSparseArrays")
@@ -76,10 +83,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     // android.widget.Adapter
     override fun unregisterDataSetObserver(observer: DataSetObserver?) {
         mDataSetObservable.unregisterObserver(observer)
-    }
-
-    fun notifyDataSetChanged() {
-        mDataSetObservable.notifyChanged()
     }
 
     private inner class AutoLoadThread : Thread() {
@@ -130,6 +133,26 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         isInitialed = false
         cleanAllItem()
         stopAutoLoad()
+    }
+
+    /** android.widget.Adapter
+     * 安全的在主執行緒中更新列表
+     */
+    fun safeNotifyDataSetChanged() {
+        object : ASRunner() {
+            @SuppressLint("NotifyDataSetChanged")
+            override fun run() {
+                mDataSetObservable.notifyChanged()
+
+                // 若 listView 的 adapter 是 BaseAdapter，呼叫其 notifyDataSetChanged
+                val adapter = listView?.adapter
+                if (adapter is android.widget.BaseAdapter) {
+                    adapter.notifyDataSetChanged()
+                } else if (adapter is androidx.recyclerview.widget.RecyclerView.Adapter<*>) {
+                    adapter.notifyDataSetChanged()
+                }
+            }
+        }.runInMainThread()
     }
 
     val loadingItemNumber: Int
@@ -193,27 +216,17 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         lastLoadTime = 0L
         lastSendTime = 0L
         listName = ""
+        safeNotifyDataSetChanged()
     }
-
-    var listView: ListView?
-        get() = listViewWidget
-        set(aListView) {
-            listViewWidget = aListView
-            if (listViewWidget != null) {
-                listViewWidget?.onItemClickListener = this
-                listViewWidget?.onItemLongClickListener = this
-                listViewWidget?.setAdapter(this)
-            }
-        }
 
     fun setListViewSelection(selection: Int) {
         object : ASRunner() {
             override fun run() {
-                if (this@TelnetListPage.listViewWidget != null) {
+                if (this@TelnetListPage.listView != null) {
                     if (selection == -1) {
-                        this@TelnetListPage.listViewWidget?.setSelection(this@TelnetListPage.getCount() - 1)
+                        this@TelnetListPage.listView?.setSelection(this@TelnetListPage.getCount() - 1)
                     } else {
-                        this@TelnetListPage.listViewWidget?.setSelection(selection)
+                        this@TelnetListPage.listView?.setSelection(selection)
                     }
                 }
             }
@@ -221,11 +234,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setListViewSelectionFromTop(selection: Int, top: Int) {
-        if (listViewWidget != null) {
+        if (listView != null) {
             if (selection == -1) {
-                listViewWidget?.setSelection(getCount() - 1)
+                listView?.setSelection(getCount() - 1)
             } else {
-                listViewWidget?.setSelectionFromTop(selection, top)
+                listView?.setSelectionFromTop(selection, top)
             }
         }
     }
@@ -247,6 +260,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (pageData == null) return false
         executeCommandFinished(pageData)
         insertPageData(pageData)
+        safeNotifyDataSetChanged()
         executePreloadCommand()
         executeCommand()
         return true
@@ -284,18 +298,23 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     private fun removeBlock(key: Int?) {
+        if (key == null) {
+            return
+        }
         var item: TelnetListPageItem? = null
         val block = blockList.remove(key)
         if (block != null) {
             var i = 0
             while (i < 20 && (block.getItem(i).also { item = it }) != null) {
-                item?.clear()
+                item!!.clear()
                 recycleItem(item)
                 i++
             }
             block.clear()
             recycleBlock(block)
         }
+        // 確保在移除 block 後通知 UI（在主執行緒）
+        safeNotifyDataSetChanged()
     }
 
     private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
@@ -320,22 +339,24 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (telnetListPageBlock.maximumItemNumber > this.listCount) {
             this.listCount = telnetListPageBlock.maximumItemNumber
         }
+        // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
+        safeNotifyDataSetChanged()
     }
 
     val firstVisibleBlockIndex: Int
         get() {
-            if (listViewWidget == null) {
+            if (listView == null) {
                 return -1
             }
-            return getBlockIndex(listViewWidget?.firstVisiblePosition!!)
+            return getBlockIndex(listView?.firstVisiblePosition!!)
         }
 
     val lastVisibleBlockIndex: Int
         get() {
-            if (listViewWidget == null) {
+            if (listView == null) {
                 return -1
             }
-            return getBlockIndex(listViewWidget?.lastVisiblePosition!!)
+            return getBlockIndex(listView?.lastVisiblePosition!!)
         }
 
     private fun startAutoLoad() {
@@ -512,8 +533,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun reloadListView() {
-        if (listViewWidget != null) {
-            notifyDataSetChanged()
+        if (listView != null) {
+            safeNotifyDataSetChanged()
             if (!isListLoaded) {
                 isListLoaded = true
                 setListViewSelection(getCount() - 1)
@@ -603,10 +624,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     protected fun saveListState() {
-        if (listViewWidget != null) {
+        if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
-            state.position = listViewWidget?.firstVisiblePosition!!
-            val firstVisibleItemView = listViewWidget?.getChildAt(0)
+            state.position = listView?.firstVisiblePosition!!
+            val firstVisibleItemView = listView?.getChildAt(0)
             if (firstVisibleItemView != null) {
                 state.top = firstVisibleItemView.top
             }
@@ -614,7 +635,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     protected fun loadListState() {
-        if (listViewWidget != null) {
+        if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
             setListViewSelectionFromTop(state.position, state.top)
         }
@@ -625,12 +646,14 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun cleanAllItem() {
         synchronized(blockList) {
-            val keys: MutableSet<Int?> = HashSet(blockList.keys)
+            val keys: HashSet<Int?> = HashSet(blockList.keys)
             for (key in keys) {
                 removeBlock(key)
             }
             blockList.clear()
         }
+        // 清空所有項目後通知 UI 更新（在主執行緒）
+        safeNotifyDataSetChanged()
     }
 
     open fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
