@@ -24,9 +24,8 @@ class BoardLinkPage : BoardMainPage() {
 
     @Synchronized
     override fun onPageRefresh() {
+        boardManager = "主題串列"
         super.onPageRefresh()
-        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData(this.boardTitle, "主題串列", listName)
     }
 
     override fun onMenuButtonClicked(): Boolean {

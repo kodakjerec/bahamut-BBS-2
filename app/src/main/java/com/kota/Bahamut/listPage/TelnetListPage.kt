@@ -56,7 +56,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         private set
     var lastLoadItemIndex: Int = 0
         private set
-    private var isInitialed = false
+    var isInitialed = false
     private var isManualLoadPending = false
 
     @SuppressLint("UseSparseArrays")
@@ -83,10 +83,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     // android.widget.Adapter
     override fun unregisterDataSetObserver(observer: DataSetObserver?) {
         mDataSetObservable.unregisterObserver(observer)
-    }
-
-    fun notifyDataSetChanged() {
-        mDataSetObservable.notifyChanged()
     }
 
     private inner class AutoLoadThread : Thread() {
@@ -144,8 +140,17 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
      */
     fun safeNotifyDataSetChanged() {
         object : ASRunner() {
+            @SuppressLint("NotifyDataSetChanged")
             override fun run() {
-                notifyDataSetChanged()
+                mDataSetObservable.notifyChanged()
+
+                // 若 listView 的 adapter 是 BaseAdapter，呼叫其 notifyDataSetChanged
+                val adapter = listView?.adapter
+                if (adapter is android.widget.BaseAdapter) {
+                    adapter.notifyDataSetChanged()
+                } else if (adapter is androidx.recyclerview.widget.RecyclerView.Adapter<*>) {
+                    adapter.notifyDataSetChanged()
+                }
             }
         }.runInMainThread()
     }

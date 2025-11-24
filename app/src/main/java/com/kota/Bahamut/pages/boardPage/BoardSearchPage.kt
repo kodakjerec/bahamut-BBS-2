@@ -26,9 +26,8 @@ class BoardSearchPage : BoardMainPage() {
 
     @Synchronized
     override fun onPageRefresh() {
+        boardManager = "文章搜尋"
         super.onPageRefresh()
-        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData(this.boardTitle, "文章搜尋", listName)
     }
 
     override fun onMenuButtonClicked(): Boolean {

@@ -90,16 +90,17 @@ import java.util.TimerTask
 import java.util.Vector
 import kotlin.math.abs
 
-open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
-    DialogSelectArticleListener, PostArticlePageListener, BoardExtendOptionalPageListener,
+open class BoardMainPage : TelnetListPage(),
+    DialogSearchArticleListener,
+    DialogSelectArticleListener,
+    PostArticlePageListener,
+    BoardExtendOptionalPageListener,
     ASListViewExtentOptionalDelegate {
     var mainDrawerLayout: DrawerLayout? = null
     lateinit var mainLayout: RelativeLayout
-    protected var boardTitle: String? = null
-    protected var boardManager: String? = null
+    var boardTitle: String = ""
+    var boardManager: String = ""
     var lastListAction: Int = BoardPageAction.Companion.LIST
-    var initialed: Boolean = false
-    var isRefreshHeaderView: Boolean = false // 正在更新標題列
 
     // com.kota.Bahamut.ListPage.TelnetListPage
     override var isItemBlockEnable: Boolean = false // 是否啟用黑名單
@@ -179,10 +180,9 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     /** 彈出側邊選單  */
     val mMenuButtonListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val drawerLayout = this@BoardMainPage.findViewById(R.id.drawer_layout) as DrawerLayout?
-        if (drawerLayout != null) {
-            if (drawerLayout.isDrawerOpen(drawerLocation)) {
-                drawerLayout.closeDrawer(drawerLocation)
+        if (mainDrawerLayout != null) {
+            if (mainDrawerLayout!!.isDrawerOpen(drawerLocation)) {
+                mainDrawerLayout!!.closeDrawer(drawerLocation)
             } else {
                 drawerLocation = if (propertiesDrawerLocation == 0) {
                     GravityCompat.END
@@ -193,7 +193,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
                 val layoutParamsDrawer = menuView.layoutParams as DrawerLayout.LayoutParams
                 layoutParamsDrawer.gravity = drawerLocation
                 menuView.layoutParams = layoutParamsDrawer
-                drawerLayout.openDrawer(drawerLocation, propertiesAnimationEnable)
+                mainDrawerLayout!!.openDrawer(drawerLocation, propertiesAnimationEnable)
             }
             reloadBookmark()
         }
@@ -524,7 +524,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 按下精華區  */
     var toEssencePageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         this.lastListAction = BoardPageAction.Companion.ESSENCE
-        PageContainer.instance!!.pushBoardEssencePage(listName, boardTitle!!)
+        PageContainer.instance!!.pushBoardEssencePage(listName, boardTitle)
         navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
@@ -647,13 +647,11 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     /** 更新headerView  */
     fun refreshHeaderView() {
         var boardTitle1 = boardTitle
-        boardTitle1 =
-            if (boardTitle1 == null || boardTitle1.isEmpty()) getContextString(R.string.loading) else boardTitle1
+        boardTitle1 = boardTitle1.ifEmpty { getContextString(R.string.loading) }
         var boardManager1 = boardManager
-        boardManager1 =
-            if (boardManager1 == null || boardManager1.isEmpty()) getContextString(R.string.loading) else boardManager1
+        boardManager1 = boardManager1.ifEmpty { getContextString(R.string.loading) }
         val boardName = listName
-        val headerView = mainLayout.findViewById<BoardHeaderView?>(R.id.BoardPage_HeaderView)!!
+        val headerView = mainLayout.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
         headerView.setData(boardTitle1, boardName, boardManager1)
     }
 
@@ -664,11 +662,11 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     // com.kota.Bahamut.ListPage.TelnetListPage
     override fun loadPage(): TelnetListPageBlock {
         val load = BoardPageHandler.instance.load()
-        if (!initialed) {
+        if (!isInitialed) {
             val visitBoard = TempSettings.lastVisitBoard
             if (visitBoard != load.boardName) {
                 // 紀錄最後瀏覽的看板
-                TempSettings.lastVisitBoard = load.boardName.toString()
+                TempSettings.lastVisitBoard = load.boardName
                 clear()
                 if (load.boardType == BoardPageAction.Companion.SEARCH) {
                     pushRefreshCommand(0)
@@ -677,8 +675,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
             boardManager = load.boardManager
             boardTitle = load.boardTitle
             listName = load.boardName
-            isRefreshHeaderView = true
-            initialed = true
+            isInitialed = true
         }
         return load
     }
@@ -688,7 +685,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         val boardPageItem = getItem(index) as BoardPageItem?
         if (boardPageItem != null) {
             // 紀錄正在看的討論串標題
-            TempSettings.boardFollowTitle = boardPageItem.title.toString()
+            TempSettings.boardFollowTitle = boardPageItem.title
             TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
@@ -700,11 +697,8 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
 
     @Synchronized  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
+        refreshHeaderView()
         super.onPageRefresh()
-        if (isRefreshHeaderView) {
-            refreshHeaderView()
-            isRefreshHeaderView = false
-        }
     }
 
     // com.kota.asFramework.pageController.ASViewController
@@ -937,7 +931,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
     }
 
     fun prepareInitial() {
-        initialed = false
+        isInitialed = false
     }
 
     /** 書籤管理->按下書籤  */
@@ -1087,6 +1081,7 @@ open class BoardMainPage : TelnetListPage(), DialogSearchArticleListener,
         super.onPageDidAppear()
         bookmarkAdapter.notifyDataSetChanged()
         historyAdapter.notifyDataSetChanged()
+        safeNotifyDataSetChanged()
     }
 
     fun reloadBookmark(aView: View? = null) {
