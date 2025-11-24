@@ -189,14 +189,13 @@ class LoginPage : TelnetPage() {
         val loginPasswordField = findViewById(R.id.Login_passwordEdit) as EditText
         val loginRemember = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
         val loginWebSignIn = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        val username = UserSettings.propertiesUsername
-        val password = UserSettings.propertiesPassword
-        val username2 = username.trim()
-        val password2 = password.trim()
-        loginUsernameField.setText(username2)
-        loginPasswordField.setText(password2)
-        loginRemember.isChecked = UserSettings.propertiesSaveLogonUser
-        loginWebSignIn.isChecked = UserSettings.propertiesWebSignIn
+        // 只有propertiesSaveLogonUser: true的登入才需要從Properties拿, 否則直接用預設值
+        if (UserSettings.propertiesSaveLogonUser) {
+            loginUsernameField.setText(UserSettings.propertiesUsername)
+            loginPasswordField.setText(UserSettings.propertiesPassword)
+            loginRemember.isChecked = true
+            loginWebSignIn.isChecked = UserSettings.propertiesWebSignIn
+        }
     }
 
     /**
@@ -212,9 +211,11 @@ class LoginPage : TelnetPage() {
         if (isLoginRemember.isChecked) {
             UserSettings.propertiesUsername = username
             UserSettings.propertiesPassword = password
+            UserSettings.propertiesSaveLogonUser = true
         } else {
             UserSettings.propertiesUsername = ""
             UserSettings.propertiesPassword = ""
+            UserSettings.propertiesSaveLogonUser = false
         }
     }
 
