@@ -1006,6 +1006,8 @@ open class BoardMainPage : TelnetListPage(),
         str3: String?
     ) {
         pushCommand(BahamutCommandEditArticle(str, str2!!, str3!!))
+        // 強制刷新列表 UI（執行於主執行緒）
+        safeNotifyDataSetChanged()
     }
 
     var timer: Timer? = null
@@ -1051,6 +1053,8 @@ open class BoardMainPage : TelnetListPage(),
                 cleanCommand() // 清除引言過多留下的command buffer
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
+                // 強制刷新列表 UI（執行於主執行緒）
+                this@BoardMainPage.safeNotifyDataSetChanged()
             }
         }.runInMainThread()
         if (timer != null) {
@@ -1067,6 +1071,8 @@ open class BoardMainPage : TelnetListPage(),
             override fun run() {
                 val page = PageContainer.instance!!.postArticlePage
                 page.closeArticle()
+                // 強制刷新列表 UI（執行於主執行緒）
+                this@BoardMainPage.safeNotifyDataSetChanged()
             }
         }.runInMainThread()
         if (timer != null) {
@@ -1110,6 +1116,7 @@ open class BoardMainPage : TelnetListPage(),
         if (isPageAppeared) {
             bookmarkAdapter.notifyDataSetChanged()
             historyAdapter.notifyDataSetChanged()
+            safeNotifyDataSetChanged()
         }
         if (drawerListView.onItemClickListener == null)
             drawerListView.onItemClickListener = bookmarkListener
