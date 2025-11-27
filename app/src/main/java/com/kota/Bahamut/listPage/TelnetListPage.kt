@@ -112,7 +112,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     sleep(1000L)
                 }
             } catch (e: Exception) {
-                Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
+                // This logs the message AND the stack trace to logcat
+                Log.e(javaClass.simpleName, "An error occurred in AutoLoadThread", e)
                 running = false
             }
         }
