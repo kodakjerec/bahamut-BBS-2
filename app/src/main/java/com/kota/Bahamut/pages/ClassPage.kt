@@ -273,11 +273,11 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         return itemView
     }
 
-    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         recycle(telnetListPageBlock as ClassPageBlock)
     }
 
-    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         recycle(telnetListPageItem as ClassPageItem)
     }
 }

@@ -71,9 +71,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     abstract fun loadPage(): TelnetListPageBlock?
 
-    abstract fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?)
+    abstract fun recycleBlock(telnetListPageBlock: TelnetListPageBlock)
 
-    abstract fun recycleItem(telnetListPageItem: TelnetListPageItem?)
+    abstract fun recycleItem(telnetListPageItem: TelnetListPageItem)
 
     // android.widget.Adapter
     override fun registerDataSetObserver(observer: DataSetObserver?) {
@@ -360,16 +360,26 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
 
     private fun startAutoLoad() {
-        if (this.isAutoLoadEnable && autoLoadThread == null) {
-            autoLoadThread = AutoLoadThread()
-            autoLoadThread?.start()
+        synchronized(this) {
+            if (!this.isAutoLoadEnable) return
+            if (autoLoadThread?.isAlive == true) return
+            val thread = AutoLoadThread()
+            autoLoadThread = thread
+            thread.start()
         }
     }
 
     private fun stopAutoLoad() {
-        if (autoLoadThread != null) {
-            autoLoadThread?.run = false
+        val threadToStop: AutoLoadThread?
+        synchronized(this) {
+            threadToStop = autoLoadThread
             autoLoadThread = null
+        }
+        threadToStop?.interrupt()
+        try {
+            threadToStop?.join(2000L)
+        } catch (ie: InterruptedException) {
+            Thread.currentThread().interrupt()
         }
     }
 

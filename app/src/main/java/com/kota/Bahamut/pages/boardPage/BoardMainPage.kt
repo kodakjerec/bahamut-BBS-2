@@ -149,6 +149,7 @@ open class BoardMainPage : TelnetListPage(),
             lastEndIndexes[endIndexCheckCount] = endIndex
             endIndexCheckCount++
 
+            // 連按超過三次
             if (endIndexCheckCount >= 3) {
                 // Reset counter
                 endIndexCheckCount = 0
@@ -675,7 +676,6 @@ open class BoardMainPage : TelnetListPage(),
             boardManager = load.boardManager
             boardTitle = load.boardTitle
             listName = load.boardName
-            isInitialed = true
         }
         return load
     }
@@ -989,12 +989,12 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
-    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }
 

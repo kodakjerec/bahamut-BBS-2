@@ -267,11 +267,11 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         return view
     }
 
-    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         MailBoxPageBlock.recycle(telnetListPageBlock as MailBoxPageBlock)
     }
 
-    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         MailBoxPageItem.recycle(telnetListPageItem as MailBoxPageItem)
     }
 

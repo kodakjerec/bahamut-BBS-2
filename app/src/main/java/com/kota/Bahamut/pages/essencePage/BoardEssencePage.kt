@@ -68,8 +68,13 @@ class BoardEssencePage : TelnetListPage() {
         return BoardEssencePageHandler.instance!!.load()!!
     }
 
-    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
+    }
+
+    // com.kota.Bahamut.ListPage.TelnetListPage
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
+        BoardEssencePageItem.recycle(telnetListPageItem as BoardEssencePageItem)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
@@ -92,11 +97,6 @@ class BoardEssencePage : TelnetListPage() {
         boardEssencePageItemView.setItem(boardEssencePageItem)
         boardEssencePageItemView.setNumber(itemIndex)
         return boardEssencePageItemView
-    }
-
-    // com.kota.Bahamut.ListPage.TelnetListPage
-    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
-        BoardEssencePageItem.recycle(telnetListPageItem as BoardEssencePageItem)
     }
 
     override fun onPageDidLoad() {
