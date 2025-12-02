@@ -3,7 +3,6 @@ package com.kota.Bahamut.listPage
 import android.annotation.SuppressLint
 import android.database.DataSetObservable
 import android.database.DataSetObserver
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -26,6 +25,14 @@ import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDi
 import com.kota.asFramework.thread.ASRunner
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnetUI.TelnetPage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import java.util.Arrays
 import java.util.Stack
 import java.util.Vector
@@ -50,7 +57,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var isListLoaded = false
     private var lastLoadTime: Long = 0
     private var lastSendTime: Long = 0
-    private var autoLoadThread: AutoLoadThread? = null
     var listCount: Int = 0 // 信件量
     var selectedIndex: Int = 0
         private set
@@ -89,40 +95,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         mDataSetObservable.unregisterObserver(observer)
     }
 
-    private inner class AutoLoadThread : Thread() {
-        var run: Boolean = true
+    /** 自動加載執行緒 */
+    private var autoLoadJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-        // java.lang.Thread, java.lang.Runnable
-        override fun run() {
-            var sendCommand: Boolean
-            try {
-                sleep(10000L)
-                while (run) {
-                    val currentTime = System.currentTimeMillis()
-                    val totalOffset = currentTime - this@TelnetListPage.lastLoadTime
-                    val spanOffset = currentTime - this@TelnetListPage.lastSendTime
-                    sendCommand = if (totalOffset > 900000) {
-                        spanOffset > 60000
-                    } else if (totalOffset > 180000) {
-                        spanOffset > 30000
-                    } else if (totalOffset > 10000 && totalOffset > spanOffset) {
-                        true
-                    } else {
-                        false
-                    }
-                    if ((sendCommand || this@TelnetListPage.isManualLoadPending) && run) {
-                        this@TelnetListPage.loadLastBlock(false)
-                        this@TelnetListPage.lastSendTime = currentTime
-                    }
-                    this@TelnetListPage.isManualLoadPending = false
-                    sleep(1000L)
-                }
-            } catch (e: Exception) {
-                Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
-                run = false
-            }
-        }
-    }
     fun setManualLoadPage() {
         isManualLoadPending = true
     }
@@ -130,6 +106,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     // com.kota.telnetUI.TelnetPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidUnload() {
         stopAutoLoad()
+        scope.cancel() // 清理协程作用域
         super.onPageDidUnload()
     }
 
@@ -362,28 +339,46 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             return getBlockIndex(listView?.lastVisiblePosition!!)
         }
 
+    /** 開始自動加載最後頁 */
     private fun startAutoLoad() {
-        synchronized(this) {
-            if (!this.isAutoLoadEnable) return
-            if (autoLoadThread?.isAlive == true) return
-            val thread = AutoLoadThread()
-            autoLoadThread = thread
-            thread.start()
+        if (!isAutoLoadEnable) return
+
+        autoLoadJob?.cancel() // 取消之前的任务
+        autoLoadJob = scope.launch {
+            delay(10000L) // 初始延迟
+
+            while (isActive) {
+                val currentTime = System.currentTimeMillis()
+                val totalOffset = currentTime - lastLoadTime
+                val spanOffset = currentTime - lastSendTime
+
+                // 根據距離上次載入/送出時間決定是否要自動發送載入最後一個區塊的命令
+                // 規則：
+                // - 超過 15 分鐘 (900000ms)：若距離上次送出超過 1 分鐘則送出
+                // - 超過 3 分鐘 (180000ms)：若距離上次送出超過 30 秒則送出
+                // - 超過 10 秒，且自上次載入的時間大於自上次送出的時間，表示有可能需要更新（避免頻繁重複送出）
+                val shouldSend = when {
+                    totalOffset > 900000 -> spanOffset > 60000
+                    totalOffset > 180000 -> spanOffset > 30000
+                    totalOffset > 10000 && totalOffset > spanOffset -> true
+                    else -> false
+                }
+
+                if (shouldSend || isManualLoadPending) {
+                    loadLastBlock()
+                    lastSendTime = currentTime
+                    isManualLoadPending = false
+                }
+
+                delay(1000L) // 1秒间隔
+            }
         }
     }
 
+    /** 停止自動加載最後頁 */
     private fun stopAutoLoad() {
-        val threadToStop: AutoLoadThread?
-        synchronized(this) {
-            threadToStop = autoLoadThread
-            autoLoadThread = null
-        }
-        threadToStop?.interrupt()
-        try {
-            threadToStop?.join(2000L)
-        } catch (_: InterruptedException) {
-            Thread.currentThread().interrupt()
-        }
+        autoLoadJob?.cancel()
+        autoLoadJob = null
     }
 
     @Synchronized

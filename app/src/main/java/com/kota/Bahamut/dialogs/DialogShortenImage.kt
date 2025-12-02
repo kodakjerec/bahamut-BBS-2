@@ -206,6 +206,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     }
                     Glide.with(this).load(bitmap).into(imageView)
                 } else {
+                    @Suppress("DEPRECATION")
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
                     Glide.with(this).load(bitmap).into(imageView)
                 }
@@ -259,6 +260,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                         selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
                     } else {
+                        @Suppress("DEPRECATION")
                         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
                         selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
