@@ -150,6 +150,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     adapter.notifyDataSetChanged()
                 } else if (adapter is androidx.recyclerview.widget.RecyclerView.Adapter<*>) {
                     adapter.notifyDataSetChanged()
+                } else {
+                    // fallback：確保非 BaseAdapter / RecyclerView 的自訂 ListAdapter 也能安全更新
+                    listView?.invalidateViews()
                 }
             }
         }.runInMainThread()
@@ -260,7 +263,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (pageData == null) return false
         executeCommandFinished(pageData)
         insertPageData(pageData)
+
+        // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
         safeNotifyDataSetChanged()
+
         executePreloadCommand()
         executeCommand()
         return true
@@ -339,8 +345,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (telnetListPageBlock.maximumItemNumber > this.listCount) {
             this.listCount = telnetListPageBlock.maximumItemNumber
         }
-        // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
-        safeNotifyDataSetChanged()
     }
 
     val firstVisibleBlockIndex: Int
@@ -544,6 +548,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun reloadListView() {
         if (listView != null) {
+            // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
             safeNotifyDataSetChanged()
             if (!isListLoaded) {
                 isListLoaded = true

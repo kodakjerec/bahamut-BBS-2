@@ -1024,8 +1024,7 @@ open class BoardMainPage : TelnetListPage(),
         boolean6: Boolean?
     ) {
         pushCommand(BahamutCommandPostArticle(this, str!!, str2!!, str3, str4, str5, boolean6!!))
-        // 強制刷新列表 UI（執行於主執行緒）
-        safeNotifyDataSetChanged()
+
         // 回應到作者信箱
         if (str3 != null && str3 == "M") {
             return
@@ -1072,17 +1071,16 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 完成發文  */
     fun finishPost() {
-        // 強制刷新列表 UI（執行於主執行緒）
-        safeNotifyDataSetChanged()
-
         object : ASRunner() {
             override fun run() {
                 val page = PageContainer.instance!!.postArticlePage
                 page.closeArticle()
-                // 強制刷新列表 UI（執行於主執行緒）
-                this@BoardMainPage.safeNotifyDataSetChanged()
             }
         }.runInMainThread()
+
+        // 強制刷新列表 UI（執行於主執行緒）
+        safeNotifyDataSetChanged()
+
         if (timer != null) {
             timer?.cancel()
             timer?.purge()
