@@ -134,6 +134,9 @@ open class BoardMainPage : TelnetListPage(),
         firstIndex -= moveIndex
         if (firstIndex < 0) firstIndex = 0
         setListViewSelection(firstIndex)
+        // 記錄最後瀏覽文章編號
+        if (this::class == BoardMainPage::class)
+            TempSettings.lastVisitArticleNumber = firstIndex
     }
 
     /** 下一頁  */
@@ -166,6 +169,9 @@ open class BoardMainPage : TelnetListPage(),
         // Store current endIndex
         lastEndIndexes[0] = endIndex
         setListViewSelection(firstIndex)
+        // 記錄最後瀏覽文章編號
+        if (this::class == BoardMainPage::class)
+            TempSettings.lastVisitArticleNumber = firstIndex
     }
 
     /** 最後頁  */
@@ -490,35 +496,36 @@ open class BoardMainPage : TelnetListPage(),
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
         // keyword: clearFocusInternal
-        if (mainDrawerLayout != null) mainDrawerLayout?.requestFocus()
+        if (mainDrawerLayout != null)
+            mainDrawerLayout!!.requestFocus()
 
         // 工具列位置
         changeToolbarLocation()
         changeToolbarOrder()
 
         // 自動登入洽特
+        timer = Timer()
         if (TempSettings.isUnderAutoToChat) {
             // 任務完成
             // 關閉"正在自動登入"
 
             TempSettings.isUnderAutoToChat = false
 
-            val timer = Timer()
             val task1: TimerTask = object : TimerTask() {
                 override fun run() {
                     dismissProcessingDialog()
                 }
             }
+            timer?.schedule(task1, 500)
+        }
+        // 跳到指定文章編號
+        if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
             val task2: TimerTask = object : TimerTask() {
                 override fun run() {
-                    // 跳到指定文章編號
-                    if (TempSettings.lastVisitArticleNumber > 0) {
-                        onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
-                    }
+                    onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
                 }
             }
-            timer.schedule(task1, 500)
-            timer.schedule(task2, 500)
+            timer?.schedule(task2, 0)
         }
     }
 
@@ -686,7 +693,8 @@ open class BoardMainPage : TelnetListPage(),
         if (boardPageItem != null) {
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.title
-            TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
+            if (this::class == BoardMainPage::class)
+                TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
         }
         if (boardPageItem == null || !boardPageItem.isDeleted) {
             return true
@@ -990,15 +998,15 @@ open class BoardMainPage : TelnetListPage(),
 
     // com.kota.Bahamut.ListPage.TelnetListPage
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
-        BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
+        BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
+    //
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }
 
-    // 修改文章 訊息發出
+    /** 修改文章 訊息發出 */
     override fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -1013,7 +1021,6 @@ open class BoardMainPage : TelnetListPage(),
     var timer: Timer? = null
 
     /** 發表文章/回覆文章 訊息發出  */
-    // com.kota.Bahamut.pages.PostArticlePage_Listener
     override fun onPostDialogSendButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,

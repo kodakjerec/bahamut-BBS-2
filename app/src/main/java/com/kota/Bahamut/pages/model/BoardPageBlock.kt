@@ -12,7 +12,7 @@ class BoardPageBlock private constructor() : TelnetListPageBlock() {
     var boardMode: Int = 0
 
     companion object {
-        private val _pool = Stack<BoardPageBlock?>()
+        private val _pool = Stack<BoardPageBlock>()
         @JvmStatic
         fun release() {
             synchronized(_pool) {
@@ -20,7 +20,7 @@ class BoardPageBlock private constructor() : TelnetListPageBlock() {
             }
         }
 
-        fun recycle(block: BoardPageBlock?) {
+        fun recycle(block: BoardPageBlock) {
             synchronized(_pool) {
                 _pool.push(block)
             }

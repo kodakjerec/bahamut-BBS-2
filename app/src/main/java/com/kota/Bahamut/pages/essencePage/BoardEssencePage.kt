@@ -65,11 +65,11 @@ class BoardEssencePage : TelnetListPage() {
         get() = false
 
     override fun loadPage(): TelnetListPageBlock {
-        return BoardEssencePageHandler.instance!!.load()!!
+        return BoardEssencePageHandler.instance!!.load()
     }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
-        BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock?)
+        BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage

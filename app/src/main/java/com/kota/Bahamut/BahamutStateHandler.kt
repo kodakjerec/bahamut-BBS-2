@@ -822,19 +822,21 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     // 通用顯示頁面
     fun showPage(aPage: TelnetPage?) {
-        val topPage =
-            ASNavigationController.currentController?.topController as TelnetPage?
-        if (aPage === topPage) {
-            object : ASRunner() {
-                override fun run() {
-                    topPage?.requestPageRefresh()
+        val currentController = ASNavigationController.currentController
+        if (currentController != null) {
+            val topPage = currentController.topController as TelnetPage?
+            if (aPage === topPage) {
+                object : ASRunner() {
+                    override fun run() {
+                        topPage?.requestPageRefresh()
+                    }
+                }.runInMainThread()
+            } else if (topPage != null && !topPage.isPopupPage && aPage != null) {
+                if (currentController.containsViewController(aPage)) {
+                    currentController.popToViewController(aPage)
+                } else {
+                    currentController.pushViewController(aPage)
                 }
-            }.runInMainThread()
-        } else if (topPage != null && !topPage.isPopupPage && aPage != null) {
-            if (ASNavigationController.currentController!!.containsViewController(aPage)) {
-                ASNavigationController.currentController!!.popToViewController(aPage)
-            } else {
-                ASNavigationController.currentController!!.pushViewController(aPage)
             }
         }
     }

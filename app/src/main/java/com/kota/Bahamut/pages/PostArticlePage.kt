@@ -386,7 +386,11 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             recover = false
         }
         clear()
-        navigationController.popToViewController(boardMainPage)
+        try {
+            navigationController.popToViewController(boardMainPage)
+        } catch (e: UninitializedPropertyAccessException) {
+            // navigationController 未初始化時不執行任何動作
+        }
         PageContainer.instance!!.cleanPostArticlePage()
     }
 

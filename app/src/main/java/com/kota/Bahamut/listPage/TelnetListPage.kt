@@ -17,8 +17,10 @@ import com.kota.Bahamut.command.BahamutCommandLoadBlock
 import com.kota.Bahamut.command.BahamutCommandLoadLastBlock
 import com.kota.Bahamut.command.BahamutCommandMoveToLastBlock
 import com.kota.Bahamut.command.TelnetCommand
+import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.thread.ASRunner
@@ -71,8 +73,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     abstract fun loadPage(): TelnetListPageBlock?
 
+    /** 回收block */
     abstract fun recycleBlock(telnetListPageBlock: TelnetListPageBlock)
 
+    /** 回收item */
     abstract fun recycleItem(telnetListPageItem: TelnetListPageItem)
 
     // android.widget.Adapter
@@ -146,13 +150,19 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
                 // 若 listView 的 adapter 是 BaseAdapter，呼叫其 notifyDataSetChanged
                 val adapter = listView?.adapter
-                if (adapter is android.widget.BaseAdapter) {
-                    adapter.notifyDataSetChanged()
-                } else if (adapter is androidx.recyclerview.widget.RecyclerView.Adapter<*>) {
-                    adapter.notifyDataSetChanged()
-                } else {
-                    // fallback：確保非 BaseAdapter / RecyclerView 的自訂 ListAdapter 也能安全更新
-                    listView?.invalidateViews()
+                when (adapter) {
+                    is android.widget.BaseAdapter -> {
+                        adapter.notifyDataSetChanged()
+                    }
+
+                    is androidx.recyclerview.widget.RecyclerView.Adapter<*> -> {
+                        adapter.notifyDataSetChanged()
+                    }
+
+                    else -> {
+                        // fallback：確保非 BaseAdapter / RecyclerView 的自訂 ListAdapter 也能安全更新
+                        listView?.invalidateViews()
+                    }
                 }
             }
         }.runInMainThread()
@@ -160,10 +170,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     val loadingItemNumber: Int
         get() = this.lastLoadItemIndex + 1
-
-    fun isItemLoadingByIndex(index: Int): Boolean {
-        return index == this.lastLoadItemIndex
-    }
 
     fun isItemLoadingByNumber(number: Int): Boolean {
         return number == this.loadingItemNumber
@@ -263,10 +269,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (pageData == null) return false
         executeCommandFinished(pageData)
         insertPageData(pageData)
-
-        // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
-        safeNotifyDataSetChanged()
-
         executePreloadCommand()
         executeCommand()
         return true
@@ -303,10 +305,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         Arrays.fill(pagePreloadCommand, false)
     }
 
-    private fun removeBlock(key: Int?) {
-        if (key == null) {
-            return
-        }
+    private fun removeBlock(key: Int) {
         var item: TelnetListPageItem? = null
         val block = blockList.remove(key)
         if (block != null) {
@@ -382,7 +381,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         threadToStop?.interrupt()
         try {
             threadToStop?.join(2000L)
-        } catch (ie: InterruptedException) {
+        } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
         }
     }
@@ -493,26 +492,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return result
     }
 
-    @get:Synchronized
-    val isLoadingSize: Boolean
-        get() {
-            var loadSizeCommandExists: Boolean
-            loadSizeCommandExists = false
-            val it =
-                operationCommandStack.iterator()
-            while (true) {
-                if (!it.hasNext()) {
-                    break
-                }
-                val command = it.next()
-                if (command.action == 2) {
-                    loadSizeCommandExists = true
-                    break
-                }
-            }
-            return loadSizeCommandExists
-        }
-
     fun loadBoardBlock(block: Int) {
         val command: TelnetCommand = BahamutCommandLoadBlock(block)
         pushCommand(command)
@@ -544,12 +523,13 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun moveToLastPosition() {
         val command: TelnetCommand = BahamutCommandMoveToLastBlock()
         pushCommand(command)
+        // 記錄最後瀏覽文章編號
+        if (this::class == BoardMainPage::class)
+            TempSettings.lastVisitArticleNumber = listCount
     }
 
     fun reloadListView() {
         if (listView != null) {
-            // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
-            safeNotifyDataSetChanged()
             if (!isListLoaded) {
                 isListLoaded = true
                 setListViewSelection(getCount() - 1)
@@ -573,6 +553,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun setBlock(blockIndex: Int, aBlock: TelnetListPageBlock) {
         blockList.put(blockIndex, aBlock)
+        // 在設定 block 後通知 UI 更新（在主執行緒）
+        safeNotifyDataSetChanged()
     }
 
     fun getBlock(blockIndex: Int): TelnetListPageBlock? {
@@ -663,12 +645,13 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         synchronized(blockList) {
             val keys: HashSet<Int?> = HashSet(blockList.keys)
             for (key in keys) {
-                removeBlock(key)
+                if (key != null)
+                    removeBlock(key)
             }
             blockList.clear()
+            // 清空所有項目後通知 UI 更新（在主執行緒）
+            safeNotifyDataSetChanged()
         }
-        // 清空所有項目後通知 UI 更新（在主執行緒）
-        safeNotifyDataSetChanged()
     }
 
     open fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
