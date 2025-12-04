@@ -81,10 +81,17 @@ class BahaBBSBackgroundService : Service() {
             return START_NOT_STICKY
         }
 
+        // 檢查 App 基礎設施是否已初始化
+        if (TelnetClient.myInstance == null) {
+            Log.w(TAG, "Service restarted without app context, stopping")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         this.myClient = TelnetClient.myInstance!!
         this.myController = ASNavigationController.currentController
 
-        return START_STICKY // 確保服務重啟
+        return START_NOT_STICKY // 確保服務重啟
     }
 
     // android.app.Service
