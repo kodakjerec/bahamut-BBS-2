@@ -1062,11 +1062,9 @@ open class BoardMainPage : TelnetListPage(),
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
                 // 強制刷新列表 UI（執行於主執行緒）
-                this@BoardMainPage.safeNotifyDataSetChanged()
+                safeNotifyDataSetChanged()
             }
         }.runInMainThread()
-        // 強制刷新列表 UI（執行於主執行緒）
-        safeNotifyDataSetChanged()
 
         if (timer != null) {
             timer?.cancel()
@@ -1082,11 +1080,10 @@ open class BoardMainPage : TelnetListPage(),
             override fun run() {
                 val page = PageContainer.instance!!.postArticlePage
                 page.closeArticle()
+                // 強制刷新列表 UI（執行於主執行緒）
+                safeNotifyDataSetChanged()
             }
         }.runInMainThread()
-
-        // 強制刷新列表 UI（執行於主執行緒）
-        safeNotifyDataSetChanged()
 
         if (timer != null) {
             timer?.cancel()
@@ -1098,8 +1095,6 @@ open class BoardMainPage : TelnetListPage(),
 
     override fun onPageDidAppear() {
         super.onPageDidAppear()
-        bookmarkAdapter.notifyDataSetChanged()
-        historyAdapter.notifyDataSetChanged()
         safeNotifyDataSetChanged()
     }
 
@@ -1126,10 +1121,13 @@ open class BoardMainPage : TelnetListPage(),
             drawerListView.adapter = bookmarkAdapter
         else
             drawerListView.adapter = historyAdapter
+            
         if (isPageAppeared) {
-            bookmarkAdapter.notifyDataSetChanged()
-            historyAdapter.notifyDataSetChanged()
-            safeNotifyDataSetChanged()
+            // 只更新當前顯示的 adapter
+            if (myMode == 0)
+                bookmarkAdapter.notifyDataSetChanged()
+            else
+                historyAdapter.notifyDataSetChanged()
         }
         if (drawerListView.onItemClickListener == null)
             drawerListView.onItemClickListener = bookmarkListener

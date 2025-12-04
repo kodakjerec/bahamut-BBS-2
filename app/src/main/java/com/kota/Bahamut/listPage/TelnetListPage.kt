@@ -125,21 +125,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             override fun run() {
                 mDataSetObservable.notifyChanged()
 
-                // 若 listView 的 adapter 是 BaseAdapter，呼叫其 notifyDataSetChanged
-                val adapter = listView?.adapter
-                when (adapter) {
-                    is android.widget.BaseAdapter -> {
-                        adapter.notifyDataSetChanged()
-                    }
-
-                    is androidx.recyclerview.widget.RecyclerView.Adapter<*> -> {
-                        adapter.notifyDataSetChanged()
-                    }
-
-                    else -> {
-                        // fallback：確保非 BaseAdapter / RecyclerView 的自訂 ListAdapter 也能安全更新
-                        listView?.invalidateViews()
-                    }
+                // 如果 ListView 還沒設定 adapter，則手動刷新視圖
+                if (listView?.adapter == null) {
+                    listView?.invalidateViews()
                 }
             }
         }.runInMainThread()
