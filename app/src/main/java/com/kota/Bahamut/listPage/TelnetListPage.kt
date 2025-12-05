@@ -3,6 +3,8 @@ package com.kota.Bahamut.listPage
 import android.annotation.SuppressLint
 import android.database.DataSetObservable
 import android.database.DataSetObserver
+import android.util.Log
+import com.kota.Bahamut.BuildConfig
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -39,6 +41,24 @@ import java.util.Vector
 
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
+    // Short-term tracing control: enabled only for debug builds
+    val TRACE_LOG_ENABLE: Boolean = try { BuildConfig.DEBUG } catch (t: Throwable) { false }
+
+    fun traceCaller(): String {
+        try {
+            val st = Throwable().stackTrace
+            for (f in st) {
+                val cn = f.className
+                if (!cn.startsWith("android.") && !cn.startsWith("java.") && !cn.startsWith("kotlin.")) {
+                    return "${f.className}.${f.methodName}:${f.lineNumber}"
+                }
+            }
+        } catch (e: Exception) {
+            // ignore
+        }
+        return "unknown"
+    }
+
     private val operationCommandStack = Vector<TelnetCommand>()
     private val loadCommandStack = Stack<TelnetCommand?>()
     private var executingCommand: TelnetCommand? = null
@@ -120,6 +140,14 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
      * 安全的在主執行緒中更新列表
      */
     fun safeNotifyDataSetChanged() {
+        if (TRACE_LOG_ENABLE) {
+            try {
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=safeNotify listCount=${this.listCount} hasListView=${listView!=null}")
+                if (ASRunner.isMainThread) {
+                    Log.i("TelnetListPageTrace", "blockKeys=${blockList.keys}")
+                }
+            } catch (e: Exception) { /* ignore logging errors */ }
+        }
         object : ASRunner() {
             @SuppressLint("NotifyDataSetChanged")
             override fun run() {
@@ -272,6 +300,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     private fun removeBlock(key: Int) {
+        if (TRACE_LOG_ENABLE) {
+            try {
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=removeBlock key=$key blockListSizeBefore=${blockList.size}")
+            } catch (e: Exception) { }
+        }
         var item: TelnetListPageItem? = null
         val block = blockList.remove(key)
         if (block != null) {
@@ -289,6 +322,13 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
+        if (TRACE_LOG_ENABLE) {
+            try {
+                val min = telnetListPageBlock.minimumItemNumber
+                val max = telnetListPageBlock.maximumItemNumber
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=insertPageData min=$min max=$max")
+            } catch (e: Exception) { }
+        }
         val blockIndex = getBlockIndex(telnetListPageBlock.minimumItemNumber - 1)
         synchronized(blockList) {
             setBlock(blockIndex, telnetListPageBlock)
@@ -626,6 +666,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         get() = BoardPageAction.LIST
 
     fun cleanAllItem() {
+        if (TRACE_LOG_ENABLE) {
+            try {
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=cleanAllItem blockListSize=${blockList.size}")
+            } catch (e: Exception) { }
+        }
         synchronized(blockList) {
             val keys: HashSet<Int?> = HashSet(blockList.keys)
             for (key in keys) {
