@@ -1020,6 +1020,15 @@ open class BoardMainPage : TelnetListPage(),
         str3: String?
     ) {
         pushCommand(BahamutCommandEditArticle(str, str2!!, str3!!))
+        if (TRACE_LOG_ENABLE) {
+            try {
+                Log.i(
+                    "BoardMainPageTrace",
+                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked timerSet=${timer != null} isPageAppeared=${isPageAppeared}"
+                )
+            } catch (e: Exception) {
+            }
+        }
         // 強制刷新列表 UI（執行於主執行緒）
         safeNotifyDataSetChanged()
     }
@@ -1067,8 +1076,6 @@ open class BoardMainPage : TelnetListPage(),
                 cleanCommand() // 清除引言過多留下的command buffer
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
-                // 強制刷新列表 UI（執行於主執行緒）
-                safeNotifyDataSetChanged()
             }
         }.runInMainThread()
 
@@ -1086,8 +1093,6 @@ open class BoardMainPage : TelnetListPage(),
             override fun run() {
                 val page = PageContainer.instance!!.postArticlePage
                 page.closeArticle()
-                // 強制刷新列表 UI（執行於主執行緒）
-                safeNotifyDataSetChanged()
             }
         }.runInMainThread()
 
@@ -1101,6 +1106,9 @@ open class BoardMainPage : TelnetListPage(),
 
     override fun onPageDidAppear() {
         super.onPageDidAppear()
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=onPageDidAppear") } catch (e: Exception) { }
+        }
         safeNotifyDataSetChanged()
     }
 
@@ -1113,6 +1121,9 @@ open class BoardMainPage : TelnetListPage(),
             } else {
                 store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
             }
+        }
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=reloadBookmark myBookmarkListSize=${myBookmarkList.size}") } catch (e: Exception) { }
         }
         if (myBookmarkList.isEmpty()) {
             drawerListView.visibility = View.GONE
