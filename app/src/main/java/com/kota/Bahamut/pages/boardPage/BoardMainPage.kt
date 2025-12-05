@@ -20,6 +20,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BuildConfig
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandEditArticle
@@ -73,8 +74,6 @@ import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.setMessage
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.thread.ASRunner
@@ -98,6 +97,24 @@ open class BoardMainPage : TelnetListPage(),
     PostArticlePageListener,
     BoardExtendOptionalPageListener,
     ASListViewExtentOptionalDelegate {
+    // Short-term tracing control: enabled only for debug builds
+    private val TRACE_LOG_ENABLE: Boolean = try { BuildConfig.DEBUG } catch (t: Throwable) { false }
+
+    private fun traceCallerShort(): String {
+        try {
+            val st = Throwable().stackTrace
+            for (f in st) {
+                val cn = f.className
+                if (!cn.startsWith("android.") && !cn.startsWith("java.") && !cn.startsWith("kotlin.")) {
+                    return "${f.className}.${f.methodName}:${f.lineNumber}"
+                }
+            }
+        } catch (e: Exception) {
+            // ignore
+        }
+        return "unknown"
+    }
+
     var mainDrawerLayout: DrawerLayout? = null
     lateinit var mainLayout: RelativeLayout
     var boardTitle: String = ""
@@ -1038,26 +1055,11 @@ open class BoardMainPage : TelnetListPage(),
     ) {
         pushCommand(BahamutCommandPostArticle(this, str!!, str2!!, str3, str4, str5, boolean6!!))
 
-        // 回應到作者信箱
-        if (str3 != null && str3 == "M") {
-            return
+        if (TRACE_LOG_ENABLE) {
+            try {
+                Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=onPostDialogSendButtonClicked timerSet=${timer!=null} isPageAppeared=${isPageAppeared}")
+            } catch (e: Exception) { }
         }
-        // 發文中等待視窗
-        timer = Timer()
-        val timerTask: TimerTask = object : TimerTask() {
-            override fun run() {
-                setMessage(getContextString(R.string.board_page_post_waiting_message_2))
-            }
-        }
-        val timerTask2: TimerTask = object : TimerTask() {
-            override fun run() {
-                setMessage(getContextString(R.string.board_page_post_waiting_message_3))
-            }
-        }
-        timer?.schedule(timerTask, 3000)
-        timer?.schedule(timerTask2, 6000)
-
-        showProcessingDialog(getContextString(R.string.board_page_post_waiting_message_1))
     }
 
     /** 引言過多, 回逤發文時的設定  */
@@ -1068,16 +1070,17 @@ open class BoardMainPage : TelnetListPage(),
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
                 // 強制刷新列表 UI（執行於主執行緒）
-                safeNotifyDataSetChanged()
+                if (TRACE_LOG_ENABLE) {
+                    try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=recoverPost") } catch (e: Exception) { }
+                }
+                this@BoardMainPage.safeNotifyDataSetChanged()
             }
         }.runInMainThread()
-
-        if (timer != null) {
-            timer?.cancel()
-            timer?.purge()
-            timer = null
+        // 強制刷新列表 UI（執行於主執行緒）
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=recoverPost_postMain") } catch (e: Exception) { }
         }
-        dismissProcessingDialog()
+        safeNotifyDataSetChanged()
     }
 
     /** 完成發文  */
@@ -1086,21 +1089,23 @@ open class BoardMainPage : TelnetListPage(),
             override fun run() {
                 val page = PageContainer.instance!!.postArticlePage
                 page.closeArticle()
-                // 強制刷新列表 UI（執行於主執行緒）
-                safeNotifyDataSetChanged()
             }
         }.runInMainThread()
 
-        if (timer != null) {
-            timer?.cancel()
-            timer?.purge()
-            timer = null
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=finishPost timerActive=${timer!=null}") } catch (e: Exception) { }
         }
-        dismissProcessingDialog()
+        // 強制刷新列表 UI（執行於主執行緒）
+        safeNotifyDataSetChanged()
     }
 
     override fun onPageDidAppear() {
         super.onPageDidAppear()
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=onPageDidAppear") } catch (e: Exception) { }
+        }
+        // Use safeNotifyDataSetChanged to ensure updates happen on the main thread and
+        // are posted after current layout passes to avoid IllegalStateException.
         safeNotifyDataSetChanged()
     }
 
@@ -1113,6 +1118,9 @@ open class BoardMainPage : TelnetListPage(),
             } else {
                 store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
             }
+        }
+        if (TRACE_LOG_ENABLE) {
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCallerShort()} action=reloadBookmark myBookmarkListSize=${myBookmarkList.size}") } catch (e: Exception) { }
         }
         if (myBookmarkList.isEmpty()) {
             drawerListView.visibility = View.GONE
@@ -1172,3 +1180,4 @@ open class BoardMainPage : TelnetListPage(),
     override fun onSearchDialogCancelButtonClicked() {
     }
 }
+
