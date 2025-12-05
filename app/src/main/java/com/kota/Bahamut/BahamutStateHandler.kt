@@ -209,7 +209,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 } else if (topPage is PostArticlePage) {
                     // 最上層是 發文 或 看板
                     // 清除最先遇到的 BoardSearch, BoardLink, BoardMain
-                    val controllers: Vector<ASViewController> = ASNavigationController.currentController!!.allController
+                    val controllers: Vector<ASViewController> = ASNavigationController.currentController!!.viewControllers
                     for (i in controllers.size downTo 1) {
                         val nowPage = controllers[i - 1] as TelnetPage
 

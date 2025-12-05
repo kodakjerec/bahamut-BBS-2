@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
+import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
@@ -54,12 +55,14 @@ open class ASNavigationController : Activity() {
     protected fun onControllerWillFinish() {
     }
 
+    /** 設定導覽列標題 */
     fun setNavigationTitle(title: String?) {
         super.setTitle(title)
     }
 
+    /** 取得APP標題 */
     protected open val controllerName: String?
-        get() = ""
+        get() = R.string.app_name.toString()
 
     private fun onMenuPressed(): Boolean {
         val page = this.topController
@@ -151,15 +154,6 @@ open class ASNavigationController : Activity() {
             }
             return controller
         }
-    val allController: Vector<ASViewController>
-        get() {
-            var controllers =
-                Vector<ASViewController>()
-            synchronized(this.controllers) {
-                controllers = this.controllers
-            }
-            return controllers
-        }
 
     private fun buildPageView(controller: ASViewController) {
         val pageView = ASPageView(this)
@@ -174,13 +168,13 @@ open class ASNavigationController : Activity() {
         controller.pageView = null
     }
 
-    fun addPageView(aPage: ASViewController) {
-        val pageView: ASPageView? = aPage.pageView
-        this.rootView?.post {
-            aPage.onPageDidDisappear()
-            this@ASNavigationController.rootView?.removeView(pageView)
-        }
-    }
+    //    fun addPageView(aPage: ASViewController) {
+    //        val pageView: ASPageView? = aPage.pageView
+    //        this.rootView?.post {
+    //            aPage.onPageDidDisappear()
+    //            this@ASNavigationController.rootView?.removeView(pageView)
+    //        }
+    //    }
 
     fun removePageView(aPage: ASViewController) {
         val pageView: ASPageView? = aPage.pageView
@@ -520,14 +514,6 @@ open class ASNavigationController : Activity() {
                 println("Network disconnected while in background")
             }
         }
-    }
-
-    @JvmOverloads
-    fun printControllers(controllers: Vector<ASViewController> = this.controllers) {
-        for (controller in controllers) {
-            print(controller.pageType.toString() + " ")
-        }
-        print("\n")
     }
 
     override fun onLowMemory() {

@@ -8,7 +8,7 @@ import java.util.Vector
 
 abstract class ASViewController {
     lateinit var navigationController: ASNavigationController
-    protected var isLoaded: Boolean = false
+    var isLoaded: Boolean = false
     private var aSPageView: ASPageView? = null
     private var isContainedInContainer = false
     var isMarkedRemoved: Boolean = false
@@ -42,6 +42,7 @@ abstract class ASViewController {
         get() = 0
 
     open fun onPageDidLoad() {
+        isLoaded = true
     }
 
     open fun onPageWillAppear() {

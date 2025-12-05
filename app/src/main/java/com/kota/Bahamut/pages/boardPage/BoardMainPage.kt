@@ -75,6 +75,8 @@ import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.setMessage
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASListViewExtentOptionalDelegate
@@ -517,15 +519,19 @@ open class BoardMainPage : TelnetListPage(),
                 }
             }
             timer?.schedule(task1, 500)
-        }
-        // 跳到指定文章編號
-        if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
-            val task2: TimerTask = object : TimerTask() {
-                override fun run() {
-                    onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
+
+            // 跳到指定文章編號
+            // 指定 boardMainPage 才能用, 而且是從 classPage 進入到 boardMainPage
+            if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
+                val controllers: Vector<ASViewController> = ASNavigationController.currentController!!.viewControllers
+                // TODO
+                val task2: TimerTask = object : TimerTask() {
+                    override fun run() {
+                        onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
+                    }
                 }
+                timer?.schedule(task2, 0)
             }
-            timer?.schedule(task2, 0)
         }
     }
 

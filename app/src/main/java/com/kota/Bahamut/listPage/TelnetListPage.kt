@@ -219,6 +219,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     override fun onPageDidLoad() {
         loadCommandStack.setSize(2)
+        isLoaded = true
     }
 
     override val pageLayout: Int
