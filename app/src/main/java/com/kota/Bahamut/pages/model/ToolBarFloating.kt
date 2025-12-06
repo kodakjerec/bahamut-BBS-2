@@ -15,8 +15,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.floatingLocation
 import com.kota.Bahamut.service.UserSettings.Companion.setFloatingLocation
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
-import java.util.Timer
-import java.util.TimerTask
+import com.kota.asFramework.thread.ASCoroutine
 
 class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
     private var mainLayout: LinearLayout? = null
@@ -24,7 +23,6 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     private var btn1: Button? = null
     private var btn2: Button? = null
     private var scale = 0f // 畫面精度
-    private var timer: Timer? = null
 
     private var idleTime = 0f // 閒置多久
     private var alphaPercentage = 0f // 閒置不透明度
@@ -198,21 +196,23 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         super.onConfigurationChanged(newConfig)
     }
 
-    private fun startInvisible() {
-        if (timer != null) timer?.cancel()
 
-        timer = Timer()
-        val task1: TimerTask = object : TimerTask() {
-            override fun run() {
-                mainLayout?.alpha = alphaPercentage
-            }
+    val startInvisible : ASCoroutine? = object : ASCoroutine() {
+        override suspend fun run() {
+            mainLayout?.alpha = alphaPercentage
         }
-        timer?.schedule(task1, idleTime.toInt() * 1000L)
+    }
+    private fun startInvisible() {
+        startInvisible?.cancel()
+
+        startInvisible?.postDelayed(idleTime.toLong() * 1000L)
+
         TempSettings.isFloatingInvisible = true
     }
 
     private fun cancelInvisible() {
-        if (timer != null) timer?.cancel()
+        startInvisible?.cancel()
+
         mainLayout?.alpha = 1f
         TempSettings.isFloatingInvisible = false
     }

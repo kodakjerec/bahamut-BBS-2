@@ -20,6 +20,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BuildConfig
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandEditArticle
@@ -43,6 +44,7 @@ import com.kota.Bahamut.listPage.ListStateStore.Companion.instance
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
+import com.kota.Bahamut.pages.ClassPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.PostArticlePageListener
 import com.kota.Bahamut.pages.blockListPage.BlockListPage
@@ -86,8 +88,6 @@ import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.textView.TelnetTextViewLarge
-import java.util.Timer
-import java.util.TimerTask
 import java.util.Vector
 import kotlin.math.abs
 
@@ -127,7 +127,7 @@ open class BoardMainPage : TelnetListPage(),
         true
     }
 
-    /** 前一頁  */
+    /** 上一頁  */
     val mPrevPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         var firstIndex = listView?.firstVisiblePosition!!
         val endIndex = listView?.lastVisiblePosition!!
@@ -135,9 +135,6 @@ open class BoardMainPage : TelnetListPage(),
         firstIndex -= moveIndex
         if (firstIndex < 0) firstIndex = 0
         setListViewSelection(firstIndex)
-        // 記錄最後瀏覽文章編號
-        if (this::class == BoardMainPage::class)
-            TempSettings.lastVisitArticleNumber = firstIndex
     }
 
     /** 下一頁  */
@@ -170,9 +167,6 @@ open class BoardMainPage : TelnetListPage(),
         // Store current endIndex
         lastEndIndexes[0] = endIndex
         setListViewSelection(firstIndex)
-        // 記錄最後瀏覽文章編號
-        if (this::class == BoardMainPage::class)
-            TempSettings.lastVisitArticleNumber = firstIndex
     }
 
     /** 最後頁  */
@@ -497,39 +491,45 @@ open class BoardMainPage : TelnetListPage(),
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
         // keyword: clearFocusInternal
-        if (mainDrawerLayout != null)
-            mainDrawerLayout!!.requestFocus()
+        mainLayout.requestFocus()
 
         // 工具列位置
         changeToolbarLocation()
         changeToolbarOrder()
 
         // 自動登入洽特
-        timer = Timer()
         if (TempSettings.isUnderAutoToChat) {
             // 任務完成
             // 關閉"正在自動登入"
 
             TempSettings.isUnderAutoToChat = false
 
-            val task1: TimerTask = object : TimerTask() {
-                override fun run() {
+            object: ASCoroutine() {
+                override suspend fun run() {
                     dismissProcessingDialog()
                 }
-            }
-            timer?.schedule(task1, 500)
+            }.postDelayed(500L)
+        }
 
-            // 跳到指定文章編號
-            // 指定 boardMainPage 才能用, 而且是從 classPage 進入到 boardMainPage
-            if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
-                ASNavigationController.currentController!!.viewControllers
-                // TODO
-                val task2: TimerTask = object : TimerTask() {
-                    override fun run() {
+        // 跳到指定文章編號
+        // 指定 boardMainPage 才能用
+        if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
+            // 從 classPage 進入到 boardMainPage
+            if (ASNavigationController.currentController!!.lastViewController!!::class == ClassPage::class) {
+                if (BuildConfig.DEBUG)
+                    showShortToast(TempSettings.lastVisitArticleNumber.toString())
+
+                object :ASCoroutine() {
+                    override suspend fun run() {
+                        // 置中顯示
+                        val firstIndex = listView?.firstVisiblePosition!!
+                        val endIndex = listView?.lastVisiblePosition!!
+                        val moveIndex = abs(endIndex - firstIndex)
+                        TempSettings.lastVisitArticleNumber -= moveIndex / 2
+
                         onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
                     }
-                }
-                timer?.schedule(task2, 0)
+                }.postDelayed(300L)
             }
         }
     }
@@ -847,14 +847,14 @@ open class BoardMainPage : TelnetListPage(),
     fun pushArticle() {
         this@BoardMainPage.pushCommand(BahamutCommandPushArticle(loadingItemNumber))
 
-        pushArticleASCoroutine.cancel()
-        pushArticleASCoroutine.postDelayed(2000)
+        pushArticleASCoroutine?.cancel()
+        pushArticleASCoroutine?.postDelayed(2000L)
         isPostDelayedSuccess = false
     }
 
     /** 開啟推文小視窗  */
     fun openPushArticleDialog() {
-        pushArticleASCoroutine.cancel()
+        pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
 
         val dialog = DialogPushArticle()
@@ -862,7 +862,7 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     /** 沒有開啟推文小視窗, 視為沒開放功能  */
-    var pushArticleASCoroutine: ASCoroutine = object : ASCoroutine() {
+    var pushArticleASCoroutine: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 onPagePreload()
@@ -873,7 +873,7 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 提供給 stateHandler 的取消介面  */
     fun cancelRunner() {
-        pushArticleASCoroutine.cancel()
+        pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
     }
 
@@ -1023,7 +1023,7 @@ open class BoardMainPage : TelnetListPage(),
             try {
                 Log.i(
                     "BoardMainPageTrace",
-                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked timerSet=${timer != null} isPageAppeared=${isPageAppeared}"
+                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked isPageAppeared=${isPageAppeared}"
                 )
             } catch (_: Exception) {
             }
@@ -1031,8 +1031,6 @@ open class BoardMainPage : TelnetListPage(),
         // 強制刷新列表 UI（執行於主執行緒）
         safeNotifyDataSetChanged()
     }
-
-    var timer: Timer? = null
 
     /** 發表文章/回覆文章 訊息發出  */
     override fun onPostDialogSendButtonClicked(
@@ -1051,21 +1049,21 @@ open class BoardMainPage : TelnetListPage(),
             return
         }
         // 發文中等待視窗
-        timer = Timer()
-        val timerTask: TimerTask = object : TimerTask() {
-            override fun run() {
-                setMessage(getContextString(R.string.board_page_post_waiting_message_2))
-            }
-        }
-        val timerTask2: TimerTask = object : TimerTask() {
-            override fun run() {
-                setMessage(getContextString(R.string.board_page_post_waiting_message_3))
-            }
-        }
-        timer?.schedule(timerTask, 3000)
-        timer?.schedule(timerTask2, 6000)
-
         showProcessingDialog(getContextString(R.string.board_page_post_waiting_message_1))
+        postWaitingDialog1?.postDelayed(3000L)
+        postWaitingDialog2?.postDelayed(6000L)
+    }
+    // 3秒後跳出
+    val postWaitingDialog1: ASCoroutine? = object: ASCoroutine() {
+        override suspend fun run() {
+            setMessage(getContextString(R.string.board_page_post_waiting_message_2))
+        }
+    }
+    // 6秒後跳出
+    val postWaitingDialog2: ASCoroutine? = object: ASCoroutine() {
+        override suspend fun run() {
+            setMessage(getContextString(R.string.board_page_post_waiting_message_3))
+        }
     }
 
     /** 引言過多, 回逤發文時的設定  */
@@ -1076,11 +1074,8 @@ open class BoardMainPage : TelnetListPage(),
                 page.setRecover()
         }
 
-        if (timer != null) {
-            timer?.cancel()
-            timer?.purge()
-            timer = null
-        }
+        postWaitingDialog1?.cancel()
+        postWaitingDialog2?.cancel()
         dismissProcessingDialog()
     }
 
@@ -1091,20 +1086,9 @@ open class BoardMainPage : TelnetListPage(),
             page.closeArticle()
         }
 
-        if (timer != null) {
-            timer?.cancel()
-            timer?.purge()
-            timer = null
-        }
+        postWaitingDialog1?.cancel()
+        postWaitingDialog2?.cancel()
         dismissProcessingDialog()
-    }
-
-    override fun onPageDidAppear() {
-        super.onPageDidAppear()
-        if (TRACE_LOG_ENABLE) {
-            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPageDidAppear") } catch (_: Exception) { }
-        }
-        safeNotifyDataSetChanged()
     }
 
     fun reloadBookmark(aView: View? = null) {

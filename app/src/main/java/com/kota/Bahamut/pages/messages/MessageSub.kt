@@ -181,13 +181,13 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             db.close()
         }
 
-        messageAsRunner.cancel()
-        messageAsRunner.postDelayed(3000)
+        messageAsRunner?.cancel()
+        messageAsRunner?.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
     /** 送出訊息-2 送出對方id */
     fun sendMessagePart2() {
-        messageAsRunner.cancel()
+        messageAsRunner?.cancel()
 
         if (tempMessage!=null) {
             val aSenderName = tempMessage?.senderName
@@ -198,14 +198,14 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             TelnetClient.myInstance!!.sendDataToServer(builder)
         }
 
-        messageAsRunner.postDelayed(3000)
+        messageAsRunner?.postDelayed(3000L)
         // telnet會連續觸發這段兩次
         if (!isPostDelayedSuccess)
             isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */
     fun sendMessagePart3() {
-        messageAsRunner.cancel()
+        messageAsRunner?.cancel()
         isPostDelayedSuccess = true
 
         if (tempMessage!=null) {
@@ -239,7 +239,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         }
     }
     fun sendMessageFail(status:MessageStatus) {
-        messageAsRunner.cancel()
+        messageAsRunner?.cancel()
         isPostDelayedSuccess = false
 
         if (tempMessage!=null) {
@@ -271,7 +271,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
     /** 強制發送訊息進入失敗 */
-    private var messageAsRunner: ASCoroutine = object : ASCoroutine() {
+    private var messageAsRunner: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 sendMessageFail(MessageStatus.Offline)

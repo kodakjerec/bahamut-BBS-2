@@ -28,6 +28,7 @@ import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
@@ -35,8 +36,6 @@ import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.logic.SearchBoardHandler
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetHeaderItemView
-import java.util.Timer
-import java.util.TimerTask
 
 class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
     lateinit var mainLayout: RelativeLayout
@@ -67,13 +66,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         if (TempSettings.isUnderAutoToChat) {
             // 進入洽特
             // 查詢看板 => Chat => 定位到Chat:Enter
-            val timer = Timer()
-            val task1: TimerTask = object : TimerTask() {
-                override fun run() {
+            object: ASCoroutine() {
+                override suspend fun run() {
+                    // 延遲1秒，確保看板列表載入完成
                     TelnetClient.myInstance!!.sendStringToServerInBackground("sChat")
                 }
-            }
-            timer.schedule(task1, 300)
+            }.postDelayed(500L)
         }
     }
 

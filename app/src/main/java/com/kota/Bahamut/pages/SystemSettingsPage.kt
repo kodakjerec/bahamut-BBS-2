@@ -56,10 +56,9 @@ import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.textView.TelnetTextViewSmall
-import java.util.Timer
-import java.util.TimerTask
 import androidx.core.net.toUri
 import com.kota.Bahamut.service.TempSettings.myContext
+import com.kota.asFramework.thread.ASCoroutine
 
 class SystemSettingsPage : TelnetPage() {
     var mainLayout: LinearLayout? = null
@@ -110,13 +109,11 @@ class SystemSettingsPage : TelnetPage() {
                     showProcessingDialog("設定套用中\n請重新進入設定")
                     onBackPressed()
 
-                    val timer = Timer()
-                    val task: TimerTask = object : TimerTask() {
-                        override fun run() {
+                    object : ASCoroutine() {
+                        override suspend fun run() {
                             dismissProcessingDialog()
                         }
-                    }
-                    timer.schedule(task, 3000)
+                    }.postDelayed(1500L)
                 }
                 cloudBackup.askCloudSave()
             }

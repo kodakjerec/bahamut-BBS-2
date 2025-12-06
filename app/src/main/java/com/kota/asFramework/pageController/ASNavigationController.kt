@@ -142,6 +142,7 @@ open class ASNavigationController : Activity() {
         }
     }
 
+    /** 最上層Controller */
     val topController: ASViewController?
         get() {
             var controller: ASViewController? = null
@@ -152,6 +153,9 @@ open class ASNavigationController : Activity() {
             }
             return controller
         }
+
+    /** 最後離開前的Controller */
+    var lastViewController: ASViewController? = null
 
     private fun buildPageView(controller: ASViewController) {
         val pageView = ASPageView(this)
@@ -291,6 +295,7 @@ open class ASNavigationController : Activity() {
         aController: ASViewController?,
         animated: Boolean = this.isAnimationEnable
     ) {
+        lastViewController = this.topController
         val command: PageCommand = object : PageCommand() {
             override fun run() {
                 if (aController != null) {
