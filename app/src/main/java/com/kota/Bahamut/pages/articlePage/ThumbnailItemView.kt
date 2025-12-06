@@ -1,6 +1,5 @@
 package com.kota.Bahamut.pages.articlePage
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -31,7 +30,7 @@ import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -101,7 +100,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                         .build()
 
                     // 尋找URL資料
-                    ASRunner.runInNewThread {
+                    ASCoroutine.runInNewCoroutine {
                         try {
                             // load heads
                             val response: Response = client.newCall(request).execute()
@@ -175,22 +174,17 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
                         } catch (_: Exception) {
-                            object : ASRunner() {
-                                override fun run() {
-                                    setFail()
-                                }
-                            }.runInMainThread()
+                            ASCoroutine.runOnMain {
+                                setFail()
+                            }
                         }
                     }
                 }
             }
         } catch (_: Exception) {
-            object : ASRunner() {
-                // com.kota.asFramework.thread.ASRunner
-                override fun run() {
-                    setFail()
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                setFail()
+            }
         }
     }
 
@@ -201,42 +195,36 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         val transportType = TempSettings.transportType
 
         if (isPic) { // 純圖片
-            object : ASRunner() {
-                // com.kota.asFramework.thread.ASRunner
-                override fun run() {
-                    layoutDefault.visibility = GONE
+            ASCoroutine.runOnMain {
+                layoutDefault.visibility = GONE
 
-                    // 圖片
-                    layoutPic.visibility = VISIBLE
-                    if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
-                        prepareLoadImage()
-                    } else if (myImageUrl == "") {
-                        imageViewButton.visibility = GONE
-                    }
-
-                    // 內容
-                    layoutNormal.visibility = GONE
+                // 圖片
+                layoutPic.visibility = VISIBLE
+                if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                    prepareLoadImage()
+                } else if (myImageUrl == "") {
+                    imageViewButton.visibility = GONE
                 }
-            }.runInMainThread()
+
+                // 內容
+                layoutNormal.visibility = GONE
+            }
         } else { // 內容網址
-            object : ASRunner() {
-                // com.kota.asFramework.thread.ASRunner
-                override fun run() {
-                    layoutDefault.visibility = GONE
+            ASCoroutine.runOnMain {
+                layoutDefault.visibility = GONE
 
-                    // 圖片
-                    layoutPic.visibility = VISIBLE
-                    if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
-                        prepareLoadImage()
-                    } else if (myImageUrl == "") {
-                        imageViewButton.visibility = GONE
-                    }
-
-                    // 內容
-                    layoutNormal.visibility = VISIBLE
-                    setNormal()
+                // 圖片
+                layoutPic.visibility = VISIBLE
+                if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                    prepareLoadImage()
+                } else if (myImageUrl == "") {
+                    imageViewButton.visibility = GONE
                 }
-            }.runInMainThread()
+
+                // 內容
+                layoutNormal.visibility = VISIBLE
+                setNormal()
+            }
         }
     }
 
@@ -281,116 +269,104 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     /** 讀取圖片  */
     private fun loadImage() {
         imgLoaded = true
-        object : ASRunner() {
-            @SuppressLint("ResourceType")
-            override fun run() {
-                imageViewButton.visibility = GONE
-                photoViewPic.visibility = VISIBLE
-                photoViewPic.contentDescription = myDescription
-                try {
-                    val circularProgressDrawable = CircularProgressDrawable(context)
-                    circularProgressDrawable.setStrokeWidth(10f)
-                    circularProgressDrawable.setCenterRadius(60f)
-                    // progress bar color
-                    val typedValue = TypedValue()
+        ASCoroutine.runOnMain {
+            imageViewButton.visibility = GONE
+            photoViewPic.visibility = VISIBLE
+            photoViewPic.contentDescription = myDescription
+            try {
+                val circularProgressDrawable = CircularProgressDrawable(context)
+                circularProgressDrawable.setStrokeWidth(10f)
+                circularProgressDrawable.setCenterRadius(60f)
+                // progress bar color
+                val typedValue = TypedValue()
 
-                    context.theme
-                        .resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true)
-                    circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId))
-                    // progress bar start
-                    circularProgressDrawable.start()
+                context.theme
+                    .resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true)
+                circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId))
+                // progress bar start
+                circularProgressDrawable.start()
 
-                    if (myImageUrl.isEmpty()) {
-                        return
-                    }
+                if (myImageUrl.isEmpty()) {
+                    return@runOnMain
+                }
 
-                    photoViewPic.setImageDrawable(circularProgressDrawable)
+                photoViewPic.setImageDrawable(circularProgressDrawable)
 
-                    Glide.with(this@ThumbnailItemView)
-                        .load(myImageUrl)
-                        .listener(object : RequestListener<Drawable?> {
-                            override fun onLoadFailed(
-                                e: GlideException?,
-                                model: Any?,
-                                target: Target<Drawable?>,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                object : ASRunner() {
-                                    // com.kota.asFramework.thread.ASRunner
-                                    override fun run() {
-                                        setFail()
-                                    }
-                                }.runInMainThread()
-                                return false
+                Glide.with(this@ThumbnailItemView)
+                    .load(myImageUrl)
+                    .listener(object : RequestListener<Drawable?> {
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable?>,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            ASCoroutine.runOnMain {
+                                setFail()
                             }
+                            return false
+                        }
 
-                            override fun onResourceReady(
-                                resource: Drawable?,
-                                model: Any?,
-                                target: Target<Drawable?>?,
-                                dataSource: DataSource?,
-                                isFirstResource: Boolean
-                            ): Boolean {
-                                return false
-                            }
-                        })
-                        .into(object : CustomTarget<Drawable?>() {
-                            override fun onResourceReady(
-                                resource: Drawable,
-                                transition: Transition<in Drawable?>?
-                            ) {
-                                try {
-                                    val bitmap: Bitmap
-                                    if (resource is GifDrawable) bitmap = resource.firstFrame
-                                    else bitmap = (resource as BitmapDrawable).bitmap
-                                    val picHeight = bitmap.height
-                                    val picWidth = bitmap.width
-                                    var targetHeight = viewHeight
-                                    var targetWidth = viewWidth
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable?>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean
+                        ): Boolean {
+                            return false
+                        }
+                    })
+                    .into(object : CustomTarget<Drawable?>() {
+                        override fun onResourceReady(
+                            resource: Drawable,
+                            transition: Transition<in Drawable?>?
+                        ) {
+                            try {
+                                val bitmap: Bitmap
+                                if (resource is GifDrawable) bitmap = resource.firstFrame
+                                else bitmap = (resource as BitmapDrawable).bitmap
+                                val picHeight = bitmap.height
+                                val picWidth = bitmap.width
+                                var targetHeight = viewHeight
+                                var targetWidth = viewWidth
 
-                                    val scaleWidth = targetWidth.toFloat() / picWidth
-                                    val scaleHeight = targetHeight.toFloat() / picHeight
-                                    var scale = min(scaleWidth, scaleHeight)
-                                    if (scale > 1) scale = 1f
+                                val scaleWidth = targetWidth.toFloat() / picWidth
+                                val scaleHeight = targetHeight.toFloat() / picHeight
+                                var scale = min(scaleWidth, scaleHeight)
+                                if (scale > 1) scale = 1f
 
-                                    val tempHeight = (picHeight * scale).toInt()
-                                    targetHeight = min(tempHeight, targetHeight)
-                                    photoViewPic.minimumHeight = targetHeight
+                                val tempHeight = (picHeight * scale).toInt()
+                                targetHeight = min(tempHeight, targetHeight)
+                                photoViewPic.minimumHeight = targetHeight
 
-                                    val tempWidth = (picWidth * scale).toInt()
-                                    targetWidth = min(tempWidth, targetWidth)
-                                    photoViewPic.minimumWidth = targetWidth
+                                val tempWidth = (picWidth * scale).toInt()
+                                targetWidth = min(tempWidth, targetWidth)
+                                photoViewPic.minimumWidth = targetWidth
 
-                                    if (resource is GifDrawable) {
-                                        resource.startFromFirstFrame()
-                                        photoViewPic.setImageDrawable(resource)
-                                    } else {
-                                        val newBitmap = bitmap.scale(targetWidth, targetHeight)
-                                        photoViewPic.setImageBitmap(newBitmap)
-                                    }
-                                } catch (_: Exception) {
-                                    object : ASRunner() {
-                                        // com.kota.asFramework.thread.ASRunner
-                                        override fun run() {
-                                            setFail()
-                                        }
-                                    }.runInMainThread()
+                                if (resource is GifDrawable) {
+                                    resource.startFromFirstFrame()
+                                    photoViewPic.setImageDrawable(resource)
+                                } else {
+                                    val newBitmap = bitmap.scale(targetWidth, targetHeight)
+                                    photoViewPic.setImageBitmap(newBitmap)
+                                }
+                            } catch (_: Exception) {
+                                ASCoroutine.runOnMain {
+                                    setFail()
                                 }
                             }
-
-                            override fun onLoadCleared(placeholder: Drawable?) {
-                            }
-                        })
-                } catch (_: Exception) {
-                    object : ASRunner() {
-                        // com.kota.asFramework.thread.ASRunner
-                        override fun run() {
-                            setFail()
                         }
-                    }.runInMainThread()
+
+                        override fun onLoadCleared(placeholder: Drawable?) {
+                        }
+                    })
+            } catch (_: Exception) {
+                ASCoroutine.runOnMain {
+                    setFail()
                 }
             }
-        }.runInMainThread()
+        }
     }
 
     var openUrlListener: OnClickListener = OnClickListener {

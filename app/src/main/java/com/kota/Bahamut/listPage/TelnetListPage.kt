@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.database.DataSetObservable
 import android.database.DataSetObserver
 import android.util.Log
-import com.kota.Bahamut.BuildConfig
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -12,6 +11,7 @@ import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView.OnItemLongClickListener
 import android.widget.ListAdapter
 import android.widget.ListView
+import com.kota.Bahamut.BuildConfig
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandLoadArticle
 import com.kota.Bahamut.command.BahamutCommandLoadBlock
@@ -24,17 +24,9 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnetUI.TelnetPage
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import java.util.Arrays
 import java.util.Stack
 import java.util.Vector
@@ -42,7 +34,7 @@ import java.util.Vector
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
     // Short-term tracing control: enabled only for debug builds
-    val TRACE_LOG_ENABLE: Boolean = try { BuildConfig.DEBUG } catch (t: Throwable) { false }
+    val TRACE_LOG_ENABLE: Boolean = try { BuildConfig.DEBUG } catch (_: Throwable) { false }
 
     fun traceCaller(): String {
         try {
@@ -53,7 +45,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     return "${f.className}.${f.methodName}:${f.lineNumber}"
                 }
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // ignore
         }
         return "unknown"
@@ -116,8 +108,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     /** 自動加載執行緒 */
-    private var autoLoadJob: Job? = null
-    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var autoLoadJob: ASCoroutine? = null
 
     fun setManualLoadPage() {
         isManualLoadPending = true
@@ -126,7 +117,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     // com.kota.telnetUI.TelnetPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidUnload() {
         stopAutoLoad()
-        scope.cancel() // 清理协程作用域
+        autoLoadJob?.cancel() // 清理协程作用域
         super.onPageDidUnload()
     }
 
@@ -142,23 +133,20 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun safeNotifyDataSetChanged() {
         if (TRACE_LOG_ENABLE) {
             try {
-                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=safeNotify listCount=${this.listCount} hasListView=${listView!=null}")
-                if (ASRunner.isMainThread) {
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=safeNotify listCount=${this.listCount} hasListView=${listView!=null}")
+                if (ASCoroutine.isMainThread) {
                     Log.i("TelnetListPageTrace", "blockKeys=${blockList.keys}")
                 }
-            } catch (e: Exception) { /* ignore logging errors */ }
+            } catch (_: Exception) { /* ignore logging errors */ }
         }
-        object : ASRunner() {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun run() {
-                mDataSetObservable.notifyChanged()
+        ASCoroutine.runOnMain {
+            mDataSetObservable.notifyChanged()
 
-                // 如果 ListView 還沒設定 adapter，則手動刷新視圖
-                if (listView?.adapter == null) {
-                    listView?.invalidateViews()
-                }
+            // 如果 ListView 還沒設定 adapter，則手動刷新視圖
+            if (listView?.adapter == null) {
+                listView?.invalidateViews()
             }
-        }.runInMainThread()
+        }
     }
 
     val loadingItemNumber: Int
@@ -222,17 +210,15 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setListViewSelection(selection: Int) {
-        object : ASRunner() {
-            override fun run() {
-                if (this@TelnetListPage.listView != null) {
-                    if (selection == -1) {
-                        this@TelnetListPage.listView?.setSelection(this@TelnetListPage.getCount() - 1)
-                    } else {
-                        this@TelnetListPage.listView?.setSelection(selection)
-                    }
+        ASCoroutine.runOnMain {
+            if (this@TelnetListPage.listView != null) {
+                if (selection == -1) {
+                    this@TelnetListPage.listView?.setSelection(this@TelnetListPage.getCount() - 1)
+                } else {
+                    this@TelnetListPage.listView?.setSelection(selection)
                 }
             }
-        }.runInMainThread()
+        }
     }
 
     fun setListViewSelectionFromTop(selection: Int, top: Int) {
@@ -302,8 +288,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private fun removeBlock(key: Int) {
         if (TRACE_LOG_ENABLE) {
             try {
-                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=removeBlock key=$key blockListSizeBefore=${blockList.size}")
-            } catch (e: Exception) { }
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=removeBlock key=$key blockListSizeBefore=${blockList.size}")
+            } catch (_: Exception) { }
         }
         var item: TelnetListPageItem? = null
         val block = blockList.remove(key)
@@ -326,8 +312,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             try {
                 val min = telnetListPageBlock.minimumItemNumber
                 val max = telnetListPageBlock.maximumItemNumber
-                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=insertPageData min=$min max=$max")
-            } catch (e: Exception) { }
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=insertPageData min=$min max=$max")
+            } catch (_: Exception) { }
         }
         val blockIndex = getBlockIndex(telnetListPageBlock.minimumItemNumber - 1)
         synchronized(blockList) {
@@ -373,33 +359,37 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (!isAutoLoadEnable) return
 
         autoLoadJob?.cancel() // 取消之前的任务
-        autoLoadJob = scope.launch {
-            delay(10000L) // 初始延迟
+        autoLoadJob = object : ASCoroutine() {
+            override suspend fun run() {
+                postDelayed(10000L) // 初始延迟
 
-            while (isActive) {
-                val currentTime = System.currentTimeMillis()
-                val totalOffset = currentTime - lastLoadTime
-                val spanOffset = currentTime - lastSendTime
+                try {
+                    val currentTime = System.currentTimeMillis()
+                    val totalOffset = currentTime - lastLoadTime
+                    val spanOffset = currentTime - lastSendTime
 
-                // 根據距離上次載入/送出時間決定是否要自動發送載入最後一個區塊的命令
-                // 規則：
-                // - 超過 15 分鐘 (900000ms)：若距離上次送出超過 1 分鐘則送出
-                // - 超過 3 分鐘 (180000ms)：若距離上次送出超過 30 秒則送出
-                // - 超過 10 秒，且自上次載入的時間大於自上次送出的時間，表示有可能需要更新（避免頻繁重複送出）
-                val shouldSend = when {
-                    totalOffset > 900000 -> spanOffset > 60000
-                    totalOffset > 180000 -> spanOffset > 30000
-                    totalOffset > 10000 && totalOffset > spanOffset -> true
-                    else -> false
+                    // 根據距離上次載入/送出時間決定是否要自動發送載入最後一個區塊的命令
+                    // 規則：
+                    // - 超過 15 分鐘 (900000ms)：若距離上次送出超過 1 分鐘則送出
+                    // - 超過 3 分鐘 (180000ms)：若距離上次送出超過 30 秒則送出
+                    // - 超過 10 秒，且自上次載入的時間大於自上次送出的時間，表示有可能需要更新（避免頻繁重複送出）
+                    val shouldSend = when {
+                        totalOffset > 900000 -> spanOffset > 60000
+                        totalOffset > 180000 -> spanOffset > 30000
+                        totalOffset > 10000 && totalOffset > spanOffset -> true
+                        else -> false
+                    }
+
+                    if (shouldSend || isManualLoadPending) {
+                        loadLastBlock()
+                        lastSendTime = currentTime
+                        isManualLoadPending = false
+                    }
+                } catch (_: Exception) {
+                    // 忽略錯誤
+                } finally {
+                    postDelayed(1000L) // 1秒间隔
                 }
-
-                if (shouldSend || isManualLoadPending) {
-                    loadLastBlock()
-                    lastSendTime = currentTime
-                    isManualLoadPending = false
-                }
-
-                delay(1000L) // 1秒间隔
             }
         }
     }
@@ -668,8 +658,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun cleanAllItem() {
         if (TRACE_LOG_ENABLE) {
             try {
-                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=cleanAllItem blockListSize=${blockList.size}")
-            } catch (e: Exception) { }
+                Log.i("TelnetListPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=cleanAllItem blockListSize=${blockList.size}")
+            } catch (_: Exception) { }
         }
         synchronized(blockList) {
             val keys: HashSet<Int?> = HashSet(blockList.keys)

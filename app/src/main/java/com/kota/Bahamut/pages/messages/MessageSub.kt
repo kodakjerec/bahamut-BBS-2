@@ -17,7 +17,7 @@ import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
@@ -93,12 +93,10 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             } finally {
                 db.close()
             }
-            object: ASRunner(){
-                override fun run() {
-                    val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
-                    myAdapter.addItem(item)
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
+                myAdapter.addItem(item)
+            }
         }
     }
 
@@ -273,8 +271,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
     /** 強制發送訊息進入失敗 */
-    private var messageAsRunner: ASRunner = object : ASRunner() {
-        override fun run() {
+    private var messageAsRunner: ASCoroutine = object : ASCoroutine() {
+        override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 sendMessageFail(MessageStatus.Offline)
                 ASToast.showLongToast("私訊無反應，對方可能不在線上")

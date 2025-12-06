@@ -76,8 +76,7 @@ import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessin
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.setMessage
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.pageController.ASViewController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASListViewExtentOptionalDelegate
 import com.kota.asFramework.ui.ASToast.showLongToast
@@ -523,7 +522,7 @@ open class BoardMainPage : TelnetListPage(),
             // 跳到指定文章編號
             // 指定 boardMainPage 才能用, 而且是從 classPage 進入到 boardMainPage
             if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
-                val controllers: Vector<ASViewController> = ASNavigationController.currentController!!.viewControllers
+                ASNavigationController.currentController!!.viewControllers
                 // TODO
                 val task2: TimerTask = object : TimerTask() {
                     override fun run() {
@@ -848,14 +847,14 @@ open class BoardMainPage : TelnetListPage(),
     fun pushArticle() {
         this@BoardMainPage.pushCommand(BahamutCommandPushArticle(loadingItemNumber))
 
-        pushArticleAsRunner.cancel()
-        pushArticleAsRunner.postDelayed(2000)
+        pushArticleASCoroutine.cancel()
+        pushArticleASCoroutine.postDelayed(2000)
         isPostDelayedSuccess = false
     }
 
     /** 開啟推文小視窗  */
     fun openPushArticleDialog() {
-        pushArticleAsRunner.cancel()
+        pushArticleASCoroutine.cancel()
         isPostDelayedSuccess = true
 
         val dialog = DialogPushArticle()
@@ -863,8 +862,8 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     /** 沒有開啟推文小視窗, 視為沒開放功能  */
-    var pushArticleAsRunner: ASRunner = object : ASRunner() {
-        override fun run() {
+    var pushArticleASCoroutine: ASCoroutine = object : ASCoroutine() {
+        override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 onPagePreload()
                 showLongToast("沒反應，看板未開放推文")
@@ -874,7 +873,7 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 提供給 stateHandler 的取消介面  */
     fun cancelRunner() {
-        pushArticleAsRunner.cancel()
+        pushArticleASCoroutine.cancel()
         isPostDelayedSuccess = true
     }
 
@@ -1024,9 +1023,9 @@ open class BoardMainPage : TelnetListPage(),
             try {
                 Log.i(
                     "BoardMainPageTrace",
-                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked timerSet=${timer != null} isPageAppeared=${isPageAppeared}"
+                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked timerSet=${timer != null} isPageAppeared=${isPageAppeared}"
                 )
-            } catch (e: Exception) {
+            } catch (_: Exception) {
             }
         }
         // 強制刷新列表 UI（執行於主執行緒）
@@ -1071,13 +1070,11 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 引言過多, 回逤發文時的設定  */
     fun recoverPost() {
-        object : ASRunner() {
-            override fun run() {
+        ASCoroutine.runOnMain {
                 cleanCommand() // 清除引言過多留下的command buffer
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
-            }
-        }.runInMainThread()
+        }
 
         if (timer != null) {
             timer?.cancel()
@@ -1089,12 +1086,10 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 完成發文  */
     fun finishPost() {
-        object : ASRunner() {
-            override fun run() {
-                val page = PageContainer.instance!!.postArticlePage
-                page.closeArticle()
-            }
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            val page = PageContainer. instance!!.postArticlePage
+            page.closeArticle()
+        }
 
         if (timer != null) {
             timer?.cancel()
@@ -1107,7 +1102,7 @@ open class BoardMainPage : TelnetListPage(),
     override fun onPageDidAppear() {
         super.onPageDidAppear()
         if (TRACE_LOG_ENABLE) {
-            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=onPageDidAppear") } catch (e: Exception) { }
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPageDidAppear") } catch (_: Exception) { }
         }
         safeNotifyDataSetChanged()
     }
@@ -1123,7 +1118,7 @@ open class BoardMainPage : TelnetListPage(),
             }
         }
         if (TRACE_LOG_ENABLE) {
-            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASRunner.isMainThread} caller=${traceCaller()} action=reloadBookmark myBookmarkListSize=${myBookmarkList.size}") } catch (e: Exception) { }
+            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=reloadBookmark myBookmarkListSize=${myBookmarkList.size}") } catch (_: Exception) { }
         }
         if (myBookmarkList.isEmpty()) {
             drawerListView.visibility = View.GONE

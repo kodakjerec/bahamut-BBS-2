@@ -1,11 +1,11 @@
 package com.kota.Bahamut.command
 
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() {
     var articleIndex: Int = 0
@@ -29,12 +29,10 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
             }
 
             if (articleIndex == maximumAvailableIndex) {
-                object : ASRunner() {
-                    override fun run() {
-                        showShortToast("找沒有了耶...:(")
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.runOnMain {
+                    showShortToast("找沒有了耶...:(")
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
                 create()
@@ -57,23 +55,19 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
     ) {
         if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(telnetListPageBlock?.selectedItem)) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                object : ASRunner() {
-                    override fun run() {
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.runOnMain {
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
                 articleIndex = telnetListPageBlock?.selectedItemNumber!!
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            object : ASRunner() {
-                override fun run() {
-                    showShortToast("找沒有了耶...:(")
-                    telnetListPage.onLoadItemFinished()
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                showShortToast("找沒有了耶...:(")
+                telnetListPage.onLoadItemFinished()
+            }
             isDone = true
         } else if (!telnetListPage.isEnabled(telnetListPageBlock.selectedItemNumber - 1)) {
             showShortToast("下一篇不可使用")

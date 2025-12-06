@@ -24,7 +24,7 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -92,7 +92,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             .url(apiUrl)
             .post(body)
             .build()
-        ASRunner.runInNewThread {
+        ASCoroutine.runInNewCoroutine {
             try{
                 client.newCall(request).execute().use { response->
                     val data = response.body.string()
@@ -103,13 +103,11 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                         val title = jsonObject.getString("title")
                         val description = jsonObject.getString("description")
 
-                        object : ASRunner() {
-                            override fun run() {
-                                editText.setText(targetUrl)
-                                changeFrontend(shortUrl)
-                                UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
-                            }
-                        }.runInMainThread()
+                        ASCoroutine.runOnMain {
+                            editText.setText(targetUrl)
+                            changeFrontend(shortUrl)
+                            UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
+                        }
 
                         // 網址存進資料庫
                         urlDatabase.addShortenUrl(targetUrl, title, description, shortUrl)

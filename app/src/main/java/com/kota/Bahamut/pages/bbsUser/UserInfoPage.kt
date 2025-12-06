@@ -1,6 +1,5 @@
 package com.kota.Bahamut.pages.bbsUser
 
-import android.annotation.SuppressLint
 import android.view.View.OnClickListener
 import android.widget.Button
 import android.widget.LinearLayout
@@ -13,7 +12,7 @@ import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
@@ -77,24 +76,21 @@ class UserInfoPage: TelnetPage() {
         val mailCount = rows[12].toContentString()
         val certificateTime = rows[13].toContentString()
         val stayTime = rows[14].toContentString()
-        object : ASRunner() {
-            @SuppressLint("SetTextI18n")
-            override fun run() {
-                if (rowString4.contains("暱    稱：")) {
-                    txnNickName.setText(rowString4.replace("暱    稱：", ""))
-                    txnOthers.text =
-                        "$realName\n$address\n$eMail\n$registerTime\n$lastVisitTime\n$hp\n$mp\n$mailCount\n$certificateTime\n$stayTime\n"
+        ASCoroutine.runOnMain {
+            if (rowString4.contains("暱    稱：")) {
+                txnNickName.setText(rowString4.replace("暱    稱：", ""))
+                txnOthers.text =
+                    "$realName\n$address\n$eMail\n$registerTime\n$lastVisitTime\n$hp\n$mp\n$mailCount\n$certificateTime\n$stayTime\n"
 
 
-                    txnNickName.doOnTextChanged { content, _, _, _ ->
-                        if (content!!.trim().isEmpty())
-                            paintBtnUpdate(false)
-                        else
-                            paintBtnUpdate(true)
-                    }
+                txnNickName.doOnTextChanged { content, _, _, _ ->
+                    if (content!!.trim().isEmpty())
+                        paintBtnUpdate(false)
+                    else
+                        paintBtnUpdate(true)
                 }
             }
-        }.runInMainThread()
+        }
 
         // 返回
         TelnetClient.myInstance!!.sendStringToServer("N")

@@ -13,7 +13,7 @@ import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.NotificationSettings
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 
 class MessageSmall(context: Context): LinearLayout(context) {
     private var mainLayout: RelativeLayout
@@ -39,17 +39,15 @@ class MessageSmall(context: Context): LinearLayout(context) {
 
     /** 更新Badge */
     fun updateBadge(aNumber: String) {
-        object : ASRunner() {
-            override fun run() {
-                if (aNumber != "0") {
-                    badgeView.text = aNumber
-                    badgeView.visibility = VISIBLE
-                } else {
-                    badgeView.text = ""
-                    badgeView.visibility = GONE
-                }
+        ASCoroutine.runOnMain {
+            if (aNumber != "0") {
+                badgeView.text = aNumber
+                badgeView.visibility = VISIBLE
+            } else {
+                badgeView.text = ""
+                badgeView.visibility = GONE
             }
-        }.runInMainThread()
+        }
     }
 
     fun show() {

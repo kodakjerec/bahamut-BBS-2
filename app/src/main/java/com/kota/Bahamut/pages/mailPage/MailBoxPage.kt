@@ -27,7 +27,6 @@ import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
@@ -276,17 +275,11 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     }
 
     fun recoverPost() {
-        object : ASRunner() {
-            override fun run() {
-            }
-        }.runInMainThread()
+        // nothing
     }
 
     fun finishPost() {
-        object : ASRunner() {
-            override fun run() {
-            }
-        }.runInMainThread()
+        // nothing
     }
 
     override fun onSearchDialogCancelButtonClicked() {

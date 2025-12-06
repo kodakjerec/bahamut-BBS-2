@@ -48,7 +48,7 @@ import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showLongToast
@@ -933,13 +933,11 @@ class ArticlePage : TelnetPage() {
     /** 查詢勇者  */
     fun ctrlQUser(fromStrings: Vector<String>) {
         try {
-            object : ASRunner() {
-                override fun run() {
-                    val dialogQueryHero = DialogQueryHero()
-                    dialogQueryHero.show()
-                    dialogQueryHero.getData(fromStrings)
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                val dialogQueryHero = DialogQueryHero()
+                dialogQueryHero.show()
+                dialogQueryHero.getData(fromStrings)
+            }
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }

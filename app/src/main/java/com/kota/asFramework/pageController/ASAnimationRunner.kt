@@ -2,8 +2,7 @@ package com.kota.asFramework.pageController
 
 import android.view.View
 import android.view.animation.Animation
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.thread.ASRunner.Companion.runInNewThread
+import com.kota.asFramework.thread.ASCoroutine
 
 abstract class ASAnimationRunner(animation: Animation?) {
     var animation: Animation? = null
@@ -17,7 +16,7 @@ abstract class ASAnimationRunner(animation: Animation?) {
     }
 
     fun start() {
-        runInNewThread {
+        ASCoroutine.runOnMain {
             var i = 0
             var success = false
             while (true) {
@@ -44,19 +43,15 @@ abstract class ASAnimationRunner(animation: Animation?) {
     }
 
     private fun fail() {
-        object : ASRunner() {
-            override fun run() {
-                this@ASAnimationRunner.onAnimationStartFail()
-            }
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            this@ASAnimationRunner.onAnimationStartFail()
+        }
     }
 
     private fun animate() {
-        object : ASRunner() {
-            override fun run() {
-                val targetView1 = this@ASAnimationRunner.targetView
-                targetView1?.startAnimation(this@ASAnimationRunner.animation)
-            }
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            val targetView1 = this@ASAnimationRunner.targetView
+            targetView1?.startAnimation(this@ASAnimationRunner.animation)
+        }
     }
 }

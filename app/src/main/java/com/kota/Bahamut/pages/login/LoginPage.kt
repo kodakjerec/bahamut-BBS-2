@@ -21,7 +21,7 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
@@ -234,7 +234,7 @@ class LoginPage : TelnetPage() {
      */
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
-        ASRunner.runInNewThread {
+        ASCoroutine.runInNewCoroutine {
             TelnetClient.myInstance!!.sendStringToServerInBackground(username)
         }
     }
@@ -243,33 +243,31 @@ class LoginPage : TelnetPage() {
      * 檢查是否刪除重複登入
      */
     fun onCheckRemoveLogonUser() {
-        object : ASRunner() {
-            override fun run() {
-                ASProcessingDialog.dismissProcessingDialog()
-                if (dialogRemoveLoginUser == null) {
-                    dialogRemoveLoginUser = ASAlertDialog.createDialog().setTitle("提示")
-                        .setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是")
-                        .setListener { aDialog: ASAlertDialog?, index: Int ->
-                            if (index == 0) {
-                                TelnetClient.myInstance!!.sendStringToServerInBackground("n")
-                            } else {
-                                TelnetClient.myInstance!!.sendStringToServerInBackground("y")
-                            }
-                            dialogRemoveLoginUser = null
-                            ASProcessingDialog.showProcessingDialog("登入中")
-                        }.setOnBackDelegate { aDialog: ASDialog? ->
+        ASCoroutine.runOnMain {
+            ASProcessingDialog.dismissProcessingDialog()
+            if (dialogRemoveLoginUser == null) {
+                dialogRemoveLoginUser = ASAlertDialog.createDialog().setTitle("提示")
+                    .setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是")
+                    .setListener { aDialog: ASAlertDialog?, index: Int ->
+                        if (index == 0) {
                             TelnetClient.myInstance!!.sendStringToServerInBackground("n")
-                            if (dialogRemoveLoginUser != null) {
-                                dialogRemoveLoginUser!!.dismiss()
-                                dialogRemoveLoginUser = null
-                            }
-                            ASProcessingDialog.showProcessingDialog("登入中")
-                            true
-                        } as ASAlertDialog?
-                }
-                dialogRemoveLoginUser!!.show()
+                        } else {
+                            TelnetClient.myInstance!!.sendStringToServerInBackground("y")
+                        }
+                        dialogRemoveLoginUser = null
+                        ASProcessingDialog.showProcessingDialog("登入中")
+                    }.setOnBackDelegate { aDialog: ASDialog? ->
+                        TelnetClient.myInstance!!.sendStringToServerInBackground("n")
+                        if (dialogRemoveLoginUser != null) {
+                            dialogRemoveLoginUser!!.dismiss()
+                            dialogRemoveLoginUser = null
+                        }
+                        ASProcessingDialog.showProcessingDialog("登入中")
+                        true
+                    } as ASAlertDialog?
             }
-        }.runInMainThread()
+            dialogRemoveLoginUser!!.show()
+        }
     }
 
     /**
@@ -277,14 +275,12 @@ class LoginPage : TelnetPage() {
      */
     fun onPasswordError() {
         if (errorCount < 3) {
-            object : ASRunner() {
-                override fun run() {
-                    ASProcessingDialog.dismissProcessingDialog()
-                    ASAlertDialog.createDialog().setTitle("勇者密碼錯誤")
-                        .setMessage("勇者密碼錯誤，請重新輸入勇者密碼").addButton("確定")
-                        .scheduleDismissOnPageDisappear(this@LoginPage).show()
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                ASProcessingDialog.dismissProcessingDialog()
+                ASAlertDialog.createDialog().setTitle("勇者密碼錯誤")
+                    .setMessage("勇者密碼錯誤，請重新輸入勇者密碼").addButton("確定")
+                    .scheduleDismissOnPageDisappear(this@LoginPage).show()
+            }
         } else {
             onLoginErrorAndDisconnected()
         }
@@ -295,14 +291,12 @@ class LoginPage : TelnetPage() {
      */
     fun onUsernameError() {
         if (errorCount < 3) {
-            object : ASRunner() {
-                override fun run() {
-                    ASProcessingDialog.dismissProcessingDialog()
-                    ASAlertDialog.createDialog().setTitle("勇者代號錯誤")
-                        .setMessage("勇者代號錯誤，請重新輸入勇者代號").addButton("確定")
-                        .scheduleDismissOnPageDisappear(this@LoginPage).show()
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                ASProcessingDialog.dismissProcessingDialog()
+                ASAlertDialog.createDialog().setTitle("勇者代號錯誤")
+                    .setMessage("勇者代號錯誤，請重新輸入勇者代號").addButton("確定")
+                    .scheduleDismissOnPageDisappear(this@LoginPage).show()
+            }
         } else {
             onLoginErrorAndDisconnected()
         }
@@ -312,13 +306,11 @@ class LoginPage : TelnetPage() {
      * 登入錯誤並斷線
      */
     fun onLoginErrorAndDisconnected() {
-        object : ASRunner() {
-            override fun run() {
-                ASProcessingDialog.dismissProcessingDialog()
-                ASAlertDialog.createDialog().setTitle("斷線")
-                    .setMessage("帳號密碼輸入錯誤次數過多，請重新連線。").addButton("確定").show()
-            }
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            ASProcessingDialog.dismissProcessingDialog()
+            ASAlertDialog.createDialog().setTitle("斷線")
+                .setMessage("帳號密碼輸入錯誤次數過多，請重新連線。").addButton("確定").show()
+        }
     }
 
     /**
@@ -349,26 +341,24 @@ class LoginPage : TelnetPage() {
                 // 如果今日已經登入過，跳過自動簽到
                 ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg05))
             } else {
-                object : ASRunner() {
-                    override fun run() {
-                        try {
-                            ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
+                ASCoroutine.runOnMain {
+                    try {
+                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
 
-                            // 使用 LoginWebDebugView 來顯示和處理自動登入
-                            val debugView = LoginWebDebugView(context!!)
-                            debugView.startAutoLogin {
-                                // 記錄web自動簽到成功時間
-                                setWebAutoLoginSuccessTime()
-                                null
-                            }
-                        } catch (e: Exception) {
-                            ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                            Log.e(
-                                javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                            )
+                        // 使用 LoginWebDebugView 來顯示和處理自動登入
+                        val debugView = LoginWebDebugView(context!!)
+                        debugView.startAutoLogin {
+                            // 記錄web自動簽到成功時間
+                            setWebAutoLoginSuccessTime()
+                            null
                         }
+                    } catch (e: Exception) {
+                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
+                        Log.e(
+                            javaClass.simpleName, (if (e.message != null) e.message else "")!!
+                        )
                     }
-                }.runInMainThread()
+                }
             }
 
             // 每小時檢查是否換日，如果換日則執行自動簽到
@@ -380,27 +370,25 @@ class LoginPage : TelnetPage() {
                         // 檢查今日是否已經自動簽到過
                         if (!this.isWebAutoLoginToday) {
                             // 換日了，執行自動簽到
-                            object : ASRunner() {
-                                override fun run() {
-                                    try {
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
+                            ASCoroutine.runOnMain {
+                                try {
+                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
 
-                                        // 使用 LoginWebDebugView 來處理自動簽到
-                                        val debugView = LoginWebDebugView(context!!)
-                                        debugView.startAutoLogin {
-                                            // 記錄web自動簽到成功時間
-                                            setWebAutoLoginSuccessTime()
-                                            null
-                                        }
-                                    } catch (e: Exception) {
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                                        Log.e(
-                                            javaClass.simpleName,
-                                            (if (e.message != null) e.message else "")!!
-                                        )
+                                    // 使用 LoginWebDebugView 來處理自動簽到
+                                    val debugView = LoginWebDebugView(context!!)
+                                    debugView.startAutoLogin {
+                                        // 記錄web自動簽到成功時間
+                                        setWebAutoLoginSuccessTime()
+                                        null
                                     }
+                                } catch (e: Exception) {
+                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
+                                    Log.e(
+                                        javaClass.simpleName,
+                                        (if (e.message != null) e.message else "")!!
+                                    )
                                 }
-                            }.runInMainThread()
+                            }
                         }
                     } catch (e: InterruptedException) {
                         Log.e(
@@ -477,13 +465,11 @@ class LoginPage : TelnetPage() {
      * 帳號重覆登入超過上限
      */
     fun onLoginAccountOverLimit() {
-        object : ASRunner() {
-            override fun run() {
-                ASProcessingDialog.dismissProcessingDialog()
-                ASAlertDialog.createDialog().setTitle("警告")
-                    .setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。")
-                    .addButton("確定").show()
-            }
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            ASProcessingDialog.dismissProcessingDialog()
+            ASAlertDialog.createDialog().setTitle("警告")
+                .setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。")
+                .addButton("確定").show()
+        }
     }
 }

@@ -19,7 +19,7 @@ object : ASRunner() {
 }.runInMainThread()
 
 // Background execution
-ASRunner.runInNewThread {
+ASCoroutine.runInNewCoroutine {
     // Background work
 }
 
@@ -217,7 +217,7 @@ ASProcessingDialog.dismissProcessingDialog()
 2. **Missing ASRunner wrapper** → UI thread violations
 3. **Forgetting object recycling** → Memory leaks
 4. **Direct page instantiation** → Use PageContainer
-5. **Sync operations on main thread** → Use `ASRunner.runInNewThread`
+5. **Sync operations on main thread** → Use `ASCoroutine.runInNewCoroutine`
 
 ## Testing Workflow Changes
 After modifying list pages:

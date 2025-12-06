@@ -11,7 +11,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.UserSettings
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 
 class LoginWeb(private val context: Context, private val externalWebView: WebView? = null) {
     
@@ -287,22 +287,20 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
     fun cleanup() {
         // 先取消計時器
         cancelTimeout()
-        
-        object : ASRunner() {
-            override fun run() {
-                currentWebView?.let { webView ->
-                    webView.stopLoading()
-                    webView.loadUrl("about:blank")
-                    webView.destroy()
-                }
-                currentWebView = null
 
-                // 清理回調函數引用
-                onFailCallback = null
-                onSignDetectedCallback = null
-                onManualCallback = null
+        ASCoroutine.runOnMain {
+            currentWebView?.let { webView ->
+                webView.stopLoading()
+                webView.loadUrl("about:blank")
+                webView.destroy()
             }
-        }.runInMainThread()
+            currentWebView = null
+
+            // 清理回調函數引用
+            onFailCallback = null
+            onSignDetectedCallback = null
+            onManualCallback = null
+        }
     }
     
     // JavaScript接口類
@@ -310,25 +308,21 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
         @JavascriptInterface
         fun onFail() {
             println("檢測不到簽到。")
-            
-            object : ASRunner() {
-                override fun run() {
-                    onFailCallback?.invoke()
-                    cleanup()
-                }
-            }.runInMainThread()
+
+            ASCoroutine.runOnMain {
+                onFailCallback?.invoke()
+                cleanup()
+            }
         }
 
         @JavascriptInterface
         fun signSuccess() {
             println("檢測到簽到對話框！")
-            
-            object : ASRunner() {
-                override fun run() {
-                    onSignDetectedCallback?.invoke()
-                    cleanup()
-                }
-            }.runInMainThread()
+
+            ASCoroutine.runOnMain {
+                onSignDetectedCallback?.invoke()
+                cleanup()
+            }
         }
         
         @JavascriptInterface
@@ -336,11 +330,9 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
             println("需要手動登入驗證")
             cancelTimeout()
 
-            object : ASRunner() {
-                override fun run() {
-                    onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
-                }
-            }.runInMainThread()
+            ASCoroutine.runOnMain {
+                onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
+            }
         }
         
     }

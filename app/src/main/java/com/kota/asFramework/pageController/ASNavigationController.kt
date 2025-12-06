@@ -19,8 +19,7 @@ import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.UserSettings
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.thread.ASRunner.Companion.construct
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 import kotlin.math.max
@@ -107,7 +106,6 @@ open class ASNavigationController : Activity() {
 
         // 獲取顯示器指標
         initializeDisplayMetrics()
-        construct()
 
         UserSettings(this)
         upgrade(this)
@@ -357,61 +355,59 @@ open class ASNavigationController : Activity() {
     }
 
     fun exchangeViewControllers(animated: Boolean) {
-        object : ASRunner() {
-            override fun run() {
-                val sourceController =
-                    if (this@ASNavigationController.controllers.isNotEmpty()) this@ASNavigationController.controllers.lastElement() else null
-                val targetController =
-                    if (this@ASNavigationController.tempControllers.isNotEmpty()) this@ASNavigationController.tempControllers.lastElement() else null
-                val pop = this@ASNavigationController.controllers.contains(targetController)
-                for (controller in this@ASNavigationController.controllers) {
-                    controller.prepareForRemove()
-                }
-                for (controller2 in this@ASNavigationController.tempControllers) {
-                    controller2.prepareForAdd()
-                }
-                for (controller3 in this@ASNavigationController.controllers) {
-                    if (controller3.isMarkedRemoved) {
-                        this@ASNavigationController.removeList.add(controller3)
-                    }
-                    controller3.cleanMark()
-                }
-                for (controller4 in this@ASNavigationController.tempControllers) {
-                    if (controller4.isMarkedAdded) {
-                        controller4.navigationController = this@ASNavigationController
-                        this@ASNavigationController.addList.add(controller4)
-                    }
-                    controller4.cleanMark()
-                }
-                this@ASNavigationController.controllers.removeAllElements()
-                this@ASNavigationController.controllers.addAll(this@ASNavigationController.tempControllers)
-                for (controller5 in this@ASNavigationController.addList) {
-                    controller5.notifyPageDidAddToNavigationController()
-                }
-                for (controller6 in this@ASNavigationController.removeList) {
-                    controller6.notifyPageDidRemoveFromNavigationController()
-                }
-                this@ASNavigationController.addList.clear()
-                this@ASNavigationController.removeList.clear()
-                if (sourceController === targetController) {
-                    this@ASNavigationController.onPageCommandExecuteFinished()
-                } else if (pop) {
-                    this@ASNavigationController.animatePopViewController(
-                        sourceController,
-                        targetController,
-                        animated
-                    )
-                } else {
-                    this@ASNavigationController.animatedPushViewController(
-                        sourceController,
-                        targetController,
-                        animated
-                    )
-                }
-                // 檢查顯示訊息小視窗
-                checkMessageFloatingShow()
+        ASCoroutine.runOnMain {
+            val sourceController =
+                if (this@ASNavigationController.controllers.isNotEmpty()) this@ASNavigationController.controllers.lastElement() else null
+            val targetController =
+                if (this@ASNavigationController.tempControllers.isNotEmpty()) this@ASNavigationController.tempControllers.lastElement() else null
+            val pop = this@ASNavigationController.controllers.contains(targetController)
+            for (controller in this@ASNavigationController.controllers) {
+                controller.prepareForRemove()
             }
-        }.runInMainThread()
+            for (controller2 in this@ASNavigationController.tempControllers) {
+                controller2.prepareForAdd()
+            }
+            for (controller3 in this@ASNavigationController.controllers) {
+                if (controller3.isMarkedRemoved) {
+                    this@ASNavigationController.removeList.add(controller3)
+                }
+                controller3.cleanMark()
+            }
+            for (controller4 in this@ASNavigationController.tempControllers) {
+                if (controller4.isMarkedAdded) {
+                    controller4.navigationController = this@ASNavigationController
+                    this@ASNavigationController.addList.add(controller4)
+                }
+                controller4.cleanMark()
+            }
+            this@ASNavigationController.controllers.removeAllElements()
+            this@ASNavigationController.controllers.addAll(this@ASNavigationController.tempControllers)
+            for (controller5 in this@ASNavigationController.addList) {
+                controller5.notifyPageDidAddToNavigationController()
+            }
+            for (controller6 in this@ASNavigationController.removeList) {
+                controller6.notifyPageDidRemoveFromNavigationController()
+            }
+            this@ASNavigationController.addList.clear()
+            this@ASNavigationController.removeList.clear()
+            if (sourceController === targetController) {
+                this@ASNavigationController.onPageCommandExecuteFinished()
+            } else if (pop) {
+                this@ASNavigationController.animatePopViewController(
+                    sourceController,
+                    targetController,
+                    animated
+                )
+            } else {
+                this@ASNavigationController.animatedPushViewController(
+                    sourceController,
+                    targetController,
+                    animated
+                )
+            }
+            // 檢查顯示訊息小視窗
+            checkMessageFloatingShow()
+        }
     }
 
     val viewControllers: Vector<ASViewController>

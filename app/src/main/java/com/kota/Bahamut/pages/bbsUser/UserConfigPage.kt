@@ -7,14 +7,14 @@ import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast
+import com.kota.telnet.TelnetClient
 import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
@@ -63,23 +63,20 @@ class UserConfigPage: TelnetPage() {
 
     /** 收到回傳的資料內容 */
     fun updateUserConfigPageContent(rows: Vector<TelnetRow>) {
-        object:ASRunner() {
-            override fun run() {
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_0_Enable).isChecked = rows[5].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_1_Enable).isChecked = rows[6].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_2_Enable).isChecked = rows[7].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_3_Enable).isChecked = rows[8].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_4_Enable).isChecked = rows[9].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).isChecked = rows[10].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).isChecked = rows[11].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_7_Enable).isChecked = rows[12].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).isChecked = rows[13].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).isChecked = rows[14].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_A_Enable).isChecked = rows[15].toContentString().substring(2,3) == "■"
-                mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_B_Enable).isChecked = rows[16].toContentString().substring(2,3) == "■"
-            }
-
-        }.runInMainThread()
+        ASCoroutine.runOnMain {
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_0_Enable).isChecked = rows[5].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_1_Enable).isChecked = rows[6].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_2_Enable).isChecked = rows[7].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_3_Enable).isChecked = rows[8].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_4_Enable).isChecked = rows[9].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_5_Enable).isChecked = rows[10].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_6_Enable).isChecked = rows[11].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_7_Enable).isChecked = rows[12].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).isChecked = rows[13].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).isChecked = rows[14].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_A_Enable).isChecked = rows[15].toContentString().substring(2,3) == "■"
+            mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_B_Enable).isChecked = rows[16].toContentString().substring(2,3) == "■"
+        }
     }
 
     /** 展開/摺疊 不適用區塊 */
