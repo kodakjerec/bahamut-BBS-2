@@ -154,7 +154,7 @@ class MainPage : TelnetPage() {
                     // 進入布告討論區
                     mainLayout?.findViewById<View>(R.id.Main_BoardsButton)!!.performClick()
                 }
-            }.postDelayed(300)
+            }.postDelayed(300L)
         }
     }
 

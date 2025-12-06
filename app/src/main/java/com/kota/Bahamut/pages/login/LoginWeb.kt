@@ -2,8 +2,6 @@ package com.kota.Bahamut.pages.login
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebSettings
@@ -19,8 +17,6 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
     private var onFailCallback: (() -> Unit)? = null
     private var onSignDetectedCallback: (() -> Unit)? = null
     private var onManualCallback: ((String) -> Unit)? = null
-    private var timeoutHandler: Handler? = null
-    private var timeoutRunnable: Runnable? = null
 
     @SuppressLint("SetJavaScriptEnabled")
     fun init(onSignDetected: (() -> Unit)? = null, onFail: (() -> Unit)? = null, onManual: ((String) -> Unit)? = null) {
@@ -264,23 +260,20 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
     }
 
     // 設定 20 秒後自動清理
-    private fun setupTimeout() {
-        timeoutHandler = Handler(Looper.getMainLooper())
-        timeoutRunnable = Runnable {
+    private var timeoutASCoroutine: ASCoroutine? = object:ASCoroutine() {
+        override suspend fun run() {
             println("WebView 登入 20 秒超時，自動清理")
             onFailCallback?.invoke()
             cleanup()
         }
-        timeoutHandler?.postDelayed(timeoutRunnable!!, 20000) // 20 秒 = 20000 毫秒
+    }
+    private fun setupTimeout() {
+        timeoutASCoroutine?.postDelayed(20000L) // 20 秒 = 20000 毫秒
     }
     
     // 取消計時器
     private fun cancelTimeout() {
-        timeoutRunnable?.let { runnable ->
-            timeoutHandler?.removeCallbacks(runnable)
-        }
-        timeoutHandler = null
-        timeoutRunnable = null
+        timeoutASCoroutine?.cancel()
     }
 
     // 清理WebView資源

@@ -245,7 +245,7 @@ class MessageMain:TelnetPage() {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
-        messageAsRunner.cancel()
+        messageASCoroutine.cancel()
         isPostDelayedSuccess = true
 
         ASProcessingDialog.dismissProcessingDialog()
@@ -337,12 +337,12 @@ class MessageMain:TelnetPage() {
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
-        messageAsRunner.cancel()
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine.cancel()
+        messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
 
         val db = MessageDatabase(myContext!!)
@@ -383,7 +383,7 @@ class MessageMain:TelnetPage() {
     }
 
     // 強制讀取訊息進入讀取完畢
-    private var messageAsRunner: ASCoroutine = object : ASCoroutine() {
+    private var messageASCoroutine: ASCoroutine = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess)
                 loadMessageList()
