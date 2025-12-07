@@ -536,9 +536,9 @@ open class BoardMainPage : TelnetListPage(),
                         val firstIndex = listView?.firstVisiblePosition!!
                         val endIndex = listView?.lastVisiblePosition!!
                         val moveIndex = abs(endIndex - firstIndex)
-                        TempSettings.lastVisitArticleNumber -= moveIndex / 2
+                        val findIndex = TempSettings.lastVisitArticleNumber - moveIndex / 2
 
-                        onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
+                        onSelectDialogDismissWIthIndex(findIndex.toString())
                     }
                 }.postDelayed(100L)
             }
