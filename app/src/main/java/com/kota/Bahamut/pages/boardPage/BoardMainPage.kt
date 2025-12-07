@@ -134,6 +134,12 @@ open class BoardMainPage : TelnetListPage(),
         val moveIndex = abs(endIndex - firstIndex)
         firstIndex -= moveIndex
         if (firstIndex < 0) firstIndex = 0
+
+        // 紀錄最後瀏覽的文章編號
+        if (this::class == BoardMainPage::class) {
+            TempSettings.lastVisitArticleNumber = firstIndex
+        }
+
         setListViewSelection(firstIndex)
     }
 
@@ -162,6 +168,11 @@ open class BoardMainPage : TelnetListPage(),
         } else {
             // Reset counter if endIndex changed
             endIndexCheckCount = 1
+        }
+
+        // 紀錄最後瀏覽的文章編號
+        if (this::class == BoardMainPage::class) {
+            TempSettings.lastVisitArticleNumber = firstIndex
         }
 
         // Store current endIndex
@@ -529,7 +540,7 @@ open class BoardMainPage : TelnetListPage(),
 
                         onSelectDialogDismissWIthIndex(TempSettings.lastVisitArticleNumber.toString())
                     }
-                }.postDelayed(300L)
+                }.postDelayed(100L)
             }
         }
     }
