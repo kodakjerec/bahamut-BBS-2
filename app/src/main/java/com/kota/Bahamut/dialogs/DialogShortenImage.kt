@@ -148,7 +148,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                 // 本地檔案上傳
                 val link = uploaderObj.postImage( finalUri )
                 if (link.startsWith("http")) {
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         sampleTextView?.text = link
                         outputParam = sampleTextView?.text.toString()
                         sendButton?.isEnabled = true
@@ -328,12 +328,12 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     }
 
     private fun showProcessingDialog() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             processingDialog.visibility = VISIBLE
         }
     }
     private  fun closeProcessingDialog() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             processingDialog.visibility = INVISIBLE
         }
     }

@@ -282,7 +282,7 @@ class MessageMain:TelnetPage() {
         val db = MessageDatabase(myContext!!)
         try {
             val itemSummary = db.getIdNewestMessage(item.senderName)
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 // 找到同名人物
                 if (findSender) {
                     senderView.setContent(itemSummary)

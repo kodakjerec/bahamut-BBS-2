@@ -39,7 +39,7 @@ class MessageSmall(context: Context): LinearLayout(context) {
 
     /** 更新Badge */
     fun updateBadge(aNumber: String) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (aNumber != "0") {
                 badgeView.text = aNumber
                 badgeView.visibility = VISIBLE

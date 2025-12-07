@@ -20,7 +20,7 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
             // 找出沒被block的最小index
             val miniumAvailableIndex = 1
             if (articleIndex == miniumAvailableIndex) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     showShortToast("找沒有了耶...:(")
                     telnetListPage.onLoadItemFinished()
                 }
@@ -44,7 +44,7 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
                 telnetListPageBlock?.selectedItem
             )) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     telnetListPage.onLoadItemFinished()
                 }
                 isDone = true
@@ -57,7 +57,7 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 showShortToast("找沒有了耶...:(")
                 telnetListPage.onLoadItemFinished()
             }

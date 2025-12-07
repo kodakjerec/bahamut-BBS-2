@@ -91,7 +91,7 @@ open class ASNavigationControllerPopAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 this@ASNavigationControllerPopAnimation.onAnimationFinished()
             }
             this.isFinished = true

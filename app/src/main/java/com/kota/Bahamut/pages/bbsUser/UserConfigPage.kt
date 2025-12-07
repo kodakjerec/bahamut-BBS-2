@@ -63,7 +63,7 @@ class UserConfigPage: TelnetPage() {
 
     /** 收到回傳的資料內容 */
     fun updateUserConfigPageContent(rows: Vector<TelnetRow>) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_0_Enable).isChecked = rows[5].toContentString().substring(2,3) == "■"
             mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_1_Enable).isChecked = rows[6].toContentString().substring(2,3) == "■"
             mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_2_Enable).isChecked = rows[7].toContentString().substring(2,3) == "■"

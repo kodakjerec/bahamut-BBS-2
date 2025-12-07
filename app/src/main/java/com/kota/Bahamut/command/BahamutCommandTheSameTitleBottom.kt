@@ -29,7 +29,7 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
             }
 
             if (articleIndex == maximumAvailableIndex) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     showShortToast("找沒有了耶...:(")
                     telnetListPage.onLoadItemFinished()
                 }
@@ -55,7 +55,7 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
     ) {
         if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(telnetListPageBlock?.selectedItem)) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     telnetListPage.onLoadItemFinished()
                 }
                 isDone = true
@@ -64,7 +64,7 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 showShortToast("找沒有了耶...:(")
                 telnetListPage.onLoadItemFinished()
             }

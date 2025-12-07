@@ -103,7 +103,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                         val title = jsonObject.getString("title")
                         val description = jsonObject.getString("description")
 
-                        ASCoroutine.runOnMain {
+                        ASCoroutine.ensureMainThread {
                             editText.setText(targetUrl)
                             changeFrontend(shortUrl)
                             UserSettings.propertiesNoVipShortenTimes = ++shortenTimes

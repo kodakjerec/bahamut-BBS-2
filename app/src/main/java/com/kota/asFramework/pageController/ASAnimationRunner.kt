@@ -16,7 +16,7 @@ abstract class ASAnimationRunner(animation: Animation?) {
     }
 
     fun start() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             var i = 0
             var success = false
             while (true) {
@@ -43,13 +43,13 @@ abstract class ASAnimationRunner(animation: Animation?) {
     }
 
     private fun fail() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             this@ASAnimationRunner.onAnimationStartFail()
         }
     }
 
     private fun animate() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val targetView1 = this@ASAnimationRunner.targetView
             targetView1?.startAnimation(this@ASAnimationRunner.animation)
         }

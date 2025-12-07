@@ -57,21 +57,15 @@ abstract class ASCoroutine {
             }
         }
 
-        /** 在主執行緒執行（靜態方法） */
-        @JvmStatic
-        fun runOnMain(block: () -> Unit): Job {
-            return CoroutineScope(Dispatchers.Main).launch {
-                block()
-            }
-        }
-
         /** 確保在主執行緒執行 */
         @JvmStatic
         fun ensureMainThread(block: () -> Unit) {
             if (isMainThread) {
                 block()
             } else {
-                runOnMain(block)
+                CoroutineScope(Dispatchers.Main).launch {
+                    block()
+                }
             }
         }
     }

@@ -57,7 +57,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
             MessageStatus.Offline -> "離線" // 沒上線
             else -> "未知"
         }
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             txtSendStatus.text = txtStatus
         }
     }

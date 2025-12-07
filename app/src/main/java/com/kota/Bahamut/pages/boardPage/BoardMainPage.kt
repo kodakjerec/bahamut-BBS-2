@@ -1068,7 +1068,7 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 引言過多, 回逤發文時的設定  */
     fun recoverPost() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
                 cleanCommand() // 清除引言過多留下的command buffer
                 val page = PageContainer.instance!!.postArticlePage
                 page.setRecover()
@@ -1081,7 +1081,7 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 完成發文  */
     fun finishPost() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val page = PageContainer. instance!!.postArticlePage
             page.closeArticle()
         }

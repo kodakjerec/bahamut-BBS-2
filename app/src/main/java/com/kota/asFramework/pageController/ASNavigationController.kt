@@ -360,7 +360,7 @@ open class ASNavigationController : Activity() {
     }
 
     fun exchangeViewControllers(animated: Boolean) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val sourceController =
                 if (this@ASNavigationController.controllers.isNotEmpty()) this@ASNavigationController.controllers.lastElement() else null
             val targetController =

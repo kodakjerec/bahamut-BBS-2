@@ -350,7 +350,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     val messageSmall = MessageSmall(TempSettings.myContext!!)
                     messageSmall.afterInit()
                     setMessageSmall(messageSmall)
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         ASNavigationController.currentController?.addForeverView(messageSmall)
 
                         if (getShowMessageFloating()) {
@@ -374,14 +374,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
 
         if (this.lastHeader == "本次") {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 val page2: MainPage = PageContainer.instance!!.mainPage
                 if (page2.isTopPage) {
                     page2.onProcessHotMessage()
                 }
             }
         } else if (this.lastHeader == "G)") {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 val page2: MainPage = PageContainer.instance!!.mainPage
                 if (page2.isTopPage) {
                     page2.onCheckGoodbye()
@@ -420,7 +420,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             SearchBoardHandler.instance.read()
             val data = create().pushKey(TelnetKeyboard.CTRL_Y).pushString("\n\n").build()
             TelnetClient.myInstance!!.sendDataToServer(data)
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 val page: ClassPage = PageContainer.instance!!.classPage
                 page.onSearchBoardFinished()
             }
@@ -559,7 +559,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (this.rowString00.startsWith("【網友列表】")) {
                 // 載入名單
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                         topPage.loadUserList(telnetRows)
                     }
             } else if (this.rowStringFinal.contains("瀏覽 P.")) {
@@ -571,7 +571,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 topPage.receiveSyncCommand(telnetRows)
                 TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
 
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     topPage.loadMessageList()
                 }
             } else if (this.rowStringFinal.startsWith("★") && !this.rowStringFinal.substring(
@@ -672,7 +672,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             } else if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
                 if (rowStringFinal.startsWith("推文(系統測試中)：")) {
                     // 呼叫推文訊息視窗
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         PageContainer.instance!!.boardPage.openPushArticleDialog()
                     }
                     return
@@ -685,7 +685,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             } else if (this.rowStringFinal == "● 請按任意鍵繼續 ●") {
                 TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             } else if (this.lastHeader == "您想") {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     val page: LoginPage = PageContainer.instance!!.loginPage
                     if (page.isTopPage) {
                         page.onSaveArticle()
@@ -746,7 +746,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     // 顯示文章內文
     fun showArticle(aArticle: TelnetArticle) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             try {
                 PageContainer.instance!!.articlePage.setArticle(aArticle)
             } catch (e: Exception) {
@@ -757,7 +757,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     // 顯示郵件內文
     fun showMail(aArticle: TelnetArticle) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val mailPage: MailPage?
             try {
                 val lastPage =
@@ -778,7 +778,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
     // 顯示精華區內文
     fun showEssence(aArticle: TelnetArticle?) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val articleEssencePage: ArticleEssencePage?
             try {
                 val lastPage =
@@ -804,7 +804,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         if (currentController != null) {
             val topPage = currentController.topController as TelnetPage?
             if (aPage === topPage) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     topPage?.requestPageRefresh()
                 }
             } else if (topPage != null && !topPage.isPopupPage && aPage != null) {

@@ -87,7 +87,7 @@ class BillingPage : TelnetPage() {
                 if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
                     // process returned productDetailsList
                     for (product in productDetailsList!!.productDetailsList) {
-                        ASCoroutine.runOnMain {
+                        ASCoroutine.ensureMainThread {
                             val btn =
                                 findViewById(R.id.button_90) as Button?
                             if (btn != null) {

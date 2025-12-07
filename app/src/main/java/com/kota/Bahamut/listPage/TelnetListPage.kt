@@ -139,7 +139,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                 }
             } catch (_: Exception) { /* ignore logging errors */ }
         }
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             mDataSetObservable.notifyChanged()
 
             // 如果 ListView 還沒設定 adapter，則手動刷新視圖
@@ -210,7 +210,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     fun setListViewSelection(selection: Int) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (this@TelnetListPage.listView != null) {
                 if (selection == -1) {
                     this@TelnetListPage.listView?.setSelection(this@TelnetListPage.getCount() - 1)

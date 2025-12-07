@@ -281,7 +281,7 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
         // 先取消計時器
         cancelTimeout()
 
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             currentWebView?.let { webView ->
                 webView.stopLoading()
                 webView.loadUrl("about:blank")
@@ -302,7 +302,7 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
         fun onFail() {
             println("檢測不到簽到。")
 
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 onFailCallback?.invoke()
                 cleanup()
             }
@@ -312,7 +312,7 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
         fun signSuccess() {
             println("檢測到簽到對話框！")
 
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 onSignDetectedCallback?.invoke()
                 cleanup()
             }
@@ -323,7 +323,7 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
             println("需要手動登入驗證")
             cancelTimeout()
 
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
             }
         }
