@@ -206,7 +206,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         lastLoadTime = 0L
         lastSendTime = 0L
         listName = ""
-        safeNotifyDataSetChanged()
     }
 
     fun setListViewSelection(selection: Int) {
@@ -303,8 +302,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             block.clear()
             recycleBlock(block)
         }
-        // 確保在移除 block 後通知 UI（在主執行緒）
-        safeNotifyDataSetChanged()
     }
 
     private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
@@ -544,6 +541,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun reloadListView() {
         if (listView != null) {
+            safeNotifyDataSetChanged()
             if (!isListLoaded) {
                 isListLoaded = true
                 setListViewSelection(getCount() - 1)
@@ -567,8 +565,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     fun setBlock(blockIndex: Int, aBlock: TelnetListPageBlock) {
         blockList.put(blockIndex, aBlock)
-        // 在設定 block 後通知 UI 更新（在主執行緒）
-        safeNotifyDataSetChanged()
     }
 
     fun getBlock(blockIndex: Int): TelnetListPageBlock? {
@@ -668,8 +664,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     removeBlock(key)
             }
             blockList.clear()
-            // 清空所有項目後通知 UI 更新（在主執行緒）
-            safeNotifyDataSetChanged()
         }
     }
 
