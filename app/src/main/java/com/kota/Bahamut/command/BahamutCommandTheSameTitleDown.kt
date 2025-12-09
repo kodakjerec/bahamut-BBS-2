@@ -17,7 +17,7 @@ class BahamutCommandTheSameTitleDown(fromArticleIndex: Int) : TelnetCommand() {
 
     override fun execute(telnetListPage: TelnetListPage) {
         if (telnetListPage.listType > 0) {
-            if (articleIndex == telnetListPage.listCount) {
+            if (articleIndex == telnetListPage.getItemSize()) {
                 ASCoroutine.ensureMainThread {
                     showShortToast("無下一篇同主題文章")
                     telnetListPage.onLoadItemFinished()

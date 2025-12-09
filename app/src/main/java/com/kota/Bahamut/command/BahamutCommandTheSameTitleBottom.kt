@@ -19,7 +19,7 @@ class BahamutCommandTheSameTitleBottom(fromArticleIndex: Int) : TelnetCommand() 
         if (telnetListPage.listType > 0) {
             // 找出沒被block的最大index
             var maximumAvailableIndex = 1
-            val itemSize = telnetListPage.listCount
+            val itemSize = telnetListPage.getItemSize()
             for (i in itemSize - 1 downTo 0) {
                 val item = telnetListPage.getItem(i)
                 if (item != null && !item.isDeleted && !telnetListPage.isItemBlocked(item)) {

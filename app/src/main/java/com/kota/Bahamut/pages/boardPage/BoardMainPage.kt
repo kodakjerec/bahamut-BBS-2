@@ -20,7 +20,6 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BuildConfig
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandEditArticle
@@ -527,8 +526,6 @@ open class BoardMainPage : TelnetListPage(),
         if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
             // 從 classPage 進入到 boardMainPage
             if (ASNavigationController.currentController!!.lastViewController!!::class == ClassPage::class) {
-                if (BuildConfig.DEBUG)
-                    showShortToast(TempSettings.lastVisitArticleNumber.toString())
 
                 object :ASCoroutine() {
                     override suspend fun run() {
@@ -1030,15 +1027,7 @@ open class BoardMainPage : TelnetListPage(),
         str3: String?
     ) {
         pushCommand(BahamutCommandEditArticle(str, str2!!, str3!!))
-        if (TRACE_LOG_ENABLE) {
-            try {
-                Log.i(
-                    "BoardMainPageTrace",
-                    "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=onPostDialogSendButtonClicked isPageAppeared=${isPageAppeared}"
-                )
-            } catch (_: Exception) {
-            }
-        }
+
         // 強制刷新列表 UI（執行於主執行緒）
         safeNotifyDataSetChanged()
     }
@@ -1111,9 +1100,6 @@ open class BoardMainPage : TelnetListPage(),
             } else {
                 store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
             }
-        }
-        if (TRACE_LOG_ENABLE) {
-            try { Log.i("BoardMainPageTrace", "time=${java.time.Instant.now()} thread=${Thread.currentThread().name} isMain=${ASCoroutine.isMainThread} caller=${traceCaller()} action=reloadBookmark myBookmarkListSize=${myBookmarkList.size}") } catch (_: Exception) { }
         }
         if (myBookmarkList.isEmpty()) {
             drawerListView.visibility = View.GONE
