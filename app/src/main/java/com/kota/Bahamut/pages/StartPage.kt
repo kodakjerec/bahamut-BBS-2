@@ -36,26 +36,29 @@ import com.kota.telnetUI.textView.TelnetTextViewSmall
 
 class StartPage : TelnetPage() {
     /** 連線  */
-    var connectListener: View.OnClickListener =
-        View.OnClickListener { v: View? -> this@StartPage.onConnectButtonClicked() }
+    private val connectListener = View.OnClickListener {
+        onConnectButtonClicked()
+    }
 
     /** 離開  */
-    var exitListener: View.OnClickListener =
-        View.OnClickListener { v: View? -> this@StartPage.onExitButtonClicked() }
+    private val exitListener = View.OnClickListener {
+        onExitButtonClicked()
+    }
 
     /** 按下教學  */
-    var urlClickListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val id = v!!.id
-        var url = ""
-        if (id == R.id.Start_instructions) url =
-            "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/"
-        if (id == R.id.Start_Icon_Discord) url = "https://discord.gg/YP8dthZ"
-        if (id == R.id.Start_Icon_Facebook) url = "https://www.facebook.com/groups/264144897071532"
-        if (id == R.id.Start_Icon_Reddit) url = "https://www.reddit.com/r/bahachat"
-        if (id == R.id.Start_Icon_Steam) url = "https://steamcommunity.com/groups/BAHACHAT"
-        if (id == R.id.Start_Icon_Telegram) url = "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A"
-        if (!url.isEmpty()) {
-            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+    private val urlClickListener = View.OnClickListener { v ->
+        val url = when (v.id) {
+            R.id.Start_instructions -> "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/"
+            R.id.Start_Icon_Discord -> "https://discord.gg/YP8dthZ"
+            R.id.Start_Icon_Facebook -> "https://www.facebook.com/groups/264144897071532"
+            R.id.Start_Icon_Reddit -> "https://www.reddit.com/r/bahachat"
+            R.id.Start_Icon_Steam -> "https://steamcommunity.com/groups/BAHACHAT"
+            R.id.Start_Icon_Telegram -> "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A"
+            else -> null
+        }
+
+        url?.let {
+            val intent = Intent(Intent.ACTION_VIEW, it.toUri())
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(intent)
         }
@@ -86,13 +89,12 @@ class StartPage : TelnetPage() {
         val radioButton2 = findViewById(R.id.radioButtonIP2) as RadioButton
 
         // 連線位址
-        val connectIp: String? = checkNotNull(getConnectIpAddress())
-        if (connectIp == radioButton1.text.toString()) {
-            radioButton1.isChecked = true
-        } else {
-            radioButton2.isChecked = true
+        val connectIp = getConnectIpAddress()
+        when (connectIp) {
+            radioButton1.text.toString() -> radioButton1.isChecked = true
+            else -> radioButton2.isChecked = true
         }
-        radioGroup.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+        radioGroup.setOnCheckedChangeListener { _, checkedId ->
             val rb = findViewById(checkedId) as RadioButton
             setConnectIpAddress(rb.text.toString())
         }
@@ -102,13 +104,12 @@ class StartPage : TelnetPage() {
         val connectMethodButton1 = findViewById(R.id.radioButtonConnectMethod1) as RadioButton
         val connectMethodButton2 = findViewById(R.id.radioButtonConnectMethod2) as RadioButton
 
-        val connectMethod: String? = checkNotNull(getConnectMethod())
-        if (connectMethod == connectMethodButton1.text.toString()) {
-            connectMethodButton1.isChecked = true
-        } else {
-            connectMethodButton2.isChecked = true
+        val connectMethod = getConnectMethod()
+        when (connectMethod) {
+            connectMethodButton1.text.toString() -> connectMethodButton1.isChecked = true
+            else -> connectMethodButton2.isChecked = true
         }
-        connectMethodGroup.setOnCheckedChangeListener { group: RadioGroup?, checkedId: Int ->
+        connectMethodGroup.setOnCheckedChangeListener { _, checkedId ->
             val rb = findViewById(checkedId) as RadioButton
             setConnectMethod(rb.text.toString())
             updateIPSelectionState(
@@ -184,20 +185,19 @@ class StartPage : TelnetPage() {
     fun connect() {
         val transportType = navigationController.deviceController!!.isNetworkAvailable
         TempSettings.transportType = transportType
-        if (transportType > -1) {
-            ASProcessingDialog.showProcessingDialog(
-                "連線中"
-            ) { aDialog: ASProcessingDialog? ->
-                TelnetClient.myInstance!!.close()
-                false
+        when {
+            transportType > -1 -> {
+                ASProcessingDialog.showProcessingDialog("連線中") {
+                    TelnetClient.myInstance!!.close()
+                    false
+                }
+                val connectIpAddress = getConnectIpAddress()
+                ASCoroutine.runInNewCoroutine {
+                    TelnetClient.myInstance!!.connect(connectIpAddress, 23)
+                }
             }
-            val connectIpAddress = getConnectIpAddress()
-            ASCoroutine.runInNewCoroutine {
-                TelnetClient.myInstance!!.connect(connectIpAddress, 23)
-            }
-            return
+            else -> ASToast.showShortToast("您未連接網路")
         }
-        ASToast.showShortToast("您未連接網路")
     }
 
     // 添加輔助方法
@@ -207,18 +207,21 @@ class StartPage : TelnetPage() {
         ip1: RadioButton,
         ip2: RadioButton
     ) {
-        if (isWebSocket) {
-            // WebSocket 模式：禁用 IP 選擇
-            ipGroup.isEnabled = false
-            ip1.isEnabled = false
-            ip2.isEnabled = false
-            ipGroup.alpha = 0.5f
-        } else {
-            // Telnet 模式：啟用 IP 選擇
-            ipGroup.isEnabled = true
-            ip1.isEnabled = true
-            ip2.isEnabled = true
-            ipGroup.alpha = 1.0f
+        when (isWebSocket) {
+            true -> {
+                // WebSocket 模式：禁用 IP 選擇
+                ipGroup.isEnabled = false
+                ip1.isEnabled = false
+                ip2.isEnabled = false
+                ipGroup.alpha = 0.5f
+            }
+            false -> {
+                // Telnet 模式：啟用 IP 選擇
+                ipGroup.isEnabled = true
+                ip1.isEnabled = true
+                ip2.isEnabled = true
+                ipGroup.alpha = 1.0f
+            }
         }
     }
 
@@ -244,7 +247,7 @@ class StartPage : TelnetPage() {
                         .addButton(getContextString(R.string.notification_permission_later))
                         .addButton(getContextString(R.string.notification_permission_goto_settings))
                         .setDefaultButtonIndex(0)
-                        .setListener { aDialog: ASAlertDialog?, index: Int ->
+                        .setListener { _, index ->
                             if (index == 1) {
                                 // 前往設定頁面
                                 try {
