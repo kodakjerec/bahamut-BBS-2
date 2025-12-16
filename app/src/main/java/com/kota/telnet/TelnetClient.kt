@@ -1,7 +1,7 @@
 package com.kota.telnet
 
 import android.util.Log
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.model.TelnetModel
 import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard
@@ -48,7 +48,7 @@ class TelnetClient(aStateHandler: TelnetStateHandler) : TelnetConnectorListener 
     }
 
     fun sendStringToServer(str: String?) {
-        if (ASRunner.isMainThread) {
+        if (ASCoroutine.isMainThread) {
             sendStringToServerInBackground(str, 0)
         } else {
             sendStringToServer(str, 0)
@@ -87,7 +87,7 @@ class TelnetClient(aStateHandler: TelnetStateHandler) : TelnetConnectorListener 
     }
 
     fun sendKeyboardInputToServer(key: Int) {
-        if (ASRunner.isMainThread) {
+        if (ASCoroutine.isMainThread) {
             sendKeyboardInputToServerInBackground(key, 0)
         } else {
             sendKeyboardInputToServer(key, 0)
@@ -104,7 +104,7 @@ class TelnetClient(aStateHandler: TelnetStateHandler) : TelnetConnectorListener 
     }
 
     fun sendDataToServer(data: ByteArray?) {
-        if (ASRunner.isMainThread) {
+        if (ASCoroutine.isMainThread) {
             sendDataToServerInBackground(data, 0)
         } else {
             sendDataToServer(data, 0)

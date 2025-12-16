@@ -1,7 +1,7 @@
 package com.kota.asFramework.pageController
 
 import android.view.animation.Animation
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 
 open class ASNavigationControllerPopAnimation(
     private val sourceViewController: ASViewController?,
@@ -91,13 +91,9 @@ open class ASNavigationControllerPopAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            object : ASRunner() {
-                // from class: com.kota.asFramework.pageController.ASNavigationControllerPopAnimation.3
-                // com.kota.asFramework.thread.ASRunner
-                override fun run() {
-                    this@ASNavigationControllerPopAnimation.onAnimationFinished()
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                this@ASNavigationControllerPopAnimation.onAnimationFinished()
+            }
             this.isFinished = true
         }
     }

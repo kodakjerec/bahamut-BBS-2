@@ -27,7 +27,7 @@ import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.model.TelnetFrame
 import com.kota.telnetUI.TelnetPage
@@ -148,13 +148,13 @@ class MainPage : TelnetPage() {
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
-            object : ASRunner() {
-                override fun run() {
+            object : ASCoroutine() {
+                override suspend fun run() {
                     showProcessingDialog(getContextString(R.string.is_under_auto_logging_chat))
                     // 進入布告討論區
                     mainLayout?.findViewById<View>(R.id.Main_BoardsButton)!!.performClick()
                 }
-            }.postDelayed(300)
+            }.postDelayed(300L)
         }
     }
 

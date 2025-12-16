@@ -28,7 +28,7 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
@@ -192,7 +192,7 @@ class StartPage : TelnetPage() {
                 false
             }
             val connectIpAddress = getConnectIpAddress()
-            ASRunner.runInNewThread {
+            ASCoroutine.runInNewCoroutine {
                 TelnetClient.myInstance!!.connect(connectIpAddress, 23)
             }
             return

@@ -3,9 +3,9 @@ package com.kota.asFramework.dialog
 import android.annotation.SuppressLint
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
 import com.kota.Bahamut.R
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASCoroutine
 
 class ASProcessingDialog : ASDialog() {
     private var messageLabel: TextView? = null
@@ -69,18 +69,16 @@ class ASProcessingDialog : ASDialog() {
         ) {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
-                    object : ASRunner() {
-                        override fun run() {
-                            if (aSProcessingDialog == null) {
-                                constructInstance()
-                            }
-                            setMessage(aMessage)
-                            aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
-                            if (!aSProcessingDialog!!.isShowing) {
-                                aSProcessingDialog?.show()
-                            }
+                    ASCoroutine.ensureMainThread {
+                        if (aSProcessingDialog == null) {
+                            constructInstance()
                         }
-                    }.runInMainThread()
+                        setMessage(aMessage)
+                        aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
+                        if (!aSProcessingDialog!!.isShowing) {
+                            aSProcessingDialog?.show()
+                        }
+                    }
                 }
             }
         }
@@ -89,27 +87,23 @@ class ASProcessingDialog : ASDialog() {
         fun dismissProcessingDialog() {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
-                    object : ASRunner() {
-                        override fun run() {
-                            if (aSProcessingDialog != null) {
-                                aSProcessingDialog?.dismiss()
-                                releaseInstance()
-                            }
+                    ASCoroutine.ensureMainThread {
+                        if (aSProcessingDialog != null) {
+                            aSProcessingDialog?.dismiss()
+                            releaseInstance()
                         }
-                    }.runInMainThread()
+                    }
                 }
             }
         }
 
         @JvmStatic
         fun setMessage(message: String?) {
-            object : ASRunner() {
-                override fun run() {
-                    if (aSProcessingDialog != null) {
-                        aSProcessingDialog?.messageLabel?.text = message
-                    }
+            ASCoroutine.ensureMainThread {
+                if (aSProcessingDialog != null) {
+                    aSProcessingDialog?.messageLabel?.text = message
                 }
-            }.runInMainThread()
+            }
         }
     }
 }

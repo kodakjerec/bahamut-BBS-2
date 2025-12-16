@@ -1,11 +1,11 @@
 package com.kota.Bahamut.command
 
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
     var articleIndex: Int
@@ -18,12 +18,10 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
     override fun execute(telnetListPage: TelnetListPage) {
         if (telnetListPage.listType > 0) {
             if (this.articleIndex == 1) {
-                object : ASRunner() {
-                    override fun run() {
-                        showShortToast("無上一篇同主題文章")
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.ensureMainThread {
+                    showShortToast("無上一篇同主題文章")
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
                 create()
@@ -42,24 +40,20 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(telnetListPageBlock?.selectedItem)) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                object : ASRunner() {
-                    override fun run() {
-                        showShortToast("無上一篇同主題文章")
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.ensureMainThread {
+                    showShortToast("無上一篇同主題文章")
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
                 articleIndex = telnetListPageBlock?.selectedItemNumber!!
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            object : ASRunner() {
-                override fun run() {
-                    showShortToast("無上一篇同主題文章")
-                    telnetListPage.onLoadItemFinished()
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                showShortToast("無上一篇同主題文章")
+                telnetListPage.onLoadItemFinished()
+            }
             isDone = true
         } else if (!telnetListPage.isEnabled(telnetListPageBlock.selectedItemNumber - 1)) {
             showShortToast("上一篇不可使用")

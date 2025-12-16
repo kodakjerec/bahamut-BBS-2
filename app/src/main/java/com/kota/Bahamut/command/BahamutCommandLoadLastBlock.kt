@@ -3,8 +3,8 @@ package com.kota.Bahamut.command
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
-import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 
 open class BahamutCommandLoadLastBlock : TelnetCommand() {
     enum class OperationMode {
@@ -23,7 +23,7 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
         when (aListPage.listType) {
             BoardPageAction.LINK_TITLE -> return OperationMode.LeftSEnd
             BoardPageAction.SEARCH, BoardPageAction.ESSENCE -> {
-                if (aListPage.selectedIndex != aListPage.listCount) {
+                if (aListPage.selectedIndex != aListPage.getItemSize()) {
                     return OperationMode.End
                 }
                 if (aListPage.selectedIndex > 1) {
@@ -34,11 +34,11 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
 
             else -> {
                 // 目前的文章index != 所有文章
-                if (aListPage.selectedIndex != aListPage.listCount) {
+                if (aListPage.selectedIndex != aListPage.getItemSize()) {
                     return OperationMode.End
                 }
                 // 只有一篇 看板/文章
-                if (aListPage.listCount == 1) {
+                if (aListPage.getItemSize() == 1) {
                     return OperationMode.LeftRightEnd
                 }
                 return OperationMode.HomeEnd
@@ -82,8 +82,7 @@ open class BahamutCommandLoadLastBlock : TelnetCommand() {
     }
 
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
-        if (telnetListPage.listCount > telnetListPageBlock!!.maximumItemNumber) {
-            telnetListPage.listCount = 0
+        if (telnetListPage.getItemSize() > telnetListPageBlock!!.maximumItemNumber) {
             telnetListPage.cleanAllItem()
         }
         isDone = true

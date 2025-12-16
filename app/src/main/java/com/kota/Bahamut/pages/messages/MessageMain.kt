@@ -24,7 +24,7 @@ import com.kota.Bahamut.service.TempSettings.myContext
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
@@ -245,7 +245,7 @@ class MessageMain:TelnetPage() {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
         }
 
-        messageAsRunner.cancel()
+        messageASCoroutine.cancel()
         isPostDelayedSuccess = true
 
         ASProcessingDialog.dismissProcessingDialog()
@@ -282,17 +282,15 @@ class MessageMain:TelnetPage() {
         val db = MessageDatabase(myContext!!)
         try {
             val itemSummary = db.getIdNewestMessage(item.senderName)
-            object: ASRunner(){
-                override fun run() {
-                    // 找到同名人物
-                    if (findSender) {
-                        senderView.setContent(itemSummary)
-                    } else {
-                        val myAdapter:MessageMainChatAdapter = listView.adapter as MessageMainChatAdapter
-                        myAdapter.addItem(itemSummary)
-                    }
+            ASCoroutine.ensureMainThread {
+                // 找到同名人物
+                if (findSender) {
+                    senderView.setContent(itemSummary)
+                } else {
+                    val myAdapter:MessageMainChatAdapter = listView.adapter as MessageMainChatAdapter
+                    myAdapter.addItem(itemSummary)
                 }
-            }.runInMainThread()
+            }
         } finally {
             db.close()
         }
@@ -339,12 +337,12 @@ class MessageMain:TelnetPage() {
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
 
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
-        messageAsRunner.cancel()
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine.cancel()
+        messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
 
         val db = MessageDatabase(myContext!!)
@@ -385,8 +383,8 @@ class MessageMain:TelnetPage() {
     }
 
     // 強制讀取訊息進入讀取完畢
-    private var messageAsRunner: ASRunner = object : ASRunner() {
-        override fun run() {
+    private var messageASCoroutine: ASCoroutine = object : ASCoroutine() {
+        override suspend fun run() {
             if (!isPostDelayedSuccess)
                 loadMessageList()
         }

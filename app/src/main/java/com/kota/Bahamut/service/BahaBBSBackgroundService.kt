@@ -14,14 +14,13 @@ import androidx.core.app.NotificationCompat
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.TelnetClient
 
 class BahaBBSBackgroundService : Service() {
     var myClient: TelnetClient? = null
     var myController: ASNavigationController? = null
     private var isRunningForeground = false
-    private var timeoutRunner: ASRunner? = null
 
     // android.app.Service
     override fun onBind(intent: Intent?): IBinder? {
@@ -81,21 +80,22 @@ class BahaBBSBackgroundService : Service() {
             return START_NOT_STICKY
         }
 
+        // 檢查 App 基礎設施是否已初始化
+        if (TelnetClient.myInstance == null) {
+            Log.w(TAG, "Service restarted without app context, stopping")
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         this.myClient = TelnetClient.myInstance!!
         this.myController = ASNavigationController.currentController
 
-        return START_STICKY // 確保服務重啟
+        return START_NOT_STICKY // 確保服務重啟
     }
 
     // android.app.Service
     override fun onDestroy() {
         Log.i(TAG, "BackgroundService onDestroy() called")
-
-        // 立即取消所有等待中的任務
-        if (timeoutRunner != null) {
-            timeoutRunner!!.cancel()
-            timeoutRunner = null
-        }
 
         // 確保前景服務狀態正確停止（必須在 onDestroy 開始時立即執行）
         if (isRunningForeground) {
@@ -150,12 +150,6 @@ class BahaBBSBackgroundService : Service() {
         // 快速清理引用並停止服務
         myClient = null
         myController = null
-
-        // 取消任何等待中的任務
-        if (timeoutRunner != null) {
-            timeoutRunner!!.cancel()
-            timeoutRunner = null
-        }
 
         stopSelf()
         super.onTaskRemoved(rootIntent)
@@ -264,17 +258,11 @@ class BahaBBSBackgroundService : Service() {
             }
         }
 
-        // 取消任何等待中的任務
-        if (timeoutRunner != null) {
-            timeoutRunner!!.cancel()
-            timeoutRunner = null
-        }
-
         // 快速斷線並立即停止服務
         try {
             if (myClient != null) {
                 // 在背景執行緒快速關閉連線，但不等待完成
-                ASRunner.runInNewThread {
+                ASCoroutine.runInNewCoroutine {
                     try {
                         myClient!!.close()
                         Log.d(TAG, "Telnet client closed in background")

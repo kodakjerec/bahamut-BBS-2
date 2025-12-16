@@ -3,7 +3,6 @@ package com.kota.Bahamut.listPage
 import android.annotation.SuppressLint
 import android.database.DataSetObservable
 import android.database.DataSetObserver
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -17,11 +16,13 @@ import com.kota.Bahamut.command.BahamutCommandLoadBlock
 import com.kota.Bahamut.command.BahamutCommandLoadLastBlock
 import com.kota.Bahamut.command.BahamutCommandMoveToLastBlock
 import com.kota.Bahamut.command.TelnetCommand
+import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnetUI.TelnetPage
 import java.util.Arrays
@@ -30,6 +31,7 @@ import java.util.Vector
 
 abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     OnItemLongClickListener {
+
     private val operationCommandStack = Vector<TelnetCommand>()
     private val loadCommandStack = Stack<TelnetCommand?>()
     private var executingCommand: TelnetCommand? = null
@@ -48,8 +50,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     private var isListLoaded = false
     private var lastLoadTime: Long = 0
     private var lastSendTime: Long = 0
-    private var autoLoadThread: AutoLoadThread? = null
-    var listCount: Int = 0 // 信件量
+    private var listCount: Int = 0 // UI 執行緒讀取用（有同步保護）
+    private var itemSize: Int = 0 // 背景執行緒更新用
+    private val countLock = Any() // 在類別最上方加入同步鎖物件
     var selectedIndex: Int = 0
         private set
     var currentBlock: Int = 0
@@ -71,9 +74,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     abstract fun loadPage(): TelnetListPageBlock?
 
-    abstract fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?)
+    /** 回收block */
+    abstract fun recycleBlock(telnetListPageBlock: TelnetListPageBlock)
 
-    abstract fun recycleItem(telnetListPageItem: TelnetListPageItem?)
+    /** 回收item */
+    abstract fun recycleItem(telnetListPageItem: TelnetListPageItem)
 
     // android.widget.Adapter
     override fun registerDataSetObserver(observer: DataSetObserver?) {
@@ -85,39 +90,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         mDataSetObservable.unregisterObserver(observer)
     }
 
-    private inner class AutoLoadThread : Thread() {
-        var running = true
+    /** 自動加載執行緒 */
+    private var autoLoadJob: ASCoroutine? = null
 
-        // java.lang.Thread, java.lang.Runnable
-        override fun run() {
-            var shallSendCommand: Boolean
-            try {
-                sleep(10000L)
-                while (running) {
-                    val currentTime = System.currentTimeMillis()
-                    val totalOffset = currentTime - this@TelnetListPage.lastLoadTime
-                    val spanOffset = currentTime - this@TelnetListPage.lastSendTime
-                    shallSendCommand = when {
-                        totalOffset > 900000 -> spanOffset > 60000
-                        totalOffset > 180000 -> spanOffset > 30000
-                        totalOffset > 10000 && totalOffset > spanOffset -> true
-                        else -> false
-                    }
-
-                    if ((shallSendCommand || this@TelnetListPage.isManualLoadPending) && running) {
-                        this@TelnetListPage.loadLastBlock(false)
-                        this@TelnetListPage.lastSendTime = currentTime
-                    }
-                    this@TelnetListPage.isManualLoadPending = false
-                    sleep(1000L)
-                }
-            } catch (e: Exception) {
-                // This logs the message AND the stack trace to logcat
-                Log.e(javaClass.simpleName, "An error occurred in AutoLoadThread", e)
-                running = false
-            }
-        }
-    }
     fun setManualLoadPage() {
         isManualLoadPending = true
     }
@@ -125,6 +100,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     // com.kota.telnetUI.TelnetPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidUnload() {
         stopAutoLoad()
+        autoLoadJob?.cancel() // 清理协程作用域
         super.onPageDidUnload()
     }
 
@@ -138,28 +114,18 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
      * 安全的在主執行緒中更新列表
      */
     fun safeNotifyDataSetChanged() {
-        object : ASRunner() {
-            @SuppressLint("NotifyDataSetChanged")
-            override fun run() {
-                mDataSetObservable.notifyChanged()
+        ASCoroutine.ensureMainThread {
+            mDataSetObservable.notifyChanged()
 
-                // 若 listView 的 adapter 是 BaseAdapter，呼叫其 notifyDataSetChanged
-                val adapter = listView?.adapter
-                if (adapter is android.widget.BaseAdapter) {
-                    adapter.notifyDataSetChanged()
-                } else if (adapter is androidx.recyclerview.widget.RecyclerView.Adapter<*>) {
-                    adapter.notifyDataSetChanged()
-                }
+            // 如果 ListView 還沒設定 adapter，則手動刷新視圖
+            if (listView?.adapter == null) {
+                listView?.invalidateViews()
             }
-        }.runInMainThread()
+        }
     }
 
     val loadingItemNumber: Int
         get() = this.lastLoadItemIndex + 1
-
-    fun isItemLoadingByIndex(index: Int): Boolean {
-        return index == this.lastLoadItemIndex
-    }
 
     fun isItemLoadingByNumber(number: Int): Boolean {
         return number == this.loadingItemNumber
@@ -211,31 +177,31 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         isListLoaded = false
         this.selectedIndex = 0
         this.currentBlock = 0
-        this.listCount = 0
+        synchronized(countLock) {
+            this.listCount = 0
+            this.itemSize = 0
+        }
         lastLoadTime = 0L
         lastSendTime = 0L
         listName = ""
-        safeNotifyDataSetChanged()
     }
 
     fun setListViewSelection(selection: Int) {
-        object : ASRunner() {
-            override fun run() {
-                if (this@TelnetListPage.listView != null) {
-                    if (selection == -1) {
-                        this@TelnetListPage.listView?.setSelection(this@TelnetListPage.getCount() - 1)
-                    } else {
-                        this@TelnetListPage.listView?.setSelection(selection)
-                    }
+        ASCoroutine.ensureMainThread {
+            if (this@TelnetListPage.listView != null) {
+                if (selection == -1) {
+                    this@TelnetListPage.listView?.setSelection(this@TelnetListPage.count - 1)
+                } else {
+                    this@TelnetListPage.listView?.setSelection(selection)
                 }
             }
-        }.runInMainThread()
+        }
     }
 
     fun setListViewSelectionFromTop(selection: Int, top: Int) {
         if (listView != null) {
             if (selection == -1) {
-                listView?.setSelection(getCount() - 1)
+                listView?.setSelection(count - 1)
             } else {
                 listView?.setSelectionFromTop(selection, top)
             }
@@ -244,12 +210,12 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     override fun onPageDidLoad() {
         loadCommandStack.setSize(2)
+        isLoaded = true
     }
 
     override val pageLayout: Int
         get() = 0
 
-    @Synchronized
     override fun onPagePreload(): Boolean {
         val pageData = loadPage()
         if (!isInitialed) {
@@ -259,15 +225,22 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (pageData == null) return false
         executeCommandFinished(pageData)
         insertPageData(pageData)
-        safeNotifyDataSetChanged()
         executePreloadCommand()
         executeCommand()
         return true
     }
 
-    @Synchronized  // com.kota.asFramework.pageController.ASViewController
     override fun onPageRefresh() {
-        reloadListView()
+        synchronized (countLock) {
+            listCount = itemSize
+            if (listView != null) {
+                mDataSetObservable.notifyChanged()
+                if (!isListLoaded) {
+                    isListLoaded = true
+                    setListViewSelection(count - 1)
+                }
+            }
+        }
         executeRefreshCommand()
     }
 
@@ -296,10 +269,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         Arrays.fill(pagePreloadCommand, false)
     }
 
-    private fun removeBlock(key: Int?) {
-        if (key == null) {
-            return
-        }
+    private fun removeBlock(key: Int) {
         var item: TelnetListPageItem? = null
         val block = blockList.remove(key)
         if (block != null) {
@@ -312,8 +282,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             block.clear()
             recycleBlock(block)
         }
-        // 確保在移除 block 後通知 UI（在主執行緒）
-        safeNotifyDataSetChanged()
     }
 
     private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
@@ -335,11 +303,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             this.selectedIndex = telnetListPageBlock.selectedItemNumber
             this.currentBlock = ItemUtils.getBlock(this.selectedIndex)
         }
-        if (telnetListPageBlock.maximumItemNumber > this.listCount) {
-            this.listCount = telnetListPageBlock.maximumItemNumber
+        if (telnetListPageBlock.maximumItemNumber > this.itemSize) {
+            this.itemSize = telnetListPageBlock.maximumItemNumber
         }
-        // 插入/更新資料結構後，確保在主執行緒通知 ListView 更新
-        safeNotifyDataSetChanged()
     }
 
     val firstVisibleBlockIndex: Int
@@ -358,21 +324,52 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             return getBlockIndex(listView?.lastVisiblePosition!!)
         }
 
+    /** 開始自動加載最後頁 */
     private fun startAutoLoad() {
-        if (this.isAutoLoadEnable && autoLoadThread == null) {
-            autoLoadThread = AutoLoadThread()
-            autoLoadThread?.start()
+        if (!isAutoLoadEnable) return
+
+        autoLoadJob?.cancel() // 取消之前的任务
+        autoLoadJob = object : ASCoroutine() {
+            override suspend fun run() {
+                postDelayed(10000L) // 初始延迟
+
+                try {
+                    val currentTime = System.currentTimeMillis()
+                    val totalOffset = currentTime - lastLoadTime
+                    val spanOffset = currentTime - lastSendTime
+
+                    // 根據距離上次載入/送出時間決定是否要自動發送載入最後一個區塊的命令
+                    // 規則：
+                    // - 超過 15 分鐘 (900000ms)：若距離上次送出超過 1 分鐘則送出
+                    // - 超過 3 分鐘 (180000ms)：若距離上次送出超過 30 秒則送出
+                    // - 超過 10 秒，且自上次載入的時間大於自上次送出的時間，表示有可能需要更新（避免頻繁重複送出）
+                    val shouldSend = when {
+                        totalOffset > 900000 -> spanOffset > 60000
+                        totalOffset > 180000 -> spanOffset > 30000
+                        totalOffset > 10000 && totalOffset > spanOffset -> true
+                        else -> false
+                    }
+
+                    if (shouldSend || isManualLoadPending) {
+                        loadLastBlock()
+                        lastSendTime = currentTime
+                        isManualLoadPending = false
+                    }
+                } catch (_: Exception) {
+                    // 忽略錯誤
+                } finally {
+                    postDelayed(1000L) // 1秒间隔
+                }
+            }
         }
     }
 
+    /** 停止自動加載最後頁 */
     private fun stopAutoLoad() {
-        if (autoLoadThread != null) {
-            autoLoadThread?.running = false
-            autoLoadThread = null
-        }
+        autoLoadJob?.cancel()
+        autoLoadJob = null
     }
 
-    @Synchronized
     fun popCommand(): TelnetCommand? {
         var command: TelnetCommand?
         command = null
@@ -384,7 +381,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return command
     }
 
-    @Synchronized
     fun rePushCommand(aCommand: TelnetCommand?) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand) {
@@ -395,12 +391,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    @Synchronized
     fun pushCommand(aCommand: TelnetCommand?) {
         pushCommand(aCommand, true)
     }
 
-    @Synchronized
     fun pushCommand(aCommand: TelnetCommand?, executeNow: Boolean) {
         if (aCommand != null) {
             if (!aCommand.isOperationCommand) {
@@ -414,7 +408,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    @Synchronized
     fun cleanCommand() {
         operationCommandStack.clear()
         loadCommandStack.clear()
@@ -423,7 +416,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         cleanPreloadCommand()
     }
 
-    @Synchronized
     fun executeCommand() {
         if (executingCommand == null) {
             executingCommand = popCommand()
@@ -440,7 +432,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    @Synchronized
     fun executeCommandFinished(telnetListPageBlock: TelnetListPageBlock) {
         if (executingCommand != null) {
             executingCommand?.executeFinished(this, telnetListPageBlock)
@@ -451,7 +442,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    @Synchronized
     fun isLoadingBlock(itemIndex: Int): Boolean {
         var result: Boolean
         result = false
@@ -477,26 +467,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
         return result
     }
-
-    @get:Synchronized
-    val isLoadingSize: Boolean
-        get() {
-            var loadSizeCommandExists: Boolean
-            loadSizeCommandExists = false
-            val it =
-                operationCommandStack.iterator()
-            while (true) {
-                if (!it.hasNext()) {
-                    break
-                }
-                val command = it.next()
-                if (command.action == 2) {
-                    loadSizeCommandExists = true
-                    break
-                }
-            }
-            return loadSizeCommandExists
-        }
 
     fun loadBoardBlock(block: Int) {
         val command: TelnetCommand = BahamutCommandLoadBlock(block)
@@ -529,6 +499,9 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     fun moveToLastPosition() {
         val command: TelnetCommand = BahamutCommandMoveToLastBlock()
         pushCommand(command)
+        // 記錄最後瀏覽文章編號
+        if (this::class == BoardMainPage::class)
+            TempSettings.lastVisitArticleNumber = listCount
     }
 
     fun reloadListView() {
@@ -536,15 +509,23 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             safeNotifyDataSetChanged()
             if (!isListLoaded) {
                 isListLoaded = true
-                setListViewSelection(getCount() - 1)
+                setListViewSelection(count - 1)
             }
         }
     }
 
     // android.widget.Adapter
     override fun getCount(): Int {
-        val intValue: Int = this.listCount
+        var intValue: Int
+        synchronized(countLock) {
+            intValue = listCount
+        }
         return intValue
+    }
+
+    /** 給外部存取用 */
+    fun getItemSize(): Int {
+        return itemSize
     }
 
     fun getIndexInBlock(itemIndex: Int): Int {
@@ -563,7 +544,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return blockList[blockIndex]
     }
 
-    @Synchronized  // android.widget.Adapter
     override fun getItem(index: Int): TelnetListPageItem? {
         val item: TelnetListPageItem?
         val itemIndex = index + 1
@@ -594,7 +574,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     override fun isEmpty(): Boolean {
-        return getCount() == 0
+        return count == 0
     }
 
     override fun areAllItemsEnabled(): Boolean {
@@ -647,12 +627,11 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         synchronized(blockList) {
             val keys: HashSet<Int?> = HashSet(blockList.keys)
             for (key in keys) {
-                removeBlock(key)
+                if (key != null)
+                    removeBlock(key)
             }
             blockList.clear()
         }
-        // 清空所有項目後通知 UI 更新（在主執行緒）
-        safeNotifyDataSetChanged()
     }
 
     open fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {

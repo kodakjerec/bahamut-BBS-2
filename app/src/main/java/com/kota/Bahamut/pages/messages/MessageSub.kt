@@ -17,7 +17,7 @@ import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
@@ -48,6 +48,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         get() = true
 
     override fun onPageDidLoad() {
+        super.onPageDidLoad()
+
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
         listView = mainLayout.findViewById(R.id.Message_Sub_Scroll)
@@ -93,12 +95,10 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             } finally {
                 db.close()
             }
-            object: ASRunner(){
-                override fun run() {
-                    val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
-                    myAdapter.addItem(item)
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
+                myAdapter.addItem(item)
+            }
         }
     }
 
@@ -183,13 +183,13 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             db.close()
         }
 
-        messageAsRunner.cancel()
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine?.cancel()
+        messageASCoroutine?.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
     /** 送出訊息-2 送出對方id */
     fun sendMessagePart2() {
-        messageAsRunner.cancel()
+        messageASCoroutine?.cancel()
 
         if (tempMessage!=null) {
             val aSenderName = tempMessage?.senderName
@@ -200,14 +200,14 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             TelnetClient.myInstance!!.sendDataToServer(builder)
         }
 
-        messageAsRunner.postDelayed(3000)
+        messageASCoroutine?.postDelayed(3000L)
         // telnet會連續觸發這段兩次
         if (!isPostDelayedSuccess)
             isPostDelayedSuccess = false
     }
     /** 送出訊息-3 更新訊息 */
     fun sendMessagePart3() {
-        messageAsRunner.cancel()
+        messageASCoroutine?.cancel()
         isPostDelayedSuccess = true
 
         if (tempMessage!=null) {
@@ -241,7 +241,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         }
     }
     fun sendMessageFail(status:MessageStatus) {
-        messageAsRunner.cancel()
+        messageASCoroutine?.cancel()
         isPostDelayedSuccess = false
 
         if (tempMessage!=null) {
@@ -273,8 +273,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     }
 
     /** 強制發送訊息進入失敗 */
-    private var messageAsRunner: ASRunner = object : ASRunner() {
-        override fun run() {
+    private var messageASCoroutine: ASCoroutine? = object : ASCoroutine() {
+        override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 sendMessageFail(MessageStatus.Offline)
                 ASToast.showLongToast("私訊無反應，對方可能不在線上")

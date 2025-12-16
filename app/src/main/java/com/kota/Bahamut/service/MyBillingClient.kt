@@ -11,7 +11,7 @@ import com.android.billingclient.api.Purchase
 import com.android.billingclient.api.PurchasesUpdatedListener
 import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.Bahamut.R
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -88,8 +88,7 @@ object MyBillingClient {
                             .url(apiUrl)
                             .post(body)
                             .build()
-
-                        ASRunner.runInNewThread {
+                        ASCoroutine.runInNewCoroutine {
                             client.newCall(request).execute().use { _ -> }
                         }
                     }
@@ -128,8 +127,7 @@ object MyBillingClient {
                                     .url(apiUrl)
                                     .post(body)
                                     .build()
-
-                                ASRunner.runInNewThread {
+                                ASCoroutine.runInNewCoroutine {
                                     try {
                                         client.newCall(request).execute().use { _ -> }
                                     } catch (_:Exception) {
@@ -165,7 +163,7 @@ object MyBillingClient {
             .url(apiUrl)
             .post(body)
             .build()
-        ASRunner.runInNewThread {
+        ASCoroutine.runInNewCoroutine {
             try {
                 client.newCall(request).execute().use { response ->
                     if (response.isSuccessful) {

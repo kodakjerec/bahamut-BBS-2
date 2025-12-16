@@ -9,12 +9,12 @@ import android.text.util.Linkify
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
-import com.kota.asFramework.thread.ASRunner
-import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
-import com.kota.Bahamut.pages.articlePage.MyUrlSpan
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.articlePage.MyUrlSpan
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.thread.ASCoroutine
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -57,11 +57,9 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
             MessageStatus.Offline -> "離線" // 沒上線
             else -> "未知"
         }
-        object : ASRunner() {
-            override fun run() {
-                txtSendStatus.text = txtStatus
-            }
-        }.runInMainThread()
+        ASCoroutine.ensureMainThread {
+            txtSendStatus.text = txtStatus
+        }
     }
 
 

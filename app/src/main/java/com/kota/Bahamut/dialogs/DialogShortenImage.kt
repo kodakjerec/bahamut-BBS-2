@@ -40,7 +40,7 @@ import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import java.io.File
 import java.io.IOException
@@ -142,22 +142,20 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             closeProcessingDialog()
             return@OnClickListener
         }
-        ASRunner.runInNewThread {
+        ASCoroutine.runInNewCoroutine {
             try {
                 val uploaderObj = UploaderLitterCatBox()
                 // 本地檔案上傳
                 val link = uploaderObj.postImage( finalUri )
                 if (link.startsWith("http")) {
-                    object : ASRunner() {
-                        override fun run() {
-                            sampleTextView?.text = link
-                            outputParam = sampleTextView?.text.toString()
-                            sendButton?.isEnabled = true
-                            transferButton?.isEnabled = false
-                            var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
-                            UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
-                        }
-                    }.runInMainThread()
+                    ASCoroutine.ensureMainThread {
+                        sampleTextView?.text = link
+                        outputParam = sampleTextView?.text.toString()
+                        sendButton?.isEnabled = true
+                        transferButton?.isEnabled = false
+                        var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
+                        UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
+                    }
                 } else {
                     throw Exception("")
                 }
@@ -206,6 +204,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     }
                     Glide.with(this).load(bitmap).into(imageView)
                 } else {
+                    @Suppress("DEPRECATION")
                     val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
                     Glide.with(this).load(bitmap).into(imageView)
                 }
@@ -259,6 +258,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                         selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
                     } else {
+                        @Suppress("DEPRECATION")
                         val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
                         selectedImageUri = uri
                         Glide.with(this).load(bitmap).into(imageView)
@@ -328,18 +328,14 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     }
 
     private fun showProcessingDialog() {
-        object: ASRunner() {
-            override fun run() {
-                processingDialog.visibility = VISIBLE
-            }
-        }.runInMainThread()
+        ASCoroutine.ensureMainThread {
+            processingDialog.visibility = VISIBLE
+        }
     }
     private  fun closeProcessingDialog() {
-        object: ASRunner() {
-            override fun run() {
-                processingDialog.visibility = INVISIBLE
-            }
-        }.runInMainThread()
+        ASCoroutine.ensureMainThread {
+            processingDialog.visibility = INVISIBLE
+        }
     }
 
     private fun postUrl(str:String) {

@@ -1,11 +1,11 @@
 package com.kota.Bahamut.command
 
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
     var articleIndex: Int
@@ -20,12 +20,10 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
             // 找出沒被block的最小index
             val miniumAvailableIndex = 1
             if (articleIndex == miniumAvailableIndex) {
-                object : ASRunner() {
-                    override fun run() {
-                        showShortToast("找沒有了耶...:(")
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.ensureMainThread {
+                    showShortToast("找沒有了耶...:(")
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
                 create()
@@ -46,11 +44,9 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
                 telnetListPageBlock?.selectedItem
             )) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                object : ASRunner() {
-                    override fun run() {
-                        telnetListPage.onLoadItemFinished()
-                    }
-                }.runInMainThread()
+                ASCoroutine.ensureMainThread {
+                    telnetListPage.onLoadItemFinished()
+                }
                 isDone = true
             } else {
 //                articleIndex = aPageData.selectedItemNumber;
@@ -61,12 +57,10 @@ class BahamutCommandTheSameTitleTop(fromArticleIndex: Int) : TelnetCommand() {
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            object : ASRunner() {
-                override fun run() {
-                    showShortToast("找沒有了耶...:(")
-                    telnetListPage.onLoadItemFinished()
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                showShortToast("找沒有了耶...:(")
+                telnetListPage.onLoadItemFinished()
+            }
             isDone = true
         } else if (!telnetListPage.isEnabled(telnetListPageBlock.selectedItemNumber - 1)) {
             showShortToast("上一篇不可使用")

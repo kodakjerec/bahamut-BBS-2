@@ -1,7 +1,7 @@
 package com.kota.telnet
 
 import android.util.Log
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.dataPool.MutableByteBuffer
 import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard.getKeyData
@@ -16,7 +16,7 @@ class TelnetOutputBuilder {
     }
 
     fun sendToServer() {
-        if (ASRunner.isMainThread) {
+        if (ASCoroutine.isMainThread) {
             sendToServerInBackground(0)
         } else {
             sendToServer(0)

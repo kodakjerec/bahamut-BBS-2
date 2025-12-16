@@ -19,7 +19,7 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryQuery
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
 
@@ -87,40 +87,38 @@ class BillingPage : TelnetPage() {
                 if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
                     // process returned productDetailsList
                     for (product in productDetailsList!!.productDetailsList) {
-                        object : ASRunner() {
-                            override fun run() {
-                                val btn =
-                                    findViewById(R.id.button_90) as Button?
-                                if (btn != null) {
-                                    btn.isEnabled = true
-                                    btn.text = product.name
-                                    btn.setOnClickListener { view: View? ->
-                                        val productDetailsParamsList =
-                                            ArrayList<ProductDetailsParams?>()
-                                        productDetailsParamsList
-                                            .add(
-                                                ProductDetailsParams.newBuilder()
-                                                    .setProductDetails(product)
-                                                    .build()
-                                            )
-
-                                        val billingFlowParams =
-                                            BillingFlowParams.newBuilder()
-                                                .setProductDetailsParamsList(
-                                                    productDetailsParamsList
-                                                )
-                                                .setIsOfferPersonalized(true)
+                        ASCoroutine.ensureMainThread {
+                            val btn =
+                                findViewById(R.id.button_90) as Button?
+                            if (btn != null) {
+                                btn.isEnabled = true
+                                btn.text = product.name
+                                btn.setOnClickListener { view: View? ->
+                                    val productDetailsParamsList =
+                                        ArrayList<ProductDetailsParams?>()
+                                    productDetailsParamsList
+                                        .add(
+                                            ProductDetailsParams.newBuilder()
+                                                .setProductDetails(product)
                                                 .build()
-
-                                        // Launch the billing flow
-                                        billingClient?.launchBillingFlow(
-                                            activity!!,
-                                            billingFlowParams
                                         )
-                                    }
+
+                                    val billingFlowParams =
+                                        BillingFlowParams.newBuilder()
+                                            .setProductDetailsParamsList(
+                                                productDetailsParamsList
+                                            )
+                                            .setIsOfferPersonalized(true)
+                                            .build()
+
+                                    // Launch the billing flow
+                                    billingClient?.launchBillingFlow(
+                                        activity!!,
+                                        billingFlowParams
+                                    )
                                 }
                             }
-                        }.runInMainThread()
+                        }
                     }
                 }
             }

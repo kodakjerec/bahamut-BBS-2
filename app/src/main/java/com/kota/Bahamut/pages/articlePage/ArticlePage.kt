@@ -48,7 +48,7 @@ import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showLongToast
@@ -68,9 +68,6 @@ class ArticlePage : TelnetPage() {
     lateinit var listEmptyView: TextView
     var boardMainPage: BoardMainPage? = null
     var isFullScreen: Boolean = false
-    var actionDelay: Long = 500
-    var topAction: Runnable? = null
-    var bottomAction: Runnable? = null
     var listAdapter: BaseAdapter = object : BaseAdapter() {
         private var pushLength = 0 // 推文長度
 
@@ -240,27 +237,28 @@ class ArticlePage : TelnetPage() {
         }
 
     /** 最前篇  */
+    var actionDelay: Long = 500L
+    var topAction: ASCoroutine? = object : ASCoroutine() {
+        override suspend fun run() {
+            moveToTopArticle()
+        }
+    }
+    var bottomAction: ASCoroutine? = object : ASCoroutine() {
+        override suspend fun run() {
+            moveToBottomArticle()
+        }
+    }
     var pageTopListener: OnLongClickListener = OnLongClickListener { v: View? ->
         if (propertiesArticleMoveEnable) {
-            if (topAction != null) {
-                v?.removeCallbacks(topAction)
-            }
-
-            topAction = Runnable {
-                topAction = null
-                moveToTopArticle()
-            }
-            v?.postDelayed(topAction, actionDelay)
+            topAction?.cancel()
+            topAction?.postDelayed(actionDelay)
         }
         true
     }
 
     /** 上一篇  */
     var pageUpListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (topAction != null) {
-            v?.removeCallbacks(topAction)
-            topAction = null
-        }
+        topAction?.cancel()
         if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
@@ -271,25 +269,15 @@ class ArticlePage : TelnetPage() {
     /** 最後篇  */
     var pageBottomListener: OnLongClickListener = OnLongClickListener { v: View? ->
         if (propertiesArticleMoveEnable) {
-            if (bottomAction != null) {
-                v?.removeCallbacks(bottomAction)
-            }
-
-            bottomAction = Runnable {
-                bottomAction = null
-                moveToBottomArticle()
-            }
-            v?.postDelayed(bottomAction, actionDelay)
+            bottomAction?.cancel()
+            bottomAction?.postDelayed(actionDelay)
         }
         true
     }
 
     /** 下一篇  */
     var pageDownListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        if (bottomAction != null) {
-            v?.removeCallbacks(bottomAction)
-            bottomAction = null
-        }
+        bottomAction?.cancel()
         if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
         } else {
@@ -933,13 +921,11 @@ class ArticlePage : TelnetPage() {
     /** 查詢勇者  */
     fun ctrlQUser(fromStrings: Vector<String>) {
         try {
-            object : ASRunner() {
-                override fun run() {
-                    val dialogQueryHero = DialogQueryHero()
-                    dialogQueryHero.show()
-                    dialogQueryHero.getData(fromStrings)
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                val dialogQueryHero = DialogQueryHero()
+                dialogQueryHero.show()
+                dialogQueryHero.getData(fromStrings)
+            }
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }

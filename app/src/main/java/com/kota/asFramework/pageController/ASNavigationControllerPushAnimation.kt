@@ -1,7 +1,7 @@
 package com.kota.asFramework.pageController
 
 import android.view.animation.Animation
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 
 open class ASNavigationControllerPushAnimation(
     private val sourceViewController: ASViewController?,
@@ -87,13 +87,9 @@ open class ASNavigationControllerPushAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            object : ASRunner() {
-                // from class: com.kota.asFramework.pageController.ASNavigationControllerPushAnimation.3
-                // com.kota.asFramework.thread.ASRunner
-                override fun run() {
-                    this@ASNavigationControllerPushAnimation.onAnimationFinished()
-                }
-            }.runInMainThread()
+            ASCoroutine.ensureMainThread {
+                this@ASNavigationControllerPushAnimation.onAnimationFinished()
+            }
             this.isFinished = true
         }
     }

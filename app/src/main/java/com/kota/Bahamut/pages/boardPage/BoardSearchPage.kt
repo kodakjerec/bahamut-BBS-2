@@ -118,7 +118,4 @@ class BoardSearchPage : BoardMainPage() {
         PageContainer.instance!!.cleanBoardSearchPage()
         return true
     }
-
-    override val isAutoLoadEnable: Boolean
-        get() = false
 }

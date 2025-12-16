@@ -3,15 +3,15 @@ package com.kota.Bahamut.pages.messages
 import android.content.Context
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.telnet.reference.TelnetKeyboard
+import com.kota.asFramework.dialog.ASListDialog
+import com.kota.asFramework.dialog.ASListDialogItemClickListener
+import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
+import com.kota.telnet.reference.TelnetKeyboard
 
 class MessageMainListItem(context: Context): LinearLayout(context) {
     private var mainLayout: LinearLayout
@@ -72,7 +72,7 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                         var authorId: String = txtSenderName.text.toString()
                         if (authorId.contains("(")) authorId =
                             authorId.substring(0, authorId.indexOf("("))
-                        aPage?.setSenderName(authorId)
+                        aPage.setSenderName(authorId)
                     }
                 }
             }).show()

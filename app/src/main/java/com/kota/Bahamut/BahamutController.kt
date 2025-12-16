@@ -31,7 +31,7 @@ import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
-import com.kota.asFramework.thread.ASRunner
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetClient.Companion.construct
@@ -172,13 +172,9 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
     // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionStart(telnetClient: TelnetClient) {
-        object : ASRunner() {
-            // from class: com.kota.Bahamut.BahamutController.2
-            // com.kota.asFramework.thread.ASRunner
-            override fun run() {
-                this@BahamutController.showConnectionStartMessage()
-            }
-        }.runInMainThread()
+        ASCoroutine.ensureMainThread {
+            this@BahamutController.showConnectionStartMessage()
+        }
     }
 
     // com.kota.telnet.TelnetClientListener
@@ -197,31 +193,29 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
-        object : ASRunner() {
-            override fun run() {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
-                dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")
-                val timeString = dateFormat.format(Date())
-                println("BahaBBS connection close:$timeString")
+        ASCoroutine.ensureMainThread {
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
+            dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")
+            val timeString = dateFormat.format(Date())
+            println("BahaBBS connection close:$timeString")
 
-                this@BahamutController.handleNormalConnectionClosed()
+            this@BahamutController.handleNormalConnectionClosed()
 
-                showShortToast("連線已中斷")
+            showShortToast("連線已中斷")
 
-                dismissProcessingDialog()
+            dismissProcessingDialog()
 
-                if (getCloudSave()) {
-                    val cloudBackup = CloudBackup()
-                    cloudBackup.backup()
-                }
-
-                if (getMessageSmall() != null) {
-                    val messageSmall: MessageSmall? = getMessageSmall()
-                    currentController?.removeForeverView(messageSmall)
-                    setMessageSmall(null)
-                }
+            if (getCloudSave()) {
+                val cloudBackup = CloudBackup()
+                cloudBackup.backup()
             }
-        }.runInMainThread()
+
+            if (getMessageSmall() != null) {
+                val messageSmall: MessageSmall? = getMessageSmall()
+                currentController?.removeForeverView(messageSmall)
+                setMessageSmall(null)
+            }
+        }
     }
 
     private fun handleNormalConnectionClosed() {

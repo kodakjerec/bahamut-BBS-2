@@ -27,7 +27,6 @@ import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.thread.ASRunner
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
@@ -80,7 +79,8 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        headerItemView.setData("我的信箱", "您有 $listCount 封信在信箱內", "")
+        val myListCount = getItemSize()
+        headerItemView.setData("我的信箱", "您有 $myListCount 封信在信箱內", "")
     }
 
     override fun onBackPressed(): Boolean {
@@ -229,7 +229,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
 
     fun loadNextArticle() {
         val targetIndex = loadingItemNumber + 1
-        if (targetIndex > listCount) {
+        if (targetIndex > getItemSize()) {
             showShortToast(getContextString(R.string.already_to_bottom))
         } else {
             loadItemAtNumber(targetIndex)
@@ -267,26 +267,20 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         return view
     }
 
-    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock?) {
+    override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         MailBoxPageBlock.recycle(telnetListPageBlock as MailBoxPageBlock)
     }
 
-    override fun recycleItem(telnetListPageItem: TelnetListPageItem?) {
+    override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         MailBoxPageItem.recycle(telnetListPageItem as MailBoxPageItem)
     }
 
     fun recoverPost() {
-        object : ASRunner() {
-            override fun run() {
-            }
-        }.runInMainThread()
+        // nothing
     }
 
     fun finishPost() {
-        object : ASRunner() {
-            override fun run() {
-            }
-        }.runInMainThread()
+        // nothing
     }
 
     override fun onSearchDialogCancelButtonClicked() {

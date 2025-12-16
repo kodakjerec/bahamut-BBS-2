@@ -4,12 +4,12 @@ import android.util.Log
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.thread.ASRunner
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.NotificationSettings.getShowCloudSave
 import com.kota.Bahamut.service.NotificationSettings.setShowCloudSave
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -28,27 +28,25 @@ class CloudBackup {
             // 詢問是否啟用雲端備份
             when (getShowCloudSave()) {
                 false -> {
-                    object : ASRunner() {
-                        override fun run() {
-                            ASAlertDialog.createDialog()
-                                .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
-                                .setMessage(CommonFunctions.getContextString(R.string.cloud_save_question))
-                                .addButton(CommonFunctions.getContextString(R.string.cancel))
-                                .addButton(CommonFunctions.getContextString(R.string.on))
-                                .setDefaultButtonIndex(0)
-                                .setListener { _, index ->
-                                    if (index == 1) {
-                                        // 決定同步, 檢查雲端存檔是否存在
-                                        NotificationSettings.setCloudSave(true)
-                                        checkCloud()
-                                    } else {
-                                        // 取消同步, 以本地端為主
-                                        NotificationSettings.setCloudSave(false)
-                                        final()
-                                    }
-                                }.show()
-                        }
-                    }.runInMainThread()
+                    ASCoroutine.ensureMainThread {
+                        ASAlertDialog.createDialog()
+                            .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
+                            .setMessage(CommonFunctions.getContextString(R.string.cloud_save_question))
+                            .addButton(CommonFunctions.getContextString(R.string.cancel))
+                            .addButton(CommonFunctions.getContextString(R.string.on))
+                            .setDefaultButtonIndex(0)
+                            .setListener { _, index ->
+                                if (index == 1) {
+                                    // 決定同步, 檢查雲端存檔是否存在
+                                    NotificationSettings.setCloudSave(true)
+                                    checkCloud()
+                                } else {
+                                    // 取消同步, 以本地端為主
+                                    NotificationSettings.setCloudSave(false)
+                                    final()
+                                }
+                            }.show()
+                    }
                 }
                 else -> {
                     // 不用再次詢問
@@ -80,7 +78,7 @@ class CloudBackup {
             .post(body)
             .build()
 
-        ASRunner.runInNewThread {
+        ASCoroutine.runInNewCoroutine {
             client.newCall(request).execute().use { response ->
                 val data = response.body.string()
                 val jsonObject = JSONObject(data)
@@ -105,27 +103,25 @@ class CloudBackup {
 
     private fun askCloudSave2(lastTime: String) {
         // 雲端存在, 選擇本地或雲端
-        object : ASRunner() {
-            override fun run() {
-                ASAlertDialog.createDialog()
-                    .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
-                    .setMessage("已有雲端備份：\n$lastTime\n採用 本地存檔\n或 雲端存檔？")
-                    .addButton(CommonFunctions.getContextString(R.string.cloud_save_local))
-                    .addButton(CommonFunctions.getContextString(R.string.cloud_save_cloud))
-                    .setDefaultButtonIndex(0)
-                    .setListener { _: ASAlertDialog?, index: Int ->
-                        if (index == 0) {
-                            // 選擇本地=>覆蓋雲端
-                            backup()
-                            ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result1))
-                        } else {
-                            // 選擇雲端=>覆蓋本地
-                            restore()
-                            ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result2))
-                        }
-                    }.show()
-            }
-        }.runInMainThread()
+        ASCoroutine.ensureMainThread {
+            ASAlertDialog.createDialog()
+                .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
+                .setMessage("已有雲端備份：\n$lastTime\n採用 本地存檔\n或 雲端存檔？")
+                .addButton(CommonFunctions.getContextString(R.string.cloud_save_local))
+                .addButton(CommonFunctions.getContextString(R.string.cloud_save_cloud))
+                .setDefaultButtonIndex(0)
+                .setListener { _: ASAlertDialog?, index: Int ->
+                    if (index == 0) {
+                        // 選擇本地=>覆蓋雲端
+                        backup()
+                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result1))
+                    } else {
+                        // 選擇雲端=>覆蓋本地
+                        restore()
+                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.cloud_save_result2))
+                    }
+                }.show()
+        }
     }
 
     // 備份所有設定
@@ -162,7 +158,7 @@ class CloudBackup {
                 .url(apiUrl)
                 .post(body)
                 .build()
-            ASRunner.runInNewThread {
+            ASCoroutine.runInNewCoroutine {
                 try {
                     client.newCall(request).execute().use { response->
                         val data = response.body.string()
@@ -204,7 +200,7 @@ class CloudBackup {
                 .url(apiUrl)
                 .post(body)
                 .build()
-            ASRunner.runInNewThread {
+            ASCoroutine.runInNewCoroutine {
                 try {
                     client.newCall(request).execute().use { response->
                         val data = response.body.string()
