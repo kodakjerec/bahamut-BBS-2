@@ -360,44 +360,46 @@ class LoginPage : TelnetPage() {
             }
 
             // 每小時檢查是否換日，如果換日則執行自動簽到
-            dailyCheckThread = Thread {
-                while (true) {
-                    try {
-                        Thread.sleep((60 * 60 * 1000).toLong()) // 每小時檢查一次
+            if (dailyCheckThread== null) {
+                dailyCheckThread = Thread {
+                    while (true) {
+                        try {
+                            Thread.sleep((60 * 60 * 1000).toLong()) // 每小時檢查一次
 
-                        // 檢查今日是否已經自動簽到過
-                        if (!this.isWebAutoLoginToday) {
-                            // 換日了，執行自動簽到
-                            ASCoroutine.ensureMainThread {
-                                try {
-                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
+                            // 檢查今日是否已經自動簽到過
+                            if (!this.isWebAutoLoginToday) {
+                                // 換日了，執行自動簽到
+                                ASCoroutine.ensureMainThread {
+                                    try {
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
 
-                                    // 使用 LoginWebDebugView 來處理自動簽到
-                                    val debugView = LoginWebDebugView(context!!)
-                                    debugView.startAutoLogin {
-                                        // 記錄web自動簽到成功時間
-                                        setWebAutoLoginSuccessTime()
-                                        null
+                                        // 使用 LoginWebDebugView 來處理自動簽到
+                                        val debugView = LoginWebDebugView(context!!)
+                                        debugView.startAutoLogin {
+                                            // 記錄web自動簽到成功時間
+                                            setWebAutoLoginSuccessTime()
+                                            null
+                                        }
+                                    } catch (e: Exception) {
+                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
+                                        Log.e(
+                                            javaClass.simpleName,
+                                            (if (e.message != null) e.message else "")!!
+                                        )
                                     }
-                                } catch (e: Exception) {
-                                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                                    Log.e(
-                                        javaClass.simpleName,
-                                        (if (e.message != null) e.message else "")!!
-                                    )
                                 }
                             }
+                        } catch (e: InterruptedException) {
+                            Log.e(
+                                javaClass.simpleName, (if (e.message != null) e.message else "")!!
+                            )
+                            Thread.currentThread().interrupt()
+                            break
                         }
-                    } catch (e: InterruptedException) {
-                        Log.e(
-                            javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                        )
-                        Thread.currentThread().interrupt()
-                        break
                     }
                 }
+                dailyCheckThread!!.start()
             }
-            dailyCheckThread!!.start()
         }
     }
 
