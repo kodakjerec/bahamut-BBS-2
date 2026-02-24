@@ -79,7 +79,8 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        headerItemView.setData("我的信箱", "您有 $listCount 封信在信箱內", "")
+        val myListCount = getItemSize()
+        headerItemView.setData("我的信箱", "您有 $myListCount 封信在信箱內", "")
     }
 
     override fun onBackPressed(): Boolean {
@@ -228,7 +229,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
 
     fun loadNextArticle() {
         val targetIndex = loadingItemNumber + 1
-        if (targetIndex > listCount) {
+        if (targetIndex > getItemSize()) {
             showShortToast(getContextString(R.string.already_to_bottom))
         } else {
             loadItemAtNumber(targetIndex)

@@ -17,7 +17,7 @@ class ASViewRemover(private val parentViewGroup: ViewGroup?, private val targetV
     }
 
     private fun remove() {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (this@ASViewRemover.parentViewGroup != null && this@ASViewRemover.targetView != null) {
                 this@ASViewRemover.parentViewGroup.removeView(this@ASViewRemover.targetView)
             }

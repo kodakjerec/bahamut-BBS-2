@@ -921,7 +921,7 @@ class ArticlePage : TelnetPage() {
     /** 查詢勇者  */
     fun ctrlQUser(fromStrings: Vector<String>) {
         try {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 val dialogQueryHero = DialogQueryHero()
                 dialogQueryHero.show()
                 dialogQueryHero.getData(fromStrings)

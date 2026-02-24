@@ -28,7 +28,7 @@ class CloudBackup {
             // 詢問是否啟用雲端備份
             when (getShowCloudSave()) {
                 false -> {
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         ASAlertDialog.createDialog()
                             .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
                             .setMessage(CommonFunctions.getContextString(R.string.cloud_save_question))
@@ -103,7 +103,7 @@ class CloudBackup {
 
     private fun askCloudSave2(lastTime: String) {
         // 雲端存在, 選擇本地或雲端
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             ASAlertDialog.createDialog()
                 .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
                 .setMessage("已有雲端備份：\n$lastTime\n採用 本地存檔\n或 雲端存檔？")

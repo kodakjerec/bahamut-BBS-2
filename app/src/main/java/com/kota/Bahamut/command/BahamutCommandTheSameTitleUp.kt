@@ -18,7 +18,7 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
     override fun execute(telnetListPage: TelnetListPage) {
         if (telnetListPage.listType > 0) {
             if (this.articleIndex == 1) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     showShortToast("無上一篇同主題文章")
                     telnetListPage.onLoadItemFinished()
                 }
@@ -40,7 +40,7 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         if (telnetListPageBlock?.selectedItem?.isDeleted == true || telnetListPage.isItemBlocked(telnetListPageBlock?.selectedItem)) {
             if (articleIndex == telnetListPageBlock?.selectedItemNumber) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     showShortToast("無上一篇同主題文章")
                     telnetListPage.onLoadItemFinished()
                 }
@@ -50,7 +50,7 @@ class BahamutCommandTheSameTitleUp(fromArticleIndex: Int) : TelnetCommand() {
                 isDone = false
             }
         } else if (telnetListPage.isItemLoadingByNumber(telnetListPageBlock?.selectedItemNumber!!)) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 showShortToast("無上一篇同主題文章")
                 telnetListPage.onLoadItemFinished()
             }

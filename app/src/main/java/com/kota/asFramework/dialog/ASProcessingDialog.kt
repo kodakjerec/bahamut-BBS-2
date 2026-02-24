@@ -69,7 +69,7 @@ class ASProcessingDialog : ASDialog() {
         ) {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         if (aSProcessingDialog == null) {
                             constructInstance()
                         }
@@ -87,7 +87,7 @@ class ASProcessingDialog : ASDialog() {
         fun dismissProcessingDialog() {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
-                    ASCoroutine.runOnMain {
+                    ASCoroutine.ensureMainThread {
                         if (aSProcessingDialog != null) {
                             aSProcessingDialog?.dismiss()
                             releaseInstance()
@@ -99,7 +99,7 @@ class ASProcessingDialog : ASDialog() {
 
         @JvmStatic
         fun setMessage(message: String?) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 if (aSProcessingDialog != null) {
                     aSProcessingDialog?.messageLabel?.text = message
                 }

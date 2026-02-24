@@ -48,6 +48,8 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         get() = true
 
     override fun onPageDidLoad() {
+        super.onPageDidLoad()
+
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
         listView = mainLayout.findViewById(R.id.Message_Sub_Scroll)
@@ -93,7 +95,7 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             } finally {
                 db.close()
             }
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
                 myAdapter.addItem(item)
             }

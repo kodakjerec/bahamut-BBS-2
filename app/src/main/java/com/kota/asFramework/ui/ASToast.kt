@@ -8,7 +8,7 @@ object ASToast {
     private var previousToast: Toast? = null
     @JvmStatic
     fun showShortToast(aToastMessage: String?) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (previousToast != null) {
                 previousToast?.cancel()
             }
@@ -23,7 +23,7 @@ object ASToast {
 
     @JvmStatic
     fun showLongToast(aToastMessage: String?) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (previousToast != null) {
                 previousToast?.cancel()
             }

@@ -27,7 +27,7 @@ object ASSnackBar {
      */
     @JvmStatic
     fun show(largeMessage: String, normalMessage: String?) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (previousSnackBar != null) {
                 previousSnackBar?.dismiss()
             }
@@ -97,7 +97,7 @@ object ASSnackBar {
 
                 previousSnackBar?.show()
             } else {
-                return@runOnMain // 如果沒有有效的 View，就不顯示 Snackbar
+                return@ensureMainThread // 如果沒有有效的 View，就不顯示 Snackbar
             }
         }
     }

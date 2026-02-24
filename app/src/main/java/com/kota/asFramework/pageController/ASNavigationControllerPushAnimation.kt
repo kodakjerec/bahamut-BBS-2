@@ -87,7 +87,7 @@ open class ASNavigationControllerPushAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 this@ASNavigationControllerPushAnimation.onAnimationFinished()
             }
             this.isFinished = true

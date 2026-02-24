@@ -174,7 +174,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
                         } catch (_: Exception) {
-                            ASCoroutine.runOnMain {
+                            ASCoroutine.ensureMainThread {
                                 setFail()
                             }
                         }
@@ -182,7 +182,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 }
             }
         } catch (_: Exception) {
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 setFail()
             }
         }
@@ -195,7 +195,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         val transportType = TempSettings.transportType
 
         if (isPic) { // 純圖片
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 layoutDefault.visibility = GONE
 
                 // 圖片
@@ -210,7 +210,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 layoutNormal.visibility = GONE
             }
         } else { // 內容網址
-            ASCoroutine.runOnMain {
+            ASCoroutine.ensureMainThread {
                 layoutDefault.visibility = GONE
 
                 // 圖片
@@ -269,7 +269,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     /** 讀取圖片  */
     private fun loadImage() {
         imgLoaded = true
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             imageViewButton.visibility = GONE
             photoViewPic.visibility = VISIBLE
             photoViewPic.contentDescription = myDescription
@@ -287,7 +287,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 circularProgressDrawable.start()
 
                 if (myImageUrl.isEmpty()) {
-                    return@runOnMain
+                    return@ensureMainThread
                 }
 
                 photoViewPic.setImageDrawable(circularProgressDrawable)
@@ -301,7 +301,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             target: Target<Drawable?>,
                             isFirstResource: Boolean
                         ): Boolean {
-                            ASCoroutine.runOnMain {
+                            ASCoroutine.ensureMainThread {
                                 setFail()
                             }
                             return false
@@ -352,7 +352,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                     photoViewPic.setImageBitmap(newBitmap)
                                 }
                             } catch (_: Exception) {
-                                ASCoroutine.runOnMain {
+                                ASCoroutine.ensureMainThread {
                                     setFail()
                                 }
                             }
@@ -362,7 +362,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                         }
                     })
             } catch (_: Exception) {
-                ASCoroutine.runOnMain {
+                ASCoroutine.ensureMainThread {
                     setFail()
                 }
             }

@@ -76,7 +76,7 @@ class UserInfoPage: TelnetPage() {
         val mailCount = rows[12].toContentString()
         val certificateTime = rows[13].toContentString()
         val stayTime = rows[14].toContentString()
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             if (rowString4.contains("暱    稱：")) {
                 txnNickName.setText(rowString4.replace("暱    稱：", ""))
                 txnOthers.text =

@@ -172,7 +172,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
     // com.kota.telnet.TelnetClientListener
     override fun onTelnetClientConnectionStart(telnetClient: TelnetClient) {
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             this@BahamutController.showConnectionStartMessage()
         }
     }
@@ -193,7 +193,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
-        ASCoroutine.runOnMain {
+        ASCoroutine.ensureMainThread {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
             dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")
             val timeString = dateFormat.format(Date())
