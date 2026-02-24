@@ -47,7 +47,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             listView!!.adapter = this
         }
     }
-    private var isListLoaded = false
+    private var isListLoaded = false // 是否已經載入過列表
     private var lastLoadTime: Long = 0
     private var lastSendTime: Long = 0
     private var listCount: Int = 0 // UI 執行緒讀取用（有同步保護）
@@ -284,6 +284,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
+    /** 插入頁面資料並更新列表狀態 */
     private fun insertPageData(telnetListPageBlock: TelnetListPageBlock) {
         val blockIndex = getBlockIndex(telnetListPageBlock.minimumItemNumber - 1)
         synchronized(blockList) {
@@ -442,6 +443,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
+    /** 檢查指定的文章編號是否正在載入中，通常用於在 UI 上顯示載入狀態 */
     fun isLoadingBlock(itemIndex: Int): Boolean {
         var result: Boolean
         result = false
@@ -468,15 +470,18 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return result
     }
 
+    /** 載入指定區塊 */
     fun loadBoardBlock(block: Int) {
         val command: TelnetCommand = BahamutCommandLoadBlock(block)
         pushCommand(command)
     }
 
+    /** 載入第一個區塊 */
     fun moveToFirstPosition() {
         setListViewSelection(0)
     }
 
+    /** 載入最後一個區塊 */
     @JvmOverloads
     fun loadLastBlock(isRecordTime: Boolean = true) {
         if (!containsLoadLastBlock()) {
@@ -487,6 +492,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
+    /** 檢查是否已經有載入最後一個區塊的命令在執行或等待中，避免重複送出 */
     private fun containsLoadLastBlock(): Boolean {
         for (command in operationCommandStack) {
             if (command.action == 1) {
@@ -496,6 +502,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         return false
     }
 
+    /** 移動到最後一個區塊 */
     fun moveToLastPosition() {
         val command: TelnetCommand = BahamutCommandMoveToLastBlock()
         pushCommand(command)
@@ -504,6 +511,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             TempSettings.lastVisitArticleNumber = listCount
     }
 
+    /** 重新載入列表，通常在資料更新後呼叫 */
     fun reloadListView() {
         if (listView != null) {
             safeNotifyDataSetChanged()

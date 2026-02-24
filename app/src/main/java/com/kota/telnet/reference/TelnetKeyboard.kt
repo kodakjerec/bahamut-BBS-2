@@ -24,6 +24,7 @@ object TelnetKeyboard {
     const val BACK_ONE_CHAR: Int = 83
     const val KEY_S: Int = 115
     const val SHIFT_M: Int = 77
+    const val small_C: Int = 99
 
     fun getKeyDataWithTimes(keyCode: Int, times: Int): ByteArray {
         val keyData = getKeyData(keyCode)

@@ -507,7 +507,6 @@ class ArticlePage : TelnetPage() {
         if (telnetArticle != null) {
             val author = telnetArticle!!.author.lowercase(Locale.getDefault())
             val logonUser = propertiesUsername.lowercase(Locale.getDefault())
-            val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD
             val extToolbarEnable = propertiesExternalToolbarEnable
             val externalToolbarEnableTitle =
                 if (extToolbarEnable) getContextString(R.string.hide_toolbar) else getContextString(
@@ -517,7 +516,7 @@ class ArticlePage : TelnetPage() {
                 .addItem(getContextString(R.string.do_gy))
                 .addItem(getContextString(R.string.do_push))
                 .addItem(getContextString(R.string.change_mode))
-                .addItem(if (isBoard && author == logonUser) getContextString(R.string.edit_article) else null)
+                .addItem(if (author == logonUser) getContextString(R.string.edit_article) else null)
                 .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null)
                 .addItem(externalToolbarEnableTitle)
                 .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
@@ -685,7 +684,10 @@ class ArticlePage : TelnetPage() {
 
     /** 修改文章  */
     fun onEditButtonClicked() {
-        if (telnetArticle != null) {
+        val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD // 是否為看板內文章
+
+        // 只有在看板內文章才能直接修改
+        if (isBoard && telnetArticle != null) {
             val page = PageContainer.instance!!.postArticlePage
             val editTitle = telnetArticle!!.generateEditTitle()
             val editContent = telnetArticle!!.generateEditContent()
@@ -890,6 +892,9 @@ class ArticlePage : TelnetPage() {
     /** 給其他網頁顯示文章使用  */
     fun setArticle(aArticle: TelnetArticle) {
         telnetArticle = aArticle
+        // 儲存最後一篇文章的資訊，給修改文章使用
+        TempSettings.lastArticle = aArticle
+
         if (telnetArticle != null) {
             val boardName = boardMainPage?.listName!!
             // 加入歷史紀錄
@@ -897,7 +902,7 @@ class ArticlePage : TelnetPage() {
             if (store != null) {
                 val bookmarkList = store.getBookmarkList(boardName)
                 bookmarkList.addHistoryBookmark(telnetArticle!!.title)
-                store.storeWithoutCloud()
+                store.store()
             }
 
             // 關係到 telnetView

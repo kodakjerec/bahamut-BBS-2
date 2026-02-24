@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.messages.MessageSmall
+import com.kota.telnet.TelnetArticle
 
 data class HeroStep (
     var authorNickname: String,
@@ -45,6 +46,8 @@ object TempSettings {
     var myContext: Context? = null
     @JvmField
     var myActivity: Activity? = null
+    @JvmField
+    var lastArticle: TelnetArticle? = null // 最後閱讀的文章, 用於回到文章後的定位
 
     // 比較少用到的變數, 不影響效能
     private var messageSmall: MessageSmall? = null // 聊天小視窗
