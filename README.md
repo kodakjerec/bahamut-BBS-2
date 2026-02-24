@@ -35,6 +35,3 @@ BBS 瀏覽器專門用於 [bbs.gamer.com.tw](https://bbs.gamer.com.tw)
 
 ## 贊助
 * ```推薦：應用程式內購 新台幣 90```
-* [PayPal](https://paypal.me/kodakjerec?country.x=TW&locale.x=zh_TW)
-* 台灣帳戶  
-<img src="developSource/jkopay_QRCode1706152454601.png" width="200">

@@ -36,6 +36,3 @@ It addresses the usability issues commonly found in generic BBS readers for mobi
 
 ## Donation
 * ```Recommended: In-app purchase NT$90```
-* [PayPal](https://paypal.me/kodakjerec?country.x=TW&locale.x=zh_TW)
-* Taiwan bank account  
-<img src="developSource/jkopay_QRCode1706152454601.png" width="200">
