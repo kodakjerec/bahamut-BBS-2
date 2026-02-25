@@ -2,17 +2,22 @@ package com.kota.Bahamut.command
 
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
+import com.kota.Bahamut.service.TempSettings
+import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetClient
+import com.kota.telnet.reference.TelnetKeyboard
 
-class BahamutCommandLocateArticle(var articleIndex: Int) : TelnetCommand() {
+class BahamutCommandLocateArticle() : TelnetCommand() {
+    private var lastArticle: TelnetArticle? = null
 
     init {
+        this.lastArticle = TempSettings.lastArticle
         this.action = BahamutCommandDef.Companion.LOCATE_ARTICLE
     }
 
     override fun execute(telnetListPage: TelnetListPage) {
-        if (this.articleIndex > 0) {
-            TelnetClient.myInstance!!.sendStringToServer(this.articleIndex.toString() + "\ngx")
+        if (this.lastArticle != null) {
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_T)
         }
     }
 
@@ -21,6 +26,6 @@ class BahamutCommandLocateArticle(var articleIndex: Int) : TelnetCommand() {
     }
 
     override fun toString(): String {
-        return "[LocateArticle][articleIndex=" + this.articleIndex + "]"
+        return "[LocateArticle][author=${lastArticle?.author}, title=${lastArticle?.title}, datetime=${lastArticle?.dateTime}]"
     }
 }

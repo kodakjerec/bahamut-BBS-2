@@ -656,7 +656,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 if (this.rowString01.contains("請輸入看板名稱")) {
                     handleSearchBoard()
                 } else if (this.rowString02.contains("總數")) {
-                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.small_C)
+                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_C)
                 } else {
                     handleClassPage()
                 }

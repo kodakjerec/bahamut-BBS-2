@@ -21,6 +21,7 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteArticle
+import com.kota.Bahamut.command.BahamutCommandLocateArticle
 import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.dialogs.DialogQueryHero
 import com.kota.Bahamut.pages.PostArticlePage
@@ -702,6 +703,9 @@ class ArticlePage : TelnetPage() {
             page.setHeaderHidden(true)
             page.setTelnetArticle(telnetArticle)
             navigationController.pushViewController(page)
+        } else {
+            // 透過 t 取得文章編號
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle())
         }
     }
 
