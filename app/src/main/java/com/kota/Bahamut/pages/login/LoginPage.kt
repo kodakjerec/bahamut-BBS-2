@@ -408,8 +408,9 @@ class LoginPage : TelnetPage() {
          * 檢查web自動簽到是否在今日已執行過
          */
         get() {
+            //
             val lastLoginTime = getWebAutoLoginSuccessTime()
-            if (lastLoginTime.isEmpty()) {
+            if (lastLoginTime <= 0L) {
                 return false
             }
 
@@ -429,7 +430,7 @@ class LoginPage : TelnetPage() {
                 return lastTime >= todayStartTime
             } catch (_: NumberFormatException) {
                 // 如果時間格式錯誤，重置時間
-                setWebAutoLoginSuccessTime("")
+                setWebAutoLoginSuccessTime()
                 return false
             }
         }
@@ -438,7 +439,7 @@ class LoginPage : TelnetPage() {
      * 設置web自動簽到成功時間
      */
     private fun setWebAutoLoginSuccessTime() {
-        val currentTime = System.currentTimeMillis().toString()
+        val currentTime = System.currentTimeMillis()
         setWebAutoLoginSuccessTime(currentTime)
     }
 

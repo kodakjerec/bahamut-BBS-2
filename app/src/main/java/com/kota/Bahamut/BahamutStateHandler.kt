@@ -547,7 +547,6 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         val topPage =
             ASNavigationController.currentController?.topController as TelnetPage?
 
-
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
         if (topPage is MessageMain) {
             // HP:MP:會跟網友列表同時發生, 所以判斷要在之前

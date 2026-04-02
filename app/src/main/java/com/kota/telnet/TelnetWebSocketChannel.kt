@@ -169,7 +169,19 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
             webSocket.close(1000, "Normal closure")
             isConnected = false
         }
+
+        // 2. 停止等待中的非同步任務 (Dispatchers)
         client.dispatcher.executorService.shutdown()
+
+        // 3. 立即切斷所有執行中的任務 (可選)
+        client.dispatcher.cancelAll()
+
+        // 4. 清除連線池 (Connection Pool) 中的閒置連線
+        client.connectionPool.evictAll()
+
+        // 5. 如果有 Cache 也要關閉 (如果你有設定的話)
+        client.cache?.close()
+
         return true
     }
 }

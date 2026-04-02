@@ -26,7 +26,13 @@ class TelnetDefaultSocketChannel(address: String, port: Int) : TelnetSocketChann
 
     @Throws(IOException::class)
     override fun finishConnect(): Boolean {
-        this.socketChannel.close()
-        return this.socketChannel.finishConnect()
+        return try {
+            if (socketChannel.isOpen) {
+                socketChannel.close()
+            }
+            true
+        } catch (_: IOException) {
+            false
+        }
     }
 }

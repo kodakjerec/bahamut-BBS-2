@@ -531,10 +531,15 @@ class SystemSettingsPage : TelnetPage() {
             val cloudSaveLastTime =
                 mainLayout?.findViewById<TextView>(R.id.SystemSettings_cloudSaveLastTime)!!
             val lastTime = TempSettings.cloudSaveLastTime
-            if (lastTime.isEmpty()) {
+            if (lastTime <= 0L) {
                 cloudSaveLastTime.visibility = View.GONE
             } else {
-                cloudSaveLastTime.text = lastTime
+                // 將 Long 轉換為格式化的日期字串
+                val sdf = java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss", java.util.Locale.getDefault())
+                val dateString = sdf.format(java.util.Date(lastTime))
+
+                cloudSaveLastTime.text = dateString
+                cloudSaveLastTime.visibility = View.VISIBLE
             }
         } else {
             mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)!!.visibility =
