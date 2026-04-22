@@ -240,18 +240,18 @@ class MainPage : TelnetPage() {
                 .setListener { aDialog: ASAlertDialog?, index: Int ->
                     this@MainPage.goodbyeDialog = null
                     when (index) {
-                        2 ->  // 確定
+                        2 -> { // 確定
                             TelnetClient.myInstance!!.sendStringToServerInBackground("G")
-
+                            TempSettings.lastVisitArticleNumber = 0
+                        }
                         1 -> { // 勇者足跡
                             TelnetClient.myInstance!!.sendStringToServerInBackground("N")
                             val dialogHeroStep = DialogHeroStep()
                             dialogHeroStep.show()
                         }
-
-                        0 ->  // 取消
+                        0 -> { // 取消
                             TelnetClient.myInstance!!.sendStringToServerInBackground("Q")
-
+                        }
                         else -> {}
                     }
                 }

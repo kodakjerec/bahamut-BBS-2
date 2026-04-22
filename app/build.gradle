@@ -69,4 +69,5 @@ dependencies {
 
     // 調色盤
     implementation 'com.github.skydoves:colorpickerview:2.3.0'
+    implementation 'androidx.compose.ui:ui-text:1.10.5'
 }

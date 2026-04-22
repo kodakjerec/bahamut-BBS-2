@@ -523,21 +523,32 @@ open class BoardMainPage : TelnetListPage(),
 
         // 跳到指定文章編號
         // 指定 boardMainPage 才能用
-        if (this::class == BoardMainPage::class && TempSettings.lastVisitArticleNumber > 0) {
-            // 從 classPage 進入到 boardMainPage
-            if (ASNavigationController.currentController!!.lastViewController!!::class == ClassPage::class) {
+        if (this::class == BoardMainPage::class) {
+            if (TempSettings.lastVisitArticleNumber > 0 ) {
+                // 從 classPage 進入到 boardMainPage
+                if (ASNavigationController.currentController!!.lastViewController!!::class == ClassPage::class) {
 
-                object :ASCoroutine() {
+                    object : ASCoroutine() {
+                        override suspend fun run() {
+                            // 置中顯示
+                            val firstIndex = listView?.firstVisiblePosition!!
+                            val endIndex = listView?.lastVisiblePosition!!
+                            val moveIndex = abs(endIndex - firstIndex)
+                            val findIndex = TempSettings.lastVisitArticleNumber - moveIndex / 2
+
+                            onSelectDialogDismissWIthIndex(findIndex.toString())
+                        }
+                    }.postDelayed(100L)
+                }
+            } else {
+                // 送出指令: 跳到文章最後面
+                object : ASCoroutine() {
                     override suspend fun run() {
-                        // 置中顯示
-                        val firstIndex = listView?.firstVisiblePosition!!
-                        val endIndex = listView?.lastVisiblePosition!!
-                        val moveIndex = abs(endIndex - firstIndex)
-                        val findIndex = TempSettings.lastVisitArticleNumber - moveIndex / 2
-
-                        onSelectDialogDismissWIthIndex(findIndex.toString())
+                        // 執行「最後一頁」按鈕的點擊邏輯
+                        // 傳入 null 作為 View 參數，因為 Listener 內部通常只用到功能
+                        mLastPageClickListener.onClick(null)
                     }
-                }.postDelayed(100L)
+                }.postDelayed(100L) // 延遲 200ms 確保連線與頁面狀態穩定
             }
         }
     }
