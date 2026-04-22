@@ -15,6 +15,11 @@ Postimage.org 圖床上傳器
 - 網址：https://postimages.org/
 - 特點：永久儲存、無須註冊
 
+### UploaderImgbb
+Imgbb 圖床
+- 網址: https://imgbb.com
+- 特點：設定儲存一周, API key
+
 ## 功能
 - 圖片壓縮
 - 圖片上傳
