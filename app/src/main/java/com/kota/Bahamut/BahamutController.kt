@@ -2,6 +2,7 @@ package com.kota.Bahamut
 
 import android.content.Intent
 import android.util.Log
+import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.StartPage
@@ -152,7 +153,9 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                         paramInt: Int
                     ) {
                         if (paramInt == 1) {
+                            //
                             TelnetClient.myInstance!!.close()
+                            TempSettings.lastVisitArticleNumber = 0;
                         }
                     }
                 }).show()
@@ -253,5 +256,11 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    override fun onTrimMemory(level: Int) {
+        super.onTrimMemory(level)
+        // 當系統記憶體不足時，讓 Glide 自動清理不必要的記憶體佔用
+        Glide.get(this).trimMemory(level)
     }
 }

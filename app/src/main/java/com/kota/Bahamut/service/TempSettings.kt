@@ -3,8 +3,10 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.messages.MessageSmall
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.TelnetArticle
 
 data class HeroStep (
@@ -64,6 +66,11 @@ object TempSettings {
         boardFollowTitle = ""
         cloudSaveLastTime = 0L
         heroStepList = mutableListOf()
+        // 清除Glide
+        Glide.get(applicationContext!!).clearMemory()
+        ASCoroutine.runInNewCoroutine {
+            Glide.get(applicationContext!!).clearDiskCache()
+        }
     }
 
     @JvmStatic
