@@ -22,7 +22,9 @@ class TelnetArticle {
     @JvmField
     var fromIP: String = ""
     @JvmField
-    var myNumber: Int = 0
+    var articleNumber: Int = 0 // 頁面編號, 串接模式下意義為此串第幾篇
+    @JvmField
+    var boardNumber: Int = 0 // 版面文章編號, 必定圍在本版面的第幾篇
     var articleType: Int = 0 // NEW or REPLY
     private val extendItems = Vector<TelnetArticleItem>()
     var frame: TelnetFrame? = null

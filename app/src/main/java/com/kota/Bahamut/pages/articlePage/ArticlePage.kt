@@ -644,7 +644,7 @@ class ArticlePage : TelnetPage() {
     /** 刪除文章  */
     fun onDeleteButtonClicked() {
         if (telnetArticle != null && boardMainPage != null) {
-            val itemNumber = telnetArticle!!.myNumber
+            val itemNumber = telnetArticle!!.articleNumber
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.delete))
                 .setMessage(getContextString(R.string.del_this_article))
@@ -669,7 +669,7 @@ class ArticlePage : TelnetPage() {
                 val replyContent = telnetArticle!!.generateReplyContent()
                 page.setBoardPage(boardMainPage)
                 page.setOperationMode(PostArticlePage.OperationMode.Reply)
-                page.setArticleNumber(telnetArticle!!.myNumber.toString())
+                page.setArticleNumber(telnetArticle!!.articleNumber.toString())
                 page.setPostTitle(replyTitle)
                 page.setPostContent(replyContent + "\n\n\n")
                 page.setListener(boardMainPage)
@@ -694,7 +694,7 @@ class ArticlePage : TelnetPage() {
             val editContent = telnetArticle!!.generateEditContent()
             val editFormat = telnetArticle!!.generateEditFormat()
             page.setBoardPage(boardMainPage)
-            page.setArticleNumber(telnetArticle!!.myNumber.toString())
+            page.setArticleNumber(telnetArticle!!.articleNumber.toString())
             page.setOperationMode(PostArticlePage.OperationMode.Edit)
             page.setPostTitle(editTitle)
             page.setPostContent(editContent)

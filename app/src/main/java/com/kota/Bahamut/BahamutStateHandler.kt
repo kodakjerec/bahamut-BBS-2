@@ -729,9 +729,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         this.articleHandler.newArticle()
 
         try {
-            article.myNumber = this.myArticleNumber.toInt()
+            article.articleNumber = this.myArticleNumber.toInt()
+            // 如果現在是 boardPage, 則更新文章編號
+            if (currentPage == BahamutPage.BAHAMUT_BOARD)
+                article.boardNumber = article.articleNumber
         } catch (_: Exception) {
-            article.myNumber = 0
+            article.articleNumber = 0
         }
         if (this.rowStringFinal.contains("魚雁往返")) {
             showMail(article)
