@@ -33,8 +33,7 @@ import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderImgbb
-import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderLitterCatBox
+import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderBahaImg
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeFunctions
@@ -144,9 +143,9 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             return@OnClickListener
         }
         ASCoroutine.runInNewCoroutine {
-            val uploaderObj = UploaderImgbb()
-            // 使用 ImgBB 的非同步上傳
-            uploaderObj.uploadImage( applicationContext, finalUri, object : UploaderImgbb.UploadCallback {
+            val uploaderObj = UploaderBahaImg()
+            // 使用 bahaImg 的非同步上傳
+            uploaderObj.uploadImage( applicationContext, finalUri, object : UploaderBahaImg.UploadCallback {
                 override fun onSuccess(imageUrl: String) {
                     ASCoroutine.ensureMainThread {
                         // 更新前端畫面

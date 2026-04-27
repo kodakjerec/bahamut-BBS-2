@@ -20,6 +20,7 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
@@ -36,6 +37,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
+import android.util.Log // 導入 Log
 import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -115,57 +117,56 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             myDescription = jsonObject.getString("desc")
                             myImageUrl = jsonObject.getString("imageUrl")
 
-                            // 非圖片類比較會有擷取問題
-                            if (!isPic && (myTitle == "" || myDescription == "")) {
-                                var userAgent: String = System.getProperty("http.agent")!!
-                                if (myUrl.contains("youtu") || myUrl.contains("amazon"))
-                                    userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
+                            // 遠端詢問 cloudflare 解讀失敗，改由本地直接連線獲取內容
+                            if (myTitle == "" && myDescription == "") {
+                                val userAgent: String = System.getProperty("http.agent")!!
 
-                                // cookie
-                                // Create a new Map to store cookies
-                                val cookies: HashMap<String, String> = HashMap()
-                                if (myUrl.contains("ptt"))
-                                    cookies.put("over18", "1")  // Add the over18 cookie with value 1
-
+                                // 直接去ping對方
                                 val resp: Connection.Response = Jsoup
-                                        .connect(myUrl)
-                                        .header("User-Agent", userAgent)
-                                        .cookies(cookies)
-                                        .execute()
-                                contentType = resp.contentType()!!
+                                    .connect(myUrl)
+                                    .header("User-Agent", userAgent)
+                                    .timeout(10000)
+                                    .ignoreContentType(true)
+                                    .execute()
+                                contentType = resp.contentType() ?: ""
 
                                 if (contentType.contains("image/") || contentType.contains("video/")) {
                                     isPic = true
                                 }
-                                // 域名判斷
-                                if (url.contains("i.imgur")) {
-                                    isPic = true
-                                }
 
-                                // 圖片處理
-                                if (isPic) {
-                                    myTitle = myUrl
-                                    myDescription = ""
-                                    myImageUrl = myUrl
-                                } else {
+                                if (contentType.contains("text/html")) {
                                     // 文字處理
                                     val document: Document = resp.parse()
 
                                     myTitle = document.title()
                                     if (myTitle.isEmpty())
-                                        myTitle = document.select("meta[property=og:title]").attr("content")
+                                        myTitle = document.select("meta[property=og:title]")
+                                            .attr("content")
 
-                                    myDescription = document.select("meta[name=description]").attr("content")
+                                    myDescription = document.select("meta[name=description]")
+                                        .attr("content")
                                     if (myDescription.isEmpty())
-                                        myDescription = document.select("meta[property=og:description]").attr("content")
+                                        myDescription =
+                                            document.select("meta[property=og:description]")
+                                                .attr("content")
 
-                                    myImageUrl = document.select("meta[property=og:image]").attr("content")
+                                    myImageUrl = document.select("meta[property=og:image]")
+                                        .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("meta[property=og:image]").attr("content")
+                                        myImageUrl = document.select("meta[property=og:image]")
+                                            .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("meta[property=og:images]").attr("content")
+                                        myImageUrl = document.select("meta[property=og:images]")
+                                            .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("#landingImage").attr("src")
+                                        myImageUrl =
+                                            document.select("#landingImage").attr("src")
+                                }
+
+                                // 圖片處理
+                                if (isPic) {
+                                    if (myTitle.isEmpty()) myTitle = myUrl
+                                    if (myImageUrl.isEmpty()) myImageUrl = myUrl // 圖片網址就是預覽圖網址
                                 }
                             }
 
@@ -173,7 +174,8 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             picoUrlChangeStatus(isPic)
 
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
-                        } catch (_: Exception) {
+                        } catch (e: Exception) {
+                            Log.e("loadUrl", e.message.toString())
                             ASCoroutine.ensureMainThread {
                                 setFail()
                             }
@@ -232,12 +234,6 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     fun prepareLoadImage() {
         if (imgLoaded) return
 
-        viewHeight = if (isPic) {
-            viewHeight / 2
-        } else {
-            viewHeight / 4
-        }
-        photoViewPic.minimumHeight = viewHeight
         loadImage()
         urlView.text = myImageUrl
     }
@@ -287,13 +283,15 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 circularProgressDrawable.start()
 
                 if (myImageUrl.isEmpty()) {
+                    // 如果圖片URL為空，則顯示進度條並標記為失敗
+                    photoViewPic.setImageDrawable(circularProgressDrawable)
                     return@ensureMainThread
                 }
 
-                photoViewPic.setImageDrawable(circularProgressDrawable)
-
+                // 使用 Glide 載入圖片，直接載入到 PhotoView
                 Glide.with(this@ThumbnailItemView)
                     .load(myImageUrl)
+                    .placeholder(circularProgressDrawable) // 載入時顯示進度條
                     .listener(object : RequestListener<Drawable?> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -301,6 +299,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             target: Target<Drawable?>,
                             isFirstResource: Boolean
                         ): Boolean {
+                            Log.e("GlideError", "Image load failed for URL: $myImageUrl", e) // 記錄錯誤訊息
                             ASCoroutine.ensureMainThread {
                                 setFail()
                             }
