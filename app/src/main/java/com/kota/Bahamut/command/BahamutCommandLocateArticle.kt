@@ -8,15 +8,15 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandLocateArticle() : TelnetCommand() {
-    private var lastArticle: TelnetArticle? = null
+    private var targetArticle: TelnetArticle? = null
 
     init {
-        this.lastArticle = TempSettings.lastArticle
+        this.targetArticle = TempSettings.targetArticle
         this.action = BahamutCommandDef.Companion.LOCATE_ARTICLE
     }
 
     override fun execute(telnetListPage: TelnetListPage) {
-        if (this.lastArticle != null) {
+        if (this.targetArticle != null) {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_T)
         }
     }
@@ -26,6 +26,6 @@ class BahamutCommandLocateArticle() : TelnetCommand() {
     }
 
     override fun toString(): String {
-        return "[LocateArticle][author=${lastArticle?.author}, title=${lastArticle?.title}, datetime=${lastArticle?.dateTime}]"
+        return "[LocateArticle][author=${targetArticle?.author}, title=${targetArticle?.title}, datetime=${targetArticle?.dateTime}]"
     }
 }

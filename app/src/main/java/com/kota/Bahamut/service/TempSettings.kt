@@ -50,6 +50,8 @@ object TempSettings {
     var myActivity: Activity? = null
     @JvmField
     var lastArticle: TelnetArticle? = null // 最後閱讀的文章, 用於回到文章後的定位
+    @JvmField
+    var editFromLinkedState: EditFromLinkedState? = null // 從串接頁編輯文章的狀態
 
     // 比較少用到的變數, 不影響效能
     private var messageSmall: MessageSmall? = null // 聊天小視窗
@@ -66,6 +68,7 @@ object TempSettings {
         boardFollowTitle = ""
         cloudSaveLastTime = 0L
         heroStepList = mutableListOf()
+        editFromLinkedState = null
         // 清除Glide
         Glide.get(applicationContext!!).clearMemory()
         ASCoroutine.runInNewCoroutine {

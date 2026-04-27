@@ -17,5 +17,6 @@ interface BahamutCommandDef {
         const val SEND_MAIL: Int = 12 // 寄信
         const val PUSH_ARTICLE: Int = 13 // 推文
         const val LOCATE_ARTICLE: Int = 14 // 定位文章
+        const val EDIT_FROM_LINKED: Int = 15 // 從串接頁編輯文章
     }
 }

@@ -26,6 +26,8 @@ import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.messages.MessageStatus
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.service.HeroStep
+import com.kota.Bahamut.service.EditFromLinkedState
+import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
@@ -55,25 +57,56 @@ import java.util.Vector
 import java.util.function.Consumer
 import java.util.regex.Pattern
 
+/**
+ * Bahamut BBS 狀態處理器
+ *
+ * 負責解析 Telnet 伺服器回傳的畫面內容，判斷當前頁面狀態，
+ * 並根據不同狀態觸發對應的頁面切換或動作執行。
+ * 這是整個 BBS 客戶端的核心狀態機。
+ *
+ * @see TelnetStateHandler 父類別，提供基本的 Telnet 狀態處理功能
+ */
 class BahamutStateHandler internal constructor() : TelnetStateHandler() {
+    /** 當前文章編號 */
     var myArticleNumber: String = ""
+    /** 當前連線步驟狀態 (STEP_CONNECTING 或 STEP_WORKING) */
     var nowStep: Int = 0
-    var telnetRows: Vector<TelnetRow> = Vector<TelnetRow>() // debug用
+    /** Telnet 畫面的所有行資料，供 debug 使用 */
+    var telnetRows: Vector<TelnetRow> = Vector<TelnetRow>()
+    /** 第 0 行字串內容 (通常是頁面標題) */
     var rowString00: String = ""
+    /** 第 1 行字串內容 */
     var rowString01: String = ""
+    /** 第 2 行字串內容 */
     var rowString02: String = ""
+    /** 最後一行有內容的字串 (通常是操作提示) */
     var rowStringFinal: String = ""
+    /** 第一行的標頭文字 */
     var firstHeader: String = ""
+    /** 最後一行的標頭文字 */
     var lastHeader: String = ""
+    /** 當前游標位置 */
     var telnetCursor: TelnetCursor? = null
+    /** 文章內容處理器，負責解析文章內容 */
     val articleHandler: ArticleHandler = ArticleHandler()
-    var duringReadingArticle: Boolean = false // 正在讀取文章
+    /** 是否正在讀取文章中 */
+    var duringReadingArticle: Boolean = false
 
-    /** 設定文章編號  */
+    /**
+     * 設定文章編號
+     *
+     * @param aArticleNumber 文章編號字串
+     */
     fun setArticleNumber(aArticleNumber: String) {
         this.myArticleNumber = aArticleNumber
     }
 
+    /**
+     * 載入當前 Telnet 畫面狀態
+     *
+     * 從 TelnetClient 取得當前畫面的各行資料，
+     * 解析並儲存到對應的成員變數中供後續判斷使用。
+     */
     fun loadState() {
         this.rowString00 = getRowString(0).trim()
         this.rowString01 = getRowString(1).trim()
@@ -100,7 +133,10 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     /**
-     * 接收到訊息
+     * 偵測並處理即時訊息 (水球)
+     *
+     * 解析第 23 行的背景顏色來判斷是否有新訊息，
+     * 若有則儲存到資料庫並顯示通知。
      */
     fun detectMessage() {
         val column = this.telnetCursor!!.column
@@ -179,7 +215,17 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    /** 處理非切換主頁面的需求  */
+    /**
+     * 處理非切換主頁面的需求
+     *
+     * 處理各種系統提示訊息，如：
+     * - 未完成的文章提示
+     * - 按任意鍵繼續提示
+     * - 引言過多提示
+     * - 即時訊息接收
+     *
+     * @return true 表示需要繼續處理頁面切換，false 表示已處理完畢
+     */
     fun handleNonPageSwitching(): Boolean {
         // 本文
         var runPass2 = true
@@ -286,7 +332,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    /** 逐行塞入勇者足跡  */
+    /**
+     * 解析並儲存勇者足跡資料
+     *
+     * 從 Telnet 畫面中逐行解析訪客留言，
+     * 每則留言包含作者名稱、時間和內容 (最多三行)。
+     */
     fun insertHeroSteps() {
         var startCatching = false
         var heroStep: HeroStep? = null
@@ -329,6 +380,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理登入頁面
+     *
+     * 設定當前頁面為登入頁面，並顯示登入畫面。
+     */
     fun handleLoginPage() {
         currentPage = BahamutPage.BAHAMUT_LOGIN
         val page: LoginPage = PageContainer.instance!!.loginPage
@@ -337,6 +393,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理主功能表頁面
+     *
+     * 登入成功後的主頁面處理，包括：
+     * - 初始化訊息小視窗
+     * - 處理熱門訊息
+     * - 顯示線上人數和呼叫器狀態
+     */
     fun handleMainPage() {
         this.nowStep = STEP_WORKING
 
@@ -402,6 +466,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理郵件信箱頁面
+     */
     fun handleMailBoxPage() {
         currentPage = BahamutPage.BAHAMUT_MAIL_BOX
         if (this.telnetCursor!!.column == 1) {
@@ -412,6 +479,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理搜尋看板功能
+     *
+     * 當使用者搜尋看板時，讀取搜尋結果並通知 ClassPage 更新。
+     */
     fun handleSearchBoard() {
         if (this.rowStringFinal.startsWith("★ 列表") && this.telnetCursor!!.equals(23, 29)) {
             SearchBoardHandler.instance.read()
@@ -427,6 +499,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理看板列表頁面 (分類看板)
+     */
     fun handleClassPage() {
         currentPage = BahamutPage.BAHAMUT_CLASS
         if (this.telnetCursor!!.column == 1) {
@@ -437,6 +512,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理看板主頁面 (文章列表)
+     */
     fun handleBoardPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD
         if (this.telnetCursor!!.column == 1) {
@@ -447,6 +525,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理看板搜尋結果頁面
+     */
     fun handleBoardSearchPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_SEARCH
         if (this.telnetCursor!!.column == 1) {
@@ -457,6 +538,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理精華區頁面
+     */
     fun handleBoardEssencePage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_ESSENCE
         if (this.telnetCursor!!.column == 1) {
@@ -467,6 +551,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理主題串列頁面 (相同標題的文章串接)
+     */
     fun handleBoardTitleLinkedPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD_LINK
         if (this.telnetCursor!!.column == 1) {
@@ -477,7 +564,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    /** 頁面: 個人設定   */
+    /**
+     * 處理個人設定頁面
+     *
+     * 包含個人資料頁面和操作模式設定頁面。
+     */
     fun handleUserPage() {
         // 傳給個人設定, 頁面更新資料
         if (this.rowStringFinal.contains("修改資料(Y/N)?[N]")) {
@@ -493,6 +584,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 處理文章閱讀狀態
+     *
+     * 根據當前最上層頁面類型，設定對應的文章頁面狀態，
+     * 並開始讀取文章內容。
+     */
     fun handleArticle() {
         val topPage =
             ASNavigationController.currentController?.topController as TelnetPage?
@@ -515,7 +612,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // 變更讀取條進度
+    /**
+     * 處理文章讀取進度百分比
+     *
+     * 從最後一行解析進度百分比，並更新對應頁面的載入進度顯示。
+     */
     fun handleArticlePercentage() {
         val resourceString = "((?<percent>\\d+)%)"
         val pattern = Pattern.compile(resourceString)
@@ -540,12 +641,118 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // com.kota.telnet.TelnetStateHandler
+    /**
+     * 處理從串接頁編輯文章的狀態
+     *
+     * 當使用者從 LinkPage/SearchPage 觸發編輯時，
+     * 此函式根據當前狀態執行對應的操作。
+     *
+     * @return true 如果正在處理編輯流程，false 表示沒有進行中的編輯任務
+     */
+    fun handleEditFromLinkedState(): Boolean {
+        val state = TempSettings.editFromLinkedState ?: return false
+
+        when (state.step) {
+            EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY -> {
+                // 偵測到 LinkPage/SearchPage，送出 "t"
+                if (currentPage == BahamutPage.BAHAMUT_BOARD_LINK ||
+                    currentPage == BahamutPage.BAHAMUT_BOARD_SEARCH) {
+                    state.step = EditFromLinkedStep.SENT_T
+                    create().pushKey(TelnetKeyboard.SMALL_T).sendToServer()
+                    return true
+                }
+            }
+
+            EditFromLinkedStep.SENT_T -> {
+                // 解析 row4 取得 boardNumber
+                val boardNum = parseBoardNumberFromRow4()
+                state.boardNumber = boardNum
+                state.isLastArticle = (boardNum == 1)
+
+                // 離開串接頁
+                state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
+                create().pushKey(TelnetKeyboard.LEFT_ARROW).sendToServer()
+                return true
+            }
+
+            EditFromLinkedStep.LEAVING_LINKED_PAGE -> {
+                // 偵測到 BoardMainPage
+                if (currentPage == BahamutPage.BAHAMUT_BOARD) {
+                    state.step = EditFromLinkedStep.ON_BOARD_PAGE
+
+                    ASCoroutine.ensureMainThread {
+                        val boardPage = PageContainer.instance!!.boardPage
+
+                        if (state.isLastArticle) {
+                            // 例外2: 移到最後
+                            state.step = EditFromLinkedStep.GOTO_LAST
+                            boardPage.moveToLastPosition()
+                        } else {
+                            // 正常/例外1: 選擇文章並進入
+                            state.step = EditFromLinkedStep.READING_ARTICLE
+                            boardPage.setListViewSelection(state.boardNumber - 1)
+                            boardPage.loadItemAtIndex(state.boardNumber - 1)
+                        }
+                    }
+                    return true
+                }
+            }
+
+            EditFromLinkedStep.GOTO_LAST -> {
+                // 偵測到 BoardMainPage 已到最後
+                if (currentPage == BahamutPage.BAHAMUT_BOARD) {
+                    ASCoroutine.ensureMainThread {
+                        val boardPage = PageContainer.instance!!.boardPage
+                        state.step = EditFromLinkedStep.READING_ARTICLE
+                        // 從最後一筆進入
+                        boardPage.loadItemAtIndex(boardPage.listView.count - 1)
+                    }
+                    return true
+                }
+            }
+
+            else -> {
+                // 其他步驟由 ArticlePage 處理
+            }
+        }
+        return false
+    }
+
+    /**
+     * 從 row4 解析版面文章編號
+     *
+     * 格式: "  1234  作者  日期  標題"
+     *
+     * @return 解析出的編號，解析失敗回傳 0
+     */
+    private fun parseBoardNumberFromRow4(): Int {
+        val row4 = getRowString(4).trim()
+        val match = Regex("^\\s*(\\d+)").find(row4)
+        return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
+    }
+
+    /**
+     * 主要狀態處理函式
+     *
+     * 繼承自 TelnetStateHandler，當 Telnet 畫面更新時被呼叫。
+     * 根據畫面內容判斷當前狀態，並執行對應的處理邏輯。
+     *
+     * 處理流程：
+     * 1. 載入當前畫面狀態
+     * 2. 檢查是否在訊息頁面
+     * 3. 處理非頁面切換的系統提示
+     * 4. 根據畫面內容切換到對應頁面
+     */
     override fun handleState() {
         loadState()
         this.telnetCursor = TelnetClient.model.cursor
         val topPage =
             ASNavigationController.currentController?.topController as TelnetPage?
+
+        // 處理從串接頁編輯文章的狀態
+        if (handleEditFromLinkedState()) {
+            return
+        }
 
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
         if (topPage is MessageMain) {
@@ -712,16 +919,32 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
+    /**
+     * 開始讀取文章
+     *
+     * 設定讀取狀態旗標並清除文章處理器的內容。
+     */
     fun onReadArticleStart() {
         this.duringReadingArticle = true
         this.articleHandler.clear()
     }
 
+    /**
+     * 讀取文章的一頁
+     *
+     * 將當前畫面內容載入文章處理器，並清除畫面緩衝。
+     */
     fun onReadArticlePage() {
         this.articleHandler.loadPage(TelnetClient.model)
         cleanFrame()
     }
 
+    /**
+     * 完成文章讀取
+     *
+     * 載入最後一頁內容，建立文章物件，
+     * 並根據文章類型 (一般文章/郵件/精華) 顯示對應頁面。
+     */
     fun onReadArticleFinished() {
         this.articleHandler.loadLastPage(TelnetClient.model)
         this.articleHandler.build()
@@ -746,7 +969,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         this.duringReadingArticle = false
     }
 
-    // 顯示文章內文
+    /**
+     * 顯示一般文章內容
+     *
+     * @param aArticle 要顯示的文章物件
+     */
     fun showArticle(aArticle: TelnetArticle) {
         ASCoroutine.ensureMainThread {
             try {
@@ -757,7 +984,13 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // 顯示郵件內文
+    /**
+     * 顯示郵件內容
+     *
+     * 如果最上層不是 MailPage，則建立新的 MailPage 並推入導航堆疊。
+     *
+     * @param aArticle 要顯示的郵件物件
+     */
     fun showMail(aArticle: TelnetArticle) {
         ASCoroutine.ensureMainThread {
             val mailPage: MailPage?
@@ -778,7 +1011,13 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // 顯示精華區內文
+    /**
+     * 顯示精華區文章內容
+     *
+     * 如果最上層不是 ArticleEssencePage，則建立新的頁面並推入導航堆疊。
+     *
+     * @param aArticle 要顯示的精華文章物件
+     */
     fun showEssence(aArticle: TelnetArticle?) {
         ASCoroutine.ensureMainThread {
             val articleEssencePage: ArticleEssencePage?
@@ -800,7 +1039,16 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // 通用顯示頁面
+    /**
+     * 通用顯示頁面方法
+     *
+     * 根據目標頁面與當前堆疊的關係，執行對應的導航操作：
+     * - 如果是同一頁面，則重新整理
+     * - 如果已在堆疊中，則 pop 到該頁面
+     * - 否則推入新頁面
+     *
+     * @param aPage 要顯示的頁面
+     */
     fun showPage(aPage: TelnetPage?) {
         val currentController = ASNavigationController.currentController
         if (currentController != null) {
@@ -819,12 +1067,25 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
     }
 
-    // com.kota.telnet.TelnetStateHandler
+    /**
+     * 清除狀態處理器
+     *
+     * 繼承自 TelnetStateHandler，重置連線狀態和當前頁面。
+     */
     override fun clear() {
         this.nowStep = STEP_CONNECTING
         currentPage = BahamutPage.UNKNOWN
     }
 
+    /**
+     * 截取「請按任意鍵繼續」提示中的訊息內容
+     *
+     * 移除前導的星號和後続的 [請按任意鍵繼續] 提示，
+     * 只保留實際的訊息內容。
+     *
+     * @param aMessage 原始訊息字串
+     * @return 截取後的訊息內容，若無則回傳空字串
+     */
     fun cutOffContinueMessage(aMessage: String): String {
         var start = 0
         var end = aMessage.length - 1
@@ -843,12 +1104,22 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     companion object {
+        /** 連線中狀態 */
         const val STEP_CONNECTING: Int = 0
+        /** 工作中狀態 (已登入) */
         const val STEP_WORKING: Int = 1
+        /** 未知狀態 */
         const val UNKNOWN: Int = -1
+        /** 單例實例 */
         var bahamutStateHandler: BahamutStateHandler? = null
 
-        /** 回傳instance給其他頁面使用  */
+        /**
+         * 取得 BahamutStateHandler 單例實例
+         *
+         * 採用懶漢初始化模式，首次呼叫時建立實例。
+         *
+         * @return BahamutStateHandler 實例
+         */
         fun getInstance(): BahamutStateHandler {
             if (bahamutStateHandler == null) {
                 bahamutStateHandler = BahamutStateHandler()

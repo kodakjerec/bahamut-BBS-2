@@ -29,6 +29,8 @@ import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.model.ToolBarFloating
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.EditFromLinkedState
+import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
 import com.kota.Bahamut.service.NotificationSettings.setShowTopBottomButton
 import com.kota.Bahamut.service.TempSettings
@@ -919,6 +921,58 @@ class ArticlePage : TelnetPage() {
             listAdapter.notifyDataSetChanged()
         }
         dismissProcessingDialog()
+
+        // 檢查是否有從串接頁編輯文章的任務
+        verifyAndEditFromLinked(aArticle)
+    }
+
+    /**
+     * 驗證從串接頁編輯文章的任務
+     *
+     * 當從 LinkPage/SearchPage 觸發編輯時，驗證文章特徵是否一致。
+     * 若一致則進入編輯模式，否則根據狀態嘗試搜尋或提示失敗。
+     *
+     * @param article 當前文章
+     */
+    private fun verifyAndEditFromLinked(article: TelnetArticle) {
+        val state = TempSettings.editFromLinkedState ?: return
+        if (state.step != EditFromLinkedStep.READING_ARTICLE &&
+            state.step != EditFromLinkedStep.SEARCH_NEXT &&
+            state.step != EditFromLinkedStep.SEARCH_PREV) {
+            return
+        }
+
+        if (state.matchesTarget(article)) {
+            // 特徵一致，進入編輯
+            state.step = EditFromLinkedStep.DONE
+            TempSettings.editFromLinkedState = null
+            onEditButtonClicked()
+        } else {
+            // 特徵不一致
+            state.retryCount++
+
+            if (state.retryCount >= 3) {
+                // 重試次數用盡
+                state.step = EditFromLinkedStep.FAILED
+                TempSettings.editFromLinkedState = null
+                showShortToast("找不到文章")
+                onBackPressed()
+            } else if (state.isBlockBoundary) {
+                // 例外1: 找下一篇
+                state.step = EditFromLinkedStep.SEARCH_NEXT
+                boardMainPage?.loadTheSameTitleDown()
+            } else if (state.isLastArticle) {
+                // 例外2: 找上一篇
+                state.step = EditFromLinkedStep.SEARCH_PREV
+                boardMainPage?.loadTheSameTitleUp()
+            } else {
+                // 正常情況不應該不一致
+                state.step = EditFromLinkedStep.FAILED
+                TempSettings.editFromLinkedState = null
+                showShortToast("找不到文章")
+                onBackPressed()
+            }
+        }
     }
 
     /** 給 state handler 更改讀取進度  */
