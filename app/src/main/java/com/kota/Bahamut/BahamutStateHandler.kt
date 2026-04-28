@@ -25,8 +25,8 @@ import com.kota.Bahamut.pages.messages.MessageMain
 import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.messages.MessageStatus
 import com.kota.Bahamut.pages.messages.MessageSub
-import com.kota.Bahamut.service.HeroStep
 import com.kota.Bahamut.service.EditFromLinkedStep
+import com.kota.Bahamut.service.HeroStep
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
@@ -667,9 +667,12 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow + 2)
                 state.boardNumber = boardNum
                 val firstNum = parseBoardNumberFromCursorRow(1 + 2)
-                state.isLastArticle = (firstNum == 1)
+                // 最後一筆的狀況
+                // 1. 按下 "t" 之後 telnetCursor=(3, 1), firstNum = 1. 但是 boardNum !=1
+                // TODO: 在編輯文章按下之前, 就可以決定是否判斷isLastArticle
+                state.isLastArticle = this.telnetCursor?.row == 3 && firstNum == 1 && boardNum != 1
 
-                // 離開串接頁
+                // 離開串接頁(回看板)
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
                 create().pushKey(TelnetKeyboard.LEFT_ARROW).sendToServer()
             }
@@ -688,7 +691,6 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                             boardPage.moveToLastPosition()
                             // 送出 "["
                             create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
-
                         } else {
                             // 正常/例外1: 選擇文章並進入
                             state.step = EditFromLinkedStep.READING_ARTICLE

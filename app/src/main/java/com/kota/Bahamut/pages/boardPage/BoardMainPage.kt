@@ -20,6 +20,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandEditArticle
@@ -715,6 +716,7 @@ open class BoardMainPage : TelnetListPage(),
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val boardPageItem = getItem(index) as BoardPageItem?
         if (boardPageItem != null) {
+            BahamutStateHandler.bahamutStateHandler?.myCursorRow = getIndexInBlock(index) + 1
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.title
             if (this::class == BoardMainPage::class)

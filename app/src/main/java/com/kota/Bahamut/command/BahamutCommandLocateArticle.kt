@@ -1,5 +1,6 @@
 package com.kota.Bahamut.command
 
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.service.EditFromLinkedState
@@ -27,6 +28,7 @@ class BahamutCommandLocateArticle() : TelnetCommand() {
                 // 例外流程1: 先往上移，再送 "t"
                 state.step = EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY
                 TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.UP_ARROW)
+                BahamutStateHandler.bahamutStateHandler?.myCursorRow -= 1
             } else {
                 // 正常流程: 直接送 "t"
                 state.step = EditFromLinkedStep.SENT_T
