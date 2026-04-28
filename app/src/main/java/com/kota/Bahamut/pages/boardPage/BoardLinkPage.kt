@@ -44,33 +44,16 @@ class BoardLinkPage : BoardMainPage() {
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         val item = this@BoardLinkPage.getItem(index) as BoardPageItem? ?: return true
 
-        val isOwnArticle = item.author == UserSettings.propertiesUsername
-        val dialog = ASListDialog.createDialog()
-            .setTitle(item.title)
-            .addItem(getContextString(R.string.insert) + getContextString(R.string.bookmark))
-
-        if (isOwnArticle) {
-            dialog.addItem(getContextString(R.string.edit_article))
-        }
-
-        dialog.setListener(object : ASListDialogItemClickListener {
-            override fun onListDialogItemClicked(
-                paramASListDialog: ASListDialog?,
-                clickIndex: Int,
-                title: String?
-            ) {
-                when (clickIndex) {
-                    0 -> addBookmark(item)
-                    1 -> if (isOwnArticle) startEditFromLinked(item, index)
+        ASAlertDialog.createDialog()
+            .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
+            .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
+            .addButton(getContextString(R.string.cancel))
+            .addButton(getContextString(R.string.insert))
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
+                if (index == 1) {
+                    addBookmark(item)
                 }
-            }
-
-            override fun onListDialogItemLongClicked(
-                paramASListDialog: ASListDialog?,
-                clickIndex: Int,
-                title: String?
-            ): Boolean = true
-        }).scheduleDismissOnPageDisappear(this).show()
+            }.scheduleDismissOnPageDisappear(this).show()
 
         return true
     }

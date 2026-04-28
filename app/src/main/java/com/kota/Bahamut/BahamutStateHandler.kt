@@ -705,7 +705,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                         val boardPage = PageContainer.instance!!.boardPage
                         state.step = EditFromLinkedStep.READING_ARTICLE
                         // 從最後一筆進入
-                        boardPage.loadItemAtIndex(boardPage.listView.count - 1)
+                        boardPage.loadItemAtIndex(boardPage.listView!!.count - 1)
                     }
                     return true
                 }

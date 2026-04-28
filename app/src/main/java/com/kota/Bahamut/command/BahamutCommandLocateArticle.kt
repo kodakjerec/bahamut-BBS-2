@@ -11,7 +11,7 @@ class BahamutCommandLocateArticle() : TelnetCommand() {
     private var targetArticle: TelnetArticle? = null
 
     init {
-        this.targetArticle = TempSettings.targetArticle
+        this.targetArticle = TempSettings.lastArticle
         this.action = BahamutCommandDef.Companion.LOCATE_ARTICLE
     }
 
