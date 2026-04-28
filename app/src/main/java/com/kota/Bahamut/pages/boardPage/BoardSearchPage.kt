@@ -7,16 +7,9 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.EditFromLinkedState
-import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.TempSettings
-import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
-import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetClient
-import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.reference.TelnetKeyboard
 
 class BoardSearchPage : BoardMainPage() {
@@ -72,36 +65,6 @@ class BoardSearchPage : BoardMainPage() {
             store.getBookmarkList(this@BoardSearchPage.listName).addBookmark(bookmark)
             store.store()
         }
-    }
-
-    /** 從搜尋頁觸發編輯文章 */
-    private fun startEditFromLinked(item: BoardPageItem, index: Int) {
-        // 建立目標文章特徵
-        val targetArticle = TelnetArticle()
-        targetArticle.title = item.title
-        targetArticle.author = item.author
-        targetArticle.dateTime = item.date
-        targetArticle.articleNumber = item.itemNumber
-        targetArticle.boardName = this@BoardSearchPage.listName
-
-        // 建立狀態
-        val state = EditFromLinkedState(targetArticle)
-
-        // 設定到指定位置
-        setListViewSelection(index)
-
-        // 判斷是否為區塊邊界（20的倍數）
-        if (state.isBlockBoundary) {
-            // 例外流程1: 先往上移
-            state.step = EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY
-            create().pushKey(TelnetKeyboard.UP_ARROW).sendToServer()
-        } else {
-            // 正常流程: 直接送 "t"
-            state.step = EditFromLinkedStep.SENT_T
-            create().pushKey(TelnetKeyboard.SMALL_T).sendToServer()
-        }
-
-        TempSettings.editFromLinkedState = state
     }
 
     override val listType: Int
