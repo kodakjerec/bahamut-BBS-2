@@ -26,7 +26,6 @@ import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.messages.MessageStatus
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.service.HeroStep
-import com.kota.Bahamut.service.EditFromLinkedState
 import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.TempSettings
@@ -69,6 +68,7 @@ import java.util.regex.Pattern
 class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     /** 當前文章編號 */
     var myArticleNumber: String = ""
+    var myCursorRow: Int = 0
     /** 當前連線步驟狀態 (STEP_CONNECTING 或 STEP_WORKING) */
     var nowStep: Int = 0
     /** Telnet 畫面的所有行資料，供 debug 使用 */
@@ -515,7 +515,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     /**
      * 處理看板主頁面 (文章列表)
      */
-    fun handleBoardPage() {
+    fun handleBoardMainPage() {
         currentPage = BahamutPage.BAHAMUT_BOARD
         if (this.telnetCursor!!.column == 1) {
             val page: BoardMainPage = PageContainer.instance!!.boardPage
@@ -649,8 +649,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
      *
      * @return true 如果正在處理編輯流程，false 表示沒有進行中的編輯任務
      */
-    fun handleEditFromLinkedState(): Boolean {
-        val state = TempSettings.editFromLinkedState ?: return false
+    fun handleEditFromLinkedState() {
+        val state = TempSettings.editFromLinkedState ?: return
 
         when (state.step) {
             EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY -> {
@@ -659,25 +659,24 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     currentPage == BahamutPage.BAHAMUT_BOARD_SEARCH) {
                     state.step = EditFromLinkedStep.SENT_T
                     create().pushKey(TelnetKeyboard.SMALL_T).sendToServer()
-                    return true
                 }
             }
 
             EditFromLinkedStep.SENT_T -> {
                 // 解析 row4 取得 boardNumber
-                val boardNum = parseBoardNumberFromRow4()
+                val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow + 2)
                 state.boardNumber = boardNum
-                state.isLastArticle = (boardNum == 1)
+                val firstNum = parseBoardNumberFromCursorRow(1 + 2)
+                state.isLastArticle = (firstNum == 1)
 
                 // 離開串接頁
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
                 create().pushKey(TelnetKeyboard.LEFT_ARROW).sendToServer()
-                return true
             }
 
             EditFromLinkedStep.LEAVING_LINKED_PAGE -> {
                 // 偵測到 BoardMainPage
-                if (currentPage == BahamutPage.BAHAMUT_BOARD) {
+                if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
                     state.step = EditFromLinkedStep.ON_BOARD_PAGE
 
                     ASCoroutine.ensureMainThread {
@@ -687,6 +686,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                             // 例外2: 移到最後
                             state.step = EditFromLinkedStep.GOTO_LAST
                             boardPage.moveToLastPosition()
+                            // 送出 "["
+                            create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
+
                         } else {
                             // 正常/例外1: 選擇文章並進入
                             state.step = EditFromLinkedStep.READING_ARTICLE
@@ -694,20 +696,18 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                             boardPage.loadItemAtIndex(state.boardNumber - 1)
                         }
                     }
-                    return true
                 }
             }
 
             EditFromLinkedStep.GOTO_LAST -> {
                 // 偵測到 BoardMainPage 已到最後
-                if (currentPage == BahamutPage.BAHAMUT_BOARD) {
+                if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
                     ASCoroutine.ensureMainThread {
                         val boardPage = PageContainer.instance!!.boardPage
                         state.step = EditFromLinkedStep.READING_ARTICLE
                         // 從最後一筆進入
-                        boardPage.loadItemAtIndex(boardPage.listView!!.count - 1)
+                        boardPage.loadItemAtIndex(state.boardNumber - 1)
                     }
-                    return true
                 }
             }
 
@@ -715,7 +715,6 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 // 其他步驟由 ArticlePage 處理
             }
         }
-        return false
     }
 
     /**
@@ -725,8 +724,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
      *
      * @return 解析出的編號，解析失敗回傳 0
      */
-    private fun parseBoardNumberFromRow4(): Int {
-        val row4 = getRowString(4).trim()
+    private fun parseBoardNumberFromCursorRow(row: Int): Int {
+        val row4 = getRowString(row).trim()
         val match = Regex("^\\s*(\\d+)").find(row4)
         return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
     }
@@ -750,9 +749,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             ASNavigationController.currentController?.topController as TelnetPage?
 
         // 處理從串接頁編輯文章的狀態
-        if (handleEditFromLinkedState()) {
-            return
-        }
+        handleEditFromLinkedState()
 
         // 狀況：正在重整訊息 或者 訊息主視窗收到訊息
         if (topPage is MessageMain) {
@@ -883,7 +880,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     }
                     return
                 }
-                handleBoardPage()
+                handleBoardMainPage()
             } else if (this.rowString00.contains("【個人設定】")) {
                 handleUserPage()
             } else if (this.rowStringFinal.contains("您要刪除上述記錄嗎")) {
@@ -953,6 +950,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
         try {
             article.articleNumber = this.myArticleNumber.toInt()
+
             // 如果現在是 boardPage, 則更新文章編號
             if (currentPage == BahamutPage.BAHAMUT_BOARD)
                 article.boardNumber = article.articleNumber
