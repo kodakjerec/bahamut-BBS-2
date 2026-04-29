@@ -25,6 +25,8 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
@@ -78,6 +80,9 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
         try {
             UrlDatabase(context).use { urlDatabase ->
+                // TODO:test
+                urlDatabase.clearDbAll()
+
                 val findUrl: Vector<String> = urlDatabase.getUrl(myUrl)
                 urlView.text = myUrl
 
@@ -117,7 +122,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             myImageUrl = jsonObject.getString("imageUrl")
 
                             // 遠端詢問 cloudflare 解讀失敗，改由本地直接連線獲取內容
-                            if (myTitle == "" && myDescription == "") {
+                            if (myTitle == "" || myDescription == "") {
                                 var userAgent: String = System.getProperty("http.agent")!!
                                 if (myUrl.contains("youtu") || myUrl.contains("amazon"))
                                     userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
@@ -170,6 +175,58 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                     if (myImageUrl.isEmpty())
                                         myImageUrl =
                                             document.select("#landingImage").attr("src")
+
+
+                                    // 2. 針對 B 站數據進行 Gson 深度解析
+                                    try {
+                                        // 尋找包含狀態數據的 script 標籤
+                                        val scriptTag = document.select("script").find { it.data().contains("window.__INITIAL_STATE__") }
+
+                                        scriptTag?.let {
+                                            val scriptData = it.data()
+                                            // 1. 設定起始點：從 window.__INITIAL_STATE__={ 之後開始
+                                            val prefix = "window.__INITIAL_STATE__="
+                                            val startPos = scriptData.indexOf(prefix)
+
+                                            // 2. 設定結束點：你發現的規律關鍵字
+                                            val suffix = ";(function()"
+                                            val endPos = scriptData.indexOf(suffix)
+
+                                            if (startPos != -1 && endPos != -1) {
+                                                // 截取 prefix 之後到 suffix 之前的內容
+                                                val jsonString = scriptData.substring(startPos + prefix.length, endPos)
+
+                                                // 使用 GsonBuilder 建立一個「寬容模式」的 Gson
+                                                // 這可以解決大多數 MalformedJsonException (如多餘的分號或非標準格式)
+                                                val gson = GsonBuilder().setLenient().create()
+
+                                                val rootObj = gson.fromJson(jsonString, JsonObject::class.java)
+
+                                                // 利用 Gson 的層級訪問安全地取得 desc
+                                                // 路徑：video -> viewInfo -> desc
+                                                val videoDesc = rootObj.getAsJsonObject("video")
+                                                    ?.getAsJsonObject("viewInfo")
+                                                    ?.get("desc")?.asString
+
+                                                if (!videoDesc.isNullOrEmpty()) {
+                                                    myDescription = videoDesc
+                                                }
+
+                                                // 導航到 video -> viewInfo -> pages 陣列
+                                                var imageUrl = rootObj.getAsJsonObject("video")
+                                                    ?.getAsJsonObject("viewInfo")
+                                                    ?.get("pic")?.asString
+
+                                                if (!imageUrl.isNullOrEmpty()) {
+                                                    imageUrl = imageUrl.replace("http:","https:")
+                                                    myImageUrl = imageUrl
+                                                }
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        // 發生錯誤時保留原本 meta 抓到的 description
+                                        e.printStackTrace()
+                                    }
                                 }
 
                                 // 圖片處理
