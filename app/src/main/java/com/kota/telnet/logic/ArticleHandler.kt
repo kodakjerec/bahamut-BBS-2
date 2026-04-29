@@ -520,7 +520,7 @@ class ArticleHandler {
      */
     private fun buildRows(rows: Vector<TelnetRow>) {
         synchronized(pages) {
-            if (pages != null && pages.isNotEmpty()) {
+            if (pages.isNotEmpty()) {
                 val pageCount = pages.size
                 for (pageIndex in 0..<pageCount) {
                     addPage(pages[pageIndex], rows)
@@ -615,7 +615,7 @@ class ArticleHandler {
             
             // ---------- 擷取 IP ----------
             // 從 '(' 後到 ')' 之前
-            var ipStart = authorEnd + 1
+            val ipStart = authorEnd + 1
             var ipEnd = ipStart
             for (i in ipStart..<chars.size) {
                 if (chars[i] == ')') {
