@@ -711,7 +711,7 @@ class ArticlePage : TelnetPage() {
             val selectedIndex = boardMainPage?.selectedIndex ?: 0
             val itemSize = boardMainPage?.getItemSize() ?: 0
             val isLastArticle = selectedIndex == itemSize
-            boardMainPage?.pushCommand(BahamutCommandLocateArticle(isLastArticle))
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isLastArticle))
         }
     }
 
@@ -902,8 +902,6 @@ class ArticlePage : TelnetPage() {
     /** 給其他網頁顯示文章使用  */
     fun setArticle(aArticle: TelnetArticle) {
         telnetArticle = aArticle
-        // 儲存最後一篇文章的資訊，給修改文章使用
-        TempSettings.lastArticle = aArticle
 
         if (telnetArticle != null) {
             val boardName = boardMainPage?.listName!!

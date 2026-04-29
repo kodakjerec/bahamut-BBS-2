@@ -11,7 +11,7 @@ import com.kota.telnet.TelnetArticle
  * @param targetArticle 目標文章（包含特徵：title, author, dateTime）
  */
 data class EditFromLinkedState(
-    val targetArticle: TelnetArticle
+    var targetArticle: TelnetArticle
 ) {
     /** 從 "t" 取得的版面文章編號 */
     var boardNumber: Int = 0

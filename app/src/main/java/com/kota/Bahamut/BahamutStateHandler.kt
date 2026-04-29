@@ -652,6 +652,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     fun handleEditFromLinkedState() {
         val state = TempSettings.editFromLinkedState ?: return
 
+        var isBoardMain: Boolean = false
+
+        // 偵測到 BoardMainPage 已到最後
+        if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
+            isBoardMain = true
+        }
+        val boardPage = PageContainer.instance!!.boardPage
+
         when (state.step) {
             EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY -> {
                 // 偵測到 LinkPage/SearchPage，送出 "t"
@@ -666,13 +674,15 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 // 解析 row4 取得 boardNumber
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow + 2)
                 state.boardNumber = boardNum
-                val firstNum = parseBoardNumberFromCursorRow(1 + 2)
-                // 例外2: 按下t之後, 畫面回到第一頁 (telnetCursor.row = 3 && firstNum = 1)
-                // 此時檢查畫面上各行的編號, 如果是 01-20, 代表是回到第一頁了
-                if (this.telnetCursor!!.row == 3 && firstNum == 1) {
-                    // 檢查原本文章的編號，如果大於20, 代表是回到第一頁了
-                    if (Tempsettings.lastArticle.articleNumber> 20) {
-                        state.isLastArticle = true
+                if (state.isLastArticle) {
+                    val firstNum = parseBoardNumberFromCursorRow(1 + 2)
+                    // 例外2: 按下t之後, 畫面回到第一頁 (telnetCursor.row = 3 && firstNum = 1)
+                    // 此時檢查畫面上各行的編號, 如果是 01-20, 代表是回到第一頁了
+                    if (this.telnetCursor!!.row == 3 && firstNum == 1) {
+                        // 檢查原本文章的編號，如果大於20, 代表是回到第一頁了
+                        if (state.targetArticle.articleNumber > 20) {
+                            state.isLastArticle = true
+                        }
                     }
                 }
 
@@ -683,35 +693,42 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
             EditFromLinkedStep.LEAVING_LINKED_PAGE -> {
                 // 偵測到 BoardMainPage
-                if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
+                if (isBoardMain) {
                     state.step = EditFromLinkedStep.ON_BOARD_PAGE
 
                     ASCoroutine.ensureMainThread {
-                        val boardPage = PageContainer.instance!!.boardPage
 
-                        if (state.isLastArticle) {
+                        if (state.isBlockBoundary) {
+                            state.step = EditFromLinkedStep.SEARCH_NEXT
+                            TelnetClient.myInstance!!.sendStringToServer(state.boardNumber.toString())
+                        }
+                        else if (state.isLastArticle) {
                             // 例外2: 移到最後
                             state.step = EditFromLinkedStep.GOTO_LAST
                             boardPage.moveToLastPosition()
                             // 送出 "["
                             create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
                         } else {
-                            // 正常/例外1: 選擇文章並進入
+                            // 正常: 選擇文章並進入
                             state.step = EditFromLinkedStep.READING_ARTICLE
-                            boardPage.setListViewSelection(state.boardNumber - 1)
                             boardPage.loadItemAtIndex(state.boardNumber - 1)
                         }
                     }
                 }
             }
 
+            EditFromLinkedStep.SEARCH_NEXT -> {
+                state.step = EditFromLinkedStep.GOTO_LAST
+                create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
+            }
+
             EditFromLinkedStep.GOTO_LAST -> {
                 // 偵測到 BoardMainPage 已到最後
-                if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
+                if (isBoardMain) {
                     ASCoroutine.ensureMainThread {
-                        val boardPage = PageContainer.instance!!.boardPage
                         state.step = EditFromLinkedStep.READING_ARTICLE
-                        // 從最後一筆進入
+                        val boardNum = parseBoardNumberFromCursorRow(this.telnetCursor!!.row)
+                        state.boardNumber = boardNum
                         boardPage.loadItemAtIndex(state.boardNumber - 1)
                     }
                 }

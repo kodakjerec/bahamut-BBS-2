@@ -11,12 +11,11 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandLocateArticle(
+    private val targetArticle: TelnetArticle? = null,
     private val isLastArticle: Boolean = false
 ) : TelnetCommand() {
-    private var targetArticle: TelnetArticle? = null
 
     init {
-        this.targetArticle = TempSettings.lastArticle
         this.action = BahamutCommandDef.Companion.LOCATE_ARTICLE
     }
 

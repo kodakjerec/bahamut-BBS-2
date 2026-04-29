@@ -49,8 +49,6 @@ object TempSettings {
     @JvmField
     var myActivity: Activity? = null
     @JvmField
-    var lastArticle: TelnetArticle? = null // 最後閱讀的文章, 用於回到文章後的定位
-    @JvmField
     var editFromLinkedState: EditFromLinkedState? = null // 從串接頁編輯文章的狀態
 
     // 比較少用到的變數, 不影響效能
