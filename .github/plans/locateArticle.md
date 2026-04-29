@@ -9,16 +9,19 @@
 | 變數 | 說明 | 來源 |
 |------|------|------|
 | `articleNumber` | LinkPage/SearchPage 中的位置 | `TelnetArticle.articleNumber` |
-| `boardNumber` | 版面文章編號（真正的文章編號） | 送出 "t" 後從 row4 取得 |
-| `currentPage` | 當前頁面狀態 | `BahamutStateHandler.currentPage` |
+| `boardNumber` | 版面文章編號（真正的文章編號） | 送出 "t" 後從游標所在行取得 |
+| `selectedIndex` | 當前在 LinkPage 中的選擇位置 | `boardMainPage.selectedIndex` |
+| `itemSize` | LinkPage 總文章數 | `boardMainPage.getItemSize()` |
+| `isLastArticle` | 是否為最後一篇 | `selectedIndex == itemSize` |
+| `isBlockBoundary` | 是否為區塊邊界 | `articleNumber % 20 == 0` |
 
 ## 🔧 關鍵操作
 
 | 操作 | 方法 | 說明 |
 |------|------|------|
-| 選擇文章位置 | `setListViewSelection(boardNumber - 1)` | 直接跳到指定編號 |
 | 讀取文章 | `loadItemAtIndex(boardNumber - 1)` | 自動進入文章頁 |
-| 判斷頁面 | `currentPage` | `BAHAMUT_BOARD` / `BAHAMUT_BOARD_LINK` / `BAHAMUT_BOARD_SEARCH` |
+| 移到最後 | `moveToLastPosition()` | 移到版面最後一筆 |
+| 送出編號 | `sendStringToServer(boardNumber)` | 跳到指定編號 |
 
 ---
 
@@ -26,57 +29,66 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ [LinkPage/SearchPage] 使用者點擊編輯                                     │
+│ [ArticlePage] 使用者點擊編輯 (onEditButtonClicked)                       │
 │                                                                          │
-│  1. 保存目標文章特徵 (title, author, dateTime, boardName)               │
-│  2. articleNumber = targetArticle.articleNumber                         │
+│  判斷: boardMainPage.pageType == BAHAMUT_BOARD ?                        │
+│        ├── YES → 直接進入編輯模式                                        │
+│        └── NO  → 進入以下流程 (從 LinkPage/SearchPage 來的)              │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [ArticlePage] 準備狀態                                                   │
 │                                                                          │
-│  判斷: articleNumber % 20 == 0 ?                                        │
+│  1. selectedIndex = boardMainPage.selectedIndex                         │
+│  2. itemSize = boardMainPage.getItemSize()                              │
+│  3. isLastArticle = (selectedIndex == itemSize)                         │
+│  4. pushCommand(BahamutCommandLocateArticle(telnetArticle, isLastArticle))│
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [BahamutCommandLocateArticle.execute()]                                  │
+│                                                                          │
+│  1. 建立 EditFromLinkedState(targetArticle)                             │
+│  2. state.isLastArticle = isLastArticle                                 │
+│                                                                          │
+│  判斷: articleNumber % 20 == 0 ? (isBlockBoundary)                      │
+│        ├── YES → step = MOVE_UP_FOR_BOUNDARY, 送出 "Up"                 │
+│        └── NO  → step = SENT_T, 送出 "t"                                │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [StateHandler.handleEditFromLinkedState()]                               │
+│                                                                          │
+│  MOVE_UP_FOR_BOUNDARY:                                                   │
+│    → 偵測到 LinkPage/SearchPage, 送出 "t", step = SENT_T                │
+│                                                                          │
+│  SENT_T:                                                                 │
+│    → 從游標所在行解析 boardNumber                                        │
+│    → 送出 "left" 離開串接頁, step = LEAVING_LINKED_PAGE                 │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [StateHandler] LEAVING_LINKED_PAGE                                       │
+│                                                                          │
+│  偵測到 BoardMainPage 後:                                                │
+│                                                                          │
+│  判斷: isBlockBoundary ?                                                 │
 │        ├── YES → 例外流程1                                               │
-│        └── NO  → 正常流程                                                │
+│        └── NO  → 判斷: isLastArticle ?                                  │
+│                        ├── YES → 例外流程2                               │
+│                        └── NO  → 正常流程                                │
 └─────────────────────────────────────────────────────────────────────────┘
-          │
+          │ (正常流程)
           ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 1. 送出 "t"                                                              │
-│    → 畫面上游標所在行的 articleNumber 會被替換為 boardNumber              │
-└─────────────────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ 2. StateHandler 檢查游標所在行                                           │
+│ [正常流程] boardPage.loadItemAtIndex(boardNumber - 1)                    │
 │                                                                          │
-│    判斷: articleNumber 是否被替換為 boardNumber ?                        │
-│          ├── YES → 成功取得 boardNumber，繼續流程                        │
-│          └── NO  → 檢查 row4 編號是否為 1                                │
-│                    ├── row4 == 1 → 例外流程2 (最後一篇，繞回第一篇)      │
-│                    └── row4 != 1 → 異常狀態，中止並提示錯誤              │
-└─────────────────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ 3. 送出 "left" → 離開 LinkPage/SearchPage                                │
-│    StateHandler 偵測到 BoardMainPage                                     │
-└─────────────────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ 4. boardPage.setListViewSelection(boardNumber - 1)                       │
-│    → 選擇版面文章                                                        │
-└─────────────────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ 5. boardPage.loadItemAtIndex(boardNumber - 1)                            │
-│    → 進入文章，讀取完畢後 ArticlePage.setArticle() 被呼叫                 │
-└─────────────────────────────────────────────────────────────────────────┘
-          │
-          ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│ 6. 在 ArticlePage 驗證特徵:                                              │
-│    article.title == target.title &&                                     │
-│    article.author == target.author &&                                   │
-│    article.dateTime == target.dateTime                                  │
+│  → 進入文章，讀取完畢後 ArticlePage.setArticle() 被呼叫                   │
+│  → verifyAndEditFromLinked() 驗證特徵                                    │
 │                                                                          │
 │    ✓ 一致 → 自動進入編輯模式                                             │
 │    ✗ 不一致 → Toast "找不到文章"，返回 BoardMainPage                     │
@@ -85,51 +97,92 @@
 
 ---
 
-## ⚠️ 例外流程1：articleNumber 是 20 的倍數
+## ⚠️ 例外流程1：articleNumber 是 20 的倍數 (isBlockBoundary)
 
-**問題**：20 的倍數在頁面最後一行，送出 "t" 會顯示下一區塊第一筆的 boardNumber
+**問題**：20 的倍數在頁面最後一行，送出 "t" 後取得的是上一筆的 boardNumber
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 1. 送出 "Up" → 移到上一筆                                                │
-│ 2. 送出 "t" → 取得 boardNumber (這是 articleNumber-1 的版面編號)         │
-│ 3. 送出 "left" → 回到 BoardMainPage                                      │
-│ 4. boardPage.setListViewSelection(boardNumber - 1)                       │
-│ 5. boardPage.loadItemAtIndex(boardNumber - 1)                            │
-│    → 此時特徵一定不一致                                                   │
+│ [BahamutCommandLocateArticle.execute()]                                  │
+│                                                                          │
+│  1. 送出 "Up" → 移到上一筆                                               │
+│  2. step = MOVE_UP_FOR_BOUNDARY                                          │
 └─────────────────────────────────────────────────────────────────────────┘
           │
           ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 6. 在 ArticlePage 驗證失敗後:                                            │
-│    送出 "]" 移到下一篇，重新讀取並驗證                                    │
-│    最多重試 3 次                                                         │
+│ [StateHandler] MOVE_UP_FOR_BOUNDARY                                      │
+│                                                                          │
+│  → 偵測到 LinkPage/SearchPage, 送出 "t"                                 │
+│  → step = SENT_T                                                         │
+│  → 取得 boardNumber (這是 articleNumber-1 的版面編號)                    │
+│  → 送出 "left", step = LEAVING_LINKED_PAGE                              │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [StateHandler] LEAVING_LINKED_PAGE (isBlockBoundary = true)              │
+│                                                                          │
+│  1. 送出 boardNumber → 跳到該文章位置                                    │
+│  2. step = SEARCH_NEXT                                                   │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [StateHandler] SEARCH_NEXT                                               │
+│                                                                          │
+│  → 送出 "]" (RIGHT_BRACKET) 移到下一篇                                   │
+│  → step = GOTO_LAST                                                      │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [StateHandler] GOTO_LAST                                                 │
+│                                                                          │
+│  → 從游標行解析新的 boardNumber                                          │
+│  → boardPage.loadItemAtIndex(boardNumber - 1)                            │
+│  → step = READING_ARTICLE                                                │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [ArticlePage] verifyAndEditFromLinked()                                  │
 │                                                                          │
 │    ✓ 一致 → 進入編輯                                                     │
-│    ✗ 3次都不一致 → Toast "找不到文章"                                    │
+│    ✗ 不一致 → 重試 (loadTheSameTitleDown)，最多 3 次                     │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ⚠️ 例外流程2：boardNumber == 1 (最後一篇)
+## ⚠️ 例外流程2：最後一篇文章 (isLastArticle)
 
-**問題**：送出 "t" 後 row4 顯示的 boardNumber 是 1，代表原文章是版面最後一篇（繞回第一篇）
+**問題**：當 `selectedIndex == itemSize` 時，送出 "t" 後畫面可能繞回第一頁
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 1. 送出 "left" → 回到 BoardMainPage                                      │
-│ 2. boardPage.moveToLastPosition() → 移到版面最後                         │
+│ [StateHandler] LEAVING_LINKED_PAGE (isLastArticle = true)                │
+│                                                                          │
+│  1. boardPage.moveToLastPosition() → 移到版面最後                        │
+│  2. 送出 "[" (LEFT_BRACKET) → 找上一篇同標題                             │
+│  3. step = GOTO_LAST                                                     │
 └─────────────────────────────────────────────────────────────────────────┘
           │
           ▼
 ┌─────────────────────────────────────────────────────────────────────────┐
-│ 3. 在 ArticlePage (從最後一筆開始):                                      │
-│    送出 "[" 往上一篇，讀取並驗證                                         │
-│    最多重試 3 次                                                         │
+│ [StateHandler] GOTO_LAST                                                 │
+│                                                                          │
+│  → 從游標行解析 boardNumber                                              │
+│  → boardPage.loadItemAtIndex(boardNumber - 1)                            │
+│  → step = READING_ARTICLE                                                │
+└─────────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│ [ArticlePage] verifyAndEditFromLinked()                                  │
 │                                                                          │
 │    ✓ 一致 → 進入編輯                                                     │
-│    ✗ 3次都不一致 → Toast "找不到文章"                                    │
+│    ✗ 不一致 → 重試 (loadTheSameTitleUp)，最多 3 次                       │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
