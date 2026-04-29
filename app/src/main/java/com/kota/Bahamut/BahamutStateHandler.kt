@@ -666,25 +666,15 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 if (currentPage == BahamutPage.BAHAMUT_BOARD_LINK ||
                     currentPage == BahamutPage.BAHAMUT_BOARD_SEARCH) {
                     state.step = EditFromLinkedStep.SENT_T
+                    this.myCursorRow = this.telnetCursor!!.row
                     create().pushKey(TelnetKeyboard.SMALL_T).sendToServer()
                 }
             }
 
             EditFromLinkedStep.SENT_T -> {
                 // 解析 row4 取得 boardNumber
-                val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow + 2)
+                val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
                 state.boardNumber = boardNum
-                if (state.isLastArticle) {
-                    val firstNum = parseBoardNumberFromCursorRow(1 + 2)
-                    // 例外2: 按下t之後, 畫面回到第一頁 (telnetCursor.row = 3 && firstNum = 1)
-                    // 此時檢查畫面上各行的編號, 如果是 01-20, 代表是回到第一頁了
-                    if (this.telnetCursor!!.row == 3 && firstNum == 1) {
-                        // 檢查原本文章的編號，如果大於20, 代表是回到第一頁了
-                        if (state.targetArticle.articleNumber > 20) {
-                            state.isLastArticle = true
-                        }
-                    }
-                }
 
                 // 離開串接頁(回看板)
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
@@ -698,19 +688,13 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
                     ASCoroutine.ensureMainThread {
 
-                        if (state.isBlockBoundary) {
+                        if (state.isBlockBoundary || state.isFirstInPage) {
                             state.step = EditFromLinkedStep.SEARCH_NEXT
                             TelnetClient.myInstance!!.sendStringToServer(state.boardNumber.toString())
-                        }
-                        else if (state.isLastArticle) {
-                            // 例外2: 移到最後
-                            state.step = EditFromLinkedStep.GOTO_LAST
-                            boardPage.moveToLastPosition()
-                            // 送出 "["
-                            create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
                         } else {
                             // 正常: 選擇文章並進入
                             state.step = EditFromLinkedStep.READING_ARTICLE
+                            showShortToast("編輯文章定位至：${state.boardNumber}")
                             boardPage.loadItemAtIndex(state.boardNumber - 1)
                         }
                     }
@@ -720,6 +704,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             EditFromLinkedStep.SEARCH_NEXT -> {
                 state.step = EditFromLinkedStep.GOTO_LAST
                 create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
+                // 如果之前是第一篇文章, 要多補一次"]"
+                if (state.isFirstInPage)
+                    create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
             }
 
             EditFromLinkedStep.GOTO_LAST -> {
@@ -729,6 +716,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                         state.step = EditFromLinkedStep.READING_ARTICLE
                         val boardNum = parseBoardNumberFromCursorRow(this.telnetCursor!!.row)
                         state.boardNumber = boardNum
+                        showShortToast("編輯文章定位至：$boardNum")
                         boardPage.loadItemAtIndex(state.boardNumber - 1)
                     }
                 }
@@ -990,7 +978,10 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     fun showArticle(aArticle: TelnetArticle) {
         ASCoroutine.ensureMainThread {
             try {
-                PageContainer.instance!!.articlePage.setArticle(aArticle)
+                val isSuccess = PageContainer.instance!!.articlePage.setArticle(aArticle)
+                if (!isSuccess) {
+                    ASNavigationController.currentController!!.popViewController()
+                }
             } catch (e: Exception) {
                 Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
             }

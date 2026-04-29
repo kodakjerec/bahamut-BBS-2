@@ -28,8 +28,8 @@ data class EditFromLinkedState(
     /** 是否為區塊邊界（20的倍數） */
     val isBlockBoundary: Boolean get() = articleNumber % 20 == 0
 
-    /** 是否為最後一篇文章（boardNumber == 1 代表繞回第一篇） */
-    var isLastArticle: Boolean = false
+    /** 是否為分頁第一篇 */
+    var isFirstInPage: Boolean = false
 
     /**
      * 驗證文章特徵是否一致

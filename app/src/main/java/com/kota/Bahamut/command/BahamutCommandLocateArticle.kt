@@ -12,7 +12,7 @@ import com.kota.telnet.reference.TelnetKeyboard
 
 class BahamutCommandLocateArticle(
     private val targetArticle: TelnetArticle? = null,
-    private val isLastArticle: Boolean = false
+    private val isFirstInPage: Boolean = false
 ) : TelnetCommand() {
 
     init {
@@ -22,15 +22,19 @@ class BahamutCommandLocateArticle(
     override fun execute(telnetListPage: TelnetListPage) {
         if (this.targetArticle != null) {
             // 建立狀態機，讓 StateHandler 處理後續流程
-            val state = EditFromLinkedState(targetArticle!!)
-            state.isLastArticle = isLastArticle
+            val state = EditFromLinkedState(targetArticle)
+            state.isFirstInPage = isFirstInPage
             
             // 判斷是否為區塊邊界（20的倍數）
             if (state.isBlockBoundary) {
                 // 例外流程1: 先往上移，再送 "t"
                 state.step = EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY
                 TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.UP_ARROW)
-                BahamutStateHandler.bahamutStateHandler?.myCursorRow -= 1
+            } else if (state.isFirstInPage) {
+                // 例外流程2: 剛好是第一篇, 送兩次 "t"
+                state.step = EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY
+                TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.UP_ARROW)
+                TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.UP_ARROW)
             } else {
                 // 正常流程: 直接送 "t"
                 state.step = EditFromLinkedStep.SENT_T

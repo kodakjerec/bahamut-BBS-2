@@ -709,9 +709,8 @@ class ArticlePage : TelnetPage() {
             // 透過 t 取得文章編號
             // 從 boardMainPage 判斷是否為最後一篇文章
             val selectedIndex = boardMainPage?.selectedIndex ?: 0
-            val itemSize = boardMainPage?.getItemSize() ?: 0
-            val isLastArticle = selectedIndex == itemSize
-            boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isLastArticle))
+            val isFirstInPage = selectedIndex%20 == 1
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isFirstInPage))
         }
     }
 
@@ -900,7 +899,8 @@ class ArticlePage : TelnetPage() {
     }
 
     /** 給其他網頁顯示文章使用  */
-    fun setArticle(aArticle: TelnetArticle) {
+    fun setArticle(aArticle: TelnetArticle): Boolean {
+        var isSuccess = true
         telnetArticle = aArticle
 
         if (telnetArticle != null) {
@@ -925,7 +925,8 @@ class ArticlePage : TelnetPage() {
         dismissProcessingDialog()
 
         // 檢查是否有從串接頁編輯文章的任務
-        verifyAndEditFromLinked(aArticle)
+        isSuccess = verifyAndEditFromLinked(aArticle)
+        return isSuccess
     }
 
     /**
@@ -936,12 +937,12 @@ class ArticlePage : TelnetPage() {
      *
      * @param article 當前文章
      */
-    private fun verifyAndEditFromLinked(article: TelnetArticle) {
-        val state = TempSettings.editFromLinkedState ?: return
+    private fun verifyAndEditFromLinked(article: TelnetArticle): Boolean {
+        val state = TempSettings.editFromLinkedState ?: return true
         if (state.step != EditFromLinkedStep.READING_ARTICLE &&
             state.step != EditFromLinkedStep.SEARCH_NEXT &&
             state.step != EditFromLinkedStep.SEARCH_PREV) {
-            return
+            return true
         }
 
         if (state.matchesTarget(article)) {
@@ -952,15 +953,13 @@ class ArticlePage : TelnetPage() {
         } else {
             // 特徵不一致
             state.retryCount++
-
-            if (state.retryCount >= 3) {
-                // 重試次數用盡
-                state.step = EditFromLinkedStep.FAILED
-                TempSettings.editFromLinkedState = null
-                showShortToast("找不到文章")
-                onBackPressed()
-            }
+            state.step = EditFromLinkedStep.FAILED
+            TempSettings.editFromLinkedState = null
+            showShortToast("找不到文章")
+            onBackPressed()
+            return false
         }
+        return true
     }
 
     /** 給 state handler 更改讀取進度  */

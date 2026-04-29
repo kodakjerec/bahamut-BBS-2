@@ -716,7 +716,7 @@ open class BoardMainPage : TelnetListPage(),
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val boardPageItem = getItem(index) as BoardPageItem?
         if (boardPageItem != null) {
-            BahamutStateHandler.bahamutStateHandler?.myCursorRow = getIndexInBlock(index) + 1
+            BahamutStateHandler.bahamutStateHandler?.myCursorRow = getIndexInBlock(index) + 3
             // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.title
             if (this::class == BoardMainPage::class)
