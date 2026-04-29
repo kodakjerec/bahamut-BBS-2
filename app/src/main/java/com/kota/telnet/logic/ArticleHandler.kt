@@ -1,6 +1,7 @@
 package com.kota.telnet.logic
 
 import com.kota.telnet.TelnetArticle
+import com.kota.telnet.TelnetArticleEditRecord
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetArticleItemInfo
 import com.kota.telnet.TelnetArticlePage
@@ -214,8 +215,13 @@ class ArticleHandler {
                 itemInfo.quoteLevel = quoteLevel + 1
                 article.addInfo(itemInfo)
                 
-            // ========== 跳過修改紀錄行 ==========
-            } else if (!rowString.matches("※ 修改:.*".toRegex())) {
+            // ========== 解析修改紀錄行 ==========
+            // 格式: "※ 修改: 作者 (IP), 日期時間"
+            // 例如: "※ 修改: abc123 (123.456.789.012), 04/29/2024 12:00:00"
+            } else if (rowString.matches("※ 修改:.*".toRegex())) {
+                parseEditRecord(rowString)
+                
+            } else {
                 
                 // ========== 檢測主文/推文分隔線 ==========
                 if (rowString == "--") {
@@ -280,107 +286,89 @@ class ArticleHandler {
                     
                 } else {
                     // ========== 解析推文行 ==========
-                    // 推文格式: "推 作者：推文內容 (日期 時間)"
-                    //          ↑    ↑         ↑
-                    //          |    |         └─ datetime (括號內)
-                    //          |    └─ 全形冒號 (Unicode 65306)
-                    //          └─ author (冒號前)
-                    
-                    var author3 = ""
-                    var content = ""
-                    var datetime = ""
-                    var date: String? = ""
-                    var time: String? = ""
-                    val rowWords2 = rowString.toCharArray()
-                    
-                    // ---------- 擷取推文作者 ----------
-                    // 尋找全形冒號 '：' (Unicode 65306 = 0xFF1A) 的位置
-                    var authorEnd2 = 0
-                    var i5 = 0
-                    while (true) {
-                        if (i5 >= rowWords2.size) {
-                            break
-                        } else if (rowWords2[i5].code == 65306) {  // '：' 全形冒號
-                            authorEnd2 = i5
-                            break
-                        } else {
-                            i5++
-                        }
-                    }
-                    // 冒號前的文字即為作者（含推/噓/→前綴）
-                    if (authorEnd2 > 0) {
-                        author3 = rowString.substring(0, authorEnd2).trim()
-                    }
-                    
-                    // ---------- 擷取推文日期時間 ----------
-                    // 從行尾往前找括號，擷取 "(日期 時間)"
-                    var datetimeStart = 0
-                    var datetimeEnd = 0
-                    
-                    // 從尾端找 ')' 的位置
-                    var i6 = rowWords2.size - 1
-                    while (true) {
-                        if (i6 < 0) {
-                            break
-                        } else if (rowWords2[i6] == ')') {
-                            datetimeEnd = i6
-                            break
-                        } else {
-                            i6--
-                        }
-                    }
-                    
-                    // 往前找對應的 '(' 的位置
-                    var i7 = datetimeEnd - 1
-                    while (true) {
-                        if (i7 < 0) {
-                            break
-                        } else if (rowWords2[i7] == '(') {
-                            datetimeStart = i7 + 1
-                            break
-                        } else {
-                            i7--
-                        }
-                    }
-                    
-                    // 擷取括號內的日期時間字串
-                    if (datetimeEnd > datetimeStart) {
-                        datetime = rowString.substring(datetimeStart, datetimeEnd)
-                    }
-                    
-                    // 將日期時間拆分為 date 和 time（以空白分隔）
-                    // 例如: "04/29 12:00" → date="04/29", time="12:00"
-                    val datetimeParts: Array<String?> =
-                        datetime.split(" +".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    if (datetimeParts.size == 2) {
-                        date = datetimeParts[0]
-                        time = datetimeParts[1]
-                    }
-                    
-                    // ---------- 擷取推文內容 ----------
-                    // 內容位於「全形冒號之後」到「左括號之前」
-                    val contentStart = authorEnd2 + 1
-                    val contentEnd = datetimeStart - 1
-                    if (contentEnd > contentStart) {
-                        content =
-                            rowString.substring(contentStart, contentEnd).trim()
-                    }
-                    
-                    // 建立推文物件
-                    val push = TelnetArticlePush()
-                    push.author = author3
-                    push.content = content
-                    if (date != null) {
-                        push.date = date
-                    }
-                    if (time != null) {
-                        push.time = time
-                    }
-                    article.addPush(push)
+                    parsePush(rowString)
                 }
             }
         }
         article.build()  // 最終組裝文章物件
+    }
+    
+    /**
+     * 解析推文行
+     * 
+     * 推文格式: "推 作者：推文內容 (日期 時間)"
+     *          ↑    ↑         ↑
+     *          |    |         └─ datetime (括號內)
+     *          |    └─ 全形冒號 (Unicode 65306)
+     *          └─ author (冒號前，含推/噓/→前綴)
+     * 
+     * @param rowString 推文行的原始文字
+     */
+    private fun parsePush(rowString: String) {
+        val push = TelnetArticlePush()
+        
+        try {
+            val chars = rowString.toCharArray()
+            
+            // ---------- 擷取推文作者 ----------
+            // 尋找全形冒號 '：' (Unicode 65306 = 0xFF1A) 的位置
+            var authorEnd = 0
+            for (i in chars.indices) {
+                if (chars[i].code == 65306) {  // '：' 全形冒號
+                    authorEnd = i
+                    break
+                }
+            }
+            // 冒號前的文字即為作者（含推/噓/→前綴）
+            if (authorEnd > 0) {
+                push.author = rowString.substring(0, authorEnd).trim()
+            }
+            
+            // ---------- 擷取推文日期時間 ----------
+            // 從行尾往前找括號，擷取 "(日期 時間)"
+            var datetimeStart = 0
+            var datetimeEnd = 0
+            
+            // 從尾端找 ')' 的位置
+            for (i in chars.size - 1 downTo 0) {
+                if (chars[i] == ')') {
+                    datetimeEnd = i
+                    break
+                }
+            }
+            
+            // 往前找對應的 '(' 的位置
+            for (i in datetimeEnd - 1 downTo 0) {
+                if (chars[i] == '(') {
+                    datetimeStart = i + 1
+                    break
+                }
+            }
+            
+            // 擷取括號內的日期時間字串，並拆分為 date 和 time
+            // 例如: "04/29 12:00" → date="04/29", time="12:00"
+            if (datetimeEnd > datetimeStart) {
+                val datetime = rowString.substring(datetimeStart, datetimeEnd)
+                val datetimeParts = datetime.split(" +".toRegex()).dropLastWhile { it.isEmpty() }
+                if (datetimeParts.size == 2) {
+                    push.date = datetimeParts[0]
+                    push.time = datetimeParts[1]
+                }
+            }
+            
+            // ---------- 擷取推文內容 ----------
+            // 內容位於「全形冒號之後」到「左括號之前」
+            val contentStart = authorEnd + 1
+            val contentEnd = datetimeStart - 1
+            if (contentEnd > contentStart) {
+                push.content = rowString.substring(contentStart, contentEnd).trim()
+            }
+        } catch (e: Exception) {
+            // 解析失敗時不拋出異常
+            e.printStackTrace()
+        }
+        
+        article.addPush(push)
     }
 
     /**
@@ -588,6 +576,76 @@ class ArticleHandler {
             i++
         }
         return index
+    }
+    
+    /**
+     * 解析修改紀錄行
+     * 
+     * 修改紀錄格式: "※ 修改: 作者 (IP), 日期時間"
+     * 範例: "※ 修改: abc123 (123.456.789.012), 04/29/2024 12:00:00"
+     * 
+     * @param rowString 修改紀錄行的原始文字
+     */
+    private fun parseEditRecord(rowString: String) {
+        val record = TelnetArticleEditRecord()
+        record.rawString = rowString
+        
+        try {
+            // 移除前綴 "※ 修改: " (包含全形和半形冒號)
+            var content = rowString
+            if (content.startsWith("※ 修改:")) {
+                content = content.substring(5).trim()  // "※ 修改:" = 5 字元
+            } else if (content.startsWith("※ 修改：")) {
+                content = content.substring(5).trim()  // "※ 修改：" = 5 字元
+            }
+            
+            // ---------- 擷取作者 ----------
+            // 從開頭到第一個 '(' 之前
+            val chars = content.toCharArray()
+            var authorEnd = 0
+            for (i in chars.indices) {
+                if (chars[i] == '(') {
+                    authorEnd = i
+                    break
+                }
+            }
+            if (authorEnd > 0) {
+                record.author = content.substring(0, authorEnd).trim()
+            }
+            
+            // ---------- 擷取 IP ----------
+            // 從 '(' 後到 ')' 之前
+            var ipStart = authorEnd + 1
+            var ipEnd = ipStart
+            for (i in ipStart..<chars.size) {
+                if (chars[i] == ')') {
+                    ipEnd = i
+                    break
+                }
+            }
+            if (ipEnd > ipStart) {
+                record.ip = content.substring(ipStart, ipEnd).trim()
+            }
+            
+            // ---------- 擷取日期時間 ----------
+            // ')' 後面通常有 ", " 分隔，之後是日期時間
+            if (ipEnd + 1 < chars.size) {
+                var dateTimeStart = ipEnd + 1
+                // 跳過 "), " 或 ") "
+                while (dateTimeStart < chars.size && 
+                       (chars[dateTimeStart] == ',' || chars[dateTimeStart] == ' ')) {
+                    dateTimeStart++
+                }
+                if (dateTimeStart < chars.size) {
+                    record.dateTime = content.substring(dateTimeStart).trim()
+                }
+            }
+        } catch (e: Exception) {
+            // 解析失敗時保留原始字串，不拋出異常
+            e.printStackTrace()
+        }
+        
+        article.addEditRecord(record)
     }
 
     /** 建立新的空白文章物件，準備接收新文章資料 */
