@@ -29,7 +29,6 @@ import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.model.ToolBarFloating
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.EditFromLinkedState
 import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
 import com.kota.Bahamut.service.NotificationSettings.setShowTopBottomButton
@@ -709,7 +708,10 @@ class ArticlePage : TelnetPage() {
             // 透過 t 取得文章編號
             // 從 boardMainPage 判斷是否為最後一篇文章
             val selectedIndex = boardMainPage?.selectedIndex ?: 0
-            val isFirstInPage = selectedIndex%20 == 1
+            var isFirstInPage = selectedIndex%20 == 1
+            // 如果串接只有一行, 就不適用例外1
+            val totalLength = boardMainPage?.getItemSize() ?: 0
+            if (totalLength == 1) isFirstInPage = false
             boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isFirstInPage))
         }
     }

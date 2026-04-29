@@ -7,7 +7,6 @@ import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.asFramework.thread.ASCoroutine
-import com.kota.telnet.TelnetArticle
 
 data class HeroStep (
     var authorNickname: String,

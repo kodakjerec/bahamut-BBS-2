@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +21,6 @@ import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
@@ -37,7 +37,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import android.util.Log // 導入 Log
 import org.json.JSONObject
 import org.jsoup.Connection
 import org.jsoup.Jsoup
@@ -119,12 +118,22 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                             // 遠端詢問 cloudflare 解讀失敗，改由本地直接連線獲取內容
                             if (myTitle == "" && myDescription == "") {
-                                val userAgent: String = System.getProperty("http.agent")!!
+                                var userAgent: String = System.getProperty("http.agent")!!
+                                if (myUrl.contains("youtu") || myUrl.contains("amazon"))
+                                    userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
+
+
+                                // cookie
+                                // Create a new Map to store cookies
+                                val cookies: HashMap<String, String> = HashMap()
+                                if (myUrl.contains("ptt"))
+                                    cookies.put("over18", "1")  // Add the over18 cookie with value 1
 
                                 // 直接去ping對方
                                 val resp: Connection.Response = Jsoup
                                     .connect(myUrl)
                                     .header("User-Agent", userAgent)
+                                    .cookies(cookies)
                                     .timeout(10000)
                                     .ignoreContentType(true)
                                     .execute()
