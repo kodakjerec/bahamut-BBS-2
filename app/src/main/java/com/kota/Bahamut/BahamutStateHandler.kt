@@ -667,10 +667,14 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow + 2)
                 state.boardNumber = boardNum
                 val firstNum = parseBoardNumberFromCursorRow(1 + 2)
-                // 最後一筆的狀況
-                // 1. 按下 "t" 之後 telnetCursor=(3, 1), firstNum = 1. 但是 boardNum !=1
-                // TODO: 在編輯文章按下之前, 就可以決定是否判斷isLastArticle
-                state.isLastArticle = this.telnetCursor?.row == 3 && firstNum == 1 && boardNum != 1
+                // 例外2: 按下t之後, 畫面回到第一頁 (telnetCursor.row = 3 && firstNum = 1)
+                // 此時檢查畫面上各行的編號, 如果是 01-20, 代表是回到第一頁了
+                if (this.telnetCursor!!.row == 3 && firstNum == 1) {
+                    // 檢查原本文章的編號，如果大於20, 代表是回到第一頁了
+                    if (Tempsettings.lastArticle.articleNumber> 20) {
+                        state.isLastArticle = true
+                    }
+                }
 
                 // 離開串接頁(回看板)
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
@@ -950,15 +954,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         val article = this.articleHandler.article
         this.articleHandler.newArticle()
 
-        try {
-            article.articleNumber = this.myArticleNumber.toInt()
-
-            // 如果現在是 boardPage, 則更新文章編號
-            if (currentPage == BahamutPage.BAHAMUT_BOARD)
-                article.boardNumber = article.articleNumber
-        } catch (_: Exception) {
-            article.articleNumber = 0
-        }
+        article.articleNumber = this.myArticleNumber.toIntOrNull() ?: 0
         if (this.rowStringFinal.contains("魚雁往返")) {
             showMail(article)
         } else if (this.rowStringFinal.contains("閱讀精華")) {

@@ -707,7 +707,11 @@ class ArticlePage : TelnetPage() {
             navigationController.pushViewController(page)
         } else {
             // 透過 t 取得文章編號
-            boardMainPage?.pushCommand(BahamutCommandLocateArticle())
+            // 從 boardMainPage 判斷是否為最後一篇文章
+            val selectedIndex = boardMainPage?.selectedIndex ?: 0
+            val itemSize = boardMainPage?.getItemSize() ?: 0
+            val isLastArticle = selectedIndex == itemSize
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle(isLastArticle))
         }
     }
 
@@ -953,20 +957,6 @@ class ArticlePage : TelnetPage() {
 
             if (state.retryCount >= 3) {
                 // 重試次數用盡
-                state.step = EditFromLinkedStep.FAILED
-                TempSettings.editFromLinkedState = null
-                showShortToast("找不到文章")
-                onBackPressed()
-            } else if (state.isBlockBoundary) {
-                // 例外1: 找下一篇
-                state.step = EditFromLinkedStep.SEARCH_NEXT
-                boardMainPage?.loadTheSameTitleDown()
-            } else if (state.isLastArticle) {
-                // 例外2: 找上一篇
-                state.step = EditFromLinkedStep.SEARCH_PREV
-                boardMainPage?.loadTheSameTitleUp()
-            } else {
-                // 正常情況不應該不一致
                 state.step = EditFromLinkedStep.FAILED
                 TempSettings.editFromLinkedState = null
                 showShortToast("找不到文章")

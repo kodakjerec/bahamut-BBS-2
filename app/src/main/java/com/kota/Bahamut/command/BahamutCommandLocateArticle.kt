@@ -10,7 +10,9 @@ import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.reference.TelnetKeyboard
 
-class BahamutCommandLocateArticle() : TelnetCommand() {
+class BahamutCommandLocateArticle(
+    private val isLastArticle: Boolean = false
+) : TelnetCommand() {
     private var targetArticle: TelnetArticle? = null
 
     init {
@@ -22,6 +24,7 @@ class BahamutCommandLocateArticle() : TelnetCommand() {
         if (this.targetArticle != null) {
             // 建立狀態機，讓 StateHandler 處理後續流程
             val state = EditFromLinkedState(targetArticle!!)
+            state.isLastArticle = isLastArticle
             
             // 判斷是否為區塊邊界（20的倍數）
             if (state.isBlockBoundary) {
