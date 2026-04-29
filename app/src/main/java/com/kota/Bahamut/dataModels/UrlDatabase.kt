@@ -211,4 +211,14 @@ class UrlDatabase(context: Context?) : SQLiteOpenHelper(
         } catch (_: Exception) {
         }
     }
+
+    fun clearDbAll() {
+        try {
+            val db = writableDatabase
+            db.execSQL("DELETE FROM urls")
+            db.execSQL("DELETE FROM shorten_urls")
+            onCreate(db)
+        } catch (_: Exception) {
+        }
+    }
 }

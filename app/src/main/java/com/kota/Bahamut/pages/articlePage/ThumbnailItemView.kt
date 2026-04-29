@@ -183,6 +183,22 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             picoUrlChangeStatus(isPic)
 
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
+
+                            // 上傳至cloudflare, 方便之後擷取
+                            val body: RequestBody = MultipartBody.Builder()
+                                .setType(MultipartBody.FORM)
+                                .addFormDataPart("url", myUrl)
+                                .addFormDataPart("title", myTitle)
+                                .addFormDataPart("description", myDescription)
+                                .addFormDataPart("imageUrl",myImageUrl)
+                                .addFormDataPart("contentType", contentType)
+                                .build()
+                            val request: Request = Request.Builder()
+                                .url(apiUrl)
+                                .post(body)
+                                .build()
+                            client.newCall(request).execute()
+
                         } catch (e: Exception) {
                             Log.e("loadUrl", e.message.toString())
                             ASCoroutine.ensureMainThread {

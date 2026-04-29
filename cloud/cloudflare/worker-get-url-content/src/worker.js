@@ -3,65 +3,92 @@ const cheerio = require('cheerio')
 export default {
 	async fetch(request, env, ctx) {
 		let url = "";
+		const getFormData = await request.formData();
+
 		try {
-			url = (await request.formData()).get("url");
+			url = getFormData.get("url");
 		} catch {
 			return Response.json({ "error": "No url " });
 		}
 
+		// 如果前端有傳來 title, desc, imageUrl 就直接存到資料庫，不用再爬一次
+		const titleFromFront = getFormData.get("title") || "";
+		const descFromFront = getFormData.get("description") || "";
+		const imageUrlFromFront = getFormData.get("imageUrl") || "";
+		const contentTypeFromFront = getFormData.get("contentType") || "";
+
 		// 連接 D1 資料庫
 		const { DATABASE } = env;
 
-		let urlStructure = new URL(url);
-		let isTwitter = false;
-		let title = "";
-		let desc = "";
-		let imageUrl = "";
-		let contentType = "";
-		let charset = "utf-8";
-		let headers = {
-			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0",
-			"Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-HK;q=0.5",
-			"Accept-Charset": "utf-8"
-		};
+		try {
+			if (titleFromFront || descFromFront) {
+				// 修改儲存邏輯，使用 UPSERT 語法
+				await DATABASE.prepare(`
+					INSERT INTO urls VALUES (?, ?, ?, ?, ?)
+					ON CONFLICT(url) DO UPDATE SET 
+					title = excluded.title,
+					desc = excluded.desc,
+					imageUrl = excluded.imageUrl,
+					contentType = excluded.contentType
+				`).bind(url, titleFromFront, descFromFront, imageUrlFromFront, contentTypeFromFront).run();
 
-		// 檢查是否有相同 URL 的資料
-		const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
-		const { results } = await stmt.all();
-		if (results && results.length > 0) {
-			return Response.json({
-				title: results[0].title,
-				desc: results[0].desc,
-				imageUrl: results[0].imageUrl,
-				contentType: results[0].contentType
-			});
-		}
-
-		const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu"];
-		for (let i = 0; i < siteKeywords.length; i++) {
-			const keyword = siteKeywords[i];
-			if (urlStructure.hostname.indexOf(keyword) > -1) {
 				return Response.json({
-					title,
-					desc,
-					imageUrl,
-					contentType
+					title: titleFromFront,
+					desc: descFromFront,
+					imageUrl: imageUrlFromFront,
+					contentType: contentTypeFromFront
 				});
 			}
-		}
-		// twitter 轉址
-		const twitterKeywords = ["x.com", "twitter"];
-		twitterKeywords.forEach((keyword) => {
-			if (urlStructure.hostname.indexOf(keyword) > -1) {
-				url = url.replace(urlStructure.hostname, "api.vxtwitter.com");
-				isTwitter = true;
+
+			let urlStructure = new URL(url);
+			let isTwitter = false;
+			let title = "";
+			let desc = "";
+			let imageUrl = "";
+			let contentType = "";
+			let charset = "utf-8";
+			let headers = {
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0",
+				"Accept-Language": "zh-TW,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6,zh-HK;q=0.5",
+				"Accept-Charset": "utf-8"
+			};
+
+			// 檢查是否有相同 URL 的資料
+			const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
+			const { results } = await stmt.all();
+			if (results && results.length > 0) {
+				return Response.json({
+					title: results[0].title,
+					desc: results[0].desc,
+					imageUrl: results[0].imageUrl,
+					contentType: results[0].contentType
+				});
 			}
-		});
-		// ptt 加變數
-		if (urlStructure.hostname.indexOf("ptt") > -1) {
-			headers.cookie = "over18=1";
-		}
-		try {
+
+			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu"];
+			for (let i = 0; i < siteKeywords.length; i++) {
+				const keyword = siteKeywords[i];
+				if (urlStructure.hostname.indexOf(keyword) > -1) {
+					return Response.json({
+						title,
+						desc,
+						imageUrl,
+						contentType
+					});
+				}
+			}
+			// twitter 轉址
+			const twitterKeywords = ["x.com", "twitter"];
+			twitterKeywords.forEach((keyword) => {
+				if (urlStructure.hostname.indexOf(keyword) > -1) {
+					url = url.replace(urlStructure.hostname, "api.vxtwitter.com");
+					isTwitter = true;
+				}
+			});
+			// ptt 加變數
+			if (urlStructure.hostname.indexOf("ptt") > -1) {
+				headers.cookie = "over18=1";
+			}
 			let responseFrom = await fetch(url, {
 				method: "GET",
 				headers,
@@ -128,13 +155,13 @@ export default {
 
 			// 修改儲存邏輯，使用 UPSERT 語法
 			await DATABASE.prepare(`
-        INSERT INTO urls VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(url) DO UPDATE SET 
-          title = excluded.title,
-          desc = excluded.desc,
-          imageUrl = excluded.imageUrl,
-          contentType = excluded.contentType
-      `).bind(url, title, desc, imageUrl, contentType).run();
+					INSERT INTO urls VALUES (?, ?, ?, ?, ?)
+					ON CONFLICT(url) DO UPDATE SET 
+					title = excluded.title,
+					desc = excluded.desc,
+					imageUrl = excluded.imageUrl,
+					contentType = excluded.contentType
+				`).bind(url, title, desc, imageUrl, contentType).run();
 
 			return Response.json({
 				title,
@@ -144,7 +171,7 @@ export default {
 			});
 		} catch (e) {
 			console.log(e);
-			return Response.json({ "error": " Something got error " });
+			return Response.json({ "error": "發生錯誤\n" + e.toString() });
 		}
 	}
 };
