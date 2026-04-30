@@ -208,9 +208,21 @@ class UploaderBahaImg {
             val inputHeight = videoFormat.getInteger(MediaFormat.KEY_HEIGHT)
             val outputWidth = getScaledWidth(videoFormat)
             val outputHeight = getScaledHeight(videoFormat)
+            
+            // 獲取旋轉角度（直立影片通常有 90 或 270 度旋轉）
+            val rotation = if (videoFormat.containsKey(MediaFormat.KEY_ROTATION)) {
+                videoFormat.getInteger(MediaFormat.KEY_ROTATION)
+            } else {
+                0
+            }
 
             // 2. 建立 Muxer
             muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            
+            // 設置輸出視頻的旋轉角度
+            if (rotation != 0) {
+                muxer.setOrientationHint(rotation)
+            }
             
             // 3. 配置編碼器（先創建編碼器以獲取輸入 Surface）
             val encoderFormat = MediaFormat.createVideoFormat("video/avc", outputWidth, outputHeight).apply {
