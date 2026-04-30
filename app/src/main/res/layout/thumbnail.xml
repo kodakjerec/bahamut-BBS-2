@@ -24,6 +24,12 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:visibility="gone">
+        <ProgressBar
+            android:id="@+id/thumbnail_loading"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone"/>
         <com.github.chrisbanes.photoview.PhotoView
             android:id="@+id/thumbnail_image_pic"
             android:layout_width="match_parent"
