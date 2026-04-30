@@ -8,5 +8,6 @@ interface ArticlePageItemType {
         const val HEADER: Int = 2
         const val POST_TIME: Int = 3
         const val PUSH: Int = 4
+        const val EDIT_RECORD: Int = 5
     }
 }

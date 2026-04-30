@@ -72,13 +72,15 @@ class ArticlePage : TelnetPage() {
     var isFullScreen: Boolean = false
     var listAdapter: BaseAdapter = object : BaseAdapter() {
         private var pushLength = 0 // 推文長度
+        private var editRecordLength = 0 // 修改紀錄長度
 
         // android.widget.Adapter
         override fun getCount(): Int {
             if (telnetArticle != null) {
                 pushLength = telnetArticle!!.pushSize
-                // 內文個數 + header + PostTime + push
-                return telnetArticle!!.itemSize.plus(2) + pushLength
+                editRecordLength = telnetArticle!!.editRecordSize
+                // 內文個數 + header + PostTime + push + editRecord
+                return telnetArticle!!.itemSize.plus(2) + pushLength + editRecordLength
             }
             return 0
         }
@@ -100,12 +102,15 @@ class ArticlePage : TelnetPage() {
             if (itemIndex == 0) {
                 // header
                 return ArticlePageItemType.Companion.HEADER
-            } else if (itemIndex == getCount() - 1 - pushLength) {
+            } else if (itemIndex == getCount() - 1 - pushLength - editRecordLength) {
                 // postTime
                 return ArticlePageItemType.Companion.POST_TIME
-            } else if (itemIndex >= getCount() - pushLength) {
+            } else if (itemIndex >= getCount() - pushLength - editRecordLength && itemIndex < getCount() - editRecordLength) {
                 // push
                 return ArticlePageItemType.Companion.PUSH
+            } else if (itemIndex >= getCount() - editRecordLength) {
+                // editRecord
+                return ArticlePageItemType.Companion.EDIT_RECORD
             }
             // content
             val returnItem = getItem(itemIndex)
@@ -132,6 +137,9 @@ class ArticlePage : TelnetPage() {
 
                     ArticlePageItemType.Companion.PUSH -> itemViewOrigin =
                         ArticlePagePushItemView(context!!)
+
+                    ArticlePageItemType.Companion.EDIT_RECORD -> itemViewOrigin =
+                        ArticlePageEditRecordItemView(context!!)
 
                     else -> {
                         type = ArticlePageItemType.Companion.CONTENT
@@ -178,11 +186,17 @@ class ArticlePage : TelnetPage() {
                 itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
                 itemViewOrigin.setIP(telnetArticle!!.fromIP)
             } else if (itemViewOrigin is ArticlePagePushItemView) {
-                val tempIndex = itemIndex - (getCount() - pushLength) // itemIndex - 本文長度
+                val tempIndex = itemIndex - (getCount() - pushLength - editRecordLength) // itemIndex - 本文長度
                 val itemPush = telnetArticle!!.getPush(tempIndex)
                 if (itemPush != null) {
                     itemViewOrigin.setContent(itemPush)
                     itemViewOrigin.setFloor(tempIndex + 1)
+                }
+            } else if (itemViewOrigin is ArticlePageEditRecordItemView) {
+                val tempIndex = itemIndex - (getCount() - editRecordLength) // itemIndex - 修改紀錄開始位置
+                val itemEditRecord = telnetArticle!!.getEditRecord(tempIndex)
+                if (itemEditRecord != null) {
+                    itemViewOrigin.setContent(itemEditRecord)
                 }
             }
             return itemViewOrigin
@@ -190,7 +204,7 @@ class ArticlePage : TelnetPage() {
 
         /** 一共有多少种不同的视图类型  */
         override fun getViewTypeCount(): Int {
-            return 5
+            return 6
         }
 
         override fun hasStableIds(): Boolean {
