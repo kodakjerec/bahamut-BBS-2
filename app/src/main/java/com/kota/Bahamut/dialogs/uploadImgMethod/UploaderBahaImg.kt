@@ -121,28 +121,41 @@ class UploaderBahaImg {
             if (inputBytes == null || inputBytes.isEmpty()) return null
 
             // 2. 建立臨時檔案
-            val tempInputFile = File(context.cacheDir, "temp_input_video")
-            val tempOutputFile = File(context.cacheDir, "temp_output_video.mp4")
+            val tempInputFile = File(context.cacheDir, "temp_input_video_${System.currentTimeMillis()}")
+            val tempOutputFile = File(context.cacheDir, "temp_output_video_${System.currentTimeMillis()}.mp4")
             
             tempInputFile.writeBytes(inputBytes)
 
-            // 3. 提取視頻資訊並轉碼
-            transcodeVideoWithMediaCodec(tempInputFile, tempOutputFile)
-
-            // 4. 讀取轉碼後的檔案
-            val compressedBytes = if (tempOutputFile.exists()) {
-                tempOutputFile.readBytes()
-            } else {
-                // 轉碼失敗，返回原始檔案（較小的情況下）
-                if (inputBytes.size <= FILE_SIZE_LIMITS["video"]!!) inputBytes else null
+            // 3. 嘗試轉碼，轉碼失敗時回退到原始檔案
+            return try {
+                transcodeVideoWithMediaCodec(tempInputFile, tempOutputFile)
+                
+                // 4. 檢查輸出檔案是否有效
+                if (tempOutputFile.exists() && tempOutputFile.length() > 0) {
+                    val compressedBytes = tempOutputFile.readBytes()
+                    
+                    // 驗證轉碼後的大小是否有意義
+                    if (compressedBytes.isNotEmpty()) {
+                        compressedBytes
+                    } else {
+                        // 轉碼後無效，返回原始
+                        if (inputBytes.size <= fileSizeLimits["video"]!!) inputBytes else null
+                    }
+                } else {
+                    // 轉碼失敗，返回原始檔案（較小的情況下）
+                    if (inputBytes.size <= fileSizeLimits["video"]!!) inputBytes else null
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // 轉碼發生異常，返回原始檔案
+                if (inputBytes.size <= fileSizeLimits["video"]!!) inputBytes else null
+            } finally {
+                // 5. 清理臨時檔案
+                tempInputFile.delete()
+                tempOutputFile.delete()
             }
-
-            // 5. 清理臨時檔案
-            tempInputFile.delete()
-            tempOutputFile.delete()
-
-            compressedBytes
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
     }
@@ -154,6 +167,8 @@ class UploaderBahaImg {
      */
     private fun transcodeVideoWithMediaCodec(inputFile: File, outputFile: File) {
         val extractor = MediaExtractor()
+        var muxer: MediaMuxer? = null
+        
         try {
             extractor.setDataSource(inputFile.absolutePath)
 
@@ -180,14 +195,15 @@ class UploaderBahaImg {
             }
 
             if (videoFormat == null) {
-                extractor.release()
-                return
+                return  // 沒有視頻軌道，無法轉碼
             }
 
-            // 2. 準備輸出格式
-            val muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            // 2. 建立 Muxer
+            muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
+            
             var videoMuxerTrackIndex = -1
             var audioMuxerTrackIndex = -1
+            var muxerStarted = false
 
             // 3. 配置視頻編碼器
             val videoOutputFormat = MediaFormat.createVideoFormat(
@@ -195,8 +211,6 @@ class UploaderBahaImg {
                 getScaledWidth(videoFormat),
                 getScaledHeight(videoFormat)
             ).apply {
-                setInteger(MediaFormat.KEY_COLOR_FORMAT, 
-                    MediaCodec.CodecProfileLevel.AVCProfileBaseline)
                 setInteger(MediaFormat.KEY_BIT_RATE, 2_500_000) // 2.5 Mbps
                 setInteger(MediaFormat.KEY_FRAME_RATE, 30)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
@@ -207,28 +221,36 @@ class UploaderBahaImg {
                 extractor.selectTrack(videoTrackIndex)
                 videoMuxerTrackIndex = transcodeVideoTrack(
                     extractor, 
-                    muxer, 
+                    muxer,
                     videoFormat, 
-                    videoOutputFormat
+                    videoOutputFormat,
+                    { if (!muxerStarted) { muxer.start(); muxerStarted = true } }
                 )
             }
 
-            // 5. 轉碼或複製音頻軌道
+            // 5. 複製或轉碼音頻軌道
             if (audioTrackIndex >= 0 && audioFormat != null) {
                 extractor.selectTrack(audioTrackIndex)
-                audioMuxerTrackIndex = transcodeAudioTrack(
-                    extractor, 
-                    muxer, 
-                    audioFormat
-                )
+                extractor.seekTo(0, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
+                
+                audioMuxerTrackIndex = muxer.addTrack(audioFormat)
+                if (!muxerStarted) {
+                    muxer.start()
+                    muxerStarted = true
+                }
+                
+                copyAudioTrack(extractor, muxer, audioMuxerTrackIndex)
             }
 
-            muxer.stop()
-            muxer.release()
+            // 6. 停止 Muxer
+            if (muxerStarted) {
+                muxer.stop()
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
             extractor.release()
+            muxer?.release()
         }
     }
 
@@ -239,7 +261,8 @@ class UploaderBahaImg {
         extractor: MediaExtractor,
         muxer: MediaMuxer,
         inputFormat: MediaFormat,
-        outputFormat: MediaFormat
+        outputFormat: MediaFormat,
+        onMuxerReady: () -> Unit
     ): Int {
         var muxerTrackIndex = -1
         var codec: MediaCodec? = null
@@ -250,11 +273,11 @@ class UploaderBahaImg {
             codec.start()
 
             muxerTrackIndex = muxer.addTrack(codec.outputFormat)
-            muxer.start()
+            onMuxerReady()  // 準備好後啟動 Muxer
 
             val bufferInfo = MediaCodec.BufferInfo()
-            var presentationTime = 0L
 
+            // 讀取輸入幀
             while (true) {
                 val inputIndex = codec.dequeueInputBuffer(10000)
                 if (inputIndex >= 0) {
@@ -263,12 +286,13 @@ class UploaderBahaImg {
                     if (sampleSize < 0) {
                         codec.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
                     } else {
-                        presentationTime = extractor.sampleTime
+                        val presentationTime = extractor.sampleTime
                         codec.queueInputBuffer(inputIndex, 0, sampleSize, presentationTime, 0)
                         extractor.advance()
                     }
                 }
 
+                // 獲取編碼後的輸出
                 val outputIndex = codec.dequeueOutputBuffer(bufferInfo, 10000)
                 if (outputIndex >= 0) {
                     if (bufferInfo.size > 0) {
@@ -279,8 +303,12 @@ class UploaderBahaImg {
                     if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
                         break
                     }
+                } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+                    // 編碼器改變了輸出格式（已在 muxer.addTrack 中處理）
                 }
             }
+        } catch (e: Exception) {
+            e.printStackTrace()
         } finally {
             codec?.stop()
             codec?.release()
@@ -290,33 +318,34 @@ class UploaderBahaImg {
     }
 
     /**
-     * 轉碼或複製音頻軌道
+     * 複製音頻軌道（無需轉碼）
      */
-    private fun transcodeAudioTrack(
+    private fun copyAudioTrack(
         extractor: MediaExtractor,
         muxer: MediaMuxer,
-        audioFormat: MediaFormat
-    ): Int {
-        val muxerTrackIndex = muxer.addTrack(audioFormat)
-        val bufferInfo = MediaCodec.BufferInfo()
-        val buffer = java.nio.ByteBuffer.allocate(256 * 1024)
+        audioMuxerTrackIndex: Int
+    ) {
+        try {
+            val bufferInfo = MediaCodec.BufferInfo()
+            val buffer = java.nio.ByteBuffer.allocate(256 * 1024)
 
-        while (true) {
-            val sampleSize = extractor.readSampleData(buffer, 0)
-            if (sampleSize < 0) break
+            while (true) {
+                val sampleSize = extractor.readSampleData(buffer, 0)
+                if (sampleSize < 0) break
 
-            bufferInfo.apply {
-                offset = 0
-                size = sampleSize
-                presentationTimeUs = extractor.sampleTime
-                flags = extractor.sampleFlags
+                bufferInfo.apply {
+                    offset = 0
+                    size = sampleSize
+                    presentationTimeUs = extractor.sampleTime
+                    flags = 0
+                }
+
+                muxer.writeSampleData(audioMuxerTrackIndex, buffer, bufferInfo)
+                extractor.advance()
             }
-
-            muxer.writeSampleData(muxerTrackIndex, buffer, bufferInfo)
-            extractor.advance()
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
-
-        return muxerTrackIndex
     }
 
     /**
