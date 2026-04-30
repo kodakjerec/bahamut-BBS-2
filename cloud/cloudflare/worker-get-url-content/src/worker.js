@@ -66,7 +66,7 @@ export default {
 				"Accept-Charset": "utf-8",
 			};
 
-			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu"];
+			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu", "kodakjerec"];
 			for (let i = 0; i < siteKeywords.length; i++) {
 				const keyword = siteKeywords[i];
 				if (urlStructure.hostname.indexOf(keyword) > -1) {
@@ -78,6 +78,7 @@ export default {
 					});
 				}
 			}
+
 			// twitter 轉址
 			const twitterKeywords = ["x.com", "twitter"];
 			twitterKeywords.forEach((keyword) => {
@@ -117,7 +118,8 @@ export default {
 					// 将HTML文本解码并解析
 					let decoder = new TextDecoder(charset);
 					const html = await responseFrom.arrayBuffer();
-					const soup = cheerio.load(decoder.decode(html));
+					const htmlBuffer = decoder.decode(html);
+					const soup = cheerio.load(htmlBuffer);
 					const originHtml = soup.html();
 					
 					// 记录HTML大小和基本信息
@@ -152,12 +154,12 @@ export default {
 					
 					ctx.waitUntil(
 						env.ANALYTICS.writeDataPoint({
-							indexes: ["getUrl", "parse_result"],
+							indexes: ["getUrl"],
 							blobs: [
-								url,
-								urlStructure.hostname,
-								parseQuality.isComplete ? "complete" : "incomplete",
-								parseQuality.possiblyBlocked ? "blocked" : "normal"
+								"parse_result",  // 事件类型
+								urlStructure.hostname,  // 网站
+								parseQuality.isComplete ? "complete" : "incomplete",  // 完整性
+								parseQuality.possiblyBlocked ? "blocked" : "normal"  // 状态
 							],
 							doubles: [
 								parseMetrics.htmlSize,
@@ -169,6 +171,13 @@ export default {
 						})
 					);
 
+					// ✅ 保存 htmlBuffer 到数据库
+					await DATABASE.prepare(`
+						INSERT INTO urls_html VALUES (?, ?, ?)
+						ON CONFLICT(url) DO UPDATE SET 
+						htmlContent = excluded.htmlContent,
+						createdAt = excluded.createdAt
+					`).bind(url, htmlBuffer, new Date().toISOString()).run();
 				} else {
 					// 非HTML文件：使用路径作为标题，用URL作为图片
 					title = urlStructure.pathname;
@@ -176,8 +185,8 @@ export default {
 					
 					ctx.waitUntil(
 						env.ANALYTICS.writeDataPoint({
-							indexes: ["getUrl", "non_html"],
-							blobs: [url, contentType],
+							indexes: ["getUrl"],
+							blobs: ["non_html", contentType],
 							doubles: [0]
 						})
 					);
