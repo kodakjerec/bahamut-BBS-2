@@ -11,12 +11,21 @@ import com.kota.telnet.TelnetClient
 import java.util.Locale.getDefault
 import java.util.Vector
 
+import java.io.Closeable
+
 class UrlDatabase(context: Context?) : SQLiteOpenHelper(
     context,
     TelnetClient.myInstance!!.username.lowercase(getDefault()).trim() + "_database",
     null,
     1
-) {
+), Closeable {
+        override fun close() {
+            try {
+                this.readableDatabase.close()
+                this.writableDatabase.close()
+            } catch (_: Exception) {
+            }
+        }
     override fun onCreate(aDatabase: SQLiteDatabase) {
         try {
             var createUrlsTableQuery = "CREATE TABLE IF NOT EXISTS urls (" +
