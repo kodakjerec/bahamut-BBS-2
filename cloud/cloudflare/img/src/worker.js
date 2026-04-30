@@ -8,8 +8,9 @@
  * Learn more at https://developers.cloudflare.com/workers/
  */
 
-// 定義常見圖片副檔名與其對應的 MIME 類型映射
+// 定義常見圖片和影片副檔名與其對應的 MIME 類型映射
 const mimeTypeMap = {
+  // 圖片格式
   'jpg': 'image/jpeg',
   'jpeg': 'image/jpeg',
   'png': 'image/png',
@@ -17,7 +18,31 @@ const mimeTypeMap = {
   'webp': 'image/webp',
   'svg': 'image/svg+xml',
   'ico': 'image/x-icon',
-  // 您可以根據需要添加更多圖片類型
+  // 影片格式
+  'mp4': 'video/mp4',
+  'webm': 'video/webm',
+  'mov': 'video/quicktime',
+  'avi': 'video/x-msvideo',
+  'mkv': 'video/x-matroska',
+  'flv': 'video/x-flv',
+  'wmv': 'video/x-ms-wmv',
+};
+
+// 文件大小限制 (單位: bytes)
+const FILE_SIZE_LIMITS = {
+  image: 10 * 1024 * 1024,  // 圖片: 10MB
+  video: 100 * 1024 * 1024, // 影片: 100MB
+};
+
+// 識別檔案類型
+const getFileType = (ext) => {
+  const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'ico'];
+  const videoExts = ['mp4', 'webm', 'mov', 'avi', 'mkv', 'flv', 'wmv'];
+  
+  const lowerExt = ext.toLowerCase();
+  if (imageExts.includes(lowerExt)) return 'image';
+  if (videoExts.includes(lowerExt)) return 'video';
+  return null;
 };
 
 export default {
@@ -30,16 +55,30 @@ export default {
       return new Response("Cleanup triggered");
     }
 
-    // 上傳圖片
+    // 上傳圖片或影片
     if (url.pathname === "/upload" && request.method === "POST") {
       const form = await request.formData();
       const file = form.get("image");
 
       if (!(file instanceof File)) {
-        return new Response("No image", {status: 400});
+        return new Response("No file", {status: 400});
       }
 
       const ext = file.name.split(".").pop();
+      const fileType = getFileType(ext);
+
+      // 驗證檔案類型
+      if (!fileType) {
+        return new Response("Unsupported file type", {status: 400});
+      }
+
+      // 驗證檔案大小
+      const sizeLimit = FILE_SIZE_LIMITS[fileType];
+      if (file.size > sizeLimit) {
+        const limitMB = sizeLimit / (1024 * 1024);
+        return new Response(`File too large. ${fileType} limit: ${limitMB}MB`, {status: 413});
+      }
+
       const id = crypto.randomUUID().replace(/-/g, '').slice(0, 10);
       const filename = `${id}.${ext}`;
 
@@ -67,7 +106,7 @@ export default {
       });
     }
 
-    // 讀取圖片
+    // 讀取圖片或影片
     const filename = url.pathname.slice(1);
     if (!filename) return new Response("Not found", { status:404 });
 
