@@ -31,7 +31,7 @@ const mimeTypeMap = {
 // 文件大小限制 (單位: bytes)
 const FILE_SIZE_LIMITS = {
   image: 10 * 1024 * 1024,  // 圖片: 10MB
-  video: 100 * 1024 * 1024, // 影片: 100MB
+  video: 20 * 1024 * 1024, // 影片: 20MB
 };
 
 // 識別檔案類型
