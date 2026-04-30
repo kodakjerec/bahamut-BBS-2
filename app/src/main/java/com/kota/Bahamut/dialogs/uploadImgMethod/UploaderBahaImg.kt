@@ -524,7 +524,7 @@ class UploaderBahaImg {
                 return
             }
 
-            // 5. 建立 Multipart 表單內容
+            // 4. 建立 Multipart 表單內容
             val mimeType = if (mediaType == "image") "image/*" else "video/*"
             val requestBody = MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
