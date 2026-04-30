@@ -243,7 +243,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     val jsonString = scriptData.substring(startPos + prefix.length, endPos)
 
                     // 使用 GsonBuilder 建立一個「寬容模式」的 Gson
-                    val gson = GsonBuilder().setLenient().create()
+                    val gson = GsonBuilder().create()
                     val rootObj = gson.fromJson(jsonString, JsonObject::class.java)
 
                     // 利用 Gson 的層級訪問安全地取得 desc
@@ -463,6 +463,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         DialogImageView()
             .setImageUrl(myImageUrl)
             .show()
+        true
     }
 
     /** 點擊標題展開或收起 */

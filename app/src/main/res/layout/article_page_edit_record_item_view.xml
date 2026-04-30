@@ -4,7 +4,7 @@
     style="@style/Block"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/edit_text_background_color">
+    android:background="@color/transparent">
     <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/ArticleEditRecordItemView_Content"
         style="@style/TextViewSmall"
