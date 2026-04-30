@@ -86,13 +86,4 @@ class DialogSearchArticle : ASDialog(), View.OnClickListener {
         if (searchOptions[2] == "y") markRadio.check(R.id.Bahamut_Dialog_Search_mark_YES)
         gyField.setText(searchOptions[3])
     }
-
-    /** 變更dialog寬度 */
-    private fun setDialogWidth() {
-        val screenWidth = context.resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.7).toInt()
-        val oldLayoutParams = mainLayout.layoutParams
-        oldLayoutParams.width = dialogWidth
-        mainLayout.layoutParams = oldLayoutParams
-    }
 }

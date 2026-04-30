@@ -68,16 +68,4 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         loginWeb?.cleanup()
         loginWeb = null
     }
-
-    // 變更dialog寬度和高度
-    private fun setDialogWidthHeight() {
-        val screenWidth = context.resources.displayMetrics.widthPixels
-        val screenHeight = context.resources.displayMetrics.heightPixels
-        val dialogWidth = (screenWidth * 0.8).toInt()
-        val dialogHeight = (screenHeight * 0.8).toInt()
-        val oldLayoutParams: ViewGroup.LayoutParams = mainLayout.layoutParams
-        oldLayoutParams.width = dialogWidth
-        oldLayoutParams.height = dialogHeight
-        mainLayout.layoutParams = oldLayoutParams
-    }
 }

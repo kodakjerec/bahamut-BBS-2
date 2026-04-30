@@ -369,13 +369,4 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         }
         mainLayout.layoutParams = layoutParams
     }
-
-    // 變更dialog寬度
-    private fun setDialogWidth() {
-        val screenWidth = resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.7).toInt()
-        val oldLayoutParams = mainLayout.layoutParams
-        oldLayoutParams.width = dialogWidth
-        mainLayout.layoutParams = oldLayoutParams
-    }
 }

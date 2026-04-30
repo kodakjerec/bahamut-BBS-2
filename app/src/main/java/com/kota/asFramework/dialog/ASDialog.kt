@@ -124,9 +124,20 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     // 變更dialog寬度
     fun setDialogWidth(targetView: View) {
         val screenWidth = context.resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.7).toInt()
+        val dialogWidth = (screenWidth * 0.8).toInt()
         val oldLayoutParams = targetView.layoutParams
         oldLayoutParams.width = dialogWidth
         targetView.layoutParams = oldLayoutParams
+    }
+    // 變更dialog寬度和高度
+    fun setDialogWidthHeight() {
+        val screenWidth = context.resources.displayMetrics.widthPixels
+        val screenHeight = context.resources.displayMetrics.heightPixels
+        val dialogWidth = (screenWidth * 0.8).toInt()
+        val dialogHeight = (screenHeight * 0.8).toInt()
+        val oldLayoutParams: ViewGroup.LayoutParams = mainLayout.layoutParams
+        oldLayoutParams.width = dialogWidth
+        oldLayoutParams.height = dialogHeight
+        mainLayout.layoutParams = oldLayoutParams
     }
 }

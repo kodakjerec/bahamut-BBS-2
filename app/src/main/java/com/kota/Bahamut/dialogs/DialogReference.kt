@@ -84,15 +84,6 @@ class DialogReference : ASDialog(), View.OnClickListener {
         }
     }
 
-    // 變更dialog寬度
-    private fun setDialogWidth() {
-        val screenWidth = context.resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.7).toInt()
-        val oldLayoutParams: ViewGroup.LayoutParams = mainLayout.layoutParams
-        oldLayoutParams.width = dialogWidth
-        mainLayout.layoutParams = oldLayoutParams
-    }
-
     override fun onClick(view: View) {
         if (view === sendButton && dialogReferenceListener != null) {
             // 回收資料

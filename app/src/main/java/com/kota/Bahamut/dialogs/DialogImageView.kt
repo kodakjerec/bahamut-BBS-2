@@ -100,24 +100,22 @@ class DialogImageView : ASDialog() {
 
                                 val picHeight = bitmap.height
                                 val picWidth = bitmap.width
-                                val viewHeight = context.resources.displayMetrics.heightPixels * 2 / 3
-                                val viewWidth = context.resources.displayMetrics.widthPixels
 
-                                val scaleWidth = viewWidth.toFloat() / picWidth
-                                val scaleHeight = viewHeight.toFloat() / picHeight
-                                var scale = min(scaleWidth, scaleHeight)
-                                if (scale > 1) scale = 1f
+                                // 固定視窗尺寸 (80% 螢幕寬高)
+                                val fixedHeight = (context.resources.displayMetrics.heightPixels * 0.8).toInt()
+                                val fixedWidth = (context.resources.displayMetrics.widthPixels * 0.8).toInt()
+                                setDialogWidthHeight(fixedWidth, fixedHeight)
 
-                                val tempHeight = (picHeight * scale).toInt()
-                                val targetHeight = min(tempHeight, viewHeight)
-                                photoView.minimumHeight = targetHeight
+                                // 計算縮放比例，讓圖片最大化填滿視窗（碰到寬或高為止），維持比例
+                                val scale = min(fixedWidth.toFloat() / picWidth, fixedHeight.toFloat() / picHeight)
+                                val targetWidth = (picWidth * scale).toInt()
+                                val targetHeight = (picHeight * scale).toInt()
 
-                                val tempWidth = (picWidth * scale).toInt()
-                                val targetWidth = min(tempWidth, viewWidth)
-                                photoView.minimumWidth = targetWidth
 
+                                // 顯示圖片，縮放到 targetWidth/targetHeight
                                 if (resource is GifDrawable) {
                                     resource.startFromFirstFrame()
+                                    // GIF 直接設置 Drawable，PhotoView 會自動處理縮放
                                     photoView.setImageDrawable(resource)
                                 } else {
                                     val newBitmap = bitmap.scale(targetWidth, targetHeight)
@@ -159,10 +157,9 @@ class DialogImageView : ASDialog() {
         photoView.maximumScale = 20.0f
         photoView.mediumScale = 3.0f
 
-        val screenHeight = context.resources.displayMetrics.heightPixels
         val photoViewParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
-            screenHeight * 2 / 3
+            FrameLayout.LayoutParams.MATCH_PARENT
         )
         photoViewParams.gravity = Gravity.CENTER
 
