@@ -33,7 +33,7 @@ import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderLitterCatBox
+import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderBahaImg
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeFunctions
@@ -143,28 +143,33 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             return@OnClickListener
         }
         ASCoroutine.runInNewCoroutine {
-            try {
-                val uploaderObj = UploaderLitterCatBox()
-                // 本地檔案上傳
-                val link = uploaderObj.postImage( finalUri )
-                if (link.startsWith("http")) {
+            val uploaderObj = UploaderBahaImg()
+            // 使用 bahaImg 的非同步上傳
+            uploaderObj.uploadImage( applicationContext, finalUri, object : UploaderBahaImg.UploadCallback {
+                override fun onSuccess(imageUrl: String) {
                     ASCoroutine.ensureMainThread {
-                        sampleTextView?.text = link
-                        outputParam = sampleTextView?.text.toString()
+                        // 更新前端畫面
+                        sampleTextView?.text = imageUrl
+                        outputParam = imageUrl
                         sendButton?.isEnabled = true
                         transferButton?.isEnabled = false
+
+                        // 更新縮網址次數統計
                         var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
                         UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
+
+                        // 關閉讀取視窗
+                        closeProcessingDialog()
                     }
-                } else {
-                    throw Exception("")
                 }
-            } catch (e: Exception) {
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + e.message)
-                Log.e(javaClass.simpleName, e.message.toString())
-            } finally {
-                closeProcessingDialog()
-            }
+
+                override fun onError(message: String) {
+                    ASCoroutine.ensureMainThread {
+                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + message)
+                        closeProcessingDialog()
+                    }
+                }
+            })
         }
     }
 

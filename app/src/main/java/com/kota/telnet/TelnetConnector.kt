@@ -22,10 +22,12 @@ class TelnetConnector : TelnetChannelListener {
             this.telnetChannels[0] = null
             this.telnetChannels[1] = null
         }
-        if (this.holderThread != null) {
-            this.holderThread?.close()
-        }
-        this.holderThread = null
+
+        // 1. 先中斷並清理執行緒
+        holderThread?.close()
+        holderThread = null
+
+        // 2. 真正關閉 Socket
         if (this.socketChannel != null) {
             try {
                 this.socketChannel?.finishConnect()

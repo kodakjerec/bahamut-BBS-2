@@ -3,19 +3,22 @@ package com.kota.Bahamut.pages.model
 import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetUtils
+import com.kota.telnet.logic.ClassMode
 
 class ClassPageHandler private constructor() {
     fun load(): ClassPageBlock {
         val classPackage: ClassPageBlock = ClassPageBlock.Companion.create()
-        if (TelnetClient.model.getRowString(2)?.trim()!!.startsWith("編號")) {
-            classPackage.mode = 0
+        // TODO: 原本設計是 編號/總數 共用, 但是總數目前無法逐步新增
+        if (TelnetClient.model.getRowString(2).trim().startsWith("編號")) {
+            classPackage.mode = ClassMode.INDEX
         } else {
-            classPackage.mode = 1
+            classPackage.mode = ClassMode.COUNT
         }
         val endIndex = 3 + 20
         var i = 3
-        while (i < endIndex && TelnetClient.model.getRowString(i)!!.isNotEmpty()) {
+        while (i < endIndex && TelnetClient.model.getRowString(i).isNotEmpty()) {
             val row: TelnetRow? = TelnetClient.model.getRow(i)
+            // 看板編號
             val boardIndex = TelnetUtils.getIntegerFromData(row!!, 1, 5)
             if (i == 3) {
                 classPackage.minimumItemNumber = boardIndex

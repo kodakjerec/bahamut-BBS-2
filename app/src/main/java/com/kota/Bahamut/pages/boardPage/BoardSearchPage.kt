@@ -46,21 +46,25 @@ class BoardSearchPage : BoardMainPage() {
                 .addButton(getContextString(R.string.insert))
                 .setListener { aDialog: ASAlertDialog?, index: Int ->
                     if (index == 1) {
-                        val bookmark = Bookmark()
-                        println("add bookmark:" + bookmark.title)
-                        bookmark.board = this@BoardSearchPage.listName
-                        bookmark.keyword = item.title
-                        bookmark.title = bookmark.generateTitle()
-                        val store = TempSettings.bookmarkStore
-                        if (store != null) {
-                            store.getBookmarkList(this@BoardSearchPage.listName)
-                                .addBookmark(bookmark)
-                            store.store()
-                        }
+                        addBookmark(item)
                     }
                 }.scheduleDismissOnPageDisappear(this).show()
         }
+
         return true
+    }
+
+    /** 加入書籤 */
+    private fun addBookmark(item: BoardPageItem) {
+        val bookmark = Bookmark()
+        bookmark.board = this@BoardSearchPage.listName
+        bookmark.keyword = item.title
+        bookmark.title = bookmark.generateTitle()
+        val store = TempSettings.bookmarkStore
+        if (store != null) {
+            store.getBookmarkList(this@BoardSearchPage.listName).addBookmark(bookmark)
+            store.store()
+        }
     }
 
     override val listType: Int

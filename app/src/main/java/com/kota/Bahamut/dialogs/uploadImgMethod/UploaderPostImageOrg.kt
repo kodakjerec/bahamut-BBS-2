@@ -9,7 +9,7 @@ import android.webkit.WebViewClient
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-class UploaderPostimageorg(private val context: Context) {
+class UploaderPostImageOrg(private val context: Context) {
 
     @SuppressLint("SetJavaScriptEnabled")
     suspend fun postImage(source: Uri): String = suspendCancellableCoroutine { cont ->

@@ -15,9 +15,26 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
-
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.Locale.getDefault
 
 class CloudBackup {
+    // 文字轉為 long
+    private fun parseTimeToLong(timeString: String?): Long {
+        if (timeString.isNullOrEmpty()) return 0L
+        return try {
+            // 請確保這裡的 format 與你伺服器回傳的字串格式一致
+            // 例如: "2026-04-02 13:55:50"
+            val sdf = SimpleDateFormat(
+                "yyyy/MM/dd HH:mm:ss",
+                Locale.getDefault()
+            )
+            sdf.parse(timeString)?.time ?: 0L
+        } catch (e: Exception) {
+            0L
+        }
+    }
 
     // 詢問雲端
     fun askCloudSave(): CloudBackup {
@@ -168,7 +185,7 @@ class CloudBackup {
                             ASToast.showShortToast("雲端備份失敗：$error")
                         } else {
                             // 雲端備份的時間
-                            TempSettings.cloudSaveLastTime = fromJsonObject.optString("lastTime", "")
+                            TempSettings.cloudSaveLastTime = parseTimeToLong(fromJsonObject.optString("lastTime", ""))
                         }
                     }
                 }catch (e: Exception) {
@@ -220,7 +237,7 @@ class CloudBackup {
                                 .create()
 
                             // 雲端備份的時間
-                            TempSettings.cloudSaveLastTime = jsonObject.optString("lastTime", "")
+                            TempSettings.cloudSaveLastTime = parseTimeToLong(jsonObject.optString("lastTime", ""))
 
                             val jsonDataString = jsonObject.getString("jsonData")
                             val fromJsonObject = gson.fromJson(

@@ -35,30 +35,33 @@ class BoardLinkPage : BoardMainPage() {
 
     // 長按串接到的item
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
-        val item = this@BoardLinkPage.getItem(index) as BoardPageItem?
+        val item = this@BoardLinkPage.getItem(index) as BoardPageItem? ?: return true
 
-        if (item != null) {
-            ASAlertDialog.createDialog()
-                .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
-                .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
-                .addButton(getContextString(R.string.cancel))
-                .addButton(getContextString(R.string.insert))
-                .setListener { aDialog: ASAlertDialog?, index: Int ->
-                    if (index == 1) {
-                        val bookmark = Bookmark()
-                        println("add bookmark:" + bookmark.title)
-                        bookmark.board = this@BoardLinkPage.listName
-                        bookmark.keyword = item.title
-                        bookmark.title = bookmark.generateTitle()
-                        val store = TempSettings.bookmarkStore
-                        if (store != null) {
-                            store.getBookmarkList(this@BoardLinkPage.listName).addBookmark(bookmark)
-                            store.store()
-                        }
-                    }
-                }.scheduleDismissOnPageDisappear(this).show()
-        }
+        ASAlertDialog.createDialog()
+            .setTitle(getContextString(R.string.insert) + getContextString(R.string.bookmark))
+            .setMessage(getContextString(R.string.insert_this_bookmark) + "\n\"" + item.title + "\"")
+            .addButton(getContextString(R.string.cancel))
+            .addButton(getContextString(R.string.insert))
+            .setListener { aDialog: ASAlertDialog?, index: Int ->
+                if (index == 1) {
+                    addBookmark(item)
+                }
+            }.scheduleDismissOnPageDisappear(this).show()
+
         return true
+    }
+
+    /** 加入書籤 */
+    private fun addBookmark(item: BoardPageItem) {
+        val bookmark = Bookmark()
+        bookmark.board = this@BoardLinkPage.listName
+        bookmark.keyword = item.title
+        bookmark.title = bookmark.generateTitle()
+        val store = TempSettings.bookmarkStore
+        if (store != null) {
+            store.getBookmarkList(this@BoardLinkPage.listName).addBookmark(bookmark)
+            store.store()
+        }
     }
 
     override fun getListIdFromListName(aName: String?): String? {

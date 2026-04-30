@@ -3,8 +3,10 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.messages.MessageSmall
+import com.kota.asFramework.thread.ASCoroutine
 
 data class HeroStep (
     var authorNickname: String,
@@ -32,9 +34,9 @@ object TempSettings {
     @JvmField
     var boardFollowTitle = "" // 正在看的討論串標題
     @JvmField
-    var cloudSaveLastTime: String = "" // 雲端備份最後時間
+    var cloudSaveLastTime: Long = 0L // 雲端備份最後時間
     @JvmField
-    var webAutoLoginSuccessTime: String = "" // web自動簽到成功時間
+    var webAutoLoginSuccessTime: Long = 0L // web自動簽到成功時間
     @JvmField
     var transportType = -1 // 網路狀況
     @JvmField
@@ -45,6 +47,8 @@ object TempSettings {
     var myContext: Context? = null
     @JvmField
     var myActivity: Activity? = null
+    @JvmField
+    var editFromLinkedState: EditFromLinkedState? = null // 從串接頁編輯文章的狀態
 
     // 比較少用到的變數, 不影響效能
     private var messageSmall: MessageSmall? = null // 聊天小視窗
@@ -59,8 +63,14 @@ object TempSettings {
         isSyncMessageMain = false
         lastReceivedMessage = ""
         boardFollowTitle = ""
-        cloudSaveLastTime = ""
+        cloudSaveLastTime = 0L
         heroStepList = mutableListOf()
+        editFromLinkedState = null
+        // 清除Glide
+        Glide.get(applicationContext!!).clearMemory()
+        ASCoroutine.runInNewCoroutine {
+            Glide.get(applicationContext!!).clearDiskCache()
+        }
     }
 
     @JvmStatic
@@ -92,12 +102,12 @@ object TempSettings {
 
     /** web自動簽到成功時間 */
     @JvmStatic
-    fun setWebAutoLoginSuccessTime(time: String) {
+    fun setWebAutoLoginSuccessTime(time: Long) {
         webAutoLoginSuccessTime = time
     }
 
     @JvmStatic
-    fun getWebAutoLoginSuccessTime(): String {
+    fun getWebAutoLoginSuccessTime(): Long {
         return webAutoLoginSuccessTime
     }
 

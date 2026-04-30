@@ -5,14 +5,14 @@ import java.util.Stack
 
 class ClassPageItem private constructor() : TelnetListPageItem() {
     @JvmField
-    var manager: String = ""
-    var mode: Int = 0
+    var manager: String = "" // 版主群
+    var mode: Int = 0 // 0: 看板分類, 1: 看板列表
     @JvmField
-    var name: String = ""
+    var name: String = "" // 看板英文名稱
     @JvmField
-    var title: String = ""
+    var title: String = "" // 看板中文名稱
     @JvmField
-    var isDirectory: Boolean = false
+    var isDirectory: Boolean = false // 是否為目錄
 
     override fun clear() {
         super.clear()
@@ -24,7 +24,6 @@ class ClassPageItem private constructor() : TelnetListPageItem() {
     }
 
     companion object {
-        private const val COUNT = 0
         private val _pool = Stack<ClassPageItem>()
         @JvmStatic
         fun release() {

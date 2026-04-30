@@ -110,15 +110,6 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         }
     }
 
-    /** 儲存書籤, 但是不通知雲端  */
-    fun storeWithoutCloud() {
-        val obj: JSONObject = exportToJSON()
-        println("save bookmark store to file")
-        this.context?.getSharedPreferences("bookmark", 0)?.edit {
-            putString("save_data", obj.toString())
-        }
-    }
-
     private fun load(): BookmarkStore {
         var perf: SharedPreferences? = null
         var saveData = ""

@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -24,8 +25,11 @@ import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
+import com.kota.Bahamut.dialogs.DialogImageView
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
@@ -115,11 +119,12 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             myDescription = jsonObject.getString("desc")
                             myImageUrl = jsonObject.getString("imageUrl")
 
-                            // 非圖片類比較會有擷取問題
-                            if (!isPic && (myTitle == "" || myDescription == "")) {
+                            // 遠端詢問 cloudflare 解讀失敗，改由本地直接連線獲取內容
+                            if (myTitle == "" || myDescription == "") {
                                 var userAgent: String = System.getProperty("http.agent")!!
                                 if (myUrl.contains("youtu") || myUrl.contains("amazon"))
                                     userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
+
 
                                 // cookie
                                 // Create a new Map to store cookies
@@ -127,45 +132,57 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                 if (myUrl.contains("ptt"))
                                     cookies.put("over18", "1")  // Add the over18 cookie with value 1
 
+                                // 直接去ping對方
                                 val resp: Connection.Response = Jsoup
-                                        .connect(myUrl)
-                                        .header("User-Agent", userAgent)
-                                        .cookies(cookies)
-                                        .execute()
-                                contentType = resp.contentType()!!
+                                    .connect(myUrl)
+                                    .header("User-Agent", userAgent)
+                                    .cookies(cookies)
+                                    .timeout(10000)
+                                    .ignoreContentType(true)
+                                    .execute()
+                                contentType = resp.contentType() ?: ""
 
                                 if (contentType.contains("image/") || contentType.contains("video/")) {
                                     isPic = true
                                 }
-                                // 域名判斷
-                                if (url.contains("i.imgur")) {
-                                    isPic = true
-                                }
 
-                                // 圖片處理
-                                if (isPic) {
-                                    myTitle = myUrl
-                                    myDescription = ""
-                                    myImageUrl = myUrl
-                                } else {
+                                if (contentType.contains("text/html")) {
                                     // 文字處理
                                     val document: Document = resp.parse()
 
                                     myTitle = document.title()
                                     if (myTitle.isEmpty())
-                                        myTitle = document.select("meta[property=og:title]").attr("content")
+                                        myTitle = document.select("meta[property=og:title]")
+                                            .attr("content")
 
-                                    myDescription = document.select("meta[name=description]").attr("content")
+                                    myDescription = document.select("meta[name=description]")
+                                        .attr("content")
                                     if (myDescription.isEmpty())
-                                        myDescription = document.select("meta[property=og:description]").attr("content")
+                                        myDescription =
+                                            document.select("meta[property=og:description]")
+                                                .attr("content")
 
-                                    myImageUrl = document.select("meta[property=og:image]").attr("content")
+                                    myImageUrl = document.select("meta[property=og:image]")
+                                        .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("meta[property=og:image]").attr("content")
+                                        myImageUrl = document.select("meta[property=og:image]")
+                                            .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("meta[property=og:images]").attr("content")
+                                        myImageUrl = document.select("meta[property=og:images]")
+                                            .attr("content")
                                     if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("#landingImage").attr("src")
+                                        myImageUrl =
+                                            document.select("#landingImage").attr("src")
+
+
+                                    // 2. 針對 B 站數據進行 Gson 深度解析
+                                    parseBilibiliData(document)
+                                }
+
+                                // 圖片處理
+                                if (isPic) {
+                                    if (myTitle.isEmpty()) myTitle = myUrl
+                                    if (myImageUrl.isEmpty()) myImageUrl = myUrl // 圖片網址就是預覽圖網址
                                 }
                             }
 
@@ -173,7 +190,24 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             picoUrlChangeStatus(isPic)
 
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
-                        } catch (_: Exception) {
+
+                            // 上傳至cloudflare, 方便之後擷取
+                            val body: RequestBody = MultipartBody.Builder()
+                                .setType(MultipartBody.FORM)
+                                .addFormDataPart("url", myUrl)
+                                .addFormDataPart("title", myTitle)
+                                .addFormDataPart("description", myDescription)
+                                .addFormDataPart("imageUrl",myImageUrl)
+                                .addFormDataPart("contentType", contentType)
+                                .build()
+                            val request: Request = Request.Builder()
+                                .url(apiUrl)
+                                .post(body)
+                                .build()
+                            client.newCall(request).execute()
+
+                        } catch (e: Exception) {
+                            Log.e("loadUrl", e.message.toString())
                             ASCoroutine.ensureMainThread {
                                 setFail()
                             }
@@ -185,6 +219,57 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
             ASCoroutine.ensureMainThread {
                 setFail()
             }
+        }
+    }
+
+    /** 針對 B 站數據進行 Gson 深度解析 */
+    private fun parseBilibiliData(document: Document) {
+        try {
+            // 尋找包含狀態數據的 script 標籤
+            val scriptTag = document.select("script").find { it.data().contains("window.__INITIAL_STATE__") }
+
+            scriptTag?.let {
+                val scriptData = it.data()
+                // 1. 設定起始點：從 window.__INITIAL_STATE__={ 之後開始
+                val prefix = "window.__INITIAL_STATE__="
+                val startPos = scriptData.indexOf(prefix)
+
+                // 2. 設定結束點：你發現的規律關鍵字
+                val suffix = ";(function()"
+                val endPos = scriptData.indexOf(suffix)
+
+                if (startPos != -1 && endPos != -1) {
+                    // 截取 prefix 之後到 suffix 之前的內容
+                    val jsonString = scriptData.substring(startPos + prefix.length, endPos)
+
+                    // 使用 GsonBuilder 建立一個「寬容模式」的 Gson
+                    val gson = GsonBuilder().create()
+                    val rootObj = gson.fromJson(jsonString, JsonObject::class.java)
+
+                    // 利用 Gson 的層級訪問安全地取得 desc
+                    // 路徑：video -> viewInfo -> desc
+                    val videoDesc = rootObj.getAsJsonObject("video")
+                        ?.getAsJsonObject("viewInfo")
+                        ?.get("desc")?.asString
+
+                    if (!videoDesc.isNullOrEmpty()) {
+                        myDescription = videoDesc
+                    }
+
+                    // 導航到 video -> viewInfo -> pic
+                    var imageUrl = rootObj.getAsJsonObject("video")
+                        ?.getAsJsonObject("viewInfo")
+                        ?.get("pic")?.asString
+
+                    if (!imageUrl.isNullOrEmpty()) {
+                        imageUrl = imageUrl.replace("http:", "https:")
+                        myImageUrl = imageUrl
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            // 發生錯誤時保留原本 meta 抓到的數據
+            e.printStackTrace()
         }
     }
 
@@ -232,12 +317,6 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     fun prepareLoadImage() {
         if (imgLoaded) return
 
-        viewHeight = if (isPic) {
-            viewHeight / 2
-        } else {
-            viewHeight / 4
-        }
-        photoViewPic.minimumHeight = viewHeight
         loadImage()
         urlView.text = myImageUrl
     }
@@ -287,13 +366,15 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 circularProgressDrawable.start()
 
                 if (myImageUrl.isEmpty()) {
+                    // 如果圖片URL為空，則顯示進度條並標記為失敗
+                    photoViewPic.setImageDrawable(circularProgressDrawable)
                     return@ensureMainThread
                 }
 
-                photoViewPic.setImageDrawable(circularProgressDrawable)
-
+                // 使用 Glide 載入圖片，直接載入到 PhotoView
                 Glide.with(this@ThumbnailItemView)
                     .load(myImageUrl)
+                    .placeholder(circularProgressDrawable) // 載入時顯示進度條
                     .listener(object : RequestListener<Drawable?> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -301,6 +382,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             target: Target<Drawable?>,
                             isFirstResource: Boolean
                         ): Boolean {
+                            Log.e("GlideError", "Image load failed for URL: $myImageUrl", e) // 記錄錯誤訊息
                             ASCoroutine.ensureMainThread {
                                 setFail()
                             }
@@ -369,17 +451,29 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         }
     }
 
+    /** 用預設瀏覽器開啟連結 */
     var openUrlListener: OnClickListener = OnClickListener {
         val intent = Intent(Intent.ACTION_VIEW, myUrl.toUri())
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         myContext.startActivity(intent)
     }
 
+    /** 用簡易圖片檢視視窗開啟圖片 */
+    var openImageListener: OnLongClickListener = OnLongClickListener {
+        DialogImageView()
+            .setImageUrl(myImageUrl)
+            .show()
+        true
+    }
+
+    /** 點擊標題展開或收起 */
     var titleListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
         if (textView.maxLines == 2) textView.maxLines = 9
         else textView.maxLines = 2
     }
+
+    /** 點擊描述展開或收起 */
     var descriptionListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
         if (textView.maxLines == 1) textView.maxLines = 9
@@ -405,6 +499,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         layoutPic = mainLayout!!.findViewById(R.id.thumbnail_pic)
         photoViewPic = mainLayout!!.findViewById(R.id.thumbnail_image_pic)
         photoViewPic.setOnClickListener(openUrlListener)
+        photoViewPic.setOnLongClickListener(openImageListener)
         photoViewPic.maximumScale = 20.0f
         photoViewPic.mediumScale = 3.0f
 

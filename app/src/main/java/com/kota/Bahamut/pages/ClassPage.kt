@@ -151,7 +151,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
-        if (listName != null && listName == "Favorite") {
+        if (listName == "Favorite") {
             val itemIndex = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消")
                 .addButton("確定")
@@ -270,6 +270,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         (itemView as ClassPageItemView).setItem(item)
         return itemView
     }
+
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         recycle(telnetListPageBlock as ClassPageBlock)

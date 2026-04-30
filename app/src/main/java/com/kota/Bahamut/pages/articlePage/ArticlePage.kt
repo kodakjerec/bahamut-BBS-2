@@ -21,6 +21,7 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteArticle
+import com.kota.Bahamut.command.BahamutCommandLocateArticle
 import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.dialogs.DialogQueryHero
 import com.kota.Bahamut.pages.PostArticlePage
@@ -28,6 +29,7 @@ import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.model.ToolBarFloating
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
 import com.kota.Bahamut.service.NotificationSettings.setShowTopBottomButton
 import com.kota.Bahamut.service.TempSettings
@@ -70,13 +72,15 @@ class ArticlePage : TelnetPage() {
     var isFullScreen: Boolean = false
     var listAdapter: BaseAdapter = object : BaseAdapter() {
         private var pushLength = 0 // 推文長度
+        private var editRecordLength = 0 // 修改紀錄長度
 
         // android.widget.Adapter
         override fun getCount(): Int {
             if (telnetArticle != null) {
                 pushLength = telnetArticle!!.pushSize
-                // 內文個數 + header + PostTime + push
-                return telnetArticle!!.itemSize.plus(2) + pushLength
+                editRecordLength = telnetArticle!!.editRecordSize
+                // 內文個數 + header + PostTime + push + editRecord
+                return telnetArticle!!.itemSize.plus(2) + pushLength + editRecordLength
             }
             return 0
         }
@@ -98,12 +102,15 @@ class ArticlePage : TelnetPage() {
             if (itemIndex == 0) {
                 // header
                 return ArticlePageItemType.Companion.HEADER
-            } else if (itemIndex == getCount() - 1 - pushLength) {
+            } else if (itemIndex == getCount() - 1 - pushLength - editRecordLength) {
                 // postTime
                 return ArticlePageItemType.Companion.POST_TIME
-            } else if (itemIndex >= getCount() - pushLength) {
+            } else if (itemIndex >= getCount() - pushLength - editRecordLength && itemIndex < getCount() - editRecordLength) {
                 // push
                 return ArticlePageItemType.Companion.PUSH
+            } else if (itemIndex >= getCount() - editRecordLength) {
+                // editRecord
+                return ArticlePageItemType.Companion.EDIT_RECORD
             }
             // content
             val returnItem = getItem(itemIndex)
@@ -130,6 +137,9 @@ class ArticlePage : TelnetPage() {
 
                     ArticlePageItemType.Companion.PUSH -> itemViewOrigin =
                         ArticlePagePushItemView(context!!)
+
+                    ArticlePageItemType.Companion.EDIT_RECORD -> itemViewOrigin =
+                        ArticlePageEditRecordItemView(context!!)
 
                     else -> {
                         type = ArticlePageItemType.Companion.CONTENT
@@ -176,11 +186,17 @@ class ArticlePage : TelnetPage() {
                 itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
                 itemViewOrigin.setIP(telnetArticle!!.fromIP)
             } else if (itemViewOrigin is ArticlePagePushItemView) {
-                val tempIndex = itemIndex - (getCount() - pushLength) // itemIndex - 本文長度
+                val tempIndex = itemIndex - (getCount() - pushLength - editRecordLength) // itemIndex - 本文長度
                 val itemPush = telnetArticle!!.getPush(tempIndex)
                 if (itemPush != null) {
                     itemViewOrigin.setContent(itemPush)
                     itemViewOrigin.setFloor(tempIndex + 1)
+                }
+            } else if (itemViewOrigin is ArticlePageEditRecordItemView) {
+                val tempIndex = itemIndex - (getCount() - editRecordLength) // itemIndex - 修改紀錄開始位置
+                val itemEditRecord = telnetArticle!!.getEditRecord(tempIndex)
+                if (itemEditRecord != null) {
+                    itemViewOrigin.setContent(itemEditRecord)
                 }
             }
             return itemViewOrigin
@@ -188,7 +204,7 @@ class ArticlePage : TelnetPage() {
 
         /** 一共有多少种不同的视图类型  */
         override fun getViewTypeCount(): Int {
-            return 5
+            return 6
         }
 
         override fun hasStableIds(): Boolean {
@@ -507,7 +523,6 @@ class ArticlePage : TelnetPage() {
         if (telnetArticle != null) {
             val author = telnetArticle!!.author.lowercase(Locale.getDefault())
             val logonUser = propertiesUsername.lowercase(Locale.getDefault())
-            val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD
             val extToolbarEnable = propertiesExternalToolbarEnable
             val externalToolbarEnableTitle =
                 if (extToolbarEnable) getContextString(R.string.hide_toolbar) else getContextString(
@@ -517,7 +532,7 @@ class ArticlePage : TelnetPage() {
                 .addItem(getContextString(R.string.do_gy))
                 .addItem(getContextString(R.string.do_push))
                 .addItem(getContextString(R.string.change_mode))
-                .addItem(if (isBoard && author == logonUser) getContextString(R.string.edit_article) else null)
+                .addItem(if (author == logonUser) getContextString(R.string.edit_article) else null)
                 .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null)
                 .addItem(externalToolbarEnableTitle)
                 .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
@@ -644,7 +659,7 @@ class ArticlePage : TelnetPage() {
     /** 刪除文章  */
     fun onDeleteButtonClicked() {
         if (telnetArticle != null && boardMainPage != null) {
-            val itemNumber = telnetArticle!!.myNumber
+            val itemNumber = telnetArticle!!.articleNumber
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.delete))
                 .setMessage(getContextString(R.string.del_this_article))
@@ -669,7 +684,7 @@ class ArticlePage : TelnetPage() {
                 val replyContent = telnetArticle!!.generateReplyContent()
                 page.setBoardPage(boardMainPage)
                 page.setOperationMode(PostArticlePage.OperationMode.Reply)
-                page.setArticleNumber(telnetArticle!!.myNumber.toString())
+                page.setArticleNumber(telnetArticle!!.articleNumber.toString())
                 page.setPostTitle(replyTitle)
                 page.setPostContent(replyContent + "\n\n\n")
                 page.setListener(boardMainPage)
@@ -685,13 +700,16 @@ class ArticlePage : TelnetPage() {
 
     /** 修改文章  */
     fun onEditButtonClicked() {
-        if (telnetArticle != null) {
+        val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD // 是否為看板內文章
+
+        // 只有在看板內文章才能直接修改
+        if (isBoard && telnetArticle != null) {
             val page = PageContainer.instance!!.postArticlePage
             val editTitle = telnetArticle!!.generateEditTitle()
             val editContent = telnetArticle!!.generateEditContent()
             val editFormat = telnetArticle!!.generateEditFormat()
             page.setBoardPage(boardMainPage)
-            page.setArticleNumber(telnetArticle!!.myNumber.toString())
+            page.setArticleNumber(telnetArticle!!.articleNumber.toString())
             page.setOperationMode(PostArticlePage.OperationMode.Edit)
             page.setPostTitle(editTitle)
             page.setPostContent(editContent)
@@ -700,6 +718,15 @@ class ArticlePage : TelnetPage() {
             page.setHeaderHidden(true)
             page.setTelnetArticle(telnetArticle)
             navigationController.pushViewController(page)
+        } else {
+            // 透過 t 取得文章編號
+            // 從 boardMainPage 判斷是否為最後一篇文章
+            val selectedIndex = boardMainPage?.selectedIndex ?: 0
+            var isFirstInPage = selectedIndex%20 == 1
+            // 如果串接只有一行, 就不適用例外1
+            val totalLength = boardMainPage?.getItemSize() ?: 0
+            if (totalLength == 1) isFirstInPage = false
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isFirstInPage))
         }
     }
 
@@ -888,8 +915,10 @@ class ArticlePage : TelnetPage() {
     }
 
     /** 給其他網頁顯示文章使用  */
-    fun setArticle(aArticle: TelnetArticle) {
+    fun setArticle(aArticle: TelnetArticle): Boolean {
+        var isSuccess = true
         telnetArticle = aArticle
+
         if (telnetArticle != null) {
             val boardName = boardMainPage?.listName!!
             // 加入歷史紀錄
@@ -897,7 +926,7 @@ class ArticlePage : TelnetPage() {
             if (store != null) {
                 val bookmarkList = store.getBookmarkList(boardName)
                 bookmarkList.addHistoryBookmark(telnetArticle!!.title)
-                store.storeWithoutCloud()
+                store.store()
             }
 
             // 關係到 telnetView
@@ -910,6 +939,43 @@ class ArticlePage : TelnetPage() {
             listAdapter.notifyDataSetChanged()
         }
         dismissProcessingDialog()
+
+        // 檢查是否有從串接頁編輯文章的任務
+        isSuccess = verifyAndEditFromLinked(aArticle)
+        return isSuccess
+    }
+
+    /**
+     * 驗證從串接頁編輯文章的任務
+     *
+     * 當從 LinkPage/SearchPage 觸發編輯時，驗證文章特徵是否一致。
+     * 若一致則進入編輯模式，否則根據狀態嘗試搜尋或提示失敗。
+     *
+     * @param article 當前文章
+     */
+    private fun verifyAndEditFromLinked(article: TelnetArticle): Boolean {
+        val state = TempSettings.editFromLinkedState ?: return true
+        if (state.step != EditFromLinkedStep.READING_ARTICLE &&
+            state.step != EditFromLinkedStep.SEARCH_NEXT &&
+            state.step != EditFromLinkedStep.SEARCH_PREV) {
+            return true
+        }
+
+        if (state.matchesTarget(article)) {
+            // 特徵一致，進入編輯
+            state.step = EditFromLinkedStep.DONE
+            TempSettings.editFromLinkedState = null
+            onEditButtonClicked()
+        } else {
+            // 特徵不一致
+            state.retryCount++
+            state.step = EditFromLinkedStep.FAILED
+            TempSettings.editFromLinkedState = null
+            showShortToast("找不到文章")
+            onBackPressed()
+            return false
+        }
+        return true
     }
 
     /** 給 state handler 更改讀取進度  */
