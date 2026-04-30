@@ -29,6 +29,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
+import com.kota.Bahamut.dialogs.DialogImageView
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
@@ -450,17 +451,28 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         }
     }
 
+    /** 用預設瀏覽器開啟連結 */
     var openUrlListener: OnClickListener = OnClickListener {
         val intent = Intent(Intent.ACTION_VIEW, myUrl.toUri())
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         myContext.startActivity(intent)
     }
 
+    /** 用簡易圖片檢視視窗開啟圖片 */
+    var openImageListener: OnLongClickListener = OnLongClickListener {
+        DialogImageView()
+            .setImageUrl(myImageUrl)
+            .show()
+    }
+
+    /** 點擊標題展開或收起 */
     var titleListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
         if (textView.maxLines == 2) textView.maxLines = 9
         else textView.maxLines = 2
     }
+
+    /** 點擊描述展開或收起 */
     var descriptionListener: OnClickListener = OnClickListener { view: View? ->
         val textView = view as TextView
         if (textView.maxLines == 1) textView.maxLines = 9
@@ -486,6 +498,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         layoutPic = mainLayout!!.findViewById(R.id.thumbnail_pic)
         photoViewPic = mainLayout!!.findViewById(R.id.thumbnail_image_pic)
         photoViewPic.setOnClickListener(openUrlListener)
+        photoViewPic.setOnLongClickListener(openImageListener)
         photoViewPic.maximumScale = 20.0f
         photoViewPic.mediumScale = 3.0f
 
