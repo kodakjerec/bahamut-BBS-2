@@ -7,15 +7,14 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import android.util.Log
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -30,7 +29,6 @@ import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogImageView
-import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
@@ -57,6 +55,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
     // 圖片圖層
     lateinit var layoutPic: LinearLayout
+    lateinit var loadingView: ProgressBar
     lateinit var photoViewPic: PhotoView
     lateinit var imageViewButton: Button
 
@@ -339,7 +338,8 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         layoutDefault.visibility = GONE
 
         // 圖片
-        layoutPic.visibility = GONE
+        loadingView.visibility = GONE
+        photoViewPic.visibility = GONE
 
         // 內容
         layoutNormal.visibility = GONE
@@ -348,33 +348,24 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     /** 讀取圖片  */
     private fun loadImage() {
         imgLoaded = true
+        // 立即顯示 loading，隱藏其他
+        imageViewButton.visibility = GONE
+        loadingView.visibility = VISIBLE
+        photoViewPic.visibility = GONE
+        photoViewPic.contentDescription = myDescription
+
+        if (myImageUrl.isEmpty()) {
+            // 如果圖片URL為空，隱藏 loading
+            loadingView.visibility = GONE
+            return
+        }
+
         ASCoroutine.ensureMainThread {
-            imageViewButton.visibility = GONE
-            photoViewPic.visibility = VISIBLE
-            photoViewPic.contentDescription = myDescription
             try {
-                val circularProgressDrawable = CircularProgressDrawable(context)
-                circularProgressDrawable.setStrokeWidth(10f)
-                circularProgressDrawable.setCenterRadius(60f)
-                // progress bar color
-                val typedValue = TypedValue()
-
-                context.theme
-                    .resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true)
-                circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId))
-                // progress bar start
-                circularProgressDrawable.start()
-
-                if (myImageUrl.isEmpty()) {
-                    // 如果圖片URL為空，則顯示進度條並標記為失敗
-                    photoViewPic.setImageDrawable(circularProgressDrawable)
-                    return@ensureMainThread
-                }
 
                 // 使用 Glide 載入圖片，直接載入到 PhotoView
                 Glide.with(this@ThumbnailItemView)
                     .load(myImageUrl)
-                    .placeholder(circularProgressDrawable) // 載入時顯示進度條
                     .listener(object : RequestListener<Drawable?> {
                         override fun onLoadFailed(
                             e: GlideException?,
@@ -383,9 +374,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             isFirstResource: Boolean
                         ): Boolean {
                             Log.e("GlideError", "Image load failed for URL: $myImageUrl", e) // 記錄錯誤訊息
-                            ASCoroutine.ensureMainThread {
-                                setFail()
-                            }
+                            loadingView.visibility = GONE
                             return false
                         }
 
@@ -426,6 +415,10 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                 targetWidth = min(tempWidth, targetWidth)
                                 photoViewPic.minimumWidth = targetWidth
 
+                                // 隱藏 loading，顯示圖片
+                                loadingView.visibility = GONE
+                                photoViewPic.visibility = VISIBLE
+                                
                                 if (resource is GifDrawable) {
                                     resource.startFromFirstFrame()
                                     photoViewPic.setImageDrawable(resource)
@@ -497,6 +490,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         layoutDefault = mainLayout!!.findViewById(R.id.thumbnail_default)
 
         layoutPic = mainLayout!!.findViewById(R.id.thumbnail_pic)
+        loadingView = mainLayout!!.findViewById(R.id.thumbnail_loading)
         photoViewPic = mainLayout!!.findViewById(R.id.thumbnail_image_pic)
         photoViewPic.setOnClickListener(openUrlListener)
         photoViewPic.setOnLongClickListener(openImageListener)
