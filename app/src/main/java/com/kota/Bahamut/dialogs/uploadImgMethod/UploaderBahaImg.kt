@@ -4,11 +4,13 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaCodec
+import android.media.MediaCodecInfo
 import android.media.MediaExtractor
 import android.media.MediaFormat
 import android.media.MediaMuxer
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.view.Surface
 import com.google.gson.Gson
 import okhttp3.*
 import java.io.IOException
@@ -161,13 +163,16 @@ class UploaderBahaImg {
     }
 
     /**
-     * 使用 MediaCodec 進行視頻轉碼
+     * 使用 MediaCodec 進行視頻轉碼（解碼→編碼流水線）
      * @param inputFile 輸入視頻檔案
      * @param outputFile 輸出視頻檔案
      */
     private fun transcodeVideoWithMediaCodec(inputFile: File, outputFile: File) {
         val extractor = MediaExtractor()
         var muxer: MediaMuxer? = null
+        var decoder: MediaCodec? = null
+        var encoder: MediaCodec? = null
+        var encoderInputSurface: Surface? = null
         
         try {
             extractor.setDataSource(inputFile.absolutePath)
@@ -195,126 +200,135 @@ class UploaderBahaImg {
             }
 
             if (videoFormat == null) {
-                return  // 沒有視頻軌道，無法轉碼
+                return
             }
+
+            val inputMime = videoFormat.getString(MediaFormat.KEY_MIME) ?: "video/avc"
+            val inputWidth = videoFormat.getInteger(MediaFormat.KEY_WIDTH)
+            val inputHeight = videoFormat.getInteger(MediaFormat.KEY_HEIGHT)
+            val outputWidth = getScaledWidth(videoFormat)
+            val outputHeight = getScaledHeight(videoFormat)
 
             // 2. 建立 Muxer
             muxer = MediaMuxer(outputFile.absolutePath, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
             
-            var videoMuxerTrackIndex = -1
-            var audioMuxerTrackIndex = -1
-            var muxerStarted = false
-
-            // 3. 配置視頻編碼器
-            val videoOutputFormat = MediaFormat.createVideoFormat(
-                "video/avc",
-                getScaledWidth(videoFormat),
-                getScaledHeight(videoFormat)
-            ).apply {
-                setInteger(MediaFormat.KEY_BIT_RATE, 2_500_000) // 2.5 Mbps
+            // 3. 配置編碼器（先創建編碼器以獲取輸入 Surface）
+            val encoderFormat = MediaFormat.createVideoFormat("video/avc", outputWidth, outputHeight).apply {
+                setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface)
+                setInteger(MediaFormat.KEY_BIT_RATE, 2_500_000)
                 setInteger(MediaFormat.KEY_FRAME_RATE, 30)
                 setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 1)
             }
+            
+            encoder = MediaCodec.createEncoderByType("video/avc")
+            encoder.configure(encoderFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+            encoderInputSurface = encoder.createInputSurface()
+            encoder.start()
 
-            // 4. 轉碼視頻軌道
-            if (videoTrackIndex >= 0) {
-                extractor.selectTrack(videoTrackIndex)
-                videoMuxerTrackIndex = transcodeVideoTrack(
-                    extractor, 
-                    muxer,
-                    videoFormat, 
-                    videoOutputFormat,
-                    { if (!muxerStarted) { muxer.start(); muxerStarted = true } }
-                )
-            }
+            // 4. 配置解碼器（輸出到編碼器的 Surface）
+            decoder = MediaCodec.createDecoderByType(inputMime)
+            decoder.configure(videoFormat, encoderInputSurface, null, 0)
+            decoder.start()
 
-            // 5. 複製或轉碼音頻軌道
-            if (audioTrackIndex >= 0 && audioFormat != null) {
-                extractor.selectTrack(audioTrackIndex)
-                extractor.seekTo(0, MediaExtractor.SEEK_TO_PREVIOUS_SYNC)
-                
-                audioMuxerTrackIndex = muxer.addTrack(audioFormat)
-                if (!muxerStarted) {
-                    muxer.start()
-                    muxerStarted = true
+            // 5. 選擇視頻軌道
+            extractor.selectTrack(videoTrackIndex)
+
+            // 6. 轉碼視頻
+            var videoMuxerTrackIndex = -1
+            var muxerStarted = false
+            var inputDone = false
+            var decoderDone = false
+            var encoderDone = false
+            
+            val decoderBufferInfo = MediaCodec.BufferInfo()
+            val encoderBufferInfo = MediaCodec.BufferInfo()
+
+            while (!encoderDone) {
+                // 送入解碼器
+                if (!inputDone) {
+                    val inputIndex = decoder.dequeueInputBuffer(10000)
+                    if (inputIndex >= 0) {
+                        val inputBuffer = decoder.getInputBuffer(inputIndex)!!
+                        val sampleSize = extractor.readSampleData(inputBuffer, 0)
+                        
+                        if (sampleSize < 0) {
+                            decoder.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
+                            inputDone = true
+                        } else {
+                            decoder.queueInputBuffer(inputIndex, 0, sampleSize, extractor.sampleTime, 0)
+                            extractor.advance()
+                        }
+                    }
                 }
-                
-                copyAudioTrack(extractor, muxer, audioMuxerTrackIndex)
+
+                // 從解碼器獲取輸出並渲染到 Surface
+                if (!decoderDone) {
+                    val outputIndex = decoder.dequeueOutputBuffer(decoderBufferInfo, 10000)
+                    if (outputIndex >= 0) {
+                        val render = decoderBufferInfo.size > 0
+                        decoder.releaseOutputBuffer(outputIndex, render) // render = true 會渲染到 Surface
+                        
+                        if (decoderBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                            encoder.signalEndOfInputStream()
+                            decoderDone = true
+                        }
+                    }
+                }
+
+                // 從編碼器獲取輸出
+                val encoderOutputIndex = encoder.dequeueOutputBuffer(encoderBufferInfo, 10000)
+                when {
+                    encoderOutputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED -> {
+                        videoMuxerTrackIndex = muxer.addTrack(encoder.outputFormat)
+                        muxer.start()
+                        muxerStarted = true
+                    }
+                    encoderOutputIndex >= 0 -> {
+                        val encodedData = encoder.getOutputBuffer(encoderOutputIndex)!!
+                        
+                        if (encoderBufferInfo.size > 0 && muxerStarted) {
+                            encodedData.position(encoderBufferInfo.offset)
+                            encodedData.limit(encoderBufferInfo.offset + encoderBufferInfo.size)
+                            muxer.writeSampleData(videoMuxerTrackIndex, encodedData, encoderBufferInfo)
+                        }
+                        
+                        encoder.releaseOutputBuffer(encoderOutputIndex, false)
+                        
+                        if (encoderBufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
+                            encoderDone = true
+                        }
+                    }
+                }
             }
 
-            // 6. 停止 Muxer
+            // 7. 複製音頻軌道
+            if (audioTrackIndex >= 0 && audioFormat != null) {
+                // 需要重新創建 extractor 來讀取音頻
+                val audioExtractor = MediaExtractor()
+                audioExtractor.setDataSource(inputFile.absolutePath)
+                audioExtractor.selectTrack(audioTrackIndex)
+                
+                val audioMuxerTrackIndex = muxer.addTrack(audioFormat)
+                
+                copyAudioTrack(audioExtractor, muxer, audioMuxerTrackIndex)
+                audioExtractor.release()
+            }
+
+            // 8. 停止 Muxer
             if (muxerStarted) {
                 muxer.stop()
             }
         } catch (e: Exception) {
             e.printStackTrace()
         } finally {
+            decoder?.stop()
+            decoder?.release()
+            encoder?.stop()
+            encoder?.release()
+            encoderInputSurface?.release()
             extractor.release()
             muxer?.release()
         }
-    }
-
-    /**
-     * 轉碼視頻軌道
-     */
-    private fun transcodeVideoTrack(
-        extractor: MediaExtractor,
-        muxer: MediaMuxer,
-        inputFormat: MediaFormat,
-        outputFormat: MediaFormat,
-        onMuxerReady: () -> Unit
-    ): Int {
-        var muxerTrackIndex = -1
-        var codec: MediaCodec? = null
-
-        try {
-            codec = MediaCodec.createEncoderByType("video/avc")
-            codec.configure(outputFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
-            codec.start()
-
-            muxerTrackIndex = muxer.addTrack(codec.outputFormat)
-            onMuxerReady()  // 準備好後啟動 Muxer
-
-            val bufferInfo = MediaCodec.BufferInfo()
-
-            // 讀取輸入幀
-            while (true) {
-                val inputIndex = codec.dequeueInputBuffer(10000)
-                if (inputIndex >= 0) {
-                    val sampleSize = extractor.readSampleData(codec.getInputBuffer(inputIndex)!!, 0)
-                    
-                    if (sampleSize < 0) {
-                        codec.queueInputBuffer(inputIndex, 0, 0, 0, MediaCodec.BUFFER_FLAG_END_OF_STREAM)
-                    } else {
-                        val presentationTime = extractor.sampleTime
-                        codec.queueInputBuffer(inputIndex, 0, sampleSize, presentationTime, 0)
-                        extractor.advance()
-                    }
-                }
-
-                // 獲取編碼後的輸出
-                val outputIndex = codec.dequeueOutputBuffer(bufferInfo, 10000)
-                if (outputIndex >= 0) {
-                    if (bufferInfo.size > 0) {
-                        muxer.writeSampleData(muxerTrackIndex, codec.getOutputBuffer(outputIndex)!!, bufferInfo)
-                    }
-                    codec.releaseOutputBuffer(outputIndex, false)
-
-                    if (bufferInfo.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
-                        break
-                    }
-                } else if (outputIndex == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-                    // 編碼器改變了輸出格式（已在 muxer.addTrack 中處理）
-                }
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-        } finally {
-            codec?.stop()
-            codec?.release()
-        }
-
-        return muxerTrackIndex
     }
 
     /**
