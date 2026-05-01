@@ -3,6 +3,7 @@ package com.kota.asFramework.dialog
 import android.app.Dialog
 import android.content.DialogInterface
 import android.view.View
+import android.view.ViewGroup
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.pageController.ASViewControllerDisappearListener
@@ -130,14 +131,14 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         targetView.layoutParams = oldLayoutParams
     }
     // 變更dialog寬度和高度
-    fun setDialogWidthHeight() {
+    fun setDialogWidthHeight(targetView: View) {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val screenHeight = context.resources.displayMetrics.heightPixels
         val dialogWidth = (screenWidth * 0.8).toInt()
         val dialogHeight = (screenHeight * 0.8).toInt()
-        val oldLayoutParams: ViewGroup.LayoutParams = mainLayout.layoutParams
+        val oldLayoutParams: ViewGroup.LayoutParams = targetView.layoutParams
         oldLayoutParams.width = dialogWidth
         oldLayoutParams.height = dialogHeight
-        mainLayout.layoutParams = oldLayoutParams
+        targetView.layoutParams = oldLayoutParams
     }
 }

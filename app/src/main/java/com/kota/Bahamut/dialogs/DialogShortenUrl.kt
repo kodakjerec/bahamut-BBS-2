@@ -235,7 +235,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 }
             }
         }
-        setDialogWidth()
+        setDialogWidth(mainLayout)
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(mainLayout)

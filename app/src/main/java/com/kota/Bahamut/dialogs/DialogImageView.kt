@@ -104,7 +104,7 @@ class DialogImageView : ASDialog() {
                                 // 固定視窗尺寸 (80% 螢幕寬高)
                                 val fixedHeight = (context.resources.displayMetrics.heightPixels * 0.8).toInt()
                                 val fixedWidth = (context.resources.displayMetrics.widthPixels * 0.8).toInt()
-                                setDialogWidthHeight(fixedWidth, fixedHeight)
+                                setDialogWidthHeight(photoView)
 
                                 // 計算縮放比例，讓圖片最大化填滿視窗（碰到寬或高為止），維持比例
                                 val scale = min(fixedWidth.toFloat() / picWidth, fixedHeight.toFloat() / picHeight)

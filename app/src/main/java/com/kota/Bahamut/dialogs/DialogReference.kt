@@ -2,17 +2,16 @@ package com.kota.Bahamut.dialogs
 
 import android.annotation.SuppressLint
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.core.view.forEachIndexed
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.Bahamut.dataModels.ReferenceAuthor
 import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.ReferenceAuthor
 import com.kota.Bahamut.service.NotificationSettings
+import com.kota.asFramework.dialog.ASDialog
 
 class DialogReference : ASDialog(), View.OnClickListener {
     var mainLayout: LinearLayout
@@ -35,7 +34,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
         sendButton.setOnClickListener(this)
         cancelButton.setOnClickListener(this)
 
-        setDialogWidth()
+        setDialogWidth(mainLayout)
 
         readOldSettings()
     }

@@ -5,10 +5,10 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.RadioGroup
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.ui.ASToast
 import java.util.Vector
 
 class DialogSearchArticle : ASDialog(), View.OnClickListener {
@@ -47,7 +47,7 @@ class DialogSearchArticle : ASDialog(), View.OnClickListener {
         searchButton.setOnClickListener(this)
         cancelButton.setOnClickListener(this)
 
-        setDialogWidth()
+        setDialogWidth(mainLayout)
     }
 
     override fun onClick(view: View) {

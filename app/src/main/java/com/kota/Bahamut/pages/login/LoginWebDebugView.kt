@@ -1,7 +1,6 @@
 package com.kota.Bahamut.pages.login
 
 import android.content.Context
-import android.view.ViewGroup
 import android.webkit.WebView
 import android.widget.Button
 import android.widget.LinearLayout
@@ -26,7 +25,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         btnClose.setOnClickListener { dismiss() }
 
         // 設定 WebView 屬性
-        setDialogWidthHeight()
+        setDialogWidthHeight(mainLayout)
     }
 
     /**
