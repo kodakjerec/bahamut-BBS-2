@@ -102,7 +102,7 @@ class DialogImageView : ASDialog() {
                                 val picWidth = bitmap.width
 
                                 // 固定視窗尺寸 (80% 螢幕寬高)
-                                val fixedHeight = (context.resources.displayMetrics.heightPixels * 0.8).toInt()
+                                val fixedHeight = (context.resources.displayMetrics.heightPixels * 0.7).toInt()
                                 val fixedWidth = (context.resources.displayMetrics.widthPixels * 0.8).toInt()
                                 setDialogWidthHeight(photoView)
 

@@ -82,7 +82,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         }
 
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.dialog_shorten_url_under_transfer))
-        val apiUrl = "https://worker-short-url.kodakjerec.workers.dev/"
+        val apiUrl = "https://worker-short-url.kodakjerec.work/"
         val client = OkHttpClient()
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("type", "shortenurl")

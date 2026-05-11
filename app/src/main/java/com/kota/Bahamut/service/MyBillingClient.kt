@@ -76,7 +76,7 @@ object MyBillingClient {
                     // 將購買結果塞入雲端
                     if (UserSettings.propertiesUsername.isNotEmpty()) {
                         val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-                        val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
+                        val apiUrl = "https://user-buy-history.kodakjerec.work/"
                         val client = OkHttpClient()
                         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                             .addFormDataPart("userId", userId)
@@ -114,7 +114,7 @@ object MyBillingClient {
                         if (UserSettings.propertiesUsername.isNotEmpty()) {
                             list.forEach { record ->
                                 val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-                                val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
+                                val apiUrl = "https://user-buy-history.kodakjerec.work/"
                                 val client = OkHttpClient()
                                 val body: RequestBody =
                                     MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -152,7 +152,7 @@ object MyBillingClient {
     @JvmStatic
     fun checkPurchaseHistoryCloud(callback: (Int) -> Unit) {
         val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-        val apiUrl = "https://user-buy-history.kodakjerec.workers.dev/"
+        val apiUrl = "https://user-buy-history.kodakjerec.work/"
         val client = OkHttpClient()
         val body: RequestBody =
             MultipartBody.Builder().setType(MultipartBody.FORM)

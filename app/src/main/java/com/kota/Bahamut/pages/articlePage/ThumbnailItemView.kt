@@ -91,7 +91,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     isPic = findUrl[4] != "0"
                     picoUrlChangeStatus(isPic)
                 } else {
-                    val apiUrl = "https://worker-get-url-content.kodakjerec.workers.dev/"
+                    val apiUrl = "https://worker-get-url-content.kodakjerec.work/"
                     val client: OkHttpClient = OkHttpClient()
                     val body: RequestBody = MultipartBody.Builder()
                         .setType(MultipartBody.FORM)

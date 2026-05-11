@@ -79,7 +79,10 @@ export default {
         return new Response(`File too large. ${fileType} limit: ${limitMB}MB`, {status: 413});
       }
 
-      const id = crypto.randomUUID().replace(/-/g, '').slice(0, 10);
+      const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
+      const bytes = new Uint8Array(6);
+      crypto.getRandomValues(bytes);
+      const id = Array.from(bytes, b => charset[b % 64]).join('');
       const filename = `${id}.${ext}`;
 
       const date = new Date().toISOString().slice(0, 10);
@@ -102,7 +105,7 @@ export default {
       });
 
       return Response.json({
-        url: `https://img.kodakjerec.workers.dev/${filename}`
+        url: `https://img.kodakjerec.work/${filename}`
       });
     }
 

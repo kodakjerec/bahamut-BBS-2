@@ -84,7 +84,7 @@ class CloudBackup {
     private fun checkCloud() {
         // encrypt
         val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-        val apiUrl = "https://cloud-restore.kodakjerec.workers.dev/"
+        val apiUrl = "https://cloud-restore.kodakjerec.work/"
         val client = OkHttpClient()
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("userId", userId)
@@ -165,7 +165,7 @@ class CloudBackup {
             // encrypt
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
-            val apiUrl = "https://cloud-backup.kodakjerec.workers.dev/"
+            val apiUrl = "https://cloud-backup.kodakjerec.work/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)
@@ -207,7 +207,7 @@ class CloudBackup {
             val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
             if (userId.isEmpty())
                 return
-            val apiUrl = "https://cloud-restore.kodakjerec.workers.dev/"
+            val apiUrl = "https://cloud-restore.kodakjerec.work/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
                 .addFormDataPart("userId", userId)

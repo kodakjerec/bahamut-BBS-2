@@ -28,7 +28,7 @@ class UploaderBahaImg {
     private val client = OkHttpClient()
     private val gson = Gson()
 
-    private val apiUrl = "https://img.kodakjerec.workers.dev/upload"
+    private val apiUrl = "https://img.kodakjerec.work/upload"
     
     // 文件大小限制 (單位: bytes)
     private val fileSizeLimits = mapOf(
