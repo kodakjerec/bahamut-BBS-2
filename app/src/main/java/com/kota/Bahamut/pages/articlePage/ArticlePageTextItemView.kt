@@ -24,6 +24,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetAnsi
@@ -215,6 +216,8 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                         }
                     }
                 }
+                // Apply profanity mask after all other color formatting
+                applyBlocklistMask(ssRawString)
             }
             finalString[rowIndex] = ssRawString.append("\n")
         }
@@ -451,6 +454,23 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             contentView?.visibility = VISIBLE
         } else {
             contentView?.visibility = GONE
+        }
+    }
+
+    private fun applyBlocklistMask(spannable: SpannableStringBuilder) {
+        // Using R.color.black as the mask color. Ensure this color is defined in your colors.xml.
+        val blocklist = UserSettings.blockList
+        val maskedColor = getContextColor(R.color.divider_color)
+
+        for (blockName in blocklist) {
+            var index = spannable.indexOf(blockName, ignoreCase = true)
+            while (index >= 0) {
+                val end = index + blockName.length
+                // Apply a span that makes the text "invisible" by matching foreground and background colors
+                spannable.setSpan(ForegroundColorSpan(maskedColor), index, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                spannable.setSpan(BackgroundColorSpan(maskedColor), index, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+                index = spannable.indexOf(blockName, index + 1, ignoreCase = true)
+            }
         }
     }
 }
