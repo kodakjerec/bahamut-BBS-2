@@ -11,7 +11,7 @@ class TelnetArticleItem {
         private set
     var telnetFrame: TelnetFrame? = null
     var nickname: String? = ""
-    var quoteLevel: Int = 0
+    var quoteLevel: Int = 0 // 0-發文者 1-前作者1 2-前作者2
     val rows = Vector<TelnetRow>()
     var type: Int = 0
 
