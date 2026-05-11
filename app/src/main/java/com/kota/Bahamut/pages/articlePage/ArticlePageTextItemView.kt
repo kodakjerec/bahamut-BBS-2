@@ -24,9 +24,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
-import com.kota.Bahamut.service.UserSettings
-import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
-import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContainsFuzzy
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetAnsi
@@ -43,7 +40,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     var contentLabel: TextView? = null
     var contentView: ViewGroup? = null
     var dividerView: DividerView? = null
-    var myQuote: Int = 0 // 0-發文者 1-前作者1 2-前作者2
+    var myQuote: Int = 0
 
     constructor(context: Context?) : super(context) {
         init()
@@ -100,12 +97,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         for (rowIndex in rows.indices) {
             val row = rows[rowIndex]
             row.reloadSpace()
-
-            // 過濾黑名單, 替換為指定文字
-            val originalRaw = row.rawString
-            val filteredRaw = filterBlocklist(originalRaw)
-            val ssRawString = SpannableStringBuilder(filteredRaw)
-
+            val ssRawString = SpannableStringBuilder(row.rawString)
             if (ssRawString.isNotEmpty()) {
                 var startIndex = 0
                 val textColor: ByteArray = row.getTextColorArray()
@@ -227,43 +219,6 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             finalString[rowIndex] = ssRawString.append("\n")
         }
         return TextUtils.concat(*finalString)
-    }
-
-    /** 過濾黑名單字串 */
-    private fun filterBlocklist(input: String): String {
-        // 如果沒有設定黑名單或未啟用，直接回傳
-        if (!UserSettings.propertiesBlockListEnable) {
-            return input
-        }
-
-        var result = input
-        val blocklist = UserSettings.blockList
-
-        // 1. 使用你提到的快速模糊比對檢查 (預檢查)
-        if (isBlockListContainsFuzzy(input)) {
-            for (badWord in blocklist) {
-                // 再次確認此單詞是否存在於當前字串中 (不分大小寫)
-                if (result.contains(badWord, ignoreCase = true)) {
-                    // 使用 "O".repeat(badWord.length) 以保持與 row.getTextColorArray() 的長度一致
-                    // 雙字元需分開
-                    val sb = StringBuilder()
-                    for (char in badWord) {
-                        if (char.code > 255) {
-                            sb.append("Ｏ") // 全形 O (U+FF2F)
-                        } else {
-                            sb.append("O")  // 半形 O (U+004F)
-                        }
-                    }
-                    val replacement = sb.toString()
-                    result = result.replace(
-                        badWord.toRegex(RegexOption.IGNORE_CASE),
-                        replacement
-                    )
-                }
-            }
-        }
-
-        return result
     }
 
     /**
