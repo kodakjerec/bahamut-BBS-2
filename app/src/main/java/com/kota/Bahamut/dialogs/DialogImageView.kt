@@ -176,5 +176,6 @@ class DialogImageView : ASDialog() {
 
         setContentView(mainContainer)
         setCancelable(true)
+        setDialogWidthHeight(photoView)
     }
 }

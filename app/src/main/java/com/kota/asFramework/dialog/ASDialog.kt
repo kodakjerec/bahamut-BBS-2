@@ -125,7 +125,16 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     // 變更dialog寬度
     fun setDialogWidth(targetView: View) {
         val screenWidth = context.resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.8).toInt()
+        val screenHeight = context.resources.displayMetrics.heightPixels // 新增獲取螢幕高度
+
+        var dialogWidth: Int
+        // 檢查當前螢幕方向
+        if (currentOrientation == 2) { // 如果是橫向
+            dialogWidth = (screenHeight * 0.7).toInt()
+        } else { // 直向 (Portrait) 或其他情況
+            dialogWidth = (screenWidth * 0.8).toInt()
+        }
+
         val oldLayoutParams = targetView.layoutParams
         oldLayoutParams.width = dialogWidth
         targetView.layoutParams = oldLayoutParams
@@ -134,8 +143,19 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     fun setDialogWidthHeight(targetView: View) {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val screenHeight = context.resources.displayMetrics.heightPixels
-        val dialogWidth = (screenWidth * 0.8).toInt()
-        val dialogHeight = (screenHeight * 0.8).toInt()
+
+        var dialogWidth: Int
+        var dialogHeight: Int
+
+        // 檢查當前螢幕方向, 預設直立
+        if (currentOrientation == 2) { // 如果是橫向
+            dialogWidth = (screenWidth * 0.7).toInt()
+            dialogHeight = (screenHeight * 0.8).toInt()
+        } else { // 直向 (Portrait) 或其他情況
+            dialogWidth = (screenWidth * 0.8).toInt()
+            dialogHeight = (screenHeight * 0.7).toInt()
+        }
+
         val oldLayoutParams: ViewGroup.LayoutParams = targetView.layoutParams
         oldLayoutParams.width = dialogWidth
         oldLayoutParams.height = dialogHeight
