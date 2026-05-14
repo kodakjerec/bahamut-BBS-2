@@ -28,6 +28,8 @@ object TelnetKeyboard {
     const val SMALL_T: Int = 116    // 串接模式切換編號
     const val LEFT_BRACKET: Int = 91 // [
     const val RIGHT_BRACKET: Int = 93 // ]
+    const val EQUAL: Int = 61 // =
+
 
     fun getKeyDataWithTimes(keyCode: Int, times: Int): ByteArray {
         val keyData = getKeyData(keyCode)

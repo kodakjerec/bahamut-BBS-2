@@ -31,6 +31,11 @@ data class EditFromLinkedState(
     /** 是否為分頁第一篇 */
     var isFirstInPage: Boolean = false
 
+    /** 是否為第一篇 */
+    var isFirst: Boolean = false
+
+    /** 是否為最後一篇 */
+    var isLast: Boolean = false
     /**
      * 驗證文章特徵是否一致
      *

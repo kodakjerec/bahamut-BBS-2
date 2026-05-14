@@ -672,7 +672,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
 
             EditFromLinkedStep.SENT_T -> {
-                // 解析 row4 取得 boardNumber
+                // 解析 cursor-row 取得 boardNumber
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
                 state.boardNumber = boardNum
 
@@ -688,9 +688,15 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
                     ASCoroutine.ensureMainThread {
 
-                        if (state.isBlockBoundary || state.isFirstInPage) {
+                        if (state.isBlockBoundary || (state.isFirstInPage && !state.isFirst)) {
                             state.step = EditFromLinkedStep.SEARCH_NEXT
                             TelnetClient.myInstance!!.sendStringToServer(state.boardNumber.toString())
+                        } else if (state.isFirst) {
+                            state.step = EditFromLinkedStep.GOTO_LAST
+                            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.EQUAL)
+                        } else if (state.isLast) {
+                            state.step = EditFromLinkedStep.SEARCH_PREV
+                            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.END)
                         } else {
                             // 正常: 選擇文章並進入
                             state.step = EditFromLinkedStep.READING_ARTICLE
@@ -698,6 +704,21 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                             boardPage.loadItemAtIndex(state.boardNumber - 1)
                         }
                     }
+                }
+            }
+
+            EditFromLinkedStep.SEARCH_PREV -> {
+                state.step = EditFromLinkedStep.GOTO_LAST
+                this.myCursorRow = this.telnetCursor!!.row
+                val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
+                state.boardNumber = boardNum
+                // 例外: boardMain最後一篇 = 串接最後一篇, 開啟文章
+                if ( boardPage.getItemSize() == boardNum ) {
+                    state.step = EditFromLinkedStep.READING_ARTICLE
+                    showShortToast("編輯文章定位至：${state.boardNumber}")
+                    boardPage.loadItemAtIndex(state.boardNumber)
+                } else {
+                    create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
                 }
             }
 
