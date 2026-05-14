@@ -33,6 +33,8 @@
             android:supportsPictureInPicture="true"
             android:theme="@style/MyTheme"
             android:windowSoftInputMode="adjustResize"
+            android:minWidth="300dp"
+            android:minHeight="300dp"
             tools:ignore="Instantiatable">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
