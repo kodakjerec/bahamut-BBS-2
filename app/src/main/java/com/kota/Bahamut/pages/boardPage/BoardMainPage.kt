@@ -84,7 +84,6 @@ import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASListViewExtentOptionalDelegate
 import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.asFramework.ui.ASToast.showShortToast
-import com.kota.asFramework.ui.ResponsiveLayoutHelper
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils

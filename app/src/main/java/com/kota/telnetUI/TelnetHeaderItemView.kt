@@ -9,15 +9,16 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.UserSettings
 import androidx.core.view.size
 
 open class TelnetHeaderItemView : LinearLayout {
-    private var detail1: TextView? = null
-    private var detail2: TextView? = null
-    private var myTitle: TextView? = null
-    private var mMenuButton: ImageButton? = null
-    private var mMenuDivider: View? = null
+    protected var detail1: TextView? = null
+    protected var detail2: TextView? = null
+    protected var myTitle: TextView? = null
+    protected var mMenuButton: ImageButton? = null
+    protected var mMenuDivider: View? = null
 
     constructor(context: Context?) : super(context) {
         init()
@@ -27,11 +28,14 @@ open class TelnetHeaderItemView : LinearLayout {
         init()
     }
 
-    fun init() {
-        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
-            R.layout.telnet_header_item_view,
-            this
-        )
+    /** 提供子類別覆蓋 Layout ID */
+    protected open fun getLayoutId(): Int {
+        return R.layout.telnet_header_item_view
+    }
+
+    open fun init() {
+        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+        inflater.inflate(getLayoutId(), this)
         myTitle = findViewById(R.id.title)
         detail1 = findViewById(R.id.detail_1)
         detail2 = findViewById(R.id.detail_2)
@@ -55,9 +59,12 @@ open class TelnetHeaderItemView : LinearLayout {
                 headerItemView.addView(alViews[j])
             }
         }
+
+        // 套用主題顏色
+        ThemeFunctions().applyThemeToHeaderItemView(this)
     }
 
-    fun setMenuButtonClickListener(aListener: OnClickListener?) {
+    open fun setMenuButtonClickListener(aListener: OnClickListener?) {
         if (aListener == null) {
             mMenuDivider?.visibility = GONE
             mMenuButton?.visibility = GONE
@@ -69,13 +76,13 @@ open class TelnetHeaderItemView : LinearLayout {
         mMenuButton?.setOnClickListener(aListener)
     }
 
-    fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
+    open fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
         setTitle(aTitle)
         setDetail1(aDetail1)
         setDetail2(aDetail2)
     }
 
-    fun setTitle(aTitle: String?) {
+    open fun setTitle(aTitle: String?) {
         if (myTitle != null) {
             myTitle?.text = aTitle
             if (aTitle != null && aTitle.contains("系統精靈送信來了")) {
@@ -88,20 +95,20 @@ open class TelnetHeaderItemView : LinearLayout {
         }
     }
 
-    fun setDetail1(aDetail1: String?) {
+    open fun setDetail1(aDetail1: String?) {
         if (detail1 != null) {
             detail1?.text = aDetail1
         }
     }
 
     /** 設定點擊功能 detail1  */
-    fun setDetail1ClickListener(aListener: OnClickListener?) {
+    open fun setDetail1ClickListener(aListener: OnClickListener?) {
         if (aListener != null) {
             detail1?.setOnClickListener(aListener)
         }
     }
 
-    fun setDetail2(aDetail2: String?) {
+    open fun setDetail2(aDetail2: String?) {
         if (detail2 != null) {
             detail2?.text = aDetail2
         }
