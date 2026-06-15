@@ -9,6 +9,7 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
@@ -59,6 +60,14 @@ class UserConfigPage: TelnetPage() {
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_8_Enable).setOnClickListener { _-> changeOperationMode("8") }
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_9_Enable).setOnClickListener { _-> changeOperationMode("9") }
         mainLayout.findViewById<CheckBox>(R.id.User_Config_Item_A_Enable).setOnClickListener { _-> changeOperationMode("A") }
+
+        // 新增：處理工具列返回按鈕
+        findViewById(R.id.UserConfig_BackButton)?.setOnClickListener {
+            onBackPressed()
+        }
+
+        // 新增：套用佈景主題
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     /** 收到回傳的資料內容 */

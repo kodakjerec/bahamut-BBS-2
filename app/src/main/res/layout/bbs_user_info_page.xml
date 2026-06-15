@@ -35,27 +35,43 @@
                 android:text="@string/user_info_nick_name"/>
         </LinearLayout>
     </LinearLayout>
-    <LinearLayout style="@style/toolbar"
-        android:id="@+id/toolbar"
-        android:layout_below="@+id/User_Info_Main_Layout">
-        <Button
-            android:id="@+id/User_Info_Page_Reset"
-            style="@style/ToolbarItem.Danger"
-            android:layout_weight="0"
-            android:text="@string/_back" />
-        <Button
-            android:id="@+id/User_Info_Page_Update"
-            style="@style/ToolbarItem"
-            android:layout_width="wrap_content"
-            android:layout_weight="1"
-            android:enabled="false"
-            android:text="@string/theme_manager_page_chapter_update" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/User_Info_Page_Update"
+        style="@style/ToolbarItem"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/User_Info_Main_Layout"
+        android:text="@string/theme_manager_page_chapter_update"
+        android:visibility="gone" />
 
     <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/User_Info_Others"
         style="@style/TextViewSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/toolbar" />
+        android:layout_below="@+id/User_Info_Page_Update" />
+
+    <LinearLayout style="@style/toolbar"
+        android:id="@+id/toolbar"
+        android:layout_alignParentBottom="true">
+        
+        <Button
+            android:id="@+id/User_Info_Page_Reset"
+            style="@style/ToolbarItem"
+            android:text="@string/_back" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BlockList_EmptyButton1"
+            style="@style/ToolbarItem"
+            android:text="" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BlockList_EmptyButton2"
+            style="@style/ToolbarItem"
+            android:text="" />
+    </LinearLayout>
 </RelativeLayout>

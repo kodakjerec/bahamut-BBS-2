@@ -57,6 +57,12 @@ class BillingPage : TelnetPage() {
         }
         button1.performClick()
 
+        // 新增：處理底端工具列的返回按鈕
+        findViewById(R.id.BillingPage_BackButton)?.setOnClickListener {
+            onBackPressed()
+            PageContainer.instance!!.cleanBillingPage()
+        }
+
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }

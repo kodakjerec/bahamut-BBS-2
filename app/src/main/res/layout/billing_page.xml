@@ -1,78 +1,117 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:background="@color/black">
-<LinearLayout
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@color/black"
-    android:layout_marginTop="12dp"
-    android:gravity="center">
+    android:layout_height="match_parent"
+    android:background="@color/black">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@mipmap/ic_launcher"
-        android:contentDescription="@string/app_name"
-        />
-
-    <TextView
-        style="@style/TouchBlock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:text="@string/billing_page_note"
-        android:textColor="@color/button_text_color"
-        android:textSize="14sp"/>
-    <TextView
-        style="@style/TouchBlock"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:text="@string/billing_page_note2"
-        android:textColor="@color/yellow"
-        android:textSize="16sp"/>
-    <LinearLayout
-        android:id="@+id/toolbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:minWidth="200dp">
-        <Button
-            android:id="@+id/button_90"
-            style="@style/BillingPageButton"
-            android:enabled="false"
-            android:text="@string/billing_page_button_90" />
-        <Button
-            android:id="@+id/button_checkPurchaseQuery"
-            style="@style/BillingPageButton"
-            android:text="@string/billing_page_button_check_purchase_query" />
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/toolbar"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@color/black"
             android:layout_marginTop="12dp"
-            android:orientation="horizontal">
+            android:gravity="center">
 
-            <com.kota.telnetUI.textView.TelnetTextViewNormal
-                style="@style/TextViewNormal"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/white"
-                android:text="@string/billing_page_already_billing_text" />
+            <ImageView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@mipmap/ic_launcher"
+                android:contentDescription="@string/app_name" />
 
-            <com.kota.telnetUI.textView.TelnetTextViewNormal
-                android:id="@+id/BillingPage_already_billing_value"
-                style="@style/TextViewNormal"
-                android:layout_width="0dp"
+            <TextView
+                style="@style/TouchBlock"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:textColor="@color/white" />
+                android:gravity="center_vertical"
+                android:text="@string/billing_page_note"
+                android:textColor="@color/button_text_color"
+                android:textSize="14sp" />
+
+            <TextView
+                style="@style/TouchBlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:text="@string/billing_page_note2"
+                android:textColor="@color/yellow"
+                android:textSize="16sp" />
+
+            <!-- 原本的贊助按鈕區塊，ID 已更名以避免衝突 -->
+            <LinearLayout
+                android:id="@+id/billing_purchase_buttons_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:minWidth="200dp">
+
+                <Button
+                    android:id="@+id/button_90"
+                    style="@style/BillingPageButton"
+                    android:enabled="false"
+                    android:text="@string/billing_page_button_90" />
+
+                <Button
+                    android:id="@+id/button_checkPurchaseQuery"
+                    style="@style/BillingPageButton"
+                    android:text="@string/billing_page_button_check_purchase_query" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="12dp"
+                    android:orientation="horizontal">
+
+                    <com.kota.telnetUI.textView.TelnetTextViewNormal
+                        style="@style/TextViewNormal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/white"
+                        android:text="@string/billing_page_already_billing_text" />
+
+                    <com.kota.telnetUI.textView.TelnetTextViewNormal
+                        android:id="@+id/BillingPage_already_billing_value"
+                        style="@style/TextViewNormal"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:textColor="@color/white" />
+                </LinearLayout>
+            </LinearLayout>
+
         </LinearLayout>
+    </ScrollView>
+
+    <!-- 套用 class_page.xml 風格的底部工具列 -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/BillingPage_BackButton"
+            style="@style/ToolbarItem"
+            android:text="@string/_back" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BillingPage_EmptyButton1"
+            style="@style/ToolbarItem"
+            android:text="" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            android:id="@+id/BillingPage_EmptyButton2"
+            style="@style/ToolbarItem"
+            android:text="" />
     </LinearLayout>
 
-</LinearLayout>
-</ScrollView>
+</RelativeLayout>

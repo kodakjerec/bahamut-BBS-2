@@ -1,6 +1,8 @@
 package com.kota.Bahamut.pages.bbsUser
 
+import android.view.View.GONE
 import android.view.View.OnClickListener
+import android.view.View.VISIBLE
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -60,6 +62,7 @@ class UserInfoPage: TelnetPage() {
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
+        ThemeFunctions().layoutReplaceTheme(mainLayout)
         paintBtnUpdate(false)
     }
 
@@ -118,5 +121,6 @@ class UserInfoPage: TelnetPage() {
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
         btnUpdate.isEnabled = enabled
+        btnUpdate.visibility = if (enabled) VISIBLE else GONE
     }
 }

@@ -8,9 +8,10 @@
     android:orientation="vertical">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:id="@+id/content_view">
+        android:id="@+id/content_view"
+        android:layout_above="@+id/toolbar">
         <LinearLayout
             android:id="@+id/Theme_Manager_Page_Buttons"
             android:layout_width="match_parent"
@@ -175,7 +176,10 @@
                     android:text="@string/loading"/>
             </LinearLayout>
         </LinearLayout>
-        <LinearLayout style="@style/toolbar" android:id="@+id/toolbar">
+        <LinearLayout
+            android:id="@+id/Theme_Manager_Page_Edit_Toolbar"
+            style="@style/toolbar"
+            android:visibility="gone">
             <Button
                 android:id="@+id/Theme_Manager_Page_Toolbar_Reset"
                 style="@style/ToolbarItem.Danger"
@@ -189,5 +193,32 @@
                 android:enabled="false"
                 android:text="@string/theme_manager_page_chapter_update" />
         </LinearLayout>
+    </LinearLayout>
+
+    <!-- 畫面底部固定導覽列 -->
+    <LinearLayout
+        android:id="@+id/toolbar"
+        style="@style/toolbar"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/Theme_Manager_Page_Toolbar_Back"
+            style="@style/ToolbarItem"
+            android:layout_weight="1"
+            android:text="@string/_back" />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            style="@style/ToolbarItem"
+            android:layout_weight="1"
+            android:text=" " />
+
+        <View style="@style/ToolbarDivider" />
+
+        <Button
+            style="@style/ToolbarItem"
+            android:layout_weight="1"
+            android:text=" " />
     </LinearLayout>
 </RelativeLayout>

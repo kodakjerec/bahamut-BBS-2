@@ -1,9 +1,14 @@
 package com.kota.Bahamut.pages.theme
 
+import android.content.res.ColorStateList
+import android.graphics.drawable.StateListDrawable
+import android.view.View
 import android.view.View.OnClickListener
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.doOnTextChanged
 import com.kota.asFramework.ui.ASToast
 import com.kota.Bahamut.BahamutPage
@@ -27,8 +32,10 @@ class ThemeManagerPage: TelnetPage() {
     private lateinit var txnBackColor:TextView
     private lateinit var txnBackColorPressed:TextView
     private lateinit var txnBackColorDisabled:TextView
+    private lateinit var editToolbar: LinearLayout
     private lateinit var btnReset:Button
     private lateinit var btnUpdate:Button
+    private lateinit var btnBack:Button
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
@@ -90,11 +97,17 @@ class ThemeManagerPage: TelnetPage() {
         txnBackColorPressed.setOnClickListener(textClickListener)
         txnBackColorDisabled.setOnClickListener(textClickListener)
 
+        editToolbar = mainLayout.findViewById(R.id.Theme_Manager_Page_Edit_Toolbar)
         btnReset = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Reset)
         btnReset.setOnClickListener(btnResetOnClickListener)
 
         btnUpdate = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Update)
         btnUpdate.setOnClickListener(btnUpdateOnClickListener)
+
+        btnBack = findViewById(R.id.Theme_Manager_Page_Toolbar_Back) as Button
+        btnBack.setOnClickListener {
+            onBackPressed()
+        }
 
         // 按下指定的外觀
         val selectedIndex = ThemeStore.getSelectIndex()
@@ -126,10 +139,43 @@ class ThemeManagerPage: TelnetPage() {
         val button3:Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_3)
         button3.setTextColor(CommonFunctions.rgbToInt(txnTextColorDisabled.text.toString()))
         button3.setBackgroundColor(CommonFunctions.rgbToInt(txnBackColorDisabled.text.toString()))
+
+        // 預覽底部的導覽列與編輯工具列
+        val textColor = CommonFunctions.rgbToInt(txnTextColor.text.toString())
+        val textColorPressed = CommonFunctions.rgbToInt(txnTextColorPressed.text.toString())
+        val textColorDisabled = CommonFunctions.rgbToInt(txnTextColorDisabled.text.toString())
+        val backColor = CommonFunctions.rgbToInt(txnBackColor.text.toString())
+        val backColorPressed = CommonFunctions.rgbToInt(txnBackColorPressed.text.toString())
+        val backColorDisabled = CommonFunctions.rgbToInt(txnBackColorDisabled.text.toString())
+
+        val toolbars = listOfNotNull(
+            findViewById(R.id.toolbar) as? ViewGroup,
+            editToolbar
+        )
+
+        for (toolbar in toolbars) {
+            for (i in 0 until toolbar.childCount) {
+                val child = toolbar.getChildAt(i)
+                if (child is Button) {
+                    // 套用文字顏色狀態 (按下、一般、停用)
+                    child.setTextColor(ColorStateList(
+                        arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()),
+                        intArrayOf(textColorPressed, textColor, textColorDisabled)
+                    ))
+                    // 套用背景顏色狀態 (按下、一般、停用)
+                    val backgroundDrawable = StateListDrawable()
+                    backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), backColorPressed.toDrawable())
+                    backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), backColor.toDrawable())
+                    backgroundDrawable.addState(intArrayOf(), backColorDisabled.toDrawable())
+                    child.background = backgroundDrawable
+                }
+            }
+        }
     }
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
         btnUpdate.isEnabled = enabled
+        editToolbar.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     /** 按下顏色文字跳出調色盤 */

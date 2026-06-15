@@ -4,11 +4,13 @@ import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getShowHeader
 import com.kota.Bahamut.service.NotificationSettings.setShowHeader
@@ -169,6 +171,15 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
         inputField = findViewById(R.id.BlockList_Input) as EditText?
         findViewById(R.id.BlockList_Add)?.setOnClickListener(addListener)
         findViewById(R.id.BlockList_Reset)?.setOnClickListener(resetListener)
+
+        // --- 新增：處理返回按鈕 ---
+        findViewById(R.id.BlockList_BackButton)?.setOnClickListener {
+            onBackPressed()
+        }
+
+        // --- 新增：套用佈景主題 ---
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        // -----------------------
 
         showNotification()
 
