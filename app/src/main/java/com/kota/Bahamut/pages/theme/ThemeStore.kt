@@ -52,21 +52,16 @@ object ThemeStore {
                 // 粉紅
                 addTheme(getDefaultTheme(1))
 
-                // 灰白
+                // eInk
                 addTheme(getDefaultTheme(2))
 
-                // 自訂1
-                val themeDef1 = getDefaultTheme(0)
-                themeDef1.name = "自訂1"
-                addTheme(themeDef1)
+                // eInk2
+                addTheme(getDefaultTheme(3))
 
                 // 自訂2
                 val themeDef2 = getDefaultTheme(0)
                 themeDef2.name = "自訂2"
                 addTheme(themeDef2)
-
-                // 存檔
-                save()
             } else {
                 for (i in 0 until jsonArray.length()) {
                     val subJSONObject = jsonArray.getJSONObject(i)
@@ -119,15 +114,46 @@ object ThemeStore {
                 return themePink
             }
             2 -> {
-                val themeGrayDark = Theme()
-                themeGrayDark.name = "灰白"
-                themeGrayDark.textColor = "#FFE0E0E0"
-                themeGrayDark.textColorPressed = "#FF808080"
-                themeGrayDark.textColorDisabled = "#FF808080"
-                themeGrayDark.backgroundColor =  "#FF3F3F3F"
-                themeGrayDark.backgroundColorPressed = "#FF363636"
-                themeGrayDark.backgroundColorDisabled = "#FF282828"
-                return themeGrayDark
+                val themeEInk = Theme()
+                themeEInk.name = "eInk"
+                themeEInk.textColor = "#FFE0E0E0"
+                themeEInk.textColorPressed = "#FF808080"
+                themeEInk.textColorDisabled = "#FF808080"
+                themeEInk.backgroundColor =  "#FF3F3F3F"
+                themeEInk.backgroundColorPressed = "#FF363636"
+                themeEInk.backgroundColorDisabled = "#FF282828"
+                themeEInk.headerBackColor = "#FF202020"
+                themeEInk.headerHeaderColor = "#FFFFFFFF"
+                themeEInk.headerManagerColor = "#FFCCCCCC"
+                themeEInk.headerBorderColor = "#FF999999"
+                themeEInk.contentBackColor = "#FF3F3F3F"
+                themeEInk.contentAuthorColor = "#FFEEEEEE"
+                themeEInk.contentTextColor = "#FFD0D0D0"
+                themeEInk.quoteBackColor = "#FF3F3F3F"
+                themeEInk.quoteAuthorColor = "#FF999999"
+                themeEInk.quoteTextColor = "#FF808080"
+                return themeEInk
+            }
+            3 -> {
+                val themeEInk2 = Theme()
+                themeEInk2.name = "eInk2"
+                themeEInk2.textColor = "#FF000000"
+                themeEInk2.textColorPressed = "#FF000000"
+                themeEInk2.textColorDisabled = "#FF000000"
+                themeEInk2.backgroundColor =  "#FFFFFFFF"
+                themeEInk2.backgroundColorPressed = "#FFFFFFFF"
+                themeEInk2.backgroundColorDisabled = "#FFFFFFFF"
+                themeEInk2.headerBackColor = "#FF808080"
+                themeEInk2.headerHeaderColor = "#FF000000"
+                themeEInk2.headerManagerColor = "#FF000000"
+                themeEInk2.headerBorderColor = "#FF000000"
+                themeEInk2.contentBackColor = "#FFFFFFFF"
+                themeEInk2.contentAuthorColor = "#FF000000"
+                themeEInk2.contentTextColor = "#FF000000"
+                themeEInk2.quoteBackColor = "#FFFFFFFF"
+                themeEInk2.quoteAuthorColor = "#FF808080"
+                themeEInk2.quoteTextColor = "#FF808080"
+                return themeEInk2
             }
             else -> {
                 return Theme()

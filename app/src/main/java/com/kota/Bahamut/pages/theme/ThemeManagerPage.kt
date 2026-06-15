@@ -32,6 +32,16 @@ class ThemeManagerPage: TelnetPage() {
     private lateinit var txnBackColor:TextView
     private lateinit var txnBackColorPressed:TextView
     private lateinit var txnBackColorDisabled:TextView
+    private lateinit var txnHeaderBackColor: TextView
+    private lateinit var txnHeaderHeaderColor: TextView
+    private lateinit var txnHeaderManagerColor: TextView
+    private lateinit var txnHeaderBorderColor: TextView
+    private lateinit var txnContentBackColor: TextView
+    private lateinit var txnContentAuthorColor: TextView
+    private lateinit var txnContentTextColor: TextView
+    private lateinit var txnQuoteBackColor: TextView
+    private lateinit var txnQuoteAuthorColor: TextView
+    private lateinit var txnQuoteTextColor: TextView
     private lateinit var editToolbar: LinearLayout
     private lateinit var btnReset:Button
     private lateinit var btnUpdate:Button
@@ -97,6 +107,28 @@ class ThemeManagerPage: TelnetPage() {
         txnBackColorPressed.setOnClickListener(textClickListener)
         txnBackColorDisabled.setOnClickListener(textClickListener)
 
+        txnHeaderBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Back_Color)
+        txnHeaderHeaderColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Header_Color)
+        txnHeaderManagerColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Manager_Color)
+        txnHeaderBorderColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Border_Color)
+        txnContentBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Back_Color)
+        txnContentAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Author_Color)
+        txnContentTextColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Color)
+        txnQuoteBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Back_Color)
+        txnQuoteAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Author_Color)
+        txnQuoteTextColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Color)
+
+        txnHeaderBackColor.setOnClickListener(textClickListener)
+        txnHeaderHeaderColor.setOnClickListener(textClickListener)
+        txnHeaderManagerColor.setOnClickListener(textClickListener)
+        txnHeaderBorderColor.setOnClickListener(textClickListener)
+        txnContentAuthorColor.setOnClickListener(textClickListener)
+        txnContentBackColor.setOnClickListener(textClickListener)
+        txnContentTextColor.setOnClickListener(textClickListener)
+        txnQuoteBackColor.setOnClickListener(textClickListener)
+        txnQuoteAuthorColor.setOnClickListener(textClickListener)
+        txnQuoteTextColor.setOnClickListener(textClickListener)
+
         editToolbar = mainLayout.findViewById(R.id.Theme_Manager_Page_Edit_Toolbar)
         btnReset = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Reset)
         btnReset.setOnClickListener(btnResetOnClickListener)
@@ -124,7 +156,16 @@ class ThemeManagerPage: TelnetPage() {
         txnBackColor.text = selectedTheme.backgroundColor
         txnBackColorPressed.text = selectedTheme.backgroundColorPressed
         txnBackColorDisabled.text = selectedTheme.backgroundColorDisabled
-
+        txnHeaderBackColor.text = selectedTheme.headerBackColor
+        txnHeaderHeaderColor.text = selectedTheme.headerHeaderColor
+        txnHeaderManagerColor.text = selectedTheme.headerManagerColor
+        txnHeaderBorderColor.text = selectedTheme.headerBorderColor
+        txnContentBackColor.text = selectedTheme.contentBackColor
+        txnContentAuthorColor.text = selectedTheme.contentAuthorColor
+        txnContentTextColor.text = selectedTheme.contentTextColor
+        txnQuoteBackColor.text = selectedTheme.quoteBackColor
+        txnQuoteAuthorColor.text = selectedTheme.quoteAuthorColor
+        txnQuoteTextColor.text = selectedTheme.quoteTextColor
     }
     /** 變更工具列示範按鈕外觀 */
     private fun paintToolbarButtons() {
@@ -171,11 +212,49 @@ class ThemeManagerPage: TelnetPage() {
                 }
             }
         }
+
+        // 標題列預覽: 背景(Col2)+標題(Col3)+版主(Col4)+版面(Col5)
+        val hBack = CommonFunctions.rgbToInt(txnHeaderBackColor.text.toString())
+        val hTitle = CommonFunctions.rgbToInt(txnHeaderHeaderColor.text.toString())
+        val hManager = CommonFunctions.rgbToInt(txnHeaderManagerColor.text.toString())
+        val hBorder = CommonFunctions.rgbToInt(txnHeaderBorderColor.text.toString())
+
+        txnHeaderBackColor.setTextColor(hTitle)
+        txnHeaderBackColor.setBackgroundColor(hBack)
+        txnHeaderHeaderColor.setTextColor(hTitle)
+        txnHeaderHeaderColor.setBackgroundColor(hBack)
+        txnHeaderManagerColor.setTextColor(hManager)
+        txnHeaderManagerColor.setBackgroundColor(hBack)
+        txnHeaderBorderColor.setTextColor(hBorder)
+        txnHeaderBorderColor.setBackgroundColor(hBack)
+
+        // 內文預覽: 背景(Col2)+作者(Col3)+內文(Col4)
+        val cBack = CommonFunctions.rgbToInt(txnContentBackColor.text.toString())
+        val cAuthor = CommonFunctions.rgbToInt(txnContentAuthorColor.text.toString())
+        val cText = CommonFunctions.rgbToInt(txnContentTextColor.text.toString())
+
+        txnContentBackColor.setTextColor(cText)
+        txnContentBackColor.setBackgroundColor(cBack)
+        txnContentAuthorColor.setTextColor(cAuthor)
+        txnContentAuthorColor.setBackgroundColor(cBack)
+        txnContentTextColor.setTextColor(cText)
+        txnContentTextColor.setBackgroundColor(cBack)
+
+        // 引用預覽: 背景(Col2)+作者(Col3)+內文(Col4)
+        val qBack = CommonFunctions.rgbToInt(txnQuoteBackColor.text.toString())
+        val qAuthor = CommonFunctions.rgbToInt(txnQuoteAuthorColor.text.toString())
+        val qText = CommonFunctions.rgbToInt(txnQuoteTextColor.text.toString())
+
+        txnQuoteBackColor.setTextColor(qText)
+        txnQuoteBackColor.setBackgroundColor(qBack)
+        txnQuoteAuthorColor.setTextColor(qAuthor)
+        txnQuoteAuthorColor.setBackgroundColor(qBack)
+        txnQuoteTextColor.setTextColor(qText)
+        txnQuoteTextColor.setBackgroundColor(qBack)
     }
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
-        btnUpdate.isEnabled = enabled
-        editToolbar.visibility = if (enabled) View.VISIBLE else View.GONE
+        btnUpdate.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
     /** 按下顏色文字跳出調色盤 */
@@ -220,6 +299,16 @@ class ThemeManagerPage: TelnetPage() {
         selectedTheme.backgroundColor = txnBackColor.text.toString()
         selectedTheme.backgroundColorPressed = txnBackColorPressed.text.toString()
         selectedTheme.backgroundColorDisabled = txnBackColorDisabled.text.toString()
+        selectedTheme.headerBackColor = txnHeaderBackColor.text.toString()
+        selectedTheme.headerHeaderColor = txnHeaderHeaderColor.text.toString()
+        selectedTheme.headerManagerColor = txnHeaderManagerColor.text.toString()
+        selectedTheme.headerBorderColor = txnHeaderBorderColor.text.toString()
+        selectedTheme.contentBackColor = txnContentBackColor.text.toString()
+        selectedTheme.contentAuthorColor = txnContentAuthorColor.text.toString()
+        selectedTheme.contentTextColor = txnContentTextColor.text.toString()
+        selectedTheme.quoteBackColor = txnQuoteBackColor.text.toString()
+        selectedTheme.quoteAuthorColor = txnQuoteAuthorColor.text.toString()
+        selectedTheme.quoteTextColor = txnQuoteTextColor.text.toString()
 
         // 更新
         ThemeStore.updateTheme(ThemeStore.getSelectIndex(), selectedTheme)

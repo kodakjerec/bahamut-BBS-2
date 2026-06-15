@@ -12,6 +12,7 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
 import android.widget.Spinner
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import android.widget.TextView
 import com.google.android.material.slider.Slider
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
@@ -575,6 +576,14 @@ class SystemSettingsPage : TelnetPage() {
         // bbs-user-page
         mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserConfig)!!
             .setOnClickListener(bbsUserConfigListener)
+
+        // 返回按鈕
+        findViewById(R.id.SystemSettings_BackButton)?.setOnClickListener {
+            onBackPressed()
+        }
+
+        // 替換工具列外觀，使其符合佈景主題
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     val name: String
