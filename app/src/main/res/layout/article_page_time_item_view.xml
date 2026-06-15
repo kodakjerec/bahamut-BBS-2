@@ -4,19 +4,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/time_line_background_color">
-    <com.kota.telnetUI.textView.TelnetTextViewSmall
-        android:id="@+id/ArticleTimeItemView_IP"
-        style="@style/TextViewSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:layout_alignParentStart="true"
-        android:textIsSelectable="true"/>
+
+    <!-- 時間固定在右側 -->
     <com.kota.telnetUI.textView.TelnetTextViewSmall
         android:id="@+id/ArticleTimeItemView_Time"
         style="@style/TextViewSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/white"
-        android:layout_alignParentEnd="true"/>
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true" />
+
+    <!-- IP 固定在左側，但右方限制在時間的左邊 -->
+    <com.kota.telnetUI.textView.TelnetTextViewSmall
+        android:id="@+id/ArticleTimeItemView_IP"
+        style="@style/TextViewSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@id/ArticleTimeItemView_Time"
+        android:layout_marginEnd="8dp"
+        android:layout_centerVertical="true"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="@color/white"
+        android:textIsSelectable="true" />
 </RelativeLayout>
