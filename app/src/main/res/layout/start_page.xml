@@ -10,7 +10,8 @@
         android:layout_height="wrap_content"
         android:background="@color/black"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/toolbar">
+        android:layout_above="@+id/toolbar"
+        android:id="@+id/content_view">
 
         <LinearLayout
             style="@style/TouchBlock"

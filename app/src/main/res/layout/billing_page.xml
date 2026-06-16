@@ -98,20 +98,6 @@
             android:id="@+id/BillingPage_BackButton"
             style="@style/ToolbarItem"
             android:text="@string/_back" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/BillingPage_EmptyButton1"
-            style="@style/ToolbarItem"
-            android:text="" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/BillingPage_EmptyButton2"
-            style="@style/ToolbarItem"
-            android:text="" />
     </LinearLayout>
 
 </RelativeLayout>

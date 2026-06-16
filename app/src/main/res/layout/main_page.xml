@@ -9,7 +9,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/item_background_color" />
+        android:background="@color/black" />
 
     <com.kota.telnetUI.TelnetView
         android:id="@+id/Main_TelnetView"
@@ -42,7 +42,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@+id/toolbar"
-        android:background="@color/black"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
@@ -92,7 +91,6 @@
                     android:layout_height="30dp"
                     android:layout_alignParentTop="true"
                     android:layout_alignParentEnd="true"
-                    android:background="@color/transparent"
                     android:drawableStart="@drawable/icon_comment"
                     android:scaleX="0.4"
                     android:scaleY="0.4"
@@ -109,13 +107,11 @@
             </RelativeLayout>
             <Button
                 android:id="@+id/Main_HeroStepButton"
-                style="@style/ToolbarItem"
+                style="@style/MainItem"
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="match_parent"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/main_hero_step"
-                android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
         <LinearLayout
@@ -130,9 +126,7 @@
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_boards"
-                android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
 
@@ -148,9 +142,7 @@
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_class"
-                android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
 
@@ -166,9 +158,7 @@
                 style="@style/MainItem"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:drawable/list_selector_background"
                 android:text="@string/folder_favorite"
-                android:textColor="@color/button_text_color"
                 android:textSize="28sp"/>
         </LinearLayout>
     </LinearLayout>

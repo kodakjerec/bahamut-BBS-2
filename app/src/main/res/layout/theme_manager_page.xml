@@ -422,19 +422,5 @@
             style="@style/ToolbarItem"
             android:layout_weight="1"
             android:text="@string/_back" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            style="@style/ToolbarItem"
-            android:layout_weight="1"
-            android:text=" " />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            style="@style/ToolbarItem"
-            android:layout_weight="1"
-            android:text=" " />
     </LinearLayout>
 </RelativeLayout>

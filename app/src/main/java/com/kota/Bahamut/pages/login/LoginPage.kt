@@ -2,6 +2,7 @@ package com.kota.Bahamut.pages.login
 
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -106,8 +107,9 @@ class LoginPage : TelnetPage() {
         }
 
         // 替換外觀
-        val mainLayout = findViewById(R.id.toolbar) as LinearLayout?
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
+        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        // 替換內文外觀
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.content_view) as ViewGroup?)
     }
 
     @Synchronized

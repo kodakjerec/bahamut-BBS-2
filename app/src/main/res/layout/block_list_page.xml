@@ -55,19 +55,5 @@
             android:id="@+id/BlockList_BackButton"
             style="@style/ToolbarItem"
             android:text="@string/_back" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/BlockList_EmptyButton1"
-            style="@style/ToolbarItem"
-            android:text="" />
-
-        <View style="@style/ToolbarDivider" />
-
-        <Button
-            android:id="@+id/BlockList_EmptyButton2"
-            style="@style/ToolbarItem"
-            android:text="" />
     </LinearLayout>
 </LinearLayout>

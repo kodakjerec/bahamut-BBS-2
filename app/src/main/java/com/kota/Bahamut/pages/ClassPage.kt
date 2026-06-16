@@ -61,6 +61,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        // 替換內文外觀
+        ThemeFunctions().applyThemeToContent(mainLayout)
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
