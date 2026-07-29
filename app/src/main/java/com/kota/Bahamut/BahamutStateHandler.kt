@@ -326,7 +326,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 .isEmpty()
         ) {
             detectMessage()
-            return false
+            return true
         } else {
             return runPass2
         }
