@@ -189,6 +189,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         val adapter: ArrayAdapter<Any> =
             ArrayAdapter<Any>(context!!, R.layout.simple_spinner_item, headers)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        headerSelected = 0
         headerSelector?.adapter = adapter
         headerSelector?.onItemSelectedListener = this
         titleBlock = mainLayout?.findViewById(R.id.Post_TitleBlock)
@@ -212,6 +213,10 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         if (contentField != null) {
             contentField?.setText("")
         }
+
+        headerSelector?.setSelection(0) // 讓 UI 上的下拉選單回到第 0 個
+        headerSelected = 0              // 將紀錄索引的變數也歸零
+
         postArticlePageListener = null
         recover = false
     }
@@ -315,7 +320,6 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         } else {
             null
         }
-        val sendContent = content
         // 有來源文章編號, 可能為Reply, edit
         if (articleNumber != null) {
             if (operationMode == OperationMode.Reply) {
@@ -326,7 +330,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                         this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
                             this@PostArticlePage,
                             sendTitle,
-                            sendContent,
+                            content,
                             aTarget,
                             this@PostArticlePage.articleNumber,
                             aSign,
@@ -365,7 +369,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                     this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
                         this@PostArticlePage,
                         sendTitle,
-                        sendContent,
+                        content,
                         null,
                         null,
                         aSign,
@@ -539,7 +543,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
     /** 從字串去回推標題定位  */
     fun getIndexOfHeader(aHeader: String?): Int {
-        if (aHeader == null || aHeader.isEmpty()) {
+        if (aHeader.isNullOrEmpty()) {
             return 0
         }
         for (i in 1..<headers.size) {
@@ -551,7 +555,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
     }
 
     /** 從定位取出特定標題  */
-    fun getArticleHeader(index: Int): String? {
+    fun getArticleHeader(index: Int): String {
         if (index <= 0 || index >= headers.size) {
             return ""
         }
