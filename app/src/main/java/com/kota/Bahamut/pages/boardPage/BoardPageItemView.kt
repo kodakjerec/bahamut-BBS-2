@@ -10,6 +10,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
@@ -45,6 +46,9 @@ class BoardPageItemView : LinearLayout {
             setGYNumber(aItem.gy)
             setReply(aItem.isReply)
             setRead(aItem.isDeleted || aItem.isRead)
+            // 套用主題
+            val isRead = aItem.isDeleted || aItem.isRead
+            ThemeFunctions().applyThemeToBoardItem(this, isRead, aItem.title, aItem.isReply)
             return
         }
         clear()

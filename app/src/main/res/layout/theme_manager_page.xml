@@ -392,6 +392,214 @@
                 android:gravity="center"/>
         </LinearLayout>
 
+        <!-- 看板列表: 第一組 (背景+標題+已讀+分隔線) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewSmall"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="看板列表" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="背景" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="標題" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="已讀" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="分隔線" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewSmall"
+                android:layout_width="60dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Back_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Title_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Title_Read_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Divider_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- 看板列表: 第二組 (關注+關注已讀+M文+狀態) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View android:layout_width="60dp" android:layout_height="0dp" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="關注" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="關註讀" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="M文" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="狀態" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View android:layout_width="60dp" android:layout_height="0dp" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Title_Follow_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Title_Follow_Read_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Mark_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Status_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+        </LinearLayout>
+
+        <!-- 看板列表: 第三組 (編號+日期+作者) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View android:layout_width="60dp" android:layout_height="0dp" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="編號" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="日期" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="40dp"
+                android:gravity="center"
+                android:text="作者" />
+            <View android:layout_width="0dp" android:layout_weight="1" android:layout_height="0dp" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <View android:layout_width="60dp" android:layout_height="0dp" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Number_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Date_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <com.kota.telnetUI.textView.TelnetTextView
+                android:id="@+id/Theme_Manager_Page_List_Author_Color"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="50dp"
+                android:gravity="center" />
+            <View android:layout_width="0dp" android:layout_weight="1" android:layout_height="0dp" />
+        </LinearLayout>
+
+            <!-- 工具列 -->
         <LinearLayout
             android:id="@+id/Theme_Manager_Page_Edit_Toolbar"
             style="@style/toolbar">

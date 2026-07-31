@@ -199,6 +199,26 @@ class ArticlePage : TelnetPage() {
                     itemViewOrigin.setContent(itemEditRecord)
                 }
             }
+
+            // 在資料填充完畢後套用外觀
+            when (itemViewOrigin) {
+                is ArticlePageTextItemView -> {
+                    ThemeFunctions().applyThemeToArticleTextItem(itemViewOrigin)
+                }
+                is ArticlePagePushItemView -> {
+                    ThemeFunctions().applyThemeToArticlePushItem(itemViewOrigin)
+                }
+                is ArticlePageTelnetItemView -> {
+                    ThemeFunctions().applyThemeToArticleTelnetItem(itemViewOrigin)
+                }
+                is ArticlePageTimeTimeView -> {
+                    ThemeFunctions().applyThemeToArticleTimeItem(itemViewOrigin)
+                }
+                is ArticlePageEditRecordItemView -> {
+                    ThemeFunctions().applyThemeToArticleEditRecordItem(itemViewOrigin)
+                }
+            }
+
             return itemViewOrigin
         }
 

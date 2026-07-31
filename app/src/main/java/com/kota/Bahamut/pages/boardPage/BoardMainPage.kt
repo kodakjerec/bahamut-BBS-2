@@ -1006,6 +1006,7 @@ open class BoardMainPage : TelnetListPage(),
         boardPageItemView.setItem(boardPageItem)
         boardPageItemView.setNumber(itemIndex)
 
+        // 黑名單判斷
         if (boardPageItem != null && this.isItemBlockEnable) {
             if (isBlockListContains(boardPageItem.author)) {
                 boardPageItem.isBlocked = true

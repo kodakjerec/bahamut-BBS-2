@@ -28,6 +28,21 @@ class Theme {
     var quoteAuthorColor: String = "#FF80FF80"
     var quoteTextColor: String = "#FF20FF20"
 
+    // 看板列表 ListItem
+    var listBackColor: String = "#FF000000"              // 列表背景
+    var listTitleColor: String = "#FFFFFFFF"             // 主題(未讀)
+    var listTitleReadColor: String = "#FF808080"         // 主題(已讀)
+    var listTitleFollowFirstColor: String = "#FF00FF00"     // 關注首篇(未讀) - 亮綠
+    var listTitleFollowFirstReadColor: String = "#FF008000" // 關注首篇(已讀) - 深綠
+    var listTitleFollowColor: String = "#FFFFFF00"       // 關注主題(未讀)
+    var listTitleFollowReadColor: String = "#FF808000"   // 關注主題(已讀)
+    var listNumberColor: String = "#FFC08080"            // 左下(編號)
+    var listDateColor: String = "#FF80C080"              // 中間(日期)
+    var listAuthorColor: String = "#FFB0B0F0"            // 右下(作者)
+    var listMarkColor: String = "#FFFF7F27"              // M文標記
+    var listStatusColor: String = "#FFF0F080"            // 狀態標記(Re/◆)
+    var listDividerColor: String = "#FF404040"           // 項目分隔線
+
     fun importFromJSON(obj: JSONObject) {
         name = obj.optString("name")
         textColor = obj.optString("tC", textColor)
@@ -36,16 +51,35 @@ class Theme {
         backgroundColorPressed = obj.optString("bCP", backgroundColorPressed)
         textColorDisabled = obj.optString("tCD", textColorDisabled)
         backgroundColorDisabled = obj.optString("bCD", backgroundColorDisabled)
+
         headerBackColor = obj.optString("hBC", headerBackColor) // 標題列背景
         headerHeaderColor = obj.optString("hHC", headerHeaderColor) // 標題列標題
         headerManagerColor = obj.optString("hMC", headerManagerColor) // 標題列版主
         headerBorderColor = obj.optString("hBDC", headerBorderColor) // 標題列版面
+
         contentBackColor = obj.optString("cBC", contentBackColor) // 內文背景
         contentAuthorColor = obj.optString("cAC", contentAuthorColor) // 內文作者
         contentTextColor = obj.optString("cTC", contentTextColor) // 內文
+
         quoteBackColor = obj.optString("qBC", quoteBackColor) // 引用背景
         quoteAuthorColor = obj.optString("qAC", quoteAuthorColor) // 引用作者
         quoteTextColor = obj.optString("qTC", quoteTextColor) // 引用內文
+
+        // 看板列表
+        listBackColor = obj.optString("lBC", listBackColor)
+        listTitleColor = obj.optString("lTC", listTitleColor)
+        listTitleReadColor = obj.optString("lTRC", listTitleReadColor)
+        listTitleFollowFirstColor = obj.optString("lTFFC", listTitleFollowFirstColor)
+        listTitleFollowFirstReadColor = obj.optString("lTFFRC", listTitleFollowReadColor)
+        listTitleFollowColor = obj.optString("lTFC", listTitleFollowColor)
+        listTitleFollowReadColor = obj.optString("lTFRC", listTitleFollowReadColor)
+        listNumberColor = obj.optString("lNC", listNumberColor)
+        listDateColor = obj.optString("lDC", listDateColor)
+        listAuthorColor = obj.optString("lAC", listAuthorColor)
+        listMarkColor = obj.optString("lMC", listMarkColor)
+        listStatusColor = obj.optString("lSC", listStatusColor)
+        listDividerColor = obj.optString("lDivC", listDividerColor)
+
     }
 
     fun exportToJSON(): JSONObject {
@@ -57,16 +91,34 @@ class Theme {
         obj.put("bCP", backgroundColorPressed)
         obj.put("tCD", textColorDisabled)
         obj.put("bCD", backgroundColorDisabled)
+
         obj.put("hBC", headerBackColor) // 標題列背景
         obj.put("hHC", headerHeaderColor) // 標題列標題
         obj.put("hMC", headerManagerColor) // 標題列版主
         obj.put("hBDC", headerBorderColor) // 標題列版面
+
         obj.put("cBC", contentBackColor) // 內文背景
         obj.put("cAC", contentAuthorColor) // 內文作者
         obj.put("cTC", contentTextColor) // 內文
+
         obj.put("qBC", quoteBackColor) // 引用背景
         obj.put("qAC", quoteAuthorColor) // 引用作者
         obj.put("qTC", quoteTextColor) // 引用內文
+
+        // 看板列表
+        obj.put("lBC", listBackColor)
+        obj.put("lTC", listTitleColor)
+        obj.put("lTRC", listTitleReadColor)
+        obj.put("lTFFC", listTitleFollowFirstColor)
+        obj.put("lTFFRC", listTitleFollowFirstReadColor)
+        obj.put("lTFC", listTitleFollowColor)
+        obj.put("lTFRC", listTitleFollowReadColor)
+        obj.put("lNC", listNumberColor)
+        obj.put("lDC", listDateColor)
+        obj.put("lAC", listAuthorColor)
+        obj.put("lMC", listMarkColor)
+        obj.put("lSC", listStatusColor)
+        obj.put("lDivC", listDividerColor)
         return obj
     }
 }

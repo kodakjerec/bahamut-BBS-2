@@ -32,6 +32,9 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
 
     var articleExpressionListAdapter: BlockListAdapter? = null
 
+    override val isPopupPage: Boolean
+        get() = true
+
     // 按下新增
     var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
         if (inputField != null) {

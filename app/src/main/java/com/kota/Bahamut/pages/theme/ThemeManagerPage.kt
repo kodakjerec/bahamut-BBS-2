@@ -46,12 +46,26 @@ class ThemeManagerPage: TelnetPage() {
     private lateinit var btnReset:Button
     private lateinit var btnUpdate:Button
     private lateinit var btnBack:Button
+    private lateinit var txnListBackColor: TextView
+    private lateinit var txnListTitleColor: TextView
+    private lateinit var txnListTitleReadColor: TextView
+    private lateinit var txnListTitleFollowColor: TextView
+    private lateinit var txnListTitleFollowReadColor: TextView
+    private lateinit var txnListNumberColor: TextView
+    private lateinit var txnListDateColor: TextView
+    private lateinit var txnListAuthorColor: TextView
+    private lateinit var txnListMarkColor: TextView
+    private lateinit var txnListStatusColor: TextView
+    private lateinit var txnListDividerColor: TextView
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
 
     override val pageLayout: Int
         get() = R.layout.theme_manager_page
+
+    override val isPopupPage: Boolean
+        get() = true
 
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as LinearLayout
@@ -111,9 +125,11 @@ class ThemeManagerPage: TelnetPage() {
         txnHeaderHeaderColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Header_Color)
         txnHeaderManagerColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Manager_Color)
         txnHeaderBorderColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Border_Color)
+
         txnContentBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Back_Color)
         txnContentAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Author_Color)
         txnContentTextColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Content_Color)
+
         txnQuoteBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Back_Color)
         txnQuoteAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Author_Color)
         txnQuoteTextColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Color)
@@ -122,12 +138,34 @@ class ThemeManagerPage: TelnetPage() {
         txnHeaderHeaderColor.setOnClickListener(textClickListener)
         txnHeaderManagerColor.setOnClickListener(textClickListener)
         txnHeaderBorderColor.setOnClickListener(textClickListener)
+
         txnContentAuthorColor.setOnClickListener(textClickListener)
         txnContentBackColor.setOnClickListener(textClickListener)
         txnContentTextColor.setOnClickListener(textClickListener)
+
         txnQuoteBackColor.setOnClickListener(textClickListener)
         txnQuoteAuthorColor.setOnClickListener(textClickListener)
         txnQuoteTextColor.setOnClickListener(textClickListener)
+
+        txnListBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Back_Color)
+        txnListTitleColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Color)
+        txnListTitleReadColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Read_Color)
+        txnListTitleFollowColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_Color)
+        txnListTitleFollowReadColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_Read_Color)
+        txnListNumberColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Number_Color)
+        txnListDateColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Date_Color)
+        txnListAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Author_Color)
+        txnListMarkColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Mark_Color)
+        txnListStatusColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Status_Color)
+        txnListDividerColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Divider_Color)
+
+        val listPickers = listOf(
+            txnListBackColor, txnListTitleColor, txnListTitleReadColor,
+            txnListTitleFollowColor, txnListTitleFollowReadColor,
+            txnListNumberColor, txnListDateColor, txnListAuthorColor,
+            txnListMarkColor, txnListStatusColor, txnListDividerColor
+        )
+        listPickers.forEach { it.setOnClickListener(textClickListener) }
 
         editToolbar = mainLayout.findViewById(R.id.Theme_Manager_Page_Edit_Toolbar)
         btnReset = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Reset)
@@ -156,16 +194,31 @@ class ThemeManagerPage: TelnetPage() {
         txnBackColor.text = selectedTheme.backgroundColor
         txnBackColorPressed.text = selectedTheme.backgroundColorPressed
         txnBackColorDisabled.text = selectedTheme.backgroundColorDisabled
+
         txnHeaderBackColor.text = selectedTheme.headerBackColor
         txnHeaderHeaderColor.text = selectedTheme.headerHeaderColor
         txnHeaderManagerColor.text = selectedTheme.headerManagerColor
         txnHeaderBorderColor.text = selectedTheme.headerBorderColor
+
         txnContentBackColor.text = selectedTheme.contentBackColor
         txnContentAuthorColor.text = selectedTheme.contentAuthorColor
         txnContentTextColor.text = selectedTheme.contentTextColor
+
         txnQuoteBackColor.text = selectedTheme.quoteBackColor
         txnQuoteAuthorColor.text = selectedTheme.quoteAuthorColor
         txnQuoteTextColor.text = selectedTheme.quoteTextColor
+
+        txnListBackColor.text = selectedTheme.listBackColor
+        txnListTitleColor.text = selectedTheme.listTitleColor
+        txnListTitleReadColor.text = selectedTheme.listTitleReadColor
+        txnListTitleFollowColor.text = selectedTheme.listTitleFollowColor
+        txnListTitleFollowReadColor.text = selectedTheme.listTitleFollowReadColor
+        txnListNumberColor.text = selectedTheme.listNumberColor
+        txnListDateColor.text = selectedTheme.listDateColor
+        txnListAuthorColor.text = selectedTheme.listAuthorColor
+        txnListMarkColor.text = selectedTheme.listMarkColor
+        txnListStatusColor.text = selectedTheme.listStatusColor
+        txnListDividerColor.text = selectedTheme.listDividerColor
     }
     /** 變更工具列示範按鈕外觀 */
     private fun paintToolbarButtons() {
@@ -251,6 +304,37 @@ class ThemeManagerPage: TelnetPage() {
         txnQuoteAuthorColor.setBackgroundColor(qBack)
         txnQuoteTextColor.setTextColor(qText)
         txnQuoteTextColor.setBackgroundColor(qBack)
+
+        // === 加入看板列表預覽 ===
+        val lBack = CommonFunctions.rgbToInt(txnListBackColor.text.toString())
+
+        // 列表背景色套用到所有相關欄位的背景
+        val listFields = listOf(
+            txnListBackColor, txnListTitleColor, txnListTitleReadColor,
+            txnListTitleFollowColor, txnListTitleFollowReadColor,
+            txnListMarkColor, txnListStatusColor, txnListNumberColor,
+            txnListDateColor, txnListAuthorColor
+        )
+        listFields.forEach {
+            it.setBackgroundColor(lBack)
+        }
+
+        // 分隔線特殊處理：直接顯示該顏色作為背景
+        val lDivider = CommonFunctions.rgbToInt(txnListDividerColor.text.toString())
+        txnListDividerColor.setBackgroundColor(lDivider)
+        txnListDividerColor.setTextColor(lBack) // 文字用背景色以利閱讀 Hex
+
+        // 設定各欄位文字顏色
+        txnListBackColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleColor.text.toString()))
+        txnListTitleColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleColor.text.toString()))
+        txnListTitleReadColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleReadColor.text.toString()))
+        txnListTitleFollowColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleFollowColor.text.toString()))
+        txnListTitleFollowReadColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleFollowReadColor.text.toString()))
+        txnListMarkColor.setTextColor(CommonFunctions.rgbToInt(txnListMarkColor.text.toString()))
+        txnListStatusColor.setTextColor(CommonFunctions.rgbToInt(txnListStatusColor.text.toString()))
+        txnListNumberColor.setTextColor(CommonFunctions.rgbToInt(txnListNumberColor.text.toString()))
+        txnListDateColor.setTextColor(CommonFunctions.rgbToInt(txnListDateColor.text.toString()))
+        txnListAuthorColor.setTextColor(CommonFunctions.rgbToInt(txnListAuthorColor.text.toString()))
     }
     /** 變更套用新設定按鈕外觀 */
     private fun paintBtnUpdate(enabled: Boolean) {
@@ -299,16 +383,31 @@ class ThemeManagerPage: TelnetPage() {
         selectedTheme.backgroundColor = txnBackColor.text.toString()
         selectedTheme.backgroundColorPressed = txnBackColorPressed.text.toString()
         selectedTheme.backgroundColorDisabled = txnBackColorDisabled.text.toString()
+
         selectedTheme.headerBackColor = txnHeaderBackColor.text.toString()
         selectedTheme.headerHeaderColor = txnHeaderHeaderColor.text.toString()
         selectedTheme.headerManagerColor = txnHeaderManagerColor.text.toString()
         selectedTheme.headerBorderColor = txnHeaderBorderColor.text.toString()
+
         selectedTheme.contentBackColor = txnContentBackColor.text.toString()
         selectedTheme.contentAuthorColor = txnContentAuthorColor.text.toString()
         selectedTheme.contentTextColor = txnContentTextColor.text.toString()
+
         selectedTheme.quoteBackColor = txnQuoteBackColor.text.toString()
         selectedTheme.quoteAuthorColor = txnQuoteAuthorColor.text.toString()
         selectedTheme.quoteTextColor = txnQuoteTextColor.text.toString()
+
+        selectedTheme.listBackColor = txnListBackColor.text.toString()
+        selectedTheme.listTitleColor = txnListTitleColor.text.toString()
+        selectedTheme.listTitleReadColor = txnListTitleReadColor.text.toString()
+        selectedTheme.listTitleFollowColor = txnListTitleFollowColor.text.toString()
+        selectedTheme.listTitleFollowReadColor = txnListTitleFollowReadColor.text.toString()
+        selectedTheme.listNumberColor = txnListNumberColor.text.toString()
+        selectedTheme.listDateColor = txnListDateColor.text.toString()
+        selectedTheme.listAuthorColor = txnListAuthorColor.text.toString()
+        selectedTheme.listMarkColor = txnListMarkColor.text.toString()
+        selectedTheme.listStatusColor = txnListStatusColor.text.toString()
+        selectedTheme.listDividerColor = txnListDividerColor.text.toString()
 
         // 更新
         ThemeStore.updateTheme(ThemeStore.getSelectIndex(), selectedTheme)

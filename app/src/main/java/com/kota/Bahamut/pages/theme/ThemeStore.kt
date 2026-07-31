@@ -113,28 +113,50 @@ object ThemeStore {
                 themePink.backgroundColorDisabled = "#FF650065"
                 return themePink
             }
-            2 -> {
+            2 -> { // 低亮度
                 val themeEInk = Theme()
-                themeEInk.name = "eInk"
+                themeEInk.name = "低亮度"
                 themeEInk.textColor = "#FFE0E0E0"
                 themeEInk.textColorPressed = "#FF808080"
                 themeEInk.textColorDisabled = "#FF808080"
-                themeEInk.backgroundColor =  "#FF3F3F3F"
+                themeEInk.backgroundColor =  "#FF202020"
                 themeEInk.backgroundColorPressed = "#FF363636"
                 themeEInk.backgroundColorDisabled = "#FF282828"
                 themeEInk.headerBackColor = "#FF202020"
                 themeEInk.headerHeaderColor = "#FFFFFFFF"
                 themeEInk.headerManagerColor = "#FFCCCCCC"
                 themeEInk.headerBorderColor = "#FF999999"
-                themeEInk.contentBackColor = "#FF3F3F3F"
+                themeEInk.contentBackColor = "#FF202020"
                 themeEInk.contentAuthorColor = "#FFEEEEEE"
                 themeEInk.contentTextColor = "#FFD0D0D0"
-                themeEInk.quoteBackColor = "#FF3F3F3F"
+                themeEInk.quoteBackColor = "#FF202020"
                 themeEInk.quoteAuthorColor = "#FF999999"
                 themeEInk.quoteTextColor = "#FF808080"
+                // 看板列表 (低亮度特色：利用灰階亮度區分優先順序)
+                themeEInk.listBackColor = "#FF202020"      // 深灰背景
+
+                // 一般文章
+                themeEInk.listTitleColor = "#FFE0E0E0"     // 未讀 (淺灰)
+                themeEInk.listTitleReadColor = "#FF808080" // 已讀 (中灰)
+
+                // 關注首篇 (◆) - 最顯眼
+                themeEInk.listTitleFollowFirstColor = "#FFFFFFFF"      // 關注首篇未讀 (純白)
+                themeEInk.listTitleFollowFirstReadColor = "#FFB0B0B0"  // 關注首篇已讀 (淺灰)
+
+                // 關注回應 (Re) - 次顯眼
+                themeEInk.listTitleFollowColor = "#FFCCCCCC"           // 關注回應未讀 (淺灰)
+                themeEInk.listTitleFollowReadColor = "#FF666666"       // 關注回應已讀 (深灰)
+
+                // 其他資訊
+                themeEInk.listNumberColor = "#FF999999"    // 編號灰
+                themeEInk.listDateColor = "#FF999999"      // 日期灰
+                themeEInk.listAuthorColor = "#FFCCCCCC"    // 作者淺灰
+                themeEInk.listMarkColor = "#FFFFFFFF"      // M文白色
+                themeEInk.listStatusColor = "#FFCCCCCC"    // 狀態淺灰
+                themeEInk.listDividerColor = "#FF444444"   // 分隔線
                 return themeEInk
             }
-            3 -> {
+            3 -> { // eInk2 (純白版)
                 val themeEInk2 = Theme()
                 themeEInk2.name = "eInk2"
                 themeEInk2.textColor = "#FF000000"
@@ -153,6 +175,18 @@ object ThemeStore {
                 themeEInk2.quoteBackColor = "#FFFFFFFF"
                 themeEInk2.quoteAuthorColor = "#FF808080"
                 themeEInk2.quoteTextColor = "#FF808080"
+                // 看板列表 (eInk2 特色：純白底黑字)
+                themeEInk2.listBackColor = "#FFFFFFFF"      // 純白背景
+                themeEInk2.listTitleColor = "#FF000000"     // 未讀純黑
+                themeEInk2.listTitleReadColor = "#FF999999" // 已讀淺灰
+                themeEInk2.listTitleFollowColor = "#FF000000" // 關注黑 (加粗由UI處理)
+                themeEInk2.listTitleFollowReadColor = "#FF666666" // 關注已讀深灰
+                themeEInk2.listNumberColor = "#FF666666"    // 編號深灰
+                themeEInk2.listDateColor = "#FF666666"      // 日期深灰
+                themeEInk2.listAuthorColor = "#FF333333"    // 作者黑灰
+                themeEInk2.listMarkColor = "#FF000000"      // M文黑色
+                themeEInk2.listStatusColor = "#FF333333"    // 狀態黑灰
+                themeEInk2.listDividerColor = "#FFCCCCCC"   // 分隔線淺灰
                 return themeEInk2
             }
             else -> {
