@@ -108,6 +108,7 @@
             <Button
                 android:id="@+id/Main_HeroStepButton"
                 style="@style/MainItem"
+                android:tag="normalButton"
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="match_parent"
@@ -124,6 +125,7 @@
             <Button
                 android:id="@+id/Main_BoardsButton"
                 style="@style/MainItem"
+                android:tag="normalButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/folder_boards"
@@ -140,6 +142,7 @@
             <Button
                 android:id="@+id/Main_ClassButton"
                 style="@style/MainItem"
+                android:tag="normalButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/folder_class"
@@ -156,6 +159,7 @@
             <Button
                 android:id="@+id/Main_FavoriteButton"
                 style="@style/MainItem"
+                android:tag="normalButton"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:text="@string/folder_favorite"

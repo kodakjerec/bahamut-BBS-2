@@ -110,46 +110,65 @@ class ThemeFunctions {
             val childView: View = viewGroup.getChildAt(i)
 
             // 避開工具列元件 (ToolbarItem)
-            if (childView.tag != null && childView.tag.equals("ToolbarItem")) {
-                // 避免共用bug, 每次獨立產生
-                // 文字
-                val colorStateList = ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()), // States
-                    intArrayOf(rgbToInt(theme.textColorPressed), rgbToInt(theme.textColor), rgbToInt(theme.textColorDisabled)) // Colors for each state
-                )
-                // 背景
-                val backgroundDrawable = StateListDrawable()
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed),
-                    rgbToInt(theme.backgroundColorPressed).toDrawable())
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled),
-                    rgbToInt(theme.backgroundColor).toDrawable())
-                backgroundDrawable.addState(intArrayOf(),
-                    rgbToInt(theme.backgroundColorDisabled).toDrawable())
+            if (childView.tag != null) {
+                if (childView.tag.equals("ToolbarItem")) {
+                    // 避免共用bug, 每次獨立產生
+                    // 文字
+                    val colorStateList = ColorStateList(
+                        arrayOf(
+                            intArrayOf(android.R.attr.state_pressed),
+                            intArrayOf(android.R.attr.state_enabled),
+                            intArrayOf()
+                        ), // States
+                        intArrayOf(
+                            rgbToInt(theme.textColorPressed),
+                            rgbToInt(theme.textColor),
+                            rgbToInt(theme.textColorDisabled)
+                        ) // Colors for each state
+                    )
+                    // 背景
+                    val backgroundDrawable = StateListDrawable()
+                    backgroundDrawable.addState(
+                        intArrayOf(android.R.attr.state_pressed),
+                        rgbToInt(theme.backgroundColorPressed).toDrawable()
+                    )
+                    backgroundDrawable.addState(
+                        intArrayOf(android.R.attr.state_enabled),
+                        rgbToInt(theme.backgroundColor).toDrawable()
+                    )
+                    backgroundDrawable.addState(
+                        intArrayOf(),
+                        rgbToInt(theme.backgroundColorDisabled).toDrawable()
+                    )
 
-                if (childView.javaClass == Button::class.java) {
+                    if (childView.javaClass == Button::class.java) {
+                        val button = childView as Button
+                        button.setTextColor(colorStateList)
+                    } else if (childView.javaClass == TextView::class.java) {
+                        val textView = childView as TextView
+                        textView.setTextColor(colorStateList)
+                    }
+                    childView.background = backgroundDrawable
+                } else if (childView.tag.equals("normalButton")) {
                     val button = childView as Button
-                    button.setTextColor(colorStateList)
-                } else if (childView.javaClass == TextView::class.java) {
+                    button.setTextColor(rgbToInt(theme.contentTextColor))
+                } else if (childView.tag.equals("normalText")) {
                     val textView = childView as TextView
-                    textView.setTextColor(colorStateList)
+                    textView.setTextColor(rgbToInt(theme.contentTextColor))
                 }
-                childView.background = backgroundDrawable
             } else if (childView.javaClass == Button::class.java) {
                 continue
             } else if (childView is TextView) {
-                // 一般文字元件 (Label, CheckBox, RadioButton)
-
                 // 針對 CheckBox 處理勾選框顏色 (Tint)，但排除 RadioButton
-                if (childView is android.widget.CompoundButton && childView !is android.widget.RadioButton) {
-                    childView.buttonTintList = ColorStateList.valueOf(textColor)
+                if (childView is android.widget.CompoundButton) {
+                    if (childView is android.widget.RadioButton) {
+                        childView.setTextColor(rgbToInt(theme.contentTextColor))
+                    } else {
+                        childView.buttonTintList = ColorStateList.valueOf(textColor)
+                    }
                 }
             } else if (childView is ViewGroup) {
-                // 如果是容器, 遞迴處理
-                // 僅當原本背景是黑色時才替換為主題內文背景色
-                val background = childView.background
-                if (background is ColorDrawable && background.color == Color.BLACK) {
-                    childView.setBackgroundColor(backColor)
-                }
+                childView.setBackgroundColor(backColor)
                 recursiveApplyContent(childView, backColor, textColor)
             }
         }
