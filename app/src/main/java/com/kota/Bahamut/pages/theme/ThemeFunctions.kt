@@ -80,8 +80,7 @@ class ThemeFunctions {
 
     /**
      * 專門套用內文樣式
-     * 有設定 backgroundColor 就套用 contentBackColor
-     * 有設定 textColor 就套用 contentTextColor
+     * 整合了處理 ArticlePage 的背景色邏輯，解決空白處黑色問題
      */
     fun applyThemeToContent(container: ViewGroup?) {
         if (container == null) return
@@ -89,11 +88,17 @@ class ThemeFunctions {
         val cBack = rgbToInt(theme.contentBackColor)
         val cText = rgbToInt(theme.contentTextColor)
 
-        // 設定根容器背景色 (僅當原本背景是黑色時才替換)
+        // 1. 設定根容器背景色 (若原本背景是黑色，或是主容器 ID，則替換)
         val background = container.background
-        if (background is ColorDrawable && background.color == Color.BLACK) {
+        if ((background is ColorDrawable && background.color == Color.BLACK) || container.id == R.id.content_view) {
             container.setBackgroundColor(cBack)
         }
+
+        // 2. 針對 ArticlePage 特有元件優先處理 (即使背景非黑色也強制設定，解決空白溢出問題)
+        container.findViewById<View>(R.id.Article_contentList)?.setBackgroundColor(cBack)
+        container.findViewById<View>(R.id.Article_listEmptyView)?.setBackgroundColor(cBack)
+
+        // 3. 遞迴處理所有子元件
         recursiveApplyContent(container, cBack, cText)
     }
 
@@ -133,14 +138,10 @@ class ThemeFunctions {
                 continue
             } else if (childView is TextView) {
                 // 一般文字元件 (Label, CheckBox, RadioButton)
-                // 只有原本設定為白色的文字才套用主題內文顏色 (-1 代表 Color.WHITE)
-                if (childView.currentTextColor == -1) {
-                    childView.setTextColor(textColor)
 
-                    // 針對 CheckBox 處理勾選框顏色 (Tint)，但排除 RadioButton
-                    if (childView is android.widget.CompoundButton && childView !is android.widget.RadioButton) {
-                        childView.buttonTintList = ColorStateList.valueOf(textColor)
-                    }
+                // 針對 CheckBox 處理勾選框顏色 (Tint)，但排除 RadioButton
+                if (childView is android.widget.CompoundButton && childView !is android.widget.RadioButton) {
+                    childView.buttonTintList = ColorStateList.valueOf(textColor)
                 }
             } else if (childView is ViewGroup) {
                 // 如果是容器, 遞迴處理
@@ -321,5 +322,137 @@ class ThemeFunctions {
 
         // 分隔線
         view.findViewById<View>(R.id.BoardPage_ItemView_DividerBottom)?.setBackgroundColor(rgbToInt(theme.listDividerColor))
+    }
+
+    /**
+    ◦
+    專門套用分類列表 Item 的主題 (配色等同 BoardItem) */
+    fun applyThemeToClassItem(view: View) {
+        theme = ThemeStore.getSelectTheme()
+        val lBack = rgbToInt(theme.listBackColor)
+        // 1. 設定背景
+        view.setBackgroundColor(lBack)
+        // 2. 設定文字顏色 // 看板標題 (白)
+        view.findViewById<TextView>(R.id.ClassPage_ItemView_classTitle)?.setTextColor(rgbToInt(theme.listTitleColor))
+        // 看板名稱 (黃)
+         view.findViewById<TextView>(R.id.ClassPage_ItemView_className)?.setTextColor(rgbToInt(theme.listStatusColor))
+        // 板主 (粉藍)
+         view.findViewById<TextView>(R.id.ClassPage_ItemView_classManager)?.setTextColor(rgbToInt(theme.listAuthorColor))
+        // 分隔線
+        view.findViewById<View>(R.id.ClassPage_ItemView_DividerBottom)?.setBackgroundColor(rgbToInt(theme.listDividerColor))
+        // 右側箭頭
+        view.findViewById<TextView>(R.id.ClassPage_ItemView_ArrowView)?.setTextColor(rgbToInt(theme.listDividerColor))
+     }
+
+    /**
+     * 套用看板側邊選單 (抽屜) 容器的主題，解決背景黑色問題
+     */
+    fun applyThemeToBoardDrawer(drawerView: ViewGroup?) {
+        if (drawerView == null) return
+        theme = ThemeStore.getSelectTheme()
+        val lBack = rgbToInt(theme.listBackColor)
+
+        // 1. 設定抽屜根容器背景 (id: menu_view)
+        drawerView.setBackgroundColor(lBack)
+
+        // 2. 設定書籤 ListView 背景 (id: bookmark_list_view)
+        val listView = drawerView.findViewById<View>(R.id.bookmark_list_view)
+        listView?.setBackgroundColor(lBack)
+
+        // 3. 設定列表為空時的文字背景 (id: bookmark_list_view_none)
+        val emptyView = drawerView.findViewById<View>(R.id.bookmark_list_view_none)
+        emptyView?.setBackgroundColor(lBack)
+
+        // 4. 對其子元件進行遞迴著色 (處理標籤、Checkbox 等)
+        recursiveApplyContent(drawerView, lBack, rgbToInt(theme.listTitleColor))
+    }
+    /**
+     * 專門套用看板側邊選單 (抽屜) Item 的主題
+     */
+    fun applyThemeToBoardDrawerItem(view: View) {
+        theme = ThemeStore.getSelectTheme()
+        val lBack = rgbToInt(theme.listBackColor)
+        val lTitle = rgbToInt(theme.listTitleColor)
+        val lAuthor = rgbToInt(theme.listAuthorColor)
+        val lNumber = rgbToInt(theme.listNumberColor) // GY 使用編號色
+        val lMark = rgbToInt(theme.listMarkColor)
+        val lDivider = rgbToInt(theme.listDividerColor)
+
+        // 1. 設定背景
+        view.setBackgroundColor(lBack)
+
+        // 2. 設定標題 (關鍵字)
+        // 兼容 BookmarkItemView 與 HistoryItemView 的 ID
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)?.setTextColor(lTitle)
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_historyItemView_Title)?.setTextColor(lTitle)
+
+        // 3. 設定作者 (包含 "作者:" 標籤與 ID)
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_Author_Title)?.setTextColor(lNumber) // 標籤用次要色
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_Author)?.setTextColor(lAuthor)
+
+        // 4. 設定 GY (包含 "GY:" 標籤與 數值)
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_GY_Title)?.setTextColor(lNumber)
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)?.setTextColor(lNumber)
+
+        // 5. 設定 M文 標記
+        view.findViewById<TextView>(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)?.setTextColor(lMark)
+
+        // 6. 設定分隔線 (抽屜選單通常使用 DividerTop)
+        view.findViewById<View>(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop)?.setBackgroundColor(lDivider)
+    }
+
+    /**
+     * 專門套用連結預覽 (ThumbnailItemView) 的主題
+     */
+    fun applyThemeToThumbnailItem(view: View) {
+        // 設定背景 (通常預覽圖背景比內文稍微亮一點點或透明)
+        view.setBackgroundColor(Color.TRANSPARENT)
+
+        // --- 新增：從主題取得顏色並著色 ---
+        val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
+        val textColor = com.kota.Bahamut.service.CommonFunctions.rgbToInt(theme.contentTextColor)
+        // 顏色減半：保留 RGB，並將 Alpha 設為 0x80 (約 50% 透明度)
+        val dimmedColor = (textColor and 0x00FFFFFF) or 0x80000000.toInt()
+
+        // 取得標題、描述、網址等 TextView 並上色
+        // 注意：這裡直接強制設定顏色，不判斷是否為白色
+        val title = view.findViewById<TextView>(R.id.thumbnail_title)
+        val desc = view.findViewById<TextView>(R.id.thumbnail_description)
+        val url = view.findViewById<TextView>(R.id.thumbnail_url)
+
+        title?.setTextColor(textColor)
+        desc?.setTextColor(dimmedColor)
+        // 網址可以使用主題的邊框色(較淡)或是維持內文色
+        url?.setTextColor(dimmedColor)
+    }
+
+    /**
+     * 專門套用發表文章頁面的主題
+     */
+    fun applyThemeToPostArticle(container: ViewGroup?) {
+        if (container == null) return
+        theme = ThemeStore.getSelectTheme()
+        val backColor = rgbToInt(theme.contentBackColor)
+        val titleColor = rgbToInt(theme.listTitleColor)
+
+        // 設定整體背景
+        container.setBackgroundColor(backColor)
+
+        // 設定輸入框顏色
+        val titleField = container.findViewById<TextView>(R.id.ArticlePostDialog_TitleField)
+        val editField = container.findViewById<TextView>(R.id.ArticlePostDialog_EditField)
+        val titleFieldBackground = container.findViewById<TextView>(R.id.ArticlePostDialog_TitleFieldBackground)
+
+        titleField?.setTextColor(titleColor)
+        titleField?.setBackgroundColor(backColor)
+        editField?.setTextColor(titleColor)
+        editField?.setBackgroundColor(backColor)
+
+        // 這裡設定背景 TextView 的顏色 (平時顯示用)
+        titleFieldBackground?.setTextColor(titleColor)
+        titleFieldBackground?.setBackgroundColor(backColor)
+
+        // 同步處理其他的子元件 (如 Spinner 等)
+        recursiveApplyContent(container, backColor, titleColor)
     }
 }

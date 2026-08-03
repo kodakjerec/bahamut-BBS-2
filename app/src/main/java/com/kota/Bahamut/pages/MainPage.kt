@@ -143,6 +143,7 @@ class MainPage : TelnetPage() {
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(mainLayout)
 
         // 檢查不斷線掛網
         checkBatteryLife()

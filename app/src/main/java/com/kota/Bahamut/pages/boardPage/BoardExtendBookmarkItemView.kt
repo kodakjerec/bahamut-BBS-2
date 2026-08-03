@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BoardExtendBookmarkItemView : LinearLayout {
     private var authorLabel: TextView? = null
@@ -30,8 +31,11 @@ class BoardExtendBookmarkItemView : LinearLayout {
             setAuthor(bookmark.author)
             setMark(bookmark.mark == "y")
             setGYNumber(bookmark.gy)
+            // --- 套用主題 ---
+            ThemeFunctions().applyThemeToBoardDrawerItem(this)
             return
         }
+
         clear()
     }
 

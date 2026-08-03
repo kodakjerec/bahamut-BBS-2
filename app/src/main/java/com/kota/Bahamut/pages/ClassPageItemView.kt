@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.ClassPageItem
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import java.util.Objects
 
@@ -72,6 +73,9 @@ class ClassPageItemView : LinearLayout {
             setBoardTitleText(aItem.title)
             setBoardNameText(aItem.name)
             setBoardManagerText(aItem.manager)
+            // --- 套用主題 ---
+            ThemeFunctions().applyThemeToClassItem(this)
+
             return
         }
         clear()

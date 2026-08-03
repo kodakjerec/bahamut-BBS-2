@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -22,6 +24,7 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.text.color
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
@@ -68,10 +71,10 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             if (author != null) {
                 authorBuffer.append(author)
             }
-            if (nickname != null && !nickname.isEmpty()) {
+            if (!nickname.isNullOrEmpty()) {
                 authorBuffer.append("(").append(nickname).append(")")
             }
-            if (author != null && !author.isEmpty()) authorBuffer.append(" 說:")
+            if (!author.isNullOrEmpty()) authorBuffer.append(" 說:")
             authorLabel?.text = authorBuffer.toString()
         }
     }
@@ -250,6 +253,8 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         val mainLayout = contentView as LinearLayout
 
         var originalIndex = mainLayout.indexOfChild(contentLabel)
+        val originalColor = contentLabel?.currentTextColor ?: Color.WHITE
+
         if (originalIndex > 0) {
             // 使用預覽圖
             if (linkAutoShow) {
@@ -305,8 +310,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                             textView.setTextIsSelectable(true)
                             textView.setFocusable(true)
                             textView.isLongClickable = true
-                            if (myQuote > 0) textView.setTextColor(getContextColor(R.color.article_page_text_item_content1))
-                            else textView.setTextColor(getContextColor(R.color.article_page_text_item_content0))
+                            textView.setTextColor(originalColor)
 
                             addMenuItemSearch(textView)
                             stringNewUrlSpan(textView)
@@ -428,7 +432,6 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setQuote(quote: Int) {
         myQuote = quote
-        ThemeFunctions().applyThemeToArticleTextItem(this)
     }
 
     override val type: Int

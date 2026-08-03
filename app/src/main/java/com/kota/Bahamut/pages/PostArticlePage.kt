@@ -203,7 +203,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
         // 替換內文外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
+        ThemeFunctions().applyThemeToPostArticle(mainLayout)
     }
 
     override fun clear() {
@@ -413,15 +413,20 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             if (view !== titleField) {
                 return@OnFocusChangeListener
             }
+            // 取得主題顏色
+            val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
+            val titleColor = com.kota.Bahamut.service.CommonFunctions.rgbToInt(theme.listTitleColor)
+            val transparent = 0 // 透明
+
             if (hasFocus) {
                 titleField?.isSingleLine = false
-                titleField?.setTextColor(-1)
-                titleFieldBackground?.setTextColor(0)
+                titleField?.setTextColor(titleColor)
+                titleFieldBackground?.setTextColor(transparent)
                 return@OnFocusChangeListener
             }
             titleField?.isSingleLine = true
-            titleField?.setTextColor(0)
-            titleFieldBackground?.setTextColor(-1)
+            titleField?.setTextColor(transparent)
+            titleFieldBackground?.setTextColor(titleColor)
             titleFieldBackground?.text = titleField?.text.toString()
         }
 

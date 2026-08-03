@@ -29,6 +29,7 @@ import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogImageView
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
@@ -501,10 +502,15 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         imageViewButton.setOnClickListener { view: View? -> prepareLoadImage() }
 
         layoutNormal = mainLayout!!.findViewById(R.id.thumbnail_normal)
+
+        // title 顏色 = 作者內文 顏色
         titleView = mainLayout!!.findViewById(R.id.thumbnail_title)
         titleView.setOnClickListener(titleListener)
+        // description 色為 title 減半
         descriptionView = mainLayout!!.findViewById(R.id.thumbnail_description)
         descriptionView.setOnClickListener(descriptionListener)
         urlView = mainLayout!!.findViewById(R.id.thumbnail_url)
+
+        ThemeFunctions().applyThemeToThumbnailItem(mainLayout!!)
     }
 }

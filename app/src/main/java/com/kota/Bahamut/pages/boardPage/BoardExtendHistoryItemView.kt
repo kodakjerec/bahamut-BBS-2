@@ -8,6 +8,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BoardExtendHistoryItemView : LinearLayout {
     private var dividerTop: View? = null
@@ -24,8 +25,11 @@ class BoardExtendHistoryItemView : LinearLayout {
     fun setBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
             setTitle(bookmark.keyword)
+            // --- 套用主題 ---
+            ThemeFunctions().applyThemeToBoardDrawerItem(this)
             return
         }
+
         clear()
     }
 

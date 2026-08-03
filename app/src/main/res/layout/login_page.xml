@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/Login_mainFrame"
+    android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Telnet 畫面放置於最上方 -->
     <com.kota.telnetUI.TelnetView
         android:id="@+id/Login_TelnetView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <!-- 底部登入按鈕工具列 -->
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar"
@@ -22,18 +24,13 @@
             android:text="@string/login" />
     </LinearLayout>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/toolbar"
-        android:id="@+id/content_view">
-
-        <LinearLayout
+    <!-- 輸入區塊置於工具列上方 -->
+    <LinearLayout
             android:id="@+id/Login_InputBlock"
             style="@style/TouchBlock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/toolbar"
             android:background="@color/black"
             android:orientation="vertical"
             android:paddingLeft="0px"
@@ -127,5 +124,4 @@
                     android:text="@string/save_data" />
             </RelativeLayout>
         </LinearLayout>
-    </RelativeLayout>
 </RelativeLayout>

@@ -481,6 +481,10 @@ open class BoardMainPage : TelnetListPage(),
             showHistoryButton?.setOnClickListener(buttonClickListener)
             mainDrawerLayout?.findViewById<View>(R.id.bookmark_tab_button)!!
                 .setOnClickListener(toEssencePageClickListener)
+            // 套用外觀
+            val menuView = mainDrawerLayout?.findViewById<ViewGroup>(R.id.menu_view)
+            ThemeFunctions().applyThemeToBoardDrawer(menuView)
+            ThemeFunctions().applyThemeToContent(mainDrawerLayout)
         }
 
         // 標題
@@ -499,6 +503,7 @@ open class BoardMainPage : TelnetListPage(),
 
         // 替換外觀
         ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(mainLayout)
 
         // 解決android 14跳出軟鍵盤
         // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
