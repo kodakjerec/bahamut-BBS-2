@@ -77,7 +77,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         resetAdapter()
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     override fun onBackPressed(): Boolean {

@@ -423,9 +423,6 @@ open class BoardMainPage : TelnetListPage(),
 
         // 側邊選單
         if (mainDrawerLayout != null) {
-            // 替換外觀
-            ThemeFunctions().layoutReplaceTheme(mainDrawerLayout?.findViewById<ViewGroup?>(R.id.menu_view))
-
             val drawerLayout = mainDrawerLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
             if (drawerLayout != null) {
                 val menuView = mainDrawerLayout?.findViewById<LinearLayout>(R.id.menu_view)!!
@@ -502,7 +499,6 @@ open class BoardMainPage : TelnetListPage(),
         blockListForTitle = propertiesBlockListForTitle
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
         ThemeFunctions().applyThemeToContent(mainLayout)
 
         // 解決android 14跳出軟鍵盤

@@ -59,8 +59,6 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
         // 替換內文外觀
         ThemeFunctions().applyThemeToContent(mainLayout)
 

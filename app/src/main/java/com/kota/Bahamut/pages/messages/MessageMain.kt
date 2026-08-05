@@ -172,9 +172,6 @@ class MessageMain:TelnetPage() {
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
-
         // 分頁
         val btnChat = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Chat)
         val btnList = mainLayout.findViewById<Button>(R.id.Message_Main_Button_List)
@@ -222,6 +219,9 @@ class MessageMain:TelnetPage() {
             sendSyncCommand()
         }
 
+        // 替換外觀
+        ThemeFunctions().applyThemeToContent(mainLayout)
+        
         btnChat.performClick()
     }
 

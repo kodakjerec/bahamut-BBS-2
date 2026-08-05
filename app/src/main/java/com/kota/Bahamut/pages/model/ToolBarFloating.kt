@@ -60,7 +60,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         else startInvisible()
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ToolbarFloating))
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.ToolbarFloating))
     }
 
     // 移動toolbar

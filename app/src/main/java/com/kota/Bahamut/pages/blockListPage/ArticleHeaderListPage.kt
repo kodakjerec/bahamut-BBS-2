@@ -180,8 +180,8 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             onBackPressed()
         }
 
-        // --- 新增：套用佈景主題 ---
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        // --- 套用佈景主題 ---
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
         // -----------------------
 
         showNotification()

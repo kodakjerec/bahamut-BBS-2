@@ -582,10 +582,10 @@ class SystemSettingsPage : TelnetPage() {
             onBackPressed()
         }
 
-        // 替換工具列外觀，使其符合佈景主題
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
         // 替換內文外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
+        mainLayout!!.post {
+            ThemeFunctions().applyThemeToContent(mainLayout)
+        }
     }
 
     val name: String

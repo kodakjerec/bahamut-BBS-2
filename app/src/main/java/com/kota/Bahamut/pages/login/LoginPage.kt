@@ -106,8 +106,6 @@ class LoginPage : TelnetPage() {
             blockWebSignIn.visibility = View.VISIBLE
         }
 
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
         // 替換內文外觀
         ThemeFunctions().applyThemeToContent(findViewById(R.id.content_view) as ViewGroup?)
     }

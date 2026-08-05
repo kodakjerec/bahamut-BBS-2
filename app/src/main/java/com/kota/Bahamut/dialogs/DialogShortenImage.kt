@@ -97,7 +97,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         setDialogWidth()
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
+        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     /** 選擇相簿 */

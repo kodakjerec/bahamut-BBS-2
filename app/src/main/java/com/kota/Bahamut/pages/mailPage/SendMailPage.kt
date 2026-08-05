@@ -128,7 +128,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         refresh()
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     override fun clear() {

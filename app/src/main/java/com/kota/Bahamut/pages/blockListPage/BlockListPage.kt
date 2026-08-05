@@ -172,8 +172,8 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             onBackPressed()
         }
 
-        // --- 新增：套用佈景主題 (套用到 id 為 toolbar 的 LinearLayout) ---
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout?)
+        // --- 套用佈景主題 (套用到 id 為 toolbar 的 LinearLayout) ---
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
         // -----------------------
 
         showNotification()

@@ -61,8 +61,7 @@ class UserInfoPage: TelnetPage() {
         txnOthers = mainLayout.findViewById(R.id.User_Info_Others)
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
+        ThemeFunctions().applyThemeToContent(mainLayout)
         paintBtnUpdate(false)
     }
 

@@ -11,6 +11,7 @@ import android.widget.ImageButton
 import android.widget.GridLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import android.widget.Spinner
 import android.widget.TextView
 import com.kota.Bahamut.R
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -22,61 +23,10 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
 import com.kota.Bahamut.service.CommonFunctions.rgbToInt
 import com.kota.Bahamut.service.TempSettings
+import com.kota.telnetUI.textView.TelnetTextView
 
 class ThemeFunctions {
     private lateinit var theme:Theme
-
-    fun layoutReplaceTheme(mainLayout: ViewGroup?) {
-        if (mainLayout==null) {
-            return
-        }
-        theme = ThemeStore.getSelectTheme()
-        recursiveReplace(mainLayout)
-    }
-
-    // 遞迴替換ToolbarItem的顏色
-    private fun recursiveReplace(mainLayout: ViewGroup) {
-        for (i in 0 until  mainLayout.childCount) {
-            val childView: View = mainLayout.getChildAt(i)
-            // ToolbarItem
-            if (childView.tag!==null && childView.tag.equals("ToolbarItem")) {
-                // 避免共用bug, 每次獨立產生
-                // 文字
-                val colorStateList = ColorStateList(
-                    arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()), // States
-                    intArrayOf(rgbToInt(theme.textColorPressed), rgbToInt(theme.textColor), rgbToInt(theme.textColorDisabled)) // Colors for each state
-                )
-                // 背景
-                val backgroundDrawable = StateListDrawable()
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed),
-                    rgbToInt(theme.backgroundColorPressed).toDrawable())
-                backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled),
-                    rgbToInt(theme.backgroundColor).toDrawable())
-                backgroundDrawable.addState(intArrayOf(),
-                    rgbToInt(theme.backgroundColorDisabled).toDrawable())
-
-                if (childView.javaClass == Button::class.java) {
-                    val button = childView as Button
-                    button.setTextColor(colorStateList)
-                } else if (childView.javaClass == TextView::class.java) {
-                    val textView = childView as TextView
-                    textView.setTextColor(colorStateList)
-                }
-                childView.background = backgroundDrawable
-            }
-
-            // 如果有子元件, 繼續往下
-            if (childView.javaClass==LinearLayout::class.java
-                || childView.javaClass==RelativeLayout::class.java
-                || childView.javaClass==GridLayout::class.java
-                || childView.javaClass==ConstraintLayout::class.java) {
-                val tempChildView:ViewGroup = childView as ViewGroup
-                if (tempChildView.isNotEmpty()) {
-                    recursiveReplace(tempChildView)
-                }
-            }
-        }
-    }
 
     /**
      * 專門套用內文樣式
@@ -158,15 +108,29 @@ class ThemeFunctions {
                 }
             } else if (childView.javaClass == Button::class.java) {
                 continue
-            } else if (childView is TextView) {
+            } else if (childView is android.widget.CompoundButton) {
                 // 針對 CheckBox 處理勾選框顏色 (Tint)，但排除 RadioButton
-                if (childView is android.widget.CompoundButton) {
-                    if (childView is android.widget.RadioButton) {
-                        childView.setTextColor(rgbToInt(theme.contentTextColor))
-                    } else {
-                        childView.buttonTintList = ColorStateList.valueOf(textColor)
+                if (childView is android.widget.RadioButton) {
+                    childView.setTextColor(rgbToInt(theme.contentTextColor))
+                } else {
+                    childView.buttonTintList = ColorStateList.valueOf(textColor)
+                }
+            } else if (childView is Spinner) {
+                // --- 針對 Spinner 套用標題列配色 ---
+                val hBack = rgbToInt(theme.headerBackColor)
+                val hTitle = rgbToInt(theme.headerHeaderColor)
+
+                // 設定 Spinner 本身的背景色 (標題列背景)
+                childView.setBackgroundColor(hBack)
+
+                // 遍歷 Spinner 的子元件 (通常是顯示選中項目的 TextView) 並設定顏色
+                for (j in 0 until childView.childCount) {
+                    val subView = childView.getChildAt(j)
+                    if (subView is TextView) {
+                        subView.setTextColor(hTitle)
                     }
                 }
+                continue
             } else if (childView is ViewGroup) {
                 childView.setBackgroundColor(backColor)
                 recursiveApplyContent(childView, backColor, textColor)

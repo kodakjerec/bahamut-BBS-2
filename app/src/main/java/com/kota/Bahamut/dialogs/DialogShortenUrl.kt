@@ -238,7 +238,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
         setDialogWidth(mainLayout)
 
         // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(mainLayout)
+        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun onClick(view: View) {

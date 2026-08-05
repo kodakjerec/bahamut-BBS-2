@@ -391,9 +391,6 @@ class ArticlePage : TelnetPage() {
         mainLayout.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
         mainLayout.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
 
-        // 替換外觀
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.ext_toolbar) as LinearLayout)
-        ThemeFunctions().layoutReplaceTheme(findViewById(R.id.toolbar) as LinearLayout)
         // 套用容器背景 (解決底部黑色問題)
         ThemeFunctions().applyThemeToContent(mainLayout)
 
