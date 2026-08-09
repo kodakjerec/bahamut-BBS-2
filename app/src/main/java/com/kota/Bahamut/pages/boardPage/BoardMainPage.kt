@@ -1,7 +1,6 @@
 package com.kota.Bahamut.pages.boardPage
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
@@ -1026,11 +1025,12 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     // com.kota.Bahamut.ListPage.TelnetListPage
+    /** 回收 Block 物件，用於記憶體管理，避免大量文章區塊佔用記憶體 */
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
-    //
+    /** 回收 Item 物件，將文章資料清空後放回物件池供後續重複使用 */
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }

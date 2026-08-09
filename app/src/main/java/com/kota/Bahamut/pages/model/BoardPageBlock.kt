@@ -20,7 +20,15 @@ class BoardPageBlock private constructor() : TelnetListPageBlock() {
             }
         }
 
+        /** 回收區塊物件，清空看板相關資訊與內部項目以釋放記憶體引用 */
         fun recycle(block: BoardPageBlock) {
+            block.clear() // 清除基類 Items 陣列引用
+            // 清除本類別欄位
+            block.boardManager = ""
+            block.boardName = ""
+            block.boardTitle = ""
+            block.boardType = BoardPageAction.LIST
+            block.boardMode = 0
             synchronized(_pool) {
                 _pool.push(block)
             }

@@ -47,7 +47,10 @@ class BoardPageItem private constructor() : TelnetListPageItem() {
             }
         }
 
+        /** 回收物件至物件池，回收前會先清空資料以節省記憶體 */
         fun recycle(item: BoardPageItem?) {
+            if (item == null) return
+            item.clear()
             synchronized(_pool) {
                 _pool.push(item)
             }
