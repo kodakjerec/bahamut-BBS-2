@@ -47,6 +47,14 @@ import java.util.Vector
 import kotlin.math.min
 
 class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
+    companion object {
+        private val sharedClient: OkHttpClient by lazy {
+            OkHttpClient.Builder()
+                .followRedirects(true)
+                .followSslRedirects(true)
+                .build()
+        }
+    }
     var mainLayout: LinearLayout? = null
     var viewWidth: Int
     var viewHeight: Int
@@ -93,7 +101,6 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     picoUrlChangeStatus(isPic)
                 } else {
                     val apiUrl = "https://worker-get-url-content.kodakjerec.work/"
-                    val client: OkHttpClient = OkHttpClient()
                     val body: RequestBody = MultipartBody.Builder()
                         .setType(MultipartBody.FORM)
                         .addFormDataPart("url", myUrl)
@@ -106,8 +113,8 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     // 尋找URL資料
                     ASCoroutine.runInNewCoroutine {
                         try {
-                            // load heads
-                            val response: Response = client.newCall(request).execute()
+                            // 使用共用的 sharedClient
+                            val response: Response = sharedClient.newCall(request).execute()
                             val data = response.body
                             val jsonObject: JSONObject = JSONObject(data.string())
                             var contentType: String = jsonObject.getString("contentType")
@@ -132,51 +139,70 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                 if (myUrl.contains("ptt"))
                                     cookies.put("over18", "1")  // Add the over18 cookie with value 1
 
-                                // 直接去ping對方
-                                val resp: Connection.Response = Jsoup
-                                    .connect(myUrl)
-                                    .header("User-Agent", userAgent)
-                                    .cookies(cookies)
-                                    .timeout(10000)
-                                    .ignoreContentType(true)
-                                    .execute()
-                                contentType = resp.contentType() ?: ""
+                                // 1. 先用 HEAD 請求確認類型，這完全不下載 Body
+                                try {
+                                    val headResp = Jsoup.connect(myUrl)
+                                        .method(Connection.Method.HEAD)
+                                        .header("User-Agent", userAgent)
+                                        .cookies(cookies)
+                                        .timeout(5000)
+                                        .ignoreContentType(true)
+                                        .execute()
+                                    contentType = headResp.contentType() ?: ""
+                                } catch (_: Exception) {}
 
                                 if (contentType.contains("image/") || contentType.contains("video/")) {
                                     isPic = true
-                                }
+                                } else {
+                                    // 2. 如果是網頁（或 HEAD 失敗），才執行限制大小的 GET
+                                    val getResp: Connection.Response = Jsoup
+                                        .connect(myUrl)
+                                        .header("User-Agent", userAgent)
+                                        .header("Range", "bytes=0-102400") // 請求前 100KB
+                                        .cookies(cookies)
+                                        .timeout(10000)
+                                        .ignoreContentType(true)
+                                        .maxBodySize(100 * 1024) // 限制只下載前 100KB
+                                        .execute()
 
-                                if (contentType.contains("text/html")) {
-                                    // 文字處理
-                                    val document: Document = resp.parse()
+                                    contentType = getResp.contentType() ?: ""
 
-                                    myTitle = document.title()
-                                    if (myTitle.isEmpty())
-                                        myTitle = document.select("meta[property=og:title]")
-                                            .attr("content")
+                                    if (contentType.contains("image/") || contentType.contains("video/")) {
+                                        isPic = true
+                                    }
 
-                                    myDescription = document.select("meta[name=description]")
-                                        .attr("content")
-                                    if (myDescription.isEmpty())
-                                        myDescription =
-                                            document.select("meta[property=og:description]")
+                                    if (contentType.contains("text/html")) {
+                                        // 文字處理
+                                        val document: Document = getResp.parse()
+
+                                        myTitle = document.title()
+                                        if (myTitle.isEmpty())
+                                            myTitle = document.select("meta[property=og:title]")
                                                 .attr("content")
 
-                                    myImageUrl = document.select("meta[property=og:image]")
-                                        .attr("content")
-                                    if (myImageUrl.isEmpty())
+                                        myDescription = document.select("meta[name=description]")
+                                            .attr("content")
+                                        if (myDescription.isEmpty())
+                                            myDescription =
+                                                document.select("meta[property=og:description]")
+                                                    .attr("content")
+
                                         myImageUrl = document.select("meta[property=og:image]")
                                             .attr("content")
-                                    if (myImageUrl.isEmpty())
-                                        myImageUrl = document.select("meta[property=og:images]")
-                                            .attr("content")
-                                    if (myImageUrl.isEmpty())
-                                        myImageUrl =
-                                            document.select("#landingImage").attr("src")
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl = document.select("meta[property=og:image]")
+                                                .attr("content")
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl = document.select("meta[property=og:images]")
+                                                .attr("content")
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl =
+                                                document.select("#landingImage").attr("src")
 
 
-                                    // 2. 針對 B 站數據進行 Gson 深度解析
-                                    parseBilibiliData(document)
+                                        // 2. 針對 B 站數據進行 Gson 深度解析
+                                        parseBilibiliData(document)
+                                    }
                                 }
 
                                 // 圖片處理
@@ -192,7 +218,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
 
                             // 上傳至cloudflare, 方便之後擷取
-                            val body: RequestBody = MultipartBody.Builder()
+                            val uploadBody: RequestBody = MultipartBody.Builder()
                                 .setType(MultipartBody.FORM)
                                 .addFormDataPart("url", myUrl)
                                 .addFormDataPart("title", myTitle)
@@ -200,11 +226,11 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                 .addFormDataPart("imageUrl",myImageUrl)
                                 .addFormDataPart("contentType", contentType)
                                 .build()
-                            val request: Request = Request.Builder()
+                            val uploadRequest: Request = Request.Builder()
                                 .url(apiUrl)
-                                .post(body)
+                                .post(uploadBody)
                                 .build()
-                            client.newCall(request).execute()
+                            sharedClient.newCall(uploadRequest).execute()
 
                         } catch (e: Exception) {
                             Log.e("loadUrl", e.message.toString())
