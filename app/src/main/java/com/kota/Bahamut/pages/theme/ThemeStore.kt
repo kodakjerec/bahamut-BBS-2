@@ -1,8 +1,12 @@
 package com.kota.Bahamut.pages.theme
 
 import android.app.Activity
+import android.content.Context
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import android.util.Log
+import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.UserSettings
 import org.json.JSONArray
 import org.json.JSONObject
 import androidx.core.content.edit
@@ -15,28 +19,30 @@ object ThemeStore {
     // 變數
     private const val PER_SELECT_THEME_INDEX:String = "select_theme_index" // 選擇外觀
 
+    /** 初始化並載入儲存的外觀資料 */
     fun upgrade(activity: Activity) {
         perf = activity.getSharedPreferences(PERF_NAME, 0)
         load()
     }
 
-    /** 外觀 */
+    /** 取得目前所有的外觀清單 */
     fun getThemeStore(): ArrayList<Theme> {
         return themeStore
     }
 
-    /** 新增外觀 */
+    /** 新增一個外觀到清單中 */
     private fun addTheme(theme: Theme) {
         themeStore.add(theme)
     }
 
-    /** 更新外觀 */
+    /** 更新指定索引的外觀資料並儲存 */
     fun updateTheme(index:Int, theme: Theme) {
         themeStore.removeAt(index)
         themeStore.add(index, theme)
         save()
     }
 
+    /** 從 SharedPreferences 載入外觀資料，若無資料則初始化預設外觀 */
     fun load() {
         val data:String = perf.getString("themeStore", "{\"data\":[]}")!!
         themeStore = ArrayList()
@@ -75,6 +81,7 @@ object ThemeStore {
         }
     }
 
+    /** 將目前的外觀清單序列化為 JSON 並儲存到 SharedPreferences */
     fun save() {
         val obj = JSONObject()
         try {
@@ -89,19 +96,38 @@ object ThemeStore {
         }
     }
 
+    /** 取得目前使用者選取的外觀索引 */
     fun getSelectIndex(): Int {
         return perf.getInt(PER_SELECT_THEME_INDEX, 0)
     }
+
+    /** 判斷目前系統是否處於深色模式 */
+    fun isSystemDarkMode(context: Context): Boolean {
+        val mode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return mode == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    /** 
+     * 取得目前應該套用的外觀物件。
+     * 若開啟「跟隨系統深色模式」且系統處於深色模式，則強制返回深色主題。
+     */
     fun getSelectTheme(): Theme {
+        if (UserSettings.propertiesFollowSystemDarkMode && isSystemDarkMode(TempSettings.myContext!!)) {
+            // 返回 index 2 的深色主題
+            if (themeStore.size > 2) {
+                return themeStore[2]
+            }
+        }
         val themeIndex = perf.getInt(PER_SELECT_THEME_INDEX, 0)
         return themeStore[themeIndex]
     }
 
+    /** 設定使用者選取的外觀索引並儲存 */
     fun setSelectIndex(selectedIndex: Int) {
         perf.edit { putInt(PER_SELECT_THEME_INDEX, selectedIndex) }
     }
 
-    /** 取得預設外觀 */
+    /** 取得特定索引的初始預設外觀資料 */
     fun getDefaultTheme(selectedIndex: Int): Theme {
         when(selectedIndex) {
             1 -> {

@@ -40,6 +40,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAutoToChat
+import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
@@ -67,6 +68,10 @@ class SystemSettingsPage : TelnetPage() {
     var autoToChatEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             propertiesAutoToChat = isChecked
+        }
+    var followSystemDarkModeListener: CompoundButton.OnCheckedChangeListener =
+        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
+            propertiesFollowSystemDarkMode = isChecked
         }
     var gestureOnBoardEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
@@ -569,6 +574,14 @@ class SystemSettingsPage : TelnetPage() {
         // theme-manager-page
         mainLayout?.findViewById<View>(R.id.SystemSettings_goThemeManagerPage)!!
             .setOnClickListener(themeManagerPageListener)
+
+        // 跟隨系統深色模式
+        val followSystemDarkModeBox =
+            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_followSystemDarkMode)!!
+        followSystemDarkModeBox.isChecked = propertiesFollowSystemDarkMode
+        followSystemDarkModeBox.setOnCheckedChangeListener(followSystemDarkModeListener)
+        mainLayout?.findViewById<View>(R.id.SystemSettings_item_followSystemDarkMode)!!
+            .setOnClickListener { view: View? -> followSystemDarkModeBox.isChecked = !followSystemDarkModeBox.isChecked }
 
         // bbs-user-info-page
         mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)!!

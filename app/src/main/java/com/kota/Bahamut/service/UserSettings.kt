@@ -115,6 +115,7 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_ARTICLE_EXPRESSIONS: String = "ArticleExpressions" // 表情符號清單
         const val PROPERTIES_SHORT_URL_NON_ID: String = "ShortUrlNonId" // 短網址,開啟去識別化
         const val PROPERTIES_WEB_SIGN_IN: String = "WebSignIn" // 開啟網頁登入
+        const val PROPERTIES_FOLLOW_SYSTEM_DARK_MODE: String = "FollowSystemDarkMode" // 跟隨系統深色模式
 
         // 執行階段比較不重要的設定
         const val FLOATING_LOCATION_X: String = "floatingLocationX" // 浮動工具列位置 X
@@ -660,6 +661,19 @@ class UserSettings(var myContext: Context) {
             set(enable) {
                 myEditor!!.putBoolean(
                     PROPERTIES_WEB_SIGN_IN,
+                    enable
+                ).commit()
+            }
+
+        @JvmStatic
+        var propertiesFollowSystemDarkMode: Boolean
+            get() = mySharedPref!!.getBoolean(
+                PROPERTIES_FOLLOW_SYSTEM_DARK_MODE,
+                false
+            )
+            set(enable) {
+                myEditor!!.putBoolean(
+                    PROPERTIES_FOLLOW_SYSTEM_DARK_MODE,
                     enable
                 ).commit()
             }

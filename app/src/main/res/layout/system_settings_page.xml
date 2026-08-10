@@ -43,6 +43,12 @@
                 <View style="@style/ItemViewDividerVertical"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
+            <View style="@style/HorizontalDivider"/>
+            <RelativeLayout android:id="@+id/SystemSettings_item_followSystemDarkMode" style="@style/SystemSettingsItem">
+                <com.kota.telnetUI.textView.TelnetTextViewLarge
+                    android:text="@string/follow_system_dark_mode" style="@style/SystemSettingsCheckboxText"/>
+                <CheckBox android:id="@+id/SystemSettings_followSystemDarkMode" style="@style/SystemSettingsCheckbox" />
+            </RelativeLayout>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_blocklist"/>
