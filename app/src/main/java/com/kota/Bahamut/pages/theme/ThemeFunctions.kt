@@ -7,6 +7,7 @@ import android.graphics.drawable.StateListDrawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.Spinner
 import android.widget.TextView
@@ -134,14 +135,26 @@ class ThemeFunctions {
                         val tempChildView = childView as TextView
                         tempChildView.setTextColor(rgbToInt(theme.contentAuthorColor))
                     }
+                    "dialogTitle" -> {
+                        val tempChildView = childView as TextView
+                        tempChildView.setBackgroundColor(rgbToInt(theme.headerBackColor))
+                        tempChildView.setTextColor(rgbToInt(theme.headerHeaderColor))
+                    }
                     "rightArrow" -> {
                         applyThemeToRightArrow(childView)
                     }
                 }
             } else if (childView is android.widget.CompoundButton) {
-                // 針對 RadioButton 處理文字顏色，但不再強制變更 CheckBox 的勾選框顏色 (Tint)
+                // 針對 RadioButton 處理文字顏色
                 if (childView is android.widget.RadioButton) {
                     childView.setTextColor(rgbToInt(theme.contentAuthorColor))
+                    // 套用 Tint
+                    childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
+                } else if (childView is CheckBox) {
+                    // 1. 設定文字顏色
+                    childView.setTextColor(rgbToInt(theme.contentTextColor))
+                    // 2. 設定勾選框的 Tint (例如使用主題的按壓文字色作為強調色)
+                    childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
                 }
             } else if (childView is Spinner) {
                 applyThemeToSpinner(childView)
@@ -565,6 +578,8 @@ class ThemeFunctions {
         // --- 新增：從主題取得顏色並著色 ---
         val theme = ThemeStore.getSelectTheme()
         val textColor = rgbToInt(theme.contentTextColor)
+        val dividerColor = rgbToInt(theme.listDividerColor)
+
         // 顏色減半：保留 RGB，並將 Alpha 設為 0x80 (約 50% 透明度)
         val dimmedColor = (textColor and 0x00FFFFFF) or 0x80000000.toInt()
 
@@ -578,6 +593,24 @@ class ThemeFunctions {
         desc?.setTextColor(dimmedColor)
         // 網址可以使用主題的邊框色(較淡)或是維持內文色
         url?.setTextColor(dimmedColor)
+
+        // 處理按鈕 (顯示圖片/載入中)
+        // 1. [顯示圖片] 按鈕
+        val imageButton = view.findViewById<Button>(R.id.thumbnail_image_button)
+        imageButton?.let {
+            it.setTextColor(textColor)
+            it.setBackgroundColor(dividerColor)
+        }
+
+        // 2. [載入中] 按鈕 (在 thumbnail_default 內)
+        val defaultLayout = view.findViewById<ViewGroup>(R.id.thumbnail_default)
+        if (defaultLayout != null && defaultLayout.childCount > 0) {
+            val loadingButton = defaultLayout.getChildAt(0)
+            if (loadingButton is Button) {
+                loadingButton.setTextColor(textColor)
+                loadingButton.setBackgroundColor(dividerColor)
+            }
+        }
     }
 
     /**

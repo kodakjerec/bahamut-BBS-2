@@ -247,7 +247,7 @@ object ThemeStore {
                 themeEInk.listAuthorColor = "#FF000000"
                 themeEInk.listMarkColor = "#FF000000"
                 themeEInk.listStatusColor = "#FF000000"
-                themeEInk.listDividerColor = "#FF888888" // 稍微加深分隔線，確保清晰不留白痕
+                themeEInk.listDividerColor = "#FFE0E0E0" // 稍微加深分隔線，確保清晰不留白痕
 
                 themeEInk.backgroundColorDanger = "#FF000000"
                 themeEInk.backgroundColorDangerPressed = "#FF444444"
