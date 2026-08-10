@@ -54,6 +54,5 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-    <View android:id="@+id/menu_divider" android:visibility="gone" style="@style/ItemViewDividerVertical"/>
     <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="@color/title_bar_menu_icon_background_color" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
 </LinearLayout>

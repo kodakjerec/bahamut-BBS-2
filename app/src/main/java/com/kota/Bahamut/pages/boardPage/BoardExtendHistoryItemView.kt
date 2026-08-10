@@ -42,7 +42,7 @@ class BoardExtendHistoryItemView : LinearLayout {
         findViewById<View?>(R.id.BoardExtendOptionalPage_historyItemView_Status)!!.visibility = GONE
         findViewById<View?>(R.id.BoardExtendOptionalPage_historyItemView_SplitView)!!.visibility =
             GONE
-        findViewById<View?>(R.id.BoardExtendOptionalPage_historyItemView_ArrowView)!!.visibility =
+        findViewById<View?>(R.id.ListItem_ArrowView)!!.visibility =
             GONE
         dividerTop = findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_DividerTop)
     }
@@ -62,7 +62,7 @@ class BoardExtendHistoryItemView : LinearLayout {
 
     fun setTitle(title: String?) {
         if (titleLabel != null) {
-            if (title == null || title.isEmpty()) {
+            if (title.isNullOrEmpty()) {
                 titleLabel?.text = "未輸入"
             } else {
                 titleLabel?.text = title

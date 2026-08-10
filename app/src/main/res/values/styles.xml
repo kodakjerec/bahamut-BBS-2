@@ -50,9 +50,6 @@
         <item name="android:background">@drawable/button_background_1</item>
         <item name="android:tag">ToolbarItem.Danger</item>
     </style>
-    <style name="ToolbarItemOnlyTag">
-        <item name="android:tag">ToolbarItem</item>
-    </style>
     <style name="ToolbarItemLR" parent="ToolbarItem">
         <item name="android:layout_weight">9</item>
         <item name="android:visibility">gone</item>
@@ -160,16 +157,10 @@
         <item name="android:layout_weight">1</item>
     </style>
     <style name="MainItem">
-        <item name="android:textColor">@android:color/white</item>
-        <item name="android:background">@android:drawable/list_selector_background</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-    </style>
-    <style name="MainItem2">
-        <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:background">@android:drawable/list_selector_background</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:tag">normalText</item>
     </style>
     <style name="MainItemBackground">
         <item name="android:background">@color/item_background_color</item>
@@ -259,6 +250,7 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
+        <item name="android:tag">normalText</item>
     </style>
     <style name="SystemSettingsCheckbox" parent="BaseTouchPart">
         <item name="android:layout_width">wrap_content</item>
@@ -277,6 +269,7 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
+        <item name="android:tag">normalText</item>
     </style>
     <style name="SystemSettingsChapter" parent="TextViewLarge">
         <item name="android:layout_width">match_parent</item>
@@ -311,17 +304,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_weight">1</item>
-    </style>
-    <style name="SystemSettingsDirectoryArrow" parent="TextViewSmall">
-        <item name="android:textColor">@color/list_page_item_arrow_color</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@color/list_page_item_arrow_background</item>
-        <item name="android:paddingLeft">6dp</item>
-        <item name="android:paddingRight">6dp</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:text">@string/arrow_right</item>
+        <item name="android:tag">normalText</item>
     </style>
     <style name="SpinnerStyle">
         <item name="android:layout_width">match_parent</item>
@@ -338,7 +321,7 @@
         <item name="android:textSize">20sp</item>
         <item name="android:layout_marginTop">12sp</item>
         <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:background">@drawable/button_rounded_background_2</item>
+        <item name="android:tag">ToolbarItem</item>
     </style>
     <style name="DialogQueryHeroText" parent="TextViewNormal">
         <item name="android:layout_width">0dp</item>

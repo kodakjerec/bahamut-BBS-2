@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/black">
+    android:background="@color/black"
+    android:id="@+id/content_view">
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -11,8 +12,7 @@
         <LinearLayout android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/black"
-            android:id="@+id/content_view">
+            android:background="@color/black">
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_bbs"/>
@@ -22,7 +22,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/user_info" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>
             <LinearLayout android:id="@+id/SystemSettings_goBBSUserConfig"
@@ -30,7 +30,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/user_config" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
@@ -41,7 +41,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/theme_manager_page" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
@@ -64,7 +64,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/block_list_setting" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
@@ -177,7 +177,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/article_header_setting" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>
             <LinearLayout android:id="@+id/SystemSettings_ArticleExpressionSetting"
@@ -185,7 +185,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/article_expression_setting" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
@@ -243,7 +243,7 @@
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_ignore_battery_optimizations"
                     style="@style/SystemSettingsSpinnerText"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <RelativeLayout android:visibility="gone" android:id="@+id/SystemSettings_item_AutoConnectionRecover" style="@style/SystemSettingsItem">
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
@@ -281,7 +281,7 @@
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/system_setting_page_goBillingPage" style="@style/SystemSettingsDirectoryText"/>
                 <View style="@style/ItemViewDividerVertical"/>
-                <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+                <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

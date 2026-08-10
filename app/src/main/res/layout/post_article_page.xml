@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:background="@color/item_background_color"
         android:focusableInTouchMode="true"
         android:orientation="horizontal">
 
@@ -30,11 +29,9 @@
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/item_background_color"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
-                android:singleLine="true"
-                android:textColor="@color/item_background_color"/>
+                android:singleLine="true"/>
 
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/ArticlePostDialog_TitleField"
@@ -42,13 +39,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints=""
-                android:background="@color/item_background_color"
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:hint="@string/input_title_here"
                 android:inputType="textMultiLine"
-                android:singleLine="true"
-                android:textColor="@color/white" />
+                android:singleLine="true"/>
         </FrameLayout>
     </LinearLayout>
 
@@ -70,13 +65,11 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:background="@color/item_background_color"
             android:gravity="top|start|center_vertical|center_horizontal|center"
             android:hint="@string/input_content_here"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"
-            android:padding="10dp"
-            android:textColor="@android:color/white" />
+            android:padding="10dp"/>
     </LinearLayout>
 
     <LinearLayout

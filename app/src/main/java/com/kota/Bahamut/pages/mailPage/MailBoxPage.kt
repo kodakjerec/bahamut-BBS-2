@@ -69,7 +69,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         headerItemView = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView
 
         // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.content_view) as LinearLayout?)
     }
 
     override fun loadPage(): TelnetListPageBlock? {

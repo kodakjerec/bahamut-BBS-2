@@ -1,10 +1,12 @@
 package com.kota.Bahamut.pages.blockListPage
 
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -27,6 +29,8 @@ class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
             nameLabel.text = aName
             nameLabel.contentDescription = "從名單中剔除$aName"
         }
+        // 套用主題
+        ThemeFunctions().applyThemeToContent(itemView as ViewGroup?)
     }
 
     override fun onClick(v: View?) {

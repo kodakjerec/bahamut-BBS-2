@@ -14,7 +14,9 @@
             </LinearLayout>
         </LinearLayout>
         <View style="@style/ItemViewDividerVertical"/>
-        <TextView android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/ClassPage_ItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+        <include
+            layout="@layout/right_arrow_item_view"
+            android:id="@+id/ListItem_ArrowView" />
         <LinearLayout android:orientation="horizontal" android:id="@+id/ClassPage_ItemView_OrderBock" android:visibility="gone" android:layout_width="wrap_content" android:layout_height="wrap_content">
             <Button android:textSize="28sp" android:id="@+id/BoardPage_ItemView_MoveUp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/arrow_up" style="@style/TouchBlock"/>
             <Button android:textSize="28sp" android:id="@+id/BoardPage_ItemView_MoveDown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/arrow_down" style="@style/TouchBlock"/>

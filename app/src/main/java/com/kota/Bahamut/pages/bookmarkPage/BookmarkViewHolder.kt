@@ -1,10 +1,12 @@
 package com.kota.Bahamut.pages.bookmarkPage
 
 import android.view.View
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
@@ -12,10 +14,15 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     private val gyLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_GY)
     private val markLevel: TextView = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
     private val titleLevel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
+    private val btnEdit: Button? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Edit)
+    private val btnDelete: Button? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Delete)
+    private val buttonBlock: View? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_ButtonBlock)
 
     init {
-
         view.setOnClickListener(this)
+        btnEdit?.setOnClickListener(this)
+        btnDelete?.setOnClickListener(this)
+        buttonBlock?.visibility = View.VISIBLE
     }
 
     fun setBookmark(bookmark: Bookmark?) {
@@ -24,6 +31,9 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
             setAuthor(bookmark.author)
             setMark(bookmark.mark == "y")
             setGYNumber(bookmark.gy)
+            
+            // 套用主題
+            ThemeFunctions().applyThemeToBoardDrawerItem(itemView)
             return
         }
         clear()
@@ -31,40 +41,24 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
 
     fun setTitle(title: String?) {
         if (this.titleLevel != null) {
-            if (title == null || title.isEmpty()) {
-                this.titleLevel.text = "未輸入"
-            } else {
-                this.titleLevel.text = title
-            }
+            this.titleLevel.text = if (title.isNullOrEmpty()) "未輸入" else title
         }
     }
 
     fun setAuthor(author: String?) {
         if (this.authorLabel != null) {
-            if (author == null || author.isEmpty()) {
-                this.authorLabel.text = "未輸入"
-            } else {
-                this.authorLabel.text = author
-            }
+            this.authorLabel.text = if (author.isNullOrEmpty()) "未輸入" else author
         }
     }
 
     fun setGYNumber(number: String?) {
         if (this.gyLabel != null) {
-            if (number == null || number.isEmpty()) {
-                this.gyLabel.text = Bookmark.OPTIONAL_BOOKMARK
-            } else {
-                this.gyLabel.text = number
-            }
+            this.gyLabel.text = if (number.isNullOrEmpty()) Bookmark.OPTIONAL_BOOKMARK else number
         }
     }
 
     fun setMark(isMarked: Boolean) {
-        if (isMarked) {
-            this.markLevel.visibility = View.VISIBLE
-        } else {
-            this.markLevel.visibility = View.INVISIBLE
-        }
+        this.markLevel.visibility = if (isMarked) View.VISIBLE else View.INVISIBLE
     }
 
     fun clear() {
@@ -75,6 +69,10 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     }
 
     override fun onClick(view: View?) {
-        mListener?.onItemClick(view, bindingAdapterPosition)
+        when(view?.id) {
+            R.id.BoardExtendOptionalPage_bookmarkItemView_Edit -> mListener?.onEditClick(view, bindingAdapterPosition)
+            R.id.BoardExtendOptionalPage_bookmarkItemView_Delete -> mListener?.onDeleteClick(view, bindingAdapterPosition)
+            else -> mListener?.onItemClick(view, bindingAdapterPosition)
+        }
     }
 }

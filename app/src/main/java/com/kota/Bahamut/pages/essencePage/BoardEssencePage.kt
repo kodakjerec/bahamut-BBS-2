@@ -119,7 +119,7 @@ class BoardEssencePage : TelnetListPage() {
         }
 
         // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout)
+        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun isItemCanLoadAtIndex(index: Int): Boolean {

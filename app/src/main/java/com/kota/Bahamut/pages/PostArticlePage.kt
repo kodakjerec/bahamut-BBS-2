@@ -201,7 +201,9 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .setOnClickListener(referenceClickListener)
 
         // 替換內文外觀
-        ThemeFunctions().applyThemeToPostArticle(mainLayout)
+        mainLayout!!.post {
+            ThemeFunctions().applyThemeToPostArticle(mainLayout)
+        }
     }
 
     override fun clear() {

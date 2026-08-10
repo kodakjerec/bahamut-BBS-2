@@ -19,7 +19,7 @@ class BoardEssencePageHandler private constructor() {
         boardPageBlock.boardName = ""
 
         val regexBoardName: Regex = """《(?<boardName>.*?)》""".trimIndent().toRegex()
-        val boardName = regexBoardName.find(firstRowString.toString())
+        val boardName = regexBoardName.find(firstRowString)
 
         if (boardName!=null) {
             boardPageBlock.boardTitle = boardName.groups[1]?.value.toString()

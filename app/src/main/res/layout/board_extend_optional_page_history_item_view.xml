@@ -1,16 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:id="@+id/BoardExtendOptionalPage_historyItemView_contentView" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <View android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerTop" android:visibility="gone" style="@style/ItemViewDividerHorizontal"/>
-    <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-        <LinearLayout android:orientation="horizontal" android:id="@+id/BoardExtendOptionalPage_historyItemView_backgroundView" android:background="@color/list_page_item_content_background" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/BoardExtendOptionalPage_historyItemView_contentView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <View
+        android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerTop"
+        style="@style/ItemViewDividerHorizontal"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/BoardExtendOptionalPage_historyItemView_backgroundView"
+            style="@style/TouchBlock"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@color/list_page_item_content_background"
+            android:orientation="horizontal">
+
             <com.kota.telnetUI.textView.TelnetTextViewNormal
-                android:textColor="@color/mail_box_page_item_view_status" android:id="@+id/BoardExtendOptionalPage_historyItemView_Status" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/title_" style="@style/TextViewNormal"/>
+                android:id="@+id/BoardExtendOptionalPage_historyItemView_Status"
+                style="@style/TextViewNormal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/title_"
+                android:textColor="@color/mail_box_page_item_view_status" />
+
             <com.kota.telnetUI.textView.TelnetTextViewNormal
-                android:textColor="@color/white" android:ellipsize="end" android:id="@+id/BoardExtendOptionalPage_historyItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:text="@string/un_input" android:singleLine="true" android:layout_weight="1" style="@style/TextViewNormal"/>
+                android:id="@+id/BoardExtendOptionalPage_historyItemView_Title"
+                style="@style/TextViewNormal"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:text="@string/un_input"
+                android:textColor="@color/white" />
         </LinearLayout>
-        <View style="@style/ItemViewDividerVertical" android:id="@+id/BoardExtendOptionalPage_historyItemView_SplitView"/>
-        <com.kota.telnetUI.textView.TelnetTextViewSmall
-            android:textStyle="bold" android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/BoardExtendOptionalPage_historyItemView_ArrowView" android:background="@color/list_page_item_arrow_background" android:paddingLeft="6dp" android:paddingRight="6dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:text="@string/arrow_right" style="@style/TextViewSmall"/>
+
+        <!-- 操作按鈕 -->
+        <LinearLayout
+            android:id="@+id/BoardExtendOptionalPage_historyItemView_ButtonBlock"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <Button
+                android:id="@+id/BoardExtendOptionalPage_historyItemView_Edit"
+                style="@style/ToolbarItem"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:text="改"
+                android:textSize="14sp" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/BoardExtendOptionalPage_historyItemView_Delete"
+                style="@style/ToolbarItem.Danger"
+                android:layout_width="45dp"
+                android:layout_height="match_parent"
+                android:text="刪"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/BoardExtendOptionalPage_historyItemView_SplitView"
+            style="@style/ItemViewDividerVertical"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/ListItem_ArrowView"
+            layout="@layout/right_arrow_item_view"
+            android:visibility="gone" />
     </LinearLayout>
-    <View android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+
+    <View
+        android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerBottom"
+        style="@style/ItemViewDividerHorizontal" />
 </LinearLayout>

@@ -39,7 +39,6 @@ open class TelnetHeaderItemView : LinearLayout {
         myTitle = findViewById(R.id.title)
         detail1 = findViewById(R.id.detail_1)
         detail2 = findViewById(R.id.detail_2)
-        mMenuDivider = findViewById(R.id.menu_divider)
         mMenuButton = findViewById(R.id.menu_button)
 
         // 側邊選單

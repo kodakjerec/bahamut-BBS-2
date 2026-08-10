@@ -111,11 +111,14 @@ object ThemeStore {
                 themePink.backgroundColor = "#FFFE00FE"
                 themePink.backgroundColorPressed = "#FFE400E4"
                 themePink.backgroundColorDisabled = "#FF650065"
+
+                themePink.backgroundColorDanger = "#FF800000"
+                themePink.backgroundColorDangerPressed = "#FFFF0000"
                 return themePink
             }
-            2 -> { // 低亮度
+            2 -> { // 深色模式
                 val themeDarkMode = Theme()
-                themeDarkMode.name = "低亮度"
+                themeDarkMode.name = "深色"
 
                 // 全域基礎色彩 (通用按鈕與文字)
                 themeDarkMode.textColor = "#FFE0E0E0"             // 主要文字 (柔和灰白)
@@ -133,8 +136,8 @@ object ThemeStore {
 
                 // 文章內文 (Content)
                 themeDarkMode.contentBackColor = "#FF121212"   // 內文背景 (深灰黑)
-                themeDarkMode.contentAuthorColor = "#FF8B939C" // 發文作者/抬頭 (藍灰)
-                themeDarkMode.contentTextColor = "#FFB0B3B8"   // 正文內容 (柔和灰白)
+                themeDarkMode.contentAuthorColor = "#FFB0B3B8" // 發文作者/抬頭 (藍灰)
+                themeDarkMode.contentTextColor = "#FF8B939C"   // 正文內容 (柔和灰白)
 
                 // 引用內容 (Quote)
                 themeDarkMode.quoteBackColor = "#FF121212"     // 引用背景 (深灰黑)
@@ -163,6 +166,10 @@ object ThemeStore {
                 themeDarkMode.listMarkColor = "#FFB25900"      // M文標記 (暗橘色)
                 themeDarkMode.listStatusColor = "#FF9E8C00"    // 狀態標記 Re/◆ (暗黃/芥末綠)
                 themeDarkMode.listDividerColor = "#FF222222"   // 項目分隔線 (極暗灰)
+
+                themeDarkMode.backgroundColorDanger = "#FF4A1A1A"
+                themeDarkMode.backgroundColorDangerPressed = "#FF8B3A3A"
+                themeDarkMode.textColorDanger = "#FFE0E0E0"
                 return themeDarkMode
             }
             3 -> { // eInk (真實電子紙專用高對比版)
@@ -185,8 +192,8 @@ object ThemeStore {
 
                 // 文章內文 (極高對比)
                 themeEInk.contentBackColor = "#FFFFFFFF"
-                themeEInk.contentAuthorColor = "#FF444444"
-                themeEInk.contentTextColor = "#FF000000"
+                themeEInk.contentAuthorColor = "#FF000000"
+                themeEInk.contentTextColor = "#FF444444"
 
                 // 引用 (避免使用過淡的灰，採用顯眼深灰區隔)
                 themeEInk.quoteBackColor = "#FFFFFFFF"
@@ -216,6 +223,9 @@ object ThemeStore {
                 themeEInk.listStatusColor = "#FF000000"
                 themeEInk.listDividerColor = "#FF888888" // 稍微加深分隔線，確保清晰不留白痕
 
+                themeEInk.backgroundColorDanger = "#FF000000"
+                themeEInk.backgroundColorDangerPressed = "#FF444444"
+                themeEInk.textColorDanger = "#FFFFFFFF"
                 return themeEInk
             }
             else -> {

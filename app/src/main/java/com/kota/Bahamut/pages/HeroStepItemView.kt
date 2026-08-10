@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.HeroStep
 import java.util.Objects
@@ -31,6 +32,8 @@ class HeroStepItemView : LinearLayout {
         txtViewAuthor = findViewById(R.id.HeroStep_ItemView_Name)
         txtViewDatetime = findViewById(R.id.HeroStep_ItemView_Datetime)
         txtViewContent = findViewById(R.id.HeroStep_ItemView_Content)
+
+        ThemeFunctions().applyThemeToHeroStepItem(this)
     }
 
     fun setAuthor(author: String?) {

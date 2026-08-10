@@ -14,8 +14,10 @@ import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.articlePage.ArticlePageEditRecordItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
+import com.kota.Bahamut.pages.articlePage.ArticlePagePushItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
@@ -77,7 +79,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         resetAdapter()
 
         // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun onBackPressed(): Boolean {
@@ -183,6 +185,27 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
             itemViewOrigin.setIP(telnetArticle?.fromIP!!)
         }
+
+
+        // 在資料填充完畢後套用外觀
+        when (itemViewOrigin) {
+            is ArticlePageTextItemView -> {
+                ThemeFunctions().applyThemeToArticleTextItem(itemViewOrigin)
+            }
+            is ArticlePagePushItemView -> {
+                ThemeFunctions().applyThemeToArticlePushItem(itemViewOrigin)
+            }
+            is ArticlePageTelnetItemView -> {
+                ThemeFunctions().applyThemeToArticleTelnetItem(itemViewOrigin)
+            }
+            is ArticlePageTimeTimeView -> {
+                ThemeFunctions().applyThemeToArticleTimeItem(itemViewOrigin)
+            }
+            is ArticlePageEditRecordItemView -> {
+                ThemeFunctions().applyThemeToArticleEditRecordItem(itemViewOrigin)
+            }
+        }
+
         return itemViewOrigin
     }
 

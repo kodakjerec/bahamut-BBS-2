@@ -76,8 +76,7 @@
                 android:text="@string/bookmark_manager"
                 style="@style/ToolbarItem.RightMenu"
                 android:layout_weight="2"/>
-            <com.kota.telnetUI.textView.TelnetTextViewSmall
-                style="@style/SystemSettingsDirectoryArrow"/>
+            <include layout="@layout/right_arrow_item_view" />
         </LinearLayout>
         <TextView
             android:id="@+id/bookmark_list_view_none"
@@ -140,7 +139,6 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            style="@style/ToolbarItemOnlyTag"
             android:background="@drawable/toolbar_item_background_color">
             <CheckBox
                 android:id="@+id/block_enable_button_checkbox"
@@ -152,12 +150,17 @@
                 style="@style/TextViewLarge"
                 android:layout_height="match_parent"
                 android:layout_width="60dp"
+                android:tag="normalText"
                 android:text="@string/drawer_button_text_enable"
                 android:textColor="@color/white"
                 android:gravity="center_vertical"/>
             <View android:background="@color/black" android:layout_width="1dp" android:layout_height="match_parent"/>
-            <Button android:id="@+id/block_setting_button" android:layout_width="0dp" android:layout_weight="1" android:text="@string/system_setting_page_chapter_blocklist" style="@style/ToolbarItem.RightMenu"/>
-            <com.kota.telnetUI.textView.TelnetTextViewSmall style="@style/SystemSettingsDirectoryArrow"/>
+            <Button android:id="@+id/block_setting_button"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:text="@string/system_setting_page_chapter_blocklist"
+                style="@style/ToolbarItem.RightMenu"/>
+            <include layout="@layout/right_arrow_item_view"/>
         </LinearLayout>
     </LinearLayout>
 </androidx.drawerlayout.widget.DrawerLayout>

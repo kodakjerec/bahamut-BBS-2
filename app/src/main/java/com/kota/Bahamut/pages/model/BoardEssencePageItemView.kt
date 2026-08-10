@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import java.util.Objects
 
@@ -36,6 +37,8 @@ class BoardEssencePageItemView : LinearLayout {
             setDate(aItem.date)
             author = aItem.author
             setDirectory(aItem.isDirectory, aItem.isBBSClickable)
+
+            ThemeFunctions().applyThemeToBoardEssenceItem(this)
             return
         }
         clear()
@@ -60,6 +63,7 @@ class BoardEssencePageItemView : LinearLayout {
                 INVISIBLE
             contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY)?.visibility = INVISIBLE
         }
+        ThemeFunctions().applyThemeToBoardEssenceItem(this)
     }
 
     fun setTitle(title: String?) {

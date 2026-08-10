@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.MailBoxPageItem
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import java.util.Objects
@@ -40,6 +41,8 @@ class MailBoxPageItemView : LinearLayout {
             setReply(aItem.isReply)
             setRead(aItem.isRead)
             setMark(aItem.isMarked)
+            // 套用主題
+            ThemeFunctions().applyThemeToMailBoxItem(this, aItem.isRead)
             return
         }
         clear()

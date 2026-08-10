@@ -21,34 +21,49 @@ import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.telnetUI.TelnetPage
 
-
 class ThemeManagerPage: TelnetPage() {
     private lateinit var mainLayout:LinearLayout
     private lateinit var buttonIds:List<Button>
     private lateinit var txnName: PostEditText
+    
+    // 一般按鈕設定
     private lateinit var txnTextColor:TextView
     private lateinit var txnTextColorPressed:TextView
     private lateinit var txnTextColorDisabled:TextView
     private lateinit var txnBackColor:TextView
     private lateinit var txnBackColorPressed:TextView
     private lateinit var txnBackColorDisabled:TextView
+
+    // 警示按鈕設定
+    private lateinit var txnTextColorDanger:TextView
+    private lateinit var txnTextColorDangerPressed:TextView
+    private lateinit var txnTextColorDangerDisabled:TextView
+    private lateinit var txnBackColorDanger:TextView
+    private lateinit var txnBackColorDangerPressed:TextView
+    private lateinit var txnBackColorDangerDisabled:TextView
+    
+    // 標題列
     private lateinit var txnHeaderBackColor: TextView
     private lateinit var txnHeaderHeaderColor: TextView
     private lateinit var txnHeaderManagerColor: TextView
     private lateinit var txnHeaderBorderColor: TextView
+    
+    // 內文
     private lateinit var txnContentBackColor: TextView
     private lateinit var txnContentAuthorColor: TextView
     private lateinit var txnContentTextColor: TextView
+    
+    // 引用
     private lateinit var txnQuoteBackColor: TextView
     private lateinit var txnQuoteAuthorColor: TextView
     private lateinit var txnQuoteTextColor: TextView
-    private lateinit var editToolbar: LinearLayout
-    private lateinit var btnReset:Button
-    private lateinit var btnUpdate:Button
-    private lateinit var btnBack:Button
+    
+    // 看板列表
     private lateinit var txnListBackColor: TextView
     private lateinit var txnListTitleColor: TextView
     private lateinit var txnListTitleReadColor: TextView
+    private lateinit var txnListTitleFollowFirstColor: TextView
+    private lateinit var txnListTitleFollowFirstReadColor: TextView
     private lateinit var txnListTitleFollowColor: TextView
     private lateinit var txnListTitleFollowReadColor: TextView
     private lateinit var txnListNumberColor: TextView
@@ -58,6 +73,11 @@ class ThemeManagerPage: TelnetPage() {
     private lateinit var txnListStatusColor: TextView
     private lateinit var txnListDividerColor: TextView
 
+    private lateinit var editToolbar: LinearLayout
+    private lateinit var btnReset:Button
+    private lateinit var btnUpdate:Button
+    private lateinit var btnBack:Button
+
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
 
@@ -65,6 +85,9 @@ class ThemeManagerPage: TelnetPage() {
         get() = R.layout.theme_manager_page
 
     override val isPopupPage: Boolean
+        get() = true
+
+    override val isKeepOnOffline: Boolean
         get() = true
 
     override fun onPageDidLoad() {
@@ -85,7 +108,6 @@ class ThemeManagerPage: TelnetPage() {
             button.text = theme.name
             button.setOnClickListener{aView ->
                 ThemeStore.setSelectIndex(index)
-
                 val selectedTheme = ThemeStore.getSelectTheme()
                 for (tabButton in buttonIds) {
                     if (tabButton == aView) {
@@ -96,8 +118,6 @@ class ThemeManagerPage: TelnetPage() {
                         tabButton.setBackgroundColor(CommonFunctions.rgbToInt(selectedTheme.backgroundColorDisabled))
                     }
                 }
-
-                // 套用版面
                 paintToolbarText()
                 paintToolbarButtons()
                 paintBtnUpdate(false)
@@ -111,15 +131,13 @@ class ThemeManagerPage: TelnetPage() {
         txnBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color)
         txnBackColorPressed = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color_Pressed)
         txnBackColorDisabled = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color_Disabled)
-        txnName.doOnTextChanged { _, _, _, _ ->
-            paintBtnUpdate(true)
-        }
-        txnTextColor.setOnClickListener(textClickListener)
-        txnTextColorPressed.setOnClickListener(textClickListener)
-        txnTextColorDisabled.setOnClickListener(textClickListener)
-        txnBackColor.setOnClickListener(textClickListener)
-        txnBackColorPressed.setOnClickListener(textClickListener)
-        txnBackColorDisabled.setOnClickListener(textClickListener)
+
+        txnTextColorDanger = mainLayout.findViewById(R.id.Theme_Manager_Page_Text_Color_Danger)
+        txnTextColorDangerPressed = mainLayout.findViewById(R.id.Theme_Manager_Page_Text_Color_Danger_Pressed)
+        txnTextColorDangerDisabled = mainLayout.findViewById(R.id.Theme_Manager_Page_Text_Color_Danger_Disabled)
+        txnBackColorDanger = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color_Danger)
+        txnBackColorDangerPressed = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color_Danger_Pressed)
+        txnBackColorDangerDisabled = mainLayout.findViewById(R.id.Theme_Manager_Page_Back_Color_Danger_Disabled)
 
         txnHeaderBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Back_Color)
         txnHeaderHeaderColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Header_Header_Color)
@@ -134,22 +152,11 @@ class ThemeManagerPage: TelnetPage() {
         txnQuoteAuthorColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Author_Color)
         txnQuoteTextColor = mainLayout.findViewById(R.id.Theme_Manager_Page_Quote_Color)
 
-        txnHeaderBackColor.setOnClickListener(textClickListener)
-        txnHeaderHeaderColor.setOnClickListener(textClickListener)
-        txnHeaderManagerColor.setOnClickListener(textClickListener)
-        txnHeaderBorderColor.setOnClickListener(textClickListener)
-
-        txnContentAuthorColor.setOnClickListener(textClickListener)
-        txnContentBackColor.setOnClickListener(textClickListener)
-        txnContentTextColor.setOnClickListener(textClickListener)
-
-        txnQuoteBackColor.setOnClickListener(textClickListener)
-        txnQuoteAuthorColor.setOnClickListener(textClickListener)
-        txnQuoteTextColor.setOnClickListener(textClickListener)
-
         txnListBackColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Back_Color)
         txnListTitleColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Color)
         txnListTitleReadColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Read_Color)
+        txnListTitleFollowFirstColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_First_Color)
+        txnListTitleFollowFirstReadColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_First_Read_Color)
         txnListTitleFollowColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_Color)
         txnListTitleFollowReadColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Title_Follow_Read_Color)
         txnListNumberColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Number_Color)
@@ -159,13 +166,23 @@ class ThemeManagerPage: TelnetPage() {
         txnListStatusColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Status_Color)
         txnListDividerColor = mainLayout.findViewById(R.id.Theme_Manager_Page_List_Divider_Color)
 
-        val listPickers = listOf(
+        // 綁定監聽
+        listOf(
+            txnTextColor, txnTextColorPressed, txnTextColorDisabled,
+            txnBackColor, txnBackColorPressed, txnBackColorDisabled,
+            txnTextColorDanger, txnTextColorDangerPressed, txnTextColorDangerDisabled,
+            txnBackColorDanger, txnBackColorDangerPressed, txnBackColorDangerDisabled,
+            txnHeaderBackColor, txnHeaderHeaderColor, txnHeaderManagerColor, txnHeaderBorderColor,
+            txnContentBackColor, txnContentAuthorColor, txnContentTextColor,
+            txnQuoteBackColor, txnQuoteAuthorColor, txnQuoteTextColor,
             txnListBackColor, txnListTitleColor, txnListTitleReadColor,
+            txnListTitleFollowFirstColor, txnListTitleFollowFirstReadColor,
             txnListTitleFollowColor, txnListTitleFollowReadColor,
             txnListNumberColor, txnListDateColor, txnListAuthorColor,
             txnListMarkColor, txnListStatusColor, txnListDividerColor
-        )
-        listPickers.forEach { it.setOnClickListener(textClickListener) }
+        ).forEach { it.setOnClickListener(textClickListener) }
+
+        txnName.doOnTextChanged { _, _, _, _ -> paintBtnUpdate(true) }
 
         editToolbar = mainLayout.findViewById(R.id.Theme_Manager_Page_Edit_Toolbar)
         btnReset = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Reset)
@@ -175,181 +192,154 @@ class ThemeManagerPage: TelnetPage() {
         btnUpdate.setOnClickListener(btnUpdateOnClickListener)
 
         btnBack = findViewById(R.id.Theme_Manager_Page_Toolbar_Back) as Button
-        btnBack.setOnClickListener {
-            onBackPressed()
-        }
+        btnBack.setOnClickListener { onBackPressed() }
 
-        // 按下指定的外觀
-        val selectedIndex = ThemeStore.getSelectIndex()
-        buttonIds[selectedIndex].performClick()
+        // 按下預設外觀
+        buttonIds[ThemeStore.getSelectIndex()].performClick()
     }
 
-    /** 變更工具列文字 */
     private fun paintToolbarText() {
-        val selectedTheme = ThemeStore.getSelectTheme()
-        txnName.setText(selectedTheme.name)
-        txnTextColor.text = selectedTheme.textColor
-        txnTextColorPressed.text = selectedTheme.textColorPressed
-        txnTextColorDisabled.text = selectedTheme.textColorDisabled
-        txnBackColor.text = selectedTheme.backgroundColor
-        txnBackColorPressed.text = selectedTheme.backgroundColorPressed
-        txnBackColorDisabled.text = selectedTheme.backgroundColorDisabled
+        val theme = ThemeStore.getSelectTheme()
+        txnName.setText(theme.name)
+        txnTextColor.text = theme.textColor
+        txnTextColorPressed.text = theme.textColorPressed
+        txnTextColorDisabled.text = theme.textColorDisabled
+        txnBackColor.text = theme.backgroundColor
+        txnBackColorPressed.text = theme.backgroundColorPressed
+        txnBackColorDisabled.text = theme.backgroundColorDisabled
 
-        txnHeaderBackColor.text = selectedTheme.headerBackColor
-        txnHeaderHeaderColor.text = selectedTheme.headerHeaderColor
-        txnHeaderManagerColor.text = selectedTheme.headerManagerColor
-        txnHeaderBorderColor.text = selectedTheme.headerBorderColor
+        txnTextColorDanger.text = theme.textColorDanger
+        txnTextColorDangerPressed.text = theme.textColorDangerPressed
+        txnTextColorDangerDisabled.text = theme.textColorDangerDisabled
+        txnBackColorDanger.text = theme.backgroundColorDanger
+        txnBackColorDangerPressed.text = theme.backgroundColorDangerPressed
+        txnBackColorDangerDisabled.text = theme.backgroundColorDangerDisabled
+        
+        txnHeaderBackColor.text = theme.headerBackColor
+        txnHeaderHeaderColor.text = theme.headerHeaderColor
+        txnHeaderManagerColor.text = theme.headerManagerColor
+        txnHeaderBorderColor.text = theme.headerBorderColor
+        
+        txnContentBackColor.text = theme.contentBackColor
+        txnContentAuthorColor.text = theme.contentAuthorColor
+        txnContentTextColor.text = theme.contentTextColor
+        
+        txnQuoteBackColor.text = theme.quoteBackColor
+        txnQuoteAuthorColor.text = theme.quoteAuthorColor
+        txnQuoteTextColor.text = theme.quoteTextColor
 
-        txnContentBackColor.text = selectedTheme.contentBackColor
-        txnContentAuthorColor.text = selectedTheme.contentAuthorColor
-        txnContentTextColor.text = selectedTheme.contentTextColor
-
-        txnQuoteBackColor.text = selectedTheme.quoteBackColor
-        txnQuoteAuthorColor.text = selectedTheme.quoteAuthorColor
-        txnQuoteTextColor.text = selectedTheme.quoteTextColor
-
-        txnListBackColor.text = selectedTheme.listBackColor
-        txnListTitleColor.text = selectedTheme.listTitleColor
-        txnListTitleReadColor.text = selectedTheme.listTitleReadColor
-        txnListTitleFollowColor.text = selectedTheme.listTitleFollowColor
-        txnListTitleFollowReadColor.text = selectedTheme.listTitleFollowReadColor
-        txnListNumberColor.text = selectedTheme.listNumberColor
-        txnListDateColor.text = selectedTheme.listDateColor
-        txnListAuthorColor.text = selectedTheme.listAuthorColor
-        txnListMarkColor.text = selectedTheme.listMarkColor
-        txnListStatusColor.text = selectedTheme.listStatusColor
-        txnListDividerColor.text = selectedTheme.listDividerColor
+        txnListBackColor.text = theme.listBackColor
+        txnListTitleColor.text = theme.listTitleColor
+        txnListTitleReadColor.text = theme.listTitleReadColor
+        txnListTitleFollowFirstColor.text = theme.listTitleFollowFirstColor
+        txnListTitleFollowFirstReadColor.text = theme.listTitleFollowFirstReadColor
+        txnListTitleFollowColor.text = theme.listTitleFollowColor
+        txnListTitleFollowReadColor.text = theme.listTitleFollowReadColor
+        txnListNumberColor.text = theme.listNumberColor
+        txnListDateColor.text = theme.listDateColor
+        txnListAuthorColor.text = theme.listAuthorColor
+        txnListMarkColor.text = theme.listMarkColor
+        txnListStatusColor.text = theme.listStatusColor
+        txnListDividerColor.text = theme.listDividerColor
     }
-    /** 變更工具列示範按鈕外觀 */
+
     private fun paintToolbarButtons() {
-        val button1:Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_1)
-        button1.setTextColor(CommonFunctions.rgbToInt(txnTextColor.text.toString()))
-        button1.setBackgroundColor(CommonFunctions.rgbToInt(txnBackColor.text.toString()))
+        val theme = ThemeStore.getSelectTheme()
 
-        val button2:Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_2)
-        button2.setTextColor(CommonFunctions.rgbToInt(txnTextColorPressed.text.toString()))
-        button2.setBackgroundColor(CommonFunctions.rgbToInt(txnBackColorPressed.text.toString()))
+        // 1. 底部的返回按鈕工具列
+        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as? ViewGroup)
 
-        val button3:Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_3)
-        button3.setTextColor(CommonFunctions.rgbToInt(txnTextColorDisabled.text.toString()))
-        button3.setBackgroundColor(CommonFunctions.rgbToInt(txnBackColorDisabled.text.toString()))
+        // 一般按鈕範例
+        val btnSample1: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_1)
+        val btnSample2: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_2)
+        val btnSample3: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_3)
+        btnSample1.setTextColor(CommonFunctions.rgbToInt(theme.textColor))
+        btnSample1.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColor))
+        btnSample2.setTextColor(CommonFunctions.rgbToInt(theme.textColorPressed))
+        btnSample2.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColorPressed))
+        btnSample3.setTextColor(CommonFunctions.rgbToInt(theme.textColorDisabled))
+        btnSample3.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColorDisabled))
 
-        // 預覽底部的導覽列與編輯工具列
-        val textColor = CommonFunctions.rgbToInt(txnTextColor.text.toString())
-        val textColorPressed = CommonFunctions.rgbToInt(txnTextColorPressed.text.toString())
-        val textColorDisabled = CommonFunctions.rgbToInt(txnTextColorDisabled.text.toString())
-        val backColor = CommonFunctions.rgbToInt(txnBackColor.text.toString())
-        val backColorPressed = CommonFunctions.rgbToInt(txnBackColorPressed.text.toString())
-        val backColorDisabled = CommonFunctions.rgbToInt(txnBackColorDisabled.text.toString())
+        // Danger 按鈕範例
+        val btnDanger1: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_Danger_1)
+        val btnDanger2: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_Danger_2)
+        val btnDanger3: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_Danger_3)
+        btnDanger1.setTextColor(CommonFunctions.rgbToInt(theme.textColorDanger))
+        btnDanger1.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColorDanger))
+        btnDanger2.setTextColor(CommonFunctions.rgbToInt(theme.textColorDangerPressed))
+        btnDanger2.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColorDangerPressed))
+        btnDanger3.setTextColor(CommonFunctions.rgbToInt(theme.textColorDangerDisabled))
+        btnDanger3.setBackgroundColor(CommonFunctions.rgbToInt(theme.backgroundColorDangerDisabled))
 
-        val toolbars = listOfNotNull(
-            findViewById(R.id.toolbar) as? ViewGroup,
-            editToolbar
-        )
-
-        for (toolbar in toolbars) {
-            for (i in 0 until toolbar.childCount) {
-                val child = toolbar.getChildAt(i)
-                if (child is Button) {
-                    // 套用文字顏色狀態 (按下、一般、停用)
-                    child.setTextColor(ColorStateList(
-                        arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()),
-                        intArrayOf(textColorPressed, textColor, textColorDisabled)
-                    ))
-                    // 套用背景顏色狀態 (按下、一般、停用)
-                    val backgroundDrawable = StateListDrawable()
-                    backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), backColorPressed.toDrawable())
-                    backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), backColor.toDrawable())
-                    backgroundDrawable.addState(intArrayOf(), backColorDisabled.toDrawable())
-                    child.background = backgroundDrawable
-                }
-            }
-        }
-
-        // 標題列預覽: 背景(Col2)+標題(Col3)+版主(Col4)+版面(Col5)
-        val hBack = CommonFunctions.rgbToInt(txnHeaderBackColor.text.toString())
-        val hTitle = CommonFunctions.rgbToInt(txnHeaderHeaderColor.text.toString())
-        val hManager = CommonFunctions.rgbToInt(txnHeaderManagerColor.text.toString())
-        val hBorder = CommonFunctions.rgbToInt(txnHeaderBorderColor.text.toString())
-
-        txnHeaderBackColor.setTextColor(hTitle)
+        // 標題列預覽
+        val hBack = CommonFunctions.rgbToInt(theme.headerBackColor)
         txnHeaderBackColor.setBackgroundColor(hBack)
-        txnHeaderHeaderColor.setTextColor(hTitle)
         txnHeaderHeaderColor.setBackgroundColor(hBack)
-        txnHeaderManagerColor.setTextColor(hManager)
         txnHeaderManagerColor.setBackgroundColor(hBack)
-        txnHeaderBorderColor.setTextColor(hBorder)
         txnHeaderBorderColor.setBackgroundColor(hBack)
+        txnHeaderHeaderColor.setTextColor(CommonFunctions.rgbToInt(theme.headerHeaderColor))
+        txnHeaderManagerColor.setTextColor(CommonFunctions.rgbToInt(theme.headerManagerColor))
+        txnHeaderBorderColor.setTextColor(CommonFunctions.rgbToInt(theme.headerBorderColor))
 
-        // 內文預覽: 背景(Col2)+作者(Col3)+內文(Col4)
-        val cBack = CommonFunctions.rgbToInt(txnContentBackColor.text.toString())
-        val cAuthor = CommonFunctions.rgbToInt(txnContentAuthorColor.text.toString())
-        val cText = CommonFunctions.rgbToInt(txnContentTextColor.text.toString())
-
-        txnContentBackColor.setTextColor(cText)
+        // 內文/引用預覽
+        val cBack = CommonFunctions.rgbToInt(theme.contentBackColor)
         txnContentBackColor.setBackgroundColor(cBack)
-        txnContentAuthorColor.setTextColor(cAuthor)
         txnContentAuthorColor.setBackgroundColor(cBack)
-        txnContentTextColor.setTextColor(cText)
         txnContentTextColor.setBackgroundColor(cBack)
+        txnContentAuthorColor.setTextColor(CommonFunctions.rgbToInt(theme.contentAuthorColor))
+        txnContentTextColor.setTextColor(CommonFunctions.rgbToInt(theme.contentTextColor))
 
-        // 引用預覽: 背景(Col2)+作者(Col3)+內文(Col4)
-        val qBack = CommonFunctions.rgbToInt(txnQuoteBackColor.text.toString())
-        val qAuthor = CommonFunctions.rgbToInt(txnQuoteAuthorColor.text.toString())
-        val qText = CommonFunctions.rgbToInt(txnQuoteTextColor.text.toString())
-
-        txnQuoteBackColor.setTextColor(qText)
+        val qBack = CommonFunctions.rgbToInt(theme.quoteBackColor)
         txnQuoteBackColor.setBackgroundColor(qBack)
-        txnQuoteAuthorColor.setTextColor(qAuthor)
         txnQuoteAuthorColor.setBackgroundColor(qBack)
-        txnQuoteTextColor.setTextColor(qText)
         txnQuoteTextColor.setBackgroundColor(qBack)
+        txnQuoteAuthorColor.setTextColor(CommonFunctions.rgbToInt(theme.quoteAuthorColor))
+        txnQuoteTextColor.setTextColor(CommonFunctions.rgbToInt(theme.quoteTextColor))
 
-        // === 加入看板列表預覽 ===
-        val lBack = CommonFunctions.rgbToInt(txnListBackColor.text.toString())
-
-        // 列表背景色套用到所有相關欄位的背景
+        // 看板列表預覽
+        val lBack = CommonFunctions.rgbToInt(theme.listBackColor)
+        val lDiv = CommonFunctions.rgbToInt(theme.listDividerColor)
         val listFields = listOf(
             txnListBackColor, txnListTitleColor, txnListTitleReadColor,
+            txnListTitleFollowFirstColor, txnListTitleFollowFirstReadColor,
             txnListTitleFollowColor, txnListTitleFollowReadColor,
             txnListMarkColor, txnListStatusColor, txnListNumberColor,
             txnListDateColor, txnListAuthorColor
         )
-        listFields.forEach {
-            it.setBackgroundColor(lBack)
+        listFields.forEach { 
+            it.setBackgroundColor(lBack) 
+            it.setTextColor(CommonFunctions.rgbToInt(theme.listTitleColor)) // 預設白字
         }
-
-        // 分隔線特殊處理：直接顯示該顏色作為背景
-        val lDivider = CommonFunctions.rgbToInt(txnListDividerColor.text.toString())
-        txnListDividerColor.setBackgroundColor(lDivider)
-        txnListDividerColor.setTextColor(lBack) // 文字用背景色以利閱讀 Hex
-
-        // 設定各欄位文字顏色
-        txnListBackColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleColor.text.toString()))
-        txnListTitleColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleColor.text.toString()))
-        txnListTitleReadColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleReadColor.text.toString()))
-        txnListTitleFollowColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleFollowColor.text.toString()))
-        txnListTitleFollowReadColor.setTextColor(CommonFunctions.rgbToInt(txnListTitleFollowReadColor.text.toString()))
-        txnListMarkColor.setTextColor(CommonFunctions.rgbToInt(txnListMarkColor.text.toString()))
-        txnListStatusColor.setTextColor(CommonFunctions.rgbToInt(txnListStatusColor.text.toString()))
-        txnListNumberColor.setTextColor(CommonFunctions.rgbToInt(txnListNumberColor.text.toString()))
-        txnListDateColor.setTextColor(CommonFunctions.rgbToInt(txnListDateColor.text.toString()))
-        txnListAuthorColor.setTextColor(CommonFunctions.rgbToInt(txnListAuthorColor.text.toString()))
+        
+        txnListTitleReadColor.setTextColor(CommonFunctions.rgbToInt(theme.listTitleReadColor))
+        txnListTitleFollowFirstColor.setTextColor(CommonFunctions.rgbToInt(theme.listTitleFollowFirstColor))
+        txnListTitleFollowFirstReadColor.setTextColor(CommonFunctions.rgbToInt(theme.listTitleFollowFirstReadColor))
+        txnListTitleFollowColor.setTextColor(CommonFunctions.rgbToInt(theme.listTitleFollowColor))
+        txnListTitleFollowReadColor.setTextColor(CommonFunctions.rgbToInt(theme.listTitleFollowReadColor))
+        txnListMarkColor.setTextColor(CommonFunctions.rgbToInt(theme.listMarkColor))
+        txnListStatusColor.setTextColor(CommonFunctions.rgbToInt(theme.listStatusColor))
+        txnListNumberColor.setTextColor(CommonFunctions.rgbToInt(theme.listNumberColor))
+        txnListDateColor.setTextColor(CommonFunctions.rgbToInt(theme.listDateColor))
+        txnListAuthorColor.setTextColor(CommonFunctions.rgbToInt(theme.listAuthorColor))
+        
+        txnListDividerColor.setBackgroundColor(lDiv)
+        txnListDividerColor.setTextColor(lBack)
     }
-    /** 變更套用新設定按鈕外觀 */
+
     private fun paintBtnUpdate(enabled: Boolean) {
         btnUpdate.visibility = if (enabled) View.VISIBLE else View.GONE
     }
 
-    /** 按下顏色文字跳出調色盤 */
     private val textClickListener = OnClickListener { view ->
         val colorRes = (view as TextView).text.toString()
-
         val dialogColorPicker = DialogColorPicker()
         dialogColorPicker.setFromRes(colorRes)
         dialogColorPicker.setListener(object: DialogColorPickerListener {
             override fun onSelectColor(colorRes: String) {
                 view.text = colorRes
+                // 即時反應到 theme 物件並重繪按鈕
+                val theme = ThemeStore.getSelectTheme()
+                updateThemeFromUI(theme)
                 paintToolbarButtons()
                 paintBtnUpdate(true)
             }
@@ -357,76 +347,72 @@ class ThemeManagerPage: TelnetPage() {
         dialogColorPicker.show()
     }
 
-    /** 還原外觀 */
     private val btnResetOnClickListener = OnClickListener { _->
-        // 還原
         val selectedIndex = ThemeStore.getSelectIndex()
-        val theme = ThemeStore.getDefaultTheme(selectedIndex)
-        ThemeStore.updateTheme(selectedIndex, theme)
-
-        // 套用版面
+        ThemeStore.updateTheme(selectedIndex, ThemeStore.getDefaultTheme(selectedIndex))
         paintToolbarText()
         paintToolbarButtons()
         paintBtnUpdate(false)
-
         mainLayout.clearFocus()
-
         ASToast.showShortToast(getContextString(R.string.theme_manager_page_msg02))
     }
-    /** 更新外觀 */
+
     private val btnUpdateOnClickListener = OnClickListener { _ ->
-        val selectedTheme = ThemeStore.getSelectTheme()
-        selectedTheme.name = txnName.text.toString()
-        selectedTheme.textColor = txnTextColor.text.toString()
-        selectedTheme.textColorPressed = txnTextColorPressed.text.toString()
-        selectedTheme.textColorDisabled = txnTextColorDisabled.text.toString()
-        selectedTheme.backgroundColor = txnBackColor.text.toString()
-        selectedTheme.backgroundColorPressed = txnBackColorPressed.text.toString()
-        selectedTheme.backgroundColorDisabled = txnBackColorDisabled.text.toString()
-
-        selectedTheme.headerBackColor = txnHeaderBackColor.text.toString()
-        selectedTheme.headerHeaderColor = txnHeaderHeaderColor.text.toString()
-        selectedTheme.headerManagerColor = txnHeaderManagerColor.text.toString()
-        selectedTheme.headerBorderColor = txnHeaderBorderColor.text.toString()
-
-        selectedTheme.contentBackColor = txnContentBackColor.text.toString()
-        selectedTheme.contentAuthorColor = txnContentAuthorColor.text.toString()
-        selectedTheme.contentTextColor = txnContentTextColor.text.toString()
-
-        selectedTheme.quoteBackColor = txnQuoteBackColor.text.toString()
-        selectedTheme.quoteAuthorColor = txnQuoteAuthorColor.text.toString()
-        selectedTheme.quoteTextColor = txnQuoteTextColor.text.toString()
-
-        selectedTheme.listBackColor = txnListBackColor.text.toString()
-        selectedTheme.listTitleColor = txnListTitleColor.text.toString()
-        selectedTheme.listTitleReadColor = txnListTitleReadColor.text.toString()
-        selectedTheme.listTitleFollowColor = txnListTitleFollowColor.text.toString()
-        selectedTheme.listTitleFollowReadColor = txnListTitleFollowReadColor.text.toString()
-        selectedTheme.listNumberColor = txnListNumberColor.text.toString()
-        selectedTheme.listDateColor = txnListDateColor.text.toString()
-        selectedTheme.listAuthorColor = txnListAuthorColor.text.toString()
-        selectedTheme.listMarkColor = txnListMarkColor.text.toString()
-        selectedTheme.listStatusColor = txnListStatusColor.text.toString()
-        selectedTheme.listDividerColor = txnListDividerColor.text.toString()
-
-        // 更新
-        ThemeStore.updateTheme(ThemeStore.getSelectIndex(), selectedTheme)
-
-        // 套用版面
+        val theme = ThemeStore.getSelectTheme()
+        updateThemeFromUI(theme)
+        ThemeStore.updateTheme(ThemeStore.getSelectIndex(), theme)
         paintToolbarText()
         paintToolbarButtons()
         paintBtnUpdate(false)
-
-        // 產生外觀列的按鈕
+        
         val themes = ThemeStore.getThemeStore()
-        themes.forEachIndexed { index, theme ->
-            val button: Button = buttonIds[index]
-            button.text = theme.name
-        }
-
+        themes.forEachIndexed { index, t -> buttonIds[index].text = t.name }
         mainLayout.clearFocus()
-
         ASToast.showShortToast(getContextString(R.string.theme_manager_page_msg01))
+    }
+
+    private fun updateThemeFromUI(theme: Theme) {
+        theme.name = txnName.text.toString()
+        theme.textColor = txnTextColor.text.toString()
+        theme.textColorPressed = txnTextColorPressed.text.toString()
+        theme.textColorDisabled = txnTextColorDisabled.text.toString()
+        theme.backgroundColor = txnBackColor.text.toString()
+        theme.backgroundColorPressed = txnBackColorPressed.text.toString()
+        theme.backgroundColorDisabled = txnBackColorDisabled.text.toString()
+
+        theme.textColorDanger = txnTextColorDanger.text.toString()
+        theme.textColorDangerPressed = txnTextColorDangerPressed.text.toString()
+        theme.textColorDangerDisabled = txnTextColorDangerDisabled.text.toString()
+        theme.backgroundColorDanger = txnBackColorDanger.text.toString()
+        theme.backgroundColorDangerPressed = txnBackColorDangerPressed.text.toString()
+        theme.backgroundColorDangerDisabled = txnBackColorDangerDisabled.text.toString()
+        
+        theme.headerBackColor = txnHeaderBackColor.text.toString()
+        theme.headerHeaderColor = txnHeaderHeaderColor.text.toString()
+        theme.headerManagerColor = txnHeaderManagerColor.text.toString()
+        theme.headerBorderColor = txnHeaderBorderColor.text.toString()
+        
+        theme.contentBackColor = txnContentBackColor.text.toString()
+        theme.contentAuthorColor = txnContentAuthorColor.text.toString()
+        theme.contentTextColor = txnContentTextColor.text.toString()
+        
+        theme.quoteBackColor = txnQuoteBackColor.text.toString()
+        theme.quoteAuthorColor = txnQuoteAuthorColor.text.toString()
+        theme.quoteTextColor = txnQuoteTextColor.text.toString()
+        
+        theme.listBackColor = txnListBackColor.text.toString()
+        theme.listTitleColor = txnListTitleColor.text.toString()
+        theme.listTitleReadColor = txnListTitleReadColor.text.toString()
+        theme.listTitleFollowFirstColor = txnListTitleFollowFirstColor.text.toString()
+        theme.listTitleFollowFirstReadColor = txnListTitleFollowFirstReadColor.text.toString()
+        theme.listTitleFollowColor = txnListTitleFollowColor.text.toString()
+        theme.listTitleFollowReadColor = txnListTitleFollowReadColor.text.toString()
+        theme.listNumberColor = txnListNumberColor.text.toString()
+        theme.listDateColor = txnListDateColor.text.toString()
+        theme.listAuthorColor = txnListAuthorColor.text.toString()
+        theme.listMarkColor = txnListMarkColor.text.toString()
+        theme.listStatusColor = txnListStatusColor.text.toString()
+        theme.listDividerColor = txnListDividerColor.text.toString()
     }
 
     override fun onBackPressed(): Boolean {
@@ -436,7 +422,6 @@ class ThemeManagerPage: TelnetPage() {
 
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        ASToast.showShortToast("返回")
         return true
     }
 }

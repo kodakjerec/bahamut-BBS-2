@@ -12,6 +12,14 @@ class Theme {
     var textColorDisabled:String = "#FF608060"
     var backgroundColorDisabled:String = "#FF001A1A"
 
+    // 工具列按鈕 (Danger)
+    var textColorDanger:String = "#FFFFFFFF"
+    var backgroundColorDanger:String = "#FF800000"
+    var textColorDangerPressed:String = "#FF000000"
+    var backgroundColorDangerPressed:String = "#FFFF0000"
+    var textColorDangerDisabled:String = "#FF808080"
+    var backgroundColorDangerDisabled:String = "#FF400000"
+
     // 標題列
     var headerBackColor: String = "#FF000060"
     var headerHeaderColor: String = "#FFF0F080"
@@ -52,6 +60,13 @@ class Theme {
         textColorDisabled = obj.optString("tCD", textColorDisabled)
         backgroundColorDisabled = obj.optString("bCD", backgroundColorDisabled)
 
+        textColorDanger = obj.optString("tCDG", textColorDanger)
+        backgroundColorDanger = obj.optString("bCDG", backgroundColorDanger)
+        textColorDangerPressed = obj.optString("tCDGP", textColorDangerPressed)
+        backgroundColorDangerPressed = obj.optString("bCDGP", backgroundColorDangerPressed)
+        textColorDangerDisabled = obj.optString("tCDGD", textColorDangerDisabled)
+        backgroundColorDangerDisabled = obj.optString("bCDGD", backgroundColorDangerDisabled)
+
         headerBackColor = obj.optString("hBC", headerBackColor) // 標題列背景
         headerHeaderColor = obj.optString("hHC", headerHeaderColor) // 標題列標題
         headerManagerColor = obj.optString("hMC", headerManagerColor) // 標題列版主
@@ -91,6 +106,13 @@ class Theme {
         obj.put("bCP", backgroundColorPressed)
         obj.put("tCD", textColorDisabled)
         obj.put("bCD", backgroundColorDisabled)
+
+        obj.put("tCDG", textColorDanger)
+        obj.put("bCDG", backgroundColorDanger)
+        obj.put("tCDGP", textColorDangerPressed)
+        obj.put("bCDGP", backgroundColorDangerPressed)
+        obj.put("tCDGD", textColorDangerDisabled)
+        obj.put("bCDGD", backgroundColorDangerDisabled)
 
         obj.put("hBC", headerBackColor) // 標題列背景
         obj.put("hHC", headerHeaderColor) // 標題列標題

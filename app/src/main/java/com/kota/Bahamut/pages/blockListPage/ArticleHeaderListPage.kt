@@ -3,6 +3,7 @@ package com.kota.Bahamut.pages.blockListPage
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -180,13 +181,15 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             onBackPressed()
         }
 
-        // --- 套用佈景主題 ---
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
-        // -----------------------
-
         showNotification()
 
         reload()
+
+        val mainLayout = findViewById(R.id.content_view) as ViewGroup
+        // 套用外觀
+        mainLayout.post {
+            ThemeFunctions().applyThemeToContent(mainLayout)
+        }
     }
 
     // 第一次進入的提示訊息

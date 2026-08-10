@@ -3,8 +3,8 @@ package com.kota.Bahamut.pages.blockListPage
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.LinearLayout
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,12 +35,12 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         get() = true
 
     // 按下新增
-    var addListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    var addListener: View.OnClickListener = View.OnClickListener { _: View? ->
         if (inputField != null) {
             val blockName = inputField?.text.toString().trim()
             inputField?.setText("")
             if (blockName.isNotEmpty()) {
-                val newList: MutableList<String> = UserSettings.Companion.blockList
+                val newList: MutableList<String> = UserSettings.blockList
                 if (newList.contains(blockName)) {
                     showErrorDialog(
                         getContextString(R.string.already_have_item),
@@ -49,7 +49,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 } else {
                     newList.add(blockName)
                 }
-                UserSettings.Companion.blockList = newList
+                UserSettings.blockList = newList
 
                 notifyDataUpdated()
                 this@BlockListPage.reload()
@@ -60,13 +60,13 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     }
 
     // 按下重置
-    var resetListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    var resetListener: View.OnClickListener = View.OnClickListener { _: View? ->
         createDialog()
             .setTitle(getContextString(R.string.reset))
             .setMessage(getContextString(R.string.reset_message))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.sure))
-            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
+            .setListener { _: ASAlertDialog?, buttonIndex: Int ->
                 if (buttonIndex > 0) {
                     showShortToast(getContextString(R.string.reset_ok))
                     inputField?.setText("")
@@ -133,7 +133,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                             dragView?.setBackgroundResource(R.color.transparent)
                             dragView = null
                         }
-                        UserSettings.Companion.blockList = this@BlockListPage.blockList
+                        UserSettings.blockList = this@BlockListPage.blockList
                     }
                     isSwiped = false
                     isDragged = false
@@ -172,13 +172,15 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             onBackPressed()
         }
 
-        // --- 套用佈景主題 (套用到 id 為 toolbar 的 LinearLayout) ---
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
-        // -----------------------
-
         showNotification()
 
         reload()
+
+        val mainLayout = findViewById(R.id.content_view) as ViewGroup
+        // 套用外觀
+        mainLayout.post {
+            ThemeFunctions().applyThemeToContent(mainLayout)
+        }
     }
 
     // 第一次進入的提示訊息
@@ -201,7 +203,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun reload() {
-        val temp: MutableList<String> = UserSettings.Companion.blockList
+        val temp: MutableList<String> = UserSettings.blockList
         blockList.clear()
         blockList.addAll(temp)
         blockListAdapter?.notifyDataSetChanged()
@@ -224,7 +226,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         newList.removeAt(deletedIndex)
 
         // 更新
-        UserSettings.Companion.blockList = this@BlockListPage.blockList
+        UserSettings.blockList = this@BlockListPage.blockList
         this@BlockListPage.reload()
     }
 }

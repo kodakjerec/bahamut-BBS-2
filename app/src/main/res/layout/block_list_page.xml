@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/content_view">
     <View style="@style/ItemViewDividerHorizontal"/>
     <LinearLayout
         android:gravity="center_vertical"
@@ -27,7 +32,7 @@
             android:hint="@string/please_input_id"
             android:inputType="text"
             android:singleLine="true"
-            android:textColor="@color/white" />
+            android:tag="normalText" />
         <Button
             android:id="@+id/BlockList_Add"
             style="@style/ToolbarItem.Danger"

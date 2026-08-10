@@ -67,7 +67,7 @@ class UserConfigPage: TelnetPage() {
         }
 
         // 新增：套用佈景主題
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
+        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     /** 收到回傳的資料內容 */

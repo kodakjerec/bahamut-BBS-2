@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.CompoundButton
 import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import android.widget.Spinner
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import android.widget.TextView
@@ -62,7 +63,7 @@ import com.kota.Bahamut.service.TempSettings.myContext
 import com.kota.asFramework.thread.ASCoroutine
 
 class SystemSettingsPage : TelnetPage() {
-    var mainLayout: LinearLayout? = null
+    var mainLayout: RelativeLayout? = null
     var autoToChatEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             propertiesAutoToChat = isChecked
@@ -328,7 +329,7 @@ class SystemSettingsPage : TelnetPage() {
 
     @SuppressLint("SetTextI18n")
     override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as LinearLayout?
+        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
 
         // 黑名單
         mainLayout?.findViewById<View>(R.id.SystemSettings_blockListSetting)!!
