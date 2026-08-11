@@ -38,9 +38,12 @@ class DialogInsertExpression : ASDialog() {
 
         mainView = findViewById<ScrollView>(R.id.dialog_insert_expressions_scrollView)
         titleLabel = findViewById<TextView?>(R.id.dialog_insert_expressions_title)
+        titleLabel?.tag = "dialogTitle"
         itemBlock = findViewById<LinearLayout>(R.id.dialog_insert_expressions_content)
 
-        findViewById<View>(R.id.dialog_insert_expressions_setting).setOnClickListener(
+        val settingButton = findViewById<View>(R.id.dialog_insert_expressions_setting)
+        settingButton.tag = "normalText"
+        settingButton.setOnClickListener(
             settingListener
         )
         setDialogWidth(mainView)
@@ -88,6 +91,7 @@ class DialogInsertExpression : ASDialog() {
 
     fun createDivider(): View {
         val divider = View(context)
+        divider.tag = "listDivider"
         val dividerHeight = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
@@ -102,6 +106,7 @@ class DialogInsertExpression : ASDialog() {
 
     private fun createButton(): Button {
         val button = Button(context)
+        button.tag = "ToolbarItem.Danger"
         button.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT

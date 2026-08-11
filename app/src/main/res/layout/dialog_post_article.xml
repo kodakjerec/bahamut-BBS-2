@@ -2,7 +2,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
     <LinearLayout android:orientation="vertical" android:background="@color/black" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white" android:background="@color/list_page_item_arrow_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/confirm" style="@style/TextViewLarge"/>
+            android:textColor="@color/white" android:background="@color/list_page_item_arrow_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/confirm" android:tag="dialogTitle" style="@style/TextViewLarge"/>
         <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
 
             <LinearLayout
@@ -15,6 +15,7 @@
                     style="@style/TextViewNormal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:tag="normalText"
                     android:text="@string/is_post_article"
                     android:textColor="@color/white" />
 
@@ -29,6 +30,7 @@
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:tag="normalText"
                         android:text="@string/is_post_article_reply"
                         android:textColor="@color/white" />
 
@@ -83,6 +85,7 @@
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:tag="normalText"
                         android:text="@string/select_sign"
                         android:textColor="@color/white" />
 
@@ -98,6 +101,7 @@
                     <Button
                         android:id="@+id/cancel"
                         style="@style/DialogToolbarItem"
+                        android:tag="ToolbarItem.Danger"
                         android:text="@string/cancel" />
 
                     <View style="@style/ToolbarDivider" />
@@ -105,6 +109,7 @@
                     <Button
                         android:id="@+id/send"
                         style="@style/DialogToolbarItem"
+                        android:tag="ToolbarItem.Danger"
                         android:text="@string/send" />
                 </LinearLayout>
             </LinearLayout>

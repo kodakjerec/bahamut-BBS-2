@@ -11,6 +11,7 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import com.kota.Bahamut.R
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import java.util.Vector
 import kotlin.math.ceil
 
@@ -23,6 +24,7 @@ class ASListDialog : ASDialog() {
     private var dialogWidth = 280.0f
     private var scrollView: ScrollView? = null
     private var itemTextSize = 1
+    private var rootFrame: LinearLayout? = null
 
     private class ASListDialogItem {
         var button: Button? = null
@@ -56,6 +58,7 @@ class ASListDialog : ASDialog() {
             context.resources.displayMetrics
         ).toInt()
         val frame = LinearLayout(context)
+        this.rootFrame = frame
         frame.setBackgroundResource(R.color.dialog_border_color)
         frame.setPadding(framePadding, framePadding, framePadding, framePadding)
         val contentView = LinearLayout(context)
@@ -86,6 +89,7 @@ class ASListDialog : ASDialog() {
         this.contentView?.gravity = Gravity.CENTER
         this.scrollView?.addView(this.contentView)
         this.titleLabel = TextView(context)
+        this.titleLabel?.tag = "dialogTitle"
         this.titleLabel?.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -130,8 +134,9 @@ class ASListDialog : ASDialog() {
         return this
     }
 
-    fun addItem(aItemTitle: String?): ASListDialog {
-        val button = createButton()
+    @JvmOverloads
+    fun addItem(aItemTitle: String?, isDanger: Boolean = false): ASListDialog {
+        val button = createButton(isDanger)
         button.setOnClickListener { v: View? ->
             this@ASListDialog.onItemClicked(
                 v as Button?
@@ -160,6 +165,7 @@ class ASListDialog : ASDialog() {
 
     fun createDivider(): View {
         val divider = View(context)
+        divider.tag = "listDivider"
         val dividerHeight = ceil(
             TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
@@ -172,8 +178,9 @@ class ASListDialog : ASDialog() {
         return divider
     }
 
-    private fun createButton(): Button {
+    private fun createButton(isDanger: Boolean = false): Button {
         val button = Button(context)
+        button.tag = if (isDanger) "ToolbarItem.Danger" else "normalButton"
         button.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -258,6 +265,10 @@ class ASListDialog : ASDialog() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         return this
+    }
+
+    override fun show() {
+        super.show()
     }
 
     companion object {

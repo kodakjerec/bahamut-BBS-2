@@ -137,7 +137,7 @@ class MessageMain:TelnetPage() {
         ASListDialog.createDialog()
             .setTitle(getContextString(R.string.setting))
             .addItem(getContextString(R.string.message_main_setting01))
-            .addItem(getContextString(R.string.message_main_setting02))
+            .addItem(getContextString(R.string.message_main_setting02), true)
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemLongClicked(
                     paramASListDialog: ASListDialog?,

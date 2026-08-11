@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.view.View
 import android.view.ViewGroup
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.pageController.ASViewControllerDisappearListener
@@ -52,6 +53,14 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         try {
             super.show()
             this.isShowing = true
+            // 套用主題
+            val container = window?.findViewById<ViewGroup>(android.R.id.content)
+            if (container != null && container.childCount > 0) {
+                val root = container.getChildAt(0)
+                if (root is ViewGroup) {
+                    ThemeFunctions().applyThemeToDialog(root)
+                }
+            }
         } catch (_: Exception) {
         }
     }

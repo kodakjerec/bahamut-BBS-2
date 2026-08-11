@@ -31,6 +31,8 @@ class DialogReference : ASDialog(), View.OnClickListener {
 
         sendButton = mainLayout.findViewById(R.id.Dialog_reference_Send_Button)
         cancelButton = mainLayout.findViewById(R.id.Dialog_reference_Cancel_Button)
+        sendButton.tag = "ToolbarItem.Danger"
+        cancelButton.tag = "ToolbarItem.Danger"
         sendButton.setOnClickListener(this)
         cancelButton.setOnClickListener(this)
 

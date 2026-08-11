@@ -158,8 +158,10 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
 
         // 按鈕
         sendButton = mainLayout.findViewById<Button>(R.id.send)
+        sendButton.tag = "ToolbarItem.Danger"
         sendButton.setOnClickListener(this)
         cancelButton = mainLayout.findViewById<Button>(R.id.cancel)
+        cancelButton.tag = "ToolbarItem.Danger"
         cancelButton.setOnClickListener(this)
 
         setDialogWidth(mainLayout)

@@ -413,21 +413,11 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             if (view !== titleField) {
                 return@OnFocusChangeListener
             }
-            // 取得主題顏色
-            val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
-            val titleColor = com.kota.Bahamut.service.CommonFunctions.rgbToInt(theme.listTitleColor)
-            val transparent = 0 // 透明
-
             if (hasFocus) {
                 titleField?.isSingleLine = false
-                titleField?.setTextColor(titleColor)
-                titleFieldBackground?.setTextColor(transparent)
-                return@OnFocusChangeListener
+            } else {
+                titleField?.isSingleLine = true
             }
-            titleField?.isSingleLine = true
-            titleField?.setTextColor(transparent)
-            titleFieldBackground?.setTextColor(titleColor)
-            titleFieldBackground?.text = titleField?.text.toString()
         }
 
     fun setHeaderHidden(hidden: Boolean) {

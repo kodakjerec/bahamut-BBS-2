@@ -43,6 +43,8 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
         )
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         this.signSpinner.adapter = adapter
+        this.sendButton.tag = "ToolbarItem.Danger"
+        this.cancelButton.tag = "ToolbarItem.Danger"
         this.sendButton.setOnClickListener(this)
         this.cancelButton.setOnClickListener(this)
     }

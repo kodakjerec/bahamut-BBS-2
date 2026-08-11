@@ -552,7 +552,7 @@ class ArticlePage : TelnetPage() {
                 .addItem(getContextString(R.string.do_push))
                 .addItem(getContextString(R.string.change_mode))
                 .addItem(if (author == logonUser) getContextString(R.string.edit_article) else null)
-                .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null)
+                .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null, true)
                 .addItem(externalToolbarEnableTitle)
                 .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
                 .addItem(getContextString(R.string.open_url))

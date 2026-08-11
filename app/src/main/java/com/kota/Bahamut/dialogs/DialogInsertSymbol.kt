@@ -3,12 +3,14 @@ package com.kota.Bahamut.dialogs
 import android.database.DataSetObserver
 import android.view.View
 import android.view.ViewGroup
+import android.view.Gravity
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import android.widget.GridView
 import android.widget.ListAdapter
 import android.widget.TextView
+import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
 
@@ -28,11 +30,7 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
         for (i in list.indices) {
             list[i] = this.symbols[i].toString()
         }
-        this.mainView.adapter = ArrayAdapter<String?>(
-            context,
-            R.layout.simple_list_item_1,
-            list
-        )
+        this.mainView.adapter = this
         setDialogWidth(mainView)
     }
 
@@ -60,13 +58,22 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var convertView = convertView
-        if (convertView == null) {
-            convertView = TextView(context)
-            convertView.layoutParams = ViewGroup.LayoutParams(100, 100)
+        var view = convertView
+        if (view == null) {
+            view = TextView(context)
+            view.layoutParams = ViewGroup.LayoutParams(100, 100)
+            view.gravity = Gravity.CENTER
+            view.textSize = 24f
+            view.tag = "normalText"
         }
-        (convertView as TextView).text = getItem(position)
-        return convertView
+        val textView = view as TextView
+        textView.text = getItem(position)
+        
+        // 套用主題顏色 (normalText 對應內容作者顏色)
+        val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
+        textView.setTextColor(com.kota.Bahamut.service.CommonFunctions.rgbToInt(theme.contentAuthorColor))
+        
+        return textView
     }
 
     override fun getViewTypeCount(): Int {

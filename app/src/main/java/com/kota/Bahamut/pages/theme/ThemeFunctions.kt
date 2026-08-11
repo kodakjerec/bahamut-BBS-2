@@ -20,6 +20,7 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
 import com.kota.Bahamut.service.CommonFunctions.rgbToInt
 import com.kota.Bahamut.service.TempSettings
 import com.kota.telnetUI.TelnetHeaderItemView
+import androidx.core.view.isNotEmpty
 
 class ThemeFunctions {
     private lateinit var theme:Theme
@@ -55,119 +56,109 @@ class ThemeFunctions {
         for (i in 0 until viewGroup.childCount) {
             val childView: View = viewGroup.getChildAt(i)
 
-            // 避開工具列元件 (ToolbarItem)
+            // 處理按鈕與文字元件
+            var handled = false
             if (childView.tag != null) {
-                when (childView.tag.toString()) {
-                    "normalButton", "ToolbarItem" -> {
-                        // 避免共用bug, 每次獨立產生
-                        // 文字
-                        val colorStateList = ColorStateList(
-                            arrayOf(
-                                intArrayOf(android.R.attr.state_pressed),
-                                intArrayOf(android.R.attr.state_enabled),
-                                intArrayOf()
-                            ), // States
-                            intArrayOf(
-                                rgbToInt(theme.textColorPressed),
-                                rgbToInt(theme.textColor),
-                                rgbToInt(theme.textColorDisabled)
-                            ) // Colors for each state
-                        )
-                        // 背景
-                        val backgroundDrawable = StateListDrawable()
-                        backgroundDrawable.addState(
-                            intArrayOf(android.R.attr.state_pressed),
-                            rgbToInt(theme.backgroundColorPressed).toDrawable()
-                        )
-                        backgroundDrawable.addState(
-                            intArrayOf(android.R.attr.state_enabled),
-                            rgbToInt(theme.backgroundColor).toDrawable()
-                        )
-                        backgroundDrawable.addState(
-                            intArrayOf(),
-                            rgbToInt(theme.backgroundColorDisabled).toDrawable()
-                        )
-
-                        if (childView is Button) {
-                            childView.setTextColor(colorStateList)
-                        } else if (childView is TextView) {
-                            childView.setTextColor(colorStateList)
+                val tagStr = childView.tag.toString()
+                if (tagStr == "normalButton" || tagStr == "ToolbarItem" || tagStr == "ToolbarItem.Danger") {
+                    applyButtonStyle(childView, tagStr == "ToolbarItem.Danger")
+                    handled = true
+                } else {
+                    when (tagStr) {
+                        "normalText" -> {
+                            val tempChildView = childView as TextView
+                            tempChildView.setTextColor(rgbToInt(theme.contentAuthorColor))
+                            handled = true
                         }
-                        childView.background = backgroundDrawable
-                    }
-                    "ToolbarItem.Danger" -> {
-                        // 文字
-                        val colorStateList = ColorStateList(
-                            arrayOf(
-                                intArrayOf(android.R.attr.state_pressed),
-                                intArrayOf(android.R.attr.state_enabled),
-                                intArrayOf()
-                            ), // States
-                            intArrayOf(
-                                rgbToInt(theme.textColorDangerPressed),
-                                rgbToInt(theme.textColorDanger),
-                                rgbToInt(theme.textColorDangerDisabled)
-                            ) // Colors for each state
-                        )
-                        // 背景
-                        val backgroundDrawable = StateListDrawable()
-                        backgroundDrawable.addState(
-                            intArrayOf(android.R.attr.state_pressed),
-                            rgbToInt(theme.backgroundColorDangerPressed).toDrawable()
-                        )
-                        backgroundDrawable.addState(
-                            intArrayOf(android.R.attr.state_enabled),
-                            rgbToInt(theme.backgroundColorDanger).toDrawable()
-                        )
-                        backgroundDrawable.addState(
-                            intArrayOf(),
-                            rgbToInt(theme.backgroundColorDangerDisabled).toDrawable()
-                        )
-
-                        if (childView is Button) {
-                            childView.setTextColor(colorStateList)
-                        } else if (childView is TextView) {
-                            childView.setTextColor(colorStateList)
+                        "dialogTitle" -> {
+                            val tempChildView = childView as TextView
+                            tempChildView.setBackgroundColor(rgbToInt(theme.headerBackColor))
+                            tempChildView.setTextColor(rgbToInt(theme.headerHeaderColor))
+                            handled = true
                         }
-                        childView.background = backgroundDrawable
-                    }
-                    "normalText" -> {
-                        val tempChildView = childView as TextView
-                        tempChildView.setTextColor(rgbToInt(theme.contentAuthorColor))
-                    }
-                    "dialogTitle" -> {
-                        val tempChildView = childView as TextView
-                        tempChildView.setBackgroundColor(rgbToInt(theme.headerBackColor))
-                        tempChildView.setTextColor(rgbToInt(theme.headerHeaderColor))
-                    }
-                    "rightArrow" -> {
-                        applyThemeToRightArrow(childView)
+                        "listDivider" -> {
+                            childView.setBackgroundColor(rgbToInt(theme.listDividerColor))
+                            handled = true
+                        }
+                        "rightArrow" -> {
+                            applyThemeToRightArrow(childView)
+                            handled = true
+                        }
                     }
                 }
-            } else if (childView is android.widget.CompoundButton) {
-                // 針對 RadioButton 處理文字顏色
-                if (childView is android.widget.RadioButton) {
-                    childView.setTextColor(rgbToInt(theme.contentAuthorColor))
-                    // 套用 Tint
-                    childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
-                } else if (childView is CheckBox) {
-                    // 1. 設定文字顏色
-                    childView.setTextColor(rgbToInt(theme.contentTextColor))
-                    // 2. 設定勾選框的 Tint (例如使用主題的按壓文字色作為強調色)
-                    childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
-                }
-            } else if (childView is Spinner) {
-                applyThemeToSpinner(childView)
-                continue
-            } else if (childView is ViewGroup) {
-                // 排除 telnetHeaderView
-                if (childView is TelnetHeaderItemView) {
+            }
+
+            if (!handled) {
+                if (childView is android.widget.CompoundButton) {
+                    // 優先處理勾選框/單選鈕 (它們也是 Button 的子類)
+                    if (childView is android.widget.RadioButton) {
+                        childView.setTextColor(rgbToInt(theme.contentAuthorColor))
+                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
+                    } else if (childView is CheckBox) {
+                        childView.setTextColor(rgbToInt(theme.contentAuthorColor))
+                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
+                    }
+                    handled = true
+                } else if (childView is Button) {
+                    // 對於沒有 Tag 的按鈕，預設套用一般按鈕樣式 (針對對話框按鈕)
+                    applyButtonStyle(childView, false)
+                    handled = true
+                } else if (childView is Spinner) {
+                    applyThemeToSpinner(childView)
                     continue
+                } else if (childView is ViewGroup) {
+                    // 排除 telnetHeaderView
+                    if (childView is TelnetHeaderItemView) {
+                        continue
+                    }
+                    childView.setBackgroundColor(backColor)
+                    recursiveApplyContent(childView, backColor, textColor)
                 }
-                childView.setBackgroundColor(backColor)
-                recursiveApplyContent(childView, backColor, textColor)
             }
         }
+    }
+
+    /** 套用按鈕樣式 */
+    fun applyButtonStyle(view: View, isDanger: Boolean) {
+        theme = ThemeStore.getSelectTheme()
+        // 文字顏色狀態
+        val colorStateList = if (isDanger) {
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()),
+                intArrayOf(rgbToInt(theme.textColorDangerPressed), rgbToInt(theme.textColorDanger), rgbToInt(theme.textColorDangerDisabled))
+            )
+        } else {
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_pressed), intArrayOf(android.R.attr.state_enabled), intArrayOf()),
+                intArrayOf(rgbToInt(theme.textColorPressed), rgbToInt(theme.textColor), rgbToInt(theme.textColorDisabled))
+            )
+        }
+
+        // 背景圖案狀態
+        val backgroundDrawable = StateListDrawable()
+        if (isDanger) {
+            backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), rgbToInt(theme.backgroundColorDangerPressed).toDrawable())
+            backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), rgbToInt(theme.backgroundColorDanger).toDrawable())
+            backgroundDrawable.addState(intArrayOf(), rgbToInt(theme.backgroundColorDangerDisabled).toDrawable())
+        } else {
+            backgroundDrawable.addState(intArrayOf(android.R.attr.state_pressed), rgbToInt(theme.backgroundColorPressed).toDrawable())
+            backgroundDrawable.addState(intArrayOf(android.R.attr.state_enabled), rgbToInt(theme.backgroundColor).toDrawable())
+            backgroundDrawable.addState(intArrayOf(), rgbToInt(theme.backgroundColorDisabled).toDrawable())
+        }
+
+        if (view is Button) {
+            view.setTextColor(colorStateList)
+        } else if (view is TextView) {
+            view.setTextColor(colorStateList)
+        } else if (view is ViewGroup) {
+            for (j in 0 until view.childCount) {
+                val subView = view.getChildAt(j)
+                if (subView is TextView) {
+                    subView.setTextColor(colorStateList)
+                }
+            }
+        }
+        view.background = backgroundDrawable
     }
 
     /**
@@ -540,8 +531,9 @@ class ThemeFunctions {
 
     private fun applyThemeToSpinner(spinner: Spinner) {
         // --- 針對 Spinner 套用標題列配色 ---
+        theme = ThemeStore.getSelectTheme()
         val hBack = rgbToInt(theme.contentBackColor)
-        val hTitle = rgbToInt(theme.contentTextColor)
+        val hTitle = rgbToInt(theme.contentAuthorColor)
 
         // 設定 Spinner 本身的背景色 (標題列背景)
         spinner.setBackgroundColor(hBack)
@@ -549,11 +541,20 @@ class ThemeFunctions {
         // --- 設定下拉選單的背景色 ---
         spinner.setPopupBackgroundDrawable(hBack.toDrawable())
 
-        // 遍歷 Spinner 的子元件 (通常是顯示選中項目的 TextView) 並設定顏色
+        // 由於 Spinner 的子 View 是非同步產生的，我們使用監聽器來確保著色
+        spinner.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
+            override fun onChildViewAdded(parent: View?, child: View?) {
+                if (child is TextView) {
+                    child.setTextColor(hTitle)
+                }
+            }
+            override fun onChildViewRemoved(parent: View?, child: View?) {}
+        })
+
+        // 遍歷現有的子元件並設定顏色
         for (j in 0 until spinner.childCount) {
             val subView = spinner.getChildAt(j)
             if (subView is TextView) {
-                print(subView.text)
                 subView.setTextColor(hTitle)
             }
         }
@@ -604,7 +605,7 @@ class ThemeFunctions {
 
         // 2. [載入中] 按鈕 (在 thumbnail_default 內)
         val defaultLayout = view.findViewById<ViewGroup>(R.id.thumbnail_default)
-        if (defaultLayout != null && defaultLayout.childCount > 0) {
+        if (defaultLayout != null && defaultLayout.isNotEmpty()) {
             val loadingButton = defaultLayout.getChildAt(0)
             if (loadingButton is Button) {
                 loadingButton.setTextColor(textColor)
@@ -620,7 +621,7 @@ class ThemeFunctions {
         if (container == null) return
         theme = ThemeStore.getSelectTheme()
         val backColor = rgbToInt(theme.contentBackColor)
-        val titleColor = rgbToInt(theme.contentAuthorColor)
+        val textColor = rgbToInt(theme.contentTextColor)
 
         // 設定整體背景
         container.setBackgroundColor(backColor)
@@ -631,16 +632,38 @@ class ThemeFunctions {
         val titleFieldBackground = container.findViewById<TextView>(R.id.ArticlePostDialog_TitleFieldBackground)
         val headSelect = container.findViewById<Spinner>(R.id.Post_headerSelector)
 
-        titleField?.setTextColor(titleColor)
+        // 標題欄位 (統一使用內文色與背景色)
+        titleField?.setTextColor(textColor)
+        titleField?.setHintTextColor((textColor and 0x00FFFFFF) or 0x80000000.toInt())
         titleField?.setBackgroundColor(backColor)
 
-        editField?.setTextColor(titleColor)
+        // 內文欄位
+        editField?.setTextColor(textColor)
+        editField?.setHintTextColor((textColor and 0x00FFFFFF) or 0x80000000.toInt())
         editField?.setBackgroundColor(backColor)
 
-        // 這裡設定背景 TextView 的顏色 (平時顯示用)
-        titleFieldBackground?.setTextColor(titleColor)
-        titleFieldBackground?.setBackgroundColor(backColor)
+        // 隱藏舊的背景補位元件，避免干擾
+        titleFieldBackground?.visibility = View.GONE
 
         applyThemeToSpinner(headSelect)
+
+        // 遞迴處理工具列按鈕與其餘元件
+        recursiveApplyContent(container, backColor, textColor)
+    }
+
+    /**
+     * 專門套用對話框 (如 ASListDialog) 的主題
+     */
+    fun applyThemeToDialog(container: ViewGroup?) {
+        if (container == null) return
+        theme = ThemeStore.getSelectTheme()
+        val cBack = rgbToInt(theme.contentBackColor)
+        val lDivider = rgbToInt(theme.listDividerColor)
+
+        // 1. 設定外層邊框背景 (通常是 frame)
+        container.setBackgroundColor(lDivider)
+
+        // 2. 遞迴處理子元件 (標題、按鈕等)
+        recursiveApplyContent(container, cBack, rgbToInt(theme.contentTextColor))
     }
 }
