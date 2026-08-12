@@ -4,7 +4,7 @@
     android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/header_item_view">
     <LinearLayout
         android:orientation="vertical"
-        android:background="@color/title_bar_background_color"
+        android:background="?attr/titleBarBackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="@color/white"
+                android:textColor="?attr/defaultTextColor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 

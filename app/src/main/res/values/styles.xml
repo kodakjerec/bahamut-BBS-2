@@ -4,25 +4,62 @@
         <item name="android:minWidth">60dp</item>
         <item name="android:minHeight">60dp</item>
     </style>
-    <style name="TitleBar">
-        <item name="android:background">@color/title_bar_background_color</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
+
+    <style name="MyTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- 基礎視窗設定 -->
+        <item name="android:windowBackground">@color/black</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:textColorHint">@android:color/tab_indicator_text</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+
+        <!-- 自定義主題色彩屬性 -->
+        <item name="titleBarBackground">@color/title_bar_background_color</item>
+        <item name="toolbarDivider">@color/toolbar_divider</item>
+        <item name="buttonTextColor">@color/button_text_color</item>
+        <item name="toolbarItemBackground">@drawable/toolbar_item_background_color</item>
+        <item name="dialogItemBackground">@drawable/dialog_item_background_color</item>
+        <item name="editTextColor">@color/edit_text_text_color</item>
+        <item name="editTextBackground">@color/edit_text_background_color</item>
+        <item name="dividerColor">@color/divider_color</item>
+        <item name="listItemHorizontalDivider">@color/list_page_item_horizontal_divider</item>
+        <item name="listItemVerticalDivider">@color/list_page_item_vertical_divider</item>
+        <item name="defaultTextColor">@color/default_text_color</item>
+        <item name="itemBackground">@color/item_background_color</item>
+        <item name="chapterBackground">@color/system_page_chapter_background</item>
+        <item name="chapterTextColor">@color/article_page_text_item_content0</item>
+        <item name="checkboxTint">@color/button_checkbox</item>
+        <item name="sliderActiveColor">@color/checkbox_checked_color</item>
+        <item name="sliderInactiveColor">@color/slider_inactive_color</item>
+        <item name="sliderThumbColor">@color/checkbox_checked_color</item>
+
+        <!-- 選擇文章對話框相關 -->
+        <item name="dialogSelectArticleFocusedColor">@color/dialog_select_article_background_color_focused</item>
+        <item name="dialogSelectArticleDividerColor">@color/dialog_select_article_divider_color</item>
+        <item name="dialogSelectArticleTextColor">@color/dialog_select_article_item_text_color</item>
+        <item name="dialogSelectArticleItemBackground">@drawable/dialog_select_article_item_background_color</item>
+
+        <!-- 其他通用 -->
+        <item name="dialogBorderColor">@color/dialog_border_color</item>
+        <item name="pageBackground">@color/black</item>
     </style>
+
     <style name="toolbar" parent="BaseTouchPart">
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
     <style name="ToolbarDivider">
-        <item name="android:background">@color/toolbar_divider</item>
+        <item name="android:background">?attr/toolbarDivider</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
     </style>
+
     <style name="ToolbarItem" parent="BaseTouchPart">
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:background">@drawable/toolbar_item_background_color</item>
+        <item name="android:textColor">?attr/buttonTextColor</item>
+        <item name="android:background">?attr/toolbarItemBackground</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
@@ -33,66 +70,77 @@
         <item name="autoSizeMaxTextSize">24sp</item>
         <item name="autoSizeStepGranularity">2sp</item>
     </style>
+
     <style name="ToolbarItem.Grid">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_marginRight">1dp</item>
         <item name="android:layout_marginBottom">1dp</item>
         <item name="android:layout_columnWeight">1</item>
     </style>
+
     <style name="ToolbarItem.Hero">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">40dp</item>
         <item name="android:padding">1dp</item>
         <item name="android:background">@color/black</item>
     </style>
+
     <style name="ToolbarItem.Danger">
         <item name="android:background">@drawable/button_background_1</item>
     </style>
+
     <style name="ToolbarItemLR" parent="ToolbarItem">
         <item name="android:layout_weight">9</item>
         <item name="android:visibility">gone</item>
         <item name="android:alpha">0.5</item>
-        <item name="android:textColor">@color/dialog_select_article_background_color_focused</item>
+        <item name="android:textColor">?attr/dialogSelectArticleFocusedColor</item>
     </style>
+
     <style name="Block">
         <item name="android:paddingLeft">6dp</item>
         <item name="android:paddingTop">6dp</item>
         <item name="android:paddingRight">6dp</item>
         <item name="android:paddingBottom">6dp</item>
     </style>
+
     <style name="BlockDividerHorizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">6dp</item>
     </style>
+
     <style name="Button">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:textColor">?attr/buttonTextColor</item>
         <item name="android:gravity">center</item>
         <item name="android:background">@android:drawable/list_selector_background</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_weight">1</item>
     </style>
+
     <style name="DialogSelectArticleHorizontalDivider">
-        <item name="android:background">@color/dialog_select_article_divider_color</item>
+        <item name="android:background">?attr/dialogSelectArticleDividerColor</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
     </style>
+
     <style name="DialogSelectArticleVerticalDivider">
-        <item name="android:background">@color/dialog_select_article_divider_color</item>
+        <item name="android:background">?attr/dialogSelectArticleDividerColor</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>
     </style>
+
     <style name="DialogToolbarItem" parent="BaseTouchPart">
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/button_text_color</item>
-        <item name="android:background">@drawable/dialog_item_background_color</item>
+        <item name="android:textColor">?attr/buttonTextColor</item>
+        <item name="android:background">?attr/dialogItemBackground</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
     <style name="Dialog_NoTitle_FullScreen">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:windowFrame">@null</item>
@@ -102,9 +150,10 @@
         <item name="android:windowContentOverlay">@android:color/transparent</item>
         <item name="android:backgroundDimEnabled">false</item>
     </style>
+
     <style name="EditTextSingleLine" parent="TextViewUltraLarge">
-        <item name="android:textColor">@color/edit_text_text_color</item>
-        <item name="android:background">@color/edit_text_background_color</item>
+        <item name="android:textColor">?attr/editTextColor</item>
+        <item name="android:background">?attr/editTextBackground</item>
         <item name="android:paddingLeft">6dp</item>
         <item name="android:paddingRight">6dp</item>
         <item name="android:layout_width">match_parent</item>
@@ -113,89 +162,99 @@
         <item name="maxLines">1</item>
         <item name="singleLine">true</item>
     </style>
+
     <style name="ExtToolbar">
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
     <style name="ToolbarItem.Ext">
         <item name="android:layout_width">match_parent</item>
     </style>
+
     <style name="HorizontalDivider">
-        <item name="android:background">@color/divider_color</item>
+        <item name="android:background">?attr/dividerColor</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
     </style>
+
     <style name="ItemViewDividerHorizontal">
-        <item name="android:background">@color/list_page_item_horizontal_divider</item>
+        <item name="android:background">?attr/listItemHorizontalDivider</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
     </style>
+
     <style name="ItemViewDividerVertical">
-        <item name="android:background">@color/list_page_item_vertical_divider</item>
+        <item name="android:background">?attr/listItemVerticalDivider</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>
     </style>
+
     <style name="List">
         <item name="android:listSelector">@android:drawable/list_selector_background</item>
-        <item name="android:divider">@color/divider_color</item>
+        <item name="android:divider">?attr/dividerColor</item>
         <item name="android:dividerHeight">1dp</item>
     </style>
+
     <style name="ListDialogItem">
         <item name="android:textSize">24sp</item>
-        <item name="android:textColor">@color/default_text_color</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:gravity">center</item>
-        <item name="android:buttonTint">@color/button_checkbox</item>
+        <item name="android:buttonTint">?attr/checkboxTint</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:singleLine">true</item>
         <item name="android:layout_weight">1</item>
     </style>
+
     <style name="MainItem">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">center</item>
     </style>
+
     <style name="MainItemBackground">
-        <item name="android:background">@color/item_background_color</item>
+        <item name="android:background">?attr/itemBackground</item>
     </style>
+
     <style name="MenuItem">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:textColor">?attr/buttonTextColor</item>
         <item name="android:background">@android:drawable/list_selector_background</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
-    <style name="MyTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-        <item name="android:windowBackground">@color/black</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:textColorHint">@android:color/tab_indicator_text</item>
-        <item name="android:enforceStatusBarContrast">false</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
-    </style>
+
     <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
+
     <style name="TextViewUltraLarge" parent="TextViewNormal">
         <item name="android:textSize">28sp</item>
     </style>
+
     <style name="TextViewLarge" parent="TextViewNormal">
         <item name="android:textSize">24sp</item>
     </style>
+
     <style name="TextViewNormal">
         <item name="android:textColor">@android:color/tab_indicator_text</item>
         <item name="android:textSize">20sp</item>
     </style>
+
     <style name="TextViewSmall" parent="TextViewNormal">
         <item name="android:textSize">16sp</item>
     </style>
+
     <style name="TextViewVerySmall" parent="TextViewNormal">
         <item name="android:textSize">12sp</item>
     </style>
+
     <style name="TouchBlock">
         <item name="android:paddingLeft">6dp</item>
         <item name="android:paddingTop">6dp</item>
@@ -204,31 +263,35 @@
         <item name="android:minHeight">48dp</item>
         <item name="android:minWidth">48dp</item>
     </style>
+
     <style name="VerticalDivider">
-        <item name="android:background">@color/divider_color</item>
+        <item name="android:background">?attr/dividerColor</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>
     </style>
+
     <style name="SelectArticleItemL" parent="BaseTouchPart">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
+        <item name="android:textColor">?attr/dialogSelectArticleTextColor</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/dialog_select_article_item_background_color</item>
+        <item name="android:background">?attr/dialogSelectArticleItemBackground</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minWidth">70dp</item>
     </style>
+
     <style name="SelectArticleItemP" parent="BaseTouchPart">
         <item name="android:textStyle">bold</item>
-        <item name="android:textColor">@color/dialog_select_article_item_text_color</item>
+        <item name="android:textColor">?attr/dialogSelectArticleTextColor</item>
         <item name="android:gravity">center</item>
-        <item name="android:background">@drawable/dialog_select_article_item_background_color</item>
+        <item name="android:background">?attr/dialogSelectArticleItemBackground</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minWidth">90dp</item>
         <item name="android:textSize">32sp</item>
     </style>
+
     <style name="SystemSettingsItem" parent="BaseTouchPart">
         <item name="android:background">@android:drawable/list_selector_background</item>
         <item name="android:layout_width">match_parent</item>
@@ -236,18 +299,21 @@
         <item name="android:layout_marginStart">5dp</item>
         <item name="android:gravity">center</item>
     </style>
+
     <style name="CheckboxBahamut">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:buttonTint">@color/button_checkbox</item>
+        <item name="android:buttonTint">?attr/checkboxTint</item>
     </style>
+
     <style name="SystemSettingsCheckboxText" parent="TextViewLarge">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
+
     <style name="SystemSettingsCheckbox" parent="BaseTouchPart">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
@@ -256,66 +322,75 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:scaleX">1</item>
         <item name="android:scaleY">1</item>
-        <item name="android:buttonTint">@color/button_checkbox</item>
+        <item name="android:buttonTint">?attr/checkboxTint</item>
     </style>
+
     <style name="SystemSettingsSpinnerText" parent="TextViewLarge">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_centerVertical">true</item>
     </style>
+
     <style name="SystemSettingsChapter" parent="TextViewLarge">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/article_page_text_item_content0</item>
-        <item name="android:background">@color/system_page_chapter_background</item>
+        <item name="android:textColor">?attr/chapterTextColor</item>
+        <item name="android:background">?attr/chapterBackground</item>
         <item name="android:paddingStart">5dp</item>
     </style>
+
     <style name="SystemSettingsSpinnerItem" parent="SpinnerStyle">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_alignParentEnd">true</item>
         <item name="android:textSize">19sp</item>
     </style>
+
     <style name="SystemSettingsSlider" parent="SpinnerStyle">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_alignParentEnd">true</item>
         <item name="android:textSize">19sp</item>
-        <item name="trackColorActive">@color/checkbox_checked_color</item>
-        <item name="thumbColor">@color/checkbox_checked_color</item>
-        <item name="trackColorInactive">@color/slider_inactive_color</item>
+        <item name="trackColorActive">?attr/sliderActiveColor</item>
+        <item name="thumbColor">?attr/sliderThumbColor</item>
+        <item name="trackColorInactive">?attr/sliderInactiveColor</item>
     </style>
+
     <style name="SystemSettingsDirectoryText" parent="TextViewLarge">
-        <item name="android:textColor">@color/white</item>
+        <item name="android:textColor">?attr/defaultTextColor</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_weight">1</item>
     </style>
+
     <style name="SpinnerStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">50dp</item>
     </style>
+
     <style name="ToolbarItem.RightMenu">
         <item name="android:layout_width">0dp</item>
     </style>
+
     <style name="BillingPageButton" parent="BaseTouchPart">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:gravity">center</item>
         <item name="android:textSize">20sp</item>
         <item name="android:layout_marginTop">12sp</item>
-        <item name="android:textColor">@color/button_text_color</item>
+        <item name="android:textColor">?attr/buttonTextColor</item>
     </style>
+
     <style name="DialogQueryHeroText" parent="TextViewNormal">
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_weight">1</item>
