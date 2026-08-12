@@ -46,7 +46,6 @@
 
             <com.kota.telnetUI.textView.TelnetTextViewNormal
                 style="@style/TextViewLarge"
-                android:tag="normalText"
                 android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -64,7 +63,6 @@
 
             <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
-                android:tag="normalText"
                 android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -97,7 +95,6 @@
 
             <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
-                android:tag="normalText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"

@@ -31,8 +31,7 @@
             android:gravity="center"
             android:hint="@string/please_input_id"
             android:inputType="text"
-            android:singleLine="true"
-            android:tag="normalText" />
+            android:singleLine="true"/>
         <Button
             android:id="@+id/BlockList_Add"
             style="@style/ToolbarItem.Danger"

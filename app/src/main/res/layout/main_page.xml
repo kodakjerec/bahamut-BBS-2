@@ -106,7 +106,6 @@
             </RelativeLayout>
             <com.kota.telnetUI.textView.TelnetTextView
                 android:id="@+id/Main_HeroStepButton"
-                android:tag="normalText"
                 android:layout_width="0dp"
                 android:layout_weight="2"
                 android:layout_height="match_parent"

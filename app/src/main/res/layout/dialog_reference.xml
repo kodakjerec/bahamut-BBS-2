@@ -21,7 +21,6 @@
             android:background="#202020"
             android:padding="6dp"
             android:text="@string/dialog_reference_title"
-            android:tag="dialogTitle"
             android:textColor="@color/white" />
 
         <ScrollView
@@ -77,7 +76,6 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textColor="@color/white"
-                                android:tag="normalText"
                                 android:text="@string/dialog_reference_reserved_type"/>
 
                             <RadioGroup
@@ -200,7 +198,6 @@
             <Button
                 android:id="@+id/Dialog_reference_Cancel_Button"
                 style="@style/DialogToolbarItem"
-                android:tag="ToolbarItem.Danger"
                 android:text="@string/cancel" />
 
             <View style="@style/ToolbarDivider" />
@@ -208,7 +205,6 @@
             <Button
                 android:id="@+id/Dialog_reference_Send_Button"
                 style="@style/DialogToolbarItem"
-                android:tag="ToolbarItem.Danger"
                 android:text="@string/send" />
         </LinearLayout>
     </LinearLayout>

@@ -150,7 +150,6 @@
                 style="@style/TextViewLarge"
                 android:layout_height="match_parent"
                 android:layout_width="60dp"
-                android:tag="normalText"
                 android:text="@string/drawer_button_text_enable"
                 android:textColor="@color/white"
                 android:gravity="center_vertical"/>

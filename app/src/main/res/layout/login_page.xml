@@ -48,7 +48,6 @@
                     style="@style/CheckboxBahamut" />
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     style="@style/SystemSettingsCheckboxText"
-                    android:tag="normalText"
                     android:layout_toEndOf="@+id/LoginWebSignInCheckBox"
                     android:id="@+id/LoginWebSignInLabel"
                     android:layout_alignParentTop="true"
@@ -119,7 +118,6 @@
                     style="@style/CheckboxBahamut" />
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     style="@style/SystemSettingsCheckboxText"
-                    android:tag="normalText"
                     android:layout_toEndOf="@+id/Login_loginRememberCheckBox"
                     android:id="@+id/loginRememberLabel"
                     android:layout_alignParentTop="true"

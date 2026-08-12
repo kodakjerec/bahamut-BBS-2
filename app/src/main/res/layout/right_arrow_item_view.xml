@@ -10,5 +10,4 @@
     android:paddingRight="6dp"
     android:text="@string/arrow_right"
     android:textColor="@color/list_page_item_arrow_color"
-    android:textStyle="bold"
-    android:tag="rightArrow"/>
+    android:textStyle="bold"/>
