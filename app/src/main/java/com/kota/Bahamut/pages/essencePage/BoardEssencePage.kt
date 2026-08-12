@@ -117,9 +117,6 @@ class BoardEssencePage : TelnetListPage() {
         mainLayout.findViewById<View>(R.id.BoardPageLatestPageButton).setOnClickListener{
             moveToLastPosition()
         }
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun isItemCanLoadAtIndex(index: Int): Boolean {

@@ -67,9 +67,6 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         pageDownButton.setOnLongClickListener(this)
         findViewById(R.id.Mail_SearchButton)?.setOnClickListener(this)
         headerItemView = findViewById(R.id.MailBox_headerView) as TelnetHeaderItemView
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.content_view) as LinearLayout?)
     }
 
     override fun loadPage(): TelnetListPageBlock? {

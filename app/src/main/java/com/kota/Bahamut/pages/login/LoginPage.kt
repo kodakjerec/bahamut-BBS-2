@@ -105,9 +105,6 @@ class LoginPage : TelnetPage() {
             val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as RelativeLayout
             blockWebSignIn.visibility = View.VISIBLE
         }
-
-        // 替換內文外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.content_view) as ViewGroup?)
     }
 
     @Synchronized

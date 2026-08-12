@@ -31,8 +31,6 @@ class BoardExtendBookmarkItemView : LinearLayout {
             setAuthor(bookmark.author)
             setMark(bookmark.mark == "y")
             setGYNumber(bookmark.gy)
-            // --- 套用主題 ---
-            ThemeFunctions().applyThemeToBoardDrawerItem(this)
             return
         }
 

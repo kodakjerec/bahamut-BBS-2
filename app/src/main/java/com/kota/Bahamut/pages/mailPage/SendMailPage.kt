@@ -126,9 +126,6 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         findViewById(R.id.SendMailDialog_change)?.setOnClickListener(this)
         titleBlock = findViewById(R.id.SendMail_TitleBlock) as View
         refresh()
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as LinearLayout?)
     }
 
     override fun clear() {

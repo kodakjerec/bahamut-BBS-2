@@ -170,14 +170,6 @@ open class ASNavigationController : Activity() {
         controller.pageView = null
     }
 
-    //    fun addPageView(aPage: ASViewController) {
-    //        val pageView: ASPageView? = aPage.pageView
-    //        this.rootView?.post {
-    //            aPage.onPageDidDisappear()
-    //            this@ASNavigationController.rootView?.removeView(pageView)
-    //        }
-    //    }
-
     fun removePageView(aPage: ASViewController) {
         val pageView: ASPageView? = aPage.pageView
         this.rootView?.post {

@@ -59,9 +59,6 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
-        // 替換內文外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
-
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             // 進入洽特

@@ -25,8 +25,6 @@ class BoardExtendHistoryItemView : LinearLayout {
     fun setBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
             setTitle(bookmark.keyword)
-            // --- 套用主題 ---
-            ThemeFunctions().applyThemeToBoardDrawerItem(this)
             return
         }
 

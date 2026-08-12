@@ -595,11 +595,6 @@ class SystemSettingsPage : TelnetPage() {
         findViewById(R.id.SystemSettings_BackButton)?.setOnClickListener {
             onBackPressed()
         }
-
-        // 替換內文外觀
-        mainLayout!!.post {
-            ThemeFunctions().applyThemeToContent(mainLayout)
-        }
     }
 
     val name: String

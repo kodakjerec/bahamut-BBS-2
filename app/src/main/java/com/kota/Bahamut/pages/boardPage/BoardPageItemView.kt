@@ -46,9 +46,6 @@ class BoardPageItemView : LinearLayout {
             setGYNumber(aItem.gy)
             setReply(aItem.isReply)
             setRead(aItem.isDeleted || aItem.isRead)
-            // 套用主題
-            val isRead = aItem.isDeleted || aItem.isRead
-            ThemeFunctions().applyThemeToBoardItem(this, isRead, aItem.title, aItem.isReply)
             return
         }
         clear()

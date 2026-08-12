@@ -184,12 +184,6 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
         showNotification()
 
         reload()
-
-        val mainLayout = findViewById(R.id.content_view) as ViewGroup
-        // 套用外觀
-        mainLayout.post {
-            ThemeFunctions().applyThemeToContent(mainLayout)
-        }
     }
 
     // 第一次進入的提示訊息

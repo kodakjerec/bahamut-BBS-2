@@ -115,9 +115,6 @@ open class BookmarkManagePage(
         val bookmarkList = bookmarkStore?.getBookmarkList(boardName)
         if (currentMode == 1) bookmarkList?.loadHistoryList(bookmarks)
         else bookmarkList?.loadBookmarkList(bookmarks)
-
-        val mainLayout: ViewGroup = findViewById(R.id.content_view) as ViewGroup
-        mainLayout.post { ThemeFunctions().applyThemeToContent(mainLayout) }
     }
 
     var buttonClickListener: View.OnClickListener = View.OnClickListener { aView ->

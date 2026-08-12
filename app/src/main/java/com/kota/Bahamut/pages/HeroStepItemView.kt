@@ -32,8 +32,6 @@ class HeroStepItemView : LinearLayout {
         txtViewAuthor = findViewById(R.id.HeroStep_ItemView_Name)
         txtViewDatetime = findViewById(R.id.HeroStep_ItemView_Datetime)
         txtViewContent = findViewById(R.id.HeroStep_ItemView_Content)
-
-        ThemeFunctions().applyThemeToHeroStepItem(this)
     }
 
     fun setAuthor(author: String?) {

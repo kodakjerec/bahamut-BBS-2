@@ -218,9 +218,6 @@ class MessageMain:TelnetPage() {
         } else {
             sendSyncCommand()
         }
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
         
         btnChat.performClick()
     }

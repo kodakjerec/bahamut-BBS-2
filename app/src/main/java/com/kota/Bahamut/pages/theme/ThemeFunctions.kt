@@ -67,7 +67,7 @@ class ThemeFunctions {
                     when (tagStr) {
                         "normalText" -> {
                             val tempChildView = childView as TextView
-                            tempChildView.setTextColor(rgbToInt(theme.contentAuthorColor))
+                            tempChildView.setTextColor(rgbToInt(theme.contentTextColor))
                             handled = true
                         }
                         "dialogTitle" -> {
@@ -92,17 +92,15 @@ class ThemeFunctions {
                 if (childView is android.widget.CompoundButton) {
                     // 優先處理勾選框/單選鈕 (它們也是 Button 的子類)
                     if (childView is android.widget.RadioButton) {
-                        childView.setTextColor(rgbToInt(theme.contentAuthorColor))
-                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
+                        childView.setTextColor(rgbToInt(theme.contentTextColor))
+                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.contentTextColor))
                     } else if (childView is CheckBox) {
-                        childView.setTextColor(rgbToInt(theme.contentAuthorColor))
-                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.textColor))
+                        childView.setTextColor(rgbToInt(theme.contentTextColor))
+                        childView.buttonTintList = ColorStateList.valueOf(rgbToInt(theme.contentTextColor))
                     }
                     handled = true
                 } else if (childView is Button) {
-                    // 對於沒有 Tag 的按鈕，預設套用一般按鈕樣式 (針對對話框按鈕)
-                    applyButtonStyle(childView, false)
-                    handled = true
+                    continue
                 } else if (childView is Spinner) {
                     applyThemeToSpinner(childView)
                     continue
@@ -541,23 +539,6 @@ class ThemeFunctions {
         // --- 設定下拉選單的背景色 ---
         spinner.setPopupBackgroundDrawable(hBack.toDrawable())
 
-        // 由於 Spinner 的子 View 是非同步產生的，我們使用監聽器來確保著色
-        spinner.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
-            override fun onChildViewAdded(parent: View?, child: View?) {
-                if (child is TextView) {
-                    child.setTextColor(hTitle)
-                }
-            }
-            override fun onChildViewRemoved(parent: View?, child: View?) {}
-        })
-
-        // 遍歷現有的子元件並設定顏色
-        for (j in 0 until spinner.childCount) {
-            val subView = spinner.getChildAt(j)
-            if (subView is TextView) {
-                subView.setTextColor(hTitle)
-            }
-        }
     }
 
     private fun darkenColor(color: Int, factor: Float): Int {

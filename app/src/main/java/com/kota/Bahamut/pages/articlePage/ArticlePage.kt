@@ -200,25 +200,6 @@ class ArticlePage : TelnetPage() {
                 }
             }
 
-            // 在資料填充完畢後套用外觀
-            when (itemViewOrigin) {
-                is ArticlePageTextItemView -> {
-                    ThemeFunctions().applyThemeToArticleTextItem(itemViewOrigin)
-                }
-                is ArticlePagePushItemView -> {
-                    ThemeFunctions().applyThemeToArticlePushItem(itemViewOrigin)
-                }
-                is ArticlePageTelnetItemView -> {
-                    ThemeFunctions().applyThemeToArticleTelnetItem(itemViewOrigin)
-                }
-                is ArticlePageTimeTimeView -> {
-                    ThemeFunctions().applyThemeToArticleTimeItem(itemViewOrigin)
-                }
-                is ArticlePageEditRecordItemView -> {
-                    ThemeFunctions().applyThemeToArticleEditRecordItem(itemViewOrigin)
-                }
-            }
-
             return itemViewOrigin
         }
 
@@ -390,9 +371,6 @@ class ArticlePage : TelnetPage() {
 
         mainLayout.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
         mainLayout.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
-
-        // 套用容器背景 (解決底部黑色問題)
-        ThemeFunctions().applyThemeToContent(mainLayout)
 
         refreshExternalToolbar()
         showNotification()

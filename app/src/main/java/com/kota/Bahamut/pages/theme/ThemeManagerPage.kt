@@ -246,9 +246,6 @@ class ThemeManagerPage: TelnetPage() {
     private fun paintToolbarButtons() {
         val theme = ThemeStore.getSelectTheme()
 
-        // 1. 底部的返回按鈕工具列
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.toolbar) as? ViewGroup)
-
         // 一般按鈕範例
         val btnSample1: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_1)
         val btnSample2: Button = mainLayout.findViewById(R.id.Theme_Manager_Page_Toolbar_Sample_2)

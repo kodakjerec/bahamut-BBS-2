@@ -37,8 +37,6 @@ class BoardEssencePageItemView : LinearLayout {
             setDate(aItem.date)
             author = aItem.author
             setDirectory(aItem.isDirectory, aItem.isBBSClickable)
-
-            ThemeFunctions().applyThemeToBoardEssenceItem(this)
             return
         }
         clear()
@@ -63,7 +61,6 @@ class BoardEssencePageItemView : LinearLayout {
                 INVISIBLE
             contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY)?.visibility = INVISIBLE
         }
-        ThemeFunctions().applyThemeToBoardEssenceItem(this)
     }
 
     fun setTitle(title: String?) {

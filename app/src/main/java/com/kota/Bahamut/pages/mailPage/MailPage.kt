@@ -77,9 +77,6 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         pageDownButton?.setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.Mail_changeModeButton)!!.setOnClickListener(this)
         resetAdapter()
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun onBackPressed(): Boolean {
@@ -184,26 +181,6 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         } else if (itemViewOrigin is ArticlePageTimeTimeView) {
             itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
             itemViewOrigin.setIP(telnetArticle?.fromIP!!)
-        }
-
-
-        // 在資料填充完畢後套用外觀
-        when (itemViewOrigin) {
-            is ArticlePageTextItemView -> {
-                ThemeFunctions().applyThemeToArticleTextItem(itemViewOrigin)
-            }
-            is ArticlePagePushItemView -> {
-                ThemeFunctions().applyThemeToArticlePushItem(itemViewOrigin)
-            }
-            is ArticlePageTelnetItemView -> {
-                ThemeFunctions().applyThemeToArticleTelnetItem(itemViewOrigin)
-            }
-            is ArticlePageTimeTimeView -> {
-                ThemeFunctions().applyThemeToArticleTimeItem(itemViewOrigin)
-            }
-            is ArticlePageEditRecordItemView -> {
-                ThemeFunctions().applyThemeToArticleEditRecordItem(itemViewOrigin)
-            }
         }
 
         return itemViewOrigin

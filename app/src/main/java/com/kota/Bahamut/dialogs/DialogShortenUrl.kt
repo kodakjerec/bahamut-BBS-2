@@ -236,9 +236,6 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             }
         }
         setDialogWidth(mainLayout)
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun onClick(view: View) {

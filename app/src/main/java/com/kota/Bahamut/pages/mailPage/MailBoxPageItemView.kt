@@ -41,8 +41,6 @@ class MailBoxPageItemView : LinearLayout {
             setReply(aItem.isReply)
             setRead(aItem.isRead)
             setMark(aItem.isMarked)
-            // 套用主題
-            ThemeFunctions().applyThemeToMailBoxItem(this, aItem.isRead)
             return
         }
         clear()

@@ -25,9 +25,7 @@ class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener
     fun setBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
             setTitle(bookmark.keyword)
-            
-            // 套用主題
-            ThemeFunctions().applyThemeToBoardDrawerItem(itemView)
+
             return
         }
         clear()

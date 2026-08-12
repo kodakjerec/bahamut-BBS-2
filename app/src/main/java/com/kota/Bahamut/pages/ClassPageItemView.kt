@@ -73,8 +73,6 @@ class ClassPageItemView : LinearLayout {
             setBoardTitleText(aItem.title)
             setBoardNameText(aItem.name)
             setBoardManagerText(aItem.manager)
-            // --- 套用主題 ---
-            ThemeFunctions().applyThemeToClassItem(this)
 
             return
         }

@@ -199,11 +199,6 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .setOnClickListener(postToolbarShowOnClickListener)
         mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Reference)!!
             .setOnClickListener(referenceClickListener)
-
-        // 替換內文外觀
-        mainLayout!!.post {
-            ThemeFunctions().applyThemeToPostArticle(mainLayout)
-        }
     }
 
     override fun clear() {

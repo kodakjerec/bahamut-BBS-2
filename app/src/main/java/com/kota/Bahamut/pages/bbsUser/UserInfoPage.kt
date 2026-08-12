@@ -59,9 +59,6 @@ class UserInfoPage: TelnetPage() {
         btnUpdate = mainLayout.findViewById(R.id.User_Info_Page_Update)
         btnUpdate.setOnClickListener(btnUpdateOnClickListener)
         txnOthers = mainLayout.findViewById(R.id.User_Info_Others)
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
         paintBtnUpdate(false)
     }
 

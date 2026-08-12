@@ -65,9 +65,6 @@ class UserConfigPage: TelnetPage() {
         findViewById(R.id.UserConfig_BackButton)?.setOnClickListener {
             onBackPressed()
         }
-
-        // 新增：套用佈景主題
-        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     /** 收到回傳的資料內容 */

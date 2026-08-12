@@ -536,7 +536,5 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         descriptionView = mainLayout!!.findViewById(R.id.thumbnail_description)
         descriptionView.setOnClickListener(descriptionListener)
         urlView = mainLayout!!.findViewById(R.id.thumbnail_url)
-
-        ThemeFunctions().applyThemeToThumbnailItem(mainLayout!!)
     }
 }

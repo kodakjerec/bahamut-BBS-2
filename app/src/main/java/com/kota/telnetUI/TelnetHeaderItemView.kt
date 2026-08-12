@@ -58,9 +58,6 @@ open class TelnetHeaderItemView : LinearLayout {
                 headerItemView.addView(alViews[j])
             }
         }
-
-        // 套用主題顏色
-        ThemeFunctions().applyThemeToHeaderItemView(this)
     }
 
     open fun setMenuButtonClickListener(aListener: OnClickListener?) {

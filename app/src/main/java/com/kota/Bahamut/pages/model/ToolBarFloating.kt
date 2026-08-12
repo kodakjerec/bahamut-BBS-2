@@ -58,9 +58,6 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         // 如果之前已經隱藏就不要再讓他顯現出來
         if (TempSettings.isFloatingInvisible) mainLayout?.alpha = alphaPercentage
         else startInvisible()
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(findViewById(R.id.ToolbarFloating))
     }
 
     // 移動toolbar

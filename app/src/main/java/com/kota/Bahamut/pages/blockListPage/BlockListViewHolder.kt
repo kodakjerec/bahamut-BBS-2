@@ -29,8 +29,6 @@ class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
             nameLabel.text = aName
             nameLabel.contentDescription = "從名單中剔除$aName"
         }
-        // 套用主題
-        ThemeFunctions().applyThemeToContent(itemView as ViewGroup?)
     }
 
     override fun onClick(v: View?) {

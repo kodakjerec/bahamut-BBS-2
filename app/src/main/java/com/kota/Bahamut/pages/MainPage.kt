@@ -141,9 +141,6 @@ class MainPage : TelnetPage() {
         mainLayout?.findViewById<View>(R.id.Main_BBCall_Layout)!!
             .setOnClickListener(showMessageMainListener)
 
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
-
         // 檢查不斷線掛網
         checkBatteryLife()
 

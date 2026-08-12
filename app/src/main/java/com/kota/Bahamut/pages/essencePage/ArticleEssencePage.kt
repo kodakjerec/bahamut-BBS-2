@@ -150,25 +150,6 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                     itemView4.setIP(telnetArticle?.fromIP!!)
                 }
             }
-
-            // 在資料填充完畢後套用外觀
-            when (itemViewOrigin) {
-                is ArticlePageTextItemView -> {
-                    ThemeFunctions().applyThemeToArticleTextItem(itemViewOrigin)
-                }
-                is ArticlePagePushItemView -> {
-                    ThemeFunctions().applyThemeToArticlePushItem(itemViewOrigin)
-                }
-                is ArticlePageTelnetItemView -> {
-                    ThemeFunctions().applyThemeToArticleTelnetItem(itemViewOrigin)
-                }
-                is ArticlePageTimeTimeView -> {
-                    ThemeFunctions().applyThemeToArticleTimeItem(itemViewOrigin)
-                }
-                is ArticlePageEditRecordItemView -> {
-                    ThemeFunctions().applyThemeToArticleEditRecordItem(itemViewOrigin)
-                }
-            }
             return itemViewOrigin
         }
 
@@ -237,9 +218,6 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
         pageUpButton?.setOnClickListener(this)
         pageDownButton?.setOnClickListener(this)
         resetAdapter()
-
-        // 替換外觀
-        ThemeFunctions().applyThemeToContent(mainLayout)
     }
 
     override fun onBackPressed(): Boolean {
