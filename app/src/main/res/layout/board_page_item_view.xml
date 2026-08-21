@@ -11,7 +11,7 @@
                 <com.kota.telnetUI.textView.TelnetTextViewNormal
                     android:textColor="@color/board_page_item_view_status" android:layout_gravity="start|center_vertical|center_horizontal|center" android:id="@+id/BoardPage_ItemView_Status" android:layout_width="30dp" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
                 <com.kota.telnetUI.textView.TelnetTextViewNormal
-                    android:textColor="@color/board_page_item_view_title" android:ellipsize="end" android:id="@+id/BoardPage_ItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
+                    android:ellipsize="end" android:id="@+id/BoardPage_ItemView_Title" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
             </LinearLayout>
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <com.kota.telnetUI.textView.TelnetTextViewSmall

@@ -391,7 +391,7 @@ class SystemSettingsPage : TelnetPage() {
             R.layout.simple_spinner_item,
             resource?.getStringArray(R.array.system_setting_page_screen_orientation_items) ?: arrayOf()
         )
-        adapterScreenOrientation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        adapterScreenOrientation.setDropDownViewResource(R.layout.simple_spinner_item)
         val spinnerScreenOrientation =
             mainLayout?.findViewById<Spinner>(R.id.SystemSettings_screen_orientation_spinner)!!
         spinnerScreenOrientation.adapter = adapterScreenOrientation
@@ -455,7 +455,7 @@ class SystemSettingsPage : TelnetPage() {
                 R.layout.simple_spinner_item,
                 resource?.getStringArray(R.array.system_setting_page_toolbar_location_items) ?: arrayOf()
             )
-            adapterToolbarLocation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapterToolbarLocation.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerToolbarLocation =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_location_spinner)!!
             spinnerToolbarLocation.adapter = adapterToolbarLocation
@@ -468,7 +468,7 @@ class SystemSettingsPage : TelnetPage() {
                 R.layout.simple_spinner_item,
                 resource?.getStringArray(R.array.system_setting_page_toolbar_order_items) ?: arrayOf()
             )
-            adapterToolbarOrder.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapterToolbarOrder.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerToolbarOrder =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_order_spinner)!!
             spinnerToolbarOrder.adapter = adapterToolbarOrder
@@ -515,7 +515,7 @@ class SystemSettingsPage : TelnetPage() {
                 R.layout.simple_spinner_item,
                 resource?.getStringArray(R.array.system_setting_page_drawer_location_items) ?: arrayOf()
             )
-            adapterDrawerLocation.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            adapterDrawerLocation.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerDrawerLocation =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_drawer_location_spinner)!!
             spinnerDrawerLocation.adapter = adapterDrawerLocation

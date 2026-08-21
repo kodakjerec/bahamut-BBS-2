@@ -46,7 +46,6 @@
 
             <com.kota.telnetUI.textView.TelnetTextViewNormal
                 style="@style/TextViewLarge"
-                android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="start"
@@ -63,7 +62,6 @@
 
             <com.kota.telnetUI.textView.TelnetTextViewSmall
                 style="@style/TextViewSmall"
-                android:textColor="@android:color/white"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
@@ -79,7 +77,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/SystemSettingsCheckbox"
-                    android:textColor="@android:color/white"
                     android:textSize="24dp"
                     android:text="@string/start_connect_ip1" />
 
@@ -88,7 +85,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/SystemSettingsCheckbox"
-                    android:textColor="@android:color/white"
                     android:textSize="24dp"
                     android:text="@string/start_connect_ip2" />
             </RadioGroup>
@@ -98,8 +94,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
-                android:text="@string/start_connect_method"
-                android:textColor="@android:color/white" />
+                android:text="@string/start_connect_method" />
 
             <RadioGroup
                 android:id="@+id/radioButtonConnectMethod"
@@ -112,7 +107,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/start_connect_method1"
-                    android:textColor="@android:color/white"
                     android:textSize="24dp" />
 
                 <RadioButton
@@ -121,7 +115,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/start_connect_method2"
-                    android:textColor="@android:color/white"
                     android:textSize="24dp" />
 
             </RadioGroup>
@@ -133,8 +126,7 @@
                 android:layout_marginTop="10dp"
                 android:layout_marginBottom="10dp"
                 android:gravity="center_horizontal"
-                android:text="@string/start_vault"
-                android:textColor="@android:color/white" />
+                android:text="@string/start_vault"/>
 
             <LinearLayout
                 android:layout_width="match_parent"

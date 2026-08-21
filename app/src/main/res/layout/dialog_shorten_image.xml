@@ -21,7 +21,7 @@
         <LinearLayout
             android:id="@+id/dialog_shorten_url_middle_linear_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_below="@+id/dialog_title"
             android:layout_above="@+id/dialog_shorten_image_sample"
             android:orientation="horizontal">
@@ -32,11 +32,11 @@
                 <LinearLayout
                     android:id="@+id/dialog_shorten_image_middle_image_area"
                     android:layout_width="match_parent"
-                    android:layout_height="0dp"
+                    android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_above="@+id/toolbar"
                     android:orientation="horizontal">
-                    <TextView
+                    <com.kota.telnetUI.textView.TelnetTextViewNormal
                         android:id="@+id/dialog_shorten_image_hint"
                         style="@style/TextViewNormal"
                         android:layout_width="match_parent"

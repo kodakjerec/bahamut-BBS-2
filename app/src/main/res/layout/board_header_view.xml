@@ -4,7 +4,7 @@
     android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/header_item_view">
     <LinearLayout
         android:orientation="vertical"
-        android:background="?attr/titleBarBackground"
+        android:background="?attr/bahamut_titleBarBackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:ellipsize="end"
                 android:singleLine="true"
-                android:textColor="?attr/defaultTextColor"
+                android:textColor="?attr/bahamut_defaultTextColor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -54,5 +54,5 @@
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
-    <ImageButton android:textColor="@color/list_page_item_arrow_color" android:gravity="center" android:id="@+id/menu_button" android:background="@color/title_bar_menu_icon_background_color" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
+    <ImageButton android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:id="@+id/menu_button" android:background="?attr/bahamut_titleBarMenuIconBackground" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
 </LinearLayout>

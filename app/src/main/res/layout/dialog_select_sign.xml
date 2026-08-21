@@ -3,7 +3,7 @@
     <LinearLayout android:orientation="vertical" android:background="@color/black" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign" style="@style/TextViewLarge"/>
-        <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.kota.telnetUI.textView.TelnetTextViewNormal
                 android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_sign_msg" style="@style/TextViewNormal"/>
             <View style="@style/BlockDividerHorizontal"/>

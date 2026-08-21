@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <LinearLayout
-        android:background="@color/black"
+        android:background="?attr/bahamut_pageBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="@style/BaseTouchPart"
@@ -19,8 +19,9 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 style="@style/TextViewSmall"
-                android:textColor="@color/white"
-                android:background="@color/time_line_background_color"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:background="?attr/bahamut_titleBarBackground"
                 android:text="@string/main_page_hero_step_author"/>
             <com.kota.telnetUI.textView.TelnetTextView
                 android:id="@+id/HeroStep_ItemView_Datetime"
@@ -29,15 +30,17 @@
                 android:layout_height="wrap_content"
                 style="@style/TextViewSmall"
                 android:gravity="right"
-                android:textColor="@color/time_line_background_color"
-                android:background="@color/article_page_text_item_content0"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:textColor="?attr/bahamut_titleBarBackground"
+                android:background="?attr/bahamut_chapterTextColor"
                 android:text="@string/main_page_hero_step_datetime"/>
         </LinearLayout>
         <com.kota.telnetUI.textView.TelnetTextView
-            android:textColor="@color/white"
             android:id="@+id/HeroStep_ItemView_Content"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="4dp"
             style="@style/TextViewSmall"
             android:text="@string/main_page_hero_step_content"/>
     </LinearLayout>

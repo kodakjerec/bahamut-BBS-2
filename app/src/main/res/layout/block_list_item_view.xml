@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
     <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@color/list_page_item_content_background" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white"
             android:gravity="center_vertical"
             android:id="@+id/BlockListItemView_Name"
             android:padding="10dp"
@@ -18,7 +17,9 @@
             android:layout_height="wrap_content"
             android:minWidth="100dp"
             android:text="@string/delete"
-            style="@style/TouchBlock"/>
+            style="@style/TouchBlock"
+            android:textColor="?attr/bahamut_buttonTextColor"
+            android:background="?attr/bahamut_dialogItemBackground"/>
     </LinearLayout>
     <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/header_item_view">
     <LinearLayout
         android:orientation="vertical"
-        android:background="@color/title_bar_background_color"
+        android:background="?attr/bahamut_titleBarBackground"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -21,5 +21,5 @@
                 android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
         </LinearLayout>
     </LinearLayout>
-    <ImageButton android:gravity="center" android:id="@+id/menu_button" android:background="@color/transparent" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
+    <ImageButton android:gravity="center" android:id="@+id/menu_button" android:background="?attr/bahamut_titleBarMenuIconBackground" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
 </LinearLayout>

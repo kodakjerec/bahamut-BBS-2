@@ -43,24 +43,38 @@
                 android:textColor="@color/yellow"
                 android:textSize="16sp" />
 
-            <!-- 原本的贊助按鈕區塊，ID 已更名以避免衝突 -->
+            <!-- 原本的贊助按鈕區塊 -->
             <LinearLayout
                 android:id="@+id/billing_purchase_buttons_container"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:minWidth="200dp">
+                android:layout_marginTop="12dp">
 
-                <Button
-                    android:id="@+id/button_90"
-                    style="@style/BillingPageButton"
-                    android:enabled="false"
-                    android:text="@string/billing_page_button_90" />
+                <LinearLayout
+                    style="@style/toolbar"
+                    android:background="@null">
+                    <Button
+                        android:id="@+id/button_90"
+                        style="@style/ToolbarItem"
+                        android:layout_width="match_parent"
+                        android:backgroundTint="@null"
+                        android:enabled="false"
+                        android:text="@string/billing_page_button_90" />
+                </LinearLayout>
 
-                <Button
-                    android:id="@+id/button_checkPurchaseQuery"
-                    style="@style/BillingPageButton"
-                    android:text="@string/billing_page_button_check_purchase_query" />
+                <View style="@style/HorizontalDivider" />
+
+                <LinearLayout
+                    style="@style/toolbar"
+                    android:background="@null">
+                    <Button
+                        android:id="@+id/button_checkPurchaseQuery"
+                        style="@style/ToolbarItem"
+                        android:layout_width="match_parent"
+                        android:backgroundTint="@null"
+                        android:text="@string/billing_page_button_check_purchase_query" />
+                </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -73,6 +87,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:textColor="@color/white"
                         android:text="@string/billing_page_already_billing_text" />
 
@@ -82,6 +97,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
+                        android:gravity="center"
                         android:textColor="@color/white" />
                 </LinearLayout>
             </LinearLayout>

@@ -1,32 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 全域主題色彩 -->
-    <attr name="titleBarBackground" format="reference|color" />
-    <attr name="toolbarDivider" format="reference|color" />
-    <attr name="buttonTextColor" format="reference|color" />
-    <attr name="toolbarItemBackground" format="reference" />
-    <attr name="dialogItemBackground" format="reference" />
-    <attr name="editTextColor" format="reference|color" />
-    <attr name="editTextBackground" format="reference|color" />
-    <attr name="dividerColor" format="reference|color" />
-    <attr name="listItemHorizontalDivider" format="reference|color" />
-    <attr name="listItemVerticalDivider" format="reference|color" />
-    <attr name="defaultTextColor" format="reference|color" />
-    <attr name="itemBackground" format="reference|color" />
-    <attr name="chapterBackground" format="reference|color" />
-    <attr name="chapterTextColor" format="reference|color" />
-    <attr name="checkboxTint" format="reference|color" />
-    <attr name="sliderActiveColor" format="reference|color" />
-    <attr name="sliderInactiveColor" format="reference|color" />
-    <attr name="sliderThumbColor" format="reference|color" />
+    <attr name="bahamut_titleBarBackground" format="reference|color" />
+    <attr name="bahamut_toolbarDivider" format="reference|color" />
+    <attr name="bahamut_buttonTextColor" format="reference|color" />
+    <attr name="bahamut_toolbarItemBackground" format="reference" />
+    <attr name="bahamut_dialogItemBackground" format="reference" />
+    <attr name="bahamut_editTextColor" format="reference|color" />
+    <attr name="bahamut_editTextBackground" format="reference|color" />
+    <attr name="bahamut_dividerColor" format="reference|color" />
+    <attr name="bahamut_listItemHorizontalDivider" format="reference|color" />
+    <attr name="bahamut_listItemVerticalDivider" format="reference|color" />
+    <attr name="bahamut_defaultTextColor" format="reference|color" />
+    <attr name="bahamut_itemBackground" format="reference|color" />
+    <attr name="bahamut_chapterBackground" format="reference|color" />
+    <attr name="bahamut_chapterTextColor" format="reference|color" />
+    <attr name="bahamut_checkboxTint" format="reference|color" />
+    <attr name="bahamut_sliderActiveColor" format="reference|color" />
+    <attr name="bahamut_sliderInactiveColor" format="reference|color" />
+    <attr name="bahamut_sliderThumbColor" format="reference|color" />
 
     <!-- 選擇文章對話框相關 -->
-    <attr name="dialogSelectArticleFocusedColor" format="reference|color" />
-    <attr name="dialogSelectArticleDividerColor" format="reference|color" />
-    <attr name="dialogSelectArticleTextColor" format="reference|color" />
-    <attr name="dialogSelectArticleItemBackground" format="reference" />
+    <attr name="bahamut_dialogSelectArticleFocusedColor" format="reference|color" />
+    <attr name="bahamut_dialogSelectArticleDividerColor" format="reference|color" />
+    <attr name="bahamut_dialogSelectArticleTextColor" format="reference|color" />
+    <attr name="bahamut_dialogSelectArticleItemBackground" format="reference" />
 
     <!-- 其他通用 -->
-    <attr name="dialogBorderColor" format="reference|color" />
-    <attr name="pageBackground" format="reference|color" />
+    <attr name="bahamut_dialogBorderColor" format="reference|color" />
+    <attr name="bahamut_pageBackground" format="reference|color" />
+    <attr name="bahamut_titleBarMenuIconBackground" format="reference|color" />
 </resources>

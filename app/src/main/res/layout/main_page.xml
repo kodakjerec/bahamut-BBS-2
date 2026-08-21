@@ -110,6 +110,7 @@
                 android:layout_weight="2"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:textColor="?attr/bahamut_buttonTextColor"
                 android:text="@string/main_hero_step"
                 android:textSize="28sp"/>
         </LinearLayout>

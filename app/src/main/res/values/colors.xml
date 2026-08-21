@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- 基礎色盤 (Base Palette) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="transparent">#00000000</color>
@@ -7,97 +8,102 @@
     <color name="red">#FF800000</color>
     <color name="text_color_link">#FF1F5EFF</color>
     <color name="halfWhite">#FF808080</color>
-    <color name="button_label_color_disable">@color/halfWhite</color>
-    <color name="button_label_color_focused">@color/black</color>
-    <color name="button_label_color_normal">@color/white</color>
-    <color name="button_label_color_pressed">@color/black</color>
-    <color name="dialog_select_article_background_color_disabled">@color/item_background_color</color>
-    <color name="dialog_select_article_background_color_focused">#FF606060</color>
-    <color name="dialog_select_article_background_color_normal">#FF303030</color>
-    <color name="dialog_select_article_background_color_pressed">@color/white</color>
-    <color name="dialog_select_article_divider_color">#80000000</color>
-    <color name="dialog_select_article_text_color_disabled">#FF303030</color>
-    <color name="dialog_select_article_text_color_focused">@color/white</color>
-    <color name="dialog_select_article_text_color_normal">@color/white</color>
-    <color name="dialog_select_article_text_color_pressed">@color/black</color>
-    <color name="dialog_toolbar_background_color_disabled">#FF200000</color>
-    <color name="dialog_toolbar_background_color_focused">#FFFF7F27</color>
-    <color name="dialog_toolbar_background_color_normal">#FF400000</color>
-    <color name="dialog_toolbar_background_color_pressed">#FFFFC90E</color>
+
+    <!-- 功能性顏色 (保留給程式碼引用) -->
     <color name="divider_color">#FF404040</color>
-    <color name="edit_text_background_color">#FFE0E0E0</color>
-    <color name="edit_text_text_color">@color/black</color>
-    <color name="edit_text_highlight_color">#FFA9D47B</color>
-    <color name="ext_toolbar_background_color_disabled">#FF000020</color>
-    <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
-    <color name="ext_toolbar_background_color_normal">#FF000030</color>
-    <color name="ext_toolbar_background_color_pressed">#FF1DB5E6</color>
-    <color name="item_background_color">@color/transparent</color>
+    <color name="ripple_material">#1f000000</color>
+    <color name="dialog_border_color">@color/halfWhite</color>
     <color name="list_page_item_arrow_background">#FF202020</color>
     <color name="list_page_item_arrow_color">@color/white</color>
-    <color name="list_page_item_content_background">@color/item_background_color</color>
-    <color name="list_page_item_horizontal_divider">#404040</color>
-    <color name="list_page_item_vertical_divider">@color/item_background_color</color>
-    <color name="notification_action_color_filter">@color/white</color>
     <color name="notification_icon_bg_color">#FF9e9e9e</color>
-    <color name="ripple_material">#1f000000</color>
-    <color name="tab_selected_background_color_disabled">#FF002020</color>
-    <color name="tab_selected_background_color_focused">#FF004040</color>
-    <color name="tab_selected_background_color_normal">#FF004040</color>
-    <color name="tab_selected_background_color_pressed">#FF004040</color>
-    <color name="tab_selected_text_color_disable">@color/item_background_color</color>
-    <color name="tab_selected_text_color_focused">@color/black</color>
-    <color name="tab_selected_text_color_normal">@color/white</color>
-    <color name="tab_selected_text_color_pressed">@color/black</color>
-    <color name="tab_unselected_background_color_disabled">#002020</color>
-    <color name="tab_unselected_background_color_focused">#004040</color>
-    <color name="tab_unselected_background_color_normal">#002020</color>
-    <color name="tab_unselected_background_color_pressed">#004040</color>
-    <color name="tab_unselected_text_color_disable">@color/item_background_color</color>
-    <color name="tab_unselected_text_color_focused">@color/black</color>
-    <color name="tab_unselected_text_color_normal">#FF608060</color>
-    <color name="tab_unselected_text_color_pressed">@color/white</color>
-    <color name="dialog_border_color">@color/halfWhite</color>
-    <color name="time_line_background_color">#FF000060</color>
-    <color name="title_bar_background_color">#FF000060</color>
-    <color name="title_bar_menu_icon_background_color">#FF101090</color>
-    <color name="toolbar_background_color_disabled">#FF002020</color>
-    <color name="toolbar_background_color_focused">#FF22B14C</color>
-    <color name="toolbar_background_color_normal">#FF003030</color>
-    <color name="toolbar_background_color_pressed">#FFB5E61D</color>
-    <color name="toolbar_divider">@color/black</color>
-    <color name="checkbox_checked_color">#FF99CC00</color>
-    <color name="checkbox_unchecked_color">#FFB8B8B8</color>
-    <color name="slider_inactive_color">#3399CC00</color>
+
+    <!-- BBS 內容顯示色彩 (Domain colors) -->
     <color name="mail_box_page_item_view_status">#FFF0F080</color>
     <color name="mail_box_page_item_view_mark">#FFFF7F27</color>
     <color name="mail_box_page_item_view_reply">#FF00FFFF</color>
     <color name="mail_box_page_item_view_date">#FF80C080</color>
     <color name="mail_box_page_item_view_author">#FFB0B0F0</color>
     <color name="mail_box_page_item_view_number">#FFC08080</color>
-    <color name="board_page_item_view_status">@color/mail_box_page_item_view_status</color>
-    <color name="board_page_item_view_title">@color/white</color>
-    <color name="board_page_item_view_mark">@color/mail_box_page_item_view_mark</color>
-    <color name="board_page_item_view_date">@color/mail_box_page_item_view_date</color>
-    <color name="board_page_item_view_gy_title">@color/article_page_text_item_content0</color>
+
     <color name="board_page_item_view_gy">#FF00C0C0</color>
-    <color name="board_page_item_view_author">@color/mail_box_page_item_view_author</color>
-    <color name="board_page_item_view_number">@color/mail_box_page_item_view_number</color>
     <color name="board_ex_page_item_view_author_title">#FFB0FFFF</color>
     <color name="board_ex_page_item_view_author">#FF909090</color>
-    <color name="class_page_item_view_name">@color/mail_box_page_item_view_status</color>
-    <color name="class_page_item_view_manager">@color/mail_box_page_item_view_author</color>
     <color name="article_page_header_board">#FFC0FFFF</color>
     <color name="article_page_text_item_author1">#FF80FF80</color>
     <color name="article_page_text_item_content1">#FF20FF20</color>
-    <color name="article_page_text_item_author0">@color/white</color>
     <color name="article_page_text_item_content0">#FFC0C0C0</color>
-    <color name="system_page_chapter_text">@color/button_label_color_disable</color>
-    <color name="system_page_chapter_background">@color/list_page_item_arrow_background</color>
+
     <color name="board_item_follow_first">#FF00FF00</color>
     <color name="board_item_follow_first_read">#FF008000</color>
     <color name="board_item_follow_other">#FFFFFF00</color>
     <color name="board_item_follow_other_read">#FF808000</color>
     <color name="board_item_normal">@color/white</color>
     <color name="board_item_normal_read">@color/halfWhite</color>
+
+    <!-- Tab 相關顏色 -->
+    <color name="tab_selected_text_color_normal">#FFFF0000</color>
+    <color name="tab_selected_text_color_pressed">#FFFFFFFF</color>
+    <color name="tab_selected_text_color_focused">#FFFFFFFF</color>
+    <color name="tab_selected_text_color_disable">@color/halfWhite</color>
+
+    <color name="tab_unselected_text_color_normal">#FFFFFFFF</color>
+    <color name="tab_unselected_text_color_pressed">#FFFFFFFF</color>
+    <color name="tab_unselected_text_color_focused">#FFFFFFFF</color>
+    <color name="tab_unselected_text_color_disable">@color/halfWhite</color>
+
+    <color name="tab_selected_background_color_normal">#FF003030</color>
+    <color name="tab_selected_background_color_pressed">#FFB5E61D</color>
+    <color name="tab_selected_background_color_focused">#FF22B14C</color>
+    <color name="tab_selected_background_color_disabled">@color/transparent</color>
+
+    <color name="tab_unselected_background_color_normal">@color/transparent</color>
+    <color name="tab_unselected_background_color_pressed">#FFB5E61D</color>
+    <color name="tab_unselected_background_color_focused">#FF22B14C</color>
+    <color name="tab_unselected_background_color_disabled">@color/transparent</color>
+
+    <!-- Dialog Toolbar Colors -->
+    <color name="dialog_toolbar_background_color_normal">#FF400000</color>
+    <color name="dialog_toolbar_background_color_pressed">#FFFFC90E</color>
+    <color name="dialog_toolbar_background_color_focused">#FFFF7F27</color>
+    <color name="dialog_toolbar_background_color_disabled">#FF200000</color>
+
+    <!-- Other UI Colors -->
+    <color name="list_page_item_content_background">@color/black</color>
+
+    <!-- Base UI Background Colors (to be used in drawables) -->
+    <color name="dialog_item_background_normal">#FF400000</color>
+    <color name="dialog_item_background_pressed">#FFFFC90E</color>
+    <color name="dialog_item_background_focused">#FFFF7F27</color>
+    <color name="dialog_item_background_disabled">#FF200000</color>
+
+    <color name="dialog_select_article_item_background_normal">#FF303030</color>
+    <color name="dialog_select_article_item_background_focused">#FF606060</color>
+
+    <color name="ext_toolbar_item_background_normal">#FF000030</color>
+    <color name="ext_toolbar_item_background_pressed">#FF1DB5E6</color>
+    <color name="ext_toolbar_item_background_focused">#FF224CB1</color>
+    <color name="ext_toolbar_item_background_disabled">#FF000020</color>
+
+    <color name="toolbar_item_background_normal">#FF003030</color>
+    <color name="toolbar_item_background_pressed">#FFB5E61D</color>
+    <color name="toolbar_item_background_focused">#FF22B14C</color>
+
+    <!-- Board Page Item Colors -->
+    <color name="board_page_item_view_status">#FFF0F080</color>
+    <color name="board_page_item_view_number">#FFC08080</color>
+    <color name="board_page_item_view_mark">#FFFF7F27</color>
+    <color name="board_page_item_view_date">#FF80C080</color>
+    <color name="board_page_item_view_author">#FFB0B0F0</color>
+    <color name="board_page_item_view_gy_title">#FF00C0C0</color>
+    <color name="class_page_item_view_name">#FFF0F080</color>
+    <color name="class_page_item_view_manager">#FFB0B0F0</color>
+
+    <color name="time_line_background_color">#FF224CB1</color>
+
+    <!-- Additional Missing Colors -->
+    <color name="dialog_select_article_background_color_normal">#FF303030</color>
+    <color name="dialog_select_article_background_color_focused">#FF606060</color>
+    <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
+    <color name="article_page_text_item_author0">#FFC0C0C0</color>
+    <color name="item_background_color">@color/black</color>
 </resources>

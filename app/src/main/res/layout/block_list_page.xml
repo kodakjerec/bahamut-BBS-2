@@ -27,7 +27,7 @@
             android:layout_height="60dp"
             android:layout_weight="1"
             android:autofillHints=""
-            android:background="?attr/itemBackground"
+            android:background="?attr/bahamut_itemBackground"
             android:gravity="center"
             android:hint="@string/please_input_id"
             android:inputType="text"
@@ -42,7 +42,7 @@
             android:text="@string/add"/>
     </LinearLayout>
     <View style="@style/ItemViewDividerHorizontal"/>
-    <View android:background="?attr/dividerColor" android:layout_width="match_parent" android:layout_height="5dp"/>
+    <View android:background="?attr/bahamut_dividerColor" android:layout_width="match_parent" android:layout_height="5dp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/BlockList_list"
         android:layout_width="match_parent"

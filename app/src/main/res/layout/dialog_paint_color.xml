@@ -14,8 +14,8 @@
         android:background="@color/black">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
-        <ScrollView android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-            <LinearLayout android:orientation="vertical" android:background="@color/item_background_color" android:layout_width="match_parent" android:layout_height="wrap_content">
+        <ScrollView android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
+            <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <RelativeLayout android:id="@+id/dialog_paint_color_check_recovery_item" style="@style/SystemSettingsItem">
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/post_article_page_paint_color_recovery" style="@style/SystemSettingsCheckboxText"/>

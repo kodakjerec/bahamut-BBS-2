@@ -25,7 +25,7 @@
             
         <WebView
             android:id="@+id/debug_webview"
-            android:background="@color/item_background_color"
+            android:background="?attr/bahamut_itemBackground"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>

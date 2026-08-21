@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/dialogBorderColor" android:padding="3dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:background="?attr/pageBackground" android:padding="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:background="?attr/bahamut_dialogBorderColor" android:padding="3dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_pageBackground" android:padding="1dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="?attr/defaultTextColor" android:background="?attr/titleBarBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_article" style="@style/TextViewLarge"/>
+            android:background="?attr/bahamut_titleBarBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/select_article" style="@style/TextViewLarge"/>
         <ScrollView android:layout_width="wrap_content" android:layout_height="wrap_content">
             <LinearLayout android:gravity="center_horizontal" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content">
-                <TextView android:textColor="?attr/defaultTextColor" android:gravity="center" android:id="@+id/Bahamut_Dialog_Select_content_Label" android:background="@null" android:layout_width="match_parent" android:layout_height="60dp" android:hint="@string/please_input_article_number" style="@style/TextViewUltraLarge"/>
+                <TextView android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:id="@+id/Bahamut_Dialog_Select_content_Label" android:background="@null" android:layout_width="match_parent" android:layout_height="60dp" android:hint="@string/please_input_article_number" style="@style/TextViewUltraLarge"/>
                 <View style="@style/DialogSelectArticleHorizontalDivider"/>
                 <LinearLayout android:orientation="vertical" android:id="@+id/Bahamut_Dialog_Select_block_P" android:visibility="visible" android:layout_width="wrap_content" android:layout_height="wrap_content">
                     <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content">
