@@ -8,6 +8,7 @@ import android.graphics.PixelFormat
 import android.graphics.drawable.GradientDrawable
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.View
@@ -17,7 +18,6 @@ import android.widget.TextView
 import android.widget.Toast
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
-import java.lang.ref.WeakReference // 加入此行
 
 object ASToast {
     /**
@@ -25,8 +25,8 @@ object ASToast {
      */
     private var previousToastRef: Toast? = null
 
-    /** Toast 容器（使用弱引用避免記憶體洩漏） */
-    private var toastContainerRef: WeakReference<LinearLayout>? = null
+    /** Toast 容器 */
+    private var toastContainer: LinearLayout? = null
 
     /** 主執行緒 Handler */
     private val mainHandler = Handler(Looper.getMainLooper())
@@ -34,6 +34,7 @@ object ASToast {
     private const val DURATION_SHORT = 2000L
     private const val DURATION_LONG = 3500L
     private const val ANIMATION_DURATION = 200L
+    private val TOAST_TOKEN = Any()
 
     @JvmStatic
     fun showShortToast(aToastMessage: String?) {
@@ -52,15 +53,15 @@ object ASToast {
             val context = ASNavigationController.currentController ?: return@ensureMainThread
             val windowManager = context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager
 
-            var toastContainer = toastContainerRef?.get()
+            var container = toastContainer
 
             // 初始化容器
-            if (toastContainer == null || toastContainer.windowToken == null) {
-                toastContainer = LinearLayout(context).apply {
+            if (container == null || container.windowToken == null) {
+                container = LinearLayout(context).apply {
                     orientation = LinearLayout.VERTICAL
                     gravity = Gravity.CENTER_HORIZONTAL
                 }
-                toastContainerRef = WeakReference(toastContainer)
+                toastContainer = container
 
                 val params = WindowManager.LayoutParams(
                     WindowManager.LayoutParams.WRAP_CONTENT,
@@ -77,7 +78,7 @@ object ASToast {
                 }
 
                 try {
-                    windowManager.addView(toastContainer, params)
+                    windowManager.addView(container, params)
                 } catch (_: Exception) {
                     fallbackToSystemToast(message, duration)
                     return@ensureMainThread
@@ -88,7 +89,7 @@ object ASToast {
             toastView.alpha = 0f
 
             // 新 Toast 加在底部
-            toastContainer.addView(toastView)
+            container.addView(toastView)
 
             // 淡入動畫
             ObjectAnimator.ofFloat(toastView, "alpha", 0f, 1f).apply {
@@ -97,7 +98,7 @@ object ASToast {
             }
 
             // 設定消失時間
-            mainHandler.postDelayed({ removeToastView(toastView) }, duration)
+            mainHandler.postAtTime({ removeToastView(toastView) }, TOAST_TOKEN, SystemClock.uptimeMillis() + duration)
         }
     }
 
@@ -143,8 +144,8 @@ object ASToast {
                             wm.removeView(container)
                         } catch (_: Exception) {}
 
-                        if (toastContainerRef?.get() == container) {
-                            toastContainerRef = null
+                        if (toastContainer == container) {
+                            toastContainer = null
                         }
                     }
                 }
@@ -172,15 +173,20 @@ object ASToast {
     @JvmStatic
     fun clearAll() {
         ASCoroutine.ensureMainThread {
-            mainHandler.removeCallbacksAndMessages(null)
-            val container = toastContainerRef?.get()
+            // 取消所有屬於 ASToast 的延遲任務
+            mainHandler.removeCallbacksAndMessages(TOAST_TOKEN)
+            
+            // 手動清理容器
+            val container = toastContainer
             if (container != null) {
                 container.removeAllViews()
                 try {
                     val wm = container.context.getSystemService(android.content.Context.WINDOW_SERVICE) as WindowManager
-                    wm.removeView(container)
-                } catch (_: Exception) {}
-                toastContainerRef = null
+                    wm.removeViewImmediate(container)
+                } catch (_: Exception) {
+                } finally {
+                    toastContainer = null
+                }
             }
         }
     }

@@ -14,7 +14,6 @@ import com.kota.Bahamut.pages.model.ClassPageBlock
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageItem
-import com.kota.Bahamut.pages.theme.ThemeStore.upgrade
 import com.kota.Bahamut.service.BahaBBSBackgroundService
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.changeScreenOrientation
@@ -29,6 +28,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASAlertDialogListener
+import com.kota.asFramework.dialog.ASDialog.Companion.dismissAllDialogs
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
@@ -51,8 +51,12 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onControllerWillLoad() {
         requestWindowFeature(1)
         try {
-            B2UEncoder.constructInstance(resources.openRawResource(R.raw.b2u))
-            U2BEncoder.constructInstance(resources.openRawResource(R.raw.u2b))
+            if (B2UEncoder.instance == null) {
+                B2UEncoder.constructInstance(resources.openRawResource(R.raw.b2u))
+            }
+            if (U2BEncoder.instance == null) {
+                U2BEncoder.constructInstance(resources.openRawResource(R.raw.u2b))
+            }
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
         }
@@ -65,14 +69,25 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         ArticleTempStore.upgrade(this, articleFilePath)
 
         // 系統架構
-        construct(BahamutStateHandler.Companion.getInstance())
+        if (TelnetClient.myInstance == null) {
+            construct(BahamutStateHandler.Companion.getInstance())
+        }
         TelnetClient.myInstance!!.setListener(this)
+
+        // 如果已經連線，觸發一次狀態更新以同步 UI
+        if (TelnetClient.myInstance!!.telnetConnector?.isConnecting == true) {
+            ASCoroutine.ensureMainThread {
+                BahamutStateHandler.getInstance().handleState()
+            }
+        }
 
 
         // 設定 TelnetConnector 的設備控制器
         TelnetClient.myInstance!!.telnetConnector?.setDeviceController(deviceController)
 
-        PageContainer.Companion.constructInstance()
+        if (PageContainer.instance == null) {
+            PageContainer.Companion.constructInstance()
+        }
 
         // UserSettings
         isAnimationEnable = propertiesAnimationEnable
@@ -91,14 +106,15 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         TempSettings.applicationContext = applicationContext
         initBillingClient()
 
-        // 外觀
-        upgrade(this)
     }
 
     // com.kota.asFramework.pageController.ASNavigationController
     override fun onControllerDidLoad() {
-        val startPage: StartPage? = PageContainer.instance!!.startPage
-        pushViewController(startPage, false)
+        // 如果未連線，才顯示起始頁面
+        if (TelnetClient.myInstance?.telnetConnector?.isConnecting != true) {
+            val startPage: StartPage? = PageContainer.instance!!.startPage
+            pushViewController(startPage, false)
+        }
     }
 
     override fun onResume() {
@@ -107,6 +123,9 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     }
 
     override fun onDestroy() {
+        // 關閉正在顯示的對話框
+        dismissAllDialogs()
+
         // 關閉VIP
         closeBillingClient()
 
@@ -116,8 +135,10 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
             cloudBackup.backup()
         }
 
-        // 強制關閉連線
-        TelnetClient.myInstance!!.close()
+        // 強制關閉連線 (僅在 Activity 真正結束時)
+        if (isFinishing) {
+            TelnetClient.myInstance!!.close()
+        }
 
 
         // 清理 TelnetConnector 的設備控制器引用
@@ -140,7 +161,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onBackLongPressed(): Boolean {
         var result = true
         if (TelnetClient.myInstance!!.telnetConnector?.isConnecting == true) {
-            val dialog = ASAlertDialog()
+            val dialog = ASAlertDialog("FORCE_CLOSE_CONFIRM")
             dialog
                 .setMessage("是否確定要強制斷線?")
                 .addButton("取消")

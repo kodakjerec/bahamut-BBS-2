@@ -106,4 +106,23 @@
     <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
     <color name="article_page_text_item_author0">#FFC0C0C0</color>
     <color name="item_background_color">@color/black</color>
+
+    <!-- Pink Theme Colors -->
+    <color name="pink_button_background_normal">#FFFE00FE</color>
+    <color name="pink_button_background_pressed">#FFE400E4</color>
+    <color name="pink_button_background_disabled">#FF650065</color>
+    <color name="pink_header_background">#FFFFC0CB</color>
+    <color name="pink_header_text">#FFC71585</color>
+
+    <!-- Dark Theme Colors (Sample) -->
+    <color name="dark_button_background_normal">#FF202020</color>
+    <color name="dark_button_background_pressed">#FF363636</color>
+    <color name="dark_button_background_disabled">#FF282828</color>
+    <color name="dark_button_text">#FFE0E0E0</color>
+
+    <!-- eInk Theme Colors (Sample) -->
+    <color name="eink_button_background_normal">#FFFFFFFF</color>
+    <color name="eink_button_background_pressed">#FF000000</color>
+    <color name="eink_button_text_normal">#FF000000</color>
+    <color name="eink_button_text_pressed">#FFFFFFFF</color>
 </resources>

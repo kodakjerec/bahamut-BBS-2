@@ -52,6 +52,31 @@
         <item name="bahamut_articleContentColor1">@color/article_page_text_item_content1</item>
     </style>
 
+    <!-- 粉紅主題 -->
+    <style name="MyTheme.Pink" parent="MyTheme">
+        <item name="bahamut_buttonTextColor">@color/white</item>
+        <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
+    </style>
+
+    <!-- 深色主題 -->
+    <style name="MyTheme.Dark" parent="MyTheme">
+        <item name="bahamut_buttonTextColor">@color/dark_button_text</item>
+        <item name="bahamut_toolbarItemBackground">@drawable/dark_toolbar_item_background</item>
+    </style>
+
+    <!-- eInk 主題 -->
+    <style name="MyTheme.eInk" parent="MyTheme">
+        <item name="bahamut_pageBackground">@color/white</item>
+        <item name="bahamut_defaultTextColor">@color/black</item>
+        <item name="bahamut_buttonTextColor">@color/eink_button_text_normal</item>
+        <item name="bahamut_toolbarItemBackground">@drawable/eink_toolbar_item_background</item>
+        <item name="bahamut_dividerColor">@color/black</item>
+        <item name="bahamut_articleAuthorColor0">@color/black</item>
+        <item name="bahamut_articleContentColor0">@color/black</item>
+        <item name="bahamut_articleAuthorColor1">@color/halfWhite</item>
+        <item name="bahamut_articleContentColor1">@color/halfWhite</item>
+    </style>
+
     <style name="toolbar" parent="BaseTouchPart">
         <item name="android:orientation">horizontal</item>
         <item name="android:layout_width">match_parent</item>

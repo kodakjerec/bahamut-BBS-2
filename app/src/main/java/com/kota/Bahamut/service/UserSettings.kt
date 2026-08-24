@@ -283,15 +283,15 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesAnimationEnable: Boolean
-            get() = mySharedPref!!.getBoolean(
+            get() = mySharedPref?.getBoolean(
                 PROPERTIES_ANIMATION_DISABLE,
                 true
-            )
+            ) ?: true
             set(enable) {
-                myEditor!!.putBoolean(
+                myEditor?.putBoolean(
                     PROPERTIES_ANIMATION_DISABLE,
                     enable
-                ).commit()
+                )?.commit()
             }
 
         /** 看板上一頁/下一頁  */
@@ -513,15 +513,15 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesKeepWifi: Boolean
-            get() = mySharedPref!!.getBoolean(
+            get() = mySharedPref?.getBoolean(
                 PROPERTIES_KEEP_WIFI_ENABLE,
                 true
-            )
+            ) ?: true
             set(enable) {
-                myEditor!!.putBoolean(
+                myEditor?.putBoolean(
                     PROPERTIES_KEEP_WIFI_ENABLE,
                     enable
-                ).commit()
+                )?.commit()
             }
 
         @JvmStatic
@@ -667,15 +667,15 @@ class UserSettings(var myContext: Context) {
 
         @JvmStatic
         var propertiesFollowSystemDarkMode: Boolean
-            get() = mySharedPref!!.getBoolean(
+            get() = mySharedPref?.getBoolean(
                 PROPERTIES_FOLLOW_SYSTEM_DARK_MODE,
                 false
-            )
+            ) ?: false
             set(enable) {
-                myEditor!!.putBoolean(
+                myEditor?.putBoolean(
                     PROPERTIES_FOLLOW_SYSTEM_DARK_MODE,
                     enable
-                ).commit()
+                )?.commit()
             }
     }
 }

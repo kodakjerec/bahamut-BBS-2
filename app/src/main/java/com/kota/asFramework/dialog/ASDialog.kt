@@ -9,6 +9,7 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.pageController.ASViewControllerDisappearListener
 import androidx.core.view.isNotEmpty
+import java.lang.ref.WeakReference
 
 open class ASDialog : Dialog, ASViewControllerDisappearListener {
     private var aSViewController: ASViewController?
@@ -19,6 +20,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         this.backPressedHandler = null
         this.isShowing = false
         this.aSViewController = null
+        trackDialog(this)
     }
 
     protected constructor(
@@ -28,12 +30,14 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         this.backPressedHandler = null
         this.isShowing = false
         this.aSViewController = null
+        trackDialog(this)
     }
 
     constructor() : super(ASNavigationController.currentController!!) {
         this.backPressedHandler = null
         this.isShowing = false
         this.aSViewController = null
+        trackDialog(this)
     }
 
     // android.app.Dialog, android.content.DialogInterface
@@ -162,5 +166,35 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         oldLayoutParams.width = dialogWidth
         oldLayoutParams.height = dialogHeight
         targetView.layoutParams = oldLayoutParams
+    }
+
+    companion object {
+        private val _allDialogs = ArrayList<WeakReference<ASDialog>>()
+
+        private fun trackDialog(dialog: ASDialog) {
+            synchronized(_allDialogs) {
+                _allDialogs.add(WeakReference(dialog))
+            }
+        }
+
+        @JvmStatic
+        fun dismissAllDialogs() {
+            synchronized(_allDialogs) {
+                val iterator = _allDialogs.iterator()
+                while (iterator.hasNext()) {
+                    val ref = iterator.next()
+                    val dialog = ref.get()
+                    if (dialog != null) {
+                        try {
+                            if (dialog.isShowing) {
+                                dialog.dismiss()
+                            }
+                        } catch (_: Exception) {
+                        }
+                    }
+                    iterator.remove()
+                }
+            }
+        }
     }
 }

@@ -36,7 +36,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowTopBottomButton(): Boolean {
-        return perf?.getBoolean(SHOW_TOP_BOTTOM_FUNCTION, false)!!
+        return perf?.getBoolean(SHOW_TOP_BOTTOM_FUNCTION, false) ?: false
     }
 
     @JvmStatic
@@ -46,7 +46,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowBlockList(): Boolean {
-        return perf?.getBoolean(SHOW_BLOCK_LIST, false)!!
+        return perf?.getBoolean(SHOW_BLOCK_LIST, false) ?: false
     }
 
     @JvmStatic
@@ -56,7 +56,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowHeader(): Boolean {
-        return perf?.getBoolean(SHOW_HEADER, false)!!
+        return perf?.getBoolean(SHOW_HEADER, false) ?: false
     }
 
     @JvmStatic
@@ -66,7 +66,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowCloudSave(): Boolean {
-        return perf?.getBoolean(SHOW_CLOUD_SAVE, true)!!
+        return perf?.getBoolean(SHOW_CLOUD_SAVE, true) ?: true
     }
 
     @JvmStatic
@@ -76,7 +76,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowExpression(): Boolean {
-        return perf?.getBoolean(SHOW_EXPRESSION, false)!!
+        return perf?.getBoolean(SHOW_EXPRESSION, false) ?: false
     }
 
     @JvmStatic
@@ -91,7 +91,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getCloudSave(): Boolean {
-        return perf?.getBoolean(CLOUD_SAVE, false)!!
+        return perf?.getBoolean(CLOUD_SAVE, false) ?: false
     }
 
     @JvmStatic
@@ -120,7 +120,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowHeroStep(): Boolean {
-        return perf?.getBoolean(SHOW_HERO_STEP, true)!!
+        return perf?.getBoolean(SHOW_HERO_STEP, true) ?: true
     }
 
     @JvmStatic
@@ -130,7 +130,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getShowMessageFloating(): Boolean {
-        return perf?.getBoolean(SHOW_MESSAGE_FLOATING, false)!!
+        return perf?.getBoolean(SHOW_MESSAGE_FLOATING, false) ?: false
     }
 
     @JvmStatic
@@ -140,12 +140,12 @@ object NotificationSettings {
 
     @JvmStatic
     fun getAlarmIgnoreBatteryOptimizations(): Boolean {
-        return perf?.getBoolean(NOT_ALARM_IGNORE_BATTERY_OPTIMIZATIONS, false)!!
+        return perf?.getBoolean(NOT_ALARM_IGNORE_BATTERY_OPTIMIZATIONS, false) ?: false
     }
 
     @JvmStatic
     fun getDialogReferenceAuthor0RemoveBlank(): Boolean {
-        return perf?.getBoolean(DIALOG_REFERENCE_AUTHOR_0_REMOVE_BLANK, true)!!
+        return perf?.getBoolean(DIALOG_REFERENCE_AUTHOR_0_REMOVE_BLANK, true) ?: true
     }
 
     @JvmStatic
@@ -155,7 +155,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getDialogReferenceAuthor0ReservedType(): Int {
-        return perf?.getInt(DIALOG_REFERENCE_AUTHOR_0_RESERVED_TYPE, 0)!!
+        return perf?.getInt(DIALOG_REFERENCE_AUTHOR_0_RESERVED_TYPE, 0) ?: 0
     }
 
     @JvmStatic
@@ -165,7 +165,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getDialogReferenceAuthor1RemoveBlank(): Boolean {
-        return perf?.getBoolean(DIALOG_REFERENCE_AUTHOR_1_REMOVE_BLANK, true)!!
+        return perf?.getBoolean(DIALOG_REFERENCE_AUTHOR_1_REMOVE_BLANK, true) ?: true
     }
 
     @JvmStatic
@@ -175,7 +175,7 @@ object NotificationSettings {
 
     @JvmStatic
     fun getDialogReferenceAuthor1ReservedType(): Int {
-        return perf?.getInt(DIALOG_REFERENCE_AUTHOR_1_RESERVED_TYPE, 0)!!
+        return perf?.getInt(DIALOG_REFERENCE_AUTHOR_1_RESERVED_TYPE, 0) ?: 0
     }
 
     @JvmStatic
@@ -190,7 +190,7 @@ object NotificationSettings {
      */
     @JvmStatic
     fun getShowNotificationPermissionDialog(): Boolean {
-        return perf!!.getBoolean(SHOW_NOTIFICATION_PERMISSION_DIALOG, false)
+        return perf?.getBoolean(SHOW_NOTIFICATION_PERMISSION_DIALOG, false) ?: false
     }
 
     /**
@@ -199,7 +199,7 @@ object NotificationSettings {
      */
     @JvmStatic
     fun setShowNotificationPermissionDialog(isShown: Boolean) {
-        perf!!.edit {
+        perf?.edit {
             putBoolean(
                 SHOW_NOTIFICATION_PERMISSION_DIALOG,
                 isShown

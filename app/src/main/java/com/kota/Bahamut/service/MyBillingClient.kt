@@ -191,13 +191,15 @@ object MyBillingClient {
     /** 處理應用程式外的購買交易 */
     @JvmStatic
     fun checkPurchase() {
-        billingClient.queryPurchasesAsync(
-            QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
-                .build()
-        ) { billingResult: BillingResult, list: List<Purchase>? ->
-            if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
-                for (purchase in list) {
-                    handlePurchase(purchase)
+        if (::billingClient.isInitialized && billingClient.isReady) {
+            billingClient.queryPurchasesAsync(
+                QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.INAPP)
+                    .build()
+            ) { billingResult: BillingResult, list: List<Purchase>? ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
+                    for (purchase in list) {
+                        handlePurchase(purchase)
+                    }
                 }
             }
         }
@@ -228,6 +230,8 @@ object MyBillingClient {
 
     @JvmStatic
     fun closeBillingClient() {
-        billingClient.endConnection()
+        if (::billingClient.isInitialized && billingClient.isReady) {
+            billingClient.endConnection()
+        }
     }
 }

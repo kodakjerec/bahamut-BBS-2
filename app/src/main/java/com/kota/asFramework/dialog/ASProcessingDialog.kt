@@ -85,14 +85,12 @@ class ASProcessingDialog : ASDialog() {
 
         @JvmStatic
         fun dismissProcessingDialog() {
-            ASNavigationController.currentController?.isInBackground?.let {
-                if (!it) {
-                    ASCoroutine.ensureMainThread {
-                        if (aSProcessingDialog != null) {
-                            aSProcessingDialog?.dismiss()
-                            releaseInstance()
-                        }
+            ASCoroutine.ensureMainThread {
+                if (aSProcessingDialog != null) {
+                    if (aSProcessingDialog!!.isShowing) {
+                        aSProcessingDialog?.dismiss()
                     }
+                    releaseInstance()
                 }
             }
         }

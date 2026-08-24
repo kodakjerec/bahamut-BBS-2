@@ -15,11 +15,17 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.messages.MessageSmall
+import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
+import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASDialog.Companion.dismissAllDialogs
+import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 import kotlin.math.max
@@ -92,6 +98,21 @@ open class ASNavigationController : Activity() {
 
     // android.app.Activity
     public override fun onCreate(savedInstanceState: Bundle?) {
+        // 初始化基本設定，供 ThemeStore 使用
+        UserSettings(this)
+        upgrade(this)
+        TempSettings.myContext = this
+        setNavigationController(this)
+
+        // 0. 初始化 ThemeStore
+        ThemeStore.upgrade(this)
+
+        // 1. 從 ThemeStore 取得目前應該套用的原生主題資源 ID
+        val themeResId = ThemeStore.getThemeResId()
+
+        // 3. 在 super.onCreate 之前套用
+        setTheme(themeResId)
+
         super.onCreate(savedInstanceState)
 
 
@@ -102,13 +123,8 @@ open class ASNavigationController : Activity() {
         }
         // 對於 API 35+ (VANILLA_ICE_CREAM)，行為預設為 false 且無法更改
 
-        setNavigationController(this)
-
         // 獲取顯示器指標
         initializeDisplayMetrics()
-
-        UserSettings(this)
-        upgrade(this)
 
         this.deviceController = ASDeviceController(this)
         onControllerWillLoad()
@@ -507,6 +523,21 @@ open class ASNavigationController : Activity() {
                 println("Network disconnected while in background")
             }
         }
+    }
+
+    override fun onDestroy() {
+        // 關閉正在顯示的對話框以防止 WindowLeaked
+        dismissAllDialogs()
+
+        // 關閉所有彈出對話框和 Toast
+        ASAlertDialog.dismissAllAlerts()
+        ASProcessingDialog.dismissProcessingDialog()
+        ASToast.clearAll()
+
+        if (currentController === this) {
+            setNavigationController(null)
+        }
+        super.onDestroy()
     }
 
     override fun onLowMemory() {

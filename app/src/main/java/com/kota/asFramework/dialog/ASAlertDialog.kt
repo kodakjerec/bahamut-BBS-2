@@ -263,6 +263,14 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         private val _alerts: MutableMap<String?, ASAlertDialog?> =
             HashMap<String?, ASAlertDialog?>()
 
+        @JvmStatic
+        fun dismissAllAlerts() {
+            for (alert in _alerts.values) {
+                alert?.dismiss()
+            }
+            _alerts.clear()
+        }
+
         fun containsAlert(paramString: String?): Boolean {
             var bool = false
             if (paramString != null) bool = _alerts.containsKey(paramString)
