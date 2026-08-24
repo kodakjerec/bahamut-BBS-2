@@ -30,4 +30,10 @@
     <attr name="bahamut_dialogBorderColor" format="reference|color" />
     <attr name="bahamut_pageBackground" format="reference|color" />
     <attr name="bahamut_titleBarMenuIconBackground" format="reference|color" />
+
+    <!-- 文章內文配色 -->
+    <attr name="bahamut_articleAuthorColor0" format="reference|color" />
+    <attr name="bahamut_articleContentColor0" format="reference|color" />
+    <attr name="bahamut_articleAuthorColor1" format="reference|color" />
+    <attr name="bahamut_articleContentColor1" format="reference|color" />
 </resources>

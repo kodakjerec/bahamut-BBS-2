@@ -6,12 +6,17 @@
         android:layout_height="wrap_content"
         style="@style/TouchBlock">
         <com.kota.telnetUI.textView.TelnetTextViewNormal
-            android:id="@+id/ArticleTextItemView_Title" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/TextViewNormal"/>
+            android:id="@+id/ArticleTextItemView_Title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="?attr/bahamut_articleAuthorColor0"
+            style="@style/TextViewNormal"/>
         <com.kota.telnetUI.textView.TelnetTextViewNormal
             android:id="@+id/ArticleTextItemView_content"
             style="@style/TextViewNormal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="?attr/bahamut_articleContentColor0"
             android:enabled="true"
             android:textIsSelectable="true"
             android:focusable="true"

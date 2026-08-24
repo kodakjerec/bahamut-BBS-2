@@ -5,7 +5,6 @@ import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -24,10 +23,9 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.text.color
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
 import com.kota.asFramework.ui.ASToast.showShortToast
@@ -434,12 +432,12 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         myQuote = quote
         // 之前的引用文章
         if (myQuote > 0) {
-            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author1))
-            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content1))
+            authorLabel?.setTextColor(getThemeColor(R.attr.bahamut_articleAuthorColor1))
+            contentLabel?.setTextColor(getThemeColor(R.attr.bahamut_articleContentColor1))
         } else {
             // 使用者回文
-            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author0))
-            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content0))
+            authorLabel?.setTextColor(getThemeColor(R.attr.bahamut_articleAuthorColor0))
+            contentLabel?.setTextColor(getThemeColor(R.attr.bahamut_articleContentColor0))
         }
     }
 

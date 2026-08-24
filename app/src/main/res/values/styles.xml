@@ -44,6 +44,12 @@
         <!-- 其他通用 -->
         <item name="bahamut_dialogBorderColor">@color/halfWhite</item>
         <item name="bahamut_pageBackground">@color/black</item>
+
+        <!-- 文章內文配色預設值 -->
+        <item name="bahamut_articleAuthorColor0">@color/article_page_text_item_author0</item>
+        <item name="bahamut_articleContentColor0">@color/article_page_text_item_content0</item>
+        <item name="bahamut_articleAuthorColor1">@color/article_page_text_item_author1</item>
+        <item name="bahamut_articleContentColor1">@color/article_page_text_item_content1</item>
     </style>
 
     <style name="toolbar" parent="BaseTouchPart">

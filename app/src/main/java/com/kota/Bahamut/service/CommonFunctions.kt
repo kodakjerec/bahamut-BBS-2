@@ -3,6 +3,7 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
 import android.util.Log
+import android.util.TypedValue
 import com.kota.telnet.reference.TelnetDef
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
@@ -44,6 +45,18 @@ object CommonFunctions {
     @JvmStatic
     fun getContextColor(rColorItem: Int): Int {
         return TempSettings.myContext?.getColor(rColorItem) ?:0
+    }
+
+    /**
+     * 取得主題屬性顏色
+     * @param attrItem R.attr.XX
+     * @return 顏色內容(int)
+     */
+    @JvmStatic
+    fun getThemeColor(attrItem: Int): Int {
+        val typedValue = TypedValue()
+        TempSettings.myContext?.theme?.resolveAttribute(attrItem, typedValue, true)
+        return typedValue.data
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)
