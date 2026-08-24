@@ -432,6 +432,15 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setQuote(quote: Int) {
         myQuote = quote
+        // 之前的引用文章
+        if (myQuote > 0) {
+            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author1))
+            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content1))
+        } else {
+            // 使用者回文
+            authorLabel?.setTextColor(getContextColor(R.color.article_page_text_item_author0))
+            contentLabel?.setTextColor(getContextColor(R.color.article_page_text_item_content0))
+        }
     }
 
     override val type: Int

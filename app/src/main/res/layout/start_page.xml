@@ -27,8 +27,7 @@
                     style="@style/TextViewLarge"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/notices"
-                    android:textColor="@android:color/white" />
+                    android:text="@string/notices" />
 
                 <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/version"

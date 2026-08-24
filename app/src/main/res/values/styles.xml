@@ -332,6 +332,7 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:scaleX">1</item>
         <item name="android:scaleY">1</item>
+        <item name="android:textColor">?attr/bahamut_defaultTextColor</item>
         <item name="android:buttonTint">?attr/bahamut_checkboxTint</item>
     </style>
 
