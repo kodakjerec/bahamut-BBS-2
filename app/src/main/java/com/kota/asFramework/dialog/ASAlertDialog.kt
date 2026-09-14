@@ -74,7 +74,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         val linearLayout1 = LinearLayout(context)
         linearLayout1.orientation = LinearLayout.VERTICAL
         linearLayout1.setPadding(m, m, m, m)
-        linearLayout1.setBackgroundColor(-16777216)
+        linearLayout1.setBackgroundResource(R.color.page_background)
         linearLayout2.addView(linearLayout1 as View)
         titleLabel = TextView(context)
         titleLabel?.layoutParams = LinearLayout.LayoutParams(
@@ -102,7 +102,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         messageLabel?.minimumHeight = i
         messageLabel?.setTextColor(-1)
         messageLabel?.visibility = View.GONE
-        messageLabel?.setBackgroundColor(-16777216)
+        messageLabel?.setBackgroundResource(R.color.page_background)
         linearLayout1.addView(messageLabel as View?)
         toolbar = LinearLayout(context)
         toolbar?.layoutParams = LinearLayout.LayoutParams(

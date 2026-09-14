@@ -66,7 +66,7 @@ class ASListDialog : ASDialog() {
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        contentView.setBackgroundColor(View.MEASURED_STATE_MASK)
+        contentView.setBackgroundResource(R.color.page_background)
         frame.addView(contentView)
         contentView.orientation = LinearLayout.VERTICAL
         val dialogWidth = ((TypedValue.applyDimension(

@@ -176,7 +176,7 @@ open class ASNavigationController : Activity() {
     private fun buildPageView(controller: ASViewController) {
         val pageView = ASPageView(this)
         pageView.layoutParams = FrameLayout.LayoutParams(-1, -1)
-        pageView.setBackgroundColor(View.MEASURED_STATE_MASK)
+        pageView.setBackgroundResource(R.color.page_background)
         layoutInflater.inflate(controller.pageLayout, pageView)
         controller.pageView = pageView
         this.rootView?.contentView?.addView(pageView)

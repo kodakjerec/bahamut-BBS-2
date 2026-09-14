@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/black">
+        android:background="?attr/bahamut_pageBackground">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:textColor="@color/white" android:background="#202020" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
         <ScrollView android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">

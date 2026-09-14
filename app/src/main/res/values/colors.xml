@@ -2,6 +2,7 @@
 <resources>
     <!-- 基礎色盤 (Base Palette) -->
     <color name="black">#FF000000</color>
+    <color name="dark_gray_10">#FF101010</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray_white">#FFC0C0C0</color>
     <color name="transparent">#00000000</color>
@@ -11,6 +12,7 @@
     <color name="halfWhite">#FF808080</color>
 
     <!-- 功能性顏色 (保留給程式碼引用) -->
+    <color name="page_background">@color/black</color>
     <color name="divider_color">#FF404040</color>
     <color name="ripple_material">#1f000000</color>
     <color name="dialog_border_color">@color/halfWhite</color>
@@ -69,7 +71,7 @@
     <color name="dialog_toolbar_background_color_disabled">#FF200000</color>
 
     <!-- Other UI Colors -->
-    <color name="list_page_item_content_background">@color/black</color>
+    <color name="list_page_item_content_background">@color/page_background</color>
 
     <!-- Base UI Background Colors (to be used in drawables) -->
     <color name="dialog_item_background_normal">#FF400000</color>
@@ -111,7 +113,7 @@
     <color name="dialog_select_article_background_color_focused">#FF606060</color>
     <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
     <color name="article_page_text_item_author0">#FFC0C0C0</color>
-    <color name="item_background_color">@color/black</color>
+    <color name="item_background_color">@color/page_background</color>
 
     <!-- 輸入框配色 -->
     <color name="input_box_background">#FFE0E0E0</color>

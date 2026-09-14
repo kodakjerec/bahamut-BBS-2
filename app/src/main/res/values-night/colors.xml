@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 當系統進入深色模式時，將看板列表等原本為純白的文字調暗 -->
+    <color name="page_background">@color/dark_gray_10</color>
     <color name="board_item_normal">@color/gray_white</color>
 
     <!-- 看板追蹤顏色調暗 -->

@@ -5,7 +5,7 @@
     android:padding="3dp"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <LinearLayout android:background="@color/black"
+    <LinearLayout android:background="?attr/bahamut_pageBackground"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <GridView android:id="@+id/SymbolDialog_GridView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:numColumns="4"/>

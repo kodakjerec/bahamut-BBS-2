@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="@color/black"
+        android:background="?attr/bahamut_pageBackground"
         android:layout_margin="3.0dp">
         <TextView
             android:id="@+id/dialog_insert_expressions_title"
@@ -32,7 +32,7 @@
         android:id="@+id/dialog_insert_expressions_scrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/black"
+        android:background="?attr/bahamut_pageBackground"
         android:layout_marginStart="3dp"
         android:layout_marginEnd="3dp"
         android:layout_marginBottom="3dp">

@@ -43,7 +43,7 @@
 
         <!-- 其他通用 -->
         <item name="bahamut_dialogBorderColor">@color/halfWhite</item>
-        <item name="bahamut_pageBackground">@color/black</item>
+        <item name="bahamut_pageBackground">@color/page_background</item>
 
         <!-- 文章內文配色預設值 -->
         <item name="bahamut_articleAuthorColor0">@color/article_page_text_item_author0</item>
