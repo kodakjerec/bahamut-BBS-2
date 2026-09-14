@@ -83,6 +83,8 @@
 
     <color name="dialog_select_article_item_background_normal">#FF303030</color>
     <color name="dialog_select_article_item_background_focused">#FF606060</color>
+    <color name="list_dialog_item_background_pressed">#FF303030</color>
+    <color name="dark_list_dialog_item_background_pressed">#FF404040</color>
 
     <color name="toolbar_item_background_normal">#FF003030</color>
     <color name="toolbar_item_background_pressed">#FFB5E61D</color>

@@ -251,7 +251,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         val mainLayout = contentView as LinearLayout
 
         var originalIndex = mainLayout.indexOfChild(contentLabel)
-        val originalColor = contentLabel?.currentTextColor ?: Color.WHITE
+        val originalColor = contentLabel?.currentTextColor ?: getThemeColor(R.attr.bahamut_defaultTextColor)
 
         if (originalIndex > 0) {
             // 使用預覽圖
@@ -466,7 +466,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     private fun applyBlocklistMask(spannable: SpannableStringBuilder) {
         // Using R.color.black as the mask color. Ensure this color is defined in your colors.xml.
         val blocklist = UserSettings.blockList
-        val maskedColor = getContextColor(R.color.divider_color)
+        val maskedColor = getThemeColor(R.attr.bahamut_dividerColor)
 
         for (blockName in blocklist) {
             var index = spannable.indexOf(blockName, ignoreCase = true)

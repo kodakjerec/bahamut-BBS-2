@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="500dp"
     android:orientation="vertical"
-    android:background="@color/dialog_border_color">
+    android:background="?attr/bahamut_dialogBorderColor">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -13,19 +13,23 @@
         android:layout_margin="3dp">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:id="@+id/dialog_title"
-            android:textColor="@color/white"
-            android:background="@color/dialog_title_background"
+            android:textColor="?attr/bahamut_dialogTitleTextColor"
+            android:background="?attr/bahamut_dialogTitleBackground"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             android:text="@string/theme_manager_palette"
             style="@style/TextViewLarge"
             android:layout_alignParentTop="true"/>
+        <View
+            android:id="@+id/dialog_title_divider"
+            style="@style/HorizontalDivider"
+            android:layout_below="@id/dialog_title" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:layout_gravity="center"
-            android:layout_below="@id/dialog_title"
+            android:layout_below="@id/dialog_title_divider"
             android:layout_margin="20dp">
             <com.skydoves.colorpickerview.ColorPickerView
                 android:layout_width="250dp"

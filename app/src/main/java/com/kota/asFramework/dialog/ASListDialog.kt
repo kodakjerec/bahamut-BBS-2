@@ -61,14 +61,14 @@ class ASListDialog : ASDialog() {
         ).toInt()
         val frame = LinearLayout(context)
         this.rootFrame = frame
-        frame.setBackgroundResource(R.color.dialog_border_color)
+        frame.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogBorderColor))
         frame.setPadding(framePadding, framePadding, framePadding, framePadding)
         val contentView = LinearLayout(context)
         contentView.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.WRAP_CONTENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
-        contentView.setBackgroundResource(R.color.page_background)
+        contentView.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground))
         frame.addView(contentView)
         contentView.orientation = LinearLayout.VERTICAL
         val dialogWidth = ((TypedValue.applyDimension(
@@ -106,6 +106,7 @@ class ASListDialog : ASDialog() {
         this.titleLabel?.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogTitleBackground))
         this.titleLabel?.gravity = Gravity.CENTER
         this.contentView?.addView(this.titleLabel)
+        this.contentView?.addView(createDivider())
         this.itemBlock = LinearLayout(context)
         this.itemBlock?.layoutParams = FrameLayout.LayoutParams(
             dialogWidth,
@@ -204,13 +205,13 @@ class ASListDialog : ASDialog() {
                 button.setTextSize(2, ASLayoutParams.instance.textSizeUltraLarge)
             }
         }
-        val bgRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerBackground else R.attr.bahamut_dialogItemBackground)
+        val bgRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerBackground else R.attr.bahamut_listDialogItemBackground)
         if (bgRes != 0) {
             button.setBackgroundResource(bgRes)
         } else {
             button.background = ASLayoutParams.instance.listItemBackgroundDrawable
         }
-        val textColorRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerTextColor else R.attr.bahamut_buttonTextColor)
+        val textColorRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerTextColor else R.attr.bahamut_listDialogItemTextColor)
         if (textColorRes != 0) {
             button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
         } else {

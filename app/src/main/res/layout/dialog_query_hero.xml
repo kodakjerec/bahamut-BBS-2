@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dialog_border_color"
+    android:background="?attr/bahamut_dialogBorderColor"
     android:orientation="vertical">
     <LinearLayout
         android:id="@+id/content_view"
@@ -12,18 +12,19 @@
         android:background="?attr/bahamut_pageBackground"
         android:layout_margin="3dp">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white" android:background="@color/dialog_title_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
+            android:textColor="?attr/bahamut_dialogTitleTextColor" android:background="?attr/bahamut_dialogTitleBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/dialog_query_hero" style="@style/TextViewLarge"/>
+        <View style="@style/HorizontalDivider"/>
         <ScrollView android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="match_parent">
                 <TextView
                     android:id="@+id/dialog_query_hero_id"
                     style="@style/ToolbarItem.Hero"
-                    android:textColor="@color/article_page_text_item_content0"
+                    android:textColor="?attr/bahamut_articleContentColor0"
                     android:text="@string/zero_word" />
                 <TextView
                     android:id="@+id/dialog_query_hero_nick"
                     style="@style/ToolbarItem.Hero"
-                    android:textColor="@color/article_page_text_item_content0"
+                    android:textColor="?attr/bahamut_articleContentColor0"
                     android:text="@string/zero_word" />
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
                     <TextView
@@ -31,6 +32,7 @@
                         android:layout_weight="1"
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         android:text="HP：" />
                     <TextView
                         android:layout_width="0dp"
@@ -44,6 +46,7 @@
                         android:layout_weight="1"
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         android:text="MP：" />
                     <TextView
                         android:layout_width="0dp"
@@ -58,13 +61,13 @@
                         android:textSize="20sp"
                         android:id="@+id/dialog_query_hero_auth1"
                         style="@style/ToolbarItem.Hero"
-                        android:textColor="@color/article_page_text_item_content0"
+                        android:textColor="?attr/bahamut_articleContentColor0"
                         android:text="@string/zero_word" />
                     <TextView
                         android:textSize="20sp"
                         android:id="@+id/dialog_query_hero_auth2"
                         style="@style/ToolbarItem.Hero"
-                        android:textColor="@color/article_page_text_item_content0"
+                        android:textColor="?attr/bahamut_articleContentColor0"
                         android:text="@string/zero_word" />
                 </LinearLayout>
                 <LinearLayout
@@ -76,6 +79,7 @@
                         android:layout_weight="1"
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         android:text="上次" />
                     <LinearLayout
                         android:layout_width="0dp"
@@ -86,13 +90,13 @@
                             android:id="@+id/dialog_query_hero_last_date"
                             style="@style/ToolbarItem.Hero"
                             android:lines="2"
-                            android:textColor="@color/article_page_text_item_content0"
+                            android:textColor="?attr/bahamut_articleContentColor0"
                             android:text="@string/zero_word" />
                         <TextView
                             android:id="@+id/dialog_query_hero_last_time"
                             style="@style/ToolbarItem.Hero"
                             android:lines="2"
-                            android:textColor="@color/article_page_text_item_content0"
+                            android:textColor="?attr/bahamut_articleContentColor0"
                             android:text="@string/zero_word" />
                     </LinearLayout>
                 </LinearLayout>
@@ -102,13 +106,14 @@
                         android:layout_weight="1"
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         android:text="來自" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="5"
                         android:id="@+id/dialog_query_hero_from_ip"
                         style="@style/ToolbarItem.Hero"
-                        android:textColor="@color/article_page_text_item_content0"
+                        android:textColor="?attr/bahamut_articleContentColor0"
                         android:text="@string/zero_word" />
                 </LinearLayout>
                 <Button
@@ -117,8 +122,8 @@
                     android:layout_height="36dp"
                     android:text="@string/dialog_query_hero_show_web_view"
                     style="@style/TextViewNormal"
-                    android:textColor="@color/article_page_text_item_content0"
-                    android:background="@color/dialog_select_article_background_color_normal"/>
+                    android:textColor="?attr/bahamut_buttonTextColor"
+                    android:background="?attr/bahamut_dialogItemBackground"/>
                 <WebView
                     android:id="@+id/dialog_query_hero_web_view"
                     android:layout_width="match_parent"

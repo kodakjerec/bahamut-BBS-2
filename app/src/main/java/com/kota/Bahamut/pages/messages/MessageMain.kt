@@ -15,6 +15,7 @@ import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.PostEditText
 import androidx.core.content.ContextCompat
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.service.TempSettings
@@ -100,10 +101,14 @@ class MessageMain:TelnetPage() {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
         // 切換頁籤
+        val selectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedBackground)
+        val unselectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedBackground)
+        val selectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedTextColor)
+        val unselectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedTextColor)
         for (tabButton in tabButtons) {
             val isSelected = (tabButton == aView)
-            tabButton.setBackgroundResource(if (isSelected) R.drawable.tab_item_background_color_selected else R.drawable.tab_item_background_color_unselected)
-            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) R.color.tab_item_text_color_selected else R.color.tab_item_text_color_unselected))
+            tabButton.setBackgroundResource(if (isSelected) selectedBgRes else unselectedBgRes)
+            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) selectedTextRes else unselectedTextRes))
         }
     }
     /** 上一頁 */

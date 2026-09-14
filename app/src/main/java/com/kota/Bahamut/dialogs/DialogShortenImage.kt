@@ -37,6 +37,7 @@ import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderBahaImg
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.pageController.ASNavigationController
@@ -62,6 +63,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(ThemeStore.getDialogThemeResId())
         super.onCreate(savedInstanceState)
         init()
     }

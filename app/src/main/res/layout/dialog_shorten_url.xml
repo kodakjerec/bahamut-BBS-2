@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="500dp"
-    android:background="@color/dialog_border_color"
+    android:background="?attr/bahamut_dialogBorderColor"
     android:id="@+id/dialog_shorten_url_layout">
     <RelativeLayout
         android:layout_width="match_parent"
@@ -17,8 +17,8 @@
             android:layout_alignParentTop="true">
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 android:id="@+id/dialog_title"
-                android:textColor="@color/white"
-                android:background="@color/dialog_title_background"
+                android:textColor="?attr/bahamut_dialogTitleTextColor"
+                android:background="?attr/bahamut_dialogTitleBackground"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:text="@string/dialog_shorten_url_title"
@@ -28,15 +28,19 @@
                 android:layout_width="60dp"
                 android:layout_height="40dp"
                 android:text="@string/record"
-                android:textColor="@color/white"
-                android:background="@color/dialog_select_article_background_color_normal"
+                android:textColor="?attr/bahamut_dialogTitleTextColor"
+                android:background="?attr/bahamut_dialogItemBackground"
                 android:layout_alignParentEnd="true"/>
         </RelativeLayout>
+        <View
+            android:id="@+id/dialog_header_divider"
+            style="@style/HorizontalDivider"
+            android:layout_below="@id/dialog_header" />
         <LinearLayout
                 android:id="@+id/dialog_shorten_url_middle_linear_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/dialog_header"
+                android:layout_below="@+id/dialog_header_divider"
                 android:layout_above="@+id/dialog_shorten_url_sample"
                 android:orientation="horizontal">
                 <LinearLayout
@@ -54,7 +58,7 @@
                         android:inputType="textMultiLine"
                         android:padding="10dp"
                         android:selectAllOnFocus="true"
-                        android:textColor="@android:color/white"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         tools:ignore="TextFields"
                         android:autofillHints=""/>
                     <RelativeLayout

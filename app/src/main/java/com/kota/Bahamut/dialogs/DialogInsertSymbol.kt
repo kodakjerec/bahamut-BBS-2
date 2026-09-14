@@ -64,14 +64,12 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
             view.layoutParams = ViewGroup.LayoutParams(100, 100)
             view.gravity = Gravity.CENTER
             view.textSize = 24f
-            view.tag = "normalText"
         }
         val textView = view as TextView
         textView.text = getItem(position)
         
-        // 套用主題顏色 (normalText 對應內容作者顏色)
-        val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
-        textView.setTextColor(com.kota.Bahamut.service.CommonFunctions.rgbToInt(theme.contentAuthorColor))
+        // 套用主題顏色
+        textView.setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_defaultTextColor))
         
         return textView
     }

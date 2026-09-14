@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
 import java.util.Vector
 import kotlin.math.ceil
 
@@ -22,6 +24,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     private var messageLabel: TextView? = null
 
     private var titleLabel: TextView? = null
+    private var titleDivider: View? = null
 
     private var toolbar: LinearLayout? = null
     private var defaultIndex = -1
@@ -33,6 +36,23 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     constructor(paramString: String?) {
         initial()
         alertId = paramString
+    }
+
+    private fun createHorizontalDivider(): View {
+        val view = View(context)
+        val dividerHeight = ceil(
+            TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP,
+                1.0f,
+                context.resources.displayMetrics
+            ).toDouble()
+        ).toInt()
+        view.layoutParams = LinearLayout.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            dividerHeight
+        )
+        view.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
+        return view
     }
 
     private fun buildContentView(): View {
@@ -70,11 +90,11 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         val linearLayout2 = LinearLayout(context)
         linearLayout2.orientation = LinearLayout.VERTICAL
         linearLayout2.setPadding(j, j, j, j)
-        linearLayout2.setBackgroundResource(R.color.dialog_border_color)
+        linearLayout2.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogBorderColor))
         val linearLayout1 = LinearLayout(context)
         linearLayout1.orientation = LinearLayout.VERTICAL
         linearLayout1.setPadding(m, m, m, m)
-        linearLayout1.setBackgroundResource(R.color.page_background)
+        linearLayout1.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground))
         linearLayout2.addView(linearLayout1 as View)
         titleLabel = TextView(context)
         titleLabel?.layoutParams = LinearLayout.LayoutParams(
@@ -86,12 +106,17 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
             2,
             ASLayoutParams.instance.textSizeUltraLarge
         )
-        titleLabel?.setTextColor(-1)
+        titleLabel?.setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogTitleTextColor))
         titleLabel?.setTypeface(titleLabel?.typeface, Typeface.BOLD)
         titleLabel?.visibility = View.GONE
-        titleLabel?.setBackgroundColor(-15724528)
+        titleLabel?.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogTitleBackground))
         titleLabel?.isSingleLine = true
         linearLayout1.addView(titleLabel as View?)
+
+        titleDivider = createHorizontalDivider()
+        titleDivider?.visibility = View.GONE
+        linearLayout1.addView(titleDivider as View?)
+
         messageLabel = TextView(context)
         messageLabel?.layoutParams = LinearLayout.LayoutParams(
             n,
@@ -100,10 +125,14 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         messageLabel?.setPadding(k, k, k, k)
         messageLabel?.setTextSize(2, ASLayoutParams.instance.textSizeLarge)
         messageLabel?.minimumHeight = i
-        messageLabel?.setTextColor(-1)
+        messageLabel?.setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_defaultTextColor))
         messageLabel?.visibility = View.GONE
-        messageLabel?.setBackgroundResource(R.color.page_background)
+        messageLabel?.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground))
         linearLayout1.addView(messageLabel as View?)
+
+        val toolbarTopDivider = createHorizontalDivider()
+        linearLayout1.addView(toolbarTopDivider as View)
+
         toolbar = LinearLayout(context)
         toolbar?.layoutParams = LinearLayout.LayoutParams(
             n,
@@ -117,7 +146,11 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
 
     private fun clear() {
         if (messageLabel != null) messageLabel?.text = ""
-        if (titleLabel != null) titleLabel?.text = ""
+        if (titleLabel != null) {
+            titleLabel?.text = ""
+            titleLabel?.visibility = View.GONE
+            titleDivider?.visibility = View.GONE
+        }
         toolbar?.removeAllViews()
         itemList.clear()
     }
@@ -148,9 +181,19 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         ).toInt()
         button.gravity = 17
         button.setOnClickListener(this)
-        button.background = ASLayoutParams.instance.alertItemBackgroundDrawable
+        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_dialogItemBackground)
+        if (bgRes != 0) {
+            button.setBackgroundResource(bgRes)
+        } else {
+            button.background = ASLayoutParams.instance.alertItemBackgroundDrawable
+        }
+        val textColorRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_buttonTextColor)
+        if (textColorRes != 0) {
+            button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
+        } else {
+            button.setTextColor(ASLayoutParams.instance.alertItemTextColor)
+        }
         button.isSingleLine = false
-        button.setTextColor(ASLayoutParams.instance.alertItemTextColor)
         return button
     }
 
@@ -188,7 +231,7 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
                 ).toDouble()
             ).toInt(), ViewGroup.LayoutParams.MATCH_PARENT
         ) as ViewGroup.LayoutParams
-        view.setBackgroundColor(-16777216)
+        view.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_toolbarDivider))
         return view
     }
 
@@ -229,9 +272,11 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
     fun setTitle(paramString: String?): ASAlertDialog {
         if (paramString == null) {
             titleLabel?.visibility = View.GONE
+            titleDivider?.visibility = View.GONE
             return this
         }
         titleLabel?.visibility = View.VISIBLE
+        titleDivider?.visibility = View.VISIBLE
         titleLabel?.text = paramString
         return this
     }

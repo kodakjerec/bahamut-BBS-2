@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="?attr/bahamut_dialogBorderColor" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
     <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_pageBackground" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/content_view">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white" android:background="@color/dialog_title_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/main_hero_step" style="@style/TextViewLarge"/>
+            android:textColor="?attr/bahamut_dialogTitleTextColor" android:background="?attr/bahamut_dialogTitleBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/main_hero_step" style="@style/TextViewLarge"/>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="wrap_content">
             <com.kota.telnetUI.textView.TelnetTextViewNormal
-                android:textColor="@color/white" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/main_hero_step_msg01" style="@style/TextViewNormal"/>
+                android:textColor="?attr/bahamut_defaultTextColor" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/main_hero_step_msg01" style="@style/TextViewNormal"/>
             <View style="@style/BlockDividerHorizontal"/>
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/Dialog_hero_step_content1"

@@ -15,13 +15,13 @@ class ASLayoutParams private constructor() {
     val alertItemBackgroundDrawable: Drawable
         get() {
             val stateListDrawable = StateListDrawable()
-            var colorDrawable = (-14066).toDrawable()
+            var colorDrawable = (-13421773).toDrawable()
             stateListDrawable.addState(intArrayOf(16842919, 16842910), colorDrawable)
-            colorDrawable = (-8388608).toDrawable()
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910, 16842908), colorDrawable)
-            colorDrawable = (-12582912).toDrawable()
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910), colorDrawable)
-            colorDrawable = (-14680064).toDrawable()
+            colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(IntArray(0), colorDrawable)
             return stateListDrawable
         }
@@ -51,7 +51,7 @@ class ASLayoutParams private constructor() {
     val listItemBackgroundDrawable: Drawable
         get() {
             val stateListDrawable = StateListDrawable()
-            var colorDrawable = (-14066).toDrawable()
+            var colorDrawable = (-13421773).toDrawable()
             stateListDrawable.addState(intArrayOf(16842919, 16842910), colorDrawable)
             colorDrawable = (-16777216).toDrawable()
             stateListDrawable.addState(intArrayOf(16842910, 16842908), colorDrawable)

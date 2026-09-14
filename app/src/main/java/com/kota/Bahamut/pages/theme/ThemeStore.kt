@@ -70,7 +70,7 @@ object ThemeStore {
     fun getSelectTheme(): Theme {
         val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
         val themeIndex = getSelectIndex()
-        if (isDark) {
+        if (isDark && themeIndex != 2) {
             return when (themeIndex) {
                 1 -> getDefaultTheme(4) // 粉紅深色
                 else -> getDefaultTheme(2) // 預設深色
@@ -98,6 +98,17 @@ object ThemeStore {
             1 -> if (isDark) R.style.MyTheme_Pink_Dark else R.style.MyTheme_Pink
             2 -> R.style.MyTheme_eInk
             else -> if (isDark) R.style.MyTheme_Dark else R.style.MyTheme
+        }
+    }
+
+    /** 取得目前應該套用的對話框 Activity 原生主題資源 ID (用於 DialogShortenImage 等) */
+    fun getDialogThemeResId(): Int {
+        val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
+        val index = getSelectIndex()
+        return when(index) {
+            1 -> if (isDark) R.style.Dialog_NoTitleBar_Pink_Dark else R.style.Dialog_NoTitleBar_Pink
+            2 -> R.style.Dialog_NoTitleBar_eInk
+            else -> if (isDark) R.style.Dialog_NoTitleBar_Dark else R.style.Dialog_NoTitleBar
         }
     }
 
@@ -129,13 +140,6 @@ object ThemeStore {
                 themeDarkMode.backgroundColorPressed = "#FF004848"// 按壓時背景 (深青綠，非刺眼亮綠)
                 themeDarkMode.backgroundColorDisabled = "#FF001414"// 停用時背景 (極深墨綠)
                 themeDarkMode.contentAuthorColor = "#FFC0C0C0"
-
-                themeDarkMode.articleAuthorColor0 = "#FFC0C0C0"
-                themeDarkMode.articleContentColor0 = "#FFC0C0C0"
-                themeDarkMode.articleAuthorColor1 = "#FF80FF80"
-                themeDarkMode.articleContentColor1 = "#FF20FF20"
-                themeDarkMode.articlePushAuthorColor = "#FF808080"
-                themeDarkMode.articlePushContentColor = "#FF808000"
 
                 themeDarkMode.backgroundColorDanger = "#FF4A1A1A"
                 themeDarkMode.backgroundColorDangerPressed = "#FF8B3A3A"
@@ -179,13 +183,6 @@ object ThemeStore {
                 themePinkDark.backgroundColorPressed = "#FF902068"
                 themePinkDark.backgroundColorDisabled = "#FF300A24"
                 themePinkDark.contentAuthorColor = "#FFFF80C0"
-
-                themePinkDark.articleAuthorColor0 = "#FFC0C0C0"
-                themePinkDark.articleContentColor0 = "#FFC0C0C0"
-                themePinkDark.articleAuthorColor1 = "#FFFF80C0"
-                themePinkDark.articleContentColor1 = "#FFFFB0D0"
-                themePinkDark.articlePushAuthorColor = "#FF808080"
-                themePinkDark.articlePushContentColor = "#FF808000"
 
                 themePinkDark.backgroundColorDanger = "#FF800000"
                 themePinkDark.backgroundColorDangerPressed = "#FFFF0000"

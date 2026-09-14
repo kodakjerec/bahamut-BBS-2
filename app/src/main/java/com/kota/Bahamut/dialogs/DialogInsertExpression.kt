@@ -44,7 +44,6 @@ class DialogInsertExpression : ASDialog() {
         itemBlock = findViewById<LinearLayout>(R.id.dialog_insert_expressions_content)
 
         val settingButton = findViewById<View>(R.id.dialog_insert_expressions_setting)
-        settingButton.tag = "normalText"
         settingButton.setOnClickListener(
             settingListener
         )
@@ -119,13 +118,13 @@ class DialogInsertExpression : ASDialog() {
         ).toInt()
         button.gravity = Gravity.CENTER
         button.setTextSize(2, instance.textSizeNormal)
-        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_dialogItemBackground)
+        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_listDialogItemBackground)
         if (bgRes != 0) {
             button.setBackgroundResource(bgRes)
         } else {
             button.background = instance.listItemBackgroundDrawable
         }
-        val textColorRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_buttonTextColor)
+        val textColorRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_listDialogItemTextColor)
         if (textColorRes != 0) {
             button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
         } else {

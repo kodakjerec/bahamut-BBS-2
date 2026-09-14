@@ -44,4 +44,10 @@
     <color name="pink_button_background_disabled">#FF300A24</color>
     <color name="pink_header_background">#FF401030</color>
     <color name="pink_header_text">#FFFF80C0</color>
+
+    <!-- 對話框項目深色模式配色 -->
+    <color name="dialog_item_background_normal">#FF300000</color>
+    <color name="dialog_item_background_pressed">#FF404040</color>
+    <color name="dialog_item_background_focused">#FF404040</color>
+    <color name="dialog_item_background_disabled">#FF100000</color>
 </resources>

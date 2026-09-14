@@ -81,4 +81,8 @@
     <attr name="bahamut_dialogTitleBackground" format="reference|color" />
     <attr name="bahamut_dialogTitleTextColor" format="reference|color" />
     <attr name="bahamut_dialogBlockBackground" format="reference|color" />
+
+    <!-- 清單對話框項目 (ASListDialog, DialogInsertExpression) 配色 -->
+    <attr name="bahamut_listDialogItemBackground" format="reference" />
+    <attr name="bahamut_listDialogItemTextColor" format="reference|color" />
 </resources>
