@@ -3,6 +3,7 @@
     <!-- 基礎色盤 (Base Palette) -->
     <color name="black">#FF000000</color>
     <color name="dark_gray_10">#FF101010</color>
+    <color name="dark_gray_20">#FF202020</color>
     <color name="white">#FFFFFFFF</color>
     <color name="gray_white">#FFC0C0C0</color>
     <color name="transparent">#00000000</color>
@@ -13,12 +14,13 @@
 
     <!-- 功能性顏色 (保留給程式碼引用) -->
     <color name="page_background">@color/black</color>
+    <color name="dialog_title_background">@color/dark_gray_20</color>
+    <color name="chapter_background">@color/dark_gray_20</color>
     <color name="divider_color">#FF404040</color>
     <color name="ripple_material">#1f000000</color>
     <color name="dialog_border_color">@color/halfWhite</color>
-    <color name="list_page_item_arrow_background">#FF202020</color>
+    <color name="list_page_item_arrow_background">@color/dark_gray_20</color>
     <color name="list_page_item_arrow_color">@color/white</color>
-    <color name="notification_icon_bg_color">#FF9e9e9e</color>
 
     <!-- BBS 內容顯示色彩 (Domain colors) -->
     <color name="mail_box_page_item_view_status">#FFF0F080</color>
@@ -44,24 +46,24 @@
     <color name="board_item_normal_read">@color/halfWhite</color>
 
     <!-- Tab 相關顏色 -->
-    <color name="tab_selected_text_color_normal">#FFFF0000</color>
-    <color name="tab_selected_text_color_pressed">#FFFFFFFF</color>
-    <color name="tab_selected_text_color_focused">#FFFFFFFF</color>
+    <color name="tab_selected_text_color_normal">@color/white</color>
+    <color name="tab_selected_text_color_pressed">@color/white</color>
+    <color name="tab_selected_text_color_focused">@color/white</color>
     <color name="tab_selected_text_color_disable">@color/halfWhite</color>
 
-    <color name="tab_unselected_text_color_normal">#FFFFFFFF</color>
-    <color name="tab_unselected_text_color_pressed">#FFFFFFFF</color>
-    <color name="tab_unselected_text_color_focused">#FFFFFFFF</color>
+    <color name="tab_unselected_text_color_normal">@color/halfWhite</color>
+    <color name="tab_unselected_text_color_pressed">@color/white</color>
+    <color name="tab_unselected_text_color_focused">@color/white</color>
     <color name="tab_unselected_text_color_disable">@color/halfWhite</color>
 
-    <color name="tab_selected_background_color_normal">#FF003030</color>
-    <color name="tab_selected_background_color_pressed">#FFB5E61D</color>
-    <color name="tab_selected_background_color_focused">#FF22B14C</color>
-    <color name="tab_selected_background_color_disabled">@color/transparent</color>
+    <color name="tab_selected_background_color_normal">@color/toolbar_background_color_normal</color>
+    <color name="tab_selected_background_color_pressed">@color/toolbar_background_color_pressed</color>
+    <color name="tab_selected_background_color_focused">@color/toolbar_background_color_focused</color>
+    <color name="tab_selected_background_color_disabled">@color/toolbar_background_color_disabled</color>
 
     <color name="tab_unselected_background_color_normal">@color/transparent</color>
-    <color name="tab_unselected_background_color_pressed">#FFB5E61D</color>
-    <color name="tab_unselected_background_color_focused">#FF22B14C</color>
+    <color name="tab_unselected_background_color_pressed">@color/toolbar_background_color_pressed</color>
+    <color name="tab_unselected_background_color_focused">@color/toolbar_background_color_focused</color>
     <color name="tab_unselected_background_color_disabled">@color/transparent</color>
 
     <!-- Dialog Toolbar Colors -->
@@ -81,11 +83,6 @@
 
     <color name="dialog_select_article_item_background_normal">#FF303030</color>
     <color name="dialog_select_article_item_background_focused">#FF606060</color>
-
-    <color name="ext_toolbar_item_background_normal">#FF000030</color>
-    <color name="ext_toolbar_item_background_pressed">#FF1DB5E6</color>
-    <color name="ext_toolbar_item_background_focused">#FF224CB1</color>
-    <color name="ext_toolbar_item_background_disabled">#FF000020</color>
 
     <color name="toolbar_item_background_normal">#FF003030</color>
     <color name="toolbar_item_background_pressed">#FFB5E61D</color>
@@ -126,11 +123,12 @@
     <color name="pink_header_background">#FFFFC0CB</color>
     <color name="pink_header_text">#FFC71585</color>
 
-    <!-- Dark Theme Colors (Sample) -->
-    <color name="dark_button_background_normal">#FF202020</color>
-    <color name="dark_button_background_pressed">#FF363636</color>
-    <color name="dark_button_background_disabled">#FF282828</color>
-    <color name="dark_button_text">#FFFFFFFF</color>
+    <!-- Dark Theme Colors -->
+    <color name="dark_button_background_normal">@color/toolbar_background_color_normal</color>
+    <color name="dark_button_background_pressed">@color/toolbar_background_color_pressed</color>
+    <color name="dark_button_background_focused">@color/toolbar_background_color_focused</color>
+    <color name="dark_button_background_disabled">@color/toolbar_background_color_disabled</color>
+    <color name="dark_button_text">@color/gray_white</color>
 
     <!-- eInk Theme Colors (Sample) -->
     <color name="eink_button_background_normal">#FFFFFFFF</color>

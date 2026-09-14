@@ -16,7 +16,7 @@
             android:layout_height="40dp"
             style="@style/TextViewLarge"
             android:textColor="@color/white"
-            android:background="@color/list_page_item_arrow_background"
+            android:background="@color/dialog_title_background"
             android:padding="2dp">
         </TextView>
         <Button

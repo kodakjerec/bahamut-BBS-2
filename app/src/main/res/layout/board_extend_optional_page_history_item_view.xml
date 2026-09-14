@@ -41,7 +41,7 @@
                 android:ellipsize="end"
                 android:singleLine="true"
                 android:text="@string/un_input"
-                android:textColor="@color/white" />
+                android:textColor="?attr/bahamut_defaultTextColor" />
         </LinearLayout>
 
         <!-- 操作按鈕 -->

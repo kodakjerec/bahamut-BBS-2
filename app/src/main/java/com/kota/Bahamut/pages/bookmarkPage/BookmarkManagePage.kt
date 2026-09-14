@@ -15,10 +15,8 @@ import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.dialogs.DialogSearchArticle
 import com.kota.Bahamut.dialogs.DialogSearchArticleListener
 import com.kota.Bahamut.listPage.ListStateStore.Companion.instance
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme
+import androidx.core.content.ContextCompat
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.CommonFunctions.rgbToInt
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
@@ -138,13 +136,10 @@ open class BookmarkManagePage(
             }
         }
 
-        val theme = getSelectTheme()
         tabButtons.forEach { btn ->
-            if (btn === aView) {
-                btn.setTextColor(rgbToInt(theme.textColor)); btn.setBackgroundColor(rgbToInt(theme.backgroundColor))
-            } else {
-                btn.setTextColor(rgbToInt(theme.textColorDisabled)); btn.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
-            }
+            val isSelected = (btn === aView)
+            btn.setBackgroundResource(if (isSelected) R.drawable.tab_item_background_color_selected else R.drawable.tab_item_background_color_unselected)
+            btn.setTextColor(ContextCompat.getColorStateList(btn.context, if (isSelected) R.color.tab_item_text_color_selected else R.color.tab_item_text_color_unselected))
         }
     }
 

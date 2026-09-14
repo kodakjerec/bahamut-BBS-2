@@ -16,7 +16,7 @@
         
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:textColor="@color/white"
-            android:background="#202020"
+            android:background="@color/dialog_title_background"
             android:padding="6dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

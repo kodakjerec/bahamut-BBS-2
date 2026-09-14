@@ -14,10 +14,8 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.PostEditText
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme
+import androidx.core.content.ContextCompat
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.CommonFunctions.rgbToInt
 import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.myContext
@@ -102,15 +100,10 @@ class MessageMain:TelnetPage() {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
         // 切換頁籤
-        val theme = getSelectTheme()
         for (tabButton in tabButtons) {
-            if (tabButton == aView) {
-                tabButton.setTextColor(rgbToInt(theme.textColor))
-                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColor))
-            } else {
-                tabButton.setTextColor(rgbToInt(theme.textColorDisabled))
-                tabButton.setBackgroundColor(rgbToInt(theme.backgroundColorDisabled))
-            }
+            val isSelected = (tabButton == aView)
+            tabButton.setBackgroundResource(if (isSelected) R.drawable.tab_item_background_color_selected else R.drawable.tab_item_background_color_unselected)
+            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) R.color.tab_item_text_color_selected else R.color.tab_item_text_color_unselected))
         }
     }
     /** 上一頁 */

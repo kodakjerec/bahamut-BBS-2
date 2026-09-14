@@ -122,12 +122,12 @@ object ThemeStore {
                 themeDarkMode.name = "深色"
 
                 // 全域基礎色彩 (通用按鈕與文字)
-                themeDarkMode.textColor = "#FFC0C0C0"             // 主要文字 (柔和灰白)
-                themeDarkMode.textColorPressed = "#FF808080"      // 按壓時文字 (中灰)
-                themeDarkMode.textColorDisabled = "#FF808080"     // 停用時文字 (中灰)
-                themeDarkMode.backgroundColor = "#FF202020"       // 通用背景 (極深灰)
-                themeDarkMode.backgroundColorPressed = "#FF363636"// 按壓時背景 (深灰)
-                themeDarkMode.backgroundColorDisabled = "#FF282828"// 停用時背景 (暗灰)
+                themeDarkMode.textColor = "#FFE0E0E0"             // 主要文字 (柔和灰白，非刺眼純白)
+                themeDarkMode.textColorPressed = "#FFFFFFFF"      // 按壓時文字 (白色微亮)
+                themeDarkMode.textColorDisabled = "#FF507050"     // 停用時文字 (暗綠灰)
+                themeDarkMode.backgroundColor = "#FF002020"       // 通用背景 (暗墨綠，比白天 #003030 更深)
+                themeDarkMode.backgroundColorPressed = "#FF004848"// 按壓時背景 (深青綠，非刺眼亮綠)
+                themeDarkMode.backgroundColorDisabled = "#FF001414"// 停用時背景 (極深墨綠)
                 themeDarkMode.contentAuthorColor = "#FFC0C0C0"
 
                 themeDarkMode.articleAuthorColor0 = "#FFC0C0C0"

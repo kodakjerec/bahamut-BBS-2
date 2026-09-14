@@ -18,7 +18,7 @@
             style="@style/TextViewLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#202020"
+            android:background="@color/dialog_title_background"
             android:padding="6dp"
             android:text="@string/search_article"
             android:textColor="@color/white" />

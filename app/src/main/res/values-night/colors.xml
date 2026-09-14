@@ -17,4 +17,24 @@
     <!-- 輸入框配色調暗 -->
     <color name="input_box_background">#FF404040</color>
     <color name="input_box_text">@color/gray_white</color>
+
+    <!-- Toolbar 深色模式按鈕配色 (調暗並避免按壓過亮) -->
+    <color name="toolbar_background_color_normal">#FF002020</color>
+    <color name="toolbar_background_color_pressed">#FF004848</color>
+    <color name="toolbar_background_color_focused">#FF004848</color>
+    <color name="toolbar_background_color_disabled">#FF001414</color>
+
+    <!-- Tab 深色模式顏色 -->
+    <color name="tab_selected_text_color_normal">@color/gray_white</color>
+
+    <!-- 看板列表、側邊選單與書籤項目配色調暗 -->
+    <color name="board_page_item_view_status">#FFB0B050</color>
+    <color name="board_page_item_view_number">#FFA07070</color>
+    <color name="board_page_item_view_mark">#FFC06018</color>
+    <color name="board_page_item_view_date">#FF60A060</color>
+    <color name="board_page_item_view_author">#FF8080C0</color>
+    <color name="board_page_item_view_gy_title">#FF008080</color>
+    <color name="board_page_item_view_gy">#FF008080</color>
+    <color name="board_ex_page_item_view_author_title">#FF60A0A0</color>
+    <color name="mail_box_page_item_view_status">#FFB0B050</color>
 </resources>

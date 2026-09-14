@@ -21,13 +21,13 @@
         <item name="bahamut_dialogItemBackground">@drawable/dialog_item_background_color</item>
         <item name="bahamut_editTextColor">@color/input_box_text</item>
         <item name="bahamut_editTextBackground">@color/input_box_background</item>
-        <item name="bahamut_dividerColor">#FF404040</item>
+        <item name="bahamut_dividerColor">@color/divider_color</item>
         <item name="bahamut_listItemHorizontalDivider">#404040</item>
         <item name="bahamut_listItemVerticalDivider">@color/transparent</item>
         <item name="bahamut_defaultTextColor">@color/white</item>
         <item name="bahamut_itemBackground">@color/transparent</item>
-        <item name="bahamut_chapterBackground">#FF202020</item>
-        <item name="bahamut_chapterTextColor">#FFC0C0C0</item>
+        <item name="bahamut_chapterBackground">@color/chapter_background</item>
+        <item name="bahamut_chapterTextColor">@color/gray_white</item>
         <item name="bahamut_checkboxTint">@color/button_checkbox</item>
         <item name="bahamut_sliderActiveColor">#FF99CC00</item>
         <item name="bahamut_sliderInactiveColor">#3399CC00</item>
@@ -69,7 +69,7 @@
     <!-- 深色主題 -->
     <style name="MyTheme.Dark" parent="MyTheme">
         <item name="bahamut_defaultTextColor">@color/gray_white</item>
-        <item name="bahamut_buttonTextColor">@color/gray_white</item>
+        <item name="bahamut_buttonTextColor">@color/dark_button_text_color</item>
         <item name="bahamut_toolbarItemBackground">@drawable/dark_toolbar_item_background</item>
     </style>
 
