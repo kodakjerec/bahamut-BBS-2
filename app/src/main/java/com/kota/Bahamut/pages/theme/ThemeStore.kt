@@ -122,7 +122,6 @@ object ThemeStore {
                 themePink.backgroundColor = "#FFFE00FE"
                 themePink.backgroundColorPressed = "#FFE400E4"
                 themePink.backgroundColorDisabled = "#FF650065"
-                themePink.contentAuthorColor = "#FFFFC0CB"
 
                 themePink.backgroundColorDanger = "#FF800000"
                 themePink.backgroundColorDangerPressed = "#FFFF0000"
@@ -182,7 +181,6 @@ object ThemeStore {
                 themePinkDark.backgroundColor = "#FF701850"
                 themePinkDark.backgroundColorPressed = "#FF902068"
                 themePinkDark.backgroundColorDisabled = "#FF300A24"
-                themePinkDark.contentAuthorColor = "#FFFF80C0"
 
                 themePinkDark.backgroundColorDanger = "#FF800000"
                 themePinkDark.backgroundColorDangerPressed = "#FFFF0000"

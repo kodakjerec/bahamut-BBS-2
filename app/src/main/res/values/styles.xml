@@ -105,12 +105,18 @@
     <style name="MyTheme.Pink" parent="MyTheme">
         <item name="bahamut_buttonTextColor">@color/white</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/white</item>
     </style>
 
     <!-- 粉紅主題 (深色模式) -->
     <style name="MyTheme.Pink.Dark" parent="MyTheme.Dark">
         <item name="bahamut_buttonTextColor">@color/white</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/white</item>
     </style>
 
     <!-- 深色主題 -->
@@ -411,6 +417,9 @@
     <style name="Dialog.NoTitleBar.Pink" parent="Dialog.NoTitleBar">
         <item name="bahamut_buttonTextColor">@color/white</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/white</item>
     </style>
 
     <style name="Dialog.NoTitleBar.Dark" parent="Dialog.NoTitleBar">
@@ -426,6 +435,9 @@
     <style name="Dialog.NoTitleBar.Pink.Dark" parent="Dialog.NoTitleBar.Dark">
         <item name="bahamut_buttonTextColor">@color/white</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/white</item>
     </style>
 
     <style name="Dialog.NoTitleBar.eInk" parent="Dialog.NoTitleBar">
