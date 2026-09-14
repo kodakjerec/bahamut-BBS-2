@@ -65,15 +65,18 @@ object ThemeStore {
 
     /** 
      * 取得目前應該套用的外觀物件。
-     * 若開啟「跟隨系統深色模式」且系統處於深色模式，則強制返回深色主題。
+     * 若開啟「跟隨系統深色模式」且系統處於深色模式，則依使用者選取的風格返回對應深色主題。
      */
     fun getSelectTheme(): Theme {
-        if (UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)) {
-            // 強制返回深色主題 (即使它不顯示在清單中)
-            return getDefaultTheme(2)
+        val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
+        val themeIndex = getSelectIndex()
+        if (isDark) {
+            return when (themeIndex) {
+                1 -> getDefaultTheme(4) // 粉紅深色
+                else -> getDefaultTheme(2) // 預設深色
+            }
         }
         val themes = getThemeStore()
-        val themeIndex = getSelectIndex()
         if (themeIndex >= 0 && themeIndex < themes.size) {
             return themes[themeIndex]
         }
@@ -89,15 +92,12 @@ object ThemeStore {
 
     /** 取得目前應該套用的原生主題資源 ID (用於 Activity.setTheme) */
     fun getThemeResId(): Int {
-        if (UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)) {
-            return R.style.MyTheme_Dark
-        }
-        
+        val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
         val index = getSelectIndex()
         return when(index) {
-            1 -> R.style.MyTheme_Pink
+            1 -> if (isDark) R.style.MyTheme_Pink_Dark else R.style.MyTheme_Pink
             2 -> R.style.MyTheme_eInk
-            else -> R.style.MyTheme
+            else -> if (isDark) R.style.MyTheme_Dark else R.style.MyTheme
         }
     }
 
@@ -166,6 +166,31 @@ object ThemeStore {
                 themeEInk.backgroundColorDangerPressed = "#FF444444"
                 themeEInk.textColorDanger = "#FFFFFFFF"
                 return themeEInk
+            }
+            4 -> { // 粉紅深色模式 (保留作為系統跟隨用)
+                val themePinkDark = Theme()
+                themePinkDark.name = "粉紅深色"
+
+                // 全域基礎色彩 (通用按鈕與文字)
+                themePinkDark.textColor = "#FFE0E0E0"
+                themePinkDark.textColorPressed = "#FFFFFFFF"
+                themePinkDark.textColorDisabled = "#FF805068"
+                themePinkDark.backgroundColor = "#FF701850"
+                themePinkDark.backgroundColorPressed = "#FF902068"
+                themePinkDark.backgroundColorDisabled = "#FF300A24"
+                themePinkDark.contentAuthorColor = "#FFFF80C0"
+
+                themePinkDark.articleAuthorColor0 = "#FFC0C0C0"
+                themePinkDark.articleContentColor0 = "#FFC0C0C0"
+                themePinkDark.articleAuthorColor1 = "#FFFF80C0"
+                themePinkDark.articleContentColor1 = "#FFFFB0D0"
+                themePinkDark.articlePushAuthorColor = "#FF808080"
+                themePinkDark.articlePushContentColor = "#FF808000"
+
+                themePinkDark.backgroundColorDanger = "#FF800000"
+                themePinkDark.backgroundColorDangerPressed = "#FFFF0000"
+                themePinkDark.textColorDanger = "#FFE0E0E0"
+                return themePinkDark
             }
             else -> {
                 return Theme()

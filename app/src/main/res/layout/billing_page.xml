@@ -31,7 +31,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="@string/billing_page_note"
-                android:textColor="@color/button_text_color"
+                android:textColor="?attr/bahamut_defaultTextColor"
                 android:textSize="14sp" />
 
             <TextView
@@ -40,7 +40,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:text="@string/billing_page_note2"
-                android:textColor="@color/yellow"
+                android:textColor="?attr/bahamut_titleBarTitleColor"
                 android:textSize="16sp" />
 
             <!-- 原本的贊助按鈕區塊 -->
@@ -88,7 +88,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:textColor="@color/white"
+                        android:textColor="?attr/bahamut_defaultTextColor"
                         android:text="@string/billing_page_already_billing_text" />
 
                     <com.kota.telnetUI.textView.TelnetTextViewNormal
@@ -98,7 +98,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:textColor="@color/white" />
+                        android:textColor="?attr/bahamut_defaultTextColor" />
                 </LinearLayout>
             </LinearLayout>
 

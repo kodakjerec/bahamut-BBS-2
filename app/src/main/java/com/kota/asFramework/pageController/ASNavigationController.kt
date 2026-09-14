@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.View
 import android.view.ViewGroup
@@ -176,7 +177,16 @@ open class ASNavigationController : Activity() {
     private fun buildPageView(controller: ASViewController) {
         val pageView = ASPageView(this)
         pageView.layoutParams = FrameLayout.LayoutParams(-1, -1)
-        pageView.setBackgroundResource(R.color.page_background)
+        val typedValue = TypedValue()
+        if (theme.resolveAttribute(R.attr.bahamut_pageBackground, typedValue, true)) {
+            if (typedValue.resourceId != 0) {
+                pageView.setBackgroundResource(typedValue.resourceId)
+            } else {
+                pageView.setBackgroundColor(typedValue.data)
+            }
+        } else {
+            pageView.setBackgroundResource(R.color.page_background)
+        }
         layoutInflater.inflate(controller.pageLayout, pageView)
         controller.pageView = pageView
         this.rootView?.contentView?.addView(pageView)

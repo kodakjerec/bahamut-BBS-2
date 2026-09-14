@@ -55,6 +55,7 @@ import com.kota.Bahamut.pages.model.BoardPageHandler
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.pages.model.ToolBarFloating
 import androidx.core.content.ContextCompat
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
@@ -1133,12 +1134,17 @@ open class BoardMainPage : TelnetListPage(),
             drawerListView.onItemClickListener = bookmarkListener
 
         // 填上顏色: 書籤. 紀錄
+        val selectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedBackground)
+        val unselectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedBackground)
+        val selectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedTextColor)
+        val unselectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedTextColor)
+
         var selectedView = aView
         if(selectedView == null) selectedView = tabButtons[myMode]
         for (tabButton in this@BoardMainPage.tabButtons) {
             val isSelected = (tabButton === selectedView)
-            tabButton.setBackgroundResource(if (isSelected) R.drawable.tab_item_background_color_selected else R.drawable.tab_item_background_color_unselected)
-            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) R.color.tab_item_text_color_selected else R.color.tab_item_text_color_unselected))
+            tabButton.setBackgroundResource(if (isSelected) selectedBgRes else unselectedBgRes)
+            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) selectedTextRes else unselectedTextRes))
         }
     }
 

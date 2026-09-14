@@ -10,8 +10,10 @@ import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions
 import java.util.Vector
 import kotlin.math.ceil
 
@@ -95,13 +97,13 @@ class ASListDialog : ASDialog() {
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
         this.titleLabel?.setPadding(padding, padding, padding, padding)
-        this.titleLabel?.setTextColor(-1)
+        this.titleLabel?.setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogTitleTextColor))
         this.titleLabel?.setTextSize(
             2,
             ASLayoutParams.instance.textSizeLarge
         )
         this.titleLabel?.text = "選項"
-        this.titleLabel?.setBackgroundColor(-14671840)
+        this.titleLabel?.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dialogTitleBackground))
         this.titleLabel?.gravity = Gravity.CENTER
         this.contentView?.addView(this.titleLabel)
         this.itemBlock = LinearLayout(context)
@@ -174,7 +176,7 @@ class ASListDialog : ASDialog() {
             ).toDouble()
         ).toInt()
         divider.layoutParams = LinearLayout.LayoutParams(-1, dividerHeight)
-        divider.setBackgroundColor(-2130706433)
+        divider.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
         return divider
     }
 
@@ -202,8 +204,18 @@ class ASListDialog : ASDialog() {
                 button.setTextSize(2, ASLayoutParams.instance.textSizeUltraLarge)
             }
         }
-        button.background = ASLayoutParams.instance .listItemBackgroundDrawable
-        button.setTextColor(ASLayoutParams.instance.listItemTextColor)
+        val bgRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerBackground else R.attr.bahamut_dialogItemBackground)
+        if (bgRes != 0) {
+            button.setBackgroundResource(bgRes)
+        } else {
+            button.background = ASLayoutParams.instance.listItemBackgroundDrawable
+        }
+        val textColorRes = CommonFunctions.getThemeResourceId(if (isDanger) R.attr.bahamut_buttonDangerTextColor else R.attr.bahamut_buttonTextColor)
+        if (textColorRes != 0) {
+            button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
+        } else {
+            button.setTextColor(ASLayoutParams.instance.listItemTextColor)
+        }
         button.isSingleLine = true
         return button
     }

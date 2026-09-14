@@ -16,7 +16,7 @@
                 android:layout_weight="1">
                 <!-- 文字模式 -->
                 <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
-                    android:id="@+id/Essence_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                    android:id="@+id/Essence_listEmptyView" android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.asFramework.ui.ASListView
                     android:id="@+id/Essence_contentList"
                     style="@style/List"

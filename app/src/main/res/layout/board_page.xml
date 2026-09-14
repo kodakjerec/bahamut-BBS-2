@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="end">
-    <RelativeLayout android:orientation="vertical" android:id="@+id/content_view" android:layout_width="match_parent" android:layout_height="match_parent">
+    <RelativeLayout android:orientation="vertical" android:id="@+id/content_view" android:background="?attr/bahamut_pageBackground" android:layout_width="match_parent" android:layout_height="match_parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -14,7 +14,7 @@
                 android:id="@+id/BoardPage_HeaderView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
             <FrameLayout android:id="@+id/BoardPage_ListViewBlock" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
                 <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
-                    android:textColor="@color/white" android:gravity="center" android:id="@+id/BoardPageListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                    android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:id="@+id/BoardPageListEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.asFramework.ui.ASListView
                     android:id="@+id/BoardPageListView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
             </FrameLayout>
@@ -100,8 +100,8 @@
             <Button
                 android:id="@+id/show_bookmark_button"
                 style="@style/ToolbarItem.RightMenu"
-                android:background="@drawable/tab_item_background_color_selected"
-                android:textColor="@color/tab_item_text_color_selected"
+                android:background="?attr/bahamut_tabSelectedBackground"
+                android:textColor="?attr/bahamut_tabSelectedTextColor"
                 android:text="@string/bookmark" />
 
             <View style="@style/ToolbarDivider" />
@@ -109,18 +109,18 @@
             <Button
                 android:id="@+id/show_history_button"
                 style="@style/ToolbarItem.RightMenu"
-                android:background="@drawable/tab_item_background_color_unselected"
-                android:textColor="@color/tab_item_text_color_unselected"
+                android:background="?attr/bahamut_tabUnselectedBackground"
+                android:textColor="?attr/bahamut_tabUnselectedTextColor"
                 android:text="@string/record" />
         </LinearLayout>
 
-        <View android:layout_width="match_parent" android:layout_height="3dp" android:background="@color/black" />
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="?attr/bahamut_dividerColor" />
 
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/toolbar_item_background_color">
+            android:background="?attr/bahamut_toolbarItemBackground">
 
             <Button
                 android:id="@+id/search_article_button"
@@ -139,7 +139,7 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:background="@drawable/toolbar_item_background_color">
+            android:background="?attr/bahamut_toolbarItemBackground">
             <CheckBox
                 android:id="@+id/block_enable_button_checkbox"
                 style="@style/CheckboxBahamut"

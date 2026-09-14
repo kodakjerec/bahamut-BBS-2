@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="wrap_content">
-    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="@color/list_page_item_content_background" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
+    <LinearLayout android:gravity="center_vertical" android:orientation="horizontal" android:background="?attr/bahamut_pageBackground" android:layout_width="match_parent" android:layout_height="wrap_content" style="@style/BaseTouchPart">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
             android:gravity="center_vertical"
             android:id="@+id/BlockListItemView_Name"
@@ -10,16 +10,16 @@
             android:singleLine="true"
             android:layout_weight="1"
             style="@style/TextViewLarge"/>
-        <Button android:textSize="24sp"
-            android:gravity="center"
+        <Button
             android:id="@+id/BlockListItemView_Delete"
+            style="@style/ToolbarItem.Danger"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="0"
             android:minWidth="100dp"
-            android:text="@string/delete"
-            style="@style/TouchBlock"
-            android:textColor="?attr/bahamut_buttonTextColor"
-            android:background="?attr/bahamut_dialogItemBackground"/>
+            android:minHeight="48dp"
+            android:padding="6dp"
+            android:text="@string/delete"/>
     </LinearLayout>
     <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
 </LinearLayout>

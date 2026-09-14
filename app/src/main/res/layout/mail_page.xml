@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:id="@+id/content_view"
+    android:background="?attr/bahamut_pageBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
@@ -20,13 +21,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
                 <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
-                    android:id="@+id/Mail_listEmptyView" android:textColor="@color/white" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
+                    android:id="@+id/Mail_listEmptyView" android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/loading_" style="@style/TextViewUltraLarge"/>
                 <com.kota.asFramework.ui.ASListView
                     android:id="@+id/Mail_contentList"
                     style="@style/List"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:divider="@color/divider_color"
+                    android:divider="@null"
+                    android:dividerHeight="0dp"
                     android:listSelector="@null"
                     android:scrollbars="vertical" />
             </FrameLayout>

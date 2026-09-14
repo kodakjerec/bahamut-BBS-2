@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dialog_border_color"
+    android:background="?attr/bahamut_dialogBorderColor"
     android:id="@+id/dialog_paint_color_content_view"
     android:orientation="vertical"
     android:padding="3dp">
@@ -13,7 +13,8 @@
         android:orientation="vertical"
         android:background="?attr/bahamut_pageBackground">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white" android:background="@color/dialog_title_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
+            android:textColor="?attr/bahamut_dialogTitleTextColor" android:background="?attr/bahamut_dialogTitleBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
+        <View style="@style/HorizontalDivider" />
         <ScrollView android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
             <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <RelativeLayout android:id="@+id/dialog_paint_color_check_recovery_item" style="@style/SystemSettingsItem">

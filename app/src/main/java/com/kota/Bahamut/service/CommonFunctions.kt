@@ -59,6 +59,18 @@ object CommonFunctions {
         return typedValue.data
     }
 
+    /**
+     * 取得主題屬性資源 ID
+     * @param attrItem R.attr.XX
+     * @return 資源ID(int)
+     */
+    @JvmStatic
+    fun getThemeResourceId(attrItem: Int): Int {
+        val typedValue = TypedValue()
+        TempSettings.myContext?.theme?.resolveAttribute(attrItem, typedValue, true)
+        return typedValue.resourceId
+    }
+
     /** 輸入 R.string.XX 回傳 文字內容(string)
      * @param rStringItem R.string.XX
      * @response string

@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:padding="3dp"
-    android:background="@color/dialog_border_color">
+    android:background="?attr/bahamut_dialogBorderColor">
     <LinearLayout
         android:id="@+id/as_processing_dialog_content_view"
         android:layout_width="wrap_content"
@@ -22,6 +22,7 @@
             android:id="@+id/as_processing_dialog_progress_bar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:indeterminateTint="?attr/bahamut_defaultTextColor"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
             android:paddingTop="0dp"
@@ -31,7 +32,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
-            android:textColor="@color/white"
+            android:textColor="?attr/bahamut_defaultTextColor"
             android:gravity="center_horizontal"
             android:text="@string/dialog_shorten_url_under_transfer"/>
     </LinearLayout>

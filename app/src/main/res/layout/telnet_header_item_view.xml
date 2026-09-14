@@ -1,25 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content" android:id="@+id/header_item_view">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
     <LinearLayout
-        android:orientation="vertical"
-        android:background="?attr/bahamut_titleBarBackground"
-        android:layout_width="0dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        style="@style/TouchBlock">
-        <com.kota.telnetUI.textView.TelnetTextViewNormal
-            android:textColor="@color/yellow"
-            android:id="@+id/title"
-            android:layout_width="match_parent"
+        android:background="?attr/bahamut_titleBarBackground"
+        android:id="@+id/header_item_view">
+        <LinearLayout
+            android:orientation="vertical"
+            android:background="?attr/bahamut_titleBarBackground"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            style="@style/TextViewNormal"
-            android:textIsSelectable="true"/>
-        <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-            <com.kota.telnetUI.textView.TelnetTextViewSmall
-                android:textColor="@color/white" android:ellipsize="end" android:id="@+id/detail_1" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
-            <com.kota.telnetUI.textView.TelnetTextViewSmall
-                android:textColor="@color/article_page_header_board" android:id="@+id/detail_2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:singleLine="true" style="@style/TextViewSmall"/>
+            android:layout_weight="1"
+            style="@style/TouchBlock">
+            <com.kota.telnetUI.textView.TelnetTextViewNormal
+                android:textColor="?attr/bahamut_titleBarTitleColor"
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/TextViewNormal"
+                android:textIsSelectable="true"/>
+            <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="?attr/bahamut_titleBarDetailColor"
+                    android:ellipsize="end"
+                    android:id="@+id/detail_1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:layout_weight="1"
+                    style="@style/TextViewSmall"/>
+                <com.kota.telnetUI.textView.TelnetTextViewSmall
+                    android:textColor="?attr/bahamut_titleBarDetail2Color"
+                    android:id="@+id/detail_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    style="@style/TextViewSmall"/>
+            </LinearLayout>
         </LinearLayout>
+        <ImageButton
+            android:gravity="center"
+            android:id="@+id/menu_button"
+            android:tint="?attr/bahamut_defaultTextColor"
+            android:background="?attr/bahamut_titleBarMenuIconBackground"
+            android:visibility="gone"
+            android:layout_width="60dp"
+            android:layout_height="match_parent"
+            android:src="@drawable/menu_icon"
+            android:contentDescription="@string/zero_word"/>
     </LinearLayout>
-    <ImageButton android:gravity="center" android:id="@+id/menu_button" android:background="?attr/bahamut_titleBarMenuIconBackground" android:visibility="gone" android:layout_width="60dp" android:layout_height="match_parent" android:src="@drawable/menu_icon" android:contentDescription="@string/zero_word"/>
+    <View style="@style/HorizontalDivider"/>
 </LinearLayout>

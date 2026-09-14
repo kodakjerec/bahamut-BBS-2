@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 基礎色盤 (Base Palette) -->
+    <!-- 基礎色盤 -->
     <color name="black">#FF000000</color>
     <color name="dark_gray_10">#FF101010</color>
     <color name="dark_gray_20">#FF202020</color>
@@ -22,7 +22,7 @@
     <color name="list_page_item_arrow_background">@color/dark_gray_20</color>
     <color name="list_page_item_arrow_color">@color/white</color>
 
-    <!-- BBS 內容顯示色彩 (Domain colors) -->
+    <!-- BBS 內容顯示色彩 -->
     <color name="mail_box_page_item_view_status">#FFF0F080</color>
     <color name="mail_box_page_item_view_mark">#FFFF7F27</color>
     <color name="mail_box_page_item_view_reply">#FF00FFFF</color>
@@ -45,7 +45,7 @@
     <color name="board_item_normal">@color/white</color>
     <color name="board_item_normal_read">@color/halfWhite</color>
 
-    <!-- Tab 相關顏色 -->
+    <!-- 標籤頁相關顏色 -->
     <color name="tab_selected_text_color_normal">@color/white</color>
     <color name="tab_selected_text_color_pressed">@color/white</color>
     <color name="tab_selected_text_color_focused">@color/white</color>
@@ -66,16 +66,16 @@
     <color name="tab_unselected_background_color_focused">@color/toolbar_background_color_focused</color>
     <color name="tab_unselected_background_color_disabled">@color/transparent</color>
 
-    <!-- Dialog Toolbar Colors -->
+    <!-- 對話框工具列顏色 -->
     <color name="dialog_toolbar_background_color_normal">#FF400000</color>
     <color name="dialog_toolbar_background_color_pressed">#FFFFC90E</color>
     <color name="dialog_toolbar_background_color_focused">#FFFF7F27</color>
     <color name="dialog_toolbar_background_color_disabled">#FF200000</color>
 
-    <!-- Other UI Colors -->
+    <!-- 其他介面顏色 -->
     <color name="list_page_item_content_background">@color/page_background</color>
 
-    <!-- Base UI Background Colors (to be used in drawables) -->
+    <!-- 基礎介面背景顏色 (供 Drawable 使用) -->
     <color name="dialog_item_background_normal">#FF400000</color>
     <color name="dialog_item_background_pressed">#FFFFC90E</color>
     <color name="dialog_item_background_focused">#FFFF7F27</color>
@@ -93,7 +93,7 @@
     <color name="toolbar_background_color_focused">#FF22B14C</color>
     <color name="toolbar_background_color_disabled">#FF001A1A</color>
 
-    <!-- Board Page Item Colors -->
+    <!-- 看板列表項目顏色 -->
     <color name="board_page_item_view_status">#FFF0F080</color>
     <color name="board_page_item_view_number">#FFC08080</color>
     <color name="board_page_item_view_mark">#FFFF7F27</color>
@@ -105,7 +105,7 @@
 
     <color name="time_line_background_color">#FF224CB1</color>
 
-    <!-- Additional Missing Colors -->
+    <!-- 其他補充顏色 -->
     <color name="dialog_select_article_background_color_normal">#FF303030</color>
     <color name="dialog_select_article_background_color_focused">#FF606060</color>
     <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
@@ -116,23 +116,25 @@
     <color name="input_box_background">#FFE0E0E0</color>
     <color name="input_box_text">@color/black</color>
 
-    <!-- Pink Theme Colors -->
+    <!-- 粉紅主題配色 -->
     <color name="pink_button_background_normal">#FFFE00FE</color>
     <color name="pink_button_background_pressed">#FFE400E4</color>
     <color name="pink_button_background_disabled">#FF650065</color>
     <color name="pink_header_background">#FFFFC0CB</color>
     <color name="pink_header_text">#FFC71585</color>
 
-    <!-- Dark Theme Colors -->
+    <!-- 深色主題配色 -->
     <color name="dark_button_background_normal">@color/toolbar_background_color_normal</color>
     <color name="dark_button_background_pressed">@color/toolbar_background_color_pressed</color>
     <color name="dark_button_background_focused">@color/toolbar_background_color_focused</color>
     <color name="dark_button_background_disabled">@color/toolbar_background_color_disabled</color>
     <color name="dark_button_text">@color/gray_white</color>
 
-    <!-- eInk Theme Colors (Sample) -->
+    <!-- 電子紙主題配色 (E-Ink) -->
     <color name="eink_button_background_normal">#FFFFFFFF</color>
     <color name="eink_button_background_pressed">#FF000000</color>
     <color name="eink_button_text_normal">#FF000000</color>
     <color name="eink_button_text_pressed">#FFFFFFFF</color>
+    <color name="eink_button_danger_background_normal">#FF000000</color>
+    <color name="eink_button_danger_background_pressed">#FF444444</color>
 </resources>

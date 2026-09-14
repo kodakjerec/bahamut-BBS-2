@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="?attr/bahamut_pageBackground"
     android:id="@+id/content_view">
 
     <com.kota.telnetUI.TelnetHeaderItemView
@@ -24,7 +25,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:text="@string/loading_"
-            android:textColor="@color/white"
+            android:textColor="?attr/bahamut_defaultTextColor"
             android:visibility="invisible" />
 
         <com.kota.asFramework.ui.ASListView
@@ -47,7 +48,7 @@
         android:height="60dp"
         android:textSize="20sp"
         android:gravity="center_vertical"
-        android:textColor="@color/article_page_text_item_content0"
+        android:textColor="?attr/bahamut_articleContentColor0"
         android:visibility="gone" />
     <LinearLayout
         android:id="@+id/toolbar"

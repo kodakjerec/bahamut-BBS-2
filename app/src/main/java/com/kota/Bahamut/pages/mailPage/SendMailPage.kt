@@ -19,6 +19,7 @@ import com.kota.Bahamut.dialogs.DialogPaintColor
 import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnetUI.TelnetPage
@@ -242,15 +243,16 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
+        val textColor = getThemeColor(R.attr.bahamut_defaultTextColor)
         if (v === receiverField) {
             if (hasFocus) {
                 receiverField.isSingleLine = false
                 receiverFieldBackground.setTextColor(0)
-                receiverField.setTextColor(-1)
+                receiverField.setTextColor(textColor)
             } else {
                 receiverField.isSingleLine = true
                 receiverField.setTextColor(0)
-                receiverFieldBackground.setTextColor(-1)
+                receiverFieldBackground.setTextColor(textColor)
                 receiverFieldBackground.text = receiverField.text.toString()
             }
         }
@@ -259,13 +261,13 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         }
         if (hasFocus) {
             titleField.isSingleLine = false
-            titleField.setTextColor(-1)
+            titleField.setTextColor(textColor)
             titleFieldBackground.setTextColor(0)
             return
         }
         titleField.isSingleLine = true
         titleField.setTextColor(0)
-        titleFieldBackground.setTextColor(-1)
+        titleFieldBackground.setTextColor(textColor)
         titleFieldBackground.text = titleField.text.toString()
     }
 

@@ -18,13 +18,13 @@
     <color name="input_box_background">#FF404040</color>
     <color name="input_box_text">@color/gray_white</color>
 
-    <!-- Toolbar 深色模式按鈕配色 (調暗並避免按壓過亮) -->
+    <!-- 工具列深色模式按鈕配色 (調暗並避免按壓過亮) -->
     <color name="toolbar_background_color_normal">#FF002020</color>
     <color name="toolbar_background_color_pressed">#FF004848</color>
     <color name="toolbar_background_color_focused">#FF004848</color>
     <color name="toolbar_background_color_disabled">#FF001414</color>
 
-    <!-- Tab 深色模式顏色 -->
+    <!-- 標籤頁深色模式顏色 -->
     <color name="tab_selected_text_color_normal">@color/gray_white</color>
 
     <!-- 看板列表、側邊選單與書籤項目配色調暗 -->
@@ -37,4 +37,11 @@
     <color name="board_page_item_view_gy">#FF008080</color>
     <color name="board_ex_page_item_view_author_title">#FF60A0A0</color>
     <color name="mail_box_page_item_view_status">#FFB0B050</color>
+
+    <!-- 粉紅主題深色模式配色 -->
+    <color name="pink_button_background_normal">#FF701850</color>
+    <color name="pink_button_background_pressed">#FF902068</color>
+    <color name="pink_button_background_disabled">#FF300A24</color>
+    <color name="pink_header_background">#FF401030</color>
+    <color name="pink_header_text">#FFFF80C0</color>
 </resources>

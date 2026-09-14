@@ -4,6 +4,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/bahamut_pageBackground"
     android:id="@+id/content_view">
     <View style="@style/ItemViewDividerHorizontal"/>
     <LinearLayout
@@ -30,11 +31,13 @@
             android:background="?attr/bahamut_itemBackground"
             android:gravity="center"
             android:hint="@string/please_input_id"
+            android:textColor="?attr/bahamut_defaultTextColor"
+            android:textColorHint="@color/halfWhite"
             android:inputType="text"
             android:singleLine="true"/>
         <Button
             android:id="@+id/BlockList_Add"
-            style="@style/ToolbarItem.Danger"
+            style="@style/ToolbarItem"
             android:layout_weight="0"
             android:minHeight="48dp"
             android:minWidth="100dp"

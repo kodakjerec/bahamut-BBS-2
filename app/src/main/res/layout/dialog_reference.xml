@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dialog_border_color"
+    android:background="?attr/bahamut_dialogBorderColor"
     android:orientation="vertical"
     android:padding="3dp"
     android:id="@+id/dialog_reference_layout">
@@ -18,10 +18,12 @@
             style="@style/TextViewLarge"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/dialog_title_background"
+            android:background="?attr/bahamut_dialogTitleBackground"
             android:padding="6dp"
             android:text="@string/dialog_reference_title"
-            android:textColor="@color/white" />
+            android:textColor="?attr/bahamut_dialogTitleTextColor" />
+
+        <View style="@style/HorizontalDivider" />
 
         <ScrollView
             android:layout_width="match_parent"
@@ -42,7 +44,7 @@
                         android:layout_weight="1"
                         android:orientation="vertical"
                         android:layout_margin="3dp"
-                        android:background="@color/list_page_item_arrow_background">
+                        android:background="?attr/bahamut_dialogBlockBackground">
 
                         <CheckBox
                             android:id="@+id/Dialog_reference_author1"
@@ -75,7 +77,7 @@
                                 style="@style/TextViewNormal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="?attr/bahamut_defaultTextColor"
                                 android:text="@string/dialog_reference_reserved_type"/>
 
                             <RadioGroup
@@ -116,7 +118,7 @@
                     android:layout_weight="1"
                     android:orientation="vertical"
                     android:layout_margin="3dp"
-                    android:background="@color/list_page_item_arrow_background">
+                    android:background="?attr/bahamut_dialogBlockBackground">
 
                         <CheckBox
                             android:id="@+id/Dialog_reference_author0"
@@ -146,7 +148,7 @@
                                 style="@style/TextViewNormal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:textColor="@color/white"
+                                android:textColor="?attr/bahamut_defaultTextColor"
                                 android:text="@string/dialog_reference_reserved_type" />
 
                             <RadioGroup
@@ -189,7 +191,7 @@
                         android:text="@string/dialog_reference_authorNone"
                         android:textSize="24sp"
                         android:layout_margin="3dp"
-                        android:background="@color/list_page_item_arrow_background" />
+                        android:background="?attr/bahamut_dialogBlockBackground" />
                 </LinearLayout>
         </ScrollView>
 

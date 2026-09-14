@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/list_page_item_content_background"
+            android:background="?attr/bahamut_pageBackground"
             android:orientation="horizontal">
 
             <com.kota.telnetUI.textView.TelnetTextViewNormal
@@ -30,7 +30,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/title_"
-                android:textColor="@color/mail_box_page_item_view_status" />
+                android:textColor="?attr/bahamut_boardItemStatusColor" />
 
             <com.kota.telnetUI.textView.TelnetTextViewNormal
                 android:id="@+id/BoardExtendOptionalPage_historyItemView_Title"

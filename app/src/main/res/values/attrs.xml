@@ -4,7 +4,9 @@
     <attr name="bahamut_titleBarBackground" format="reference|color" />
     <attr name="bahamut_toolbarDivider" format="reference|color" />
     <attr name="bahamut_buttonTextColor" format="reference|color" />
+    <attr name="bahamut_buttonDangerTextColor" format="reference|color" />
     <attr name="bahamut_toolbarItemBackground" format="reference" />
+    <attr name="bahamut_buttonDangerBackground" format="reference" />
     <attr name="bahamut_dialogItemBackground" format="reference" />
     <attr name="bahamut_editTextColor" format="reference|color" />
     <attr name="bahamut_editTextBackground" format="reference|color" />
@@ -30,6 +32,17 @@
     <attr name="bahamut_dialogBorderColor" format="reference|color" />
     <attr name="bahamut_pageBackground" format="reference|color" />
     <attr name="bahamut_titleBarMenuIconBackground" format="reference|color" />
+    <attr name="bahamut_titleBarTitleColor" format="reference|color" />
+    <attr name="bahamut_titleBarDetailColor" format="reference|color" />
+    <attr name="bahamut_titleBarDetail2Color" format="reference|color" />
+
+    <!-- 看板分類列表項目 (ClassPageItem) 配色 -->
+    <attr name="bahamut_classItemNameColor" format="reference|color" />
+    <attr name="bahamut_classItemManagerColor" format="reference|color" />
+
+    <!-- 列表右側箭頭項目 (RightArrow) 配色 -->
+    <attr name="bahamut_arrowBackground" format="reference|color" />
+    <attr name="bahamut_arrowColor" format="reference|color" />
 
     <!-- 文章內文配色 -->
     <attr name="bahamut_articleAuthorColor0" format="reference|color" />
@@ -44,4 +57,28 @@
     <attr name="bahamut_boardItemFollowOtherReadColor" format="reference|color" />
     <attr name="bahamut_boardItemNormalColor" format="reference|color" />
     <attr name="bahamut_boardItemNormalReadColor" format="reference|color" />
+
+    <!-- 看板文章列表項目 (BoardPageItem) 配色 -->
+    <attr name="bahamut_boardItemStatusColor" format="reference|color" />
+    <attr name="bahamut_boardItemNumberColor" format="reference|color" />
+    <attr name="bahamut_boardItemMarkColor" format="reference|color" />
+    <attr name="bahamut_boardItemDateColor" format="reference|color" />
+    <attr name="bahamut_boardItemGyColor" format="reference|color" />
+    <attr name="bahamut_boardItemAuthorColor" format="reference|color" />
+    <attr name="bahamut_mailItemReplyColor" format="reference|color" />
+
+    <!-- 側邊選單書籤/歷史 (drawerItem) 配色 -->
+    <attr name="bahamut_boardExAuthorTitleColor" format="reference|color" />
+    <attr name="bahamut_boardExAuthorColor" format="reference|color" />
+
+    <!-- 標籤頁切換 (Tab) 配色 -->
+    <attr name="bahamut_tabSelectedBackground" format="reference" />
+    <attr name="bahamut_tabUnselectedBackground" format="reference" />
+    <attr name="bahamut_tabSelectedTextColor" format="reference|color" />
+    <attr name="bahamut_tabUnselectedTextColor" format="reference|color" />
+
+    <!-- 對話框配色 -->
+    <attr name="bahamut_dialogTitleBackground" format="reference|color" />
+    <attr name="bahamut_dialogTitleTextColor" format="reference|color" />
+    <attr name="bahamut_dialogBlockBackground" format="reference|color" />
 </resources>

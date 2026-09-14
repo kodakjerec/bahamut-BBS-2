@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/bahamut_pageBackground"
     android:id="@+id/content_view">
     <com.kota.telnetUI.TelnetHeaderItemView
         android:id="@+id/BoardExtendOptionalPage_headerView" android:layout_width="match_parent" android:layout_height="wrap_content"/>
@@ -12,10 +13,10 @@
             android:layout_weight="1"
             android:id="@+id/recycleView"/>
     <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <Button android:textColor="@color/tab_item_text_color_selected" android:id="@+id/BoardExtendOptionalPage_bookmarkButton" android:background="@drawable/tab_item_background_color_selected" android:text="@string/bookmark" style="@style/ToolbarItem"/>
+        <Button android:textColor="?attr/bahamut_tabSelectedTextColor" android:id="@+id/BoardExtendOptionalPage_bookmarkButton" android:background="?attr/bahamut_tabSelectedBackground" android:text="@string/bookmark" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_historyButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/record" style="@style/ToolbarItem"/>
+        <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/BoardExtendOptionalPage_historyButton" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/record" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:enabled="false" android:textColor="@color/tab_item_text_color_unselected" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="@drawable/tab_item_background_color_unselected" android:text="@string/zero_word" style="@style/ToolbarItem" android:contentDescription="@string/no_use"/>
+        <Button android:enabled="false" android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/zero_word" style="@style/ToolbarItem" android:contentDescription="@string/no_use"/>
     </LinearLayout>
 </LinearLayout>

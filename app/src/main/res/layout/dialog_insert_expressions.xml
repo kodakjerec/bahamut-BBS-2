@@ -2,32 +2,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/dialog_border_color"
+    android:background="?attr/bahamut_dialogBorderColor"
     android:orientation="vertical">
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:background="?attr/bahamut_pageBackground"
+        android:background="?attr/bahamut_dialogTitleBackground"
         android:layout_margin="3.0dp">
         <TextView
             android:id="@+id/dialog_insert_expressions_title"
             android:layout_width="match_parent"
             android:layout_height="40dp"
             style="@style/TextViewLarge"
-            android:textColor="@color/white"
-            android:background="@color/dialog_title_background"
-            android:padding="2dp">
+            android:gravity="center_vertical"
+            android:textColor="?attr/bahamut_dialogTitleTextColor"
+            android:background="?attr/bahamut_dialogTitleBackground"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp">
         </TextView>
         <Button
             android:id="@+id/dialog_insert_expressions_setting"
+            style="@style/ToolbarItem"
             android:layout_width="60dp"
             android:layout_height="40dp"
             android:text="@string/setting"
-            android:textColor="@color/white"
-            android:background="@color/dialog_select_article_background_color_normal"
+            android:textSize="18sp"
             android:layout_alignParentEnd="true" />
     </RelativeLayout>
+    <View style="@style/HorizontalDivider" />
     <ScrollView
         android:id="@+id/dialog_insert_expressions_scrollView"
         android:layout_width="match_parent"

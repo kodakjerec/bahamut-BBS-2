@@ -1,9 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android" android:background="@color/dialog_border_color" android:padding="3dp" android:layout_width="260dp" android:layout_height="wrap_content">
-    <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_pageBackground" android:padding="1dp" android:layout_width="match_parent" android:layout_height="wrap_content">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?attr/bahamut_dialogBorderColor"
+    android:padding="3dp"
+    android:layout_width="260dp"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:background="?attr/bahamut_pageBackground"
+        android:padding="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="@color/white" android:background="@color/dialog_title_background" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/confirm" style="@style/TextViewLarge"/>
-        <ScrollView android:layout_width="match_parent" android:layout_height="wrap_content">
+            android:textColor="?attr/bahamut_dialogTitleTextColor"
+            android:background="?attr/bahamut_dialogTitleBackground"
+            android:padding="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/confirm"
+            style="@style/TextViewLarge"/>
+        <View style="@style/HorizontalDivider" />
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -16,7 +34,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/is_post_article"
-                    android:textColor="@color/white" />
+                    android:textColor="?attr/bahamut_defaultTextColor" />
 
                 <LinearLayout
                     android:id="@+id/reply_target_view"
@@ -30,7 +48,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/is_post_article_reply"
-                        android:textColor="@color/white" />
+                        android:textColor="?attr/bahamut_defaultTextColor" />
 
                     <RadioGroup
                         android:id="@+id/post_target"
@@ -84,7 +102,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="@string/select_sign"
-                        android:textColor="@color/white" />
+                        android:textColor="?attr/bahamut_defaultTextColor" />
 
                     <Spinner
                         android:id="@+id/sign_spinner"

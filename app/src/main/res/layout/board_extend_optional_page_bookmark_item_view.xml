@@ -21,7 +21,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:background="@color/list_page_item_content_background"
+            android:background="?attr/bahamut_pageBackground"
             android:orientation="vertical"
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
@@ -53,7 +53,7 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:text="@string/author_"
-                    android:textColor="@color/board_ex_page_item_view_author_title" />
+                    android:textColor="?attr/bahamut_boardExAuthorTitleColor" />
 
                 <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Author"
@@ -63,7 +63,7 @@
                     android:layout_weight="1"
                     android:singleLine="true"
                     android:text="@string/un_input"
-                    android:textColor="@color/board_ex_page_item_view_author" />
+                    android:textColor="?attr/bahamut_boardExAuthorColor" />
 
                 <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Mark"
@@ -71,7 +71,7 @@
                     android:layout_width="30dp"
                     android:layout_height="wrap_content"
                     android:text="@string/word_m"
-                    android:textColor="@color/board_page_item_view_mark"
+                    android:textColor="?attr/bahamut_boardItemMarkColor"
                     android:visibility="invisible" />
 
                 <com.kota.telnetUI.textView.TelnetTextViewSmall
@@ -81,7 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
                     android:text="@string/gy_"
-                    android:textColor="@color/board_page_item_view_gy_title" />
+                    android:textColor="?attr/bahamut_articleContentColor0" />
 
                 <com.kota.telnetUI.textView.TelnetTextViewSmall
                     android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_GY"
@@ -89,7 +89,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/number_0"
-                    android:textColor="@color/board_page_item_view_gy" />
+                    android:textColor="?attr/bahamut_boardItemGyColor" />
             </LinearLayout>
         </LinearLayout>
 

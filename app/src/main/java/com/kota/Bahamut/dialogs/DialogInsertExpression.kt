@@ -8,9 +8,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASLayoutParams.Companion.instance
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
 import java.util.Vector
 import kotlin.math.ceil
 
@@ -100,13 +102,12 @@ class DialogInsertExpression : ASDialog() {
             ).toDouble()
         ).toInt()
         divider.layoutParams = LinearLayout.LayoutParams(-1, dividerHeight)
-        divider.setBackgroundColor(-2130706433)
+        divider.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
         return divider
     }
 
     private fun createButton(): Button {
         val button = Button(context)
-        button.tag = "ToolbarItem.Danger"
         button.layoutParams = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -118,8 +119,18 @@ class DialogInsertExpression : ASDialog() {
         ).toInt()
         button.gravity = Gravity.CENTER
         button.setTextSize(2, instance.textSizeNormal)
-        button.background = instance.listItemBackgroundDrawable
-        button.setTextColor(instance.listItemTextColor)
+        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_dialogItemBackground)
+        if (bgRes != 0) {
+            button.setBackgroundResource(bgRes)
+        } else {
+            button.background = instance.listItemBackgroundDrawable
+        }
+        val textColorRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_buttonTextColor)
+        if (textColorRes != 0) {
+            button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
+        } else {
+            button.setTextColor(instance.listItemTextColor)
+        }
         button.isSingleLine = true
         return button
     }
