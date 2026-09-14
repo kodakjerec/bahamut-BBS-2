@@ -8,11 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.TempSettings
 import java.util.Objects
 
@@ -163,22 +162,22 @@ class BoardPageItemView : LinearLayout {
         if (TempSettings.isBoardFollowTitle((titleLabel?.text as String?)!!)) { // 關注的討論串
             if (statusLabel?.text == "◆") { // 首篇文章
                 if (isRead) {
-                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_first_read))
+                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowFirstReadColor))
                 } else {
-                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_first))
+                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowFirstColor))
                 }
             } else { // 回應文章
                 if (isRead) {
-                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_other_read))
+                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowOtherReadColor))
                 } else {
-                    titleLabel?.setTextColor(getContextColor(R.color.board_item_follow_other))
+                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowOtherColor))
                 }
             }
         } else { // 其他文章
             if (isRead) {
-                titleLabel?.setTextColor(getContextColor(R.color.board_item_normal_read))
+                titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalReadColor))
             } else {
-                titleLabel?.setTextColor(getContextColor(R.color.board_item_normal))
+                titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalColor))
             }
         }
     }

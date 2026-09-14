@@ -12,6 +12,7 @@ import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import java.util.Objects
 
 class MailBoxPageItemView : LinearLayout {
@@ -119,11 +120,11 @@ class MailBoxPageItemView : LinearLayout {
         // 戰巴哈信件只要看到有沒有讀取
         if (isRead) {
             statusTextView?.text = "◇"
-            titleTextView?.setTextColor(getContextColor(R.color.board_item_normal_read))
+            titleTextView?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalReadColor))
             return
         }
         statusTextView?.text = "◆"
-        titleTextView?.setTextColor(getContextColor(R.color.board_item_normal))
+        titleTextView?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalColor))
     }
 
     fun clear() {

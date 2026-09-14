@@ -3,6 +3,7 @@
     <!-- 基礎色盤 (Base Palette) -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="gray_white">#FFC0C0C0</color>
     <color name="transparent">#00000000</color>
     <color name="yellow">#FFF0F080</color>
     <color name="red">#FF800000</color>
@@ -88,6 +89,11 @@
     <color name="toolbar_item_background_pressed">#FFB5E61D</color>
     <color name="toolbar_item_background_focused">#FF22B14C</color>
 
+    <color name="toolbar_background_color_normal">#FF003030</color>
+    <color name="toolbar_background_color_pressed">#FFB5E61D</color>
+    <color name="toolbar_background_color_focused">#FF22B14C</color>
+    <color name="toolbar_background_color_disabled">#FF001A1A</color>
+
     <!-- Board Page Item Colors -->
     <color name="board_page_item_view_status">#FFF0F080</color>
     <color name="board_page_item_view_number">#FFC08080</color>
@@ -107,6 +113,10 @@
     <color name="article_page_text_item_author0">#FFC0C0C0</color>
     <color name="item_background_color">@color/black</color>
 
+    <!-- 輸入框配色 -->
+    <color name="input_box_background">#FFE0E0E0</color>
+    <color name="input_box_text">@color/black</color>
+
     <!-- Pink Theme Colors -->
     <color name="pink_button_background_normal">#FFFE00FE</color>
     <color name="pink_button_background_pressed">#FFE400E4</color>
@@ -118,7 +128,7 @@
     <color name="dark_button_background_normal">#FF202020</color>
     <color name="dark_button_background_pressed">#FF363636</color>
     <color name="dark_button_background_disabled">#FF282828</color>
-    <color name="dark_button_text">#FFE0E0E0</color>
+    <color name="dark_button_text">#FFFFFFFF</color>
 
     <!-- eInk Theme Colors (Sample) -->
     <color name="eink_button_background_normal">#FFFFFFFF</color>

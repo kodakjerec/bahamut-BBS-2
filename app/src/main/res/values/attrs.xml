@@ -36,4 +36,12 @@
     <attr name="bahamut_articleContentColor0" format="reference|color" />
     <attr name="bahamut_articleAuthorColor1" format="reference|color" />
     <attr name="bahamut_articleContentColor1" format="reference|color" />
+
+    <!-- 看板列表配色 -->
+    <attr name="bahamut_boardItemFollowFirstColor" format="reference|color" />
+    <attr name="bahamut_boardItemFollowFirstReadColor" format="reference|color" />
+    <attr name="bahamut_boardItemFollowOtherColor" format="reference|color" />
+    <attr name="bahamut_boardItemFollowOtherReadColor" format="reference|color" />
+    <attr name="bahamut_boardItemNormalColor" format="reference|color" />
+    <attr name="bahamut_boardItemNormalReadColor" format="reference|color" />
 </resources>

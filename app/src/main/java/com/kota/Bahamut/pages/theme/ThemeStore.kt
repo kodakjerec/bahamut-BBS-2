@@ -122,7 +122,7 @@ object ThemeStore {
                 themeDarkMode.name = "深色"
 
                 // 全域基礎色彩 (通用按鈕與文字)
-                themeDarkMode.textColor = "#FFE0E0E0"             // 主要文字 (柔和灰白)
+                themeDarkMode.textColor = "#FFC0C0C0"             // 主要文字 (柔和灰白)
                 themeDarkMode.textColorPressed = "#FF808080"      // 按壓時文字 (中灰)
                 themeDarkMode.textColorDisabled = "#FF808080"     // 停用時文字 (中灰)
                 themeDarkMode.backgroundColor = "#FF202020"       // 通用背景 (極深灰)

@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="black">#FF121212</color>
-    <color name="edit_text_background_color">#FF393A3C</color>
-    <color name="edit_text_text_color">@color/white</color>
-    <color name="ripple_material">#FF333333</color>
-    <color name="title_bar_menu_icon_background_color">#FF204A77</color>
-    <color name="toolbar_background_color_disabled">#FF002020</color>
-    <color name="toolbar_background_color_focused">#FF22B14C</color>
-    <color name="toolbar_background_color_normal">#FF002020</color>
-    <color name="toolbar_background_color_pressed">#FFB5E61D</color>
-    <color name="checkbox_checked_color">#FF669900</color>
+    <!-- 當系統進入深色模式時，將看板列表等原本為純白的文字調暗 -->
+    <color name="board_item_normal">@color/gray_white</color>
+
+    <!-- 看板追蹤顏色調暗 -->
+    <color name="board_item_follow_first">#FF00A000</color>
+    <color name="board_item_follow_first_read">#FF006000</color>
+    <color name="board_item_follow_other">#FFD0D000</color>
+    <color name="board_item_follow_other_read">#FF707000</color>
+
+    <!-- 文章內文配色調暗 -->
+    <color name="article_page_text_item_author1">#FF60C060</color>
+    <color name="article_page_text_item_content1">#FF18C018</color>
+
+    <!-- 輸入框配色調暗 -->
+    <color name="input_box_background">#FF404040</color>
+    <color name="input_box_text">@color/gray_white</color>
 </resources>
