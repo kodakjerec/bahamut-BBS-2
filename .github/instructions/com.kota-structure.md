@@ -125,7 +125,7 @@ com.kota/
 - `blockListPage/` - 黑名單頁面
 - `bbsUser/` - 使用者資訊頁面
 - `login/` - 登入頁面
-- `theme/` - 主題管理
+- `theme/` - 主題管理與深色模式規範（詳見 [Bahamut-theme.md](Bahamut-theme.md)）
 - `model/` - 頁面資料模型
 - `MainPage.kt` / `StartPage.kt` - 主頁面和啟動頁
 - `SystemSettingsPage.kt` - 系統設定頁面

@@ -38,7 +38,7 @@
 | [asFramework-network.md](asFramework-network.md) | network | 網路狀態管理 | ⭐⭐⭐ |
 | [asFramework-utils.md](asFramework-utils.md) | utils | 工具類別 | ⭐⭐⭐ |
 
-### Bahamut 子模組（6個）
+### Bahamut 子模組（7個）
 
 | 文件 | 資料夾 | 說明 | 重要性 |
 |------|--------|------|--------|
@@ -46,6 +46,7 @@
 | [Bahamut-command.md](Bahamut-command.md) | command | BBS 命令系統 | ⭐⭐⭐⭐⭐ |
 | [Bahamut-pages.md](Bahamut-pages.md) | pages | 業務頁面集合 | ⭐⭐⭐⭐ |
 | [Bahamut-dialogs.md](Bahamut-dialogs.md) | dialogs | 業務對話框 | ⭐⭐⭐⭐ |
+| [Bahamut-theme.md](Bahamut-theme.md) | theme | **主題系統與深色模式規範** | ⭐⭐⭐⭐ |
 | [Bahamut-dataModels.md](Bahamut-dataModels.md) | dataModels | 資料模型與本地儲存 | ⭐⭐⭐⭐ |
 | [Bahamut-service.md](Bahamut-service.md) | service | 背景服務與設定 | ⭐⭐⭐ |
 
@@ -70,6 +71,7 @@
 ### 修改 UI 相關
 - 修改頁面導航 → [asFramework-pageController.md](asFramework-pageController.md)
 - 修改對話框 → [asFramework-dialog.md](asFramework-dialog.md) 或 [Bahamut-dialogs.md](Bahamut-dialogs.md)
+- 修改配色 / 主題 / 深色模式 → [Bahamut-theme.md](Bahamut-theme.md)
 - 修改列表元件 → [asFramework-ui.md](asFramework-ui.md)
 - 修改終端機顯示 → [telnetUI-textView.md](telnetUI-textView.md)
 
@@ -211,9 +213,9 @@ val big5Data = U2BEncoder.convert(utf8Text)
 
 ## 🔄 文件更新
 
-**最後更新**: 2025-12-11  
-**文件總數**: 24 個（1 總覽 + 6 第一層 + 17 第二層）  
-**涵蓋範圍**: com.kota 套件完整結構
+**最後更新**: 2026-09-15  
+**文件總數**: 25 個（1 總覽 + 6 第一層 + 18 第二層）  
+**涵蓋範圍**: com.kota 套件完整結構、主題系統與深色模式規範
 
 **更新原則**:
 - 模組結構變更時更新

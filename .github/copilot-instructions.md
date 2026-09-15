@@ -210,6 +210,7 @@ ASProcessingDialog.dismissProcessingDialog()
 - `ASNavigationController.kt` - Page stack manager
 - `BahamutStateHandler.kt` - Telnet response parser
 - `PageContainer.kt` - Singleton page cache
+- `ThemeStore.kt` - Theme & dark mode state manager
 - `TelnetClient.kt` - Telnet connection manager
 
 ## Common Pitfalls
@@ -218,6 +219,7 @@ ASProcessingDialog.dismissProcessingDialog()
 3. **Forgetting object recycling** → Memory leaks
 4. **Direct page instantiation** → Use PageContainer
 5. **Sync operations on main thread** → Use `ASCoroutine.runInNewCoroutine`
+6. **Hardcoding color values** → Use `?attr/bahamut_*` or `CommonFunctions.getThemeColor(R.attr.bahamut_*)` for dark mode & E-Ink compatibility
 
 ## Testing Workflow Changes
 After modifying list pages:

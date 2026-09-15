@@ -106,7 +106,7 @@ abstract class ASViewController {
 ```kotlin
 class BoardMainPage : TelnetListPage() {
     
-    override val pageLayout: Int = R.layout.board_main_page_layout
+    override val pageLayout: Int = R.layout.board_page
     
     override fun onPageDidLoad() {
         super.onPageDidLoad()

@@ -67,7 +67,7 @@ Bahamut 模組是整個 BBS 客戶端的核心業務邏輯層，實現所有與�
 - **訊息**: `messages/` - 系統訊息
 - **使用者**: `bbsUser/` - 使用者資訊
 - **黑名單**: `blockListPage/` - 黑名單管理
-- **主題**: `theme/` - 主題設定
+- **主題**: `theme/` - 主題設定與深色模式（詳見 [Bahamut-theme.md](Bahamut-theme.md)）
 - **登入**: `login/` - 登入頁面
 - **其他**: 主頁、設定、分類、發文等
 

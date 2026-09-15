@@ -31,134 +31,75 @@ abstract class ASDialog : Dialog {
 顯示訊息、確認操作的標準對話框。
 
 **特性**:
-- 標題和訊息顯示
-- 單按鈕/雙按鈕模式
-- 自訂按鈕文字
-- 點擊監聽器
+- 支援流式鏈式呼叫 (Chaining API: `.setTitle()`, `.setMessage()`, `.addButton()`)
+- 動態主題色彩適配（邊框 `bahamut_dialogBorderColor`、標題 `bahamut_dialogTitle*`、按鈕 `bahamut_dialogItemBackground`）
+- 自訂多按鈕與點擊監聽器
 
 **使用範例**:
 ```kotlin
 // 簡單訊息對話框
-ASAlertDialog.createDialog(
-    context = activity,
-    title = "提示",
-    message = "操作成功",
-    okButtonText = "確定",
-    listener = object : ASAlertDialogListener {
-        override fun onASAlertDialogButtonClicked(dialog: ASAlertDialog, index: Int) {
-            if (index == 0) {
-                // 確定按鈕被點擊
-                handleConfirm()
-            }
-        }
-    }
-).show()
+ASAlertDialog.createDialog()
+    .setTitle("提示")
+    .setMessage("操作成功")
+    .addButton("確定")
+    .show()
 
-// 確認對話框（兩個按鈕）
-ASAlertDialog.createDialog(
-    context = activity,
-    title = "確認刪除",
-    message = "確定要刪除這篇文章嗎？",
-    okButtonText = "刪除",
-    cancelButtonText = "取消",
-    listener = object : ASAlertDialogListener {
-        override fun onASAlertDialogButtonClicked(dialog: ASAlertDialog, index: Int) {
-            when (index) {
-                0 -> deleteArticle()  // 刪除
-                1 -> dialog.dismiss() // 取消
-            }
+// 多按鈕確認對話框
+ASAlertDialog.createDialog()
+    .setTitle("確認刪除")
+    .setMessage("確定要刪除這篇文章嗎？")
+    .addButton("取消") // index = 0
+    .addButton("確定") // index = 1
+    .setListener { dialog, index ->
+        when (index) {
+            1 -> deleteArticle()
         }
     }
-).show()
+    .show()
 ```
 
 #### `ASAlertDialogListener.kt` - 警告對話框監聽器
 ```kotlin
 interface ASAlertDialogListener {
-    /**
-     * 當對話框按鈕被點擊
-     * @param dialog 對話框實例
-     * @param index 按鈕索引（0=確定, 1=取消）
-     */
-    fun onASAlertDialogButtonClicked(dialog: ASAlertDialog, index: Int)
+    fun onAlertDialogDismissWithButtonIndex(paramASAlertDialog: ASAlertDialog, paramInt: Int)
 }
 ```
 
 #### `ASListDialog.kt` - 列表選擇對話框
-顯示可選擇項目的列表對話框。
-
-**特性**:
-- 單選列表
-- 自訂項目視圖
-- 項目點擊回呼
-- 標題顯示
+顯示可滾動選擇項目的列表對話框（如文章暫存檔清單）。項目底色與文字透過 `bahamut_listDialogItemBackground` 與 `bahamut_listDialogItemTextColor` 與全域按鈕完全解耦，黑底白字不污染。
 
 **使用範例**:
 ```kotlin
-// 簡單列表對話框
-val items = arrayOf("選項一", "選項二", "選項三")
-ASListDialog.createDialog(
-    context = activity,
-    title = "請選擇",
-    items = items,
-    listener = object : ASListDialogItemClickListener {
-        override fun onASListDialogItemClicked(dialog: ASListDialog, index: Int) {
-            when (index) {
-                0 -> handleOption1()
-                1 -> handleOption2()
-                2 -> handleOption3()
-            }
-            dialog.dismiss()
+val dialog = ASListDialog.createDialog()
+    .setTitle("請選擇看板")
+    .addItem("C_Chat")
+    .addItem("Gossiping")
+    .addItem("NBA")
+    .setListener(object : ASListDialogItemClickListener {
+        override fun onListDialogItemClicked(dialog: ASListDialog?, index: Int, title: String?) {
+            println("選取了: $title")
         }
-    }
-).show()
 
-// 擴展列表對話框（帶資料）
-val dataList = listOf(
-    BookmarkItem("看板1", "C_Chat"),
-    BookmarkItem("看板2", "Gossiping"),
-    BookmarkItem("看板3", "NBA")
-)
-
-ASListDialog.createExtendedDialog(
-    context = activity,
-    title = "選擇看板",
-    items = dataList,
-    listener = object : ASListDialogExtendedItemClickListener<BookmarkItem> {
-        override fun onASListDialogItemClicked(
-            dialog: ASListDialog, 
-            index: Int, 
-            item: BookmarkItem
-        ) {
-            navigateToBoard(item.boardName)
-            dialog.dismiss()
+        override fun onListDialogItemLongClicked(dialog: ASListDialog?, index: Int, title: String?): Boolean {
+            return false
         }
-    }
-).show()
+    })
+dialog.show()
 ```
 
 #### `ASListDialogItemClickListener.kt` - 列表項目點擊監聽器
 ```kotlin
 interface ASListDialogItemClickListener {
-    /**
-     * 當列表項目被點擊
-     * @param dialog 對話框實例
-     * @param index 項目索引
-     */
-    fun onASListDialogItemClicked(dialog: ASListDialog, index: Int)
+    fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?)
+    fun onListDialogItemLongClicked(paramASListDialog: ASListDialog?, index: Int, title: String?): Boolean
 }
 ```
 
 #### `ASListDialogExtendedItemClickListener.kt` - 擴展列表項目點擊監聽器
 ```kotlin
-interface ASListDialogExtendedItemClickListener<T> {
-    /**
-     * 當列表項目被點擊（泛型版本）
-     * @param dialog 對話框實例
-     * @param index 項目索引
-     * @param item 項目資料
-     */
-    fun onASListDialogItemClicked(dialog: ASListDialog, index: Int, item: T)
+interface ASListDialogExtendedItemClickListener {
+    fun onListDialogExtendedItemClicked(paramASListDialog: ASListDialog?, paramInt: Int)
+    fun onListDialogExtendedItemLongClicked(paramASListDialog: ASListDialog?, paramInt: Int): Boolean
 }
 ```
 

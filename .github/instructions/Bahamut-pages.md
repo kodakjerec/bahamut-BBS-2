@@ -52,9 +52,12 @@ pages 是最大的業務模組，包含所有 BBS 功能頁面的實作。每個
 - `LoginPage.kt` - 登入介面
 - 帳號密碼輸入、自動登入
 
-### 🔟 `theme/` - 主題系統
-- `ThemePage.kt` - 主題設定
-- 顏色配置、字型設定
+### 🔟 `theme/` - 主題系統與深色模式
+- `ThemeStore.kt` - 主題資料與切換管理核心
+- `Theme.kt` - 主題色彩資料模型
+- `ThemeManagerPage.kt` - 主題管理與選擇介面
+- `ThemeFunctions.kt` - 主題色彩計算輔助
+- 支援預設、粉紅、電子紙 (E-Ink)、深色模式等多套主題外觀（詳見 [Bahamut-theme.md](Bahamut-theme.md)）
 
 ### 1️⃣1️⃣ `model/` - 頁面共用模型
 - 頁面間共用的資料結構和工具
@@ -67,7 +70,7 @@ pages 是最大的業務模組，包含所有 BBS 功能頁面的實作。每個
 ```kotlin
 class MainPage : TelnetPage() {
     
-    override val pageLayout = R.layout.main_page_layout
+    override val pageLayout = R.layout.main_page
     
     override fun onPageDidLoad() {
         super.onPageDidLoad()
