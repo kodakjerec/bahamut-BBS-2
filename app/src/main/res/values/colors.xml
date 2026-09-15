@@ -139,4 +139,9 @@
     <color name="eink_button_text_pressed">#FFFFFFFF</color>
     <color name="eink_button_danger_background_normal">#FF000000</color>
     <color name="eink_button_danger_background_pressed">#FF444444</color>
+    <!-- 電子紙深色主題配色 (E-Ink Dark) -->
+    <color name="eink_dark_button_background_normal">@color/black</color>
+    <color name="eink_dark_button_background_pressed">#FF404040</color>
+    <color name="eink_dark_button_text_normal">@color/white</color>
+    <color name="eink_dark_button_text_pressed">@color/white</color>
 </resources>

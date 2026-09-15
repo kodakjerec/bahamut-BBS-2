@@ -435,12 +435,16 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         
         // 之前的引用文章
         if (myQuote > 0) {
-            authorLabel?.setTextColor(rgbToInt(theme.articleAuthorColor1))
-            contentLabel?.setTextColor(rgbToInt(theme.articleContentColor1))
+            val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor1)
+            val contentColor = getThemeColor(R.attr.bahamut_articleContentColor1)
+            authorLabel?.setTextColor(if (authorColor != -1) authorColor else rgbToInt(theme.articleAuthorColor1))
+            contentLabel?.setTextColor(if (contentColor != -1) contentColor else rgbToInt(theme.articleContentColor1))
         } else {
             // 使用者回文
-            authorLabel?.setTextColor(rgbToInt(theme.articleAuthorColor0))
-            contentLabel?.setTextColor(rgbToInt(theme.articleContentColor0))
+            val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor0)
+            val contentColor = getThemeColor(R.attr.bahamut_articleContentColor0)
+            authorLabel?.setTextColor(if (authorColor != -1) authorColor else rgbToInt(theme.articleAuthorColor0))
+            contentLabel?.setTextColor(if (contentColor != -1) contentColor else rgbToInt(theme.articleContentColor0))
         }
     }
 

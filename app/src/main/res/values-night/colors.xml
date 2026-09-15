@@ -11,8 +11,8 @@
     <color name="board_item_follow_other_read">#FF707000</color>
 
     <!-- 文章內文配色調暗 -->
-    <color name="article_page_text_item_author1">#FF60C060</color>
-    <color name="article_page_text_item_content1">#FF18C018</color>
+    <color name="article_page_text_item_author1">#FF60A060</color>
+    <color name="article_page_text_item_content1">#FF18A018</color>
 
     <!-- 輸入框配色調暗 -->
     <color name="input_box_background">#FF404040</color>

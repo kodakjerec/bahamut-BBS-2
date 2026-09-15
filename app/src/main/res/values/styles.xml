@@ -122,7 +122,7 @@
     <!-- 深色主題 -->
     <style name="MyTheme.Dark" parent="MyTheme">
         <item name="bahamut_defaultTextColor">@color/gray_white</item>
-        <item name="bahamut_buttonTextColor">@color/dark_button_text_color</item>
+        <item name="bahamut_buttonTextColor">@color/button_text_color</item>
         <item name="bahamut_toolbarItemBackground">@drawable/dark_toolbar_item_background</item>
         <item name="bahamut_dialogTitleTextColor">@color/gray_white</item>
         <item name="bahamut_listDialogItemBackground">@drawable/dark_list_dialog_item_background</item>
@@ -202,6 +202,81 @@
         <item name="bahamut_dialogSelectArticleItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_listDialogItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/eink_button_text_normal</item>
+    </style>
+
+    <!-- eInk 主題 (深色模式 - 黑白對調) -->
+    <style name="MyTheme.eInk.Dark" parent="MyTheme.Dark">
+        <item name="bahamut_pageBackground">@color/black</item>
+        <item name="bahamut_defaultTextColor">@color/white</item>
+        <item name="bahamut_buttonTextColor">@color/white</item>
+        <item name="bahamut_buttonDangerTextColor">@color/black</item>
+        <item name="bahamut_toolbarItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_buttonDangerBackground">@drawable/eink_dark_tab_selected_background</item>
+        <item name="bahamut_dialogItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_dividerColor">@color/white</item>
+        <item name="bahamut_listItemHorizontalDivider">@color/white</item>
+        <item name="bahamut_listItemVerticalDivider">@color/white</item>
+        <item name="bahamut_articleAuthorColor0">@color/white</item>
+        <item name="bahamut_articleContentColor0">@color/white</item>
+        <item name="bahamut_articleAuthorColor1">@color/halfWhite</item>
+        <item name="bahamut_articleContentColor1">@color/halfWhite</item>
+
+        <!-- 標題列 (TelnetHeader) 電子紙深色配色 -->
+        <item name="bahamut_titleBarBackground">@color/black</item>
+        <item name="bahamut_titleBarTitleColor">@color/white</item>
+        <item name="bahamut_titleBarDetailColor">@color/white</item>
+        <item name="bahamut_titleBarDetail2Color">@color/halfWhite</item>
+        <item name="bahamut_titleBarMenuIconBackground">@color/black</item>
+
+        <!-- 看板分類列表項目 (ClassPageItem) 電子紙深色配色 -->
+        <item name="bahamut_classItemNameColor">@color/white</item>
+        <item name="bahamut_classItemManagerColor">@color/halfWhite</item>
+
+        <!-- 列表右側箭頭 (RightArrow) 電子紙深色配色 -->
+        <item name="bahamut_arrowBackground">@color/black</item>
+        <item name="bahamut_arrowColor">@color/white</item>
+
+        <!-- 看板列表電子紙深色配色 -->
+        <item name="bahamut_boardItemFollowFirstColor">@color/white</item>
+        <item name="bahamut_boardItemFollowFirstReadColor">@color/halfWhite</item>
+        <item name="bahamut_boardItemFollowOtherColor">@color/white</item>
+        <item name="bahamut_boardItemFollowOtherReadColor">@color/halfWhite</item>
+        <item name="bahamut_boardItemNormalColor">@color/white</item>
+        <item name="bahamut_boardItemNormalReadColor">@color/halfWhite</item>
+
+        <!-- 看板文章列表項目 (BoardPageItem) 電子紙深色配色 -->
+        <item name="bahamut_boardItemStatusColor">@color/white</item>
+        <item name="bahamut_boardItemNumberColor">@color/halfWhite</item>
+        <item name="bahamut_boardItemMarkColor">@color/white</item>
+        <item name="bahamut_boardItemDateColor">@color/halfWhite</item>
+        <item name="bahamut_boardItemGyColor">@color/halfWhite</item>
+        <item name="bahamut_boardItemAuthorColor">@color/halfWhite</item>
+        <item name="bahamut_mailItemReplyColor">@color/white</item>
+
+        <!-- 側邊選單書籤/歷史 (drawerItem) 電子紙深色配色 -->
+        <item name="bahamut_boardExAuthorTitleColor">@color/white</item>
+        <item name="bahamut_boardExAuthorColor">@color/halfWhite</item>
+
+        <!-- 標籤頁切換 (Tab) 電子紙深色配色 -->
+        <item name="bahamut_tabSelectedBackground">@drawable/eink_dark_tab_selected_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/eink_dark_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/black</item>
+        <item name="bahamut_tabUnselectedTextColor">@color/white</item>
+
+        <!-- 核取方塊與單選鈕電子紙深色配色 -->
+        <item name="bahamut_checkboxTint">@color/white</item>
+
+        <!-- 對話框電子紙深色配色 -->
+        <item name="bahamut_dialogTitleBackground">@color/black</item>
+        <item name="bahamut_dialogTitleTextColor">@color/white</item>
+        <item name="bahamut_dialogBlockBackground">@drawable/eink_dark_dialog_block_background</item>
+        <item name="bahamut_dialogBorderColor">@color/white</item>
+        <item name="bahamut_dialogSelectArticleFocusedColor">#FF404040</item>
+        <item name="bahamut_dialogSelectArticleDividerColor">@color/white</item>
+        <item name="bahamut_dialogSelectArticleTextColor">@color/white</item>
+        <item name="bahamut_dialogSelectArticleItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_listDialogItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_listDialogItemTextColor">@color/white</item>
     </style>
 
     <style name="toolbar" parent="BaseTouchPart">
@@ -425,7 +500,7 @@
     <style name="Dialog.NoTitleBar.Dark" parent="Dialog.NoTitleBar">
         <item name="bahamut_pageBackground">@color/dark_gray_10</item>
         <item name="bahamut_defaultTextColor">@color/gray_white</item>
-        <item name="bahamut_buttonTextColor">@color/dark_button_text_color</item>
+        <item name="bahamut_buttonTextColor">@color/button_text_color</item>
         <item name="bahamut_toolbarItemBackground">@drawable/dark_toolbar_item_background</item>
         <item name="bahamut_dialogTitleTextColor">@color/gray_white</item>
         <item name="bahamut_listDialogItemBackground">@drawable/dark_list_dialog_item_background</item>
@@ -455,6 +530,28 @@
         <item name="bahamut_dialogBlockBackground">@drawable/eink_dialog_block_background</item>
         <item name="bahamut_listDialogItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/eink_button_text_normal</item>
+    </style>
+
+    <!-- 對話框 eInk 主題 (深色模式 - 黑白對調) -->
+    <style name="Dialog.NoTitleBar.eInk.Dark" parent="Dialog.NoTitleBar.Dark">
+        <item name="bahamut_pageBackground">@color/black</item>
+        <item name="bahamut_defaultTextColor">@color/white</item>
+        <item name="bahamut_buttonTextColor">@color/white</item>
+        <item name="bahamut_buttonDangerTextColor">@color/black</item>
+        <item name="bahamut_toolbarItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_buttonDangerBackground">@drawable/eink_dark_tab_selected_background</item>
+        <item name="bahamut_dialogItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_dialogBorderColor">@color/white</item>
+        <item name="bahamut_dialogTitleBackground">@color/black</item>
+        <item name="bahamut_dialogTitleTextColor">@color/white</item>
+        <item name="bahamut_dividerColor">@color/white</item>
+        <item name="bahamut_dialogBlockBackground">@drawable/eink_dark_dialog_block_background</item>
+        <item name="bahamut_listDialogItemBackground">@drawable/eink_dark_toolbar_item_background</item>
+        <item name="bahamut_listDialogItemTextColor">@color/white</item>
+        <item name="bahamut_tabSelectedBackground">@drawable/eink_dark_tab_selected_background</item>
+        <item name="bahamut_tabUnselectedBackground">@drawable/eink_dark_tab_unselected_background</item>
+        <item name="bahamut_tabSelectedTextColor">@color/black</item>
+        <item name="bahamut_tabUnselectedTextColor">@color/white</item>
     </style>
 
     <style name="TextViewUltraLarge" parent="TextViewNormal">
