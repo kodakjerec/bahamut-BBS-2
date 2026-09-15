@@ -1,6 +1,8 @@
 package com.kota.asFramework.pageController
 
 import android.app.Activity
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.DisplayMetrics
@@ -12,6 +14,7 @@ import android.view.WindowInsets
 import android.view.animation.Animation
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import com.kota.Bahamut.R
@@ -97,8 +100,28 @@ open class ASNavigationController : Activity() {
         return false
     }
 
+    override fun attachBaseContext(newBase: Context) {
+        UserSettings(newBase)
+        if (!UserSettings.propertiesFollowSystemDarkMode) {
+            val config = Configuration(newBase.resources.configuration)
+            config.uiMode = (config.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv()) or Configuration.UI_MODE_NIGHT_NO
+            val context = newBase.createConfigurationContext(config)
+            super.attachBaseContext(context)
+        } else {
+            super.attachBaseContext(newBase)
+        }
+    }
+
     // android.app.Activity
     public override fun onCreate(savedInstanceState: Bundle?) {
+        // 同步設定 AppCompatDelegate 的深色模式
+        val nightMode = if (UserSettings.propertiesFollowSystemDarkMode) {
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        } else {
+            AppCompatDelegate.MODE_NIGHT_NO
+        }
+        AppCompatDelegate.setDefaultNightMode(nightMode)
+
         // 初始化基本設定，供 ThemeStore 使用
         UserSettings(this)
         upgrade(this)

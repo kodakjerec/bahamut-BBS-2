@@ -15,7 +15,10 @@ import android.widget.RelativeLayout
 import android.widget.Spinner
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.slider.Slider
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
@@ -65,13 +68,56 @@ import com.kota.asFramework.thread.ASCoroutine
 
 class SystemSettingsPage : TelnetPage() {
     var mainLayout: RelativeLayout? = null
+    private var followSystemDarkModeBox: CheckBox? = null
     var autoToChatEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
             propertiesAutoToChat = isChecked
         }
     var followSystemDarkModeListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesFollowSystemDarkMode = isChecked
+            if (propertiesFollowSystemDarkMode != isChecked) {
+                val dialog = ASAlertDialog("DARK_MODE_CHANGE_CONFIRM")
+                dialog.setTitle("更換深色模式")
+                    .setMessage("更換深色模式設定將會中斷目前的連線並重新啟動應用程式，是否確定更換?")
+                    .addButton("取消")
+                    .addButton("確定")
+                    .setDefaultButtonIndex(0)
+                    .setListener(object : ASAlertDialogListener {
+                        override fun onAlertDialogDismissWithButtonIndex(
+                            paramASAlertDialog: ASAlertDialog,
+                            paramInt: Int
+                        ) {
+                            if (paramInt == 1) {
+                                propertiesFollowSystemDarkMode = isChecked
+                                val nightMode = if (isChecked) {
+                                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                                } else {
+                                    AppCompatDelegate.MODE_NIGHT_NO
+                                }
+                                AppCompatDelegate.setDefaultNightMode(nightMode)
+
+                                // 更換主題時使用系統 Toast，因為 recreate() 會銷毀當前 Activity 的所有自定義 Window
+                                android.widget.Toast.makeText(
+                                    context,
+                                    getContextString(R.string.theme_manager_page_msg01),
+                                    android.widget.Toast.LENGTH_SHORT
+                                ).show()
+
+                                // 執行斷線流程
+                                TelnetClient.myInstance?.close()
+                                TempSettings.lastVisitArticleNumber = 0
+
+                                // 立即重啟 Activity 以套用新設定
+                                context?.recreate()
+                            } else {
+                                // 使用者取消：還原核取方塊狀態且不觸發 listener
+                                followSystemDarkModeBox?.setOnCheckedChangeListener(null)
+                                followSystemDarkModeBox?.isChecked = propertiesFollowSystemDarkMode
+                                followSystemDarkModeBox?.setOnCheckedChangeListener(followSystemDarkModeListener)
+                            }
+                        }
+                    }).show()
+            }
         }
     var gestureOnBoardEnableListener: CompoundButton.OnCheckedChangeListener =
         CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
@@ -576,12 +622,13 @@ class SystemSettingsPage : TelnetPage() {
             .setOnClickListener(themeManagerPageListener)
 
         // 跟隨系統深色模式
-        val followSystemDarkModeBox =
+        val box =
             mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_followSystemDarkMode)!!
-        followSystemDarkModeBox.isChecked = propertiesFollowSystemDarkMode
-        followSystemDarkModeBox.setOnCheckedChangeListener(followSystemDarkModeListener)
+        followSystemDarkModeBox = box
+        box.isChecked = propertiesFollowSystemDarkMode
+        box.setOnCheckedChangeListener(followSystemDarkModeListener)
         mainLayout?.findViewById<View>(R.id.SystemSettings_item_followSystemDarkMode)!!
-            .setOnClickListener { view: View? -> followSystemDarkModeBox.isChecked = !followSystemDarkModeBox.isChecked }
+            .setOnClickListener { view: View? -> box.isChecked = !box.isChecked }
 
         // bbs-user-info-page
         mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)!!
