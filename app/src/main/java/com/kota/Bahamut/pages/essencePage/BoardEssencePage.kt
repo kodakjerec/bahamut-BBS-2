@@ -1,45 +1,87 @@
 package com.kota.Bahamut.pages.essencePage
 
+import android.content.Context
+import android.database.DataSetObserver
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
-import com.kota.Bahamut.pages.boardPage.BoardHeaderView
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardEssencePageItemView
 import com.kota.Bahamut.pages.model.BoardPageBlock
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
 
 class BoardEssencePage : TelnetListPage() {
-    private lateinit var mainLayout:RelativeLayout
     private var myTitle: String = ""
+
+    // Compose states
+    var headerTitleState by mutableStateOf("精華文章")
+    var headerSubtitleState by mutableStateOf("")
+    var headerDetailState by mutableStateOf("")
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOARD_ESSENCE
 
     override val pageLayout: Int
-        get() =  R.layout.board_essence_page
+        get() = 0
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                BoardEssencePageContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        val headerView = findViewById(R.id.BoardPage_HeaderView) as BoardHeaderView
-        headerView.setData("精華文章", myTitle, listName)
+        headerTitleState = "精華文章"
+        headerSubtitleState = myTitle
+        headerDetailState = listName ?: ""
     }
 
     override val listType: Int
@@ -53,6 +95,7 @@ class BoardEssencePage : TelnetListPage() {
     override fun onSearchButtonClicked(): Boolean {
         return true
     }
+
     override fun onBackPressed(): Boolean {
         clear()
         PageContainer.instance!!.popBoardEssencePage()
@@ -72,12 +115,10 @@ class BoardEssencePage : TelnetListPage() {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardEssencePageItem.recycle(telnetListPageItem as BoardEssencePageItem)
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage, android.widget.Adapter
     override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
         var view1 = view
         val itemIndex = i + 1
@@ -99,26 +140,6 @@ class BoardEssencePage : TelnetListPage() {
         return boardEssencePageItemView
     }
 
-    override fun onPageDidLoad() {
-        super.onPageDidLoad()
-
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        val aSListView = mainLayout.findViewById<ASListView>(R.id.BoardPageListView)
-        aSListView.emptyView = mainLayout.findViewById(R.id.BoardPageListEmptyView)
-        bindListView(aSListView)
-        aSListView.onItemClickListener
-
-        // 上一篇
-        mainLayout.findViewById<View>(R.id.BoardPageFirstPageButton).setOnClickListener{
-            moveToFirstPosition()
-        }
-        // 下一篇
-        mainLayout.findViewById<View>(R.id.BoardPageLatestPageButton).setOnClickListener{
-            moveToLastPosition()
-        }
-    }
-
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val boardEssencePageItem = getItem(index) as BoardEssencePageItem
         return !boardEssencePageItem.isDeleted && boardEssencePageItem.isBBSClickable
@@ -134,7 +155,6 @@ class BoardEssencePage : TelnetListPage() {
 
         if (item.isDirectory) {
             // 目錄
-
             // 如果現在最上層是article essence page, 表示是在內文按上一篇/下一篇
             val lastPage = ASNavigationController.currentController!!.viewControllers.lastElement()!!
             if (lastPage.pageType == BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
@@ -155,8 +175,6 @@ class BoardEssencePage : TelnetListPage() {
         }
     }
 
-    //
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
         return if (aItem != null) {
             val boardEssencePageItem = aItem as BoardEssencePageItem
@@ -190,6 +208,175 @@ class BoardEssencePage : TelnetListPage() {
             ASToast.showShortToast(CommonFunctions.getContextString(R.string.already_to_bottom))
         } else {
             loadItemAtNumber(targetIndex)
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Compose UI
+    // ---------------------------------------------------------------
+
+    @Composable
+    fun BoardEssencePageContent() {
+        val colors = AppTheme.colors
+        val listState = rememberLazyListState()
+
+        var dataVersion by remember { mutableIntStateOf(0) }
+        DisposableEffect(Unit) {
+            val observer = object : DataSetObserver() {
+                override fun onChanged() { dataVersion++ }
+                override fun onInvalidated() { dataVersion++ }
+            }
+            registerDataSetObserver(observer)
+            onDispose { unregisterDataSetObserver(observer) }
+        }
+
+        val currentCount = if (dataVersion >= 0) count else 0
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 頂部 header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.toolbarBackground)
+                    .padding(horizontal = 12.dp, vertical = 8.dp)
+            ) {
+                Text(
+                    text = headerTitleState.ifEmpty { stringResource(R.string.loading) },
+                    color = colors.titleBarTitle,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (headerSubtitleState.isNotEmpty() || headerDetailState.isNotEmpty()) {
+                    Text(
+                        text = listOfNotNull(
+                            headerSubtitleState.takeIf { it.isNotEmpty() },
+                            headerDetailState.takeIf { it.isNotEmpty() }
+                        ).joinToString("  "),
+                        color = colors.titleBarDetail,
+                        fontSize = 13.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            // 文章列表
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                if (currentCount == 0) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.loading_),
+                            color = colors.textSecondary,
+                            fontSize = 16.sp
+                        )
+                    }
+                } else {
+                    LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+                        items(count = currentCount) { index ->
+                            val itemIndex = index + 1
+                            val block = ItemUtils.getBlock(itemIndex)
+                            val item = getItem(index) as? BoardEssencePageItem
+                            if (item == null && currentBlock != block && !isLoadingBlock(itemIndex)) {
+                                loadBoardBlock(block)
+                            }
+                            EssenceRowItem(
+                                item = item,
+                                itemIndex = itemIndex,
+                                onClick = { loadItemAtIndex(index) }
+                            )
+                            HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
+
+            // 底部工具列
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = stringResource(R.string.first_page),
+                    modifier = Modifier.weight(1f),
+                    onClick = { moveToFirstPosition() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.last_page),
+                    modifier = Modifier.weight(1f),
+                    onClick = { moveToLastPosition() }
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun EssenceRowItem(
+        item: BoardEssencePageItem?,
+        itemIndex: Int,
+        onClick: () -> Unit
+    ) {
+        val colors = AppTheme.colors
+        val statusText = when {
+            item == null -> "..."
+            item.isDirectory -> "◆"
+            !item.isBBSClickable -> "◇("
+            else -> "◇"
+        }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = statusText,
+                color = colors.bbsBoardNormal,
+                fontSize = 13.sp,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item?.title ?: stringResource(R.string.loading_),
+                    color = colors.bbsBoardNormal,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row {
+                    Text(
+                        text = String.format("%05d", itemIndex),
+                        color = colors.bbsMailNumber,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(
+                        text = item?.author ?: "",
+                        color = colors.bbsMailAuthor,
+                        fontSize = 12.sp,
+                        modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = item?.date ?: "",
+                        color = colors.bbsMailDate,
+                        fontSize = 12.sp
+                    )
+                }
+            }
         }
     }
 }

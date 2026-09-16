@@ -16,6 +16,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -29,11 +30,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
@@ -55,12 +54,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -138,7 +135,6 @@ import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
 import kotlinx.coroutines.launch
 import java.util.Vector
-import kotlin.math.abs
 import kotlin.math.max
 
 open class BoardMainPage : TelnetListPage(),
@@ -151,7 +147,7 @@ open class BoardMainPage : TelnetListPage(),
     // 狀態驅動變數
     var boardTitle: String = ""
     var boardManager: String = ""
-    var lastListAction: Int = BoardPageAction.Companion.LIST
+    var lastListAction: Int = BoardPageAction.LIST
 
     // Compose 狀態
     var boardTitleState by mutableStateOf("")
@@ -385,7 +381,7 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     var toEssencePageClickListener: View.OnClickListener = View.OnClickListener {
-        this.lastListAction = BoardPageAction.Companion.ESSENCE
+        this.lastListAction = BoardPageAction.ESSENCE
         PageContainer.instance!!.pushBoardEssencePage(listName, boardTitle)
         navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
@@ -423,7 +419,7 @@ open class BoardMainPage : TelnetListPage(),
                 TempSettings.lastVisitBoard = load.boardName
                 TempSettings.lastVisitArticleNumber = 0
                 clear()
-                if (load.boardType == BoardPageAction.Companion.SEARCH) {
+                if (load.boardType == BoardPageAction.SEARCH) {
                     pushRefreshCommand(0)
                 }
             }
@@ -505,7 +501,7 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     fun searchArticle(keyword: String, author: String, mark: String, myGY: String) {
-        this.lastListAction = BoardPageAction.Companion.SEARCH
+        this.lastListAction = BoardPageAction.SEARCH
         val boardSearchPage = PageContainer.instance!!.boardSearchPage
         boardSearchPage.clear()
         navigationController.pushViewController(boardSearchPage)
@@ -546,7 +542,7 @@ open class BoardMainPage : TelnetListPage(),
     }
 
     fun onListArticle(i: Int) {
-        this.lastListAction = BoardPageAction.Companion.LINK_TITLE
+        this.lastListAction = BoardPageAction.LINK_TITLE
         val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage
         boardLinkedTitlePage.clear()
         navigationController.pushViewController(boardLinkedTitlePage)
@@ -675,7 +671,7 @@ open class BoardMainPage : TelnetListPage(),
 
     override fun onBoardExtendOptionalPageDidSelectBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
-            this.lastListAction = BoardPageAction.Companion.SEARCH
+            this.lastListAction = BoardPageAction.SEARCH
             pushCommand(
                 BahamutCommandSearchArticle(
                     bookmark.keyword,
@@ -1018,7 +1014,7 @@ fun BoardMainTopBar(
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = stringResource(R.string.back),
+                    contentDescription = stringResource(R.string._back),
                     tint = colors.titleBarTitle
                 )
             }
@@ -1072,6 +1068,7 @@ fun BoardMainTopBar(
 /**
  * 看板文章項目 Row Item
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BoardPageRowItem(
     item: BoardPageItem?,
@@ -1238,7 +1235,7 @@ fun BoardMainToolbar(
                 {
                     BahaButton(
                         text = postText,
-                        type = ButtonType.PRIMARY,
+                        type = ButtonType.NORMAL,
                         onClick = onPostClick,
                         modifier = Modifier.weight(1f),
                         minHeight = 40.dp
@@ -1370,14 +1367,14 @@ fun BoardEndDrawer(
                 ) {
                     BahaButton(
                         text = stringResource(R.string.bookmark),
-                        type = if (mode == 0) ButtonType.PRIMARY else ButtonType.SECONDARY,
+                        type = if (mode == 0) ButtonType.NORMAL else ButtonType.SECONDARY,
                         onClick = { onTabClick(0) },
                         modifier = Modifier.weight(1f),
                         minHeight = 36.dp
                     )
                     BahaButton(
                         text = stringResource(R.string.record),
-                        type = if (mode == 1) ButtonType.PRIMARY else ButtonType.SECONDARY,
+                        type = if (mode == 1) ButtonType.NORMAL else ButtonType.SECONDARY,
                         onClick = { onTabClick(1) },
                         modifier = Modifier.weight(1f),
                         minHeight = 36.dp

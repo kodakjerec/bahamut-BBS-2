@@ -193,7 +193,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         listName = ""
     }
 
-    fun setListViewSelection(selection: Int) {
+    open fun setListViewSelection(selection: Int) {
         ASCoroutine.ensureMainThread {
             if (this@TelnetListPage.listView != null) {
                 if (selection == -1) {
@@ -238,12 +238,13 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     }
 
     override fun onPageRefresh() {
-        synchronized (countLock) {
+        synchronized(countLock) {
             listCount = itemSize
-            if (listView != null) {
-                mDataSetObservable.notifyChanged()
-                if (!isListLoaded) {
-                    isListLoaded = true
+            mDataSetObservable.notifyChanged()
+
+            if (!isListLoaded) {
+                isListLoaded = true
+                if (listView != null) {
                     setListViewSelection(count - 1)
                 }
             }
