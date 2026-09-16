@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -244,7 +243,7 @@ class UserConfigPage : TelnetPage() {
                 }
             }
 
-            // Bottom toolbar
+            // 2. 底部固定工具列（移出滾動區域，放在外層 Column 最底端）
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
             BahaButton(
                 text = stringResource(R.string._back),

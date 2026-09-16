@@ -9,6 +9,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.sp
 
 /**
  * 主題風格列舉
@@ -439,6 +441,26 @@ fun createAppColors(style: AppThemeStyle, darkTheme: Boolean): AppColors {
 val LocalAppColors = staticCompositionLocalOf { DefaultLightColors }
 
 /**
+ * 專案字級階層規範
+ *
+ * @property scaleFactor 縮放倍率（預設 1.0f，供未來全域字體動態縮放使用）
+ */
+@Immutable
+data class AppFontSize(
+    val scaleFactor: Float = 1.0f,
+    val ultraLarge: TextUnit = (28 * scaleFactor).sp,  // 28sp (超大字 / 無障礙 / 特大標題)
+    val large: TextUnit = (26 * scaleFactor).sp,       // 26sp (主頁目錄項目 / 勇者足跡按鈕)
+    val base: TextUnit = (24 * scaleFactor).sp,        // 24sp (全域基準大小 / 終端機大字 / 輸入框文字)
+    val title: TextUnit = (20 * scaleFactor).sp,       // 20sp (狀態數值 / 區塊標題)
+    val subtitle: TextUnit = (18 * scaleFactor).sp,    // 18sp (按鈕文字 / 輸入框標籤 / 選項文字)
+    val body: TextUnit = (16 * scaleFactor).sp,        // 16sp (內文 / 核取方塊文字 / 對話框說明)
+    val caption: TextUnit = (14 * scaleFactor).sp,     // 14sp (提示說明 / 章節標題 / 輔助文字)
+    val tiny: TextUnit = (12 * scaleFactor).sp          // 12sp (極小標籤 / 狀態指示)
+)
+
+val LocalAppFontSize = staticCompositionLocalOf { AppFontSize() }
+
+/**
  * 全域 Theme Composable
  *
  * 特別限制：
@@ -449,6 +471,7 @@ val LocalAppColors = staticCompositionLocalOf { DefaultLightColors }
 fun AppTheme(
     style: AppThemeStyle = AppThemeStyle.DEFAULT,
     darkTheme: Boolean = isSystemInDarkTheme(),
+    fontSize: AppFontSize = AppFontSize(),
     content: @Composable () -> Unit
 ) {
     // Android 10 以下放棄深色模式
@@ -459,16 +482,22 @@ fun AppTheme(
 
     CompositionLocalProvider(
         LocalAppColors provides colors,
+        LocalAppFontSize provides fontSize,
         content = content
     )
 }
 
 /**
- * 導出方便存取的全域物件 AppTheme.colors
+ * 導出方便存取的全域物件 AppTheme.colors, AppTheme.fontSize
  */
 object AppTheme {
     val colors: AppColors
         @Composable
         @ReadOnlyComposable
         get() = LocalAppColors.current
+
+    val fontSize: AppFontSize
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalAppFontSize.current
 }

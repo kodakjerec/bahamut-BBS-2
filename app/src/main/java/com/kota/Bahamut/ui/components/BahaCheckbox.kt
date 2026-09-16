@@ -19,7 +19,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
@@ -59,7 +58,7 @@ fun BahaCheckboxLeft(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    fontSize: TextUnit = 16.sp,
+    fontSize: TextUnit = AppTheme.fontSize.body,
     textColor: Color = AppTheme.colors.textPrimary,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
@@ -114,7 +113,7 @@ fun SettingsCheckboxItem(
         Text(
             text = title,
             color = if (enabled) colors.textPrimary else colors.textSecondary,
-            fontSize = 17.sp,
+            fontSize = AppTheme.fontSize.base,
             modifier = Modifier.weight(1f)
         )
         BahaCheckbox(

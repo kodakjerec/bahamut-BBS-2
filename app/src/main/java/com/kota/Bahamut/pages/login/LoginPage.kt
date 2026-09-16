@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
@@ -46,6 +43,8 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -537,17 +536,16 @@ class LoginPage : TelnetComposePage() {
                                 }
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            Text(
+                            BahaText(
                                 text = stringResource(R.string.login_web_sign_in),
-                                color = colors.textPrimary,
-                                fontSize = 16.sp
+                                size = BahaTextSize.BODY
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.login_web_settings_btn),
                             color = colors.textLink,
-                            fontSize = 16.sp,
+                            size = BahaTextSize.BODY,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .clickable {
@@ -563,10 +561,9 @@ class LoginPage : TelnetComposePage() {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.account),
-                        color = colors.textPrimary,
-                        fontSize = 18.sp,
+                        size = BahaTextSize.SUBTITLE,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
@@ -584,10 +581,9 @@ class LoginPage : TelnetComposePage() {
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.password),
-                        color = colors.textPrimary,
-                        fontSize = 18.sp,
+                        size = BahaTextSize.SUBTITLE,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
@@ -626,10 +622,9 @@ class LoginPage : TelnetComposePage() {
                             }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.save_data),
-                            color = colors.textPrimary,
-                            fontSize = 16.sp
+                            size = BahaTextSize.BODY
                         )
                     }
                 }
@@ -637,7 +632,7 @@ class LoginPage : TelnetComposePage() {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 3. 底部登入工具列 (滿版無縫)
+            // 3. 底部登入工具列 (滿版無縫，50dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -649,9 +644,7 @@ class LoginPage : TelnetComposePage() {
                 onClick = { onLoginButtonClicked() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                fontSize = 18.sp,
-                minHeight = 50.dp
+                    .height(50.dp)
             )
         }
     }

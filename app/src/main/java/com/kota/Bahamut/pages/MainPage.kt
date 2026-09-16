@@ -58,6 +58,8 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -393,16 +395,16 @@ class MainPage : TelnetComposePage() {
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.main_online_people),
-                            color = colors.textSecondary,
-                            fontSize = 13.sp
+                            size = BahaTextSize.CAPTION,
+                            color = colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text(
+                        BahaText(
                             text = onlinePeopleText.ifEmpty { "0" },
+                            size = BahaTextSize.TITLE,
                             color = colors.statusNotice,
-                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -420,10 +422,10 @@ class MainPage : TelnetComposePage() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            Text(
+                            BahaText(
                                 text = stringResource(R.string.main_bb_call),
-                                color = colors.textSecondary,
-                                fontSize = 13.sp
+                                size = BahaTextSize.CAPTION,
+                                color = colors.textSecondary
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Image(
@@ -433,10 +435,10 @@ class MainPage : TelnetComposePage() {
                             )
                         }
                         Spacer(modifier = Modifier.height(2.dp))
-                        Text(
+                        BahaText(
                             text = bbCallText.ifEmpty { "0" },
+                            size = BahaTextSize.TITLE,
                             color = colors.statusNotice,
-                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -449,10 +451,10 @@ class MainPage : TelnetComposePage() {
                             .clickable { onToggleHeroStep() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.main_hero_step),
+                            size = BahaTextSize.LARGE,
                             color = colors.buttonText,
-                            fontSize = 26.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -497,9 +499,7 @@ class MainPage : TelnetComposePage() {
                     onClick = { onLogoutClicked() },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
                 Box(
                     modifier = Modifier
@@ -512,9 +512,7 @@ class MainPage : TelnetComposePage() {
                     onClick = { onMailClicked() },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
                 Box(
                     modifier = Modifier
@@ -527,9 +525,7 @@ class MainPage : TelnetComposePage() {
                     onClick = { onSystemSettingsClicked() },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
             }
         }
@@ -554,10 +550,10 @@ private fun MainFolderItem(
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        BahaText(
             text = title,
+            size = BahaTextSize.LARGE,
             color = colors.buttonText,
-            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
@@ -588,22 +584,21 @@ private fun HeroStepRow(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            BahaText(
                 text = heroStep.authorNickname ?: stringResource(R.string.loading_),
                 color = colors.titleBarTitle,
-                fontSize = 12.sp,
+                size = BahaTextSize.TINY,
                 fontWeight = FontWeight.Bold
             )
-            Text(
+            BahaText(
                 text = heroStep.datetime ?: "",
                 color = colors.textSecondary,
-                fontSize = 11.sp
+                size = BahaTextSize.TINY
             )
         }
-        Text(
+        BahaText(
             text = heroStep.content ?: stringResource(R.string.loading),
-            color = colors.textPrimary,
-            fontSize = 13.sp,
+            size = BahaTextSize.CAPTION,
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         )
     }

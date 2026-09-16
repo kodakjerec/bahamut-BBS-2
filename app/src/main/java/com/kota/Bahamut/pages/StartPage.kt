@@ -1,7 +1,6 @@
 package com.kota.Bahamut.pages
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -25,11 +24,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,8 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -64,6 +59,8 @@ import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissi
 import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
@@ -209,32 +206,30 @@ class StartPage : TelnetComposePage() {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.notices),
-                        color = colors.textPrimary,
-                        fontSize = 20.sp,
+                        size = BahaTextSize.TITLE,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
+                    BahaText(
                         text = versionText,
-                        color = colors.textSecondary,
-                        fontSize = 14.sp
+                        size = BahaTextSize.CAPTION,
+                        color = colors.textSecondary
                     )
                 }
 
                 // 2. 公告說明 1
-                Text(
+                BahaText(
                     text = stringResource(R.string.start_msg_1).trim(),
+                    size = BahaTextSize.CAPTION,
                     color = colors.textSecondary,
-                    fontSize = 14.sp,
                     lineHeight = 20.sp
                 )
 
                 // 3. 公告說明 2
-                Text(
+                BahaText(
                     text = stringResource(R.string.start_msg_2),
-                    color = colors.textPrimary,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 22.sp
                 )
@@ -246,17 +241,17 @@ class StartPage : TelnetComposePage() {
                         .padding(vertical = 4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
+                    BahaText(
                         text = "第一次登入請先至",
+                        size = BahaTextSize.CAPTION,
                         color = colors.textSecondary,
-                        fontSize = 13.sp,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(
+                    BahaText(
                         text = "https://user.gamer.com.tw/openBBS.php",
+                        size = BahaTextSize.CAPTION,
                         color = colors.textLink,
-                        fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier
@@ -266,10 +261,10 @@ class StartPage : TelnetComposePage() {
                             .padding(vertical = 2.dp)
                     )
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(
+                    BahaText(
                         text = "啟用BBS權限 ！",
+                        size = BahaTextSize.CAPTION,
                         color = colors.textSecondary,
-                        fontSize = 13.sp,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -280,10 +275,10 @@ class StartPage : TelnetComposePage() {
                         .fillMaxWidth()
                         .alpha(if (isIpEnabled) 1.0f else 0.45f)
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.start_connect_ip),
+                        size = BahaTextSize.CAPTION,
                         color = colors.textSecondary,
-                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -321,10 +316,10 @@ class StartPage : TelnetComposePage() {
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(
+                                BahaText(
                                     text = ipText,
-                                    color = if (isIpEnabled) colors.textPrimary else colors.textSecondary,
-                                    fontSize = 18.sp
+                                    size = BahaTextSize.BASE,
+                                    color = if (isIpEnabled) colors.textPrimary else colors.textSecondary
                                 )
                             }
                         }
@@ -333,10 +328,10 @@ class StartPage : TelnetComposePage() {
 
                 // 6. 連線方式區塊 (Telnet vs WebSocket)
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.start_connect_method),
+                        size = BahaTextSize.CAPTION,
                         color = colors.textSecondary,
-                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -370,10 +365,9 @@ class StartPage : TelnetComposePage() {
                                     )
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text(
+                                BahaText(
                                     text = methodText,
-                                    color = colors.textPrimary,
-                                    fontSize = 18.sp
+                                    size = BahaTextSize.BASE
                                 )
                             }
                         }
@@ -386,10 +380,10 @@ class StartPage : TelnetComposePage() {
                         .fillMaxWidth()
                         .padding(top = 4.dp)
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.start_vault),
+                        size = BahaTextSize.CAPTION,
                         color = colors.textSecondary,
-                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -427,7 +421,7 @@ class StartPage : TelnetComposePage() {
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // 8. 底部操作工具列 (滿版無縫)
+            // 8. 底部操作工具列 (滿版無縫，高度 50dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -446,9 +440,7 @@ class StartPage : TelnetComposePage() {
                     onClick = { onExitButtonClicked() },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
                 Box(
                     modifier = Modifier
@@ -461,9 +453,7 @@ class StartPage : TelnetComposePage() {
                     onClick = { openUrl("https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/") },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
                 Box(
                     modifier = Modifier
@@ -476,9 +466,7 @@ class StartPage : TelnetComposePage() {
                     onClick = { onConnectButtonClicked() },
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp
+                        .fillMaxHeight()
                 )
             }
         }

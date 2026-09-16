@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -126,85 +128,94 @@ class UserInfoPage : TelnetPage() {
     @Composable
     fun UserInfoPageContent() {
         val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 標題
-            Text(
-                text = stringResource(R.string.user_info),
-                color = colors.titleBarTitle,
-                fontSize = 14.sp,
+            Column(
                 modifier = Modifier
+                    .weight(1f)
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-
-            // 暱稱輸入列
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .verticalScroll(scrollState)
             ) {
+                // 標題
                 Text(
-                    text = stringResource(R.string.user_info_nick_name),
-                    color = colors.textPrimary,
+                    text = stringResource(R.string.user_info),
+                    color = colors.titleBarTitle,
                     fontSize = 14.sp,
-                    modifier = Modifier.weight(1f)
-                )
-                TextField(
-                    value = nickNameState,
-                    onValueChange = { newVal ->
-                        nickNameState = newVal
-                        isUpdateEnabled = newVal.trim().isNotEmpty()
-                    },
                     modifier = Modifier
-                        .weight(3f)
-                        .height(60.dp),
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = colors.surface,
-                        unfocusedContainerColor = colors.surface,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                        .fillMaxWidth()
+                        .background(colors.toolbarBackground)
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                )
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 暱稱輸入列
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.user_info_nick_name),
+                        color = colors.textPrimary,
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextField(
+                        value = nickNameState,
+                        onValueChange = { newVal ->
+                            nickNameState = newVal
+                            isUpdateEnabled = newVal.trim().isNotEmpty()
+                        },
+                        modifier = Modifier
+                            .weight(3f)
+                            .height(60.dp),
+                        singleLine = true,
+                        colors = TextFieldDefaults.colors(
+                            focusedTextColor = colors.textPrimary,
+                            unfocusedTextColor = colors.textPrimary,
+                            focusedContainerColor = colors.surface,
+                            unfocusedContainerColor = colors.surface,
+                            focusedIndicatorColor = Color.Transparent,
+                            unfocusedIndicatorColor = Color.Transparent
+                        ),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                    )
+                }
+
+                // 套用按鈕 (隱藏/顯示)
+                if (isUpdateEnabled) {
+                    BahaButton(
+                        text = stringResource(R.string.theme_manager_page_chapter_update),
+                        modifier = Modifier.fillMaxWidth(),
+                        onClick = { onUpdateClicked() }
+                    )
+                }
+
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 其他資料
+                Text(
+                    text = othersState,
+                    color = colors.textSecondary,
+                    fontSize = 12.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
-
-            // 套用按鈕 (隱藏/顯示)
-            if (isUpdateEnabled) {
-                BahaButton(
-                    text = stringResource(R.string.theme_manager_page_chapter_update),
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onUpdateClicked() }
-                )
-            }
-
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-
-            // 其他資料
-            Text(
-                text = othersState,
-                color = colors.textSecondary,
-                fontSize = 12.sp,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            )
-
-            // 底部工具列
+            // 2. 底部固定工具列（移出滾動區域，放在外層 Column 最底端）
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
             BahaButton(
                 text = stringResource(R.string._back),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 onClick = { onBackPressed() }
             )
         }

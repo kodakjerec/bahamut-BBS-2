@@ -366,7 +366,7 @@ class SystemSettingsPage : TelnetPage() {
                                 Text(
                                     text = stringResource(R.string.system_setting_page_toolbar_idle),
                                     color = colors.textPrimary,
-                                    fontSize = 17.sp,
+                                    fontSize = 24.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
@@ -400,7 +400,7 @@ class SystemSettingsPage : TelnetPage() {
                                 Text(
                                     text = stringResource(R.string.system_setting_page_toolbar_alpha),
                                     color = colors.textPrimary,
-                                    fontSize = 17.sp,
+                                    fontSize = 24.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
@@ -560,9 +560,7 @@ class SystemSettingsPage : TelnetPage() {
                 onClick = { onBackPressed() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
-                fontSize = 18.sp,
-                minHeight = 50.dp
+                    .height(50.dp)
             )
         }
     }
@@ -579,7 +577,7 @@ class SystemSettingsPage : TelnetPage() {
             Text(
                 text = title,
                 color = colors.chapterText,
-                fontSize = 17.sp,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -599,7 +597,7 @@ class SystemSettingsPage : TelnetPage() {
             Text(
                 text = title,
                 color = colors.textPrimary,
-                fontSize = 17.sp,
+                fontSize = 24.sp,
                 modifier = Modifier.weight(1f)
             )
             Text(
@@ -633,7 +631,7 @@ class SystemSettingsPage : TelnetPage() {
             Text(
                 text = title,
                 color = colors.textPrimary,
-                fontSize = 17.sp,
+                fontSize = 24.sp,
                 modifier = Modifier.weight(1f)
             )
             Box {
@@ -644,13 +642,13 @@ class SystemSettingsPage : TelnetPage() {
                     Text(
                         text = currentText,
                         color = colors.textPrimary,
-                        fontSize = 16.sp
+                        fontSize = 24.sp
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "▾",
                         color = colors.textSecondary,
-                        fontSize = 14.sp
+                        fontSize = 24.sp
                     )
                 }
                 DropdownMenu(
@@ -663,6 +661,7 @@ class SystemSettingsPage : TelnetPage() {
                             text = {
                                 Text(
                                     text = label,
+                                    fontSize = 24.sp,
                                     color = if (index == selectedIndex) colors.titleBarTitle else colors.textPrimary
                                 )
                             },

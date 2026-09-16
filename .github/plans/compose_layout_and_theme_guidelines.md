@@ -73,6 +73,26 @@
   - 外觀：`2.dp` 輕微圓角或直角、實心淺灰底色 (`colors.inputBoxBackground`)、純黑文字 (`colors.inputBoxText`)
   - 支援密碼遮罩、最大字數限制與單行輸入。
 
+### 3. 通用文字元件與字級階層 (`BahaText` & `AppFontSize`)
+- 檔案：
+  - 元件：`app/src/main/java/com/kota/Bahamut/ui/components/BahaText.kt`
+  - 規格：`app/src/main/java/com/kota/Bahamut/ui/theme/Theme.kt` (`AppFontSize`)
+- **核心設計概念**：
+  - **App 基準大小為 24.sp**（對應 `BahaTextSize.BASE`），預設字色為 `colors.textPrimary`。
+  - 杜絕在各 Composable 寫死 `fontSize = 18.sp` 等魔術數字，一律透過 `BahaText(size = ...)` 語意化指定。
+  - `AppFontSize` 內建 `scaleFactor: Float = 1.0f`，未來支援使用者在設定中動態縮放字體大小（全域即時響應重組）。
+- **字級層級對應表 (`BahaTextSize`)**：
+  | 層級列舉 | 基準大小 | 適用場景 |
+  |---|---|---|
+  | `ULTRA_LARGE` | 28.sp | 特大標題 / 無障礙模式 |
+  | `LARGE` | 26.sp | 主選單目錄項目、勇者足跡按鈕 |
+  | `BASE` (預設) | 24.sp | 全域標準基準字、終端機標題大字、輸入框文字 |
+  | `TITLE` | 20.sp | 區塊標題、重要狀態數值 (如線上人數、BB Call) |
+  | `SUBTITLE` | 18.sp | 按鈕文字、輸入框標籤、單選項目文字 |
+  | `BODY` | 16.sp | 內文、核取方塊文字、長篇說明第二段 |
+  | `CAPTION` | 14.sp | 提示說明、輔助文字、版本號、章節列小字 |
+  | `TINY` | 12.sp | 極小徽章、時間戳記、次要數據 |
+
 ---
 
 ## 🪟 通用對話框底稿規範 (`BahaAlertDialogContent`)
@@ -238,5 +258,45 @@ Column(
 ### 9. 引用對話框 (`DialogReference.kt`)
 - 前文作者選項、子選項「去除空白行」、以及「無」選項全面採用 `BahaCheckboxLeft`（型態一）。
 - 子選項保留 28dp 左縮排層次感。
+
+---
+
+## 📱 螢幕邊界與 Inset 規範（嚴禁在底部工具列使用 `navigationBarsPadding()`）
+
+> [!CAUTION]
+> **嚴禁在 Compose 底部工具列或外層容器使用 `Modifier.navigationBarsPadding()`！**
+
+### 1. 核心成因分析
+- 專案主 Activity (`BahamutController`) 採用傳統標準視窗配置，並未啟用全螢幕 Edge-to-Edge（穿透繪製至系統導覽列下方）。
+- Android 系統本身已為虛擬導覽列（返回、首頁、多工三鍵或手勢小白條）保留獨立的實體區域（通常為 48dp 黑底）。
+- 若在 Compose 底部工具列或其外層 Box/Column 上附加 `navigationBarsPadding()`，Compose 會測量到系統 Inset 並於元件內部額外墊高 48dp。
+- 當背景色 (`toolbarBackground`) 套用時，這 48dp 內距會被工具列底色一併填滿，導致原本標準的 `50dp` 工具列暴增至近 `100dp`，視覺上呈現**「兩行高度」且下半部為大片空綠/青色區塊**的排版錯誤。
+
+### 2. 標準底部工具列排版樣板
+所有頁面（`StartPage`、`MainPage`、`SystemSettingsPage`、`UserConfigPage`、`UserInfoPage` 等）底部操作列請遵循純粹的固定高度結構：
+```kotlin
+// 1dp 頂部分隔線
+Box(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(1.dp)
+        .background(colors.toolbarDivider)
+)
+// 50dp 工具列容器
+Row(
+    modifier = Modifier
+        .fillMaxWidth()
+        .height(50.dp)
+        .background(colors.toolbarBackground),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    BahaButton(
+        text = stringResource(R.string.exit),
+        onClick = { ... },
+        modifier = Modifier.weight(1f).fillMaxHeight()
+    )
+    ...
+}
+```
 
 
