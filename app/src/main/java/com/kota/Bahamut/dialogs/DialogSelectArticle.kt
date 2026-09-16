@@ -1,117 +1,217 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View
-import android.widget.Button
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.asFramework.ui.ASToast
 
-class DialogSelectArticle : ASDialog(), View.OnClickListener {
-    var button0p: Button
-    var button1p: Button
-    var button2p: Button
-    var button3p: Button
-    var button4p: Button
-    var button5p: Button
-    var button6p: Button
-    var button7p: Button
-    var button8p: Button
-    var button9p: Button
-    var buttonBackSpaceP: Button
-    var cancelButton: Button
-    var content: TextView
-    var contentString: String = ""
+class DialogSelectArticle : ASDialog() {
     var dialogSelectArticleListener: DialogSelectArticleListener? = null
-    var searchButton: Button
 
     override val name: String?
         get() = "BahamutBoardSelectDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_select_article)
-        if (window != null) window?.setBackgroundDrawable(null)
-        this.content = findViewById<TextView>(R.id.Bahamut_Dialog_Select_content_Label)
-        this.button0p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_0_p)
-        this.button1p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_1_p)
-        this.button2p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_2_p)
-        this.button3p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_3_p)
-        this.button4p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_4_p)
-        this.button5p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_5_p)
-        this.button6p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_6_p)
-        this.button7p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_7_p)
-        this.button8p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_8_p)
-        this.button9p = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_9_p)
-        this.buttonBackSpaceP =
-            findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_backSpace_p)
-        this.searchButton = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_Search)
-        this.cancelButton = findViewById<Button>(R.id.Bahamut_Dialog_Select_Button_Cancel)
-        this.button0p.setOnClickListener(this)
-        this.button1p.setOnClickListener(this)
-        this.button2p.setOnClickListener(this)
-        this.button3p.setOnClickListener(this)
-        this.button4p.setOnClickListener(this)
-        this.button5p.setOnClickListener(this)
-        this.button6p.setOnClickListener(this)
-        this.button7p.setOnClickListener(this)
-        this.button8p.setOnClickListener(this)
-        this.button9p.setOnClickListener(this)
-        this.buttonBackSpaceP.setOnClickListener(this)
-        this.searchButton.setOnClickListener(this)
-        this.cancelButton.setOnClickListener(this)
+        setTitle(CommonFunctions.getContextString(R.string.select_article))
+        setComposeContent {
+            Content()
+        }
     }
 
-    override fun onClick(view: View?) {
-        if (view === this.button0p) {
-            this.contentString += 0
-        } else if (view === this.button1p) {
-            this.contentString += 1
-        } else if (view === this.button2p) {
-            this.contentString += 2
-        } else if (view === this.button3p) {
-            this.contentString += 3
-        } else if (view === this.button4p) {
-            this.contentString += 4
-        } else if (view === this.button5p) {
-            this.contentString += 5
-        } else if (view === this.button6p) {
-            this.contentString += 6
-        } else if (view === this.button7p) {
-            this.contentString += 7
-        } else if (view === this.button8p) {
-            this.contentString += 8
-        } else if (view === this.button9p) {
-            this.contentString += 9
-        } else if (view === this.buttonBackSpaceP) {
-            if (this.contentString.length > 0) {
-                this.contentString =
-                    this.contentString.substring(0, this.contentString.length - 1)
+    @Composable
+    private fun Content() {
+        var contentString by remember { mutableStateOf("") }
+        val colors = AppTheme.colors
+
+        fun onDigit(d: String) {
+            if (contentString.length < 5) {
+                contentString += d
             }
-        } else if (view === this.searchButton) {
-            if (this.contentString.isEmpty()) {
-                showShortToast(getContextString(R.string.please_input_article_number))
-                return
-            }
-            if (this.dialogSelectArticleListener != null) {
-                this.dialogSelectArticleListener?.onSelectDialogDismissWIthIndex(this.contentString)
-            }
-            dismiss()
-        } else if (view === this.cancelButton) {
-            dismiss()
         }
-        if (this.contentString.length > 5) {
-            this.contentString = this.contentString.substring(0, 5)
+
+        fun onBackspace() {
+            if (contentString.isNotEmpty()) {
+                contentString = contentString.dropLast(1)
+            }
         }
-        this.content.text = this.contentString
+
+        Box(
+            modifier = Modifier
+                .widthIn(min = 260.dp, max = 300.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(colors.pageBackground)
+                .border(1.dp, colors.dialogBorder, RoundedCornerShape(6.dp))
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // 標題列
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Text(
+                        text = CommonFunctions.getContextString(R.string.select_article),
+                        color = colors.titleBarTitle,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.divider)
+                )
+
+                // 顯示目前輸入的數字
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = if (contentString.isEmpty()) CommonFunctions.getContextString(R.string.please_input_article_number) else contentString,
+                        color = if (contentString.isEmpty()) colors.textSecondary else colors.textPrimary,
+                        fontSize = if (contentString.isEmpty()) 15.sp else 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.divider)
+                )
+
+                // 數字鍵盤
+                val rows = listOf(
+                    listOf("7", "8", "9"),
+                    listOf("4", "5", "6"),
+                    listOf("1", "2", "3")
+                )
+
+                rows.forEach { row ->
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        row.forEachIndexed { index, digit ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(48.dp)
+                                    .clickable { onDigit(digit) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(text = digit, color = colors.textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Medium)
+                            }
+                            if (index < row.size - 1) {
+                                Box(
+                                    modifier = Modifier
+                                        .height(48.dp)
+                                        .padding(vertical = 4.dp)
+                                        .border(0.5.dp, colors.divider)
+                                )
+                            }
+                        }
+                    }
+                    Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
+                }
+
+                // 0 與 DEL
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .clickable { onDigit("0") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = "0", color = colors.textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Medium)
+                    }
+                    Box(
+                        modifier = Modifier
+                            .height(48.dp)
+                            .padding(vertical = 4.dp)
+                            .border(0.5.dp, colors.divider)
+                    )
+                    Box(
+                        modifier = Modifier
+                            .weight(2f)
+                            .height(48.dp)
+                            .clickable { onBackspace() },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(text = CommonFunctions.getContextString(R.string.del), color = colors.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                    }
+                }
+
+                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
+
+                // 底部按鈕列
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)
+                ) {
+                    BahaButton(
+                        text = CommonFunctions.getContextString(R.string.cancel),
+                        type = ButtonType.SECONDARY,
+                        onClick = { dismiss() },
+                        modifier = Modifier.weight(1f, fill = false),
+                        minHeight = 36.dp
+                    )
+                    BahaButton(
+                        text = CommonFunctions.getContextString(R.string.search),
+                        type = ButtonType.NORMAL,
+                        onClick = {
+                            if (contentString.isEmpty()) {
+                                ASToast.showShortToast(CommonFunctions.getContextString(R.string.please_input_article_number))
+                                return@BahaButton
+                            }
+                            dialogSelectArticleListener?.onSelectDialogDismissWIthIndex(contentString)
+                            dismiss()
+                        },
+                        modifier = Modifier.weight(1f, fill = false),
+                        minHeight = 36.dp
+                    )
+                }
+            }
+        }
     }
 
     fun setListener(listener: DialogSelectArticleListener?) {
         this.dialogSelectArticleListener = listener
-    }
-
-    public override fun show() {
-        super.show()
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,7 +64,6 @@ import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissi
 import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
@@ -200,7 +201,7 @@ class StartPage : TelnetComposePage() {
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(14.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // 1. 公告標題列與版本號
                 Row(
@@ -210,20 +211,20 @@ class StartPage : TelnetComposePage() {
                 ) {
                     Text(
                         text = stringResource(R.string.notices),
-                        color = colors.titleBarTitle,
-                        fontSize = 18.sp,
+                        color = colors.textPrimary,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
                         text = versionText,
                         color = colors.textSecondary,
-                        fontSize = 12.sp
+                        fontSize = 14.sp
                     )
                 }
 
                 // 2. 公告說明 1
                 Text(
-                    text = stringResource(R.string.start_msg_1),
+                    text = stringResource(R.string.start_msg_1).trim(),
                     color = colors.textSecondary,
                     fontSize = 14.sp,
                     lineHeight = 20.sp
@@ -233,30 +234,43 @@ class StartPage : TelnetComposePage() {
                 Text(
                     text = stringResource(R.string.start_msg_2),
                     color = colors.textPrimary,
-                    fontSize = 15.sp,
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Medium,
                     lineHeight = 22.sp
                 )
 
                 // 4. 開啟帳號連結 (啟用 BBS 權限)
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
-                    contentAlignment = Alignment.Center
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(R.string.StartPage_open_account),
-                        color = colors.titleBarTitle,
+                        text = "第一次登入請先至",
+                        color = colors.textSecondary,
                         fontSize = 13.sp,
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "https://user.gamer.com.tw/openBBS.php",
+                        color = colors.textLink,
+                        fontSize = 14.sp,
                         textAlign = TextAlign.Center,
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
                             .clickable {
                                 openUrl("https://user.gamer.com.tw/openBBS.php")
                             }
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .padding(vertical = 2.dp)
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "啟用BBS權限 ！",
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center
                     )
                 }
 
@@ -269,7 +283,7 @@ class StartPage : TelnetComposePage() {
                     Text(
                         text = stringResource(R.string.start_connect_ip),
                         color = colors.textSecondary,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -294,7 +308,7 @@ class StartPage : TelnetComposePage() {
                                             }
                                         }
                                     )
-                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                    .padding(vertical = 4.dp, horizontal = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
@@ -302,15 +316,15 @@ class StartPage : TelnetComposePage() {
                                     onClick = null,
                                     enabled = isIpEnabled,
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = colors.titleBarTitle,
-                                        unselectedColor = colors.divider
+                                        selectedColor = colors.checkboxTint,
+                                        unselectedColor = colors.checkboxUncheckedTint
                                     )
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = ipText,
                                     color = if (isIpEnabled) colors.textPrimary else colors.textSecondary,
-                                    fontSize = 15.sp
+                                    fontSize = 18.sp
                                 )
                             }
                         }
@@ -322,7 +336,7 @@ class StartPage : TelnetComposePage() {
                     Text(
                         text = stringResource(R.string.start_connect_method),
                         color = colors.textSecondary,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
@@ -344,22 +358,22 @@ class StartPage : TelnetComposePage() {
                                             setConnectMethod(methodText)
                                         }
                                     )
-                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                    .padding(vertical = 4.dp, horizontal = 4.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
                                     selected = (methodText == selectedMethod),
                                     onClick = null,
                                     colors = RadioButtonDefaults.colors(
-                                        selectedColor = colors.titleBarTitle,
-                                        unselectedColor = colors.divider
+                                        selectedColor = colors.checkboxTint,
+                                        unselectedColor = colors.checkboxUncheckedTint
                                     )
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = methodText,
                                     color = colors.textPrimary,
-                                    fontSize = 15.sp
+                                    fontSize = 18.sp
                                 )
                             }
                         }
@@ -375,11 +389,11 @@ class StartPage : TelnetComposePage() {
                     Text(
                         text = stringResource(R.string.start_vault),
                         color = colors.textSecondary,
-                        fontSize = 13.sp,
+                        fontSize = 14.sp,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     val shelterItems = remember {
                         listOf(
@@ -392,27 +406,20 @@ class StartPage : TelnetComposePage() {
                     }
 
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         shelterItems.forEach { (iconRes, name, url) ->
-                            Box(
+                            Image(
+                                painter = painterResource(id = iconRes),
+                                contentDescription = name,
                                 modifier = Modifier
-                                    .weight(1f)
-                                    .height(44.dp)
-                                    .padding(horizontal = 4.dp)
-                                    .clip(RoundedCornerShape(6.dp))
-                                    .background(colors.surface)
-                                    .clickable { openUrl(url) },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Image(
-                                    painter = painterResource(id = iconRes),
-                                    contentDescription = name,
-                                    modifier = Modifier.size(26.dp)
-                                )
-                            }
+                                    .size(38.dp)
+                                    .clickable { openUrl(url) }
+                            )
                         }
                     }
                 }
@@ -420,41 +427,58 @@ class StartPage : TelnetComposePage() {
                 Spacer(modifier = Modifier.height(8.dp))
             }
 
-            // 8. 底部操作工具列
+            // 8. 底部操作工具列 (滿版無縫)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(colors.divider)
+                    .background(colors.toolbarDivider)
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.exit),
-                    type = ButtonType.SECONDARY,
                     onClick = { onExitButtonClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.start_page_instructions),
-                    type = ButtonType.NORMAL,
                     onClick = { openUrl("https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/") },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.connect),
-                    type = ButtonType.NORMAL,
                     onClick = { onConnectButtonClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
                 )
             }
         }

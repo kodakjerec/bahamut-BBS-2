@@ -7,12 +7,15 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
+import androidx.core.view.size
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.UserSettings
-import androidx.core.view.size
+import com.kota.telnetUI.textView.TelnetTextViewNormal
+import com.kota.telnetUI.textView.TelnetTextViewSmall
 
 open class TelnetHeaderItemView : LinearLayout {
     protected var detail1: TextView? = null
@@ -29,24 +32,89 @@ open class TelnetHeaderItemView : LinearLayout {
         init()
     }
 
-    /** 提供子類別覆蓋 Layout ID */
-    protected open fun getLayoutId(): Int {
-        return R.layout.telnet_header_item_view
+    /** 提供子類別覆蓋詳細資訊區塊 */
+    protected open fun createDetailsLayout(dp: (Float) -> Int): View {
+        val detailsRow = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        detail1 = TelnetTextViewSmall(context).apply {
+            id = R.id.detail_1
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            isSingleLine = true
+            setTextColor(getThemeColor(R.attr.bahamut_titleBarDetailColor))
+        }
+        detailsRow.addView(detail1)
+
+        detail2 = TelnetTextViewSmall(context).apply {
+            id = R.id.detail_2
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            isSingleLine = true
+            setTextColor(getThemeColor(R.attr.bahamut_titleBarDetail2Color))
+        }
+        detailsRow.addView(detail2)
+
+        return detailsRow
     }
 
     open fun init() {
-        val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-        inflater.inflate(getLayoutId(), this)
-        myTitle = findViewById(R.id.title)
-        detail1 = findViewById(R.id.detail_1)
-        detail2 = findViewById(R.id.detail_2)
-        mMenuButton = findViewById(R.id.menu_button)
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
+
+        orientation = VERTICAL
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+        val headerItemView = LinearLayout(context).apply {
+            id = R.id.header_item_view
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setBackgroundColor(getThemeColor(R.attr.bahamut_titleBarBackground))
+        }
+
+        val textBlock = LinearLayout(context).apply {
+            orientation = VERTICAL
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            setBackgroundColor(getThemeColor(R.attr.bahamut_titleBarBackground))
+            setPadding(dp(10f), dp(6f), dp(10f), dp(6f))
+        }
+
+        myTitle = TelnetTextViewNormal(context).apply {
+            id = R.id.title
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setTextIsSelectable(true)
+            setTextColor(getThemeColor(R.attr.bahamut_titleBarTitleColor))
+        }
+        textBlock.addView(myTitle)
+
+        val detailsLayout = createDetailsLayout(::dp)
+        textBlock.addView(detailsLayout)
+
+        headerItemView.addView(textBlock)
+
+        mMenuButton = ImageButton(context).apply {
+            id = R.id.menu_button
+            layoutParams = LayoutParams(dp(60f), LayoutParams.MATCH_PARENT)
+            setImageDrawable(ContextCompat.getDrawable(context, R.drawable.menu_icon))
+            imageTintList = android.content.res.ColorStateList.valueOf(getThemeColor(R.attr.bahamut_defaultTextColor))
+            setBackgroundColor(getThemeColor(R.attr.bahamut_titleBarMenuIconBackground))
+            contentDescription = com.kota.Bahamut.service.CommonFunctions.getContextString(R.string.zero_word)
+            visibility = GONE
+        }
+        headerItemView.addView(mMenuButton)
+
+        addView(headerItemView)
+
+        val divider = View(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(1f))
+            setBackgroundColor(getThemeColor(R.attr.bahamut_dividerColor))
+        }
+        addView(divider)
 
         // 側邊選單
         val location = UserSettings.propertiesDrawerLocation
         if (location == 1) {
-            val headerItemView = findViewById<LinearLayout>(R.id.header_item_view)
-            // 備份現在的view
             val alViews = ArrayList<View?>()
             for (i in headerItemView.size - 1 downTo 0) {
                 val view = headerItemView.getChildAt(i)

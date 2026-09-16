@@ -43,24 +43,116 @@ class BoardEssencePageItemView : LinearLayout {
     }
 
     private fun init() {
-        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
-            R.layout.board_page_item_view,
-            this
-        )
-        contentView = findViewById(R.id.BoardPage_ItemView_contentView)
-        if (contentView!=null) {
-            statusLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Status)
-            titleLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Title)
-            numberLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Number)
-            dateLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Date)
-            authorLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Author)
-            dividerBottom = contentView?.findViewById(R.id.BoardPage_ItemView_DividerBottom)
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_mark)?.visibility =
-                INVISIBLE
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY_Title)?.visibility =
-                INVISIBLE
-            contentView?.findViewById<TextView>(R.id.BoardPage_ItemView_GY)?.visibility = INVISIBLE
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
+
+        orientation = VERTICAL
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+
+        val root = LinearLayout(context).apply {
+            id = R.id.BoardPage_ItemView_contentView
+            orientation = VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         }
+        contentView = root
+
+        val row = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        val bgView = LinearLayout(context).apply {
+            id = R.id.BoardPage_ItemView_backgroundView
+            orientation = VERTICAL
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground))
+            setPadding(dp(8f), dp(4f), dp(8f), dp(4f))
+        }
+
+        val titleRow = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        statusLabel = com.kota.telnetUI.textView.TelnetTextViewNormal(context).apply {
+            id = R.id.BoardPage_ItemView_Status
+            layoutParams = LayoutParams(dp(30f), LayoutParams.WRAP_CONTENT)
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_boardItemStatusColor))
+        }
+        titleRow.addView(statusLabel)
+
+        titleLabel = com.kota.telnetUI.textView.TelnetTextViewNormal(context).apply {
+            id = R.id.BoardPage_ItemView_Title
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            ellipsize = android.text.TextUtils.TruncateAt.END
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_boardItemNormalColor))
+        }
+        titleRow.addView(titleLabel)
+        bgView.addView(titleRow)
+
+        val metaRow = LinearLayout(context).apply {
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        }
+
+        numberLabel = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.BoardPage_ItemView_Number
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_boardItemNumberColor))
+        }
+        metaRow.addView(numberLabel)
+
+        dateLabel = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.BoardPage_ItemView_Date
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                marginStart = dp(12f)
+            }
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_boardItemDateColor))
+        }
+        metaRow.addView(dateLabel)
+
+        authorLabel = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.BoardPage_ItemView_Author
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f).apply {
+                marginStart = dp(12f)
+            }
+            gravity = android.view.Gravity.END
+            isSingleLine = true
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_boardItemAuthorColor))
+        }
+        metaRow.addView(authorLabel)
+
+        bgView.addView(metaRow)
+        row.addView(bgView)
+
+        val verticalDivider = View(context).apply {
+            layoutParams = LayoutParams(dp(1f), LayoutParams.MATCH_PARENT)
+            setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
+        }
+        row.addView(verticalDivider)
+
+        val arrowView = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.ListItem_ArrowView
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT)
+            gravity = android.view.Gravity.CENTER
+            setPadding(dp(6f), 0, dp(6f), 0)
+            text = CommonFunctions.getContextString(R.string.arrow_right)
+            typeface = android.graphics.Typeface.DEFAULT_BOLD
+            setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_arrowColor))
+            setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_arrowBackground))
+        }
+        row.addView(arrowView)
+
+        root.addView(row)
+
+        dividerBottom = View(context).apply {
+            id = R.id.BoardPage_ItemView_DividerBottom
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(1f))
+            setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
+        }
+        root.addView(dividerBottom)
+
+        addView(root)
     }
 
     fun setTitle(title: String?) {

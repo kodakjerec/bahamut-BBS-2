@@ -1,236 +1,335 @@
 package com.kota.Bahamut.dialogs
 
-import android.text.SpannableString
-import android.text.Spanned
-import android.text.style.BackgroundColorSpan
-import android.text.style.ForegroundColorSpan
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.Spinner
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
-import com.kota.telnet.reference.TelnetAnsiCode.getBackgroundColor
-import com.kota.telnet.reference.TelnetAnsiCode.getTextColor
+import com.kota.telnet.reference.TelnetAnsiCode
 
-class DialogPaintColor : ASDialog(), View.OnClickListener {
-    var mainLayout: LinearLayout
-    var isRecovery: Boolean = true
-    var isHighlight: Boolean = false
-    var frontColor: Int = 0
-    var backColor: Int = 0
-    var outputParam: String? = null
-    var dialogPaintColorListener: DialogPaintColorListener? = null
-    var recoveryCheckBox: CheckBox
-    var highlightCheckBox: CheckBox
-    var frontColorSpinner: Spinner
-    var backColorSpinner: Spinner
-    var textViewParam: TextView
-    var textViewSample: TextView
-
-    var sendButton: Button
-    var cancelButton: Button
-
-    var recoverListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            isRecovery = isChecked
-            if (isChecked) {
-                frontColor = -1
-                backColor = -1
-                isHighlight = false
-                frontColorSpinner.setSelection(frontColor)
-                backColorSpinner.setSelection(backColor)
-                highlightCheckBox.isChecked = isHighlight
-            }
-            generateOutputParam()
-        }
-    var highlightListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            isHighlight = isChecked
-            if (isRecovery) {
-                isRecovery = false
-                recoveryCheckBox.isChecked = false
-            }
-            generateOutputParam()
-        }
-
-    var frontColorListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
-            ) {
-                frontColor = i
-                if (i > 0 && isRecovery) {
-                    isRecovery = false
-                    recoveryCheckBox.isChecked = false
-                }
-                generateOutputParam()
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                frontColor = -1
-            }
-        }
-
-    var backColorListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
-            ) {
-                backColor = i
-                if (i > 0 && isRecovery) {
-                    isRecovery = false
-                    recoveryCheckBox.isChecked = false
-                }
-                generateOutputParam()
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                backColor = -1
-            }
-        }
+class DialogPaintColor : ASDialog() {
+    private var dialogPaintColorListener: DialogPaintColorListener? = null
 
     override val name: String?
         get() = "BahamutPostArticlePaintColor"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_paint_color)
-        if (window != null) window?.setBackgroundDrawable(null)
-        setTitle(getContextString(R.string.post_article_page_paint_color))
-        mainLayout = findViewById<LinearLayout>(R.id.dialog_paint_color_content_view)
-
-        // 還原
-        recoveryCheckBox = mainLayout.findViewById<CheckBox>(R.id.dialog_paint_color_check_recovery)
-        recoveryCheckBox.setOnCheckedChangeListener(recoverListener)
-        mainLayout.findViewById<View>(R.id.dialog_paint_color_check_recovery_item)
-            .setOnClickListener { view: View? ->
-                recoveryCheckBox.isChecked = !recoveryCheckBox.isChecked
-            }
-
-        // 前景
-        val adapterFrontColor = ArrayAdapter(
-            context,
-            R.layout.simple_spinner_item,
-            context.resources.getStringArray(R.array.dialog_paint_color_items)
-        )
-        adapterFrontColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        frontColorSpinner =
-            mainLayout.findViewById<Spinner>(R.id.post_article_page_paint_color_front_spinner)
-        frontColorSpinner.adapter = adapterFrontColor
-        frontColorSpinner.onItemSelectedListener = frontColorListener
-
-        // 背景
-        val adapterBackColor = ArrayAdapter(
-            context,
-            R.layout.simple_spinner_item,
-            context.resources.getStringArray(R.array.dialog_paint_color_items)
-        )
-        adapterBackColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        backColorSpinner =
-            mainLayout.findViewById<Spinner>(R.id.post_article_page_paint_color_back_spinner)
-        backColorSpinner.adapter = adapterBackColor
-        backColorSpinner.onItemSelectedListener = backColorListener
-
-        // 亮色
-        highlightCheckBox = mainLayout.findViewById<CheckBox>(R.id.dialog_paint_color_check_highlight)
-        highlightCheckBox.setOnCheckedChangeListener(highlightListener)
-        mainLayout.findViewById<View>(R.id.dialog_paint_color_check_highlight_item)
-            .setOnClickListener { view: View? ->
-                highlightCheckBox.isChecked = !highlightCheckBox.isChecked
-            }
-
-        // 文字
-        textViewParam = mainLayout.findViewById<TextView>(R.id.dialog_paint_color_param)
-        textViewSample = mainLayout.findViewById<TextView>(R.id.dialog_paint_color_sample)
-
-        // 按鈕
-        sendButton = mainLayout.findViewById<Button>(R.id.send)
-        sendButton.tag = "ToolbarItem.Danger"
-        sendButton.setOnClickListener(this)
-        cancelButton = mainLayout.findViewById<Button>(R.id.cancel)
-        cancelButton.tag = "ToolbarItem.Danger"
-        cancelButton.setOnClickListener(this)
-
-        setDialogWidth(mainLayout)
+        setTitle(CommonFunctions.getContextString(R.string.post_article_page_paint_color))
+        setComposeContent {
+            Content()
+        }
     }
 
-    fun generateOutputParam() {
-        if (isRecovery) {
-            outputParam = "*[m"
-        } else {
-            outputParam = "*["
-            if (isHighlight) outputParam += "1;"
-            if (frontColor > 0) {
-                outputParam += "3" + (frontColor - 1)
-                if (backColor > 0) {
-                    outputParam += ";4" + (backColor - 1)
-                }
-            } else if (backColor > 0) {
-                outputParam += "4" + (backColor - 1)
-            }
-            outputParam += "m"
+    @Composable
+    private fun Content() {
+        val context = LocalContext.current
+        val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
+
+        val colorOptions = remember {
+            context.resources.getStringArray(R.array.dialog_paint_color_items)
         }
-        // 內容改變
-        textViewParam.text = outputParam
 
-        // 顏色改變
-        val textSample = SpannableString(textViewSample.text)
-        val spansToRemove = textSample.getSpans(0, textSample.length, Any::class.java)
+        var isRecovery by remember { mutableStateOf(true) }
+        var isHighlight by remember { mutableStateOf(false) }
+        var frontColor by remember { mutableIntStateOf(0) }
+        var backColor by remember { mutableIntStateOf(0) }
 
-        if (isRecovery) {
-            // 還原
-            for (span in spansToRemove) {
-                if (span is ForegroundColorSpan || span is BackgroundColorSpan) textSample.removeSpan(
-                    span
-                )
+        var frontExpanded by remember { mutableStateOf(false) }
+        var backExpanded by remember { mutableStateOf(false) }
+
+        // Generate outputParam
+        val outputParam = remember(isRecovery, isHighlight, frontColor, backColor) {
+            if (isRecovery) {
+                "*[m"
+            } else {
+                val sb = StringBuilder("*[")
+                if (isHighlight) sb.append("1;")
+                if (frontColor > 0) {
+                    sb.append("3").append(frontColor - 1)
+                    if (backColor > 0) {
+                        sb.append(";4").append(backColor - 1)
+                    }
+                } else if (backColor > 0) {
+                    sb.append("4").append(backColor - 1)
+                }
+                sb.append("m")
+                sb.toString()
             }
-        } else {
-            var paintColor: Byte
-            if (frontColor > 0) {
-                paintColor = (frontColor - 1).toByte()
+        }
+
+        // Compute preview textColor and bgColor
+        val sampleTextColor = remember(isRecovery, isHighlight, frontColor) {
+            if (isRecovery || frontColor <= 0) {
+                colors.textPrimary
+            } else {
+                var paintColor: Byte = (frontColor - 1).toByte()
                 if (isHighlight) paintColor = (paintColor + 8).toByte()
-                val colorSpan = ForegroundColorSpan(getTextColor(paintColor))
-                textSample.setSpan(colorSpan, 0, textSample.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
-            } else {
-                for (span in spansToRemove) {
-                    if (span is ForegroundColorSpan) textSample.removeSpan(span)
-                }
+                Color(TelnetAnsiCode.getTextColor(paintColor))
             }
+        }
 
-            if (backColor > 0) {
-                paintColor = (backColor - 1).toByte()
-                val colorSpan = BackgroundColorSpan(getBackgroundColor(paintColor))
-                textSample.setSpan(colorSpan, 0, textSample.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        val sampleBgColor = remember(isRecovery, backColor) {
+            if (isRecovery || backColor <= 0) {
+                Color.Transparent
             } else {
-                for (span in spansToRemove) {
-                    if (span is BackgroundColorSpan) textSample.removeSpan(span)
+                val paintColor: Byte = (backColor - 1).toByte()
+                Color(TelnetAnsiCode.getBackgroundColor(paintColor))
+            }
+        }
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.post_article_page_paint_color),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        dialogPaintColorListener?.onPaintColorDone(outputParam)
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+            ) {
+                // 還原 Checkbox
+                BahaCheckboxLeft(
+                    text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_recovery),
+                    checked = isRecovery,
+                    onCheckedChange = { isChecked ->
+                        isRecovery = isChecked
+                        if (isChecked) {
+                            frontColor = 0
+                            backColor = 0
+                            isHighlight = false
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    trailingContent = {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_recovery2),
+                            color = colors.textSecondary,
+                            fontSize = 14.sp
+                        )
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // 前景色
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_front),
+                            color = colors.textPrimary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_front2),
+                            color = colors.textSecondary,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    Box {
+                        OutlinedCard(
+                            modifier = Modifier
+                                .width(120.dp)
+                                .clickable { frontExpanded = true }
+                        ) {
+                            Text(
+                                text = colorOptions.getOrElse(frontColor) { "" },
+                                color = colors.textPrimary,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = frontExpanded,
+                            onDismissRequest = { frontExpanded = false }
+                        ) {
+                            colorOptions.forEachIndexed { index, optionName ->
+                                DropdownMenuItem(
+                                    text = { Text(text = optionName, color = colors.textPrimary) },
+                                    onClick = {
+                                        frontColor = index
+                                        if (index > 0 && isRecovery) isRecovery = false
+                                        frontExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // 背景色
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_back),
+                            color = colors.textPrimary,
+                            fontSize = 16.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_back2),
+                            color = colors.textSecondary,
+                            fontSize = 14.sp
+                        )
+                    }
+
+                    Box {
+                        OutlinedCard(
+                            modifier = Modifier
+                                .width(120.dp)
+                                .clickable { backExpanded = true }
+                        ) {
+                            Text(
+                                text = colorOptions.getOrElse(backColor) { "" },
+                                color = colors.textPrimary,
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = backExpanded,
+                            onDismissRequest = { backExpanded = false }
+                        ) {
+                            colorOptions.forEachIndexed { index, optionName ->
+                                DropdownMenuItem(
+                                    text = { Text(text = optionName, color = colors.textPrimary) },
+                                    onClick = {
+                                        backColor = index
+                                        if (index > 0 && isRecovery) isRecovery = false
+                                        backExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // 亮色 Checkbox
+                BahaCheckboxLeft(
+                    text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_highlight),
+                    checked = isHighlight,
+                    onCheckedChange = { isChecked ->
+                        isHighlight = isChecked
+                        if (isChecked && isRecovery) isRecovery = false
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    trailingContent = {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_highlight2),
+                            color = colors.textSecondary,
+                            fontSize = 14.sp
+                        )
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // 預覽參數與預覽樣本
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = outputParam,
+                        color = colors.textSecondary,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Box(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(sampleBgColor)
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.dialog_paint_color_sample_ch),
+                            color = sampleTextColor,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
-        textViewSample.text = textSample
     }
 
     fun setListener(listener: DialogPaintColorListener?) {
-        this@DialogPaintColor.dialogPaintColorListener = listener
-    }
-
-    override fun onClick(view: View?) {
-        if (view === sendButton && dialogPaintColorListener != null) {
-            dialogPaintColorListener?.onPaintColorDone(outputParam!!)
-        }
-        dismiss()
+        this.dialogPaintColorListener = listener
     }
 }

@@ -7,9 +7,9 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,14 +21,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
@@ -44,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -73,7 +69,6 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesDrawerLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardEnable
-import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesScreenOrientation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
@@ -84,6 +79,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesLinkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.SettingsCheckboxItem
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -370,13 +366,13 @@ class SystemSettingsPage : TelnetPage() {
                                 Text(
                                     text = stringResource(R.string.system_setting_page_toolbar_idle),
                                     color = colors.textPrimary,
-                                    fontSize = 15.sp,
+                                    fontSize = 17.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
                                     text = "${toolbarIdleState}s",
                                     color = colors.textSecondary,
-                                    fontSize = 13.sp
+                                    fontSize = 15.sp
                                 )
                             }
                             Slider(
@@ -404,13 +400,13 @@ class SystemSettingsPage : TelnetPage() {
                                 Text(
                                     text = stringResource(R.string.system_setting_page_toolbar_alpha),
                                     color = colors.textPrimary,
-                                    fontSize = 15.sp,
+                                    fontSize = 17.sp,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Text(
                                     text = "${toolbarAlphaState.toInt()}%",
                                     color = colors.textSecondary,
-                                    fontSize = 13.sp
+                                    fontSize = 15.sp
                                 )
                             }
                             Slider(
@@ -552,12 +548,21 @@ class SystemSettingsPage : TelnetPage() {
                 }
             }
 
-            // 底部返回工具列
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            // 底部返回工具列 (滿版無縫)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
             BahaButton(
                 text = stringResource(R.string._back),
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { onBackPressed() }
+                onClick = { onBackPressed() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                fontSize = 18.sp,
+                minHeight = 50.dp
             )
         }
     }
@@ -568,16 +573,17 @@ class SystemSettingsPage : TelnetPage() {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.toolbarBackground)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .background(colors.chapterBackground)
+                .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
             Text(
                 text = title,
-                color = colors.titleBarTitle,
-                fontSize = 14.sp
+                color = colors.chapterText,
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold
             )
         }
-        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
     }
 
     @Composable
@@ -587,51 +593,20 @@ class SystemSettingsPage : TelnetPage() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = title,
                 color = colors.textPrimary,
-                fontSize = 15.sp,
+                fontSize = 17.sp,
                 modifier = Modifier.weight(1f)
             )
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = null,
-                tint = colors.textSecondary
-            )
-        }
-        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
-    }
-
-    @Composable
-    private fun SettingsCheckboxItem(
-        title: String,
-        isChecked: Boolean,
-        onCheckedChange: (Boolean) -> Unit
-    ) {
-        val colors = AppTheme.colors
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable { onCheckedChange(!isChecked) }
-                .padding(horizontal = 14.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
             Text(
-                text = title,
-                color = colors.textPrimary,
-                fontSize = 15.sp,
-                modifier = Modifier.weight(1f)
-            )
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = onCheckedChange,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = colors.checkboxTint,
-                    uncheckedColor = colors.textSecondary
-                )
+                text = ">",
+                color = colors.textSecondary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
             )
         }
         HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
@@ -652,21 +627,32 @@ class SystemSettingsPage : TelnetPage() {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { expanded = true }
-                .padding(horizontal = 14.dp, vertical = 12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = title,
                 color = colors.textPrimary,
-                fontSize = 15.sp,
+                fontSize = 17.sp,
                 modifier = Modifier.weight(1f)
             )
             Box {
-                Text(
-                    text = currentText,
-                    color = colors.titleBarDetail,
-                    fontSize = 14.sp
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = currentText,
+                        color = colors.textPrimary,
+                        fontSize = 16.sp
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = "▾",
+                        color = colors.textSecondary,
+                        fontSize = 14.sp
+                    )
+                }
                 DropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },

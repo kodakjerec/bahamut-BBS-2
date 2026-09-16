@@ -1,7 +1,6 @@
 package com.kota.Bahamut.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
@@ -9,16 +8,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -45,7 +40,6 @@ fun BahaButton(
     type: ButtonType = ButtonType.NORMAL,
     enabled: Boolean = true,
     isSelected: Boolean = false,
-    shape: Shape = RoundedCornerShape(4.dp),
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
     fontSize: TextUnit = 14.sp,
     minHeight: Dp = 42.dp
@@ -83,13 +77,7 @@ fun BahaButton(
     Box(
         modifier = modifier
             .defaultMinSize(minWidth = 56.dp, minHeight = minHeight)
-            .clip(shape)
             .background(backgroundColor)
-            .then(
-                if (type == ButtonType.SECONDARY) {
-                    Modifier.border(1.dp, colors.dialogBorder, shape)
-                } else Modifier
-            )
             .clickable(
                 interactionSource = interactionSource,
                 indication = null, // 自訂狀態色彩切換已包含即時反饋

@@ -18,13 +18,27 @@ class ArticlePageTelnetItemView(context: Context?) : LinearLayout(context), Teln
     }
 
     private fun init(context: Context?) {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
-            R.layout.article_page_telnet_item_view,
-            this
-        )
-        telnetView = findViewById(R.id.ArticlePage_TelnetItemView_TelnetView)
-        dividerView = findViewById(R.id.ArticlePage_TelnetItemView_DividerView)
+        val density = context?.resources?.displayMetrics?.density ?: 1f
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
+
+        orientation = VERTICAL
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         setBackgroundResource(android.R.color.transparent)
+
+        telnetView = TelnetView(context).apply {
+            id = R.id.ArticlePage_TelnetItemView_TelnetView
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                topMargin = dp(10f)
+                bottomMargin = dp(10f)
+            }
+        }
+        addView(telnetView)
+
+        dividerView = DividerView(context).apply {
+            id = R.id.ArticlePage_TelnetItemView_DividerView
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(1f))
+        }
+        addView(dividerView)
     }
 
     fun setFrame(aFrame: TelnetFrame) {

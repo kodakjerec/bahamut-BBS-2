@@ -2,8 +2,8 @@ package com.kota.Bahamut.pages
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.os.PowerManager
+import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -57,7 +58,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -328,25 +328,28 @@ class MainPage : TelnetComposePage() {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 1. 上半部 Telnet 終端 ASCII 歡迎畫面
-            Box(
+            // 1. 上半部 Telnet 終端 ASCII 歡迎畫面 (置頂，左右對齊視窗寬度)
+            AndroidView(
                 modifier = Modifier
-                    .weight(1f)
                     .fillMaxWidth()
-            ) {
-                AndroidView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = { ctx ->
-                        TelnetView(ctx).also {
-                            telnetView = it
-                            setFrameToTelnetView()
-                        }
-                    },
-                    update = { view ->
-                        telnetView = view
+                    .wrapContentHeight(),
+                factory = { ctx ->
+                    TelnetView(ctx).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        telnetView = this
+                        setFrameToTelnetView()
                     }
-                )
-            }
+                },
+                update = { view ->
+                    telnetView = view
+                }
+            )
+
+            // 彈性留白 (讓下方功能區塊沉底對齊)
+            Spacer(modifier = Modifier.weight(1f))
 
             // 2. 勇者足跡展開清單 (若有啟用且非空)
             if (isShowHeroStep && heroStepItems.isNotEmpty()) {
@@ -375,10 +378,11 @@ class MainPage : TelnetComposePage() {
                     .background(colors.pageBackground)
             ) {
                 // (1) 頂部三欄狀態資訊列 (線上人數 / 呼叫器 / 勇者足跡按鈕)
+                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(68.dp),
+                        .height(72.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // 線上人數
@@ -392,24 +396,16 @@ class MainPage : TelnetComposePage() {
                         Text(
                             text = stringResource(R.string.main_online_people),
                             color = colors.textSecondary,
-                            fontSize = 12.sp
+                            fontSize = 13.sp
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = onlinePeopleText.ifEmpty { "0" },
-                            color = Color(0xFFE53935),
-                            fontSize = 18.sp,
+                            color = colors.statusNotice,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-
-                    // 分隔線
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(36.dp)
-                            .background(colors.divider)
-                    )
 
                     // 呼叫器
                     Column(
@@ -427,7 +423,7 @@ class MainPage : TelnetComposePage() {
                             Text(
                                 text = stringResource(R.string.main_bb_call),
                                 color = colors.textSecondary,
-                                fontSize = 12.sp
+                                fontSize = 13.sp
                             )
                             Spacer(modifier = Modifier.width(4.dp))
                             Image(
@@ -439,19 +435,11 @@ class MainPage : TelnetComposePage() {
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = bbCallText.ifEmpty { "0" },
-                            color = Color(0xFFE53935),
-                            fontSize = 18.sp,
+                            color = colors.statusNotice,
+                            fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
-
-                    // 分隔線
-                    Box(
-                        modifier = Modifier
-                            .width(1.dp)
-                            .height(36.dp)
-                            .background(colors.divider)
-                    )
 
                     // 勇者足跡切換按鈕
                     Box(
@@ -463,8 +451,8 @@ class MainPage : TelnetComposePage() {
                     ) {
                         Text(
                             text = stringResource(R.string.main_hero_step),
-                            color = colors.titleBarTitle,
-                            fontSize = 18.sp,
+                            color = colors.buttonText,
+                            fontSize = 26.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -490,41 +478,58 @@ class MainPage : TelnetComposePage() {
                 )
             }
 
-            // 4. 底部工具列 (登出 / 信件匣 / 設定)
+            // 4. 底部工具列 (登出 / 信箱 / 設定) (滿版無縫)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(colors.divider)
+                    .background(colors.toolbarDivider)
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.logout),
-                    type = ButtonType.DANGER,
                     onClick = { onLogoutClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.mailbox),
-                    type = ButtonType.NORMAL,
                     onClick = { onMailClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.setting),
-                    type = ButtonType.NORMAL,
                     onClick = { onSystemSettingsClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp
                 )
             }
         }
@@ -544,15 +549,15 @@ private fun MainFolderItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .height(72.dp)
             .clickable { onClick() }
             .padding(horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = title,
-            color = colors.titleBarTitle,
-            fontSize = 22.sp,
+            color = colors.buttonText,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )

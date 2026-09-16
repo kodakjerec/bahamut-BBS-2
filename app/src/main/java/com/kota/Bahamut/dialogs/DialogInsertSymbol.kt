@@ -1,115 +1,128 @@
 package com.kota.Bahamut.dialogs
 
-import android.database.DataSetObserver
-import android.view.View
-import android.view.ViewGroup
-import android.view.Gravity
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
-import android.widget.ArrayAdapter
-import android.widget.GridView
-import android.widget.ListAdapter
-import android.widget.TextView
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.asFramework.dialog.ASDialog
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.asFramework.dialog.ASDialog
 
-class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
-    var mainView: GridView
+class DialogInsertSymbol : ASDialog() {
     private var _listener: DialogInsertSymbolListener? = null
-    var symbols: String =
+    private val symbols: String =
         "├─┼┴┬┤┌┐╞═╪╡│▕└┘╭╮╰╯╔╦╗╠═╬╣╓╥╖╒╤╕║╚╩╝╟╫╢╙╨╜╞╪╡╘╧╛＿ˍ▁▂▃▄▅▆▇█▏▎▍▌▋▊▉◢◣◥◤﹣﹦≡｜∣∥–︱—︳╴¯￣﹉﹊﹍﹎﹋﹌﹏︴∕﹨╱╲／＼↑↓←→↖↗↙↘㊣◎○●⊕⊙○●△▲☆★◇◆□■▽▼§￥〒￠￡※♀♂〔〕【】《》（）｛｝﹙﹚『』﹛﹜﹝﹞＜＞≦≧﹤﹥「」︵︶︷︸︹︺︻︼︽︾〈〉︿﹀∩∪﹁﹂﹃﹄ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρστυφχψω╳＋﹢－×÷＝≠≒∞ˇ±√⊥∠∟⊿㏒㏑∫∮∵∴"
 
+    override val name: String?
+        get() = "BahamutInsertSymbolDialog"
+
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_insert_symbol)
-        if (window != null) window?.setBackgroundDrawable(null)
-        this.mainView = findViewById<GridView>(R.id.SymbolDialog_GridView)
-        this.mainView.onItemClickListener = this
-        val list = arrayOfNulls<String>(this.symbols.length)
-        for (i in list.indices) {
-            list[i] = this.symbols[i].toString()
+        setComposeContent {
+            Content()
         }
-        this.mainView.adapter = this
-        setDialogWidth(mainView)
     }
 
-    override fun onItemClick(adapterView: AdapterView<*>?, arg1: View?, index: Int, id: Long) {
-        if (this._listener != null) {
-            this._listener?.onSymbolDialogDismissWithSymbol(getItem(index))
+    @Composable
+    private fun Content() {
+        val colors = AppTheme.colors
+        val symbolList = symbols.map { it.toString() }
+
+        Box(
+            modifier = Modifier
+                .widthIn(min = 280.dp, max = 360.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(colors.pageBackground)
+                .border(1.dp, colors.dialogBorder, RoundedCornerShape(6.dp))
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // 標題列
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                ) {
+                    Text(
+                        text = "符號表",
+                        color = colors.titleBarTitle,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 320.dp)
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                ) {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 40.dp),
+                        contentPadding = PaddingValues(4.dp)
+                    ) {
+                        items(symbolList) { sym ->
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .clickable {
+                                        _listener?.onSymbolDialogDismissWithSymbol(sym)
+                                        dismiss()
+                                    },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = sym,
+                                    color = colors.textPrimary,
+                                    fontSize = 20.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 關閉按鈕
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    BahaButton(
+                        text = CommonFunctions.getContextString(R.string.cancel),
+                        type = ButtonType.SECONDARY,
+                        onClick = { dismiss() },
+                        minHeight = 36.dp
+                    )
+                }
+            }
         }
-        dismiss()
-    }
-
-    override fun getCount(): Int {
-        return this.symbols.length
-    }
-
-    override fun getItem(position: Int): String {
-        return this.symbols[position].toString()
-    }
-
-    override fun getItemId(position: Int): Long {
-        return position.toLong()
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        return 0
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        var view = convertView
-        if (view == null) {
-            view = TextView(context)
-            view.layoutParams = ViewGroup.LayoutParams(100, 100)
-            view.gravity = Gravity.CENTER
-            view.textSize = 24f
-        }
-        val textView = view as TextView
-        textView.text = getItem(position)
-        
-        // 套用主題顏色
-        textView.setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_defaultTextColor))
-        
-        return textView
-    }
-
-    override fun getViewTypeCount(): Int {
-        return 1
-    }
-
-    override fun hasStableIds(): Boolean {
-        return false
-    }
-
-    override fun isEmpty(): Boolean {
-        return false
-    }
-
-    override fun registerDataSetObserver(observer: DataSetObserver?) {
-    }
-
-    override fun unregisterDataSetObserver(observer: DataSetObserver?) {
-    }
-
-    override fun areAllItemsEnabled(): Boolean {
-        return false
-    }
-
-    override fun isEnabled(position: Int): Boolean {
-        return false
     }
 
     fun setListener(aListener: DialogInsertSymbolListener?) {
         this._listener = aListener
-    }
-
-    override fun show() {
-        if (currentOrientation == 1) {
-            this.mainView.numColumns = 4
-        } else {
-            this.mainView.numColumns = 8
-        }
-        super.show()
     }
 }

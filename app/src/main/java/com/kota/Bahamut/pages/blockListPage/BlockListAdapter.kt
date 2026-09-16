@@ -10,8 +10,7 @@ class BlockListAdapter(private val blocklist: MutableList<String>) :
     private var mClickListener: BlockListClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BlockListViewHolder {
-        val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.block_list_item_view, parent, false)
+        val v = BlockListViewHolder.createView(parent.context)
         return BlockListViewHolder(v, mClickListener)
     }
 

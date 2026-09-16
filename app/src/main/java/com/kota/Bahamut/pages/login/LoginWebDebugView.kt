@@ -2,33 +2,71 @@ package com.kota.Bahamut.pages.login
 
 import android.content.Context
 import android.webkit.WebView
-import android.widget.Button
-import android.widget.LinearLayout
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.ui.ASToast
 
+import android.util.Log
+
 class LoginWebDebugView(private val context: Context) : ASDialog() {
-    private var mainLayout: LinearLayout
-    private var webView: WebView
-    private var btnClose: Button
+    private val webView = WebView(context)
     private var loginWeb: LoginWeb? = null
+    var onDismissCallback: (() -> Unit)? = null
+
+    override val name: String?
+        get() = "BahamutWebDebugDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_login_signin)
-        window?.setBackgroundDrawable(null)
-
-        mainLayout = findViewById(R.id.dialog_login_signin_layout)
-        webView = findViewById(R.id.debug_webview)
-        btnClose = findViewById(R.id.debug_btn_close)
-        btnClose.setOnClickListener { dismiss() }
-
-        // 設定 WebView 屬性
-        setDialogWidthHeight(mainLayout)
+        setTitle(CommonFunctions.getContextString(R.string.login_web_sign_in))
+        setComposeContent {
+            Content()
+        }
     }
 
-    var onDismissCallback: (() -> Unit)? = null
+    @Composable
+    private fun Content() {
+        BahaAlertDialogContent(
+            modifier = Modifier.widthIn(min = 300.dp, max = 380.dp),
+            title = CommonFunctions.getContextString(R.string.login_web_sign_in),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.exit),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                )
+            )
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(380.dp)
+            ) {
+                AndroidView(
+                    factory = { webView },
+                    onRelease = { view ->
+                        try {
+                            (view.parent as? android.view.ViewGroup)?.removeView(view)
+                        } catch (e: Exception) {
+                            Log.e("LoginWebDebugView", "Error in onRelease", e)
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
 
     /**
      * 初始化並開始自動登入流程
@@ -38,7 +76,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         onComplete: (() -> Unit)? = null
     ): LoginWebDebugView {
         this.onDismissCallback = onComplete
-        loginWeb = LoginWeb(context, webView) // 直接傳遞 WebView 給 LoginWeb
+        loginWeb = LoginWeb(context, webView)
 
         loginWeb?.init(
             onSignDetected = {
@@ -61,7 +99,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
                 this.show()
             }
         )
-        
+
         return this
     }
 

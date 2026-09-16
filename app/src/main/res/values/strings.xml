@@ -400,4 +400,8 @@
     <string name="background_service_description">Bahamut BBS 服務</string>
     <string name="background_service_notification_title">Bahamut BBS</string>
     <string name="background_service_notification_text">BBS 連線維持中…</string>
+    <string name="dialog_shorten_img_hint">請選擇或拍攝欲上傳的相片/影片</string>
+    <string name="dialog_shorten_img_album">相簿</string>
+    <string name="dialog_shorten_img_camera">相機</string>
+    <string name="dialog_shorten_img_video">錄影</string>
 </resources>

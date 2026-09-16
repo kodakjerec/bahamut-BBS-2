@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +32,7 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.SettingsCheckboxItem
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -133,113 +132,113 @@ class UserConfigPage : TelnetPage() {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
+                        .background(colors.chapterBackground)
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
                     Text(
                         text = stringResource(R.string.user_config),
-                        color = colors.titleBarTitle,
+                        color = colors.chapterText,
                         fontSize = 14.sp
                     )
                 }
 
                 // Interactive items
-                ConfigItem(
+                SettingsCheckboxItem(
                     title = stringResource(R.string.user_config_5),
                     isChecked = configCheckStates["5"] ?: false,
                     enabled = true,
-                    onClick = { changeOperationMode("5") }
+                    onCheckedChange = { changeOperationMode("5") }
                 )
-                ConfigItem(
+                SettingsCheckboxItem(
                     title = stringResource(R.string.user_config_6),
                     isChecked = configCheckStates["6"] ?: false,
                     enabled = true,
-                    onClick = { changeOperationMode("6") }
+                    onCheckedChange = { changeOperationMode("6") }
                 )
-                ConfigItem(
+                SettingsCheckboxItem(
                     title = stringResource(R.string.user_config_8),
                     isChecked = configCheckStates["8"] ?: false,
                     enabled = true,
-                    onClick = { changeOperationMode("8") }
+                    onCheckedChange = { changeOperationMode("8") }
                 )
-                ConfigItem(
+                SettingsCheckboxItem(
                     title = stringResource(R.string.user_config_9),
                     isChecked = configCheckStates["9"] ?: false,
                     enabled = true,
-                    onClick = { changeOperationMode("9") }
+                    onCheckedChange = { changeOperationMode("9") }
                 )
-                ConfigItem(
+                SettingsCheckboxItem(
                     title = stringResource(R.string.user_config_A),
                     isChecked = configCheckStates["A"] ?: false,
                     enabled = true,
-                    onClick = { changeOperationMode("A") }
+                    onCheckedChange = { changeOperationMode("A") }
                 )
 
                 // Expandable Section
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
+                        .background(colors.chapterBackground)
                         .clickable { isCantExpandState = !isCantExpandState }
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = stringResource(R.string.user_config_cant),
-                        color = colors.titleBarTitle,
+                        color = colors.chapterText,
                         fontSize = 14.sp,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
                         text = if (isCantExpandState) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
-                        color = colors.titleBarDetail,
+                        color = colors.chapterText.copy(alpha = 0.8f),
                         fontSize = 12.sp
                     )
                 }
 
                 AnimatedVisibility(visible = isCantExpandState) {
                     Column {
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_0),
                             isChecked = configCheckStates["0"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_1),
                             isChecked = configCheckStates["1"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_2),
                             isChecked = configCheckStates["2"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_3),
                             isChecked = configCheckStates["3"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_4),
                             isChecked = configCheckStates["4"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_7),
                             isChecked = configCheckStates["7"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
-                        ConfigItem(
+                        SettingsCheckboxItem(
                             title = stringResource(R.string.user_config_B),
                             isChecked = configCheckStates["B"] ?: false,
                             enabled = false,
-                            onClick = {}
+                            onCheckedChange = {}
                         )
                     }
                 }
@@ -249,45 +248,11 @@ class UserConfigPage : TelnetPage() {
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
             BahaButton(
                 text = stringResource(R.string._back),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 onClick = { onBackPressed() }
             )
         }
-    }
-
-    @Composable
-    private fun ConfigItem(
-        title: String,
-        isChecked: Boolean,
-        enabled: Boolean,
-        onClick: () -> Unit
-    ) {
-        val colors = AppTheme.colors
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(enabled = enabled, onClick = onClick)
-                .padding(horizontal = 14.dp, vertical = 6.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = title,
-                color = if (enabled) colors.textPrimary else colors.textSecondary,
-                fontSize = 15.sp,
-                modifier = Modifier.weight(1f)
-            )
-            Checkbox(
-                checked = isChecked,
-                onCheckedChange = if (enabled) { { onClick() } } else null,
-                enabled = enabled,
-                colors = CheckboxDefaults.colors(
-                    checkedColor = colors.checkboxTint,
-                    uncheckedColor = colors.textSecondary,
-                    disabledCheckedColor = colors.checkboxTint.copy(alpha = 0.5f),
-                    disabledUncheckedColor = colors.textSecondary.copy(alpha = 0.5f)
-                )
-            )
-        }
-        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
     }
 }

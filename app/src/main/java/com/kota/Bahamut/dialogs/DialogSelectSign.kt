@@ -1,37 +1,91 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 
-class DialogSelectSign : ASDialog(), View.OnClickListener {
-    var cancelButton: Button
-    var confirmButton: Button
+class DialogSelectSign : ASDialog() {
     var dialogSelectSignListener: DialogSelectSignListener? = null
-    var signField: EditText
 
     override val name: String?
         get() = "BahamutSelectSignDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_select_sign)
-        if (window != null) window?.setBackgroundDrawable(null)
-        setTitle(context.getString(R.string.select_sign))
-        this.signField = findViewById<EditText>(R.id.Bahamut_Dialog_Select_Sign_Input_Field)
-        this.confirmButton = findViewById<Button>(R.id.Bahamut_Dialog_Select_Sign_confirm_Button)
-        this.cancelButton = findViewById<Button>(R.id.Bahamut_Dialog_Select_Sign_Cancel_Button)
-        this.confirmButton.setOnClickListener(this)
-        this.cancelButton.setOnClickListener(this)
+        setTitle(CommonFunctions.getContextString(R.string.select_sign))
+        setComposeContent {
+            Content()
+        }
     }
 
-    override fun onClick(view: View?) {
-        if (view === this.confirmButton && this.dialogSelectSignListener != null) {
-            this.dialogSelectSignListener?.onSelectSign(this.signField.text.toString().replace("\n", ""))
+    @Composable
+    private fun Content() {
+        var signText by remember { mutableStateOf("0") }
+        val colors = AppTheme.colors
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.select_sign),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.confirm),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        dialogSelectSignListener?.onSelectSign(signText.replace("\n", ""))
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = CommonFunctions.getContextString(R.string.select_sign_msg),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = signText,
+                    onValueChange = { input ->
+                        signText = input.filter { it.isDigit() }
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = colors.pageBackground,
+                        unfocusedContainerColor = colors.pageBackground,
+                        focusedIndicatorColor = colors.toolbarBackgroundFocused,
+                        unfocusedIndicatorColor = colors.divider
+                    )
+                )
+            }
         }
-        dismiss()
     }
 
     fun setListener(listener: DialogSelectSignListener?) {

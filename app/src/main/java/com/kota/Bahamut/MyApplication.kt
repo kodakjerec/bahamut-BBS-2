@@ -4,13 +4,10 @@ import android.app.Application
 import android.webkit.WebView
 
 class MyApplication : Application() {
-    init {
-        instance = this
-    }
 
     override fun onCreate() {
         super.onCreate()
-
+        instance = this
 
         // 初始化WebView，避免多次初始化導致的錯誤
         try {
@@ -21,10 +18,7 @@ class MyApplication : Application() {
     }
 
     companion object {
-        var instance: MyApplication?
-            get() {
-                TODO()
-            }
-            set(value) {}
+        lateinit var instance: MyApplication
+            private set
     }
 }

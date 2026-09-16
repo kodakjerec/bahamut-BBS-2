@@ -24,7 +24,12 @@ object AppPalette {
     val Red = Color(0xFF800000)
     val RedBright = Color(0xFFFF0000)
     val TextLink = Color(0xFF1F5EFF)
+    val LinkCyan = Color(0xFF00FFFF)
+    val HoloGreen = Color(0xFF99CC00)
     val Divider = Color(0xFF404040)
+    val ToolbarDivider = Color(0xFF001A1A)
+    val DialogItemNormal = Color(0xFF400000)
+    val DialogItemPressed = Color(0xFFFFC90E)
 
     // 預設外觀 (Default Theme)
     val DefaultToolbarNormal = Color(0xFF003030)

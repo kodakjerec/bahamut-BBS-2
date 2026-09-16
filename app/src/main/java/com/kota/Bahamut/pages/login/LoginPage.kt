@@ -1,8 +1,11 @@
 package com.kota.Bahamut.pages.login
 
 import android.util.Log
+import android.view.ViewGroup
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,9 +16,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -42,8 +44,8 @@ import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.TempSettings.setWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
-import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -473,77 +475,85 @@ class LoginPage : TelnetComposePage() {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 1. Telnet 終端文字畫面 (由 TelnetView 繪製)
-            Box(
+            // 1. Telnet 終端文字畫面 (由 TelnetView 繪製，左右對齊視窗寬度)
+            AndroidView(
                 modifier = Modifier
-                    .weight(1f)
                     .fillMaxWidth()
-            ) {
-                AndroidView(
-                    modifier = Modifier.fillMaxSize(),
-                    factory = { ctx ->
-                        TelnetView(ctx).also {
-                            telnetView = it
-                            setFrameToTelnetView()
-                        }
-                    },
-                    update = { view ->
-                        telnetView = view
+                    .wrapContentHeight(),
+                factory = { ctx ->
+                    TelnetView(ctx).apply {
+                        layoutParams = ViewGroup.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                        )
+                        telnetView = this
+                        setFrameToTelnetView()
                     }
-                )
-            }
+                },
+                update = { view ->
+                    telnetView = view
+                }
+            )
+
+            // 彈性留白 (讓下方輸入區塊沉底)
+            Spacer(modifier = Modifier.weight(1f))
 
             // 2. 輸入面板區塊
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.pageBackground)
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp)
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                // VIP Web 簽到區塊 (僅 VIP 顯示)
+                // VIP Web 簽到區塊 (置中)
                 if (isVip) {
+                    @OptIn(ExperimentalFoundationApi::class)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(4.dp))
-                            .clickable {
-                                checkWebSignIn = !checkWebSignIn
-                                UserSettings.propertiesWebSignIn = checkWebSignIn
-                            }
-                            .padding(vertical = 4.dp),
+                            .padding(vertical = 2.dp),
+                        horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Checkbox(
-                            checked = checkWebSignIn,
-                            onCheckedChange = { checked ->
-                                checkWebSignIn = checked
-                                UserSettings.propertiesWebSignIn = checked
-                            },
-                            colors = CheckboxDefaults.colors(
-                                checkedColor = colors.checkboxTint,
-                                uncheckedColor = colors.divider
+                        Row(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .combinedClickable(
+                                    onClick = {
+                                        if (!checkWebSignIn && username.isNotEmpty() && password.isNotEmpty()) {
+                                            DialogWebLoginSettings().show()
+                                        }
+                                        checkWebSignIn = !checkWebSignIn
+                                        UserSettings.propertiesWebSignIn = checkWebSignIn
+                                    }
+                                ),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            BahaCheckbox(
+                                checked = checkWebSignIn,
+                                onCheckedChange = { checked ->
+                                    checkWebSignIn = checked
+                                    UserSettings.propertiesWebSignIn = checked
+                                }
                             )
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.login_web_sign_in),
-                            color = colors.textPrimary,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(R.string.login_web_sign_in),
+                                color = colors.textPrimary,
+                                fontSize = 16.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = stringResource(R.string.login_web_settings_btn),
-                            color = colors.titleBarTitle,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold,
+                            color = colors.textLink,
+                            fontSize = 16.sp,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .clickable {
                                     DialogWebLoginSettings().show()
                                 }
-                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                                .padding(horizontal = 4.dp, vertical = 2.dp)
                         )
                     }
                 }
@@ -557,14 +567,14 @@ class LoginPage : TelnetComposePage() {
                         text = stringResource(R.string.account),
                         color = colors.textPrimary,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(64.dp)
+                        modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
                         value = username,
                         onValueChange = { username = it },
                         placeholder = stringResource(R.string.Username_hint),
                         maxLength = 12,
+                        height = 40.dp,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -578,8 +588,7 @@ class LoginPage : TelnetComposePage() {
                         text = stringResource(R.string.password),
                         color = colors.textPrimary,
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.width(64.dp)
+                        modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
                         value = password,
@@ -587,64 +596,63 @@ class LoginPage : TelnetComposePage() {
                         placeholder = stringResource(R.string.password_hint),
                         isPassword = true,
                         maxLength = 8,
+                        height = 40.dp,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
-                // 記住帳號密碼核取方塊
+                // 記住我的資料核取方塊 (置中)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
-                        .clickable {
-                            saveLogonUser = !saveLogonUser
-                            UserSettings.propertiesSaveLogonUser = saveLogonUser
-                        }
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = 2.dp),
+                    horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Checkbox(
-                        checked = saveLogonUser,
-                        onCheckedChange = { checked ->
-                            saveLogonUser = checked
-                            UserSettings.propertiesSaveLogonUser = checked
-                        },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = colors.checkboxTint,
-                            uncheckedColor = colors.divider
+                    Row(
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .clickable {
+                                saveLogonUser = !saveLogonUser
+                                UserSettings.propertiesSaveLogonUser = saveLogonUser
+                            },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BahaCheckbox(
+                            checked = saveLogonUser,
+                            onCheckedChange = { checked ->
+                                saveLogonUser = checked
+                                UserSettings.propertiesSaveLogonUser = checked
+                            }
                         )
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = stringResource(R.string.save_data),
-                        color = colors.textPrimary,
-                        fontSize = 15.sp
-                    )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = stringResource(R.string.save_data),
+                            color = colors.textPrimary,
+                            fontSize = 16.sp
+                        )
+                    }
                 }
             }
 
-            // 3. 底部登入工具列
+            Spacer(modifier = Modifier.height(10.dp))
+
+            // 3. 底部登入工具列 (滿版無縫)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(colors.divider)
+                    .background(colors.toolbarDivider)
             )
-            Row(
+            BahaButton(
+                text = stringResource(R.string.login),
+                onClick = { onLoginButtonClicked() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BahaButton(
-                    text = stringResource(R.string.login),
-                    type = ButtonType.NORMAL,
-                    onClick = { onLoginButtonClicked() },
-                    modifier = Modifier.fillMaxWidth(),
-                    minHeight = 44.dp
-                )
-            }
+                    .height(50.dp),
+                fontSize = 18.sp,
+                minHeight = 50.dp
+            )
         }
     }
 }

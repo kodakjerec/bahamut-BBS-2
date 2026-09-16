@@ -1,10 +1,13 @@
 package com.kota.Bahamut.pages.messages
 
 import android.content.Context
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
@@ -20,17 +23,84 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
     private var txtNickname: TextView
     private var txtIp: TextView
     private var txtStatus: TextView
+    private var scale = context.resources.displayMetrics.density
+
     init {
-        inflate(context, R.layout.message_main_list_item, this)
-        mainLayout = findViewById(R.id.content_view)
-        txtIndex = mainLayout.findViewById(R.id.mmiIndex)
-        txtSenderName = mainLayout.findViewById(R.id.mmiSenderName)
-        txtNickname = mainLayout.findViewById(R.id.mmiNickName)
-        txtIp = mainLayout.findViewById(R.id.mmiIp)
-        txtStatus = mainLayout.findViewById(R.id.mmiStatus)
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        orientation = VERTICAL
+
+        mainLayout = LinearLayout(context).apply {
+            id = R.id.content_view
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            orientation = VERTICAL
+        }
+
+        val row = LinearLayout(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                setPadding((12 * scale).toInt(), (8 * scale).toInt(), (12 * scale).toInt(), (8 * scale).toInt())
+            }
+            orientation = HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+
+        txtIndex = TextView(context).apply {
+            id = R.id.mmiIndex
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f)
+            setTextColor(ContextCompat.getColor(context, R.color.article_page_text_item_content0))
+            textSize = 16f
+        }
+
+        txtSenderName = TextView(context).apply {
+            id = R.id.mmiSenderName
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 2f)
+            setTextColor(ContextCompat.getColor(context, R.color.article_page_text_item_author0))
+            textSize = 14f
+        }
+
+        txtNickname = TextView(context).apply {
+            id = R.id.mmiNickName
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 2f)
+            setTextColor(ContextCompat.getColor(context, R.color.article_page_text_item_content0))
+            textSize = 14f
+        }
+
+        val rightCol = LinearLayout(context).apply {
+            layoutParams = LayoutParams(0, LayoutParams.WRAP_CONTENT, 2f)
+            orientation = VERTICAL
+        }
+
+        txtIp = TextView(context).apply {
+            id = R.id.mmiIp
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            setTextColor(ContextCompat.getColor(context, R.color.halfWhite))
+            textSize = 12f
+        }
+
+        txtStatus = TextView(context).apply {
+            id = R.id.mmiStatus
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT)
+            setTextColor(ContextCompat.getColor(context, R.color.halfWhite))
+            textSize = 12f
+        }
+
+        rightCol.addView(txtIp)
+        rightCol.addView(txtStatus)
+
+        row.addView(txtIndex)
+        row.addView(txtSenderName)
+        row.addView(txtNickname)
+        row.addView(rightCol)
+
+        val divider = View(context).apply {
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, 1)
+            setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
+        }
+
+        mainLayout.addView(row)
+        mainLayout.addView(divider)
+        addView(mainLayout)
     }
 
-    /** 設定內容 */
     fun setContent(fromObject: MessageMainListItemStructure) {
         txtIndex.text = fromObject.index
         txtSenderName.text = fromObject.senderName
@@ -50,9 +120,7 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                     paramASListDialog: ASListDialog?,
                     index: Int,
                     title: String?
-                ): Boolean {
-                    return true
-                }
+                ): Boolean = true
 
                 override fun onListDialogItemClicked(
                     paramASListDialog: ASListDialog?,
@@ -62,7 +130,7 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                     if (title == getContextString(R.string.dialog_query_hero)) {
                         TelnetClient.myInstance!!.sendDataToServer(
                             TelnetOutputBuilder.create()
-                                .pushString(txtIndex.text.toString()+"\n")
+                                .pushString(txtIndex.text.toString() + "\n")
                                 .pushKey(TelnetKeyboard.CTRL_Q)
                                 .build()
                         )
@@ -70,8 +138,9 @@ class MessageMainListItem(context: Context): LinearLayout(context) {
                         val aPage = PageContainer.instance!!.getMessageSub()
                         ASNavigationController.currentController?.pushViewController(aPage)
                         var authorId: String = txtSenderName.text.toString()
-                        if (authorId.contains("(")) authorId =
-                            authorId.substring(0, authorId.indexOf("("))
+                        if (authorId.contains("(")) {
+                            authorId = authorId.substring(0, authorId.indexOf("("))
+                        }
                         aPage.setSenderName(authorId)
                     }
                 }

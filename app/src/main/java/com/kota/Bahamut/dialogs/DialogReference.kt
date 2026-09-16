@@ -1,200 +1,278 @@
 package com.kota.Bahamut.dialogs
 
-import android.annotation.SuppressLint
-import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import androidx.core.view.forEachIndexed
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ReferenceAuthor
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.NotificationSettings
+import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 
-class DialogReference : ASDialog(), View.OnClickListener {
-    var mainLayout: LinearLayout
-    private var cancelButton: Button
-    private var sendButton: Button
+class DialogReference : ASDialog() {
     private var dialogReferenceListener: DialogReferenceListener? = null
-    private lateinit var myAuthors: MutableList<ReferenceAuthor>
+    private var myAuthors: MutableList<ReferenceAuthor> = mutableListOf()
+
+    private var author0Available by mutableStateOf(false)
+    private var author0Name by mutableStateOf("")
+    private var author0Enabled by mutableStateOf(false)
+    private var author0RemoveBlank by mutableStateOf(NotificationSettings.getDialogReferenceAuthor0RemoveBlank())
+    private var author0ReservedType by mutableIntStateOf(NotificationSettings.getDialogReferenceAuthor0ReservedType())
+
+    private var author1Available by mutableStateOf(false)
+    private var author1Name by mutableStateOf("")
+    private var author1Enabled by mutableStateOf(false)
+    private var author1RemoveBlank by mutableStateOf(NotificationSettings.getDialogReferenceAuthor1RemoveBlank())
+    private var author1ReservedType by mutableIntStateOf(NotificationSettings.getDialogReferenceAuthor1ReservedType())
+
+    private var authorNoneChecked by mutableStateOf(false)
 
     override val name: String?
         get() = "BahamutSelectSignDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_reference)
-        window?.setBackgroundDrawable(null)
-        mainLayout = findViewById(R.id.dialog_reference_layout)
-
-        sendButton = mainLayout.findViewById(R.id.Dialog_reference_Send_Button)
-        cancelButton = mainLayout.findViewById(R.id.Dialog_reference_Cancel_Button)
-        sendButton.tag = "ToolbarItem.Danger"
-        cancelButton.tag = "ToolbarItem.Danger"
-        sendButton.setOnClickListener(this)
-        cancelButton.setOnClickListener(this)
-
-        setDialogWidth(mainLayout)
-
-        readOldSettings()
+        setTitle(CommonFunctions.getContextString(R.string.dialog_reference_title))
+        setComposeContent {
+            Content()
+        }
     }
 
-    /**
-     * 讀取暫存設定
-     * - 讀取先前的 RemoveBlank 和 ReservedType 設定
-     */
-    private fun readOldSettings() {
-        // 讀取先前設定
-        val checkBoxAuthor0: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
-        val checkBoxAuthor1: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
-        val rbs0: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
-        val rbs1: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
+    @Composable
+    private fun Content() {
+        val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
 
-        checkBoxAuthor0.isChecked = NotificationSettings.getDialogReferenceAuthor0RemoveBlank()
-        rbs0.check(rbs0.getChildAt(NotificationSettings.getDialogReferenceAuthor0ReservedType()).id)
-        checkBoxAuthor1.isChecked = NotificationSettings.getDialogReferenceAuthor1RemoveBlank()
-        rbs1.check(rbs1.getChildAt(NotificationSettings.getDialogReferenceAuthor1ReservedType()).id)
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.dialog_reference_title),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = {
+                        saveSettings()
+                        dismiss()
+                    }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        if (myAuthors.isNotEmpty()) {
+                            myAuthors[0].enabled = author0Enabled
+                            if (author0Enabled) {
+                                myAuthors[0].removeBlank = author0RemoveBlank
+                                myAuthors[0].reservedType = author0ReservedType
+                            }
+                        }
+                        if (myAuthors.size > 1) {
+                            myAuthors[1].enabled = author1Enabled
+                            if (author1Enabled) {
+                                myAuthors[1].removeBlank = author1RemoveBlank
+                                myAuthors[1].reservedType = author1ReservedType
+                            }
+                        }
+                        dialogReferenceListener?.onSelectAuthor(myAuthors)
+                        saveSettings()
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+            ) {
+                // Author 1 (前二)
+                if (author1Available) {
+                    AuthorSection(
+                        title = CommonFunctions.getContextString(R.string.dialog_reference_author1) + author1Name,
+                        enabled = author1Enabled,
+                        onEnabledChange = { isChecked ->
+                            author1Enabled = isChecked
+                            if (isChecked) authorNoneChecked = false
+                            else if (!author0Enabled) authorNoneChecked = true
+                        },
+                        removeBlank = author1RemoveBlank,
+                        onRemoveBlankChange = { author1RemoveBlank = it },
+                        reservedType = author1ReservedType,
+                        onReservedTypeChange = { author1ReservedType = it }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                // Author 0 (前一)
+                if (author0Available) {
+                    AuthorSection(
+                        title = CommonFunctions.getContextString(R.string.dialog_reference_author0) + author0Name,
+                        enabled = author0Enabled,
+                        onEnabledChange = { isChecked ->
+                            author0Enabled = isChecked
+                            if (isChecked) authorNoneChecked = false
+                            else if (!author1Enabled) authorNoneChecked = true
+                        },
+                        removeBlank = author0RemoveBlank,
+                        onRemoveBlankChange = { author0RemoveBlank = it },
+                        reservedType = author0ReservedType,
+                        onReservedTypeChange = { author0ReservedType = it }
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
+                // Author None (無)
+                BahaCheckboxLeft(
+                    text = CommonFunctions.getContextString(R.string.dialog_reference_authorNone),
+                    checked = authorNoneChecked,
+                    onCheckedChange = { isChecked ->
+                        authorNoneChecked = isChecked
+                        if (isChecked) {
+                            author0Enabled = false
+                            author1Enabled = false
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(colors.dialogBlockBackground)
+                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                )
+            }
+        }
     }
 
-    /**
-     * 儲存暫存設定
-     * - 儲存 RemoveBlank 和 ReservedType 設定
-     */
+    @Composable
+    private fun AuthorSection(
+        title: String,
+        enabled: Boolean,
+        onEnabledChange: (Boolean) -> Unit,
+        removeBlank: Boolean,
+        onRemoveBlankChange: (Boolean) -> Unit,
+        reservedType: Int,
+        onReservedTypeChange: (Int) -> Unit
+    ) {
+        val colors = AppTheme.colors
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(4.dp))
+                .background(colors.dialogBlockBackground)
+                .padding(8.dp)
+        ) {
+            BahaCheckboxLeft(
+                text = title,
+                checked = enabled,
+                onCheckedChange = onEnabledChange,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            if (enabled) {
+                Spacer(modifier = Modifier.height(6.dp))
+                // 去除空白行
+                BahaCheckboxLeft(
+                    text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
+                    checked = removeBlank,
+                    onCheckedChange = onRemoveBlankChange,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 28.dp)
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+                // 保留行數
+                Text(
+                    text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
+                    color = colors.textSecondary,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(start = 36.dp, bottom = 4.dp)
+                )
+
+                val types = listOf(
+                    0 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_0),
+                    1 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_1),
+                    2 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_2)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 32.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    types.forEach { (index, label) ->
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.clickable { onReservedTypeChange(index) }
+                        ) {
+                            RadioButton(
+                                selected = (reservedType == index),
+                                onClick = { onReservedTypeChange(index) },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = colors.toolbarBackgroundFocused,
+                                    unselectedColor = colors.textSecondary
+                                )
+                            )
+                            Text(
+                                text = label,
+                                color = colors.textPrimary,
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(start = 2.dp)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     private fun saveSettings() {
-        // 儲存設定
-        val checkBoxAuthor0: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
-        val checkBoxAuthor1: CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
-        val rbs0: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
-        val rbs1: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
-
-        NotificationSettings.setDialogReferenceAuthor0RemoveBlank(checkBoxAuthor0.isChecked)
-        NotificationSettings.setDialogReferenceAuthor1RemoveBlank(checkBoxAuthor1.isChecked)
-
-        // Get selected radio button index
-        rbs0.forEachIndexed { index, view ->
-            if (view is RadioButton && view.isChecked) {
-                NotificationSettings.setDialogReferenceAuthor0ReservedType(index)
-            }
-        }
-        rbs1.forEachIndexed { index, view ->
-            if (view is RadioButton && view.isChecked) {
-                NotificationSettings.setDialogReferenceAuthor1ReservedType(index)
-            }
-        }
+        NotificationSettings.setDialogReferenceAuthor0RemoveBlank(author0RemoveBlank)
+        NotificationSettings.setDialogReferenceAuthor1RemoveBlank(author1RemoveBlank)
+        NotificationSettings.setDialogReferenceAuthor0ReservedType(author0ReservedType)
+        NotificationSettings.setDialogReferenceAuthor1ReservedType(author1ReservedType)
     }
 
-    override fun onClick(view: View) {
-        if (view === sendButton && dialogReferenceListener != null) {
-            // 回收資料
-            val checkBoxAuthor0:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0)
-            val checkBoxAuthor1:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1)
-
-            myAuthors[0].enabled = checkBoxAuthor0.isChecked
-            if (checkBoxAuthor0.isChecked) {
-                val author = myAuthors[0]
-                // 去除空白行
-                val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
-                author.removeBlank = checkboxRemoveBlank.isChecked
-                // 保留行數
-                val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
-                rbs.forEachIndexed { index, rbsView ->
-                    if (rbsView is RadioButton) {
-                        if (rbsView.isChecked) {
-                            author.reservedType = index
-                        }
-                    }
-                }
-            }
-
-            myAuthors[1].enabled = checkBoxAuthor1.isChecked
-            if (checkBoxAuthor1.isChecked) {
-                val author = myAuthors[1]
-                // 去除空白行
-                val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
-                author.removeBlank = checkboxRemoveBlank.isChecked
-                // 保留行數
-                val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
-                rbs.forEachIndexed { index, rbsView ->
-                    if (rbsView is RadioButton) {
-                        if (rbsView.isChecked) {
-                            author.reservedType = index
-                        }
-                    }
-                }
-            }
-
-            dialogReferenceListener?.onSelectAuthor(myAuthors)
-        }
-        saveSettings()
-        dismiss()
-    }
-
-    @SuppressLint("SetTextI18n")
-    fun setAuthors(authors:MutableList<ReferenceAuthor>) {
+    fun setAuthors(authors: MutableList<ReferenceAuthor>) {
         myAuthors = authors
-        val checkBoxAuthor0:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0)
-        val checkBoxAuthor0Layout:LinearLayout = mainLayout.findViewById(R.id.Dialog_reference_author0_subLayout)
-        val checkBoxAuthor1:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1)
-        val checkBoxAuthor1Layout:LinearLayout = mainLayout.findViewById(R.id.Dialog_reference_author1_subLayout)
-        val checkBoxAuthorNone:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_authorNone)
-
-        // reset
-        checkBoxAuthor0.visibility = View.GONE
-        checkBoxAuthor0Layout.visibility = View.GONE
-        checkBoxAuthor1.visibility = View.GONE
-        checkBoxAuthor1Layout.visibility = View.GONE
-
-        // 前一
-        if (myAuthors[0].enabled) {
-            val author:ReferenceAuthor = myAuthors[0]
-            checkBoxAuthor0.visibility = View.VISIBLE
-            checkBoxAuthor0Layout.visibility = View.VISIBLE
-
-            // 作者名稱
-            checkBoxAuthor0.text = checkBoxAuthor0.text.toString() + author.authorName
-            checkBoxAuthor0.isChecked = author.enabled
-            checkBoxAuthor0.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    checkBoxAuthor0Layout.visibility = View.VISIBLE
-                    checkBoxAuthorNone.isChecked = false
-                } else {
-                    checkBoxAuthor0Layout.visibility = View.INVISIBLE
-                    if (!checkBoxAuthor1.isChecked) {
-                        checkBoxAuthorNone.isChecked = true
-                    }
-                }
-            }
+        if (authors.isNotEmpty()) {
+            author0Available = authors[0].enabled
+            author0Name = authors[0].authorName ?: ""
+            author0Enabled = authors[0].enabled
         }
-
-        // 前二
-        if (myAuthors[1].enabled) {
-            val author:ReferenceAuthor = myAuthors[1]
-            checkBoxAuthor1.visibility = View.VISIBLE
-            checkBoxAuthor1Layout.visibility = View.VISIBLE
-
-            // 作者名稱
-            checkBoxAuthor1.text = checkBoxAuthor1.text.toString() + author.authorName
-            checkBoxAuthor1.isChecked = author.enabled
-            checkBoxAuthor1.setOnCheckedChangeListener { _, isChecked ->
-                if (isChecked) {
-                    checkBoxAuthor1Layout.visibility = View.VISIBLE
-                    checkBoxAuthorNone.isChecked = false
-                } else {
-                    checkBoxAuthor1Layout.visibility = View.INVISIBLE
-                    if (!checkBoxAuthor0.isChecked) {
-                        checkBoxAuthorNone.isChecked = true
-                    }
-                }
-            }
-        }
-        // 無
-        checkBoxAuthorNone.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                checkBoxAuthor0.isChecked = false
-                checkBoxAuthor1.isChecked = false
-            }
+        if (authors.size > 1) {
+            author1Available = authors[1].enabled
+            author1Name = authors[1].authorName ?: ""
+            author1Enabled = authors[1].enabled
         }
     }
 

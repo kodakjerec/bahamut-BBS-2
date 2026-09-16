@@ -3,6 +3,7 @@ package com.kota.Bahamut.dialogs.uploadImgMethod
 import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -21,6 +22,33 @@ class UploaderPostImageOrg(private val context: Context) {
         webView.settings.domStorageEnabled = true
         dialog.setContentView(webView)
         dialog.setCancelable(true)
+
+        fun cleanup() {
+            try {
+                (webView.parent as? android.view.ViewGroup)?.removeView(webView)
+                webView.stopLoading()
+                webView.loadUrl("about:blank")
+                webView.destroy()
+            } catch (e: Exception) {
+                Log.e("UploaderPostImageOrg", "Error cleaning up WebView", e)
+            }
+        }
+
+        dialog.setOnDismissListener {
+            cleanup()
+            if (cont.isActive) {
+                cont.resume("")
+            }
+        }
+
+        cont.invokeOnCancellation {
+            try {
+                dialog.dismiss()
+            } catch (e: Exception) {
+                Log.e("UploaderPostImageOrg", "Error dismissing dialog on cancel", e)
+            }
+        }
+
         dialog.show()
 
         webView.webViewClient = object : WebViewClient() {
@@ -49,8 +77,10 @@ class UploaderPostImageOrg(private val context: Context) {
                 ) { value ->
                     val cleanValue = value?.replace("\"", "") ?: ""
                     if (cleanValue.isNotEmpty() && cleanValue.startsWith("https://postimg.cc")) {
+                        if (cont.isActive) {
+                            cont.resume(cleanValue)
+                        }
                         dialog.dismiss()
-                        cont.resume(cleanValue)
                     }
                 }
             }

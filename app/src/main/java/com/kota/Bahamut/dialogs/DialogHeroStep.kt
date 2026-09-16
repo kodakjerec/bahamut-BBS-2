@@ -1,42 +1,142 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View.OnClickListener
-import android.widget.Button
-import android.widget.LinearLayout
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.pages.model.PostEditText
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
 
-class DialogHeroStep:ASDialog() {
-    private var mainLayout: LinearLayout
-    private var content1: PostEditText
-    private var content2: PostEditText
-    private var content3: PostEditText
-    private var btnCancel: Button
-    private var btnSend: Button
+class DialogHeroStep : ASDialog() {
     private var isClickButton = false
 
-    init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_hero_step)
-        window?.setBackgroundDrawable(null)
+    override val name: String?
+        get() = "BahamutHeroStepDialog"
 
-        mainLayout = findViewById(R.id.content_view)
-        content1 = mainLayout.findViewById(R.id.Dialog_hero_step_content1)
-        content2 = mainLayout.findViewById(R.id.Dialog_hero_step_content2)
-        content3 = mainLayout.findViewById(R.id.Dialog_hero_step_content3)
-        btnCancel = mainLayout.findViewById(R.id.Dialog_hero_step_cancel)
-        btnSend = mainLayout.findViewById(R.id.Dialog_hero_step_send)
+    init {
+        setTitle(CommonFunctions.getContextString(R.string.main_hero_step))
+        setComposeContent {
+            Content()
+        }
     }
 
-    override fun show() {
-        btnCancel.setOnClickListener(cancelOnClickListener)
-        btnSend.setOnClickListener(sendOnClickListener)
-        super.show()
+    @Composable
+    private fun Content() {
+        var content1 by remember { mutableStateOf("") }
+        var content2 by remember { mutableStateOf("") }
+        var content3 by remember { mutableStateOf("") }
+        val colors = AppTheme.colors
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.main_hero_step),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = {
+                        isClickButton = true
+                        val builder = TelnetOutputBuilder.create()
+                            .pushString("\n")
+                            .pushString("\n")
+                            .build()
+                        TelnetClient.myInstance?.sendDataToServer(builder)
+                        dismiss()
+                    }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        isClickButton = true
+                        var sendContent = ""
+                        if (content1.isNotEmpty()) sendContent += "$content1\n"
+                        if (content2.isNotEmpty()) sendContent += "$content2\n"
+                        if (content3.isNotEmpty()) sendContent += "$content3\n"
+                        if (sendContent.isNotEmpty()) {
+                            val builder = TelnetOutputBuilder.create()
+                                .pushString(sendContent)
+                                .pushString("\n")
+                                .pushString("\n")
+                                .build()
+                            TelnetClient.myInstance?.sendDataToServer(builder)
+                            ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_hero_success01))
+                        } else {
+                            val builder = TelnetOutputBuilder.create()
+                                .pushString("\n")
+                                .pushString("\n")
+                                .build()
+                            TelnetClient.myInstance?.sendDataToServer(builder)
+                        }
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = CommonFunctions.getContextString(R.string.main_hero_step_msg01),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                val textFieldColors = TextFieldDefaults.colors(
+                    focusedTextColor = colors.textPrimary,
+                    unfocusedTextColor = colors.textPrimary,
+                    focusedContainerColor = colors.pageBackground,
+                    unfocusedContainerColor = colors.pageBackground,
+                    focusedIndicatorColor = colors.toolbarBackgroundFocused,
+                    unfocusedIndicatorColor = colors.divider
+                )
+
+                OutlinedTextField(
+                    value = content1,
+                    onValueChange = { if (it.length <= 48) content1 = it },
+                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_1), color = colors.textSecondary) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = content2,
+                    onValueChange = { if (it.length <= 48) content2 = it },
+                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_2), color = colors.textSecondary) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = content3,
+                    onValueChange = { if (it.length <= 48) content3 = it },
+                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_3), color = colors.textSecondary) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = textFieldColors
+                )
+            }
+        }
     }
 
     override fun dismiss() {
@@ -44,50 +144,10 @@ class DialogHeroStep:ASDialog() {
         // 不是正常的按按鈕消失
         if (!isClickButton) {
             val builder = TelnetOutputBuilder.create()
-                .pushString("\n") // 按[Enter]結束
-                .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
+                .pushString("\n")
+                .pushString("\n")
                 .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
+            TelnetClient.myInstance?.sendDataToServer(builder)
         }
     }
-
-    /** 關閉勇者足跡 */
-    private val cancelOnClickListener = OnClickListener {_->
-        isClickButton = true
-        val builder = TelnetOutputBuilder.create()
-            .pushString("\n") // 按[Enter]結束
-            .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
-            .build()
-        TelnetClient.myInstance!!.sendDataToServer(builder)
-        dismiss()
-    }
-
-    /** 送出留言 */
-    private val sendOnClickListener = OnClickListener {_->
-        isClickButton = true
-        var sendContent = ""
-        if (content1.text?.isNotEmpty() == true)
-            sendContent += content1.text.toString()+"\n"
-        if (content2.text?.isNotEmpty() == true)
-            sendContent += content2.text.toString()+"\n"
-        if (content3.text?.isNotEmpty() == true)
-            sendContent += content3.text.toString()+"\n"
-        if (sendContent.isNotEmpty()) {
-            val builder = TelnetOutputBuilder.create()
-                .pushString(sendContent)
-                .pushString("\n") // 按[Enter]結束
-                .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
-                .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
-            ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_hero_success01))
-        } else {
-            val builder = TelnetOutputBuilder.create()
-                .pushString("\n") // 按[Enter]結束
-                .pushString("\n") // (S)存檔觀賞 (E)重新來過 (Q)算了？[S]
-                .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
-        }
-        dismiss()
-    }
-
 }

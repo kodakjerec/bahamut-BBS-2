@@ -1,51 +1,30 @@
 package com.kota.asFramework.dialog
 
 import android.annotation.SuppressLint
-import android.widget.LinearLayout
-import android.widget.TextView
-import com.kota.Bahamut.R
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.kota.Bahamut.ui.dialogs.BahaProcessingDialogContent
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 
 class ASProcessingDialog : ASDialog() {
-    private var messageLabel: TextView? = null
     private var onBackDelegate: ASProcessingDialogOnBackDelegate? = null
+    var messageText by mutableStateOf("處理中...")
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.as_processing_dialog)
-        if (window != null) window?.setBackgroundDrawable(null)
-        buildContentView()
-    }
-
-    fun buildContentView() {
-        // frame_view
-        val frameView = findViewById<LinearLayout>(R.id.as_processing_dialog_frame_view)
-        messageLabel = frameView.findViewById(R.id.as_processing_dialog_text)
-        messageLabel?.setText(R.string.zero_word)
-    }
-
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
-    override fun show() {
-        super.show()
-    }
-
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog, android.content.DialogInterface
-    override fun dismiss() {
-        super.dismiss()
+        setComposeContent {
+            BahaProcessingDialogContent(message = messageText)
+        }
     }
 
     fun setOnBackDelegate(onBackDelegate: ASProcessingDialogOnBackDelegate?) {
         this.onBackDelegate = onBackDelegate
     }
 
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
-        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(
-                this
-            )
-        ) {
+        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(this)) {
             super.onBackPressed()
         }
     }
@@ -53,6 +32,7 @@ class ASProcessingDialog : ASDialog() {
     companion object {
         @SuppressLint("StaticFieldLeak")
         private var aSProcessingDialog: ASProcessingDialog? = null
+
         private fun constructInstance() {
             aSProcessingDialog = ASProcessingDialog()
         }
@@ -98,8 +78,8 @@ class ASProcessingDialog : ASDialog() {
         @JvmStatic
         fun setMessage(message: String?) {
             ASCoroutine.ensureMainThread {
-                if (aSProcessingDialog != null) {
-                    aSProcessingDialog?.messageLabel?.text = message
+                if (aSProcessingDialog != null && message != null) {
+                    aSProcessingDialog?.messageText = message
                 }
             }
         }

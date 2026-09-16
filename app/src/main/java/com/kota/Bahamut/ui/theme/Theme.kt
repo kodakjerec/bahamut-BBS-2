@@ -34,6 +34,7 @@ data class AppColors(
     // 文字
     val textPrimary: Color,
     val textSecondary: Color,
+    val textLink: Color,
     val titleBarTitle: Color,
     val titleBarDetail: Color,
     val titleBarDetail2: Color,
@@ -50,9 +51,16 @@ data class AppColors(
     val toolbarBackgroundPressed: Color,
     val toolbarBackgroundFocused: Color,
     val toolbarBackgroundDisabled: Color,
+    val toolbarDivider: Color,
     val buttonDangerBackground: Color,
     val buttonDangerPressed: Color,
     val buttonDangerDisabled: Color,
+
+    // 對話框按鈕
+    val dialogButtonBackground: Color,
+    val dialogButtonBackgroundPressed: Color,
+    val dialogButtonText: Color,
+    val dialogButtonDivider: Color,
 
     // 標籤頁 (Tab)
     val tabSelectedBackground: Color,
@@ -64,6 +72,13 @@ data class AppColors(
     val divider: Color,
     val dialogBorder: Color,
     val checkboxTint: Color,
+    val checkboxCheckmark: Color,
+    val checkboxUncheckedTint: Color,
+
+    // 章節與分類標題、警示與通知
+    val chapterBackground: Color,
+    val chapterText: Color,
+    val statusNotice: Color,
 
     // BBS 專用色彩 (內文、作者、看板列表)
     val bbsAuthor0: Color,
@@ -97,6 +112,7 @@ private val DefaultLightColors = AppColors(
 
     textPrimary = AppPalette.White,
     textSecondary = AppPalette.HalfWhite,
+    textLink = AppPalette.LinkCyan,
     titleBarTitle = AppPalette.Yellow,
     titleBarDetail = AppPalette.White,
     titleBarDetail2 = Color(0xFFC0FFFF),
@@ -112,9 +128,15 @@ private val DefaultLightColors = AppColors(
     toolbarBackgroundPressed = AppPalette.DefaultToolbarPressed,
     toolbarBackgroundFocused = AppPalette.DefaultToolbarFocused,
     toolbarBackgroundDisabled = AppPalette.DefaultToolbarDisabled,
+    toolbarDivider = AppPalette.ToolbarDivider,
     buttonDangerBackground = AppPalette.Red,
     buttonDangerPressed = AppPalette.RedBright,
     buttonDangerDisabled = Color(0xFF400000),
+
+    dialogButtonBackground = AppPalette.DialogItemNormal,
+    dialogButtonBackgroundPressed = AppPalette.DialogItemPressed,
+    dialogButtonText = AppPalette.White,
+    dialogButtonDivider = AppPalette.ToolbarDivider,
 
     tabSelectedBackground = AppPalette.DefaultToolbarNormal,
     tabSelectedText = AppPalette.White,
@@ -123,7 +145,13 @@ private val DefaultLightColors = AppColors(
 
     divider = AppPalette.Divider,
     dialogBorder = AppPalette.HalfWhite,
-    checkboxTint = AppPalette.White,
+    checkboxTint = AppPalette.HoloGreen,
+    checkboxCheckmark = AppPalette.Black,
+    checkboxUncheckedTint = AppPalette.HalfWhite,
+
+    chapterBackground = AppPalette.DarkGray20,
+    chapterText = AppPalette.GrayWhite,
+    statusNotice = AppPalette.Red,
 
     bbsAuthor0 = AppPalette.BbsArticleAuthor0,
     bbsContent0 = AppPalette.BbsArticleContent0,
@@ -156,6 +184,7 @@ private val DefaultDarkColors = AppColors(
 
     textPrimary = AppPalette.DarkTextWhite,
     textSecondary = AppPalette.HalfWhite,
+    textLink = AppPalette.LinkCyan,
     titleBarTitle = AppPalette.Yellow,
     titleBarDetail = AppPalette.DarkTextWhite,
     titleBarDetail2 = Color(0xFFC0FFFF),
@@ -164,16 +193,22 @@ private val DefaultDarkColors = AppColors(
     buttonTextDisabled = Color(0xFF507050),
     buttonTextDanger = AppPalette.DarkTextWhite,
     buttonTextDangerPressed = AppPalette.White,
-    inputBoxText = AppPalette.DarkTextWhite,
-    inputBoxBackground = AppPalette.DarkGray40,
+    inputBoxText = AppPalette.Black,
+    inputBoxBackground = Color(0xFFE0E0E0),
 
     toolbarBackground = AppPalette.DefaultDarkToolbarNormal,
     toolbarBackgroundPressed = AppPalette.DefaultDarkToolbarPressed,
     toolbarBackgroundFocused = AppPalette.DefaultDarkToolbarFocused,
     toolbarBackgroundDisabled = AppPalette.DefaultDarkToolbarDisabled,
+    toolbarDivider = AppPalette.DefaultDarkToolbarDisabled,
     buttonDangerBackground = AppPalette.DefaultDarkDangerBackground,
     buttonDangerPressed = AppPalette.DefaultDarkDangerPressed,
     buttonDangerDisabled = Color(0xFF2A0A0A),
+
+    dialogButtonBackground = AppPalette.DialogItemNormal,
+    dialogButtonBackgroundPressed = AppPalette.DialogItemPressed,
+    dialogButtonText = AppPalette.DarkTextWhite,
+    dialogButtonDivider = AppPalette.DefaultDarkToolbarDisabled,
 
     tabSelectedBackground = AppPalette.DefaultDarkToolbarNormal,
     tabSelectedText = AppPalette.DarkTextWhite,
@@ -182,7 +217,13 @@ private val DefaultDarkColors = AppColors(
 
     divider = AppPalette.Divider,
     dialogBorder = AppPalette.HalfWhite,
-    checkboxTint = AppPalette.DarkTextWhite,
+    checkboxTint = AppPalette.HoloGreen,
+    checkboxCheckmark = AppPalette.Black,
+    checkboxUncheckedTint = AppPalette.HalfWhite,
+
+    chapterBackground = AppPalette.DarkGray20,
+    chapterText = AppPalette.GrayWhite,
+    statusNotice = Color(0xFFC04040),
 
     bbsAuthor0 = AppPalette.DarkTextWhite,
     bbsContent0 = AppPalette.GrayWhite,
@@ -211,10 +252,14 @@ private val PinkLightColors = DefaultLightColors.copy(
     toolbarBackgroundPressed = AppPalette.PinkButtonPressed,
     toolbarBackgroundFocused = AppPalette.PinkButtonPressed,
     toolbarBackgroundDisabled = AppPalette.PinkButtonDisabled,
+    toolbarDivider = Color(0xFF400A24),
     tabSelectedBackground = AppPalette.PinkButtonNormal,
     tabSelectedText = AppPalette.White,
     tabUnselectedBackground = AppPalette.Transparent,
-    tabUnselectedText = AppPalette.HalfWhite
+    tabUnselectedText = AppPalette.HalfWhite,
+    chapterBackground = AppPalette.PinkHeaderBackground,
+    chapterText = AppPalette.PinkHeaderText,
+    statusNotice = AppPalette.PinkHeaderText
 )
 
 /**
@@ -225,11 +270,15 @@ private val PinkDarkColors = DefaultDarkColors.copy(
     toolbarBackgroundPressed = AppPalette.PinkDarkButtonPressed,
     toolbarBackgroundFocused = AppPalette.PinkDarkButtonPressed,
     toolbarBackgroundDisabled = AppPalette.PinkDarkButtonDisabled,
+    toolbarDivider = Color(0xFF300A24),
     buttonTextDisabled = Color(0xFF805068),
     tabSelectedBackground = AppPalette.PinkDarkButtonNormal,
     tabSelectedText = AppPalette.White,
     tabUnselectedBackground = AppPalette.Transparent,
-    tabUnselectedText = AppPalette.HalfWhite
+    tabUnselectedText = AppPalette.HalfWhite,
+    chapterBackground = AppPalette.PinkDarkHeaderBackground,
+    chapterText = AppPalette.PinkDarkHeaderText,
+    statusNotice = AppPalette.PinkDarkHeaderText
 )
 
 /**
@@ -244,6 +293,7 @@ private val EInkLightColors = AppColors(
 
     textPrimary = AppPalette.Black,
     textSecondary = AppPalette.HalfWhite,
+    textLink = AppPalette.Black,
     titleBarTitle = AppPalette.Black,
     titleBarDetail = AppPalette.Black,
     titleBarDetail2 = AppPalette.HalfWhite,
@@ -259,9 +309,15 @@ private val EInkLightColors = AppColors(
     toolbarBackgroundPressed = AppPalette.EInkButtonPressed,
     toolbarBackgroundFocused = AppPalette.EInkButtonPressed,
     toolbarBackgroundDisabled = AppPalette.EInkButtonDisabled,
+    toolbarDivider = AppPalette.Black,
     buttonDangerBackground = AppPalette.EInkDangerNormal,
     buttonDangerPressed = AppPalette.EInkDangerPressed,
     buttonDangerDisabled = AppPalette.EInkButtonDisabled,
+
+    dialogButtonBackground = AppPalette.Black,
+    dialogButtonBackgroundPressed = AppPalette.DarkGray40,
+    dialogButtonText = AppPalette.White,
+    dialogButtonDivider = AppPalette.White,
 
     tabSelectedBackground = AppPalette.Black,
     tabSelectedText = AppPalette.White,
@@ -271,6 +327,12 @@ private val EInkLightColors = AppColors(
     divider = AppPalette.Black,
     dialogBorder = AppPalette.Black,
     checkboxTint = AppPalette.Black,
+    checkboxCheckmark = AppPalette.White,
+    checkboxUncheckedTint = AppPalette.Black,
+
+    chapterBackground = AppPalette.GrayWhite,
+    chapterText = AppPalette.Black,
+    statusNotice = AppPalette.Black,
 
     bbsAuthor0 = AppPalette.Black,
     bbsContent0 = AppPalette.Black,
@@ -303,6 +365,7 @@ private val EInkDarkColors = AppColors(
 
     textPrimary = AppPalette.White,
     textSecondary = AppPalette.HalfWhite,
+    textLink = AppPalette.White,
     titleBarTitle = AppPalette.White,
     titleBarDetail = AppPalette.White,
     titleBarDetail2 = AppPalette.HalfWhite,
@@ -318,9 +381,15 @@ private val EInkDarkColors = AppColors(
     toolbarBackgroundPressed = AppPalette.EInkDarkButtonPressed,
     toolbarBackgroundFocused = AppPalette.EInkDarkButtonPressed,
     toolbarBackgroundDisabled = AppPalette.EInkDarkButtonDisabled,
+    toolbarDivider = AppPalette.White,
     buttonDangerBackground = AppPalette.EInkDarkDangerNormal,
     buttonDangerPressed = AppPalette.EInkDarkDangerPressed,
     buttonDangerDisabled = AppPalette.EInkDarkButtonDisabled,
+
+    dialogButtonBackground = AppPalette.White,
+    dialogButtonBackgroundPressed = AppPalette.GrayWhite,
+    dialogButtonText = AppPalette.Black,
+    dialogButtonDivider = AppPalette.Black,
 
     tabSelectedBackground = AppPalette.White,
     tabSelectedText = AppPalette.Black,
@@ -330,6 +399,12 @@ private val EInkDarkColors = AppColors(
     divider = AppPalette.White,
     dialogBorder = AppPalette.White,
     checkboxTint = AppPalette.White,
+    checkboxCheckmark = AppPalette.Black,
+    checkboxUncheckedTint = AppPalette.White,
+
+    chapterBackground = AppPalette.DarkGray40,
+    chapterText = AppPalette.White,
+    statusNotice = AppPalette.White,
 
     bbsAuthor0 = AppPalette.White,
     bbsContent0 = AppPalette.White,

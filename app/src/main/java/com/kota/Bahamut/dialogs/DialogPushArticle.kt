@@ -1,38 +1,109 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View.OnClickListener
-import android.widget.Button
-import android.widget.LinearLayout
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.ui.ASToast
-import com.kota.Bahamut.pages.model.PostEditText
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder
 
-class DialogPushArticle:ASDialog() {
-    private var mainLayout: LinearLayout
-    private var content1: PostEditText
-    private var btnCancel: Button
-    private var btnSend: Button
+class DialogPushArticle : ASDialog() {
     private var isClickButton = false
 
-    init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_push_article)
-        window?.setBackgroundDrawable(null)
+    override val name: String?
+        get() = "BahamutPushArticleDialog"
 
-        mainLayout = findViewById(R.id.content_view)
-        content1 = mainLayout.findViewById(R.id.Dialog_push_article_content1)
-        btnCancel = mainLayout.findViewById(R.id.Dialog_push_article_cancel)
-        btnSend = mainLayout.findViewById(R.id.Dialog_push_article_send)
+    init {
+        setTitle(CommonFunctions.getContextString(R.string.do_push))
+        setComposeContent {
+            Content()
+        }
     }
 
-    override fun show() {
-        btnCancel.setOnClickListener(cancelOnClickListener)
-        btnSend.setOnClickListener(sendOnClickListener)
-        super.show()
+    @Composable
+    private fun Content() {
+        var textContent by remember { mutableStateOf("") }
+        val colors = AppTheme.colors
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.do_push),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = {
+                        isClickButton = true
+                        val builder = TelnetOutputBuilder.create()
+                            .pushString("\n")
+                            .build()
+                        TelnetClient.myInstance?.sendDataToServer(builder)
+                        dismiss()
+                    }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        isClickButton = true
+                        if (textContent.isNotEmpty()) {
+                            val builder = TelnetOutputBuilder.create()
+                                .pushString(textContent)
+                                .pushString("\n")
+                                .build()
+                            TelnetClient.myInstance?.sendDataToServer(builder)
+                            ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_push_article_success01))
+                        } else {
+                            val builder = TelnetOutputBuilder.create()
+                                .pushString("\n")
+                                .build()
+                            TelnetClient.myInstance?.sendDataToServer(builder)
+                        }
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = textContent,
+                    onValueChange = { if (it.length <= 48) textContent = it },
+                    placeholder = {
+                        Text(
+                            CommonFunctions.getContextString(R.string.main_push_article_msg01),
+                            color = colors.textSecondary,
+                            fontSize = 16.sp
+                        )
+                    },
+                    minLines = 3,
+                    maxLines = 3,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = colors.pageBackground,
+                        unfocusedContainerColor = colors.pageBackground,
+                        focusedIndicatorColor = colors.toolbarBackgroundFocused,
+                        unfocusedIndicatorColor = colors.divider
+                    )
+                )
+            }
+        }
     }
 
     override fun dismiss() {
@@ -42,40 +113,7 @@ class DialogPushArticle:ASDialog() {
             val builder = TelnetOutputBuilder.create()
                 .pushString("\n") // 按[Enter]結束
                 .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
+            TelnetClient.myInstance?.sendDataToServer(builder)
         }
     }
-
-    /** 關閉視窗 */
-    private val cancelOnClickListener = OnClickListener {_->
-        isClickButton = true
-        val builder = TelnetOutputBuilder.create()
-            .pushString("\n") // 按[Enter]結束
-            .build()
-        TelnetClient.myInstance!!.sendDataToServer(builder)
-        dismiss()
-    }
-
-    /** 送出留言 */
-    private val sendOnClickListener = OnClickListener {_->
-        isClickButton = true
-        var sendContent = ""
-        if (content1.text?.isNotEmpty() == true)
-            sendContent += content1.text.toString()
-        if (sendContent.isNotEmpty()) {
-            val builder = TelnetOutputBuilder.create()
-                .pushString(sendContent)
-                .pushString("\n") // 按[Enter]結束
-                .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
-            ASToast.showShortToast(CommonFunctions.getContextString(R.string.main_push_article_success01))
-        } else {
-            val builder = TelnetOutputBuilder.create()
-                .pushString("\n") // 按[Enter]結束
-                .build()
-            TelnetClient.myInstance!!.sendDataToServer(builder)
-        }
-        dismiss()
-    }
-
 }

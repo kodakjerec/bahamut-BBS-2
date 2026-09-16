@@ -22,14 +22,58 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
     private var txtFloor: TextView
 
     init {
-        (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
-            R.layout.article_page_push_item_view,
-            this
-        )
-        txtAuthor = findViewById(R.id.ArticlePushItemView_Author)
-        txtContent = findViewById(R.id.ArticlePushItemView_Content)
-        txtDatetime = findViewById(R.id.ArticlePushItemView_Datetime)
-        txtFloor = findViewById(R.id.ArticlePushItemView_Floor)
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
+
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        setPadding(dp(8f), dp(4f), dp(8f), dp(4f))
+
+        txtAuthor = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.ArticlePushItemView_Author
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                startToStart = LayoutParams.PARENT_ID
+                topToTop = LayoutParams.PARENT_ID
+            }
+            setTextColor(com.kota.Bahamut.service.CommonFunctions.getContextColor(R.color.halfWhite))
+        }
+        addView(txtAuthor)
+
+        txtFloor = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.ArticlePushItemView_Floor
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                startToEnd = R.id.ArticlePushItemView_Author
+                topToTop = LayoutParams.PARENT_ID
+            }
+            setTextColor(com.kota.Bahamut.service.CommonFunctions.getContextColor(R.color.halfWhite))
+        }
+        addView(txtFloor)
+
+        txtDatetime = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.ArticlePushItemView_Datetime
+            layoutParams = LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
+                endToEnd = LayoutParams.PARENT_ID
+                topToTop = LayoutParams.PARENT_ID
+            }
+            setTextColor(com.kota.Bahamut.service.CommonFunctions.getContextColor(R.color.halfWhite))
+        }
+        addView(txtDatetime)
+
+        val contentContainer = LinearLayout(context).apply {
+            orientation = LinearLayout.VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
+                startToStart = LayoutParams.PARENT_ID
+                topToBottom = R.id.ArticlePushItemView_Author
+            }
+        }
+
+        txtContent = com.kota.telnetUI.textView.TelnetTextViewSmall(context).apply {
+            id = R.id.ArticlePushItemView_Content
+            layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+            setTextColor(com.kota.Bahamut.service.CommonFunctions.getContextColor(R.color.board_item_follow_other_read))
+            setTextIsSelectable(true)
+        }
+        contentContainer.addView(txtContent)
+        addView(contentContainer)
     }
 
     @SuppressLint("SetTextI18n")

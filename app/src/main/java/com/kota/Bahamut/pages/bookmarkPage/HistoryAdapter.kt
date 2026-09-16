@@ -11,8 +11,7 @@ class HistoryAdapter(private val bookmarks: MutableList<Bookmark>) :
     private var mClickListener: BookmarkClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryViewHolder {
-        val v = LayoutInflater.from(parent.context)
-            .inflate(R.layout.board_extend_optional_page_history_item_view, parent, false)
+        val v = HistoryViewHolder.createView(parent.context)
         return HistoryViewHolder(v, mClickListener)
     }
 

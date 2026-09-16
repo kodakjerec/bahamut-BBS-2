@@ -1,6 +1,9 @@
 package com.kota.asFramework.pageController
 
 import androidx.activity.ComponentActivity
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -154,7 +157,16 @@ open class ASNavigationController : ComponentActivity() {
         this.deviceController = ASDeviceController(this)
         onControllerWillLoad()
 
+        window.decorView.setViewTreeLifecycleOwner(this)
+        window.decorView.setViewTreeSavedStateRegistryOwner(this)
+        window.decorView.setViewTreeViewModelStoreOwner(this)
+
         this.rootView = ASNavigationControllerView(this)
+        this.rootView?.let { root ->
+            root.setViewTreeLifecycleOwner(this)
+            root.setViewTreeSavedStateRegistryOwner(this)
+            root.setViewTreeViewModelStoreOwner(this)
+        }
         this.rootView?.setPageController(this)
         setContentView(this.rootView)
 

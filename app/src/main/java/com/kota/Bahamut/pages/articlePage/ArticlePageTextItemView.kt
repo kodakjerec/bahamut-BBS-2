@@ -54,13 +54,46 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     }
 
     private fun init() {
-        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater)
-            .inflate(R.layout.article_page_text_item_view, this)
-        authorLabel = findViewById(R.id.ArticleTextItemView_Title)
-        contentLabel = findViewById(R.id.ArticleTextItemView_content)
-        dividerView = findViewById(R.id.ArticleTextItemView_DividerView)
-        contentView = findViewById(R.id.ArticleTextItemView_contentView)
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
+
+        orientation = VERTICAL
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
         setBackgroundResource(R.color.transparent)
+
+        val innerContentView = LinearLayout(context).apply {
+            id = R.id.ArticleTextItemView_contentView
+            orientation = VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setPadding(dp(8f), dp(4f), dp(8f), dp(4f))
+        }
+        contentView = innerContentView
+
+        authorLabel = com.kota.telnetUI.textView.TelnetTextViewNormal(context).apply {
+            id = R.id.ArticleTextItemView_Title
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setTextColor(getThemeColor(R.attr.bahamut_articleAuthorColor0))
+        }
+        innerContentView.addView(authorLabel)
+
+        contentLabel = com.kota.telnetUI.textView.TelnetTextViewNormal(context).apply {
+            id = R.id.ArticleTextItemView_content
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setTextColor(getThemeColor(R.attr.bahamut_articleContentColor0))
+            isEnabled = true
+            setTextIsSelectable(true)
+            isFocusable = true
+            isLongClickable = true
+        }
+        innerContentView.addView(contentLabel)
+
+        addView(innerContentView)
+
+        dividerView = DividerView(context).apply {
+            id = R.id.ArticleTextItemView_DividerView
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(1f))
+        }
+        addView(dividerView)
     }
 
     fun setAuthor(author: String?, nickname: String?) {

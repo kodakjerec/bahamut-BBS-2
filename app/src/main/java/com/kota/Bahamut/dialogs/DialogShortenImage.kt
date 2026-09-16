@@ -6,30 +6,46 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.ImageDecoder
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
-import android.view.View
-import android.view.View.GONE
-import android.view.View.INVISIBLE
-import android.view.View.OnClickListener
-import android.view.View.VISIBLE
-import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
 import android.widget.VideoView
+import androidx.activity.compose.setContent
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.PageContainer
@@ -37,31 +53,30 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderBahaImg
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.pages.theme.ThemeStore
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.dialogs.BahaProcessingDialogContent
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.BahamutAppTheme
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import java.io.File
-import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.Date
 
-class DialogShortenImage : AppCompatActivity(), OnClickListener {
-    private lateinit var mainLayout: RelativeLayout
-    private lateinit var textView: TextView
-    private lateinit var imageView: ImageView
-    private lateinit var videoView: VideoView
-    private lateinit var middleToolbar: LinearLayout
-    private lateinit var middleToolbar2: LinearLayout
-    private lateinit var processingDialog: LinearLayout
-    private var transferButton: Button? = null
-    private var sendButton: Button? = null
-    private var outputParam: String = ""
-    private var sampleTextView: TextView? = null
-
+class DialogShortenImage : AppCompatActivity() {
+    private var outputParam by mutableStateOf("")
+    private var selectedImageUri by mutableStateOf<Uri?>(null)
+    private var selectedVideoUri by mutableStateOf<Uri?>(null)
+    private var isUploading by mutableStateOf(false)
+    private var currentPhotoPath: String = ""
 
     override fun attachBaseContext(newBase: Context) {
         UserSettings(newBase)
@@ -78,240 +93,261 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemeStore.getDialogThemeResId())
         super.onCreate(savedInstanceState)
-        init()
-    }
+        window.setBackgroundDrawable(null)
 
-    fun init() {
-        val layoutId = R.layout.dialog_shorten_image
-        requestWindowFeature(1)
-        setContentView(layoutId)
-        window?.setBackgroundDrawable(null)
-        mainLayout = findViewById(R.id.dialog_shorten_image_layout)
-        mainLayout.setOnClickListener { _ -> closeProcessingDialog() }
-        textView = mainLayout.findViewById(R.id.dialog_shorten_image_hint)
-        imageView = mainLayout.findViewById(R.id.dialog_shorten_image_image)
-        videoView = mainLayout.findViewById(R.id.dialog_shorten_image_video)
-        middleToolbar = mainLayout.findViewById(R.id.dialog_shorten_image_middle_toolbar)
-        middleToolbar2 = mainLayout.findViewById(R.id.dialog_shorten_image_middle_toolbar2)
-        sampleTextView = mainLayout.findViewById(R.id.dialog_shorten_image_sample)
-        processingDialog = mainLayout.findViewById(R.id.dialog_shorten_image_processing_dialog)
-
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_album).setOnClickListener(selectImageListener)
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
-        transferButton = mainLayout.findViewById(R.id.dialog_shorten_image_transfer)
-        transferButton?.setOnClickListener(transferListener)
-        sendButton = mainLayout.findViewById(R.id.send)
-        sendButton?.setOnClickListener(this)
-        sendButton?.isEnabled = false
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_reset).setOnClickListener(resetListener)
-        mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
-
-        // 預設高度
-        changeDialogHeight(resources.configuration)
-        setDialogWidth()
-    }
-
-    /** 選擇相簿 */
-    private val selectImageListener = OnClickListener { _->
-        pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
-    }
-    /** 選擇相機 */
-    private val selectCameraListener = OnClickListener { _->
-        if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED){
-            openCameraIntent()
-        } else {
-            permissionLauncher.launch(CAMERA)
-        }
-    }
-    private val selectVideoListener = OnClickListener { _->
-        if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED){
-            openVideoIntent()
-        } else {
-            permissionVideoLauncher.launch(CAMERA)
+        setContent {
+            BahamutAppTheme {
+                Content()
+            }
         }
     }
 
-    /** 按下送出或取消 */
-    override fun onClick(view: View) {
-        postUrl(outputParam)
-        finish()
+    @Composable
+    private fun Content() {
+        val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            BahaAlertDialogContent(
+                modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
+                title = CommonFunctions.getContextString(R.string.dialog_shorten_img_title),
+                buttons = listOf(
+                    BahaDialogButton(
+                        text = CommonFunctions.getContextString(R.string.cancel),
+                        type = ButtonType.SECONDARY,
+                        onClick = { finish() }
+                    ),
+                    BahaDialogButton(
+                        text = CommonFunctions.getContextString(R.string.send),
+                        type = ButtonType.NORMAL,
+                        onClick = {
+                            if (outputParam.isNotEmpty()) {
+                                postUrl(outputParam)
+                            }
+                            finish()
+                        }
+                    )
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (selectedImageUri == null && selectedVideoUri == null) {
+                        Text(
+                            text = CommonFunctions.getContextString(R.string.dialog_shorten_img_hint),
+                            color = colors.textSecondary,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(vertical = 12.dp)
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            BahaButton(
+                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_album),
+                                type = ButtonType.NORMAL,
+                                onClick = {
+                                    pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
+                                },
+                                modifier = Modifier.weight(1f),
+                                minHeight = 36.dp
+                            )
+                            BahaButton(
+                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_camera),
+                                type = ButtonType.NORMAL,
+                                onClick = {
+                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                        openCameraIntent()
+                                    } else {
+                                        permissionLauncher.launch(CAMERA)
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                minHeight = 36.dp
+                            )
+                            BahaButton(
+                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_video),
+                                type = ButtonType.NORMAL,
+                                onClick = {
+                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                        openVideoIntent()
+                                    } else {
+                                        permissionVideoLauncher.launch(CAMERA)
+                                    }
+                                },
+                                modifier = Modifier.weight(1f),
+                                minHeight = 36.dp
+                            )
+                        }
+                    } else {
+                        // 顯示預覽
+                        if (selectedImageUri != null) {
+                            AndroidView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                factory = { ctx ->
+                                    ImageView(ctx).apply {
+                                        scaleType = ImageView.ScaleType.FIT_CENTER
+                                        Glide.with(ctx).load(selectedImageUri).into(this)
+                                    }
+                                },
+                                update = { imageView ->
+                                    Glide.with(imageView.context).load(selectedImageUri).into(imageView)
+                                }
+                            )
+                        } else if (selectedVideoUri != null) {
+                            AndroidView(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .clip(RoundedCornerShape(4.dp)),
+                                factory = { ctx ->
+                                    VideoView(ctx).apply {
+                                        setVideoURI(selectedVideoUri)
+                                        start()
+                                    }
+                                }
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            BahaButton(
+                                text = CommonFunctions.getContextString(R.string.reset),
+                                type = ButtonType.SECONDARY,
+                                onClick = { resetState() },
+                                modifier = Modifier.weight(1f),
+                                minHeight = 36.dp
+                            )
+                            BahaButton(
+                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_title),
+                                type = ButtonType.NORMAL,
+                                onClick = { startTransfer() },
+                                modifier = Modifier.weight(1f),
+                                minHeight = 36.dp
+                            )
+                        }
+                    }
+
+                    if (outputParam.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.dialogBlockBackground)
+                                .padding(10.dp)
+                        ) {
+                            Text(
+                                text = outputParam,
+                                color = colors.bbsAuthor0,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (isUploading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(colors.surface.copy(alpha = 0.5f))
+                        .clickable { isUploading = false },
+                    contentAlignment = Alignment.Center
+                ) {
+                    BahaProcessingDialogContent(message = CommonFunctions.getContextString(R.string.dialog_shorten_url_under_transfer))
+                }
+            }
+        }
     }
 
-    /** 轉檔 */
-    @SuppressLint("SimpleDateFormat")
-    private var transferListener = OnClickListener {
-        showProcessingDialog()
+    private fun resetState() {
+        outputParam = ""
+        selectedImageUri = null
+        selectedVideoUri = null
+        isUploading = false
+    }
 
-        var finalUri: Uri? = null
-        if (selectedImageUri != null) {
-            finalUri = selectedImageUri
-        } else if (selectedVideoUri != null) {
-            finalUri = selectedVideoUri
-        }
+    private fun startTransfer() {
+        val finalUri = selectedImageUri ?: selectedVideoUri
         if (finalUri == null) {
             ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
-            closeProcessingDialog()
-            return@OnClickListener
+            return
         }
+
+        isUploading = true
         ASCoroutine.runInNewCoroutine {
-            val uploaderObj = UploaderBahaImg()
-            // 使用 bahaImg 的非同步上傳
-            uploaderObj.uploadImage( applicationContext, finalUri, object : UploaderBahaImg.UploadCallback {
+            val uploader = UploaderBahaImg()
+            uploader.uploadImage(applicationContext, finalUri, object : UploaderBahaImg.UploadCallback {
                 override fun onSuccess(imageUrl: String) {
                     ASCoroutine.ensureMainThread {
-                        // 更新前端畫面
-                        sampleTextView?.text = imageUrl
                         outputParam = imageUrl
-                        sendButton?.isEnabled = true
-                        transferButton?.isEnabled = false
-
-                        // 更新縮網址次數統計
-                        var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
+                        var shortenTimes = UserSettings.propertiesNoVipShortenTimes
                         UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
-
-                        // 關閉讀取視窗
-                        closeProcessingDialog()
+                        isUploading = false
                     }
                 }
 
                 override fun onError(message: String) {
                     ASCoroutine.ensureMainThread {
                         ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + message)
-                        closeProcessingDialog()
+                        isUploading = false
                     }
                 }
             })
         }
     }
 
-    /** 清除內容 */
-    private val resetListener = OnClickListener {_ ->
-        middleToolbar.visibility = VISIBLE
-        middleToolbar2.visibility = GONE
-        textView.visibility = VISIBLE
-        imageView.setImageBitmap(null)
-        imageView.visibility = GONE
-        videoView.stopPlayback()
-        videoView.clearAnimation()
-        videoView.suspend()
-        videoView.setVideoURI(null)
-        videoView.visibility = GONE
-        sampleTextView?.text = getContextString(R.string.dialog_paint_color_sample_ch)
-        outputParam = ""
-        selectedImageUri = null
-        selectedVideoUri = null
-        sendButton?.isEnabled = false
-        transferButton?.isEnabled = true
-    }
-    /** 註冊 intent */
     private val intentCameraLauncher = registerForActivityResult(StartActivityForResult()) { result ->
         if (result.resultCode == RESULT_OK) {
-            try {
-                middleToolbar.visibility = GONE
-                middleToolbar2.visibility = VISIBLE
-                textView.visibility = GONE
-                imageView.visibility = VISIBLE
-                videoView.visibility = GONE
-                if (Build.VERSION.SDK_INT>=29) {
-                    val source = ImageDecoder.createSource(contentResolver, selectedImageUri!!)
-                    val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
-                        decoder.setTargetSampleSize(1)
-                        decoder.isMutableRequired = true
-                    }
-                    Glide.with(this).load(bitmap).into(imageView)
-                } else {
-                    @Suppress("DEPRECATION")
-                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
-                    Glide.with(this).load(bitmap).into(imageView)
-                }
-                transferButton?.performClick()
-            } catch (e:Exception) {
-                Log.d(javaClass.simpleName, e.message.toString())
-                ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
-            }
-        }
-    }
-    private val intentVideoLauncher = registerForActivityResult(StartActivityForResult()) { result ->
-        if (result.resultCode == RESULT_OK) {
-            try {
-                middleToolbar.visibility = GONE
-                middleToolbar2.visibility = VISIBLE
-                textView.visibility = GONE
-                imageView.visibility = GONE
-                videoView.visibility = VISIBLE
-                val uri: Uri? = result.data?.data
-                selectedVideoUri = uri
-                videoView.setVideoURI(uri)
-                videoView.start()
-                videoView.requestFocus()
-                transferButton?.performClick()
-            } catch (e:Exception) {
-                Log.d(javaClass.simpleName, e.message.toString())
-            }
-        }
-    }
-    /** 註冊 相簿回傳相片或影片 */
-    private var selectedImageUri: Uri? = null
-    private var selectedVideoUri: Uri? = null
-    private val pickMediaLauncher = registerForActivityResult(PickVisualMedia()) { uri ->
-        if (uri != null) {
-            try {
-                // Check if it's an image
-                middleToolbar.visibility = GONE
-                middleToolbar2.visibility = VISIBLE
-                textView.visibility = GONE
-                val uriType = contentResolver.getType(uri)
-                if (uriType?.startsWith("image/") == true) {
-                    // 影像
-                    imageView.visibility = VISIBLE
-                    videoView.visibility = GONE
-                    if (Build.VERSION.SDK_INT>= 29) {
-                        val source = ImageDecoder.createSource(contentResolver, uri)
-                        val bitmap = ImageDecoder.decodeBitmap(source) { decoder, _, _->
-                            decoder.setTargetSampleSize(1)
-                            decoder.isMutableRequired = true
-                        }
-                        selectedImageUri = uri
-                        Glide.with(this).load(bitmap).into(imageView)
-                    } else {
-                        @Suppress("DEPRECATION")
-                        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, uri)
-                        selectedImageUri = uri
-                        Glide.with(this).load(bitmap).into(imageView)
-                    }
-                    transferButton?.performClick()
-                } else {
-                    // 影片
-                    imageView.visibility = GONE
-                    videoView.visibility = VISIBLE
-                    selectedVideoUri = uri
-                    videoView.setVideoURI(uri)
-                    videoView.start()
-                    videoView.requestFocus()
-                    transferButton?.performClick()
-                }
-            } catch (_: IOException) {
-                Log.e(javaClass.simpleName, "Error loading image/video")
-            }
-        } else {
-            Log.d(javaClass.simpleName, "No media selected")
+            startTransfer()
         }
     }
 
-    /** 註冊 確認權限 */
+    private val intentVideoLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val uri: Uri? = result.data?.data
+            selectedVideoUri = uri
+            startTransfer()
+        }
+    }
+
+    private val pickMediaLauncher = registerForActivityResult(PickVisualMedia()) { uri ->
+        if (uri != null) {
+            val uriType = contentResolver.getType(uri)
+            if (uriType?.startsWith("image/") == true) {
+                selectedImageUri = uri
+                selectedVideoUri = null
+            } else {
+                selectedVideoUri = uri
+                selectedImageUri = null
+            }
+            startTransfer()
+        }
+    }
+
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            openCameraIntent()
-        }
+        if (isGranted) openCameraIntent()
     }
+
     private val permissionVideoLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            openVideoIntent()
-        }
+        if (isGranted) openVideoIntent()
     }
-    /** 開啟相機 */
-    private lateinit var currentPhotoPath: String
 
     @SuppressLint("SimpleDateFormat")
     private fun openCameraIntent() {
@@ -319,18 +355,13 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         val timeStamp: String = SimpleDateFormat("yyyyMMddHHmmss").format(Date())
         val storageDir: File? = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         try {
-            val photoFile: File? =
-                File.createTempFile(
-                    "babamutBBS_${timeStamp}_", /* prefix */
-                    ".png", /* suffix */
-                    storageDir /* directory */
-                ).apply {
-                    // Save a file: path for use with ACTION_VIEW intents
-                    currentPhotoPath = absolutePath
-                }
+            val photoFile: File? = File.createTempFile("babamutBBS_${timeStamp}_", ".png", storageDir).apply {
+                currentPhotoPath = absolutePath
+            }
             photoFile?.also {
-                selectedImageUri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
+                val uri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
+                selectedImageUri = uri
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
             }
         } catch (e: Exception) {
             Log.d(javaClass.simpleName, e.message.toString())
@@ -339,24 +370,13 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         }
         intentCameraLauncher.launch(intent)
     }
+
     private fun openVideoIntent() {
         val intent = Intent(MediaStore.ACTION_VIDEO_CAPTURE)
         intentVideoLauncher.launch(intent)
     }
 
-    private fun showProcessingDialog() {
-        ASCoroutine.ensureMainThread {
-            processingDialog.visibility = VISIBLE
-        }
-    }
-    private  fun closeProcessingDialog() {
-        ASCoroutine.ensureMainThread {
-            processingDialog.visibility = INVISIBLE
-        }
-    }
-
-    private fun postUrl(str:String) {
-        // 最上層是 發文 或 看板
+    private fun postUrl(str: String) {
         val topPage = ASNavigationController.currentController?.topController
         if ((topPage as Any).javaClass == PostArticlePage::class.java) {
             val aPage = PageContainer.instance!!.postArticlePage
@@ -365,30 +385,5 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
             val aPage = PageContainer.instance!!.getMessageSub()
             aPage.insertString(str)
         }
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        changeDialogHeight(newConfig)
-    }
-    private fun changeDialogHeight(newConfig: Configuration) {
-        val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            layoutParams?.height = ViewGroup.LayoutParams.MATCH_PARENT
-        } else {
-            val factor = applicationContext.resources.displayMetrics.density
-            layoutParams?.height = (500 * factor).toInt()
-        }
-        mainLayout.layoutParams = layoutParams
-    }
-
-    // 變更dialog寬度
-    // 因為是Activity, 不能套用 ASDialog
-    private fun setDialogWidth() {
-        val screenWidth = resources.displayMetrics.widthPixels
-        val dialogWidth = (screenWidth * 0.8).toInt()
-        val oldLayoutParams = mainLayout.layoutParams
-        oldLayoutParams.width = dialogWidth
-        mainLayout.layoutParams = oldLayoutParams
     }
 }

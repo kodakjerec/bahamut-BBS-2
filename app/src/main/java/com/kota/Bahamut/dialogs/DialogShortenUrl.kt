@@ -2,26 +2,55 @@ package com.kota.Bahamut.dialogs
 
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.res.Configuration
-import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.util.Log
-import android.view.OrientationEventListener
-import android.view.View
-import android.view.View.OnClickListener
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.RelativeLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
+import com.kota.Bahamut.dataModels.ShortenUrl
 import com.kota.Bahamut.dataModels.UrlDatabase
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
@@ -32,69 +61,267 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import org.json.JSONObject
 
-class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewListener {
-    private var mainLayout: RelativeLayout
-    private var editText: EditText
-    private var sampleTextView: TextView
-    private var sendButton: Button? = null
-    private var outputParam: String = ""
-    private lateinit var shortenUrlListener: DialogShortenUrlListener
-    private lateinit var dialogShortenUrlItemViewAdapter: DialogShortenUrlItemViewAdapter
+class DialogShortenUrl : ASDialog() {
+    private var shortenUrlListener: DialogShortenUrlListener? = null
     private val urlDatabase = UrlDatabase(context)
-    private var isTransfer: Boolean = true
-    private var mOrientationEventListener: OrientationEventListener
 
     override val name: String?
         get() = "BahamutShortenUrlDialog"
 
-    /** 轉檔 */
-    private var transferListener = OnClickListener {
-        var shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
-        if (!UserSettings.propertiesVIP && shortenTimes>30) {
-            ASToast.showLongToast(getContextString(R.string.vip_only_message))
-            return@OnClickListener
+    init {
+        setTitle(context.getString(R.string.dialog_shorten_url_title))
+        setComposeContent {
+            Content()
+        }
+    }
+
+    @Composable
+    private fun Content() {
+        val colors = AppTheme.colors
+        var isTransferMode by remember { mutableStateOf(true) }
+        var inputUrl by remember { mutableStateOf("") }
+        var outputShortUrl by remember { mutableStateOf("") }
+        var nonIdEnabled by remember { mutableStateOf(UserSettings.shortUrlNonId) }
+
+        val historyList = remember { mutableStateListOf<ShortenUrl>() }
+        LaunchedEffect(Unit) {
+            historyList.clear()
+            historyList.addAll(urlDatabase.shortenUrls)
+
+            // 自動讀取剪貼簿
+            val clipboardManager = context.getSystemService(Context.CLIPBOARD_SERVICE) as? ClipboardManager
+            val clipData = clipboardManager?.primaryClip
+            if (clipData != null && clipData.itemCount > 0) {
+                val clipText = clipData.getItemAt(0)?.text?.toString() ?: ""
+                if (clipText.isNotEmpty()) {
+                    inputUrl = filterUrl(clipText, nonIdEnabled)
+                }
+            }
         }
 
-        if (editText.text.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.keyword_hint))
-            return@OnClickListener
+        val textFieldColors = TextFieldDefaults.colors(
+            focusedTextColor = colors.textPrimary,
+            unfocusedTextColor = colors.textPrimary,
+            focusedContainerColor = colors.pageBackground,
+            unfocusedContainerColor = colors.pageBackground,
+            focusedIndicatorColor = colors.toolbarBackgroundFocused,
+            unfocusedIndicatorColor = colors.divider
+        )
+
+        BahaAlertDialogContent(
+            modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
+            title = CommonFunctions.getContextString(R.string.dialog_shorten_url_title),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        val result = if (outputShortUrl.isNotEmpty()) outputShortUrl else inputUrl
+                        shortenUrlListener?.onShortenUrlDone(result)
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // 切換模式按鈕
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isTransferMode) "縮網址" else CommonFunctions.getContextString(R.string.record),
+                        color = colors.textSecondary,
+                        fontSize = 14.sp
+                    )
+                    BahaButton(
+                        text = if (isTransferMode) CommonFunctions.getContextString(R.string.record) else CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
+                        type = ButtonType.NORMAL,
+                        onClick = {
+                            isTransferMode = !isTransferMode
+                            if (!isTransferMode) {
+                                historyList.clear()
+                                historyList.addAll(urlDatabase.shortenUrls)
+                            }
+                        },
+                        minHeight = 32.dp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                if (isTransferMode) {
+                    // 輸入網址
+                    OutlinedTextField(
+                        value = inputUrl,
+                        onValueChange = { inputUrl = it },
+                        placeholder = { Text(CommonFunctions.getContextString(R.string.keyword_hint), color = colors.textSecondary) },
+                        modifier = Modifier.fillMaxWidth(),
+                        minLines = 2,
+                        maxLines = 4,
+                        colors = textFieldColors
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 去識別化 Checkbox
+                    BahaCheckboxLeft(
+                        text = CommonFunctions.getContextString(R.string.dialog_shorten_url_non_id),
+                        checked = nonIdEnabled,
+                        onCheckedChange = { checked ->
+                            nonIdEnabled = checked
+                            UserSettings.setPropertiesShortUrlNonId(checked)
+                            inputUrl = filterUrl(inputUrl, checked)
+                        },
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // 清除 與 轉檔 按鈕
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        BahaButton(
+                            text = CommonFunctions.getContextString(R.string.reset),
+                            type = ButtonType.SECONDARY,
+                            onClick = {
+                                inputUrl = ""
+                                outputShortUrl = ""
+                            },
+                            modifier = Modifier.weight(1f),
+                            minHeight = 36.dp
+                        )
+                        BahaButton(
+                            text = CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
+                            type = ButtonType.NORMAL,
+                            onClick = {
+                                transferUrl(inputUrl) { shortUrl ->
+                                    outputShortUrl = shortUrl
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            minHeight = 36.dp
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // 預覽縮網址
+                    if (outputShortUrl.isNotEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(colors.dialogBlockBackground)
+                                .padding(10.dp)
+                        ) {
+                            Text(
+                                text = outputShortUrl,
+                                color = colors.bbsAuthor0,
+                                fontSize = 15.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                } else {
+                    // 歷史紀錄列表
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp)
+                    ) {
+                        items(historyList) { item ->
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        outputShortUrl = item.shortenUrl ?: ""
+                                        isTransferMode = true
+                                    }
+                                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                            ) {
+                                Text(
+                                    text = item.title ?: item.shortenUrl ?: "",
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                if (!item.description.isNullOrEmpty()) {
+                                    Text(
+                                        text = item.description ?: "",
+                                        color = colors.textSecondary,
+                                        fontSize = 12.sp,
+                                        maxLines = 2
+                                    )
+                                }
+                                Text(
+                                    text = item.shortenUrl ?: "",
+                                    color = colors.bbsAuthor0,
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
+                        }
+                    }
+                }
+            }
         }
-        // 擷取文章內的所有連結
-        val textView = TextView(context)
-        textView.text = editText.text
-        Linkify.addLinks(textView, Linkify.WEB_URLS)
-        val urls = textView.urls
+    }
+
+    private fun transferUrl(urlText: String, onResult: (String) -> Unit) {
+        var shortenTimes = UserSettings.propertiesNoVipShortenTimes
+        if (!UserSettings.propertiesVIP && shortenTimes > 30) {
+            ASToast.showLongToast(CommonFunctions.getContextString(R.string.vip_only_message))
+            return
+        }
+        if (urlText.isEmpty()) {
+            ASToast.showShortToast(CommonFunctions.getContextString(R.string.keyword_hint))
+            return
+        }
+
+        val dummyTextView = TextView(context)
+        dummyTextView.text = urlText
+        Linkify.addLinks(dummyTextView, Linkify.WEB_URLS)
+        val urls = dummyTextView.urls
         if (urls.isEmpty()) {
-            ASToast.showShortToast(getContextString(R.string.no_url))
-            return@OnClickListener
+            ASToast.showShortToast(CommonFunctions.getContextString(R.string.no_url))
+            return
         }
-
         val targetUrl = urls[0].url
 
-        // 找歷史檔案
+        // 檢查歷史紀錄
         val historyItem = urlDatabase.getShortenUrl(targetUrl)
-        if (!historyItem.isEmpty()) {
-            val shortUrl = historyItem[0]?.shortenUrl
-            changeFrontend(shortUrl!!)
+        if (historyItem.isNotEmpty() && historyItem[0]?.shortenUrl != null) {
+            val shortUrl = historyItem[0]!!.shortenUrl!!
+            onResult(shortUrl)
             UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_url_same_url))
-            return@OnClickListener
+            ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_url_same_url))
+            return
         }
 
-        ASProcessingDialog.showProcessingDialog(getContextString(R.string.dialog_shorten_url_under_transfer))
+        ASProcessingDialog.showProcessingDialog(CommonFunctions.getContextString(R.string.dialog_shorten_url_under_transfer))
         val apiUrl = "https://worker-short-url.kodakjerec.work/"
         val client = OkHttpClient()
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("type", "shortenurl")
             .addFormDataPart("url", targetUrl)
             .build()
-        val request: Request = Request.Builder()
-            .url(apiUrl)
-            .post(body)
-            .build()
+        val request: Request = Request.Builder().url(apiUrl).post(body).build()
+
         ASCoroutine.runInNewCoroutine {
-            try{
-                client.newCall(request).execute().use { response->
+            try {
+                client.newCall(request).execute().use { response ->
                     val data = response.body.string()
                     val jsonObject = JSONObject(data)
                     val status = jsonObject.optString("res")
@@ -104,15 +331,10 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                         val description = jsonObject.getString("description")
 
                         ASCoroutine.ensureMainThread {
-                            editText.setText(targetUrl)
-                            changeFrontend(shortUrl)
+                            onResult(shortUrl)
                             UserSettings.propertiesNoVipShortenTimes = ++shortenTimes
                         }
-
-                        // 網址存進資料庫
                         urlDatabase.addShortenUrl(targetUrl, title, description, shortUrl)
-                        DialogShortenUrlItemViewAdapter(urlDatabase.shortenUrls)
-
                     } else {
                         val msg = jsonObject.getString("msg")
                         ASToast.showLongToast(msg)
@@ -126,196 +348,40 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
             }
         }
     }
-    /** 變更畫面上選項 */
-    fun changeFrontend(shortUrl: String) {
-        sampleTextView.text = shortUrl
-        outputParam = sampleTextView.text.toString()
-        sendButton?.isEnabled = true
-    }
 
-    /** 擷取剪貼簿 */
-    var fromClipData = ""
-    private fun catchClipBoard() {
-            val clipboardManager =
-                context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            val clipData = clipboardManager.primaryClip
-            if (clipData != null && clipData.itemCount>0) {
-                val clipDataIndex0 = clipData.getItemAt(0)
-                if (clipDataIndex0 != null && clipDataIndex0.text!=null) {
-                    fromClipData = clipDataIndex0.text.toString()
-                    editText.setText(fromClipData)
-                    urlRemoveId()
-                }
-            }
-    }
+    private fun filterUrl(rawUrl: String, removeId: Boolean): String {
+        if (!removeId) return rawUrl
 
-    /** 切換去識別化 */
-    private val changeNonIdListenerForCheckbox = OnClickListener { _ ->
-        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
-        UserSettings.setPropertiesShortUrlNonId(checkbox.isChecked)
-        urlRemoveId()
-    }
-    private val changeNonIdListenerForLabel = OnClickListener { _ ->
-        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
-        checkbox.isChecked = !checkbox.isChecked
-        UserSettings.setPropertiesShortUrlNonId(checkbox.isChecked)
-        urlRemoveId()
-    }
+        val dummyTextView = TextView(context)
+        dummyTextView.text = rawUrl
+        Linkify.addLinks(dummyTextView, Linkify.WEB_URLS)
+        val urls = dummyTextView.urls
+        if (urls.isEmpty()) return rawUrl
 
-    /** 清除內容 */
-    private val resetListener = OnClickListener {_ ->
-        editText.setText("")
-        sampleTextView.text = getContextString(R.string.dialog_paint_color_sample_ch)
-        outputParam = ""
-    }
-
-    /** 切換設定 */
-    private val changeModeListener = OnClickListener { _->
-        if (isTransfer) {
-            // 從轉檔切換到紀錄
-            isTransfer = false
-            findViewById<Button>(R.id.dialog_shorten_url_change_mode).text = getContextString(R.string.dialog_shorten_url_transfer)
-            findViewById<View>(R.id.dialog_shorten_url_layout_transfer).visibility = View.GONE
-            findViewById<View>(R.id.dialog_shorten_url_layout_recycleView).visibility = View.VISIBLE
-
-            val recyclerView = findViewById<RecyclerView>(R.id.dialog_shorten_url_layout_recycleView)
-            recyclerView.layoutManager = LinearLayoutManager(context)
-
-            dialogShortenUrlItemViewAdapter = DialogShortenUrlItemViewAdapter(urlDatabase.shortenUrls)
-            recyclerView.adapter = dialogShortenUrlItemViewAdapter
-            dialogShortenUrlItemViewAdapter.setOnItemClickListener(this)
-        } else {
-            isTransfer = true
-            findViewById<Button>(R.id.dialog_shorten_url_change_mode).text = getContextString(R.string.record)
-            findViewById<View>(R.id.dialog_shorten_url_middle_linear_layout).visibility = View.VISIBLE
-            findViewById<View>(R.id.dialog_shorten_url_layout_recycleView).visibility = View.GONE
-        }
-    }
-
-    private var oldOrientation: Int = 1
-    init {
-        val layoutId = R.layout.dialog_shorten_url
-        requestWindowFeature(1)
-        setContentView(layoutId)
-        window?.setBackgroundDrawable(null)
-        setTitle(context.getString(R.string.dialog_shorten_url_title))
-        mainLayout = findViewById(R.id.dialog_shorten_url_layout)
-        editText = mainLayout.findViewById(R.id.dialog_shorten_url_content)
-        sampleTextView = mainLayout.findViewById(R.id.dialog_shorten_url_sample)
-        catchClipBoard()
-
-        // 按鈕
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_transfer).setOnClickListener(transferListener)
-        sendButton = mainLayout.findViewById(R.id.send)
-        sendButton?.setOnClickListener(this)
-        mainLayout.findViewById<Button>(R.id.cancel).setOnClickListener(this)
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_reset).setOnClickListener(resetListener)
-        mainLayout.findViewById<Button>(R.id.dialog_shorten_url_change_mode).setOnClickListener(changeModeListener)
-        val checkbox = mainLayout.findViewById<CheckBox>(R.id.dialog_shorten_url_non_id_checkbox)
-        checkbox.isChecked = UserSettings.shortUrlNonId
-        checkbox.setOnClickListener(changeNonIdListenerForCheckbox)
-        mainLayout.findViewById<TextView>(R.id.dialog_shorten_url_non_id_label).setOnClickListener(changeNonIdListenerForLabel)
-
-        // 監聽轉動事件, 變更視窗大小
-        mOrientationEventListener = object : OrientationEventListener(context) {
-            override fun onOrientationChanged(orientation: Int) {
-                val nowOrientation: Int = context.resources.configuration.orientation
-
-                if (nowOrientation!=oldOrientation) {
-                    val layoutParams : ViewGroup.LayoutParams? = mainLayout.layoutParams
-                    if (nowOrientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        layoutParams?.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                        oldOrientation = nowOrientation
-                    } else {
-                        val factor = context.resources.displayMetrics.density
-                        layoutParams?.height = (500 * factor).toInt()
-                        oldOrientation = nowOrientation
+        val firstUrl = urls[0].url
+        val splits = firstUrl.split("?")
+        if (splits.size >= 2) {
+            var returnString = splits[0]
+            if (splits[0].contains("www.youtube.com") || splits[0].contains("www.facebook.com")) {
+                val reserveKeys = arrayOf("v", "fbid")
+                val params = splits[1].split("&")
+                val kept = mutableListOf<String>()
+                for (param in params) {
+                    val paramPair = param.split("=")
+                    if (reserveKeys.contains(paramPair[0])) {
+                        kept.add(param)
                     }
-                    mainLayout.layoutParams = layoutParams
+                }
+                if (kept.isNotEmpty()) {
+                    returnString += "?" + kept.joinToString("&")
                 }
             }
+            return returnString
         }
-        setDialogWidth(mainLayout)
-    }
-
-    override fun onClick(view: View) {
-        if (view === sendButton) {
-            if (outputParam.isEmpty())
-                shortenUrlListener.onShortenUrlDone(editText.text.toString())
-            else
-                shortenUrlListener.onShortenUrlDone(outputParam)
-        }
-        dismiss()
+        return firstUrl
     }
 
     fun setListener(listener: DialogShortenUrlListener) {
         shortenUrlListener = listener
-    }
-
-    override fun onDialogShortenUrlItemViewClicked(dialogShortenUrlItemView: DialogShortenUrlViewHolder) {
-        val shortUrl = dialogShortenUrlItemViewAdapter.getItem(dialogShortenUrlItemView.layoutPosition).shortenUrl
-        changeFrontend(shortUrl!!)
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mOrientationEventListener.enable()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mOrientationEventListener.disable()
-    }
-
-    /** 去識別化 */
-    private fun urlRemoveId() {
-        val filterString = if (UserSettings.shortUrlNonId) {
-            var returnString = editText.text.toString()
-            val textView = TextView(context)
-            textView.text = returnString
-            Linkify.addLinks(textView, Linkify.WEB_URLS)
-
-            val urls: Array<URLSpan> = textView.urls
-            if (urls.isNotEmpty()) {
-                // 針對網址處理
-
-                val firstUrl = urls[0].url
-                val splits = firstUrl.split("?")
-                if (splits.size>=2) {
-                    // 有參數
-
-                    // 先指定給前面位址
-                    returnString = splits[0]
-
-                    // 特定網址參數例外處理
-                    // www.facebook.com , 只保留 fbid=1234
-                    // www.youtube.com , 只保留 v=1234
-                    if (splits[0].indexOf("www.youtube.com")>0 || splits[0].indexOf("www.facebook.com")>0) {
-                        val reserveKeys = arrayOf("v","fbid")
-                        val params = splits[1].split("&")
-                        if (params.isNotEmpty()) {
-                            for (param in params) {
-                                val paramPair = param.split("=")
-                                if (reserveKeys.contains(paramPair[0])) {
-                                    returnString+= "?$param"
-                                }
-                            }
-                        } else {
-                            returnString += splits[1]
-                        }
-                    }
-                } else {
-                    // 沒有參數
-                    returnString = firstUrl
-                }
-            }
-
-            returnString
-        } else {
-            // 不啟動去識別化
-            fromClipData
-        }
-
-        editText.setText(filterString)
     }
 }

@@ -9,6 +9,13 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.pageController.ASViewControllerDisappearListener
 import androidx.core.view.isNotEmpty
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.kota.Bahamut.ui.theme.findLifecycleOwner
+import com.kota.Bahamut.ui.theme.findSavedStateRegistryOwner
+import com.kota.Bahamut.ui.theme.findViewModelStoreOwner
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import java.lang.ref.WeakReference
 
 open class ASDialog : Dialog, ASViewControllerDisappearListener {
@@ -38,6 +45,33 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
         this.isShowing = false
         this.aSViewController = null
         trackDialog(this)
+    }
+
+    /**
+     * 以 Jetpack Compose 設置 Dialog 內容，自動套用透明背景及主題
+     */
+    fun setComposeContent(content: @androidx.compose.runtime.Composable () -> Unit): ASDialog {
+        requestWindowFeature(1)
+        window?.setBackgroundDrawable(null)
+        window?.decorView?.let { decor ->
+            val lifecycleOwner = context.findLifecycleOwner()
+            if (lifecycleOwner != null) {
+                decor.setViewTreeLifecycleOwner(lifecycleOwner)
+            }
+            val savedStateOwner = context.findSavedStateRegistryOwner()
+            if (savedStateOwner != null) {
+                decor.setViewTreeSavedStateRegistryOwner(savedStateOwner)
+            }
+            val viewModelOwner = context.findViewModelStoreOwner()
+            if (viewModelOwner != null) {
+                decor.setViewTreeViewModelStoreOwner(viewModelOwner)
+            }
+        }
+        val composeView = androidx.compose.ui.platform.ComposeView(context).apply {
+            setBahamutContent(content)
+        }
+        setContentView(composeView)
+        return this
     }
 
     // android.app.Dialog, android.content.DialogInterface

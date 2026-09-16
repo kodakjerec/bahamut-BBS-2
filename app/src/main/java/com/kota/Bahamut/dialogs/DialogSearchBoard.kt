@@ -1,39 +1,87 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 
-class DialogSearchBoard : ASDialog(), View.OnClickListener {
-    var cancelButton: Button
-    var keywordLabel: EditText
+class DialogSearchBoard : ASDialog() {
     var dialogSearchBoardListener: DialogSearchBoardListener? = null
-    var searchButton: Button
 
     override val name: String?
         get() = "BahamutBoardsSearchDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_search_board)
-        if (window != null) window?.setBackgroundDrawable(null)
-        setTitle("搜尋看板")
-        this.keywordLabel = findViewById<EditText>(R.id.Bahamut_Dialog_Search_board_keyword)
-        this.searchButton = findViewById<Button>(R.id.Bahamut_Dialog_Search_board_Search_Button)
-        this.cancelButton = findViewById<Button>(R.id.Bahamut_Dialog_Search_board_Cancel_Button)
-        this.searchButton.setOnClickListener(this)
-        this.cancelButton.setOnClickListener(this)
+        setTitle(CommonFunctions.getContextString(R.string.search_board))
+        setComposeContent {
+            Content()
+        }
     }
 
-    override fun onClick(view: View?) {
-        if (view === this.searchButton && this.dialogSearchBoardListener != null) {
-            this.dialogSearchBoardListener?.onSearchButtonClickedWithKeyword(
-                this.keywordLabel.text.toString().replace("\n", "")
+    @Composable
+    private fun Content() {
+        var keyword by remember { mutableStateOf("") }
+        val colors = AppTheme.colors
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.search_board),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.search),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        dialogSearchBoardListener?.onSearchButtonClickedWithKeyword(keyword.replace("\n", ""))
+                        dismiss()
+                    }
+                )
             )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = CommonFunctions.getContextString(R.string.input_board_name),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                OutlinedTextField(
+                    value = keyword,
+                    onValueChange = { keyword = it },
+                    placeholder = { Text(CommonFunctions.getContextString(R.string.board_name), color = colors.textSecondary) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = colors.pageBackground,
+                        unfocusedContainerColor = colors.pageBackground,
+                        focusedIndicatorColor = colors.toolbarBackgroundFocused,
+                        unfocusedIndicatorColor = colors.divider
+                    )
+                )
+            }
         }
-        dismiss()
     }
 
     fun setListener(listener: DialogSearchBoardListener?) {

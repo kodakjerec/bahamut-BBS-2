@@ -5,29 +5,33 @@ import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -230,50 +234,72 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         ) {
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-            // 輸入列
+            // 輸入列 (滿版無縫)
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.pageBackground),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.reset),
                     type = ButtonType.DANGER,
-                    modifier = Modifier,
+                    modifier = Modifier.height(50.dp),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp,
                     onClick = { onResetClicked() }
                 )
-                TextField(
-                    value = inputTextState,
-                    onValueChange = { inputTextState = it },
+                Box(
                     modifier = Modifier
                         .weight(1f)
-                        .height(60.dp),
-                    placeholder = {
-                        Text(
-                            stringResource(R.string.please_input_id),
-                            color = colors.textSecondary
-                        )
-                    },
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = colors.surface,
-                        unfocusedContainerColor = colors.surface,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onAddClicked() })
-                )
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BasicTextField(
+                        value = inputTextState,
+                        onValueChange = { inputTextState = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp),
+                        textStyle = TextStyle(
+                            color = colors.textPrimary,
+                            fontSize = 18.sp,
+                            textAlign = TextAlign.Center
+                        ),
+                        singleLine = true,
+                        cursorBrush = SolidColor(colors.textPrimary),
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { onAddClicked() }),
+                        decorationBox = { innerTextField ->
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                if (inputTextState.isEmpty()) {
+                                    Text(
+                                        text = stringResource(R.string.please_input_id),
+                                        color = colors.textSecondary,
+                                        fontSize = 18.sp,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                                innerTextField()
+                            }
+                        }
+                    )
+                }
                 BahaButton(
                     text = stringResource(R.string.add),
-                    modifier = Modifier,
+                    type = ButtonType.DANGER,
+                    modifier = Modifier.height(50.dp),
+                    fontSize = 18.sp,
+                    minHeight = 50.dp,
                     onClick = { onAddClicked() }
                 )
             }
 
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            HorizontalDivider(color = colors.divider, thickness = 5.dp)
 
             // RecyclerView with ItemTouchHelper (kept in AndroidView for drag-reorder)
             AndroidView(
@@ -289,11 +315,15 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                     .fillMaxWidth()
             )
 
-            // 底部工具列
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            // 底部工具列 (滿版無縫)
+            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
             BahaButton(
                 text = stringResource(R.string._back),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
+                fontSize = 18.sp,
+                minHeight = 50.dp,
                 onClick = { onBackPressed() }
             )
         }

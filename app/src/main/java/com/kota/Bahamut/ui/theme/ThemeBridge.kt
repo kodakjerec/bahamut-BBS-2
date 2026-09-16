@@ -1,6 +1,7 @@
 package com.kota.Bahamut.ui.theme
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -9,9 +10,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.UserSettings
+import com.kota.asFramework.pageController.ASNavigationController
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -85,21 +90,69 @@ fun BahamutAppTheme(content: @Composable () -> Unit) {
 }
 
 /**
+ * 從 Context 或其 ContextWrapper 鏈中查找 LifecycleOwner
+ */
+fun Context.findLifecycleOwner(): LifecycleOwner? {
+    var cur: Context? = this
+    while (cur is ContextWrapper) {
+        if (cur is LifecycleOwner) {
+            return cur
+        }
+        cur = cur.baseContext
+    }
+    return ASNavigationController.currentController
+}
+
+/**
+ * 從 Context 或其 ContextWrapper 鏈中查找 SavedStateRegistryOwner
+ */
+fun Context.findSavedStateRegistryOwner(): SavedStateRegistryOwner? {
+    var cur: Context? = this
+    while (cur is ContextWrapper) {
+        if (cur is SavedStateRegistryOwner) {
+            return cur
+        }
+        cur = cur.baseContext
+    }
+    return ASNavigationController.currentController
+}
+
+/**
+ * 從 Context 或其 ContextWrapper 鏈中查找 ViewModelStoreOwner
+ */
+fun Context.findViewModelStoreOwner(): ViewModelStoreOwner? {
+    var cur: Context? = this
+    while (cur is ContextWrapper) {
+        if (cur is ViewModelStoreOwner) {
+            return cur
+        }
+        cur = cur.baseContext
+    }
+    return ASNavigationController.currentController
+}
+
+/**
  * ComposeView 便捷擴充函式
  * 自動設定生命週期釋放策略並注入 BahamutAppTheme
  */
 fun ComposeView.setBahamutContent(content: @Composable () -> Unit) {
-    // 確保 ViewTreeLifecycleOwner 與 ViewTreeSavedStateRegistryOwner 存在
+    // 確保 ViewTreeLifecycleOwner、ViewTreeSavedStateRegistryOwner 與 ViewTreeViewModelStoreOwner 存在
     if (findViewTreeLifecycleOwner() == null) {
-        val owner = (context as? LifecycleOwner)
+        val owner = context.findLifecycleOwner()
         if (owner != null) {
             setViewTreeLifecycleOwner(owner)
         }
     }
     if (findViewTreeSavedStateRegistryOwner() == null) {
-        val owner = (context as? SavedStateRegistryOwner)
+        val owner = context.findSavedStateRegistryOwner()
         if (owner != null) {
             setViewTreeSavedStateRegistryOwner(owner)
+        }
+    }
+    if (findViewTreeViewModelStoreOwner() == null) {
+        val owner = context.findViewModelStoreOwner()
+        if (owner != null) {
+            setViewTreeViewModelStoreOwner(owner)
         }
     }
     setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindowOrReleasedFromPool)
@@ -107,4 +160,5 @@ fun ComposeView.setBahamutContent(content: @Composable () -> Unit) {
         BahamutAppTheme(content = content)
     }
 }
+
 

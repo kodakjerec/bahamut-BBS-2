@@ -314,9 +314,16 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
 
         ASCoroutine.ensureMainThread {
             currentWebView?.let { webView ->
-                webView.stopLoading()
-                webView.loadUrl("about:blank")
-                webView.destroy()
+                try {
+                    (webView.parent as? android.view.ViewGroup)?.removeView(webView)
+                    webView.stopLoading()
+                    webView.loadUrl("about:blank")
+                    webView.clearHistory()
+                    webView.removeAllViews()
+                    webView.destroy()
+                } catch (e: Exception) {
+                    Log.e("LoginWeb", "Error cleaning up WebView", e)
+                }
             }
             currentWebView = null
 
@@ -331,45 +338,60 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
     inner class WebAppInterface {
         @JavascriptInterface
         fun onFail() {
-            println("檢測不到簽到。")
+            try {
+                println("檢測不到簽到。")
 
-            ASCoroutine.ensureMainThread {
-                onFailCallback?.invoke()
-                cleanup()
+                ASCoroutine.ensureMainThread {
+                    onFailCallback?.invoke()
+                    cleanup()
+                }
+            } catch (e: Throwable) {
+                Log.e("LoginWeb", "Error in onFail", e)
             }
         }
 
         @JavascriptInterface
         fun signSuccess() {
-            println("檢測到簽到對話框！")
+            try {
+                println("檢測到簽到對話框！")
 
-            ASCoroutine.ensureMainThread {
-                onSignDetectedCallback?.invoke()
-                cleanup()
+                ASCoroutine.ensureMainThread {
+                    onSignDetectedCallback?.invoke()
+                    cleanup()
+                }
+            } catch (e: Throwable) {
+                Log.e("LoginWeb", "Error in signSuccess", e)
             }
         }
         
         @JavascriptInterface
         fun needManualLogin() {
-            println("需要手動登入驗證")
-            cancelTimeout()
+            try {
+                println("需要手動登入驗證")
+                cancelTimeout()
 
-            ASCoroutine.ensureMainThread {
-                onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
+                ASCoroutine.ensureMainThread {
+                    onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
+                }
+            } catch (e: Throwable) {
+                Log.e("LoginWeb", "Error in needManualLogin", e)
             }
         }
 
         @JavascriptInterface
         fun saveWebCredentials(username: String, password: String) {
-            if (username.isNotEmpty() && password.isNotEmpty()) {
-                if (UserSettings.propertiesWebUsername.isEmpty()) {
-                    UserSettings.propertiesWebUsername = username
+            try {
+                if (username.isNotEmpty() && password.isNotEmpty()) {
+                    if (UserSettings.propertiesWebUsername.isEmpty()) {
+                        UserSettings.propertiesWebUsername = username
+                    }
+                    if (UserSettings.propertiesWebPassword.isEmpty()) {
+                        UserSettings.propertiesWebPassword = password
+                    }
                 }
-                if (UserSettings.propertiesWebPassword.isEmpty()) {
-                    UserSettings.propertiesWebPassword = password
-                }
+            } catch (e: Throwable) {
+                Log.e("LoginWeb", "Error in saveWebCredentials", e)
             }
         }
-        
     }
 }

@@ -11,6 +11,8 @@
     <color name="red">#FF800000</color>
     <color name="text_color_link">#FF1F5EFF</color>
     <color name="halfWhite">#FF808080</color>
+    <color name="text_color_green">#FF00FF00</color>
+    <color name="text_color_danger">#FFFF0000</color>
 
     <!-- 功能性顏色 (保留給程式碼引用) -->
     <color name="page_background">@color/black</color>

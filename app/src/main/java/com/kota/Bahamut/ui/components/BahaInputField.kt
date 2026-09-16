@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,7 +41,7 @@ fun BahaInputField(
     isPassword: Boolean = false,
     maxLength: Int = Int.MAX_VALUE,
     singleLine: Boolean = true,
-    height: Dp = 46.dp,
+    height: Dp = 40.dp,
     keyboardOptions: KeyboardOptions = if (isPassword) {
         KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
     } else {
@@ -60,20 +61,19 @@ fun BahaInputField(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(2.dp))
             .background(colors.inputBoxBackground)
-            .border(1.dp, colors.divider, RoundedCornerShape(6.dp))
-            .padding(horizontal = 14.dp),
+            .padding(horizontal = 8.dp),
         textStyle = TextStyle(
             color = colors.inputBoxText,
             fontSize = 18.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Normal
         ),
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
-        cursorBrush = SolidColor(colors.titleBarTitle),
+        cursorBrush = SolidColor(colors.inputBoxText),
         decorationBox = { innerTextField ->
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -82,7 +82,7 @@ fun BahaInputField(
                 if (value.isEmpty() && placeholder.isNotEmpty()) {
                     Text(
                         text = placeholder,
-                        color = colors.textSecondary.copy(alpha = 0.55f),
+                        color = colors.textSecondary,
                         fontSize = 16.sp
                     )
                 }

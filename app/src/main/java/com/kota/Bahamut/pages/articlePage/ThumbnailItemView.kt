@@ -509,32 +509,111 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     }
 
     private fun init() {
-        (context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
-            R.layout.thumbnail,
-            this
-        )
-        mainLayout = findViewById(R.id.thumbnail_content_view)
-        layoutDefault = mainLayout!!.findViewById(R.id.thumbnail_default)
+        val density = context.resources.displayMetrics.density
+        fun dp(value: Float): Int = (value * density + 0.5f).toInt()
 
-        layoutPic = mainLayout!!.findViewById(R.id.thumbnail_pic)
-        loadingView = mainLayout!!.findViewById(R.id.thumbnail_loading)
-        photoViewPic = mainLayout!!.findViewById(R.id.thumbnail_image_pic)
-        photoViewPic.setOnClickListener(openUrlListener)
-        photoViewPic.setOnLongClickListener(openImageListener)
-        photoViewPic.maximumScale = 20.0f
-        photoViewPic.mediumScale = 3.0f
+        orientation = VERTICAL
+        layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+        setBackgroundColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailBackground))
 
-        imageViewButton = mainLayout!!.findViewById(R.id.thumbnail_image_button)
-        imageViewButton.setOnClickListener { view: View? -> prepareLoadImage() }
+        val contentView = LinearLayout(context).apply {
+            id = R.id.thumbnail_content_view
+            orientation = VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            setBackgroundColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailBackground))
+        }
+        mainLayout = contentView
 
-        layoutNormal = mainLayout!!.findViewById(R.id.thumbnail_normal)
+        layoutDefault = LinearLayout(context).apply {
+            id = R.id.thumbnail_default
+            orientation = HORIZONTAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
-        // title 顏色 = 作者內文 顏色
-        titleView = mainLayout!!.findViewById(R.id.thumbnail_title)
-        titleView.setOnClickListener(titleListener)
-        // description 色為 title 減半
-        descriptionView = mainLayout!!.findViewById(R.id.thumbnail_description)
-        descriptionView.setOnClickListener(descriptionListener)
-        urlView = mainLayout!!.findViewById(R.id.thumbnail_url)
+            val btn = Button(context).apply {
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(36f))
+                text = com.kota.Bahamut.service.CommonFunctions.getContextString(R.string.loading)
+                setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailButtonTextColor))
+                setBackgroundColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailButtonBackground))
+            }
+            addView(btn)
+        }
+        contentView.addView(layoutDefault)
+
+        layoutPic = LinearLayout(context).apply {
+            id = R.id.thumbnail_pic
+            orientation = VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            visibility = GONE
+
+            loadingView = ProgressBar(context).apply {
+                id = R.id.thumbnail_loading
+                layoutParams = LayoutParams(dp(48f), dp(48f)).apply {
+                    gravity = android.view.Gravity.CENTER
+                }
+                visibility = GONE
+            }
+            addView(loadingView)
+
+            photoViewPic = PhotoView(context).apply {
+                id = R.id.thumbnail_image_pic
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                contentDescription = com.kota.Bahamut.service.CommonFunctions.getContextString(R.string.zero_word)
+                visibility = GONE
+                setOnClickListener(openUrlListener)
+                setOnLongClickListener(openImageListener)
+                maximumScale = 20.0f
+                mediumScale = 3.0f
+            }
+            addView(photoViewPic)
+
+            imageViewButton = Button(context).apply {
+                id = R.id.thumbnail_image_button
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, dp(36f))
+                text = com.kota.Bahamut.service.CommonFunctions.getContextString(R.string.thumbnail_show_pic)
+                setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailButtonTextColor))
+                setBackgroundColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailButtonBackground))
+                setOnClickListener { prepareLoadImage() }
+            }
+            addView(imageViewButton)
+        }
+        contentView.addView(layoutPic)
+
+        layoutNormal = LinearLayout(context).apply {
+            id = R.id.thumbnail_normal
+            orientation = VERTICAL
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            visibility = GONE
+
+            titleView = TextView(context).apply {
+                id = R.id.thumbnail_title
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                maxLines = 2
+                setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailTitleColor))
+                visibility = GONE
+                setOnClickListener(titleListener)
+            }
+            addView(titleView)
+
+            descriptionView = TextView(context).apply {
+                id = R.id.thumbnail_description
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+                maxLines = 1
+                setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailDescriptionColor))
+                visibility = GONE
+                setOnClickListener(descriptionListener)
+            }
+            addView(descriptionView)
+        }
+        contentView.addView(layoutNormal)
+
+        urlView = TextView(context).apply {
+            id = R.id.thumbnail_url
+            layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
+            isSingleLine = true
+            setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_thumbnailUrlColor))
+        }
+        contentView.addView(urlView)
+
+        addView(contentView)
     }
 }

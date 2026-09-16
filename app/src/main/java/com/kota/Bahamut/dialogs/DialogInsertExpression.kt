@@ -1,53 +1,160 @@
 package com.kota.Bahamut.dialogs
 
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ScrollView
-import android.widget.TextView
-import androidx.core.content.ContextCompat
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.dialog.ASLayoutParams.Companion.instance
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
-import java.util.Vector
-import kotlin.math.ceil
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.asFramework.dialog.ASDialog
 
 class DialogInsertExpression : ASDialog() {
-    var mainView: ScrollView
-    var titleLabel: TextView?
-    var itemBlock: LinearLayout
-    var listener: DialogInsertExpressionListener? = null
-    val itemList: Vector<DialogItem> = Vector<DialogItem>()
+    private var listener: DialogInsertExpressionListener? = null
+    private var dialogTitle by mutableStateOf("表情符號")
+    private val itemList = mutableStateListOf<String>()
 
-    class DialogItem {
-        var button: Button? = null
-        var title: String? = null
-    }
-
-    var settingListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        this.listener?.onListDialogSettingClicked()
-        dismiss()
-    }
+    override val name: String?
+        get() = "BahamutInsertExpressionDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_insert_expressions)
-        if (window != null) window?.setBackgroundDrawable(null)
+        setComposeContent {
+            Content()
+        }
+    }
 
-        mainView = findViewById<ScrollView>(R.id.dialog_insert_expressions_scrollView)
-        titleLabel = findViewById<TextView?>(R.id.dialog_insert_expressions_title)
-        titleLabel?.tag = "dialogTitle"
-        itemBlock = findViewById<LinearLayout>(R.id.dialog_insert_expressions_content)
+    @Composable
+    private fun Content() {
+        val colors = AppTheme.colors
 
-        val settingButton = findViewById<View>(R.id.dialog_insert_expressions_setting)
-        settingButton.setOnClickListener(
-            settingListener
-        )
-        setDialogWidth(mainView)
+        Box(
+            modifier = Modifier
+                .widthIn(min = 280.dp, max = 340.dp)
+                .clip(RoundedCornerShape(6.dp))
+                .background(colors.pageBackground)
+                .border(1.dp, colors.dialogBorder, RoundedCornerShape(6.dp))
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                // 標題列 + 設定按鈕
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = dialogTitle,
+                        color = colors.titleBarTitle,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    BahaButton(
+                        text = CommonFunctions.getContextString(R.string.setting),
+                        type = ButtonType.NORMAL,
+                        onClick = {
+                            listener?.onListDialogSettingClicked()
+                            dismiss()
+                        },
+                        minHeight = 32.dp
+                    )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.divider)
+                )
+
+                // 項目列表
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 350.dp)
+                ) {
+                    itemsIndexed(itemList) { index, itemTitle ->
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    listener?.onListDialogItemClicked(
+                                        this@DialogInsertExpression,
+                                        index,
+                                        itemTitle
+                                    )
+                                    dismiss()
+                                }
+                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = itemTitle,
+                                color = colors.textPrimary,
+                                fontSize = 16.sp
+                            )
+                        }
+                        if (index < itemList.size - 1) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(colors.divider)
+                            )
+                        }
+                    }
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.divider)
+                )
+
+                // 底部關閉
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    BahaButton(
+                        text = CommonFunctions.getContextString(R.string.cancel),
+                        type = ButtonType.SECONDARY,
+                        onClick = { dismiss() },
+                        minHeight = 36.dp
+                    )
+                }
+            }
+        }
     }
 
     fun setListener(aListener: DialogInsertExpressionListener?): DialogInsertExpression {
@@ -56,106 +163,18 @@ class DialogInsertExpression : ASDialog() {
     }
 
     fun setTitle(aTitle: String): DialogInsertExpression {
-        if (this.titleLabel != null) {
-            this.titleLabel?.text = aTitle
-        }
+        dialogTitle = aTitle
         return this
     }
 
     fun addItems(aItemList: Array<String>): DialogInsertExpression {
-        for (itemTitle in aItemList) {
-            addItem(itemTitle)
-        }
+        itemList.addAll(aItemList)
         return this
     }
 
     fun addItem(aItemTitle: String): DialogInsertExpression {
-        val button = createButton()
-
-        button.setOnClickListener { v: View? ->
-            this@DialogInsertExpression.onItemClicked(
-                v as Button?
-            )
-        }
-
-        if (this.itemList.isNotEmpty()) {
-            this.itemBlock.addView(createDivider())
-        }
-        button.text = aItemTitle
-        this.itemBlock.addView(button)
-        val item = DialogItem()
-        item.button = button
-        item.title = aItemTitle
-        this.itemList.add(item)
+        itemList.add(aItemTitle)
         return this
-    }
-
-    fun createDivider(): View {
-        val divider = View(context)
-        divider.tag = "listDivider"
-        val dividerHeight = ceil(
-            TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                1.0f,
-                context.resources.displayMetrics
-            ).toDouble()
-        ).toInt()
-        divider.layoutParams = LinearLayout.LayoutParams(-1, dividerHeight)
-        divider.setBackgroundColor(CommonFunctions.getThemeColor(R.attr.bahamut_dividerColor))
-        return divider
-    }
-
-    private fun createButton(): Button {
-        val button = Button(context)
-        button.layoutParams = LinearLayout.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        button.minimumHeight = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            60.0f,
-            context.resources.displayMetrics
-        ).toInt()
-        button.gravity = Gravity.CENTER
-        button.setTextSize(2, instance.textSizeNormal)
-        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_listDialogItemBackground)
-        if (bgRes != 0) {
-            button.setBackgroundResource(bgRes)
-        } else {
-            button.background = instance.listItemBackgroundDrawable
-        }
-        val textColorRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_listDialogItemTextColor)
-        if (textColorRes != 0) {
-            button.setTextColor(ContextCompat.getColorStateList(context, textColorRes))
-        } else {
-            button.setTextColor(instance.listItemTextColor)
-        }
-        button.isSingleLine = true
-        return button
-    }
-
-    private fun indexOfButton(aButton: Button?): Int {
-        for (i in this.itemList.indices) {
-            val item = this.itemList[i]
-            if (item.button === aButton) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    private fun onItemClicked(button: Button?) {
-        if (this.listener != null) {
-            val index = indexOfButton(button)
-            if (index != -1) {
-                this.listener?.onListDialogItemClicked(
-                    this,
-                    index,
-                    this.itemList[index].title!!
-                )
-            }
-            dismiss()
-        }
     }
 
     companion object {

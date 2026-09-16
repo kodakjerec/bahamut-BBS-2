@@ -324,7 +324,10 @@ class TelnetView : View {
         // => /2 得到單字元寬度
         // => *2 得到雙字元寬度(精準)
         val myRatio = 2.5
-        if (layout.width == ViewGroup.LayoutParams.WRAP_CONTENT && layout.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        val widthMode = MeasureSpec.getMode(widthMeasureSpec)
+        val heightMode = MeasureSpec.getMode(heightMeasureSpec)
+
+        if (layout != null && layout.width == ViewGroup.LayoutParams.WRAP_CONTENT && layout.height == ViewGroup.LayoutParams.WRAP_CONTENT && widthMode == MeasureSpec.UNSPECIFIED) {
             blockWidth = (defaultTextSize1 / 2 / 2 * 2).toInt().toDouble()
             blockHeight = blockWidth * myRatio
             drawWidth = (blockWidth * columnCount).toInt()
@@ -334,31 +337,33 @@ class TelnetView : View {
             widthMeasureValue = MeasureSpec.makeMeasureSpec(drawWidth, MeasureSpec.EXACTLY)
             heightMeasureValue =
                 MeasureSpec.makeMeasureSpec(drawHeight, MeasureSpec.EXACTLY)
-        } else if (layout.height == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        } else if (layout?.height == ViewGroup.LayoutParams.WRAP_CONTENT || heightMode != MeasureSpec.EXACTLY) {
             blockWidth = (viewWidth / columnCount / 2 * 2).toDouble()
             blockHeight = blockWidth * myRatio
             drawWidth = (blockWidth * columnCount).toInt()
             drawHeight = (blockHeight * myRow).toInt()
-            myScaleX = viewWidth.toFloat() / drawWidth
+            myScaleX = if (drawWidth > 0) viewWidth.toFloat() / drawWidth else 1.0f
+            myScaleY = 1.0f
             widthMeasureValue = MeasureSpec.makeMeasureSpec(viewWidth, MeasureSpec.EXACTLY)
             heightMeasureValue =
                 MeasureSpec.makeMeasureSpec(drawHeight, MeasureSpec.EXACTLY)
-        } else if (layout.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
+        } else if (layout?.width == ViewGroup.LayoutParams.WRAP_CONTENT) {
             blockWidth = (blockHeight / myRatio / 2 * 2).toInt().toDouble()
             blockHeight = viewHeight.toDouble() / myRow
             drawWidth = (blockWidth * columnCount).toInt()
             drawHeight = (blockHeight * myRow).toInt()
-            myScaleY = viewHeight.toFloat() / drawHeight
+            myScaleX = 1.0f
+            myScaleY = if (drawHeight > 0) viewHeight.toFloat() / drawHeight else 1.0f
             widthMeasureValue = MeasureSpec.makeMeasureSpec(drawWidth, MeasureSpec.EXACTLY)
             heightMeasureValue =
                 MeasureSpec.makeMeasureSpec(viewHeight, MeasureSpec.EXACTLY)
         } else {
-            blockWidth = viewWidth.toDouble() / columnCount / 2 * 2
+            blockWidth = (viewWidth / columnCount / 2 * 2).toDouble()
             blockHeight = blockWidth * myRatio
             drawWidth = (blockWidth * columnCount).toInt()
             drawHeight = (blockHeight * myRow).toInt()
-            myScaleX = viewWidth.toFloat() / drawWidth
-            myScaleY = viewHeight.toFloat() / drawHeight
+            myScaleX = if (drawWidth > 0) viewWidth.toFloat() / drawWidth else 1.0f
+            myScaleY = if (drawHeight > 0) viewHeight.toFloat() / drawHeight else 1.0f
             widthMeasureValue = MeasureSpec.makeMeasureSpec(viewWidth, MeasureSpec.EXACTLY)
             heightMeasureValue =
                 MeasureSpec.makeMeasureSpec(viewHeight, MeasureSpec.EXACTLY)

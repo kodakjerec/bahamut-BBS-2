@@ -2,8 +2,11 @@ package com.kota.Bahamut.pages.messages
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
+import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -18,22 +21,59 @@ import com.kota.asFramework.thread.ASCoroutine
 class MessageSmall(context: Context): LinearLayout(context) {
     private var mainLayout: RelativeLayout
     private var badgeView: TextView
-    private var iconView: TextView
+    private var iconView: Button
     private var scale = 0f // 畫面精度
 
     init {
-        inflate(context, R.layout.message_small, this)
         scale = getContext().resources.displayMetrics.density
 
-        mainLayout = findViewById(R.id.Message_Small_Layout)
-        badgeView = mainLayout.findViewById(R.id.Message_Small_Badge)
-        iconView = mainLayout.findViewById(R.id.Message_Small_Icon)
+        mainLayout = RelativeLayout(context).apply {
+            id = R.id.Message_Small_Layout
+            layoutParams = LayoutParams((48 * scale).toInt(), (48 * scale).toInt())
+        }
+
+        iconView = Button(context).apply {
+            id = R.id.Message_Small_Icon
+            val iconParams = RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.MATCH_PARENT
+            ).apply {
+                setMargins((3 * scale).toInt(), (3 * scale).toInt(), (3 * scale).toInt(), (3 * scale).toInt())
+            }
+            layoutParams = iconParams
+            setPadding((3 * scale).toInt(), 0, 0, 0)
+            setCompoundDrawablesWithIntrinsicBounds(R.drawable.icon_comment, 0, 0, 0)
+            setBackgroundColor(Color.TRANSPARENT)
+        }
+
+        badgeView = TextView(context).apply {
+            id = R.id.Message_Small_Badge
+            val badgeParams = RelativeLayout.LayoutParams(
+                (16 * scale).toInt(),
+                (16 * scale).toInt()
+            ).apply {
+                addRule(RelativeLayout.ALIGN_PARENT_TOP)
+                addRule(RelativeLayout.ALIGN_PARENT_END)
+            }
+            layoutParams = badgeParams
+            elevation = 10 * scale
+            setBackgroundResource(R.drawable.shape_circle_red)
+            setTextColor(Color.WHITE)
+            textSize = 12f
+            gravity = Gravity.CENTER
+            text = "1"
+            visibility = GONE
+        }
+
+        mainLayout.addView(iconView)
+        mainLayout.addView(badgeView)
+        addView(mainLayout)
     }
 
     @SuppressLint("ClickableViewAccessibility")
     fun afterInit() {
-        val myLayout:LayoutParams = mainLayout.layoutParams as LayoutParams
-        myLayout.leftMargin = context.resources.displayMetrics.widthPixels/2
+        val myLayout: LayoutParams = mainLayout.layoutParams as LayoutParams
+        myLayout.leftMargin = context.resources.displayMetrics.widthPixels / 2
         iconView.setOnTouchListener(onTouchListener)
     }
 
@@ -51,17 +91,17 @@ class MessageSmall(context: Context): LinearLayout(context) {
     }
 
     fun show() {
-        // 設定內有允許顯示, 才會顯示
         if (NotificationSettings.getShowMessageFloating())
             this.visibility = VISIBLE
     }
+
     fun hide() {
         this.visibility = GONE
     }
 
     // 移動toolbar
     @SuppressLint("ClickableViewAccessibility")
-    private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent ->
+    private val onTouchListener = OnTouchListener { _: View?, event: MotionEvent ->
         val duration = event.eventTime - event.downTime
         var pointX = event.rawX
         var pointY = event.rawY
@@ -81,12 +121,12 @@ class MessageSmall(context: Context): LinearLayout(context) {
                     ASNavigationController.currentController?.pushViewController(aPage)
                     BahamutStateHandler.bahamutStateHandler?.currentPage =
                         BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
-                } else { // 将LinearLayout的位置更新到最终的位置
+                } else {
                     updateLayout(pointX, pointY, false)
                 }
             }
 
-            MotionEvent.ACTION_MOVE ->                 // 更新LinearLayout的位置
+            MotionEvent.ACTION_MOVE ->
                 updateLayout(pointX, pointY, true)
         }
         true
@@ -95,9 +135,8 @@ class MessageSmall(context: Context): LinearLayout(context) {
     // 更新toolbar位置
     @SuppressLint("InternalInsetResource", "DiscouragedApi")
     private fun updateLayout(deltaX: Float, deltaY: Float, dragging: Boolean) {
-        // 获取 Layout 的LayoutParams
-        var deltaX = deltaX
-        var deltaY = deltaY
+        var dx = deltaX
+        var dy = deltaY
         val barWidth: Int = mainLayout.layoutParams.width
         val barHeight: Int = mainLayout.layoutParams.height
         val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
@@ -105,26 +144,24 @@ class MessageSmall(context: Context): LinearLayout(context) {
         val resourceId: Int = context.resources.getIdentifier("navigation_bar_height", "dimen", "android")
         val navigationBarHeight = context.resources.getDimensionPixelSize(resourceId)
         screenHeight -= navigationBarHeight
-        
+
         // X軸錯誤處理
-        if (deltaX < 0) {
-            deltaX = 0f
-        } else if (deltaX + barWidth > screenWidth) {
-            deltaX = screenWidth - barWidth
+        if (dx < 0) {
+            dx = 0f
+        } else if (dx + barWidth > screenWidth) {
+            dx = screenWidth - barWidth
         }
 
         // Y軸錯誤處理
-        if (deltaY < 0) {
-            deltaY = 0f
-        } else if (deltaY + barHeight > screenHeight) {
-            deltaY = screenHeight - barHeight
+        if (dy < 0) {
+            dy = 0f
+        } else if (dy + barHeight > screenHeight) {
+            dy = screenHeight - barHeight
         }
 
         val params = mainLayout.layoutParams as LayoutParams
-        // 更新LayoutParams中的leftMargin和topMargin
-        params.leftMargin = deltaX.toInt()
-        params.topMargin = deltaY.toInt()
-        // 应用新的LayoutParams
+        params.leftMargin = dx.toInt()
+        params.topMargin = dy.toInt()
         mainLayout.layoutParams = params
     }
 }

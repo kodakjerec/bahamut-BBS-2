@@ -1,74 +1,154 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.FrameLayout
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.login.WebAutoSignInManager
-import com.kota.Bahamut.pages.model.PostEditText
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.ui.ASToast
 
-class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDialog(), View.OnClickListener {
-    private var mainLayout: FrameLayout
-    private var usernameEdit: PostEditText
-    private var passwordEdit: PostEditText
-    private var debugViewCheckbox: CheckBox
-    private var btnCancel: Button
-    private var btnSave: Button
+class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDialog() {
 
     override val name: String?
         get() = "BahamutWebLoginSettingsDialog"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_web_login_settings)
-        window?.setBackgroundDrawable(null)
-        setTitle(context.getString(R.string.login_web_settings_title))
-
-        mainLayout = findViewById(R.id.dialog_web_login_settings_layout)
-        usernameEdit = mainLayout.findViewById(R.id.dialog_web_login_username)
-        passwordEdit = mainLayout.findViewById(R.id.dialog_web_login_password)
-        debugViewCheckbox = mainLayout.findViewById(R.id.dialog_web_login_debug_view_checkbox)
-        btnCancel = mainLayout.findViewById(R.id.dialog_web_login_btn_cancel)
-        btnSave = mainLayout.findViewById(R.id.dialog_web_login_btn_save)
-
-        // 載入當前設定
-        usernameEdit.setText(UserSettings.propertiesWebUsername)
-        passwordEdit.setText(UserSettings.propertiesWebPassword)
-        debugViewCheckbox.isChecked = WebAutoSignInManager.showDebugView
-
-        // 點擊文字切換 CheckBox
-        mainLayout.findViewById<View>(R.id.dialog_web_login_debug_view_label)?.setOnClickListener {
-            debugViewCheckbox.isChecked = !debugViewCheckbox.isChecked
+        setTitle(CommonFunctions.getContextString(R.string.login_web_settings_title))
+        setComposeContent {
+            Content()
         }
-
-        btnCancel.setOnClickListener(this)
-        btnSave.setOnClickListener(this)
-
-        setDialogWidth(mainLayout)
     }
 
-    override fun onClick(v: View) {
-        when (v.id) {
-            R.id.dialog_web_login_btn_save -> {
-                val newUsername = usernameEdit.text.toString().trim()
-                val newPassword = passwordEdit.text.toString()
+    @Composable
+    private fun Content() {
+        val context = LocalContext.current
+        val colors = AppTheme.colors
 
-                UserSettings.propertiesWebUsername = newUsername
-                UserSettings.propertiesWebPassword = newPassword
-                WebAutoSignInManager.showDebugView = debugViewCheckbox.isChecked
+        var username by remember { mutableStateOf(UserSettings.propertiesWebUsername) }
+        var password by remember { mutableStateOf(UserSettings.propertiesWebPassword) }
+        var showDebugView by remember { mutableStateOf(WebAutoSignInManager.showDebugView) }
 
-                ASToast.showShortToast(context.getString(R.string.login_web_settings_saved))
-                dismiss()
-                onSaved?.invoke()
-            }
-            R.id.dialog_web_login_btn_cancel -> {
-                dismiss()
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.login_web_settings_title),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.confirm),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        val newUsername = username.trim()
+                        val newPassword = password
+                        UserSettings.propertiesWebUsername = newUsername
+                        UserSettings.propertiesWebPassword = newPassword
+                        WebAutoSignInManager.showDebugView = showDebugView
+
+                        ASToast.showShortToast(context.getString(R.string.login_web_settings_saved))
+                        dismiss()
+                        onSaved?.invoke()
+                    }
+                )
+            )
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = CommonFunctions.getContextString(R.string.login_web_settings_tip),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+
+                Text(
+                    text = CommonFunctions.getContextString(R.string.account),
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                BahaInputField(
+                    value = username,
+                    onValueChange = { username = it },
+                    placeholder = "",
+                    singleLine = true,
+                    maxLength = 20,
+                    height = 42.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                Text(
+                    text = CommonFunctions.getContextString(R.string.password),
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(bottom = 4.dp)
+                )
+                BahaInputField(
+                    value = password,
+                    onValueChange = { password = it },
+                    placeholder = "",
+                    singleLine = true,
+                    isPassword = true,
+                    maxLength = 30,
+                    height = 42.dp,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(14.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { showDebugView = !showDebugView }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BahaCheckbox(
+                        checked = showDebugView,
+                        onCheckedChange = { showDebugView = it }
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = CommonFunctions.getContextString(R.string.login_web_debug_view_toggle),
+                        color = colors.textPrimary,
+                        fontSize = 16.sp
+                    )
+                }
             }
         }
     }
 }
-

@@ -1,77 +1,179 @@
 package com.kota.Bahamut.dialogs
 
-import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.RadioGroup
-import android.widget.Spinner
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.telnet.TelnetArticle
 
-class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
-    var cancelButton: Button
+class DialogPostArticle(private val myTarget: Int) : ASDialog() {
     var dialogPostArticleListener: DialogPostArticleListener? = null
-    var postTargetRadioGroup: RadioGroup
-    var sendButton: Button
-    var signSpinner: Spinner
-    var myTarget: Int
 
     override val name: String?
         get() = "BahamutBoardsPostArticle"
 
     init {
-        requestWindowFeature(1)
-        setContentView(R.layout.dialog_post_article)
-        if (window != null) window?.setBackgroundDrawable(null)
-        this.myTarget = aTarget
-        this.postTargetRadioGroup = findViewById<RadioGroup>(R.id.post_target)
-        this.sendButton = findViewById<Button>(R.id.send)
-        this.cancelButton = findViewById<Button>(R.id.cancel)
-        val replyTargetView = findViewById<View>(R.id.reply_target_view)
-        findViewById<View?>(R.id.sign_view)
-        if (this.myTarget == TelnetArticle.Companion.NEW) {
-            replyTargetView.visibility = View.GONE
-        } else {
-            replyTargetView.visibility = View.VISIBLE
+        setTitle(CommonFunctions.getContextString(R.string.confirm))
+        setComposeContent {
+            Content()
         }
-        this.signSpinner = findViewById<Spinner>(R.id.sign_spinner)
-        val adapter = ArrayAdapter.createFromResource(
-            context,
-            R.array.reply_target_list,
-            R.layout.simple_spinner_item
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        this.signSpinner.adapter = adapter
-        this.sendButton.tag = "ToolbarItem.Danger"
-        this.cancelButton.tag = "ToolbarItem.Danger"
-        this.sendButton.setOnClickListener(this)
-        this.cancelButton.setOnClickListener(this)
     }
 
-    override fun onClick(view: View?) {
-        val target: String?
-        if (view === this.sendButton && this.dialogPostArticleListener != null) {
-            val checkedId = this.postTargetRadioGroup.checkedRadioButtonId
-            val selectedSign = this.signSpinner.selectedItemPosition
-            var sign = ""
-            if (selectedSign > 0) {
-                sign = (selectedSign - 1).toString()
-            }
-            target = when (checkedId) {
-                R.id.post_to_mail -> {
-                    "M"
-                }
-                R.id.post_to_both -> {
-                    "B"
-                }
-                else -> {
-                    "F"
-                }
-            }
-            this.dialogPostArticleListener?.onPostArticleDoneWithTarget(target, sign)
+    @Composable
+    private fun Content() {
+        val context = LocalContext.current
+        val colors = AppTheme.colors
+        val signList = remember {
+            context.resources.getStringArray(R.array.reply_target_list)
         }
-        dismiss()
+
+        var selectedTarget by remember { mutableStateOf("F") } // "F" = Board, "M" = Mail, "B" = Both
+        var selectedSignIndex by remember { mutableIntStateOf(0) }
+        var isSignDropdownExpanded by remember { mutableStateOf(false) }
+
+        val scrollState = rememberScrollState()
+
+        BahaAlertDialogContent(
+            title = CommonFunctions.getContextString(R.string.confirm),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.SECONDARY,
+                    onClick = { dismiss() }
+                ),
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.send),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        val sign = if (selectedSignIndex > 0) (selectedSignIndex - 1).toString() else ""
+                        dialogPostArticleListener?.onPostArticleDoneWithTarget(selectedTarget, sign)
+                        dismiss()
+                    }
+                )
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+            ) {
+                Text(
+                    text = CommonFunctions.getContextString(R.string.is_post_article),
+                    color = colors.textPrimary,
+                    fontSize = 15.sp,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+
+                if (myTarget != TelnetArticle.NEW) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = CommonFunctions.getContextString(R.string.is_post_article_reply),
+                        color = colors.textPrimary,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(bottom = 4.dp)
+                    )
+
+                    val targets = listOf(
+                        "F" to CommonFunctions.getContextString(R.string.post_to_board),
+                        "M" to CommonFunctions.getContextString(R.string.post_to_mail),
+                        "B" to CommonFunctions.getContextString(R.string.post_to_both)
+                    )
+
+                    targets.forEach { (key, label) ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { selectedTarget = key }
+                                .padding(vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = (selectedTarget == key),
+                                onClick = { selectedTarget = key },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = colors.toolbarBackgroundFocused,
+                                    unselectedColor = colors.textSecondary
+                                )
+                            )
+                            Text(
+                                text = label,
+                                color = colors.textPrimary,
+                                fontSize = 15.sp,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = CommonFunctions.getContextString(R.string.select_sign),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(bottom = 6.dp)
+                )
+
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedCard(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { isSignDropdownExpanded = true }
+                    ) {
+                        Text(
+                            text = signList.getOrElse(selectedSignIndex) { "" },
+                            color = colors.textPrimary,
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
+                        )
+                    }
+
+                    DropdownMenu(
+                        expanded = isSignDropdownExpanded,
+                        onDismissRequest = { isSignDropdownExpanded = false }
+                    ) {
+                        signList.forEachIndexed { index, name ->
+                            DropdownMenuItem(
+                                text = { Text(text = name, color = colors.textPrimary) },
+                                onClick = {
+                                    selectedSignIndex = index
+                                    isSignDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     fun setListener(listener: DialogPostArticleListener?) {
