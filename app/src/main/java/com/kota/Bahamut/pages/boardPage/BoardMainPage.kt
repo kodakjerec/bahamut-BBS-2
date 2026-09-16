@@ -740,7 +740,6 @@ open class BoardMainPage : TelnetListPage(),
         navigationController.popViewController()
         TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardPage()
-        TempSettings.lastVisitArticleNumber = 0
         return true
     }
 
