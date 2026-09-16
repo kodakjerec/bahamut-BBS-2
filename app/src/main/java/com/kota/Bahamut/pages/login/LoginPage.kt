@@ -108,9 +108,8 @@ class LoginPage : TelnetPage() {
         val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as? RelativeLayout
         if (UserSettings.propertiesVIP) {
             blockWebSignIn?.visibility = View.VISIBLE
-        }
-        // 若已載入帳號，非同步確認雲端購買紀錄並即時更新 VIP 介面
-        if (UserSettings.propertiesUsername.isNotEmpty()) {
+        } else if (UserSettings.propertiesUsername.isNotEmpty()) {
+            // 若當前不是 VIP 且已載入帳號，才非同步確認雲端購買紀錄並即時更新 VIP 介面
             MyBillingClient.checkPurchaseHistoryCloud { _ ->
                 ASCoroutine.ensureMainThread {
                     blockWebSignIn?.visibility = if (UserSettings.propertiesVIP) View.VISIBLE else View.GONE
@@ -342,9 +341,11 @@ class LoginPage : TelnetPage() {
         TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
 
-        // 登入時檢查課金 VIP 權限與重試本機待送達佇列 (校驗 Google Play 購買狀態、歷史與雲端紀錄)
+        // 登入時重試本機待送達佇列；唯有當不是 VIP 才做購買狀態檢查
         MyBillingClient.processPendingPurchases()
-        MyBillingClient.checkPurchaseHistoryQuery()
+        if (!UserSettings.propertiesVIP) {
+            MyBillingClient.checkPurchaseHistoryQuery()
+        }
 
         // 雲端同步
         SyncManager.performLoginSync()

@@ -3,8 +3,8 @@ package com.kota.Bahamut.service
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.core.content.edit
 import com.android.billingclient.api.AcknowledgePurchaseParams
-import com.kota.telnet.TelnetClient
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
@@ -17,6 +17,7 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.Bahamut.R
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
+import com.kota.telnet.TelnetClient
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -97,7 +98,7 @@ object MyBillingClient {
             list.add(item)
             val jsonArray = JSONArray()
             list.forEach { jsonArray.put(it) }
-            prefs.edit().putString(KEY_PENDING_LIST, jsonArray.toString()).apply()
+            prefs.edit { putString(KEY_PENDING_LIST, jsonArray.toString()) }
             Log.d(TAG, "addPendingPurchase: 已暫存至本機待送達佇列 (token=$purchaseToken, user=$username, 總待補數=${list.size})")
         } catch (e: Exception) {
             Log.e(TAG, "addPendingPurchase error: ${e.message}", e)
@@ -115,7 +116,7 @@ object MyBillingClient {
             if (removed) {
                 val jsonArray = JSONArray()
                 list.forEach { jsonArray.put(it) }
-                prefs.edit().putString(KEY_PENDING_LIST, jsonArray.toString()).apply()
+                prefs.edit { putString(KEY_PENDING_LIST, jsonArray.toString()) }
                 Log.d(TAG, "removePendingPurchase: 雲端寫入確認成功，移出待送達佇列 (token=$purchaseToken, 剩餘=${list.size})")
             }
         } catch (e: Exception) {
@@ -307,9 +308,16 @@ object MyBillingClient {
 
     /** 重新確認已購買的商品（結合未消耗查詢與本機待送達佇列重試） */
     @JvmStatic
-    fun checkPurchaseHistoryQuery() {
+    @JvmOverloads
+    fun checkPurchaseHistoryQuery(forceCheck: Boolean = false) {
         // 先處理本機待重送的訂單（方案 2：防漏機制）
         processPendingPurchases()
+
+        // 若當前已是 VIP 且非強制手動檢查，則略過檢查
+        if (!forceCheck && UserSettings.propertiesVIP) {
+            Log.d(TAG, "checkPurchaseHistoryQuery: 當前已是 VIP，略過檢查")
+            return
+        }
 
         if (!::billingClient.isInitialized || !billingClient.isReady) {
             Log.w(TAG, "checkPurchaseHistoryQuery: BillingClient 尚未就緒，直接走雲端查詢")
@@ -370,11 +378,7 @@ object MyBillingClient {
                         val data = response.body.string()
                         val jsonObject = JSONObject(data)
                         val buyQty = jsonObject.optString("qty", "0").toInt()
-                        if (buyQty > 0) {
-                            UserSettings.propertiesVIP = true
-                        } else {
-                            UserSettings.propertiesVIP = false
-                        }
+                        UserSettings.propertiesVIP = buyQty > 0
                         Log.d(TAG, "checkPurchaseHistoryCloud: 帳號 $username 購買數量=$buyQty, VIP=${UserSettings.propertiesVIP}")
                         callback(buyQty)
                     } else {
@@ -427,7 +431,9 @@ object MyBillingClient {
             override fun onBillingSetupFinished(billingResult: BillingResult) {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     processPendingPurchases()
-                    checkPurchaseHistoryQuery()
+                    if (!UserSettings.propertiesVIP) {
+                        checkPurchaseHistoryQuery()
+                    }
                 }
             }
         })

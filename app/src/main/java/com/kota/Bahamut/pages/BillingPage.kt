@@ -44,12 +44,10 @@ class BillingPage : TelnetPage() {
         billingClient = MyBillingClient.billingClient
         this.productList
 
-        checkPurchaseHistoryQuery()
-
-        // 檢查已購買
+        // 檢查已購買按鈕點擊：強制檢查 Google Play 與雲端購買紀錄
         val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button
         button1.setOnClickListener { view: View? ->
-            checkPurchaseHistoryQuery()
+            checkPurchaseHistoryQuery(forceCheck = true)
             checkPurchaseHistoryCloud { qty: Int? ->
                 val totalMoney = (qty!! * 90).toString()
                 val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
