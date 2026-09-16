@@ -49,6 +49,7 @@ class BillingPage : TelnetPage() {
         // 檢查已購買
         val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button
         button1.setOnClickListener { view: View? ->
+            checkPurchaseHistoryQuery()
             checkPurchaseHistoryCloud { qty: Int? ->
                 val totalMoney = (qty!! * 90).toString()
                 val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?

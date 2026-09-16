@@ -342,7 +342,8 @@ class LoginPage : TelnetPage() {
         TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
 
-        // 登入時檢查課金 VIP 權限 (校驗 Google Play 購買狀態與雲端歷史)
+        // 登入時檢查課金 VIP 權限與重試本機待送達佇列 (校驗 Google Play 購買狀態、歷史與雲端紀錄)
+        MyBillingClient.processPendingPurchases()
         MyBillingClient.checkPurchaseHistoryQuery()
 
         // 雲端同步

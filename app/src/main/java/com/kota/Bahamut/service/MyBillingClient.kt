@@ -1,5 +1,7 @@
 package com.kota.Bahamut.service
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.kota.telnet.TelnetClient
@@ -10,7 +12,9 @@ import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResponseListener
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
+import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
+import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.Bahamut.R
 import com.kota.asFramework.thread.ASCoroutine
@@ -19,6 +23,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import org.json.JSONArray
 import org.json.JSONObject
 
 object MyBillingClient {
@@ -38,6 +43,13 @@ object MyBillingClient {
     }
 
     private const val TAG = "MyBillingClient"
+    private const val PREFS_NAME = "billing_pending_queue"
+    private const val KEY_PENDING_LIST = "pending_list"
+
+    /** 取得本機待重送佇列的 SharedPreferences */
+    private fun getPendingPrefs(): SharedPreferences? {
+        return TempSettings.applicationContext?.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    }
 
     /** 取得當前有效帳號（優先使用即時連線帳號，次用偏好設定帳號） */
     fun getCurrentUsername(): String {
@@ -45,20 +57,85 @@ object MyBillingClient {
             ?: UserSettings.propertiesUsername
     }
 
-    /**
-     * 將購買紀錄寫入雲端 API
-     * 確保課金紀錄必定發送到伺服器保存，並帶有完整日誌與例外處理
-     */
-    @JvmStatic
-    fun uploadPurchaseRecordToCloud(
-        purchase: Purchase,
-        buyType: String = "purchase",
-        onComplete: ((Boolean) -> Unit)? = null
+    /** 取得本機待重送佇列中的所有購買紀錄 */
+    @Synchronized
+    fun getPendingPurchases(): List<JSONObject> {
+        val prefs = getPendingPrefs() ?: return emptyList()
+        val rawJson = prefs.getString(KEY_PENDING_LIST, null) ?: return emptyList()
+        val list = mutableListOf<JSONObject>()
+        try {
+            val jsonArray = JSONArray(rawJson)
+            for (i in 0 until jsonArray.length()) {
+                list.add(jsonArray.getJSONObject(i))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "getPendingPurchases parse error: ${e.message}")
+        }
+        return list
+    }
+
+    /** 新增或更新購買紀錄至本機待重送佇列（方案 2：防漏重試機制） */
+    @Synchronized
+    fun addPendingPurchase(
+        purchaseToken: String,
+        username: String,
+        buyType: String,
+        qty: Int,
+        purchaseData: String
     ) {
-        val username = getCurrentUsername()
+        if (purchaseToken.isBlank()) return
+        val prefs = getPendingPrefs() ?: return
+        try {
+            val list = getPendingPurchases().toMutableList()
+            list.removeAll { it.optString("purchaseToken") == purchaseToken }
+            val item = JSONObject().apply {
+                put("purchaseToken", purchaseToken)
+                put("username", username)
+                put("buyType", buyType)
+                put("qty", qty)
+                put("purchaseData", purchaseData)
+                put("timestamp", System.currentTimeMillis())
+            }
+            list.add(item)
+            val jsonArray = JSONArray()
+            list.forEach { jsonArray.put(it) }
+            prefs.edit().putString(KEY_PENDING_LIST, jsonArray.toString()).apply()
+            Log.d(TAG, "addPendingPurchase: 已暫存至本機待送達佇列 (token=$purchaseToken, user=$username, 總待補數=${list.size})")
+        } catch (e: Exception) {
+            Log.e(TAG, "addPendingPurchase error: ${e.message}", e)
+        }
+    }
+
+    /** 雲端確認成功後，自待重送佇列移除紀錄 */
+    @Synchronized
+    fun removePendingPurchase(purchaseToken: String) {
+        if (purchaseToken.isBlank()) return
+        val prefs = getPendingPrefs() ?: return
+        try {
+            val list = getPendingPurchases().toMutableList()
+            val removed = list.removeAll { it.optString("purchaseToken") == purchaseToken }
+            if (removed) {
+                val jsonArray = JSONArray()
+                list.forEach { jsonArray.put(it) }
+                prefs.edit().putString(KEY_PENDING_LIST, jsonArray.toString()).apply()
+                Log.d(TAG, "removePendingPurchase: 雲端寫入確認成功，移出待送達佇列 (token=$purchaseToken, 剩餘=${list.size})")
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "removePendingPurchase error: ${e.message}", e)
+        }
+    }
+
+    /** 呼叫後端 API 寫入購買紀錄 */
+    private fun sendPurchaseRecordApi(
+        purchaseToken: String,
+        username: String,
+        buyType: String,
+        qty: Int,
+        purchaseData: String,
+        onResult: ((Boolean) -> Unit)? = null
+    ) {
         if (username.isBlank()) {
-            Log.w(TAG, "uploadPurchaseRecordToCloud: 帳號為空，略過雲端購買紀錄寫入 (buyType=$buyType)")
-            onComplete?.invoke(false)
+            onResult?.invoke(false)
             return
         }
 
@@ -68,31 +145,140 @@ object MyBillingClient {
         val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
             .addFormDataPart("userId", userId)
             .addFormDataPart("buyType", buyType)
-            .addFormDataPart("qty", purchase.quantity.toString())
-            .addFormDataPart("purchaseData", purchase.originalJson)
+            .addFormDataPart("qty", qty.toString())
+            .addFormDataPart("purchaseData", purchaseData)
             .build()
         val request: Request = Request.Builder()
             .url(apiUrl)
             .post(body)
             .build()
 
+        try {
+            client.newCall(request).execute().use { response ->
+                if (response.isSuccessful) {
+                    val respBody = response.body.string()
+                    Log.d(TAG, "雲端寫入購買紀錄成功 (buyType=$buyType, user=$username): $respBody")
+                    onResult?.invoke(true)
+                } else {
+                    Log.e(TAG, "雲端寫入購買紀錄失敗 (buyType=$buyType, user=$username): HTTP ${response.code}")
+                    onResult?.invoke(false)
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "雲端寫入購買紀錄發生例外 (buyType=$buyType, user=$username): ${e.message}", e)
+            onResult?.invoke(false)
+        }
+    }
+
+    /**
+     * 重送本機待送達佇列中的所有購買紀錄（斷網恢復或登入時自動重試）
+     */
+    @JvmStatic
+    fun processPendingPurchases(onAllComplete: (() -> Unit)? = null) {
+        val pendingList = getPendingPurchases()
+        if (pendingList.isEmpty()) {
+            onAllComplete?.invoke()
+            return
+        }
+
+        Log.d(TAG, "processPendingPurchases: 發現 ${pendingList.size} 筆未送達購買紀錄，開始重送...")
         ASCoroutine.runInNewCoroutine {
-            try {
-                client.newCall(request).execute().use { response ->
-                    if (response.isSuccessful) {
-                        val respBody = response.body.string()
-                        Log.d(TAG, "雲端寫入購買紀錄成功 (buyType=$buyType, user=$username): $respBody")
-                        onComplete?.invoke(true)
-                    } else {
-                        Log.e(TAG, "雲端寫入購買紀錄失敗 (buyType=$buyType, user=$username): HTTP ${response.code}")
-                        onComplete?.invoke(false)
+            val currentUsername = getCurrentUsername()
+            for (record in pendingList) {
+                val token = record.optString("purchaseToken")
+                var user = record.optString("username")
+                if (user.isBlank() && currentUsername.isNotBlank()) {
+                    user = currentUsername
+                    // 補上登入帳號至本地暫存
+                    addPendingPurchase(
+                        token,
+                        user,
+                        record.optString("buyType", "purchase"),
+                        record.optInt("qty", 1),
+                        record.optString("purchaseData")
+                    )
+                }
+                if (user.isNotBlank()) {
+                    val buyType = record.optString("buyType", "purchase")
+                    val qty = record.optInt("qty", 1)
+                    val purchaseData = record.optString("purchaseData")
+                    sendPurchaseRecordApi(token, user, buyType, qty, purchaseData) { success ->
+                        if (success) {
+                            removePendingPurchase(token)
+                            if (!UserSettings.propertiesVIP) {
+                                UserSettings.propertiesVIP = true
+                            }
+                        }
                     }
                 }
-            } catch (e: Exception) {
-                Log.e(TAG, "雲端寫入購買紀錄發生例外 (buyType=$buyType, user=$username): ${e.message}", e)
-                onComplete?.invoke(false)
+            }
+            onAllComplete?.invoke()
+        }
+    }
+
+    /**
+     * 將購買紀錄寫入雲端 API（同時由本機待送達佇列防護）
+     */
+    @JvmStatic
+    fun uploadPurchaseRecordToCloud(
+        purchaseToken: String,
+        qty: Int,
+        purchaseData: String,
+        buyType: String = "purchase",
+        onComplete: ((Boolean) -> Unit)? = null
+    ) {
+        val username = getCurrentUsername()
+        // 1. 第一時間寫入本機待送達佇列，確保網路斷線或閃退不遺漏
+        addPendingPurchase(purchaseToken, username, buyType, qty, purchaseData)
+
+        if (username.isBlank()) {
+            Log.w(TAG, "uploadPurchaseRecordToCloud: 帳號為空，已安全保存於本地待重試佇列 (buyType=$buyType)")
+            onComplete?.invoke(false)
+            return
+        }
+
+        ASCoroutine.runInNewCoroutine {
+            sendPurchaseRecordApi(purchaseToken, username, buyType, qty, purchaseData) { success ->
+                if (success) {
+                    // 2. 確定雲端寫入成功後移出佇列
+                    removePendingPurchase(purchaseToken)
+                    if (!UserSettings.propertiesVIP) {
+                        UserSettings.propertiesVIP = true
+                    }
+                }
+                onComplete?.invoke(success)
             }
         }
+    }
+
+    @JvmStatic
+    fun uploadPurchaseRecordToCloud(
+        purchase: Purchase,
+        buyType: String = "purchase",
+        onComplete: ((Boolean) -> Unit)? = null
+    ) {
+        uploadPurchaseRecordToCloud(
+            purchaseToken = purchase.purchaseToken,
+            qty = purchase.quantity,
+            purchaseData = purchase.originalJson,
+            buyType = buyType,
+            onComplete = onComplete
+        )
+    }
+
+    @JvmStatic
+    fun uploadPurchaseRecordToCloud(
+        record: PurchaseHistoryRecord,
+        buyType: String = "history",
+        onComplete: ((Boolean) -> Unit)? = null
+    ) {
+        uploadPurchaseRecordToCloud(
+            purchaseToken = record.purchaseToken,
+            qty = record.quantity,
+            purchaseData = record.originalJson,
+            buyType = buyType,
+            onComplete = onComplete
+        )
     }
 
     /** 確認購買交易，且程式已授予使用者商品 */
@@ -118,7 +304,7 @@ object MyBillingClient {
 
     /** 購買後要回應訊息給google和使用者，並將購買紀錄寫入雲端 */
     private fun consumePurchase(purchase: Purchase) {
-        // 第一時間寫入雲端購買紀錄，確保已付款資料必定上傳
+        // 第一時間寫入雲端購買紀錄，確保已付款資料必定上傳（含本機佇列保護）
         uploadPurchaseRecordToCloud(purchase, "purchase")
 
         val consumeParams = ConsumeParams.newBuilder()
@@ -136,31 +322,70 @@ object MyBillingClient {
         billingClient.consumeAsync(consumeParams, consumeResponseListener)
     }
 
-    /** 重新確認已購買的商品 */
+    /** 重新確認已購買的商品（結合未消耗查詢、Google Play 歷史紀錄與本機待送達佇列） */
     @JvmStatic
     fun checkPurchaseHistoryQuery() {
+        // 先處理本機待重送的訂單（方案 2）
+        processPendingPurchases()
+
+        if (!::billingClient.isInitialized || !billingClient.isReady) {
+            Log.w(TAG, "checkPurchaseHistoryQuery: BillingClient 尚未就緒，直接走雲端查詢")
+            checkPurchaseHistoryCloud { }
+            return
+        }
+
         try {
+            // 1. 查詢未消耗中的進行中商品
             billingClient.queryPurchasesAsync(
                 QueryPurchasesParams.newBuilder()
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
             ) { billingResult: BillingResult, list: List<Purchase?>? ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && list != null) {
-                    // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
-                    if (list.toTypedArray().isNotEmpty()) {
-                        UserSettings.propertiesVIP = true
-                        // 將購買結果補傳至雲端
-                        list.filterNotNull().forEach { record ->
-                            uploadPurchaseRecordToCloud(record, "history")
-                        }
-                    } else {
-                        // Google Play 回傳空清單（因已消耗商品在 queryPurchasesAsync 不會返回），
-                        // 絕不可在此處過早設置 propertiesVIP = false，需等待 checkPurchaseHistoryCloud 查詢後端
-                        checkPurchaseHistoryCloud { }
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
+                    Log.d(TAG, "queryPurchasesAsync 找到 ${list.size} 筆進行中商品")
+                    UserSettings.propertiesVIP = true
+                    list.filterNotNull().forEach { record ->
+                        uploadPurchaseRecordToCloud(record, "history")
                     }
+                } else {
+                    // 2. 消耗型商品在消耗後由 queryPurchasesAsync 返回空清單，此時調用 queryPurchaseHistoryAsync 查詢 Google Play 歷史（方案 1）
+                    queryGooglePurchaseHistory()
                 }
             }
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.e(TAG, "checkPurchaseHistoryQuery exception: ${e.message}", e)
+            queryGooglePurchaseHistory()
+        }
+    }
+
+    /** 方案 1：向 Google Play 查詢過去所有購買過（包含已消耗 Consumed）的歷史紀錄 */
+    private fun queryGooglePurchaseHistory() {
+        if (!::billingClient.isInitialized || !billingClient.isReady) {
+            checkPurchaseHistoryCloud { }
+            return
+        }
+
+        try {
+            val params = QueryPurchaseHistoryParams.newBuilder()
+                .setProductType(BillingClient.ProductType.INAPP)
+                .build()
+
+            billingClient.queryPurchaseHistoryAsync(params) { billingResult, historyList ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !historyList.isNullOrEmpty()) {
+                    Log.d(TAG, "queryPurchaseHistoryAsync 成功取得 ${historyList.size} 筆 Google Play 歷史購買紀錄")
+                    // Google Play 確定此 Google 帳號有付款紀錄，啟用 VIP
+                    UserSettings.propertiesVIP = true
+                    // 補傳至雲端（內含本機佇列重試防護）
+                    historyList.forEach { historyRecord ->
+                        uploadPurchaseRecordToCloud(historyRecord, "history")
+                    }
+                } else {
+                    Log.d(TAG, "Google Play 歷史查無紀錄 (code=${billingResult.responseCode})，回退至後端雲端檢查")
+                    checkPurchaseHistoryCloud { }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "queryGooglePurchaseHistory exception: ${e.message}", e)
             checkPurchaseHistoryCloud { }
         }
     }
@@ -249,7 +474,10 @@ object MyBillingClient {
             }
 
             override fun onBillingSetupFinished(billingResult: BillingResult) {
-                checkPurchaseHistoryQuery()
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    processPendingPurchases()
+                    checkPurchaseHistoryQuery()
+                }
             }
         })
     }
