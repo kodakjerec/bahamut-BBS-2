@@ -6,30 +6,53 @@ import android.content.Intent
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.CompoundButton
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.Spinner
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.material.slider.Slider
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.blockListPage.ArticleHeaderListPage
 import com.kota.Bahamut.pages.blockListPage.BlockListPage
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.changeScreenOrientation
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -44,11 +67,11 @@ import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAutoToChat
-import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesDrawerLocation
+import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesScreenOrientation
@@ -60,152 +83,159 @@ import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesBoardMoveDis
 import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesLinkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialogListener
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
-import com.kota.telnetUI.textView.TelnetTextViewSmall
-import androidx.core.net.toUri
-import com.kota.Bahamut.service.TempSettings.myContext
-import com.kota.asFramework.thread.ASCoroutine
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class SystemSettingsPage : TelnetPage() {
-    var mainLayout: RelativeLayout? = null
-    private var followSystemDarkModeBox: CheckBox? = null
-    var autoToChatEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesAutoToChat = isChecked
-        }
-    var followSystemDarkModeListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            if (propertiesFollowSystemDarkMode != isChecked) {
-                val dialog = ASAlertDialog("DARK_MODE_CHANGE_CONFIRM")
-                dialog.setTitle("更換深色模式")
-                    .setMessage("更換深色模式設定將會中斷目前的連線並重新啟動應用程式，是否確定更換?")
-                    .addButton("取消")
-                    .addButton("確定")
-                    .setDefaultButtonIndex(0)
-                    .setListener(object : ASAlertDialogListener {
-                        override fun onAlertDialogDismissWithButtonIndex(
-                            paramASAlertDialog: ASAlertDialog,
-                            paramInt: Int
-                        ) {
-                            if (paramInt == 1) {
-                                propertiesFollowSystemDarkMode = isChecked
-                                notifyDataUpdated()
-                                val nightMode = if (isChecked) {
-                                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                                } else {
-                                    AppCompatDelegate.MODE_NIGHT_NO
-                                }
-                                AppCompatDelegate.setDefaultNightMode(nightMode)
 
-                                // 更換主題時使用系統 Toast，因為 recreate() 會銷毀當前 Activity 的所有自定義 Window
-                                android.widget.Toast.makeText(
-                                    context,
-                                    getContextString(R.string.theme_manager_page_msg01),
-                                    android.widget.Toast.LENGTH_SHORT
-                                ).show()
+    override val pageLayout: Int
+        get() = 0
 
-                                // 執行斷線流程
-                                TelnetClient.myInstance?.close()
-                                TempSettings.lastVisitArticleNumber = 0
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_SYSTEM_SETTINGS
 
-                                // 立即重啟 Activity 以套用新設定
-                                context?.recreate()
-                            } else {
-                                // 使用者取消：還原核取方塊狀態且不觸發 listener
-                                followSystemDarkModeBox?.setOnCheckedChangeListener(null)
-                                followSystemDarkModeBox?.isChecked = propertiesFollowSystemDarkMode
-                                followSystemDarkModeBox?.setOnCheckedChangeListener(followSystemDarkModeListener)
-                            }
-                        }
-                    }).show()
+    override val isPopupPage: Boolean
+        get() = true
+
+    override val isKeepOnOffline: Boolean
+        get() = true
+
+    // State bindings
+    var followSystemDarkModeState by mutableStateOf(propertiesFollowSystemDarkMode)
+    var blockListEnableState by mutableStateOf(propertiesBlockListEnable)
+    var blockListForTitleState by mutableStateOf(propertiesBlockListForTitle)
+    var enableBoardMoveState by mutableStateOf(propertiesBoardMoveEnable > 0)
+    var enableArticleMoveState by mutableStateOf(propertiesArticleMoveEnable)
+    var enableGestureOnBoardState by mutableStateOf(propertiesGestureOnBoardEnable)
+    var toolbarLocationState by mutableIntStateOf(propertiesToolbarLocation)
+    var toolbarOrderState by mutableIntStateOf(propertiesToolbarOrder)
+    var toolbarIdleState by mutableFloatStateOf(toolbarIdle)
+    var toolbarAlphaState by mutableFloatStateOf(toolbarAlpha)
+    var drawerLocationState by mutableIntStateOf(propertiesDrawerLocation)
+    var linkAutoShowState by mutableStateOf(linkAutoShow)
+    var linkShowThumbnailState by mutableStateOf(linkShowThumbnail)
+    var linkShowOnlyWifiState by mutableStateOf(linkShowOnlyWifi)
+    var autoToChatState by mutableStateOf(propertiesAutoToChat)
+    var animationEnableState by mutableStateOf(propertiesAnimationEnable)
+    var screenOrientationState by mutableIntStateOf(propertiesScreenOrientation)
+    var cloudSaveEnableState by mutableStateOf(getCloudSave())
+    var cloudSaveLastTimeString by mutableStateOf("")
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                SystemSettingsPageContent()
+                BahaGlobalDialogHost()
             }
         }
-    var gestureOnBoardEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesGestureOnBoardEnable = isChecked
-        }
-    var animationEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesAnimationEnable = isChecked
-            ASNavigationController.currentController?.isAnimationEnable = propertiesAnimationEnable
-        }
-    var articleMoveBoardEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            setPropertiesBoardMoveDisable(if (isChecked) 1 else 0)
-        }
-
-    /** 開啟或關閉文章首篇/末篇, checkbox  */
-    var articleMoveEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            setPropertiesArticleMoveDisable(isChecked)
-        }
-
-    /** 開啟或關閉黑名單, checkbox  */
-    var blockListEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesBlockListEnable = isChecked
-        }
-
-    /** 開啟或關閉黑名單套用至標題, checkbox  */
-    var blockListForTitleListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesBlockListForTitle = isChecked
-        }
-
-    /** 開啟或關閉雲端備份, checkbox  */
-    var cloudSaveEnableListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            setCloudSave(isChecked)
-            if (getCloudSave()) {
-                // 詢問雲端
-                val cloudBackup = CloudBackup()
-                cloudBackup.setListener {
-                    showProcessingDialog("設定套用中\n請重新進入設定")
-                    onBackPressed()
-
-                    object : ASCoroutine() {
-                        override suspend fun run() {
-                            dismissProcessingDialog()
-                        }
-                    }.postDelayed(1500L)
-                }
-                cloudBackup.askCloudSave()
-            }
-        }
-
-    /** 切換到黑名單設定  */
-    var blockListSettingClickListener: View.OnClickListener =
-        View.OnClickListener { v: View? -> navigationController.pushViewController(BlockListPage()) }
-
-    /** 切換到發文標題設定  */
-    var articleHeaderSettingListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        navigationController.pushViewController(ArticleHeaderListPage())
     }
 
-    /** 切換到發文表情符號設定  */
-    var articleExpressionSettingListener: View.OnClickListener =
-        View.OnClickListener { v: View? ->
-            navigationController.pushViewController(ArticleExpressionListPage())
+    override fun onPageDidLoad() {
+        super.onPageDidLoad()
+        var lastTime = TempSettings.cloudSaveLastTime
+        if (lastTime <= 0L) {
+            lastTime = getCloudSaveLastTime()
+            TempSettings.cloudSaveLastTime = lastTime
         }
-
-    /** 防止Wifi斷線  */
-    var keepWifiListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            propertiesKeepWifi = isChecked
-            if (isChecked) navigationController.deviceController?.lockWifi()
-            else navigationController.deviceController?.unlockWifi()
+        if (lastTime > 0L) {
+            val sdf = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault())
+            cloudSaveLastTimeString = sdf.format(Date(lastTime))
         }
+    }
 
-    /** 不受電池最佳化限制  */
+    override fun onBackPressed(): Boolean {
+        notifyDataUpdated()
+        return super.onBackPressed()
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        onBackPressed()
+        showShortToast("返回")
+        return true
+    }
+
+    private fun onFollowSystemDarkModeChanged(isChecked: Boolean) {
+        if (propertiesFollowSystemDarkMode != isChecked) {
+            val dialog = ASAlertDialog("DARK_MODE_CHANGE_CONFIRM")
+            dialog.setTitle("更換深色模式")
+                .setMessage("更換深色模式設定將會中斷目前的連線並重新啟動應用程式，是否確定更換?")
+                .addButton("取消")
+                .addButton("確定")
+                .setDefaultButtonIndex(0)
+                .setListener(object : ASAlertDialogListener {
+                    override fun onAlertDialogDismissWithButtonIndex(
+                        paramASAlertDialog: ASAlertDialog,
+                        paramInt: Int
+                    ) {
+                        if (paramInt == 1) {
+                            propertiesFollowSystemDarkMode = isChecked
+                            followSystemDarkModeState = isChecked
+                            notifyDataUpdated()
+                            val nightMode = if (isChecked) {
+                                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                            } else {
+                                AppCompatDelegate.MODE_NIGHT_NO
+                            }
+                            AppCompatDelegate.setDefaultNightMode(nightMode)
+
+                            android.widget.Toast.makeText(
+                                context,
+                                getContextString(R.string.theme_manager_page_msg01),
+                                android.widget.Toast.LENGTH_SHORT
+                            ).show()
+
+                            TelnetClient.myInstance?.close()
+                            TempSettings.lastVisitArticleNumber = 0
+                            context?.recreate()
+                        } else {
+                            followSystemDarkModeState = propertiesFollowSystemDarkMode
+                        }
+                    }
+                }).show()
+        }
+    }
+
+    private fun onCloudSaveChanged(isChecked: Boolean) {
+        setCloudSave(isChecked)
+        cloudSaveEnableState = isChecked
+        if (getCloudSave()) {
+            val cloudBackup = CloudBackup()
+            cloudBackup.setListener {
+                showProcessingDialog("設定套用中\n請重新進入設定")
+                onBackPressed()
+                object : ASCoroutine() {
+                    override suspend fun run() {
+                        dismissProcessingDialog()
+                    }
+                }.postDelayed(1500L)
+            }
+            cloudBackup.askCloudSave()
+        }
+    }
+
     @SuppressLint("BatteryLife")
-    var ignoreBatteryListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val powerManager = context?.getSystemService(Context.POWER_SERVICE) as PowerManager
+    private fun onIgnoreBatteryOptimizations() {
+        val powerManager = context?.getSystemService(Context.POWER_SERVICE) as? PowerManager
         val packageName: String? = context?.packageName
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        if (powerManager.isIgnoringBatteryOptimizations(packageName)) {
-//            intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        if (powerManager?.isIgnoringBatteryOptimizations(packageName) == true) {
             showLongToast(getContextString(R.string.ignoreBattery_msg02))
         } else {
             intent.action = Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS
@@ -214,456 +244,451 @@ class SystemSettingsPage : TelnetPage() {
         }
     }
 
-    /** 開啟贊助葉面  */
-    var billingPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance!!.billingPage
-        navigationController.pushViewController(page)
-    }
+    @Composable
+    fun SystemSettingsPageContent() {
+        val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
 
-    /** 開啟外觀管理  */
-    var themeManagerPageListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        val page = PageContainer.instance!!.getThemeManagerPage()
-        navigationController.pushViewController(page)
-    }
+        val screenOrientationItems = stringArrayResource(R.array.system_setting_page_screen_orientation_items)
+        val toolbarLocationItems = stringArrayResource(R.array.system_setting_page_toolbar_location_items)
+        val toolbarOrderItems = stringArrayResource(R.array.system_setting_page_toolbar_order_items)
+        val drawerLocationItems = stringArrayResource(R.array.system_setting_page_drawer_location_items)
 
-    /** 開啟BBS個人資料  */
-    var bbsUserInfoListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.myInstance!!.sendStringToServerInBackground("u\ni")
-        val page = PageContainer.instance!!.getUserInfoPage()
-        navigationController.pushViewController(page)
-    }
-    var bbsUserConfigListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        TelnetClient.myInstance!!.sendStringToServerInBackground("u\nc")
-        val page = PageContainer.instance!!.getUserConfigPage()
-        navigationController.pushViewController(page)
-    }
-
-    /** 畫面旋轉  */
-    var screenOrientationListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
             ) {
-                propertiesScreenOrientation = i
-                changeScreenOrientation()
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                propertiesScreenOrientation = 0
-            }
-        }
-
-    /** 側邊選單位置  */
-    var drawerLocationListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
-            ) {
-                propertiesDrawerLocation = i
-                changeScreenOrientation()
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                propertiesDrawerLocation = 0
-            }
-        }
-
-    /** 工具列位置  */
-    var toolbarLocationListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
-            ) {
-                if (i <= 2) {
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
-                        View.VISIBLE
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
-                        View.GONE
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
-                        View.GONE
-                } else {
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
-                        View.GONE
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
-                        View.VISIBLE
-                    mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
-                        View.VISIBLE
+                // BBS 章節
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_bbs))
+                SettingsNavigationItem(stringResource(R.string.user_info)) {
+                    TelnetClient.myInstance?.sendStringToServerInBackground("u\ni")
+                    navigationController.pushViewController(PageContainer.instance!!.getUserInfoPage())
                 }
-                propertiesToolbarLocation = i
+                SettingsNavigationItem(stringResource(R.string.user_config)) {
+                    TelnetClient.myInstance?.sendStringToServerInBackground("u\nc")
+                    navigationController.pushViewController(PageContainer.instance!!.getUserConfigPage())
+                }
+
+                // 主題
+                SettingsChapter(stringResource(R.string.theme))
+                SettingsNavigationItem(stringResource(R.string.theme_manager_page)) {
+                    navigationController.pushViewController(PageContainer.instance!!.getThemeManagerPage())
+                }
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.follow_system_dark_mode),
+                    isChecked = followSystemDarkModeState,
+                    onCheckedChange = { onFollowSystemDarkModeChanged(it) }
+                )
+
+                // 黑名單
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_blocklist))
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.switch_on_block_list),
+                    isChecked = blockListEnableState,
+                    onCheckedChange = {
+                        blockListEnableState = it
+                        propertiesBlockListEnable = it
+                    }
+                )
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.switch_on_block_list_for_title),
+                    isChecked = blockListForTitleState,
+                    onCheckedChange = {
+                        blockListForTitleState = it
+                        propertiesBlockListForTitle = it
+                    }
+                )
+                SettingsNavigationItem(stringResource(R.string.block_list_setting)) {
+                    navigationController.pushViewController(BlockListPage())
+                }
+
+                // 看板與文章
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_board_article))
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.system_setting_page_enable_board_move),
+                    isChecked = enableBoardMoveState,
+                    onCheckedChange = {
+                        enableBoardMoveState = it
+                        setPropertiesBoardMoveDisable(if (it) 1 else 0)
+                    }
+                )
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.system_setting_page_enable_article_move),
+                    isChecked = enableArticleMoveState,
+                    onCheckedChange = {
+                        enableArticleMoveState = it
+                        setPropertiesArticleMoveDisable(it)
+                    }
+                )
+
+                // VIP 功能
+                if (propertiesVIP) {
+                    SettingsCheckboxItem(
+                        title = stringResource(R.string.system_setting_page_enable_gesture_on_board),
+                        isChecked = enableGestureOnBoardState,
+                        onCheckedChange = {
+                            enableGestureOnBoardState = it
+                            propertiesGestureOnBoardEnable = it
+                        }
+                    )
+
+                    SettingsSpinnerItem(
+                        title = stringResource(R.string.system_setting_page_toolbar_location),
+                        items = toolbarLocationItems,
+                        selectedIndex = toolbarLocationState,
+                        onItemSelected = { idx ->
+                            toolbarLocationState = idx
+                            propertiesToolbarLocation = idx
+                        }
+                    )
+
+                    if (toolbarLocationState <= 2) {
+                        SettingsSpinnerItem(
+                            title = stringResource(R.string.system_setting_page_toolbar_order),
+                            items = toolbarOrderItems,
+                            selectedIndex = toolbarOrderState,
+                            onItemSelected = { idx ->
+                                toolbarOrderState = idx
+                                propertiesToolbarOrder = idx
+                            }
+                        )
+                    } else {
+                        // 浮動工具列設定
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 6.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(R.string.system_setting_page_toolbar_idle),
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "${toolbarIdleState}s",
+                                    color = colors.textSecondary,
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Slider(
+                                value = toolbarIdleState,
+                                onValueChange = {
+                                    toolbarIdleState = it
+                                    toolbarIdle = it
+                                },
+                                valueRange = 0.0f..4.0f,
+                                steps = 7,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = colors.toolbarBackground,
+                                    activeTrackColor = colors.toolbarBackground
+                                )
+                            )
+                        }
+                        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 6.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = stringResource(R.string.system_setting_page_toolbar_alpha),
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = "${toolbarAlphaState.toInt()}%",
+                                    color = colors.textSecondary,
+                                    fontSize = 13.sp
+                                )
+                            }
+                            Slider(
+                                value = toolbarAlphaState,
+                                onValueChange = {
+                                    toolbarAlphaState = it
+                                    toolbarAlpha = it
+                                },
+                                valueRange = 20f..100f,
+                                steps = 7,
+                                colors = SliderDefaults.colors(
+                                    thumbColor = colors.toolbarBackground,
+                                    activeTrackColor = colors.toolbarBackground
+                                )
+                            )
+                        }
+                        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                    }
+
+                    SettingsSpinnerItem(
+                        title = stringResource(R.string.system_setting_page_drawer_location),
+                        items = drawerLocationItems,
+                        selectedIndex = drawerLocationState,
+                        onItemSelected = { idx ->
+                            drawerLocationState = idx
+                            propertiesDrawerLocation = idx
+                            changeScreenOrientation()
+                        }
+                    )
+
+                    SettingsNavigationItem(stringResource(R.string.article_header_setting)) {
+                        navigationController.pushViewController(ArticleHeaderListPage())
+                    }
+                    SettingsNavigationItem(stringResource(R.string.article_expression_setting)) {
+                        navigationController.pushViewController(ArticleExpressionListPage())
+                    }
+                }
+
+                // 連結預覽
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_link))
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.system_setting_page_chapter_link_auto_show),
+                    isChecked = linkAutoShowState,
+                    onCheckedChange = {
+                        linkAutoShowState = it
+                        setPropertiesLinkAutoShow(it)
+                        if (!it) {
+                            linkShowThumbnailState = false
+                            linkShowThumbnail = false
+                            linkShowOnlyWifiState = false
+                            linkShowOnlyWifi = false
+                        }
+                    }
+                )
+                if (linkAutoShowState) {
+                    SettingsCheckboxItem(
+                        title = stringResource(R.string.system_setting_page_chapter_link_show_thumbnail),
+                        isChecked = linkShowThumbnailState,
+                        onCheckedChange = {
+                            linkShowThumbnailState = it
+                            linkShowThumbnail = it
+                            if (!it) {
+                                linkShowOnlyWifiState = false
+                                linkShowOnlyWifi = false
+                            }
+                        }
+                    )
+                    if (linkShowThumbnailState) {
+                        SettingsCheckboxItem(
+                            title = stringResource(R.string.system_setting_page_chapter_link_show_only_wifi),
+                            isChecked = linkShowOnlyWifiState,
+                            onCheckedChange = {
+                                linkShowOnlyWifiState = it
+                                linkShowOnlyWifi = it
+                            }
+                        )
+                    }
+                }
+
+                // 偏好設定
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_preference))
+                if (propertiesVIP) {
+                    SettingsCheckboxItem(
+                        title = stringResource(R.string.system_setting_page_enable_auto_to_chat),
+                        isChecked = autoToChatState,
+                        onCheckedChange = {
+                            autoToChatState = it
+                            propertiesAutoToChat = it
+                        }
+                    )
+                }
+                SettingsCheckboxItem(
+                    title = stringResource(R.string.system_setting_page_enable_page_animation),
+                    isChecked = animationEnableState,
+                    onCheckedChange = {
+                        animationEnableState = it
+                        propertiesAnimationEnable = it
+                        ASNavigationController.currentController?.isAnimationEnable = it
+                    }
+                )
+                SettingsSpinnerItem(
+                    title = stringResource(R.string.system_setting_page_screen_orientation),
+                    items = screenOrientationItems,
+                    selectedIndex = screenOrientationState,
+                    onItemSelected = { idx ->
+                        screenOrientationState = idx
+                        propertiesScreenOrientation = idx
+                        changeScreenOrientation()
+                    }
+                )
+                SettingsNavigationItem(stringResource(R.string.system_setting_page_ignore_battery_optimizations)) {
+                    onIgnoreBatteryOptimizations()
+                }
+
+                // 雲端備份 (VIP)
+                if (propertiesVIP) {
+                    SettingsChapter(stringResource(R.string.cloud_save))
+                    SettingsCheckboxItem(
+                        title = stringResource(R.string.cloud_save_setting_switch),
+                        isChecked = cloudSaveEnableState,
+                        onCheckedChange = { onCloudSaveChanged(it) }
+                    )
+                    if (cloudSaveLastTimeString.isNotEmpty()) {
+                        Text(
+                            text = cloudSaveLastTimeString,
+                            color = colors.textSecondary,
+                            fontSize = 13.sp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 14.dp, vertical = 4.dp)
+                        )
+                    }
+                }
+
+                // 贊助章節
+                SettingsChapter(stringResource(R.string.system_setting_page_chapter_donation))
+                SettingsNavigationItem(stringResource(R.string.system_setting_page_goBillingPage)) {
+                    navigationController.pushViewController(PageContainer.instance!!.billingPage)
+                }
             }
 
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                propertiesToolbarLocation = 0
-            }
-        }
-
-    /** 工具列排序  */
-    var toolbarOrderListener: AdapterView.OnItemSelectedListener =
-        object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(
-                adapterView: AdapterView<*>?,
-                view: View?,
-                i: Int,
-                l: Long
-            ) {
-                propertiesToolbarOrder = i
-            }
-
-            override fun onNothingSelected(adapterView: AdapterView<*>?) {
-                propertiesToolbarOrder = 0
-            }
-        }
-
-    /** 連結自動預覽  */
-    var linkAutoShowListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            setPropertiesLinkAutoShow(isChecked)
-            changeLinkAutoShowStatus(isChecked)
-        }
-
-    fun changeLinkAutoShowStatus(enable: Boolean) {
-        if (enable) {
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail)!!.visibility =
-                View.VISIBLE
-            (mainLayout?.findViewById<View>(R.id.SystemSettings_enableLinkShowThumbnail) as CheckBox).isChecked =
-                linkShowThumbnail
-            changeLinkOnlyWifiStatus(linkShowThumbnail)
-        } else {
-            linkShowThumbnail = false
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail)!!.visibility =
-                View.GONE
-            changeLinkOnlyWifiStatus(false)
-        }
-    }
-
-    /** 顯示預覽圖  */
-    var linkShowThumbnailListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            linkShowThumbnail = isChecked
-            changeLinkOnlyWifiStatus(isChecked)
-        }
-
-    fun changeLinkOnlyWifiStatus(enable: Boolean) {
-        if (enable) {
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi)!!.visibility =
-                View.VISIBLE
-            (mainLayout?.findViewById<View>(R.id.SystemSettings_enableLinkShowOnlyWifi) as CheckBox).isChecked =
-                linkShowOnlyWifi
-        } else {
-            linkShowOnlyWifi = false
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi)!!.visibility =
-                View.GONE
-        }
-    }
-
-    /** 只在Wifi下預覽  */
-    var linkShowOnlyWifiListener: CompoundButton.OnCheckedChangeListener =
-        CompoundButton.OnCheckedChangeListener { buttonView: CompoundButton?, isChecked: Boolean ->
-            linkShowOnlyWifi = isChecked
-        }
-
-    override val pageLayout: Int
-        get() = R.layout.system_settings_page
-
-    override val pageType: Int
-        get() = BahamutPage.BAHAMUT_SYSTEM_SETTINGS
-
-    override val isPopupPage: Boolean
-        get() = true
-
-    @SuppressLint("SetTextI18n")
-    override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
-
-        // 黑名單
-        mainLayout?.findViewById<View>(R.id.SystemSettings_blockListSetting)!!
-            .setOnClickListener(blockListSettingClickListener)
-        val blockListEnableBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_blockListEnable)!!
-        blockListEnableBox.isChecked = propertiesBlockListEnable
-        blockListEnableBox.setOnCheckedChangeListener(blockListEnableListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_blockListEnable)!!
-            .setOnClickListener { view: View? -> blockListEnableBox.isChecked = !blockListEnableBox.isChecked }
-        val blockListForTitleBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_blockListForTitle)!!
-        blockListForTitleBox.isChecked = propertiesBlockListForTitle
-        blockListForTitleBox.setOnCheckedChangeListener(blockListForTitleListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_blockListForTitle)!!
-            .setOnClickListener { view: View? -> blockListForTitleBox.isChecked = !blockListForTitleBox.isChecked }
-
-        // keep-wifi
-        val keepWifiBox = mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_keepWifi)!!
-        keepWifiBox.isChecked = propertiesKeepWifi
-        keepWifiBox.setOnCheckedChangeListener(keepWifiListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_keepWifi)!!
-            .setOnClickListener { view: View? -> keepWifiBox.isChecked = !keepWifiBox.isChecked }
-
-
-        // 換頁動畫
-        val animationEnableBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_animationEnable)!!
-        animationEnableBox.isChecked = propertiesAnimationEnable
-        animationEnableBox.setOnCheckedChangeListener(animationEnableListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_animationEnable)!!
-            .setOnClickListener { view: View? -> animationEnableBox.isChecked = !animationEnableBox.isChecked }
-
-        // 看板上一頁/下一頁
-        val articleMoveEnableBoardBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableBoardMove)!!
-        articleMoveEnableBoardBox.setChecked((propertiesBoardMoveEnable > 0))
-        articleMoveEnableBoardBox.setOnCheckedChangeListener(articleMoveBoardEnableListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableBoardMove)!!
-            .setOnClickListener { view: View? -> articleMoveEnableBoardBox.isChecked = !articleMoveEnableBoardBox.isChecked }
-
-
-        // 文章首篇/末篇
-        val articleMoveEnableBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableArticleMove)!!
-        articleMoveEnableBox.isChecked = propertiesArticleMoveEnable
-        articleMoveEnableBox.setOnCheckedChangeListener(articleMoveEnableListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableArticleMove)!!
-            .setOnClickListener { view: View? -> articleMoveEnableBox.isChecked = !articleMoveEnableBox.isChecked }
-
-        // 螢幕方向
-        val adapterScreenOrientation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-            myContext!!,
-            R.layout.simple_spinner_item,
-            resource?.getStringArray(R.array.system_setting_page_screen_orientation_items) ?: arrayOf()
-        )
-        adapterScreenOrientation.setDropDownViewResource(R.layout.simple_spinner_item)
-        val spinnerScreenOrientation =
-            mainLayout?.findViewById<Spinner>(R.id.SystemSettings_screen_orientation_spinner)!!
-        spinnerScreenOrientation.adapter = adapterScreenOrientation
-        spinnerScreenOrientation.setSelection(propertiesScreenOrientation)
-        spinnerScreenOrientation.onItemSelectedListener = screenOrientationListener
-
-        // 不受電池最佳化限制
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_IgnoreBatteryOptimizations)!!
-            .setOnClickListener(ignoreBatteryListener)
-
-        // 連結自動預覽
-        val linkAutoShowBox =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkAutoShow)!!
-        linkAutoShowBox.isChecked = linkAutoShow
-        linkAutoShowBox.setOnCheckedChangeListener(linkAutoShowListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkAutoShow)!!
-            .setOnClickListener { view: View? -> linkAutoShowBox.isChecked = !linkAutoShowBox.isChecked }
-        changeLinkAutoShowStatus(linkAutoShow)
-
-        // 顯示預覽圖
-        val linkShowThumbnail1 =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowThumbnail)!!
-        linkShowThumbnail1.isChecked = linkShowThumbnail
-        linkShowThumbnail1.setOnCheckedChangeListener(linkShowThumbnailListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowThumbnail)!!
-            .setOnClickListener { view: View? -> linkShowThumbnail1.isChecked = !linkShowThumbnail1.isChecked }
-
-        // 只在wifi下自動開啟
-        val linkShowOnlyWifi1 =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableLinkShowOnlyWifi)!!
-        linkShowOnlyWifi1.isChecked = linkShowOnlyWifi
-        linkShowOnlyWifi1.setOnCheckedChangeListener(linkShowOnlyWifiListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableLinkShowOnlyWifi)!!
-            .setOnClickListener { view: View? -> linkShowOnlyWifi1.isChecked = !linkShowOnlyWifi1.isChecked }
-
-        // VIP
-        if (propertiesVIP) {
-            // 使用手勢在看板/文章
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)!!.visibility =
-                View.VISIBLE
-            val gestureOnBoardEnableBox =
-                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableGestureOnBoard)!!
-            gestureOnBoardEnableBox.isChecked = propertiesGestureOnBoardEnable
-            gestureOnBoardEnableBox.setOnCheckedChangeListener(gestureOnBoardEnableListener)
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)!!
-                .setOnClickListener { view: View? -> gestureOnBoardEnableBox.isChecked = !gestureOnBoardEnableBox.isChecked }
-
-            // 自動登入洽特
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat)!!.visibility =
-                View.VISIBLE
-            val autoToChatEnableBox =
-                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_enableAutoToChat)!!
-            autoToChatEnableBox.isChecked = propertiesAutoToChat
-            autoToChatEnableBox.setOnCheckedChangeListener(autoToChatEnableListener)
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat)!!
-                .setOnClickListener { view: View? -> autoToChatEnableBox.isChecked = !autoToChatEnableBox.isChecked }
-
-            // 工具列位置
-            val adapterToolbarLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_toolbar_location_items) ?: arrayOf()
+            // 底部返回工具列
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            BahaButton(
+                text = stringResource(R.string._back),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onBackPressed() }
             )
-            adapterToolbarLocation.setDropDownViewResource(R.layout.simple_spinner_item)
-            val spinnerToolbarLocation =
-                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_location_spinner)!!
-            spinnerToolbarLocation.adapter = adapterToolbarLocation
-            spinnerToolbarLocation.setSelection(propertiesToolbarLocation)
-            spinnerToolbarLocation.onItemSelectedListener = toolbarLocationListener
-
-            // 工具列順序
-            val adapterToolbarOrder: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_toolbar_order_items) ?: arrayOf()
-            )
-            adapterToolbarOrder.setDropDownViewResource(R.layout.simple_spinner_item)
-            val spinnerToolbarOrder =
-                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_order_spinner)!!
-            spinnerToolbarOrder.adapter = adapterToolbarOrder
-            spinnerToolbarOrder.setSelection(propertiesToolbarOrder)
-            spinnerToolbarOrder.onItemSelectedListener = toolbarOrderListener
-            if (propertiesToolbarLocation <= 2) { // 底部工具列
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
-                    View.VISIBLE
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
-                    View.GONE
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
-                    View.GONE
-            } else { // 浮動
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
-                    View.GONE
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
-                    View.VISIBLE
-                mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
-                    View.VISIBLE
-            }
-            val textSmallIdle =
-                mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_idle_text)!!
-            val sliderIdle =
-                mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_idle)!!
-            sliderIdle.value = toolbarIdle
-            textSmallIdle.text = sliderIdle.value.toString() + "s"
-            sliderIdle.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
-                toolbarIdle = value
-                textSmallIdle.text = value.toString() + "s"
-            }
-            val textSmallAlpha =
-                mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_alpha_text)!!
-            val sliderAlpha =
-                mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_alpha)!!
-            sliderAlpha.value = toolbarAlpha
-            textSmallAlpha.text = sliderAlpha.value.toInt().toString() + "%"
-            sliderAlpha.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
-                toolbarAlpha = value
-                textSmallAlpha.text = value.toInt().toString() + "%"
-            }
-            // 側滑選單位置
-            val adapterDrawerLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_drawer_location_items) ?: arrayOf()
-            )
-            adapterDrawerLocation.setDropDownViewResource(R.layout.simple_spinner_item)
-            val spinnerDrawerLocation =
-                mainLayout?.findViewById<Spinner>(R.id.SystemSettings_drawer_location_spinner)!!
-            spinnerDrawerLocation.adapter = adapterDrawerLocation
-            spinnerDrawerLocation.setSelection(propertiesDrawerLocation)
-            spinnerDrawerLocation.onItemSelectedListener = drawerLocationListener
-
-            // 表情符號設定
-            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting)!!
-                .setOnClickListener(articleHeaderSettingListener)
-            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting)!!
-                .setOnClickListener(articleExpressionSettingListener)
-
-            // 雲端設定
-            val cloudSaveEnableBox =
-                mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_cloudSaveEnable)!!
-            cloudSaveEnableBox.isChecked = getCloudSave()
-            cloudSaveEnableBox.setOnCheckedChangeListener(cloudSaveEnableListener)
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_cloudSaveEnable)!!
-                .setOnClickListener { view: View? -> cloudSaveEnableBox.isChecked = !cloudSaveEnableBox.isChecked }
-            val cloudSaveLastTime =
-                mainLayout?.findViewById<TextView>(R.id.SystemSettings_cloudSaveLastTime)!!
-            var lastTime = TempSettings.cloudSaveLastTime
-            if (lastTime <= 0L) {
-                lastTime = getCloudSaveLastTime()
-                TempSettings.cloudSaveLastTime = lastTime
-            }
-            if (lastTime <= 0L) {
-                cloudSaveLastTime.visibility = View.GONE
-            } else {
-                // 將 Long 轉換為格式化的日期字串
-                val sdf = java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss", java.util.Locale.getDefault())
-                val dateString = sdf.format(java.util.Date(lastTime))
-
-                cloudSaveLastTime.text = dateString
-                cloudSaveLastTime.visibility = View.VISIBLE
-            }
-        } else {
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableGestureOnBoard)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_enableAutoToChat)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_location)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_drawer_location)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleHeaderSetting)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_ArticleExpressionSetting)!!.visibility =
-                View.GONE
-            mainLayout?.findViewById<View>(R.id.SystemSettings_item_cloud_save_layout)!!.visibility =
-                View.GONE
-        }
-
-        // billing-page
-        mainLayout?.findViewById<View>(R.id.SystemSettings_goBillingPage)!!
-            .setOnClickListener(billingPageListener)
-
-        // theme-manager-page
-        mainLayout?.findViewById<View>(R.id.SystemSettings_goThemeManagerPage)!!
-            .setOnClickListener(themeManagerPageListener)
-
-        // 跟隨系統深色模式
-        val box =
-            mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_followSystemDarkMode)!!
-        followSystemDarkModeBox = box
-        box.isChecked = propertiesFollowSystemDarkMode
-        box.setOnCheckedChangeListener(followSystemDarkModeListener)
-        mainLayout?.findViewById<View>(R.id.SystemSettings_item_followSystemDarkMode)!!
-            .setOnClickListener { view: View? -> box.isChecked = !box.isChecked }
-
-        // bbs-user-info-page
-        mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)!!
-            .setOnClickListener(bbsUserInfoListener)
-
-        // bbs-user-page
-        mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserConfig)!!
-            .setOnClickListener(bbsUserConfigListener)
-
-        // 返回按鈕
-        findViewById(R.id.SystemSettings_BackButton)?.setOnClickListener {
-            onBackPressed()
         }
     }
 
-    val name: String
-        get() = "TelnetSystemSettingsDialog"
-
-    override fun onBackPressed(): Boolean {
-        notifyDataUpdated()
-        return super.onBackPressed()
+    @Composable
+    private fun SettingsChapter(title: String) {
+        val colors = AppTheme.colors
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.toolbarBackground)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+        ) {
+            Text(
+                text = title,
+                color = colors.titleBarTitle,
+                fontSize = 14.sp
+            )
+        }
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
     }
 
-    override val isKeepOnOffline: Boolean
-        get() = true
+    @Composable
+    private fun SettingsNavigationItem(title: String, onClick: () -> Unit) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = colors.textPrimary,
+                fontSize = 15.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                contentDescription = null,
+                tint = colors.textSecondary
+            )
+        }
+        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+    }
 
-    override fun onReceivedGestureRight(): Boolean {
-        onBackPressed()
-        showShortToast("返回")
-        return true
+    @Composable
+    private fun SettingsCheckboxItem(
+        title: String,
+        isChecked: Boolean,
+        onCheckedChange: (Boolean) -> Unit
+    ) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onCheckedChange(!isChecked) }
+                .padding(horizontal = 14.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = colors.textPrimary,
+                fontSize = 15.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Checkbox(
+                checked = isChecked,
+                onCheckedChange = onCheckedChange,
+                colors = CheckboxDefaults.colors(
+                    checkedColor = colors.checkboxTint,
+                    uncheckedColor = colors.textSecondary
+                )
+            )
+        }
+        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+    }
+
+    @Composable
+    private fun SettingsSpinnerItem(
+        title: String,
+        items: Array<String>,
+        selectedIndex: Int,
+        onItemSelected: (Int) -> Unit
+    ) {
+        val colors = AppTheme.colors
+        var expanded by remember { mutableStateOf(false) }
+        val currentText = items.getOrNull(selectedIndex) ?: ""
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                color = colors.textPrimary,
+                fontSize = 15.sp,
+                modifier = Modifier.weight(1f)
+            )
+            Box {
+                Text(
+                    text = currentText,
+                    color = colors.titleBarDetail,
+                    fontSize = 14.sp
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = Modifier.background(colors.surface)
+                ) {
+                    items.forEachIndexed { index, label ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = label,
+                                    color = if (index == selectedIndex) colors.titleBarTitle else colors.textPrimary
+                                )
+                            },
+                            onClick = {
+                                expanded = false
+                                onItemSelected(index)
+                            }
+                        )
+                    }
+                }
+            }
+        }
+        HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
     }
 }

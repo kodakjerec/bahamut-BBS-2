@@ -1,25 +1,54 @@
 package com.kota.Bahamut.pages
 
-import android.view.ViewGroup
 import android.app.Activity
+import android.content.Context
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
 import com.android.billingclient.api.BillingResult
+import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.QueryProductDetailsParams
 import com.android.billingclient.api.QueryProductDetailsResult
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryQuery
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
@@ -31,106 +60,208 @@ class BillingPage : TelnetPage() {
         get() = BahamutPage.BAHAMUT_BILLING
 
     override val pageLayout: Int
-        get() = R.layout.billing_page
+        get() = 0
 
     override val isPopupPage: Boolean
         get() = true
 
     override val isKeepOnOffline: Boolean
-        // com.kota.telnetUI.TelnetPage
         get() = true
 
-    override fun onPageDidLoad() {
-        billingClient = MyBillingClient.billingClient
-        this.productList
+    // Compose states
+    var productDetailsState by mutableStateOf<ProductDetails?>(null)
+    var alreadyBillingValueState by mutableStateOf("")
 
-        // 檢查已購買按鈕點擊：強制檢查 Google Play 與雲端購買紀錄
-        val button1 = findViewById(R.id.button_checkPurchaseQuery) as Button
-        button1.setOnClickListener { view: View? ->
-            checkPurchaseHistoryQuery(forceCheck = true)
-            checkPurchaseHistoryCloud { qty: Int? ->
-                val totalMoney = (qty!! * 90).toString()
-                val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
-                textView?.text = totalMoney
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                BillingPageContent()
+                BahaGlobalDialogHost()
             }
-            showShortToast(getContextString(R.string.billing_page_result_success))
-        }
-        button1.performClick()
-
-        // 新增：處理底端工具列的返回按鈕
-        findViewById(R.id.BillingPage_BackButton)?.setOnClickListener {
-            onBackPressed()
-            PageContainer.instance!!.cleanBillingPage()
         }
     }
 
-    val productList: Unit
-        // 取得商品清單
-        get() {
-            val activity: Activity? = navigationController
+    override fun onPageDidLoad() {
+        billingClient = MyBillingClient.billingClient
+        fetchProductList()
+        checkPurchaseHistory()
+    }
 
-            // The BillingClient is ready. You can query purchases here.
-            val productList =
-                ArrayList<QueryProductDetailsParams.Product?>()
-            productList.add(
+    private fun checkPurchaseHistory() {
+        checkPurchaseHistoryQuery(forceCheck = true)
+        checkPurchaseHistoryCloud { qty: Int? ->
+            val totalMoney = ((qty ?: 0) * 90).toString()
+            ASCoroutine.ensureMainThread {
+                alreadyBillingValueState = totalMoney
+            }
+        }
+    }
+
+    private fun fetchProductList() {
+        val productList = ArrayList<QueryProductDetailsParams.Product?>().apply {
+            add(
                 QueryProductDetailsParams.Product.newBuilder()
                     .setProductId("com.kota.billing.90")
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
             )
-            // list products
-            val queryProductDetailsParams =
-                QueryProductDetailsParams.newBuilder()
-                    .setProductList(productList).build()
+        }
 
-            billingClient?.queryProductDetailsAsync(
-                queryProductDetailsParams
-            ) { billingResult: BillingResult?, productDetailsList: QueryProductDetailsResult? ->
-                // check billingResult
-                if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
-                    // process returned productDetailsList
-                    for (product in productDetailsList!!.productDetailsList) {
-                        ASCoroutine.ensureMainThread {
-                            val btn =
-                                findViewById(R.id.button_90) as Button?
-                            if (btn != null) {
-                                btn.isEnabled = true
-                                btn.text = product.name
-                                btn.setOnClickListener { view: View? ->
-                                    val productDetailsParamsList =
-                                        ArrayList<ProductDetailsParams?>()
-                                    productDetailsParamsList
-                                        .add(
-                                            ProductDetailsParams.newBuilder()
-                                                .setProductDetails(product)
-                                                .build()
-                                        )
+        val queryProductDetailsParams =
+            QueryProductDetailsParams.newBuilder()
+                .setProductList(productList).build()
 
-                                    val billingFlowParams =
-                                        BillingFlowParams.newBuilder()
-                                            .setProductDetailsParamsList(
-                                                productDetailsParamsList
-                                            )
-                                            .setIsOfferPersonalized(true)
-                                            .build()
-
-                                    // Launch the billing flow
-                                    billingClient?.launchBillingFlow(
-                                        activity!!,
-                                        billingFlowParams
-                                    )
-                                }
-                            }
-                        }
+        billingClient?.queryProductDetailsAsync(
+            queryProductDetailsParams
+        ) { billingResult: BillingResult?, productDetailsResult: QueryProductDetailsResult? ->
+            if (billingResult?.responseCode == BillingClient.BillingResponseCode.OK) {
+                val detailsList = productDetailsResult?.productDetailsList
+                if (!detailsList.isNullOrEmpty()) {
+                    ASCoroutine.ensureMainThread {
+                        productDetailsState = detailsList[0]
                     }
                 }
             }
         }
+    }
+
+    private fun launchPurchase() {
+        val product = productDetailsState ?: return
+        val activity: Activity = navigationController ?: return
+
+        val productDetailsParamsList = ArrayList<ProductDetailsParams?>().apply {
+            add(
+                ProductDetailsParams.newBuilder()
+                    .setProductDetails(product)
+                    .build()
+            )
+        }
+
+        val billingFlowParams =
+            BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .setIsOfferPersonalized(true)
+                .build()
+
+        billingClient?.launchBillingFlow(activity, billingFlowParams)
+    }
+
+    override fun onBackPressed(): Boolean {
+        PageContainer.instance?.cleanBillingPage()
+        return super.onBackPressed()
+    }
 
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        PageContainer.instance!!.cleanBillingPage()
+        PageContainer.instance?.cleanBillingPage()
         showShortToast("返回")
         return true
+    }
+
+    @Composable
+    fun BillingPageContent() {
+        val colors = AppTheme.colors
+        val scrollState = rememberScrollState()
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(scrollState)
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.mipmap.ic_launcher),
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier.size(100.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.billing_page_note),
+                    color = colors.textPrimary,
+                    fontSize = 14.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = stringResource(R.string.billing_page_note2),
+                    color = colors.titleBarTitle,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Purchase button (com.kota.billing.90)
+                BahaButton(
+                    text = productDetailsState?.name ?: stringResource(R.string.billing_page_button_90),
+                    enabled = productDetailsState != null,
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    onClick = { launchPurchase() }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Check purchase button
+                BahaButton(
+                    text = stringResource(R.string.billing_page_button_check_purchase_query),
+                    modifier = Modifier.padding(horizontal = 32.dp),
+                    onClick = {
+                        checkPurchaseHistory()
+                        showShortToast(getContextString(R.string.billing_page_result_success))
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Already billing value
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.billing_page_already_billing_text),
+                        color = colors.textPrimary,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = alreadyBillingValueState,
+                        color = colors.textPrimary,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+            }
+
+            // Bottom toolbar
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            BahaButton(
+                text = stringResource(R.string._back),
+                modifier = Modifier.fillMaxWidth(),
+                onClick = {
+                    onBackPressed()
+                    PageContainer.instance?.cleanBillingPage()
+                }
+            )
+        }
     }
 }

@@ -1,25 +1,51 @@
 package com.kota.Bahamut.pages.messages
 
+import android.content.Context
 import android.util.Log
 import android.view.View
-import android.view.View.GONE
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
-import android.view.inputmethod.EditorInfo
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.CompoundButton
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.model.PostEditText
-import androidx.core.content.ContextCompat
-import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.myContext
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog
@@ -34,122 +60,102 @@ import com.kota.telnetUI.TelnetPage
 import com.kota.textEncoder.B2UEncoder
 import java.util.Vector
 
-class MessageMain:TelnetPage() {
-    private lateinit var mainLayout: RelativeLayout
-    private lateinit var listView: ASListView
-    private lateinit var searchWord: PostEditText
-    private lateinit var tabButtons: Array<Button>
-    private lateinit var toolbarList: LinearLayout
-    private lateinit var btnSettings: Button
-    private var isPostDelayedSuccess = false // 同步用 postDelay
-    private var isUnderList = false // 是否正在查詢名單
+class MessageMain : TelnetPage() {
+    private var listViewRef: ASListView? = null
+    private var isPostDelayedSuccess = false
+    private var isUnderList = false
+
+    // Compose states
+    var currentTabState by mutableIntStateOf(0) // 0-Chat, 1-List
+    var isFloatCheckedState by mutableStateOf(NotificationSettings.getShowMessageFloating())
+    var searchWordState by mutableStateOf("")
 
     override val pageLayout: Int
-        get() = R.layout.message_main
+        get() = 0
 
     override val isPopupPage: Boolean
         get() = true
 
-    /** 顯示聊天小視窗  */
-    private val showHideFloating = CompoundButton.OnCheckedChangeListener {
-        _: CompoundButton?, isChecked: Boolean ->
-        NotificationSettings.setShowMessageFloating(isChecked)
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                MessageMainContent()
+                BahaGlobalDialogHost()
+            }
+        }
     }
 
-    /** 搜尋聊天 */
-    private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            if (isUnderList) {
-                TelnetClient.myInstance!!.sendDataToServer(
-                    TelnetOutputBuilder.create()
-                        .pushString("/") // 請輸入勇者代號：
-                        .pushKey(TelnetKeyboard.CTRL_Y) // 清除資料
-                        .pushString(textView.text.toString().lowercase()+"\n")
-                        .build()
-                )
-            } else {
-                handleSearchChats(textView.text.toString().lowercase())
-            }
-            return@OnEditorActionListener true
+    override fun onPageDidLoad() {
+        if (TempSettings.isSyncMessageMain) {
+            loadMessageList()
+        } else {
+            sendSyncCommand()
         }
-        false
     }
+
+    override fun onBackPressed(): Boolean {
+        if (isUnderList) {
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+        }
+        if (TempSettings.getMessageSmall() != null) {
+            TempSettings.getMessageSmall()?.show()
+        }
+        return super.onBackPressed()
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        onBackPressed()
+        ASToast.showShortToast("返回")
+        return true
+    }
+
+    private fun handleSearchSubmit() {
+        if (isUnderList) {
+            TelnetClient.myInstance!!.sendDataToServer(
+                TelnetOutputBuilder.create()
+                    .pushString("/")
+                    .pushKey(TelnetKeyboard.CTRL_Y)
+                    .pushString(searchWordState.lowercase() + "\n")
+                    .build()
+            )
+        } else {
+            handleSearchChats(searchWordState.lowercase())
+        }
+    }
+
     private fun handleSearchChats(searchWord: String) {
-        for (i in 0 until listView.childCount) {
-            val view = listView.getChildAt(i)
+        val lv = listViewRef ?: return
+        for (i in 0 until lv.childCount) {
+            val view = lv.getChildAt(i)
             if (view is MessageMainChatItem) {
-                val subView:MessageMainChatItem = view
-                if (subView.getContent().senderName.lowercase().contains(searchWord)) {
-                    subView.visibility = VISIBLE
+                if (view.getContent().senderName.lowercase().contains(searchWord)) {
+                    view.visibility = View.VISIBLE
                 } else {
-                    subView.visibility = GONE
+                    view.visibility = View.GONE
                 }
             }
         }
     }
 
-    /** 切換分頁 */
-    private val tabClickListener = View.OnClickListener { aView ->
-        if (aView.id == R.id.Message_Main_Button_Chat) {
-            btnSettings.visibility = VISIBLE
-            toolbarList.visibility = GONE
+    private fun switchTab(tab: Int) {
+        currentTabState = tab
+        if (tab == 0) {
+            isUnderList = false
             loadMessageList()
         } else {
-            btnSettings.visibility = INVISIBLE
-            toolbarList.visibility = VISIBLE
-            // 送出查詢指令
+            isUnderList = true
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
-        // 切換頁籤
-        val selectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedBackground)
-        val unselectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedBackground)
-        val selectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedTextColor)
-        val unselectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedTextColor)
-        for (tabButton in tabButtons) {
-            val isSelected = (tabButton == aView)
-            tabButton.setBackgroundResource(if (isSelected) selectedBgRes else unselectedBgRes)
-            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) selectedTextRes else unselectedTextRes))
-        }
-    }
-    /** 上一頁 */
-    private val prevPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP)
-    }
-    /** 下一頁 */
-    private val nextPageClickListener = View.OnClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
-    }
-    /** 最前頁 */
-    private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.HOME)
-        return@OnLongClickListener true
-    }
-    /** 最後頁 */
-    private val endPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
-        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.END)
-        return@OnLongClickListener true
     }
 
-    /** 設定選單 */
     private fun openSettings() {
         ASListDialog.createDialog()
             .setTitle(getContextString(R.string.setting))
             .addItem(getContextString(R.string.message_main_setting01))
             .addItem(getContextString(R.string.message_main_setting02), true)
             .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return true
-                }
-
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
+                override fun onListDialogItemLongClicked(paramASListDialog: ASListDialog?, index: Int, title: String?): Boolean = true
+                override fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?) {
                     if (title == getContextString(R.string.message_main_setting01)) {
                         sendSyncCommand()
                     } else if (title == getContextString(R.string.message_main_setting02)) {
@@ -167,123 +173,52 @@ class MessageMain:TelnetPage() {
             }).show()
     }
 
-    override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        // 分頁
-        val btnChat = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Chat)
-        val btnList = mainLayout.findViewById<Button>(R.id.Message_Main_Button_List)
-        btnChat.setOnClickListener(tabClickListener)
-        btnList.setOnClickListener(tabClickListener)
-        tabButtons = arrayOf(btnChat, btnList)
-        val btnPrevPage = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Prev)
-        val btnNextPage = mainLayout.findViewById<Button>(R.id.Message_Main_Button_Next)
-        btnPrevPage.setOnClickListener(prevPageClickListener)
-        btnPrevPage.setOnLongClickListener(firstPageClickListener)
-        btnNextPage.setOnClickListener(nextPageClickListener)
-        btnNextPage.setOnLongClickListener(endPageClickListener)
-
-        // 查詢
-        searchWord = mainLayout.findViewById(R.id.Message_Main_Search)
-        searchWord.setOnEditorActionListener(handleSearchWatcher)
-        // 清空查詢
-        val searchWordClear:TextView = mainLayout.findViewById(R.id.Message_Main_Search_Clear)
-        searchWordClear.setOnClickListener { _->
-            searchWord.setText("")
-            handleSearchChats("")
-        }
-
-        // 切換浮動隱藏
-        val checkBox = mainLayout.findViewById<CheckBox>(R.id.Message_Main_Checkbox)
-        checkBox.isChecked = NotificationSettings.getShowMessageFloating()
-        checkBox.setOnCheckedChangeListener(showHideFloating)
-        val checkLayout = mainLayout.findViewById<LinearLayout>(R.id.Message_Main_CheckboxLayout)
-        checkLayout.setOnClickListener { _ -> checkBox.isChecked = !checkBox.isChecked }
-
-        val txtEsc = mainLayout.findViewById<TextView>(R.id.Message_Main_Back)
-        txtEsc.setOnClickListener{ _-> onBackPressed() }
-
-        listView = mainLayout.findViewById(R.id.Message_Main_Scroll)
-        toolbarList = mainLayout.findViewById(R.id.toolbar_List)
-
-        // 重置
-        btnSettings = mainLayout.findViewById(R.id.Message_Main_Settings)
-        btnSettings.setOnClickListener { _-> openSettings() }
-
-        // 每次登入開啟訊息主視窗先同步一次
-        if (TempSettings.isSyncMessageMain) {
-            loadMessageList()
-        } else {
-            sendSyncCommand()
-        }
-        
-        btnChat.performClick()
-    }
-
-    override fun onBackPressed(): Boolean {
-        // 離開名單
-        if (isUnderList) {
-            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
-        }
-
-        // 顯示小視窗
-        if (TempSettings.getMessageSmall() != null)
-            TempSettings.getMessageSmall()?.show()
-
-        return super.onBackPressed()
-    }
-
-    /** 顯示訊息清單 */
     fun loadMessageList() {
-        // 離開名單
         if (isUnderList) {
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
+            isUnderList = false
         }
-
         messageASCoroutine.cancel()
         isPostDelayedSuccess = true
-
         ASProcessingDialog.dismissProcessingDialog()
         TempSettings.isSyncMessageMain = true
 
-        val db = MessageDatabase(myContext!!)
+        val db = MessageDatabase(myContext ?: return)
         try {
-            listView.adapter = null
-
-            // 紀錄訊息
+            listViewRef?.adapter = null
             val messageList = db.getAllAndNewestMessage()
             val myAdapter = MessageMainChatAdapter(messageList)
-            listView.adapter = myAdapter
+            listViewRef?.adapter = myAdapter
         } catch (e: Exception) {
             Log.e(javaClass.simpleName, e.message.toString())
         } finally {
             db.close()
         }
     }
-    /** 收到訊息, 只更新特定人物的最新訊息 */
-    fun loadMessageList(item:BahaMessage) {
+
+    fun loadMessageList(item: BahaMessage) {
+        val lv = listViewRef ?: return
         var findSender = false
-        var senderView = MessageMainChatItem(myContext!!)
-        for (i in 0 until listView.childCount) {
-            val view = listView.getChildAt(i)
+        var senderView = MessageMainChatItem(myContext ?: return)
+        for (i in 0 until lv.childCount) {
+            val view = lv.getChildAt(i)
             if (view is MessageMainChatItem) {
-                if (view.getContent().senderName==item.senderName) {
+                if (view.getContent().senderName == item.senderName) {
                     findSender = true
                     senderView = view
                 }
             }
         }
 
-        val db = MessageDatabase(myContext!!)
+        val db = MessageDatabase(myContext ?: return)
         try {
             val itemSummary = db.getIdNewestMessage(item.senderName)
             ASCoroutine.ensureMainThread {
-                // 找到同名人物
                 if (findSender) {
                     senderView.setContent(itemSummary)
                 } else {
-                    val myAdapter:MessageMainChatAdapter = listView.adapter as MessageMainChatAdapter
-                    myAdapter.addItem(itemSummary)
+                    val myAdapter = lv.adapter as? MessageMainChatAdapter
+                    myAdapter?.addItem(itemSummary)
                 }
             }
         } finally {
@@ -291,85 +226,55 @@ class MessageMain:TelnetPage() {
         }
     }
 
-    /** 顯示線上名單 */
-    fun loadUserList(fromRows:Vector<TelnetRow>) {
+    fun loadUserList(fromRows: Vector<TelnetRow>) {
         isUnderList = true
-        val userList:MutableList<MessageMainListItemStructure> = ArrayList()
-
-        // 创建一个新的列表，并复制传入的 rows 的内容
+        val userList: MutableList<MessageMainListItemStructure> = ArrayList()
         val rows: Vector<TelnetRow> = Vector(fromRows)
 
         for (i in 3 until rows.size step 1) {
             val row = rows[i]
             val item = MessageMainListItemStructure()
             val bytes = row.data
-            item.index =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))
-            item.senderName =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))
-            item.nickname =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))
+            item.index = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))
+            item.senderName = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))
+            item.nickname = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))
             item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56))
-            item.status =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))
+            item.status = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))
             userList.add(item)
         }
 
         val myAdapter = MessageMainListAdapter(userList)
-        listView.adapter = myAdapter
+        listViewRef?.adapter = myAdapter
     }
 
-    override fun onReceivedGestureRight(): Boolean {
-        onBackPressed()
-        ASToast.showShortToast("返回")
-        return true
-    }
-
-    /** 同步BBS訊息到DB */
     private fun sendSyncCommand() {
-        // 送出查詢指令
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_R)
-
         ASProcessingDialog.showProcessingDialog(getContextString(R.string.message_small_sync_msg01))
-
         messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
+
     fun receiveSyncCommand(rows: Vector<TelnetRow>) {
         messageASCoroutine.cancel()
         messageASCoroutine.postDelayed(3000L)
         isPostDelayedSuccess = false
 
-        val db = MessageDatabase(myContext!!)
+        val db = MessageDatabase(myContext ?: return)
         try {
-            var senderName: String
-            var message: String
-
-            var startIndex: Int
-            var endIndex: Int
-            rows.forEach { row->
+            rows.forEach { row ->
                 val rawString = row.rawString
-
                 if (rawString.startsWith("☆")) {
-                    // send
-                    startIndex = 1
-                    endIndex = rawString.indexOf("(")
-                    senderName = rawString.substring(startIndex, endIndex).trim()
-
-                    startIndex = rawString.indexOf("：")+1
-                    message = rawString.substring(startIndex).trim()
-
-                    db.syncMessage(senderName, message, 1)
+                    val startIndex = 1
+                    val endIndex = rawString.indexOf("(")
+                    val senderName = rawString.substring(startIndex, endIndex).trim()
+                    val msg = rawString.substring(rawString.indexOf("：") + 1).trim()
+                    db.syncMessage(senderName, msg, 1)
                 } else if (rawString.startsWith("★")) {
-                    // receive
-                    startIndex = 1
-                    endIndex = rawString.indexOf("(")
-                    senderName = rawString.substring(startIndex, endIndex).trim()
-
-                    startIndex = rawString.indexOf("：")+1
-                    message = rawString.substring(startIndex).trim()
-
-                    db.syncMessage(senderName, message, 0)
+                    val startIndex = 1
+                    val endIndex = rawString.indexOf("(")
+                    val senderName = rawString.substring(startIndex, endIndex).trim()
+                    val msg = rawString.substring(rawString.indexOf("：") + 1).trim()
+                    db.syncMessage(senderName, msg, 0)
                 }
             }
         } finally {
@@ -377,11 +282,160 @@ class MessageMain:TelnetPage() {
         }
     }
 
-    // 強制讀取訊息進入讀取完畢
     private var messageASCoroutine: ASCoroutine = object : ASCoroutine() {
         override suspend fun run() {
-            if (!isPostDelayedSuccess)
-                loadMessageList()
+            if (!isPostDelayedSuccess) loadMessageList()
+        }
+    }
+
+    @Composable
+    fun MessageMainContent() {
+        val colors = AppTheme.colors
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // Header: Back button + Float checkbox
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string._back),
+                    color = colors.textPrimary,
+                    fontSize = 16.sp,
+                    modifier = Modifier.clickable { onBackPressed() }
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.clickable {
+                        val newVal = !isFloatCheckedState
+                        isFloatCheckedState = newVal
+                        NotificationSettings.setShowMessageFloating(newVal)
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.message_small_show_float),
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(end = 4.dp)
+                    )
+                    Checkbox(
+                        checked = isFloatCheckedState,
+                        onCheckedChange = { newVal ->
+                            isFloatCheckedState = newVal
+                            NotificationSettings.setShowMessageFloating(newVal)
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colors.checkboxTint,
+                            uncheckedColor = colors.textSecondary
+                        )
+                    )
+                }
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            // Search Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextField(
+                    value = searchWordState,
+                    onValueChange = { searchWordState = it },
+                    placeholder = {
+                        Text(stringResource(R.string.search_id), color = colors.textSecondary)
+                    },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { handleSearchSubmit() }),
+                    modifier = Modifier.weight(1f)
+                )
+                Text(
+                    text = stringResource(R.string.message_main_search_clear),
+                    color = colors.titleBarDetail,
+                    fontSize = 14.sp,
+                    modifier = Modifier
+                        .clickable {
+                            searchWordState = ""
+                            handleSearchChats("")
+                        }
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                )
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            // ListView
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                AndroidView(
+                    factory = { ctx ->
+                        ASListView(ctx).apply {
+                            listViewRef = this
+                            if (currentTabState == 0) loadMessageList()
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // List mode pagination toolbar (Prev, Next)
+            if (currentTabState == 1) {
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    BahaButton(
+                        text = stringResource(R.string.prev_page),
+                        modifier = Modifier.weight(1f),
+                        onClick = { TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP) }
+                    )
+                    BahaButton(
+                        text = stringResource(R.string.next_page),
+                        modifier = Modifier.weight(1f),
+                        onClick = { TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN) }
+                    )
+                }
+            }
+
+            // Bottom tabs: 聊天, 名單, 設定
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = stringResource(R.string.message_main_tab_chat),
+                    modifier = Modifier.weight(1f),
+                    onClick = { switchTab(0) }
+                )
+                BahaButton(
+                    text = stringResource(R.string.message_main_tab_list),
+                    modifier = Modifier.weight(1f),
+                    onClick = { switchTab(1) }
+                )
+                if (currentTabState == 0) {
+                    BahaButton(
+                        text = stringResource(R.string.setting),
+                        modifier = Modifier.weight(1f),
+                        onClick = { openSettings() }
+                    )
+                }
+            }
         }
     }
 }

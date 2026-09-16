@@ -1,10 +1,40 @@
 package com.kota.Bahamut.pages.messages
 
+import android.content.Context
 import android.content.Intent
 import android.view.View
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogInsertExpression
 import com.kota.Bahamut.dialogs.DialogInsertExpressionListener
@@ -13,10 +43,13 @@ import com.kota.Bahamut.dialogs.DialogShortenImage
 import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.dialogs.DialogShortenUrlListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
-import com.kota.Bahamut.pages.model.PostEditText
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASToast
@@ -25,21 +58,17 @@ import com.kota.telnet.TelnetOutputBuilder
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 
-class MessageSub: TelnetPage(), View.OnClickListener {
-    private lateinit var mainLayout: RelativeLayout
-    private lateinit var listView: ASListView
-    private lateinit var senderNameField: TextView
-    private lateinit var contentField:PostEditText
+class MessageSub : TelnetPage() {
+    private var listViewRef: ASListView? = null
+    var tempMessage: BahaMessage? = null
     private var isPostDelayedSuccess = false
 
-    override val pageLayout: Int
-        get() = R.layout.message_sub
+    // Compose states
+    var senderNameState by mutableStateOf("")
+    var contentState by mutableStateOf(TextFieldValue(""))
 
-    override fun onReceivedGestureRight(): Boolean {
-        onBackPressed()
-        ASToast.showShortToast("返回")
-        return true
-    }
+    override val pageLayout: Int
+        get() = 0
 
     override val isTopPage: Boolean
         get() = true
@@ -47,48 +76,40 @@ class MessageSub: TelnetPage(), View.OnClickListener {
     override val isPopupPage: Boolean
         get() = true
 
-    override fun onPageDidLoad() {
-        super.onPageDidLoad()
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                MessageSubContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
 
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        listView = mainLayout.findViewById(R.id.Message_Sub_Scroll)
-
-        val txtEsc = mainLayout.findViewById<TextView>(R.id.Message_Sub_Back)
-        txtEsc.setOnClickListener{ _-> onBackPressed() }
-        senderNameField = mainLayout.findViewById(R.id.Message_Sub_Sender)
-        contentField = mainLayout.findViewById(R.id.Message_Sub_EditField)
-
-        mainLayout.findViewById<TextView>(R.id.Message_Sub_Cancel).setOnClickListener(this)
-        mainLayout.findViewById<TextView>(R.id.Message_Sub_Symbol).setOnClickListener(this)
-        mainLayout.findViewById<LinearLayout>(R.id.Message_Sub_ShortenUrl).setOnClickListener(this)
-        mainLayout.findViewById<TextView>(R.id.Message_Sub_ShortenImage).setOnClickListener(this)
-        mainLayout.findViewById<TextView>(R.id.Message_Sub_Post).setOnClickListener(this)
+    override fun onReceivedGestureRight(): Boolean {
+        onBackPressed()
+        ASToast.showShortToast("返回")
+        return true
     }
 
     /** 設定內容 */
     fun setSenderName(senderName: String) {
-        senderNameField.text = senderName
+        senderNameState = senderName
 
-        // 讀取訊息
         val db = MessageDatabase(context)
         try {
-            listView.adapter = null
-
+            listViewRef?.adapter = null
             val messageList = db.getIdMessage(senderName)
             val myAdapter = MessageSubAdapter(messageList)
-            listView.adapter = myAdapter
-            // 移到最下方
-            listView.setSelection(myAdapter.count-1)
+            listViewRef?.adapter = myAdapter
+            listViewRef?.setSelection(myAdapter.count - 1)
         } finally {
             db.close()
         }
     }
 
     /** 臨時插入一個訊息 */
-    fun insertMessage(item:BahaMessage) {
-        if (item.senderName == senderNameField.text) {
-            // 更新為已讀取
+    fun insertMessage(item: BahaMessage) {
+        if (item.senderName == senderNameState) {
             val db = MessageDatabase(context)
             try {
                 db.updateReceiveMessage(item.senderName)
@@ -96,87 +117,39 @@ class MessageSub: TelnetPage(), View.OnClickListener {
                 db.close()
             }
             ASCoroutine.ensureMainThread {
-                val myAdapter: MessageSubAdapter = listView.adapter as MessageSubAdapter
-                myAdapter.addItem(item)
+                val myAdapter = listViewRef?.adapter as? MessageSubAdapter
+                myAdapter?.addItem(item)
             }
         }
     }
 
-    // 按下畫面上的按鈕
-    override fun onClick(view: View) {
-        when (view.id) {
-            R.id.Message_Sub_Cancel -> {
-                // 符號
-                val dialog = DialogInsertSymbol()
-                dialog.setListener { str: String -> this.insertString(str) }
-                dialog.show()
-            }
-            R.id.Message_Sub_Symbol -> {
-                // 表情符號
-                val items = UserSettings.articleExpressions
-                DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                    .setListener(object : DialogInsertExpressionListener {
-                        override fun onListDialogItemClicked(
-                            paramASListDialog: DialogInsertExpression,
-                            paramInt: Int,
-                            paramString: String
-                        ) {
-                            val symbol = items[paramInt]
-                            insertString(symbol)
-                        }
+    fun insertString(str: String) {
+        val current = contentState
+        val start = current.selection.start.coerceIn(0, current.text.length)
+        val end = current.selection.end.coerceIn(0, current.text.length)
+        val newText = current.text.replaceRange(start, end, str).take(59)
+        val newCursor = (start + str.length).coerceAtMost(59)
+        contentState = TextFieldValue(newText, TextRange(newCursor))
+    }
 
-                        override fun onListDialogSettingClicked() {
-                            navigationController.pushViewController(ArticleExpressionListPage())
-                        }
-                    }).scheduleDismissOnPageDisappear(this).show()
-            }
-            R.id.Message_Sub_ShortenUrl -> {
-                // 短網址
-                val dialog = DialogShortenUrl()
-                dialog.setListener(object: DialogShortenUrlListener {
-                    override fun onShortenUrlDone(str: String?) {
-                        insertString(str!!)
-                    }
-                })
-                dialog.show()
-            }
-            R.id.Message_Sub_ShortenImage -> {
-                // 縮圖
-                val shortenTimes: Int = UserSettings.propertiesNoVipShortenTimes
-                if (!UserSettings.propertiesVIP && shortenTimes>30) {
-                    ASToast.showLongToast(getContextString(R.string.vip_only_message))
-                    return
-                }
-                val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
-                startActivity(intent)
-            }
-            R.id.Message_Sub_Post -> {
-                // 發表
-                if (contentField.text?.isNotEmpty() == true) {
-                    // 送出訊息指令
-                    sendMessagePart1()
-
-                    // 預設送出完畢
-                    contentField.setText("")
-                }
-            }
+    private fun onPostClicked() {
+        if (contentState.text.isNotEmpty()) {
+            sendMessagePart1()
+            contentState = TextFieldValue("")
         }
     }
 
-    var tempMessage: BahaMessage? = null
     /** 送出訊息-1 試著啟動訊息 */
     private fun sendMessagePart1() {
-        val aSenderName = senderNameField.text.toString().trim()
-        val aMessage = contentField.text.toString().trim()
+        val aSenderName = senderNameState.trim()
+        val aMessage = contentState.text.trim()
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
-        // 更新db
         val db = MessageDatabase(context)
         try {
             val bahaMessage = db.sendMessage(aSenderName, aMessage)
-            if (bahaMessage!=null) {
+            if (bahaMessage != null) {
                 tempMessage = bahaMessage
-                // 更新畫面
                 insertMessage(bahaMessage)
             }
         } finally {
@@ -187,50 +160,49 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         messageASCoroutine?.postDelayed(3000L)
         isPostDelayedSuccess = false
     }
+
     /** 送出訊息-2 送出對方id */
     fun sendMessagePart2() {
         messageASCoroutine?.cancel()
 
-        if (tempMessage!=null) {
+        if (tempMessage != null) {
             val aSenderName = tempMessage?.senderName
-
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aSenderName\n")
                 .build()
             TelnetClient.myInstance!!.sendDataToServer(builder)
-        }
 
-        messageASCoroutine?.postDelayed(3000L)
-        // telnet會連續觸發這段兩次
-        if (!isPostDelayedSuccess)
+            messageASCoroutine?.cancel()
+            messageASCoroutine?.postDelayed(3000L)
             isPostDelayedSuccess = false
+        }
     }
-    /** 送出訊息-3 更新訊息 */
+
+    /** 送出訊息-3 送出內容 */
     fun sendMessagePart3() {
         messageASCoroutine?.cancel()
         isPostDelayedSuccess = true
 
-        if (tempMessage!=null) {
+        if (tempMessage != null) {
             tempMessage?.status = MessageStatus.Success
             val aMessage = tempMessage?.message
-
             val builder = TelnetOutputBuilder.create()
                 .pushString("$aMessage\n")
                 .build()
             TelnetClient.myInstance!!.sendDataToServer(builder)
 
-            // 更新db
             val db = MessageDatabase(context)
             try {
                 db.updateSendMessage(tempMessage!!)
-                // 更新畫面
-                for (i in listView.childCount - 1 downTo 0) {
-                    val view = listView.getChildAt(i)
-                    if (view.javaClass == MessageSubSend::class.java) {
-                        val item:MessageSubSend = view as MessageSubSend
-                        if (item.myBahaMessage.id == tempMessage?.id) {
-                            item.setStatus(tempMessage?.status)
-                            break
+                val lv = listViewRef
+                if (lv != null) {
+                    for (i in lv.childCount - 1 downTo 0) {
+                        val view = lv.getChildAt(i)
+                        if (view is MessageSubSend) {
+                            if (view.myBahaMessage.id == tempMessage?.id) {
+                                view.setStatus(tempMessage?.status)
+                                break
+                            }
                         }
                     }
                 }
@@ -240,24 +212,25 @@ class MessageSub: TelnetPage(), View.OnClickListener {
             tempMessage = null
         }
     }
-    fun sendMessageFail(status:MessageStatus) {
+
+    fun sendMessageFail(status: MessageStatus) {
         messageASCoroutine?.cancel()
         isPostDelayedSuccess = false
 
-        if (tempMessage!=null) {
+        if (tempMessage != null) {
             tempMessage?.status = status
-            // 更新db
             val db = MessageDatabase(context)
             try {
                 db.updateSendMessage(tempMessage!!)
-                // 更新畫面
-                for (i in listView.childCount - 1 downTo 0) {
-                    val view = listView.getChildAt(i)
-                    if (view.javaClass == MessageSubSend::class.java) {
-                        val item:MessageSubSend = view as MessageSubSend
-                        if (item.myBahaMessage.id == tempMessage?.id) {
-                            item.setStatus(tempMessage?.status)
-                            break
+                val lv = listViewRef
+                if (lv != null) {
+                    for (i in lv.childCount - 1 downTo 0) {
+                        val view = lv.getChildAt(i)
+                        if (view is MessageSubSend) {
+                            if (view.myBahaMessage.id == tempMessage?.id) {
+                                view.setStatus(tempMessage?.status)
+                                break
+                            }
                         }
                     }
                 }
@@ -268,16 +241,148 @@ class MessageSub: TelnetPage(), View.OnClickListener {
         }
     }
 
-    fun insertString(str: String) {
-        contentField.editableText.insert(contentField.selectionStart, str)
-    }
-
-    /** 強制發送訊息進入失敗 */
     private var messageASCoroutine: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess) {
                 sendMessageFail(MessageStatus.Offline)
                 ASToast.showLongToast("私訊無反應，對方可能不在線上")
+            }
+        }
+    }
+
+    @Composable
+    fun MessageSubContent() {
+        val colors = AppTheme.colors
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // Header: Back button + Sender Name
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp)
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string._back),
+                    color = colors.textPrimary,
+                    fontSize = 16.sp,
+                    modifier = Modifier.clickable { onBackPressed() }
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = senderNameState,
+                    color = colors.titleBarTitle,
+                    fontSize = 17.sp
+                )
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            // Chat Message List
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                AndroidView(
+                    factory = { ctx ->
+                        ASListView(ctx).apply {
+                            divider = null
+                            listViewRef = this
+                            if (senderNameState.isNotEmpty()) {
+                                setSenderName(senderNameState)
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // Edit Field
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            TextField(
+                value = contentState,
+                onValueChange = { if (it.text.length <= 59) contentState = it },
+                placeholder = {
+                    Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
+                },
+                singleLine = true,
+                colors = TextFieldDefaults.colors(
+                    focusedTextColor = colors.textPrimary,
+                    unfocusedTextColor = colors.textPrimary,
+                    focusedContainerColor = colors.surface,
+                    unfocusedContainerColor = colors.surface,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                keyboardActions = KeyboardActions(onSend = { onPostClicked() }),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Bottom toolbar (符號, 表情, 短網址, 縮圖, 發送)
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = stringResource(R.string.symbol),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val dialog = DialogInsertSymbol()
+                        dialog.setListener { str -> insertString(str) }
+                        dialog.show()
+                    }
+                )
+                BahaButton(
+                    text = stringResource(R.string.face),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val items = UserSettings.articleExpressions
+                        DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+                            .setListener(object : DialogInsertExpressionListener {
+                                override fun onListDialogItemClicked(paramASListDialog: DialogInsertExpression, paramInt: Int, paramString: String) {
+                                    insertString(items[paramInt])
+                                }
+                                override fun onListDialogSettingClicked() {
+                                    navigationController.pushViewController(ArticleExpressionListPage())
+                                }
+                            }).scheduleDismissOnPageDisappear(this@MessageSub).show()
+                    }
+                )
+                BahaButton(
+                    text = stringResource(R.string.dialog_shorten_url_title),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val dialog = DialogShortenUrl()
+                        dialog.setListener(object : DialogShortenUrlListener {
+                            override fun onShortenUrlDone(str: String?) {
+                                if (str != null) insertString(str)
+                            }
+                        })
+                        dialog.show()
+                    }
+                )
+                BahaButton(
+                    text = stringResource(R.string.dialog_shorten_img_title),
+                    modifier = Modifier.weight(1f),
+                    onClick = {
+                        val shortenTimes = UserSettings.propertiesNoVipShortenTimes
+                        if (!UserSettings.propertiesVIP && shortenTimes > 30) {
+                            ASToast.showLongToast(getContextString(R.string.vip_only_message))
+                        } else {
+                            val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
+                            startActivity(intent)
+                        }
+                    }
+                )
+                BahaButton(
+                    text = stringResource(R.string.post),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPostClicked() }
+                )
             }
         }
     }

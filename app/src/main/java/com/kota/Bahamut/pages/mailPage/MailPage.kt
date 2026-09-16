@@ -1,57 +1,63 @@
 package com.kota.Bahamut.pages.mailPage
 
 import android.annotation.SuppressLint
-import android.database.DataSetObservable
-import android.database.DataSetObserver
-import android.util.TypedValue
+import android.content.Context
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ListAdapter
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.articlePage.ArticlePageEditRecordItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
-import com.kota.Bahamut.pages.articlePage.ArticlePagePushItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
-import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
+import com.kota.Bahamut.pages.articlePage.ArticleTelnetModeContent
+import com.kota.Bahamut.pages.articlePage.ArticleTextModeContent
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetArticle
-import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 
-class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageListener {
-    lateinit var mainLayout: RelativeLayout
+class MailPage : TelnetPage(), SendMailPageListener {
     var telnetArticle: TelnetArticle? = null
-    var backButton: Button? = null
-    var listView: ASListView? = null
-    var pageDownButton: Button? = null
-    var pageUpButton: Button? = null
-    var listEmptyView: TextView? = null
     var telnetView: TelnetView? = null
-    var telnetViewBlock: ASScrollView? = null
-    var viewMode: Int = ArticleViewMode.MODE_TEXT
 
-    var isFullScreen: Boolean = false
-    val mDataSetObservable: DataSetObservable = DataSetObservable()
+    // Compose states
+    var currentArticle by mutableStateOf<TelnetArticle?>(null)
+    var viewModeState by mutableIntStateOf(ArticleViewMode.MODE_TEXT)
 
     override val pageLayout: Int
-        get() = R.layout.mail_page
+        get() = 0
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_MAIL
@@ -59,24 +65,16 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     override val isPopupPage: Boolean
         get() = true
 
-    override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
+    override val isKeepOnOffline: Boolean
+        get() = true
 
-        telnetViewBlock = mainLayout.findViewById(R.id.Mail_contentTelnetViewBlock)
-        telnetView = mainLayout.findViewById(R.id.Mail_contentTelnetView)
-        reloadTelnetLayout()
-        listView = mainLayout.findViewById(R.id.Mail_contentList)
-        listEmptyView = mainLayout.findViewById(R.id.Mail_listEmptyView)
-        listView?.emptyView = listEmptyView
-
-        backButton = mainLayout.findViewById(R.id.Mail_backButton)
-        pageUpButton = mainLayout.findViewById(R.id.Mail_pageUpButton)
-        pageDownButton = mainLayout.findViewById(R.id.Mail_pageDownButton)
-        backButton?.setOnClickListener(this)
-        pageUpButton?.setOnClickListener(this)
-        pageDownButton?.setOnClickListener(this)
-        mainLayout.findViewById<View>(R.id.Mail_changeModeButton)!!.setOnClickListener(this)
-        resetAdapter()
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                MailPageContent()
+                BahaGlobalDialogHost()
+            }
+        }
     }
 
     override fun onBackPressed(): Boolean {
@@ -84,155 +82,29 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         return super.onBackPressed()
     }
 
-    override fun onPageDidDisappear() {
-        backButton = null
-        pageUpButton = null
-        pageDownButton = null
-        listView = null
-        telnetViewBlock = null
-        telnetView = null
-        super.onPageDidDisappear()
-    }
-
-    override fun onMenuButtonClicked(): Boolean {
-        reloadViewMode()
+    override fun onReceivedGestureRight(): Boolean {
+        if (viewModeState != ArticleViewMode.MODE_TEXT) {
+            return true
+        }
+        onBackPressed()
         return true
     }
 
     fun setArticle(aArticle: TelnetArticle) {
         clear()
         telnetArticle = aArticle
-        telnetView!!.frame = telnetArticle!!.frame!!
-        telnetView!!.layoutParams = telnetView?.layoutParams
-        telnetViewBlock?.scrollTo(0, 0)
+        currentArticle = aArticle
+        if (telnetView != null && aArticle.frame != null) {
+            telnetView?.frame = aArticle.frame!!
+        }
         dismissProcessingDialog()
-        resetAdapter()
-    }
-
-    fun resetAdapter() {
-        if (telnetArticle != null) {
-            listView?.adapter = this
-        }
-    }
-
-    override fun getCount(): Int {
-        if (telnetArticle != null) {
-            return telnetArticle?.itemSize!! + 2
-        }
-        return 0
-    }
-
-    override fun getItem(itemIndex: Int): TelnetArticleItem? {
-        return telnetArticle?.getItem(itemIndex - 1)
-    }
-
-    override fun getItemId(itemIndex: Int): Long {
-        return itemIndex.toLong()
-    }
-
-    override fun getItemViewType(itemIndex: Int): Int {
-        if (itemIndex == 0) {
-            return 2
-        }
-        if (itemIndex == getCount() - 1) {
-            return 3
-        }
-        return getItem(itemIndex)!!.type
-    }
-
-    override fun getView(itemIndex: Int, itemViewFrom: View?, parentView: ViewGroup?): View {
-        val type = getItemViewType(itemIndex)
-        val item = getItem(itemIndex)
-        var itemViewOrigin = itemViewFrom
-
-        if (itemViewOrigin == null) {
-            itemViewOrigin = when (type) {
-                ArticlePageItemType.SIGN -> ArticlePageTelnetItemView(context)
-                ArticlePageItemType.HEADER -> ArticlePageHeaderItemView(context)
-                ArticlePageItemType.POST_TIME -> ArticlePageTimeTimeView(context)
-                else -> ArticlePageTextItemView(context)
-            }
-        } else if (type == ArticlePageItemType.CONTENT) {
-            itemViewOrigin = ArticlePageTextItemView(context)
-        }
-
-        if (itemViewOrigin is ArticlePageTextItemView && item!==null) {
-            itemViewOrigin.setAuthor(item.author, item.nickname)
-            itemViewOrigin.setQuote(item.quoteLevel)
-            itemViewOrigin.setContent(item.content, item.frame?.rows!!)
-            if (itemIndex >= getCount() - 2) {
-                itemViewOrigin.setDividerHidden(true)
-            } else {
-                itemViewOrigin.setDividerHidden(false)
-            }
-        } else if (itemViewOrigin is ArticlePageTelnetItemView && item!==null) {
-            itemViewOrigin.setFrame(item.frame!!)
-            if (itemIndex >= getCount() - 2) {
-                itemViewOrigin.setDividerHidden(true)
-            } else {
-                itemViewOrigin.setDividerHidden(false)
-            }
-        } else if (itemViewOrigin is ArticlePageHeaderItemView) {
-            var author = telnetArticle?.author
-            if (telnetArticle?.nickName != null) {
-                author = author + "(" + telnetArticle?.nickName + ")"
-            }
-            itemViewOrigin.setData(telnetArticle?.title, author, telnetArticle?.boardName)
-        } else if (itemViewOrigin is ArticlePageTimeTimeView) {
-            itemViewOrigin.setTime("《" + telnetArticle?.dateTime + "》")
-            itemViewOrigin.setIP(telnetArticle?.fromIP!!)
-        }
-
-        return itemViewOrigin
-    }
-
-    override fun getViewTypeCount(): Int {
-        return 4
-    }
-
-    override fun hasStableIds(): Boolean {
-        return false
-    }
-
-    override fun isEmpty(): Boolean {
-        return false
-    }
-
-    override fun registerDataSetObserver(observer: DataSetObserver?) {
-        mDataSetObservable.registerObserver(observer)
-    }
-
-    override fun unregisterDataSetObserver(observer: DataSetObserver?) {
-        mDataSetObservable.unregisterObserver(observer)
-    }
-
-    override fun areAllItemsEnabled(): Boolean {
-        return false
-    }
-
-    override fun isEnabled(itemIndex: Int): Boolean {
-        return false
     }
 
     override fun clear() {
         telnetArticle = null
+        currentArticle = null
     }
 
-    override fun onClick(aView: View) {
-        if (aView === backButton) {
-            onReplyButtonClicked()
-        } else if (aView === pageUpButton) {
-            onPageUpButtonClicked()
-        } else if (aView === pageDownButton) {
-            onPageDownButtonClicked()
-        } else if (aView.id == R.id.Mail_changeModeButton) {
-            reloadViewMode()
-        }
-    }
-
-    /**
-     * 按下寄信
-     */
     override fun onSendMailDialogSendButtonClicked(
         sendMailPage: SendMailPage,
         receiver: String,
@@ -245,7 +117,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageUpButtonClicked() {
-        if (TelnetClient.myInstance!!.telnetConnector?.isConnecting == true) {
+        if (TelnetClient.myInstance?.telnetConnector?.isConnecting == true) {
             PageContainer.instance!!.mailBoxPage.loadPreviousArticle()
         } else {
             showConnectionClosedToast()
@@ -253,85 +125,161 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     fun onPageDownButtonClicked() {
-        if (TelnetClient.myInstance!!.telnetConnector?.isConnecting!!) {
+        if (TelnetClient.myInstance?.telnetConnector?.isConnecting == true) {
             PageContainer.instance!!.mailBoxPage.loadNextArticle()
         } else {
             showConnectionClosedToast()
         }
     }
 
-    fun showConnectionClosedToast() {
+    private fun showConnectionClosedToast() {
         showShortToast("連線已中斷")
     }
 
     fun onReplyButtonClicked() {
         val sendMailPage = SendMailPage()
         navigationController.pushViewController(sendMailPage)
-        if (telnetArticle != null) {
-            val replyTitle = telnetArticle!!.generateReplyTitle()
-            val replyContent = telnetArticle!!.generateReplyContent()
+        val article = currentArticle ?: telnetArticle
+        if (article != null) {
+            val replyTitle = article.generateReplyTitle()
+            val replyContent = article.generateReplyContent()
             sendMailPage.setPostTitle(replyTitle)
             sendMailPage.setPostContent(replyContent)
-            sendMailPage.setReceiver(telnetArticle!!.author)
+            sendMailPage.setReceiver(article.author)
             sendMailPage.setListener(this)
         }
     }
 
     fun reloadViewMode() {
-        viewMode = if (viewMode == ArticleViewMode.MODE_TEXT) {
+        viewModeState = if (viewModeState == ArticleViewMode.MODE_TEXT) {
             ArticleViewMode.MODE_TELNET
         } else {
             ArticleViewMode.MODE_TEXT
         }
-        if (viewMode == ArticleViewMode.MODE_TEXT) {
-            listView?.visibility = View.VISIBLE
-            telnetViewBlock?.visibility = View.GONE
-            return
-        }
-        listView?.visibility = View.GONE
-        telnetViewBlock?.visibility = View.VISIBLE
-        telnetViewBlock?.invalidate()
     }
 
-    override fun onReceivedGestureRight(): Boolean {
-        if (viewMode != ArticleViewMode.MODE_TEXT || isFullScreen) {
-            return true
-        }
-        onBackPressed()
-        return true
-    }
-
-    override val isKeepOnOffline: Boolean
-        get() = true
-
-    /** 給 state handler 更改讀取進度  */
     @SuppressLint("SetTextI18n")
     fun changeLoadingPercentage(percentage: String?) {
         showProcessingDialog(getContextString(R.string.loading_) + "\n" + percentage)
     }
 
-    // 變更telnetView大小
-    fun reloadTelnetLayout() {
-        val textWidth = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            20.0f,
-            context?.resources!!.displayMetrics
-        ).toInt()
-        var telnetViewWidth = (textWidth / 2) * 80
-        val screenWidth: Int = if (navigationController.currentOrientation == 2) {
-            navigationController.screenHeight
-        } else {
-            navigationController.screenWidth
+    @Composable
+    fun MailPageContent() {
+        val colors = AppTheme.colors
+        val article = currentArticle
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 頂部導覽列
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.toolbarBackground)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 4.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { onBackPressed() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = null,
+                            tint = colors.titleBarTitle
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(horizontal = 4.dp)
+                    ) {
+                        Text(
+                            text = article?.title ?: stringResource(R.string.loading_),
+                            color = colors.titleBarTitle,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        if (article != null) {
+                            val nick = if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""
+                            Text(
+                                text = "${article.author}$nick  ${article.dateTime}",
+                                color = colors.titleBarDetail,
+                                fontSize = 11.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            }
+
+            // 信件內容主體
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                if (article == null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.loading_),
+                            color = colors.textSecondary,
+                            fontSize = 16.sp
+                        )
+                    }
+                } else {
+                    if (viewModeState == ArticleViewMode.MODE_TEXT) {
+                        ArticleTextModeContent(
+                            article = article,
+                            colors = colors,
+                            onAuthorClick = {}
+                        )
+                    } else {
+                        ArticleTelnetModeContent(
+                            article = article,
+                            onTelnetViewCreated = { view ->
+                                this@MailPage.telnetView = view
+                            }
+                        )
+                    }
+                }
+            }
+
+            // 底部工具列 (回信, 切換模式, 上一篇, 下一篇)
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = stringResource(R.string.reply_mail),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onReplyButtonClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.change_mode_short),
+                    modifier = Modifier.weight(1f),
+                    onClick = { reloadViewMode() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.prev_article),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPageUpButtonClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.next_article),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPageDownButtonClicked() }
+                )
+            }
         }
-        if (telnetViewWidth <= screenWidth) {
-            telnetViewWidth = -1
-            isFullScreen = true
-        } else {
-            isFullScreen = false
-        }
-        val layoutParams = telnetView?.layoutParams!!
-        layoutParams.width = telnetViewWidth
-        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        telnetView?.layoutParams = layoutParams
     }
 }

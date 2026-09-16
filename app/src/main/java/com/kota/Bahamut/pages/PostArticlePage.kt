@@ -1,18 +1,40 @@
 package com.kota.Bahamut.pages
 
-import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
-import android.text.Selection
-import android.util.TypedValue
 import android.view.View
-import android.view.View.OnFocusChangeListener
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.Spinner
-import android.widget.TextView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -28,7 +50,6 @@ import com.kota.Bahamut.dialogs.DialogShortenImage
 import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.CommonFunctions.judgeDoubleWord
 import com.kota.Bahamut.service.TempSettings
@@ -36,8 +57,11 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
 import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTimes
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialog.Companion.showErrorDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.ui.ASToast.showLongToast
@@ -49,32 +73,22 @@ import com.kota.telnet.model.TelnetFrame
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 
-class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSelectedListener {
-    var mainLayout: RelativeLayout? = null
+class PostArticlePage : TelnetPage() {
     private var articleNumber: String? = null
     private var boardMainPage: BoardMainPage? = null
-    private var originalContent: String? = null
-    private var contentField: EditText? = null
     private var editFormat: String? = null
     private var isHeaderHidden = false
-    private var headerSelected = 0
-    private var headerSelector: Spinner? = null
     private var postArticlePageListener: PostArticlePageListener? = null
     private var operationMode: OperationMode? = OperationMode.New
-    private var originalTitle: String? = null
-    private var postButton: TextView? = null
-    private var symbolButton: TextView? = null
-    private var insertSymbolButton: TextView? = null
-    private var paintColorButton: TextView? = null
-    private var titleBlock: View? = null
-    private var titleField: EditText? = null
-    private var titleFieldBackground: TextView? = null
-    lateinit var headers: Array<String>
     var recover: Boolean = false
     private var telnetArticle: TelnetArticle? = null
 
-    private var isToolbarShow = false // 是否展開工具列
-
+    // Compose states
+    var headers: Array<String> = emptyArray()
+    var headerSelectedState by mutableIntStateOf(0)
+    var titleState by mutableStateOf(TextFieldValue(""))
+    var contentState by mutableStateOf(TextFieldValue(""))
+    var isToolbarExpanded by mutableStateOf(false)
 
     enum class OperationMode {
         New,
@@ -87,7 +101,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
     }
 
     override val pageLayout: Int
-        get() = R.layout.post_article_page
+        get() = 0
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_POST_ARTICLE
@@ -95,538 +109,42 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
     override val isPopupPage: Boolean
         get() = true
 
+    override val isKeepOnOffline: Boolean
+        get() = true
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                PostArticlePageContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
+
     override fun onPageDidLoad() {
-        initial()
+        headers = articleHeaders
         if (recover) {
             loadTempArticle(9)
             recover = false
         }
     }
 
-    override fun onPageDidDisappear() {
-        headerSelector = null
-        titleField = null
-        titleFieldBackground = null
-        contentField = null
-        titleBlock = null
-        symbolButton = null
-        postButton = null
-        insertSymbolButton = null
-        paintColorButton = null
-        super.onPageDidDisappear()
-    }
-
-    private fun refreshTitleField() {
-        if (titleField != null && originalTitle != null) {
-            titleField?.setText(originalTitle)
-            if (originalTitle?.isNotEmpty() == true) {
-                Selection.setSelection(titleField?.text, 1)
-            }
-            originalTitle = null
-        }
-    }
-
-    private fun refreshContentField() {
-        if (contentField != null && originalContent != null) {
-            contentField?.setText(originalContent)
-            if (originalContent?.isNotEmpty() == true) {
-                Selection.setSelection(contentField?.text, originalContent?.length!!)
-            }
-            originalContent = null
-        }
-    }
-
-    private fun refreshHeaderSelector() {
-        if (headerSelector == null) {
-            return
-        }
-        if (isHeaderHidden) {
-            headerSelector?.visibility = View.GONE
-        } else {
-            headerSelector?.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onPageRefresh() {
-        refreshTitleField()
-        refreshContentField()
-        refreshHeaderSelector()
-    }
-
-    @SuppressLint("ResourceType")
-    private fun initial() {
-        headers = articleHeaders
-
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout?
-
-        titleField = mainLayout?.findViewById(R.id.ArticlePostDialog_TitleField)
-        // 點標題的時候拉大編輯框
-        titleField?.onFocusChangeListener = titleFieldListener
-        titleFieldBackground =
-            mainLayout?.findViewById(R.id.ArticlePostDialog_TitleFieldBackground)
-        contentField = mainLayout?.findViewById(R.id.ArticlePostDialog_EditField)
-
-        postButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Post)
-        postButton?.setOnClickListener(this)
-
-        symbolButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Symbol)
-        symbolButton?.setOnClickListener(this)
-
-        insertSymbolButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Cancel)
-        insertSymbolButton?.setOnClickListener(this)
-
-        paintColorButton = mainLayout?.findViewById(R.id.ArticlePostDialog_Color)
-        paintColorButton?.setOnClickListener(this)
-
-        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_File)!!.setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenUrl)!!.setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenImage)!!
-            .setOnClickListener(this)
-        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_EditButtons)!!
-            .setOnClickListener(this)
-
-        headerSelector = mainLayout?.findViewById(R.id.Post_headerSelector)
-        val adapter: ArrayAdapter<Any> =
-            ArrayAdapter<Any>(context!!, R.layout.simple_spinner_item, headers)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        headerSelected = 0
-        headerSelector?.adapter = adapter
-        headerSelector?.onItemSelectedListener = this
-        titleBlock = mainLayout?.findViewById(R.id.Post_TitleBlock)
-        titleBlock?.requestFocus()
-
-        mainLayout?.findViewById<View>(R.id.Post_Toolbar_Show)!!
-            .setOnClickListener(postToolbarShowOnClickListener)
-        mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Reference)!!
-            .setOnClickListener(referenceClickListener)
-    }
-
-    override fun clear() {
-        if (titleField != null) {
-            titleField?.setText("")
-        }
-        if (contentField != null) {
-            contentField?.setText("")
-        }
-
-        headerSelector?.setSelection(0) // 讓 UI 上的下拉選單回到第 0 個
-        headerSelected = 0              // 將紀錄索引的變數也歸零
-
-        postArticlePageListener = null
-        recover = false
-    }
-
-    /** 引言過多失敗存檔  */
-    fun setRecover() {
-        recover = true
-        saveTempArticle(9)
-    }
-
-    /** 設定文章標題  */
     fun setPostTitle(aTitle: String?) {
-        originalTitle = aTitle
-        refreshTitleField()
+        val t = aTitle ?: ""
+        titleState = TextFieldValue(t, TextRange(t.length))
     }
 
-    /** 設定內文  */
     fun setPostContent(aContent: String?) {
-        originalContent = aContent
-        refreshContentField()
+        val c = aContent ?: ""
+        contentState = TextFieldValue(c, TextRange(c.length))
     }
 
-    override fun onClick(view: View) {
-        if (view === postButton) {
-            if (postArticlePageListener != null) {
-                val title = getArticleHeader(headerSelected) + titleField?.text.toString()
-                    .replace("\n", "")
-                val content = contentField?.text.toString()
-                var errMsg: String? = null
-                if (title.isEmpty() && content.isEmpty()) {
-                    errMsg = "標題與內文不可為空"
-                } else if (title.isEmpty()) {
-                    errMsg = "標題不可為空"
-                } else if (content.isEmpty()) {
-                    errMsg = "內文不可為空"
-                }
-                if (errMsg == null) {
-                    post(title, content)
-                } else {
-                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg)
-                        .addButton(getContextString(R.string.sure)).show()
-                }
-            }
-        } else if (view === symbolButton) {
-            // 表情符號
-            val items: Array<String> = articleExpressions
-            DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                .setListener(object : DialogInsertExpressionListener {
-                    override fun onListDialogItemClicked(
-                        paramASListDialog: DialogInsertExpression,
-                        paramInt: Int,
-                        paramString: String
-                    ) {
-                        val symbol = items[paramInt]
-                        this@PostArticlePage.insertString(symbol)
-                    }
-
-                    override fun onListDialogSettingClicked() {
-                        // 將當前內容存檔, pushView會讓當前頁面消失
-                        setRecover()
-                        navigationController.pushViewController(ArticleExpressionListPage())
-                    }
-                }).scheduleDismissOnPageDisappear(this).show()
-        } else if (view === insertSymbolButton) {
-            // 符號
-            val dialog = DialogInsertSymbol()
-            dialog.setListener { str: String? -> this.insertString(str) }
-            dialog.show()
-        } else if (view === paintColorButton) {
-            // 上色
-            val dialog = DialogPaintColor()
-            dialog.setListener { str: String? -> this.insertString(str) }
-            dialog.show()
-        } else if (view.id == R.id.ArticlePostDialog_File) {
-            // 檔案
-            onFileClicked()
-        } else if (view.id == R.id.ArticlePostDialog_ShortenUrl) {
-            // 短網址
-            val dialog = DialogShortenUrl()
-            dialog.setListener { str: String? -> this.insertString(str) }
-            dialog.show()
-        } else if (view.id == R.id.ArticlePostDialog_ShortenImage) {
-            // 縮圖
-            val shortenTimes = propertiesNoVipShortenTimes
-            if (!propertiesVIP && shortenTimes > 30) {
-                showLongToast(getContextString(R.string.vip_only_message))
-                return
-            }
-            val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
-            startActivity(intent)
-        } else if (view.id == R.id.ArticlePostDialog_EditButtons) {
-            showShortToast(getContextString(R.string.error_under_develop))
-        }
+    fun setTelnetArticle(article: TelnetArticle?) {
+        telnetArticle = article
     }
-
-    /** 發文  */
-    private fun post(title: String, content: String?) {
-
-        val sendTitle: String? = if (articleNumber == null || title != originalTitle) {
-            title
-        } else {
-            null
-        }
-        // 有來源文章編號, 可能為Reply, edit
-        if (articleNumber != null) {
-            if (operationMode == OperationMode.Reply) {
-                // 回覆: 有註記回文
-                val dialog = DialogPostArticle(1)
-                dialog.setListener { aTarget: String?, aSign: String? ->
-                    if (this@PostArticlePage.postArticlePageListener != null) {
-                        this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
-                            this@PostArticlePage,
-                            sendTitle,
-                            content,
-                            aTarget,
-                            this@PostArticlePage.articleNumber,
-                            aSign,
-                            recover
-                        )
-                    }
-                    // 回應到作者信箱
-                    if (aTarget == "M") {
-                        closeArticle()
-                    }
-                }
-                dialog.show()
-            } else {
-                // 修改: 沒有註記回文
-                ASAlertDialog.createDialog().addButton(getContextString(R.string.cancel))
-                    .addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?")
-                    .setListener { aDialog: ASAlertDialog?, index: Int ->
-                        if (index == 1) {
-                            if (this@PostArticlePage.postArticlePageListener != null) {
-                                this@PostArticlePage.postArticlePageListener?.onPostDialogEditButtonClicked(
-                                    this@PostArticlePage,
-                                    this@PostArticlePage.articleNumber,
-                                    sendTitle,
-                                    this@PostArticlePage.editContent
-                                )
-                            }
-                        }
-                        closeArticle()
-                    }.show()
-            }
-        } else {
-            // 新增文章
-            val dialog2 = DialogPostArticle(0)
-            dialog2.setListener { aTarget: String?, aSign: String? ->
-                if (this@PostArticlePage.postArticlePageListener != null) {
-                    this@PostArticlePage.postArticlePageListener?.onPostDialogSendButtonClicked(
-                        this@PostArticlePage,
-                        sendTitle,
-                        content,
-                        null,
-                        null,
-                        aSign,
-                        recover
-                    )
-                }
-            }
-            dialog2.show()
-        }
-    }
-
-    fun closeArticle() {
-        // 引言過多情況下放棄, 要補上放棄存檔command
-        if (recover) {
-            val data = create()
-                .pushKey(TelnetKeyboard.CTRL_X)
-                .pushString("a\n")
-                .build()
-            TelnetClient.myInstance!!.sendDataToServer(data)
-            recover = false
-        }
-        clear()
-        try {
-            navigationController.popToViewController(boardMainPage)
-        } catch (e: UninitializedPropertyAccessException) {
-            // navigationController 未初始化時不執行任何動作
-        }
-        PageContainer.instance!!.cleanPostArticlePage()
-    }
-
-    override fun onItemSelected(adapterView: AdapterView<*>?, aView: View?, index: Int, id: Long) {
-        headerSelected = index
-    }
-
-    override fun onNothingSelected(adapterView: AdapterView<*>?) {
-    }
-
-    /** 標題欄位取得焦點  */
-    var titleFieldListener: OnFocusChangeListener =
-        OnFocusChangeListener { view: View?, hasFocus: Boolean ->
-            if (view !== titleField) {
-                return@OnFocusChangeListener
-            }
-            if (hasFocus) {
-                titleField?.isSingleLine = false
-            } else {
-                titleField?.isSingleLine = true
-            }
-        }
 
     fun setHeaderHidden(hidden: Boolean) {
         isHeaderHidden = hidden
-        refreshHeaderSelector()
-    }
-
-    /** 讀取暫存檔  */
-    fun onFileClicked() {
-        ASListDialog.createDialog()
-            .setTitle(getContextString(R.string._article))
-            .addItem(getContextString(R.string.load_temp))
-            .addItem(getContextString(R.string.save_to_temp))
-            .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return true
-                }
-
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
-                    if (title == getContextString(R.string.load_temp)) {
-                        this@PostArticlePage.ontLoadArticleFromTempButtonClicked()
-                    } else if (title == getContextString(R.string.save_to_temp)) {
-                        this@PostArticlePage.ontSaveArticleToTempButtonClicked()
-                    }
-                }
-            }).show()
-    }
-
-    /** 按下 讀取暫存檔  */
-    private fun ontLoadArticleFromTempButtonClicked() {
-        ASListDialog.createDialog()
-            .setTitle(getContextString(R.string._article))
-            .addItem("讀取上次送出文章")
-            .addItem(getContextString(R.string.load_temp) + ".1")
-            .addItem(getContextString(R.string.load_temp) + ".2")
-            .addItem(getContextString(R.string.load_temp) + ".3")
-            .addItem(getContextString(R.string.load_temp) + ".4")
-            .addItem(getContextString(R.string.load_temp) + ".5")
-            .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return true
-                }
-
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
-                    if (index == 0) {
-                        ASAlertDialog.createDialog()
-                            .setTitle(getContextString(R.string.load_temp))
-                            .setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?")
-                            .addButton(getContextString(R.string.cancel))
-                            .addButton(getContextString(R.string.sure))
-                            .setListener { aDialog12: ASAlertDialog?, buttonIndex: Int ->
-                                this@PostArticlePage.loadTempArticle(
-                                    9
-                                )
-                            }.show()
-                    } else {
-                        ASAlertDialog.createDialog()
-                            .setTitle(getContextString(R.string.load_temp))
-                            .setMessage("您是否確定要以暫存檔." + index + "的內容取代您現在編輯的內容?")
-                            .addButton(getContextString(R.string.cancel))
-                            .addButton(getContextString(R.string.sure))
-                            .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
-                                if (buttonIndex == 1) {
-                                    this@PostArticlePage.loadTempArticle(index - 1)
-                                }
-                            }.show()
-                    }
-                }
-            }).show()
-    }
-
-    /** 讀取暫存檔  */
-    private fun loadTempArticle(index: Int) {
-        val articleTemp = ArticleTempStore(context).articles[index]
-        headerSelector?.setSelection(getIndexOfHeader(articleTemp.header))
-        titleField?.setText(articleTemp.title)
-        contentField?.setText(articleTemp.content)
-    }
-
-    /** 儲存暫存檔  */
-    private fun saveTempArticle(index: Int) {
-        val store = ArticleTempStore(context)
-        val articleTemp = store.articles[index]
-        // 類別
-        articleTemp.header = ""
-        if (headerSelector?.selectedItemPosition!! > 0) {
-            articleTemp.header = getArticleHeader(headerSelector?.selectedItemPosition!!)
-        }
-        // 標題
-        articleTemp.title = titleField?.text.toString()
-        // 內文
-        articleTemp.content = contentField?.text.toString()
-
-        // 存檔
-        store.store()
-        // ArticleTempStore 有暫存檔定義
-        if (index < 8) {
-            ASAlertDialog.createDialog().setTitle(getContextString(R.string._save))
-                .setMessage("存檔完成").addButton(getContextString(R.string.sure)).show()
-        }
-    }
-
-    /** 從字串去回推標題定位  */
-    fun getIndexOfHeader(aHeader: String?): Int {
-        if (aHeader.isNullOrEmpty()) {
-            return 0
-        }
-        for (i in 1..<headers.size) {
-            if (headers[i] == aHeader) {
-                return i
-            }
-        }
-        return -1
-    }
-
-    /** 從定位取出特定標題  */
-    fun getArticleHeader(index: Int): String {
-        if (index <= 0 || index >= headers.size) {
-            return ""
-        }
-        return headers[index]
-    }
-
-    /** 按下 存入暫存檔  */
-    private fun ontSaveArticleToTempButtonClicked() {
-        ASListDialog.createDialog()
-            .setTitle(getContextString(R.string._article))
-            .addItem(getContextString(R.string.save_to_temp) + ".1")
-            .addItem(getContextString(R.string.save_to_temp) + ".2")
-            .addItem(getContextString(R.string.save_to_temp) + ".3")
-            .addItem(getContextString(R.string.save_to_temp) + ".4")
-            .addItem(getContextString(R.string.save_to_temp) + ".5")
-            .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return true
-                }
-
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
-                    ASAlertDialog.createDialog()
-                        .setTitle(getContextString(R.string.load_temp))
-                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
-                        .addButton(getContextString(R.string.cancel))
-                        .addButton(getContextString(R.string.sure))
-                        .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
-                            if (buttonIndex == 1) {
-                                this@PostArticlePage.saveTempArticle(index)
-                            }
-                        }.show()
-                }
-            }).show()
-    }
-
-    /** 存檔時, 存入暫存檔  */
-    private fun ontSaveArticleToTempAndLeaveButtonClicked() {
-        ASListDialog.createDialog()
-            .setTitle(getContextString(R.string._article))
-            .addItem(getContextString(R.string.save_to_temp) + ".1")
-            .addItem(getContextString(R.string.save_to_temp) + ".2")
-            .addItem(getContextString(R.string.save_to_temp) + ".3")
-            .addItem(getContextString(R.string.save_to_temp) + ".4")
-            .addItem(getContextString(R.string.save_to_temp) + ".5")
-            .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return true
-                }
-
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
-                    ASAlertDialog.createDialog()
-                        .setTitle(getContextString(R.string.load_temp))
-                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
-                        .addButton(getContextString(R.string.cancel))
-                        .addButton(getContextString(R.string.sure))
-                        .setListener { aDialog1: ASAlertDialog?, buttonIndex: Int ->
-                            if (buttonIndex == 0) {
-                                this@PostArticlePage.onBackPressed()
-                            } else {
-                                this@PostArticlePage.saveTempArticle(index)
-                                closeArticle()
-                            }
-                        }.show()
-                }
-            }).show()
     }
 
     fun setOperationMode(aMode: OperationMode?) {
@@ -641,32 +159,419 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
         editFormat = aFormat
     }
 
-    val editContent: String?
-        /** 組合修改文章內容  */
-        get() {
-            if (editFormat == null) {
-                return null
-            }
-            val editTitle = judgeDoubleWord(
-                titleField?.text.toString(),
-                TelnetFrame.Companion.DEFAULT_COLUMN - 9
-            ).split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-            val editContent = contentField?.text.toString()
-            return String.format(editFormat!!, editTitle, editContent)
-        }
-
-    override val isKeepOnOffline: Boolean
-        get() = true
-
     fun setBoardPage(aBoardMainPage: BoardMainPage?) {
         boardMainPage = aBoardMainPage
     }
 
-    /** 按下 返回  */
+    fun setRecover() {
+        recover = true
+        saveTempArticle(9)
+    }
+
+    val editContent: String?
+        get() {
+            if (editFormat == null) return null
+            val editTitle = judgeDoubleWord(
+                titleState.text,
+                TelnetFrame.DEFAULT_COLUMN - 9
+            ).split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
+            val editContentStr = contentState.text
+            return String.format(editFormat!!, editTitle, editContentStr)
+        }
+
+    override fun clear() {
+        titleState = TextFieldValue("")
+        contentState = TextFieldValue("")
+        headerSelectedState = 0
+        postArticlePageListener = null
+        recover = false
+    }
+
+    fun closeArticle() {
+        if (recover) {
+            val data = create()
+                .pushKey(TelnetKeyboard.CTRL_X)
+                .pushString("a\n")
+                .build()
+            TelnetClient.myInstance?.sendDataToServer(data)
+            recover = false
+        }
+        clear()
+        try {
+            navigationController.popToViewController(boardMainPage)
+        } catch (_: UninitializedPropertyAccessException) {
+        }
+        PageContainer.instance?.cleanPostArticlePage()
+    }
+
+    fun insertString(str: String?) {
+        if (str.isNullOrEmpty()) return
+        val current = contentState
+        val start = current.selection.start.coerceIn(0, current.text.length)
+        val end = current.selection.end.coerceIn(0, current.text.length)
+        val newText = current.text.replaceRange(start, end, str)
+        val newCursor = start + str.length
+        contentState = TextFieldValue(newText, TextRange(newCursor))
+    }
+
+    private fun post(title: String, content: String?) {
+        val sendTitle: String? = if (articleNumber == null) {
+            title
+        } else {
+            title
+        }
+
+        if (articleNumber != null) {
+            if (operationMode == OperationMode.Reply) {
+                val dialog = DialogPostArticle(1)
+                dialog.setListener { aTarget: String?, aSign: String? ->
+                    postArticlePageListener?.onPostDialogSendButtonClicked(
+                        this@PostArticlePage,
+                        sendTitle,
+                        content,
+                        aTarget,
+                        articleNumber,
+                        aSign,
+                        recover
+                    )
+                    if (aTarget == "M") {
+                        closeArticle()
+                    }
+                }
+                dialog.show()
+            } else {
+                ASAlertDialog.createDialog().addButton(getContextString(R.string.cancel))
+                    .addButton("送出").setTitle("確認").setMessage("您是否確定要編輯此文章?")
+                    .setListener { _, index ->
+                        if (index == 1) {
+                            postArticlePageListener?.onPostDialogEditButtonClicked(
+                                this@PostArticlePage,
+                                articleNumber,
+                                sendTitle,
+                                editContent
+                            )
+                        }
+                        closeArticle()
+                    }.show()
+            }
+        } else {
+            val dialog2 = DialogPostArticle(0)
+            dialog2.setListener { aTarget: String?, aSign: String? ->
+                postArticlePageListener?.onPostDialogSendButtonClicked(
+                    this@PostArticlePage,
+                    sendTitle,
+                    content,
+                    null,
+                    null,
+                    aSign,
+                    recover
+                )
+            }
+            dialog2.show()
+        }
+    }
+
+    private fun onPostButtonClicked() {
+        if (postArticlePageListener == null) return
+        val title = getArticleHeader(headerSelectedState) + titleState.text.replace("\n", "")
+        val content = contentState.text
+        var errMsg: String? = null
+        if (title.isEmpty() && content.isEmpty()) {
+            errMsg = "標題與內文不可為空"
+        } else if (title.isEmpty()) {
+            errMsg = "標題不可為空"
+        } else if (content.isEmpty()) {
+            errMsg = "內文不可為空"
+        }
+        if (errMsg == null) {
+            post(title, content)
+        } else {
+            ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg)
+                .addButton(getContextString(R.string.sure)).show()
+        }
+    }
+
+    private fun onInsertExpressionClicked() {
+        val items: Array<String> = articleExpressions
+        DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+            .setListener(object : DialogInsertExpressionListener {
+                override fun onListDialogItemClicked(
+                    paramASListDialog: DialogInsertExpression,
+                    paramInt: Int,
+                    paramString: String
+                ) {
+                    insertString(items[paramInt])
+                }
+
+                override fun onListDialogSettingClicked() {
+                    setRecover()
+                    navigationController.pushViewController(ArticleExpressionListPage())
+                }
+            }).scheduleDismissOnPageDisappear(this).show()
+    }
+
+    private fun onInsertSymbolClicked() {
+        val dialog = DialogInsertSymbol()
+        dialog.setListener { str: String? -> insertString(str) }
+        dialog.show()
+    }
+
+    private fun onPaintColorClicked() {
+        val dialog = DialogPaintColor()
+        dialog.setListener { str: String? -> insertString(str) }
+        dialog.show()
+    }
+
+    private fun onFileClicked() {
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string._article))
+            .addItem(getContextString(R.string.load_temp))
+            .addItem(getContextString(R.string.save_to_temp))
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ): Boolean = true
+
+                override fun onListDialogItemClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ) {
+                    if (title == getContextString(R.string.load_temp)) {
+                        ontLoadArticleFromTempButtonClicked()
+                    } else if (title == getContextString(R.string.save_to_temp)) {
+                        ontSaveArticleToTempButtonClicked()
+                    }
+                }
+            }).show()
+    }
+
+    private fun ontLoadArticleFromTempButtonClicked() {
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string._article))
+            .addItem("讀取上次送出文章")
+            .addItem(getContextString(R.string.load_temp) + ".1")
+            .addItem(getContextString(R.string.load_temp) + ".2")
+            .addItem(getContextString(R.string.load_temp) + ".3")
+            .addItem(getContextString(R.string.load_temp) + ".4")
+            .addItem(getContextString(R.string.load_temp) + ".5")
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(paramASListDialog: ASListDialog?, index: Int, title: String?): Boolean = true
+                override fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?) {
+                    if (index == 0) {
+                        ASAlertDialog.createDialog()
+                            .setTitle(getContextString(R.string.load_temp))
+                            .setMessage("您是否確定要以上次送出文章的內容取代您現在編輯的內容?")
+                            .addButton(getContextString(R.string.cancel))
+                            .addButton(getContextString(R.string.sure))
+                            .setListener { _, buttonIndex ->
+                                if (buttonIndex == 1) loadTempArticle(9)
+                            }.show()
+                    } else {
+                        ASAlertDialog.createDialog()
+                            .setTitle(getContextString(R.string.load_temp))
+                            .setMessage("您是否確定要以暫存檔.$index 的內容取代您現在編輯的內容?")
+                            .addButton(getContextString(R.string.cancel))
+                            .addButton(getContextString(R.string.sure))
+                            .setListener { _, buttonIndex ->
+                                if (buttonIndex == 1) loadTempArticle(index - 1)
+                            }.show()
+                    }
+                }
+            }).show()
+    }
+
+    private fun ontSaveArticleToTempButtonClicked() {
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string._article))
+            .addItem(getContextString(R.string.save_to_temp) + ".1")
+            .addItem(getContextString(R.string.save_to_temp) + ".2")
+            .addItem(getContextString(R.string.save_to_temp) + ".3")
+            .addItem(getContextString(R.string.save_to_temp) + ".4")
+            .addItem(getContextString(R.string.save_to_temp) + ".5")
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(paramASListDialog: ASListDialog?, index: Int, title: String?): Boolean = true
+                override fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?) {
+                    ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string.load_temp))
+                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                        .addButton(getContextString(R.string.cancel))
+                        .addButton(getContextString(R.string.sure))
+                        .setListener { _, buttonIndex ->
+                            if (buttonIndex == 1) saveTempArticle(index)
+                        }.show()
+                }
+            }).show()
+    }
+
+    private fun ontSaveArticleToTempAndLeaveButtonClicked() {
+        ASListDialog.createDialog()
+            .setTitle(getContextString(R.string._article))
+            .addItem(getContextString(R.string.save_to_temp) + ".1")
+            .addItem(getContextString(R.string.save_to_temp) + ".2")
+            .addItem(getContextString(R.string.save_to_temp) + ".3")
+            .addItem(getContextString(R.string.save_to_temp) + ".4")
+            .addItem(getContextString(R.string.save_to_temp) + ".5")
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(paramASListDialog: ASListDialog?, index: Int, title: String?): Boolean = true
+                override fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?) {
+                    ASAlertDialog.createDialog()
+                        .setTitle(getContextString(R.string.load_temp))
+                        .setMessage("您是否確定要以現在編輯的內容取代暫存檔." + (index + 1) + "的內容?")
+                        .addButton(getContextString(R.string.cancel))
+                        .addButton(getContextString(R.string.sure))
+                        .setListener { _, buttonIndex ->
+                            if (buttonIndex == 0) {
+                                onBackPressed()
+                            } else {
+                                saveTempArticle(index)
+                                closeArticle()
+                            }
+                        }.show()
+                }
+            }).show()
+    }
+
+    private fun loadTempArticle(index: Int) {
+        val articleTemp = ArticleTempStore(context).articles[index]
+        headerSelectedState = getIndexOfHeader(articleTemp.header).coerceAtLeast(0)
+        titleState = TextFieldValue(articleTemp.title ?: "")
+        contentState = TextFieldValue(articleTemp.content ?: "")
+    }
+
+    private fun saveTempArticle(index: Int) {
+        val store = ArticleTempStore(context)
+        val articleTemp = store.articles[index]
+        articleTemp.header = if (headerSelectedState > 0) getArticleHeader(headerSelectedState) else ""
+        articleTemp.title = titleState.text
+        articleTemp.content = contentState.text
+        store.store()
+        if (index < 8) {
+            ASAlertDialog.createDialog().setTitle(getContextString(R.string._save))
+                .setMessage("存檔完成").addButton(getContextString(R.string.sure)).show()
+        }
+    }
+
+    fun getIndexOfHeader(aHeader: String?): Int {
+        if (aHeader.isNullOrEmpty()) return 0
+        for (i in 1 until headers.size) {
+            if (headers[i] == aHeader) return i
+        }
+        return -1
+    }
+
+    fun getArticleHeader(index: Int): String {
+        if (index <= 0 || index >= headers.size) return ""
+        return headers[index]
+    }
+
+    private fun onReferenceClicked() {
+        val authors: MutableList<ReferenceAuthor> = ArrayList()
+        if (telnetArticle == null) {
+            ASAlertDialog.showErrorDialog(getContextString(R.string.dialog_reference_error_1), this)
+            return
+        }
+
+        if (editFormat == null) {
+            val replyAuthor = ReferenceAuthor().apply {
+                enabled = true
+                authorName = telnetArticle?.author ?: ""
+            }
+            authors.add(replyAuthor)
+
+            val newAuthor = ReferenceAuthor().apply {
+                if ((telnetArticle?.infoSize ?: 0) > 0) {
+                    val item = telnetArticle?.getInfo(0)
+                    enabled = true
+                    authorName = item?.author ?: ""
+                }
+            }
+            authors.add(newAuthor)
+        } else {
+            if ((telnetArticle?.infoSize ?: 0) > 0) {
+                for (i in 0 until telnetArticle!!.infoSize) {
+                    val newAuthor = ReferenceAuthor().apply {
+                        val item = telnetArticle?.getInfo(i)
+                        enabled = true
+                        authorName = item?.author ?: ""
+                    }
+                    authors.add(newAuthor)
+                }
+            }
+        }
+
+        val dialog = DialogReference()
+        dialog.setAuthors(authors)
+        dialog.setListener { resAuthors -> referenceBack(resAuthors) }
+        dialog.show()
+    }
+
+    private fun referenceBack(authors: MutableList<ReferenceAuthor>) {
+        if (telnetArticle == null) return
+        val originParentContent = telnetArticle!!.generateReplyContent().split("\n").dropLastWhile { it.isEmpty() }
+        val tempParentContent = ArrayList<String>()
+        val finalParentContent = ArrayList<String>()
+
+        val author0 = authors.getOrNull(0)
+        val author1 = authors.getOrNull(1)
+        var author0InsertRows = 0
+        var author1InsertRows = 0
+
+        var author0TotalRows = 0
+        var author1TotalRows = 0
+        for (rowString in originParentContent) {
+            if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
+                if (!(author1?.removeBlank == true && rowString.replace("> > ", "").isEmpty())) {
+                    tempParentContent.add(rowString)
+                    author1TotalRows++
+                }
+            } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
+                if (!(author0?.removeBlank == true && rowString.replace("> ", "").isEmpty())) {
+                    tempParentContent.add(rowString)
+                    author0TotalRows++
+                }
+            }
+        }
+
+        for (rowString in tempParentContent) {
+            var needInsert = false
+            if (rowString.startsWith("> ※ ")) {
+                if (author1?.enabled == true) needInsert = true
+            } else if (rowString.startsWith("> > ")) {
+                if (author1?.enabled == true) {
+                    when (author1.reservedType) {
+                        0 -> needInsert = true
+                        1 -> if (author1InsertRows < 3) { author1InsertRows++; needInsert = true }
+                        2 -> { author1InsertRows++; if (author1InsertRows + 3 >= author1TotalRows) needInsert = true }
+                    }
+                }
+            } else if (rowString.startsWith("※ ")) {
+                if (author0?.enabled == true) needInsert = true
+            } else if (rowString.startsWith("> ")) {
+                if (author0?.enabled == true) {
+                    when (author0.reservedType) {
+                        0 -> needInsert = true
+                        1 -> if (author0InsertRows < 3) { author0InsertRows++; needInsert = true }
+                        2 -> { author0InsertRows++; if (author0InsertRows + 3 >= author0TotalRows) needInsert = true }
+                    }
+                }
+            }
+            if (needInsert) finalParentContent.add(rowString)
+        }
+
+        val joinedParentContent = finalParentContent.joinToString("\n")
+        val originFromContent = contentState.text.split("\n").dropLastWhile { it.isEmpty() }
+        val selfContent = originFromContent.filter { !it.startsWith("※ 引述") && !it.startsWith("> ") }
+        val joinedSelfContent = selfContent.joinToString("\n")
+
+        val result = if (joinedParentContent.isNotEmpty()) "$joinedParentContent\n$joinedSelfContent" else joinedSelfContent
+        contentState = TextFieldValue(result, TextRange(result.length))
+    }
+
     override fun onBackPressed(): Boolean {
-        if (titleField?.text.toString().isEmpty() && contentField?.text
-                .toString().isEmpty()
-        ) {
+        if (titleState.text.isEmpty() && contentState.text.isEmpty()) {
             return super.onBackPressed()
         }
         ASAlertDialog.createDialog()
@@ -675,208 +580,181 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string._giveUp))
             .addButton(getContextString(R.string._save))
-            .setListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { _, index ->
                 if (index == 1) {
                     closeArticle()
                 } else if (index == 2) {
-                    this@PostArticlePage.ontSaveArticleToTempAndLeaveButtonClicked()
+                    ontSaveArticleToTempAndLeaveButtonClicked()
                 }
             }.show()
         return true
     }
 
-    /** 按下 展開/摺疊  */
-    var postToolbarShowOnClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val thisBtn = view as TextView
-        val toolBar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)!!
-        val layoutParams = toolBar.layoutParams as RelativeLayout.LayoutParams
-        if (isToolbarShow) {
-            // 從展開->摺疊
-            isToolbarShow = false
-            thisBtn.text = getContextString(R.string.post_toolbar_show)
-            layoutParams.height = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                60f,
-                resource?.displayMetrics
-            ).toInt()
-        } else {
-            isToolbarShow = true
-            thisBtn.text = getContextString(R.string.post_toolbar_collapse)
-            layoutParams.height = TypedValue.applyDimension(
-                TypedValue.COMPLEX_UNIT_DIP,
-                120f,
-                resource?.displayMetrics
-            ).toInt()
-        }
-        toolBar.layoutParams = layoutParams
-    }
+    @Composable
+    fun PostArticlePageContent() {
+        val colors = AppTheme.colors
+        var headerDropdownExpanded by remember { mutableStateOf(false) }
 
-    fun insertString(str: String?) {
-        if (contentField != null) {
-            contentField?.editableText!!.insert(contentField?.selectionStart!!, str)
-        }
-    }
-
-    /** 設定TelnetArticle, 格式按鈕會使用  */
-    fun setTelnetArticle(article: TelnetArticle?) {
-        telnetArticle = article
-    }
-
-    /** 按下格式  */
-    var referenceClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        val authors: MutableList<ReferenceAuthor> = ArrayList()
-        if (telnetArticle == null) {
-            showErrorDialog(getContextString(R.string.dialog_reference_error_1), this)
-            return@OnClickListener
+        if (headers.isEmpty()) {
+            headers = articleHeaders
         }
 
-        if (editFormat == null) {
-            // 回覆
-            // 回應作者
-            val replyAuthor = ReferenceAuthor()
-            replyAuthor.enabled = true
-            replyAuthor.authorName = telnetArticle?.author!!
-            authors.add(replyAuthor)
-
-            // 更上一層
-            val newAuthor = ReferenceAuthor()
-            if (telnetArticle?.infoSize!! > 0) {
-                val item = telnetArticle?.getInfo(0)
-                newAuthor.enabled = true
-                newAuthor.authorName = item?.author!!
-            }
-            authors.add(newAuthor)
-        } else {
-            // 修改
-            if (telnetArticle?.infoSize!! > 0) {
-                for (i in 0..<telnetArticle?.infoSize!!) {
-                    val newAuthor = ReferenceAuthor()
-                    val item = telnetArticle?.getInfo(i)
-                    newAuthor.enabled = true
-                    newAuthor.authorName = item?.author!!
-                    authors.add(newAuthor)
-                }
-            }
-        }
-
-        val dialog = DialogReference()
-        dialog.setAuthors(authors)
-        dialog.setListener { authors ->
-            this.referenceBack(
-                authors
-            )
-        }
-        dialog.show()
-    }
-
-    fun referenceBack(authors: MutableList<ReferenceAuthor>) {
-        // 找出父層內容
-        val originParentContent = listOf(
-            *telnetArticle?.generateReplyContent()!!.split("\n".toRegex())
-                .dropLastWhile { it.isEmpty() }.toTypedArray()
-        )
-        val tempParentContent: MutableList<String> = ArrayList()
-        val finalParentContent: MutableList<String?> = ArrayList()
-
-
-        // 開始篩選
-        val author0 = authors[0]
-        val author1 = authors[1]
-        var author0InsertRows = 0
-        var author1InsertRows = 0
-
-        // 如果有選到後三行, 計算兩個作者總行數
-        var author0TotalRows = 0
-        var author1TotalRows = 0
-        for (i in originParentContent.indices) {
-            val rowString = originParentContent[i]
-            if (rowString.startsWith("> ※ ") || rowString.startsWith("> > ")) {
-                if (!(author1.removeBlank && rowString.replace("> > ".toRegex(), "").isEmpty())) {
-                    tempParentContent.add(rowString)
-                    author1TotalRows++
-                }
-            } else if (rowString.startsWith("※ ") || rowString.startsWith("> ")) {
-                if (!(author0.removeBlank && rowString.replace("> ".toRegex(), "").isEmpty())) {
-                    tempParentContent.add(rowString)
-                    author0TotalRows++
-                }
-            }
-        }
-
-        var needInsert: Boolean
-        for (i in tempParentContent.indices) {
-            val rowString = tempParentContent[i]
-            needInsert = false
-            if (rowString.startsWith("> ※ ")) {
-                // 前二
-                if (author1.enabled) needInsert = true
-            } else if (rowString.startsWith("> > ")) {
-                // 前二
-                if (author1.enabled) {
-                    when (author1.reservedType) {
-                        0 ->  // 全部
-                            needInsert = true
-
-                        1 -> { // 前三
-                            if (author1InsertRows < 3) {
-                                author1InsertRows++
-                                needInsert = true
-                            }
-                        }
-
-                        2 -> {  // 後三
-                            author1InsertRows++
-                            if (author1InsertRows + 3 >= author1TotalRows) needInsert = true
-                        }
-                    }
-                }
-            } else if (rowString.startsWith("※ ")) {
-                // 前一
-                if (author0.enabled) needInsert = true
-            } else if (rowString.startsWith("> ")) {
-                // 前一
-                if (author0.enabled) {
-                    when (author0.reservedType) {
-                        0 ->  // 保留
-                            needInsert = true
-
-                        1 -> { // 前三
-                            if (author0InsertRows < 3) {
-                                author0InsertRows++
-                                needInsert = true
-                            }
-                        }
-
-                        2 -> { // 後三
-                            author0InsertRows++
-                            if (author0InsertRows + 3 >= author0TotalRows) needInsert = true
-                        }
-                    }
-                }
-            }
-            if (needInsert) {
-                finalParentContent.add(rowString)
-            }
-        }
-        val joinedParentContent = java.lang.String.join("\n", finalParentContent)
-
-        // 找出自己打的內容
-        val originFromContent = listOf(
-            *contentField?.text.toString().split("\n".toRegex())
-                .dropLastWhile { it.isEmpty() }.toTypedArray()
-        )
-        val selfContent: MutableList<String?> = ArrayList()
-        for (i in originFromContent.indices) {
-            if (!originFromContent[i].startsWith("※ 引述") && !originFromContent[i]
-                    .startsWith("> ")
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 頂部標題列
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp, vertical = 2.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                selfContent.add(originFromContent[i])
+                // Header Selector Dropdown (if not hidden)
+                if (!isHeaderHidden && headers.isNotEmpty()) {
+                    Box {
+                        Text(
+                            text = headers.getOrNull(headerSelectedState) ?: headers[0],
+                            color = colors.titleBarTitle,
+                            fontSize = 15.sp,
+                            modifier = Modifier
+                                .clickable { headerDropdownExpanded = true }
+                                .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
+                        )
+                        DropdownMenu(
+                            expanded = headerDropdownExpanded,
+                            onDismissRequest = { headerDropdownExpanded = false },
+                            modifier = Modifier.background(colors.surface)
+                        ) {
+                            headers.forEachIndexed { index, header ->
+                                DropdownMenuItem(
+                                    text = { Text(header, color = colors.textPrimary) },
+                                    onClick = {
+                                        headerSelectedState = index
+                                        headerDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 標題輸入框
+                TextField(
+                    value = titleState,
+                    onValueChange = { titleState = it },
+                    placeholder = {
+                        Text(stringResource(R.string.input_title_here), color = colors.textSecondary)
+                    },
+                    singleLine = true,
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            // 內文輸入框
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                TextField(
+                    value = contentState,
+                    onValueChange = { contentState = it },
+                    placeholder = {
+                        Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // 工具列 (可展開/摺疊)
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+            AnimatedVisibility(visible = isToolbarExpanded) {
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth()) {
+                        BahaButton(
+                            text = stringResource(R.string.post_article_page_paint_color),
+                            modifier = Modifier.weight(1f),
+                            onClick = { onPaintColorClicked() }
+                        )
+                        BahaButton(
+                            text = stringResource(R.string.file),
+                            modifier = Modifier.weight(1f),
+                            onClick = { onFileClicked() }
+                        )
+                        BahaButton(
+                            text = stringResource(R.string.dialog_shorten_url_title),
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                val dialog = DialogShortenUrl()
+                                dialog.setListener { str -> insertString(str) }
+                                dialog.show()
+                            }
+                        )
+                        BahaButton(
+                            text = stringResource(R.string.dialog_shorten_img_title),
+                            modifier = Modifier.weight(1f),
+                            onClick = {
+                                if (!propertiesVIP && propertiesNoVipShortenTimes > 30) {
+                                    showLongToast(getContextString(R.string.vip_only_message))
+                                } else {
+                                    val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
+                                    startActivity(intent)
+                                }
+                            }
+                        )
+                    }
+                    HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                }
+            }
+
+            // 主要工具列第一行
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = if (isToolbarExpanded) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
+                    modifier = Modifier.weight(1f),
+                    onClick = { isToolbarExpanded = !isToolbarExpanded }
+                )
+                BahaButton(
+                    text = stringResource(R.string.post_article_page_format),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onReferenceClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.symbol),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onInsertSymbolClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.face),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onInsertExpressionClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.post),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPostButtonClicked() }
+                )
             }
         }
-        // final Result
-        val joinedSelfContent = java.lang.String.join("\n", selfContent)
-
-        val rev2 = java.lang.String.join("", joinedParentContent, "\n", joinedSelfContent)
-        contentField?.setText(rev2)
     }
 }

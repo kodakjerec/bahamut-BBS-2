@@ -1,14 +1,34 @@
 package com.kota.Bahamut.pages.mailPage
 
-import android.text.Selection
+import android.content.Context
 import android.view.View
-import android.view.View.OnFocusChangeListener
-import android.widget.Button
-import android.widget.EditText
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dialogs.DialogInsertExpression
@@ -18,34 +38,28 @@ import com.kota.Bahamut.dialogs.DialogInsertSymbolListener
 import com.kota.Bahamut.dialogs.DialogPaintColor
 import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 
 /**
- * 寫信畫面, 有 標題、收件人
+ * 寫信畫面, 有 標題、收件人 (純 Jetpack Compose 實作)
  */
-class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
-    DialogInsertSymbolListener, DialogPaintColorListener {
-    var myContent: String? = null
-    lateinit var contentField: EditText // 內文
+class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorListener {
+
     var sendMailPageListener: SendMailPageListener? = null
-    lateinit var insertSymbolButton: Button // 符號按鈕 
-    lateinit var paintColorButton: Button // 上色按鈕
-    lateinit var postButton: Button // 發信按鈕
-    lateinit var insertExpressionButton: Button // 表情按鈕
-    var fromReceiver: String = "" // 外部傳來的收件人
-    lateinit var receiverField: EditText // 寫信時, 收件人
-    lateinit var receiverFieldBackground: TextView // 閱讀時, 收件人
-    var fromTitle: String = "" // 外部傳來的標題
-    lateinit var titleBlock: View // 標題和收件人所處的區塊
-    var isTitleBlockHidden: Boolean = false // 判斷區塊是否隱藏
-    lateinit var titleField: EditText // 寫信時, 標題
-    lateinit var titleFieldBackground: TextView // 閱讀時, 標題
-    var recover: Boolean = false // 內文過長時標記使用
+    var recover: Boolean = false
+
+    // Compose state
+    var receiverState by mutableStateOf(TextFieldValue(""))
+    var titleState by mutableStateOf(TextFieldValue(""))
+    var contentState by mutableStateOf(TextFieldValue(""))
+    var isTitleBlockHidden by mutableStateOf(false)
 
     val name: String
         get() = "BahamutSendMailDialog"
@@ -55,7 +69,7 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     }
 
     override val pageLayout: Int
-        get() = R.layout.send_mail_page
+        get() = 0
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_SEND_MAIL
@@ -63,170 +77,42 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
     override val isPopupPage: Boolean
         get() = true
 
+    override val isKeepOnOffline: Boolean
+        get() = true
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                SendMailPageContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
+
     override fun onPageDidLoad() {
-        initial()
         if (recover) {
             loadTempArticle(8)
             recover = false
         }
     }
 
-    fun refreshTitleField() {
-        titleField.setText(fromTitle)
-        if (fromTitle.isNotEmpty()) {
-            Selection.setSelection(titleField.text, 1)
-        }
-        fromTitle = ""
-    }
-
-    fun refreshReceiverField() {
-        receiverField.setText(fromReceiver)
-        fromReceiver = ""
-    }
-
-    fun refreshContentField() {
-        if (myContent != null) {
-            contentField.setText(myContent)
-            if (myContent!!.isNotEmpty()) {
-                Selection.setSelection(contentField.text, myContent?.length!!)
-            }
-            myContent = null
-        }
-    }
-
-    override fun onPageRefresh() {
-        refreshTitleField()
-        refreshContentField()
-        refreshReceiverField()
-    }
-
-    fun initial() {
-        titleField = findViewById(R.id.SendMail_TitleField) as EditText
-        titleField.onFocusChangeListener = this
-        titleFieldBackground = findViewById(R.id.SendMail_TitleFieldBackground) as TextView
-
-        receiverField = findViewById(R.id.SendMail_ReceiverField) as EditText
-        receiverField.onFocusChangeListener = this
-        receiverFieldBackground =
-            findViewById(R.id.SendMail_ReceiverFieldBackground) as TextView
-
-        contentField = findViewById(R.id.SendMailDialog_EditField) as EditText
-
-        postButton = findViewById(R.id.SendMailDialog_Post) as Button
-        postButton.setOnClickListener(this)
-
-        insertExpressionButton = findViewById(R.id.SendMailDialog_Symbol) as Button
-        insertExpressionButton.setOnClickListener(this)
-
-        insertSymbolButton = findViewById(R.id.SendMailDialog_Cancel) as Button
-        insertSymbolButton.setOnClickListener(this)
-
-        paintColorButton = findViewById(R.id.ArticlePostDialog_Color) as Button
-        paintColorButton.setOnClickListener(this)
-
-        findViewById(R.id.SendMailDialog_change)?.setOnClickListener(this)
-        titleBlock = findViewById(R.id.SendMail_TitleBlock) as View
-        refresh()
-    }
-
-    override fun clear() {
-        receiverField.setText("")
-        titleField.setText("")
-        contentField.setText("")
-        sendMailPageListener = null
-    }
-
     fun setPostTitle(aTitle: String) {
-        fromTitle = aTitle
-        refreshTitleField()
+        titleState = TextFieldValue(aTitle, TextRange(aTitle.length))
     }
 
     fun setPostContent(aContent: String) {
-        myContent = aContent
-        refreshContentField()
+        contentState = TextFieldValue(aContent, TextRange(aContent.length))
     }
 
-    override fun onClick(view: View) {
-        if (view === postButton) {
-            if (sendMailPageListener != null) {
-                val receiver = receiverField.text.toString().replace("\n", "")
-                val title = titleField.text.toString().replace("\n", "")
-                val content = contentField.text.toString()
-                val errMsg = StringBuilder()
-                val empty = Vector<String?>()
-                if (receiver.isEmpty()) {
-                    empty.add("收件人")
-                }
-                if (title.isEmpty()) {
-                    empty.add("標題")
-                }
-                if (content.isEmpty()) {
-                    empty.add("內文")
-                }
-                if (empty.isNotEmpty()) {
-                    for (i in empty.indices) {
-                        errMsg.append(empty[i])
-                        if (i == empty.size - 2) {
-                            errMsg.append("與")
-                        } else if (i < empty.size - 2) {
-                            errMsg.append("、")
-                        }
-                    }
-                    errMsg.append("不可為空")
-                }
-                if (errMsg.isNotEmpty()) {
-                    ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg.toString())
-                        .addButton("確定").show()
-                    return
-                }
-                val sendReceiver = receiver
-                val sendTitle = title
-                val sendContent = content
-                ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認")
-                    .setMessage("您是否確定要送出此信件?")
-                    .setListener { aDialog: ASAlertDialog?, index: Int ->
-                        if (index == 1) {
-                            sendMailPageListener?.onSendMailDialogSendButtonClicked(
-                                this@SendMailPage,
-                                sendReceiver,
-                                sendTitle,
-                                sendContent
-                            )
-                            navigationController.popViewController()
-                            clear()
-                        }
-                    }.show()
-            }
-        } else if (view === insertExpressionButton) {
-            // 表情符號
+    fun setReceiver(aReceiver: String) {
+        receiverState = TextFieldValue(aReceiver, TextRange(aReceiver.length))
+    }
 
-            val items: Array<String> = articleExpressions
-            DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
-                .setListener(object : DialogInsertExpressionListener {
-                    override fun onListDialogItemClicked(
-                        paramASListDialog: DialogInsertExpression,
-                        paramInt: Int,
-                        paramString: String
-                    ) {
-                        val symbol = items[paramInt]
-                        contentField.editableText!!.insert(contentField.selectionStart, symbol)
-                    }
-
-                    override fun onListDialogSettingClicked() {
-                        // 將當前內容存檔, pushView會讓當前頁面消失
-                        setRecover()
-                        navigationController.pushViewController(ArticleExpressionListPage())
-                    }
-                }).scheduleDismissOnPageDisappear(this).show()
-        } else if (view === insertSymbolButton) {
-            onInsertSymbolButtonClicked()
-        } else if (view === paintColorButton) {
-            val dialog = DialogPaintColor()
-            dialog.setListener(this)
-            dialog.show()
-        } else if (view.id == R.id.SendMailDialog_change) {
-            changeViewMode()
-        }
+    override fun clear() {
+        receiverState = TextFieldValue("")
+        titleState = TextFieldValue("")
+        contentState = TextFieldValue("")
+        sendMailPageListener = null
     }
 
     fun setRecover() {
@@ -234,90 +120,251 @@ class SendMailPage : TelnetPage(), View.OnClickListener, OnFocusChangeListener,
         saveTempArticle(8)
     }
 
-    fun refresh() {
-        if (isTitleBlockHidden) {
-            titleBlock.visibility = View.GONE
-        } else {
-            titleBlock.visibility = View.VISIBLE
-        }
-    }
-
-    override fun onFocusChange(v: View?, hasFocus: Boolean) {
-        val textColor = getThemeColor(R.attr.bahamut_defaultTextColor)
-        if (v === receiverField) {
-            if (hasFocus) {
-                receiverField.isSingleLine = false
-                receiverFieldBackground.setTextColor(0)
-                receiverField.setTextColor(textColor)
-            } else {
-                receiverField.isSingleLine = true
-                receiverField.setTextColor(0)
-                receiverFieldBackground.setTextColor(textColor)
-                receiverFieldBackground.text = receiverField.text.toString()
-            }
-        }
-        if (v !== titleField) {
-            return
-        }
-        if (hasFocus) {
-            titleField.isSingleLine = false
-            titleField.setTextColor(textColor)
-            titleFieldBackground.setTextColor(0)
-            return
-        }
-        titleField.isSingleLine = true
-        titleField.setTextColor(0)
-        titleFieldBackground.setTextColor(textColor)
-        titleFieldBackground.text = titleField.text.toString()
-    }
-
     fun changeViewMode() {
         isTitleBlockHidden = !isTitleBlockHidden
-        refresh()
     }
 
-    fun onInsertSymbolButtonClicked() {
+    private fun insertStringAtCursor(str: String) {
+        val current = contentState
+        val start = current.selection.start.coerceIn(0, current.text.length)
+        val end = current.selection.end.coerceIn(0, current.text.length)
+        val newText = current.text.replaceRange(start, end, str)
+        val newCursor = start + str.length
+        contentState = TextFieldValue(newText, TextRange(newCursor))
+    }
+
+    private fun onPostClicked() {
+        if (sendMailPageListener == null) return
+
+        val receiver = receiverState.text.replace("\n", "").trim()
+        val title = titleState.text.replace("\n", "").trim()
+        val content = contentState.text
+
+        val empty = Vector<String?>()
+        if (receiver.isEmpty()) empty.add("收件人")
+        if (title.isEmpty()) empty.add("標題")
+        if (content.isEmpty()) empty.add("內文")
+
+        if (empty.isNotEmpty()) {
+            val errMsg = StringBuilder()
+            for (i in empty.indices) {
+                errMsg.append(empty[i])
+                if (i == empty.size - 2) {
+                    errMsg.append("與")
+                } else if (i < empty.size - 2) {
+                    errMsg.append("、")
+                }
+            }
+            errMsg.append("不可為空")
+            ASAlertDialog.createDialog().setTitle("錯誤").setMessage(errMsg.toString())
+                .addButton("確定").show()
+            return
+        }
+
+        ASAlertDialog.createDialog().addButton("取消").addButton("送出").setTitle("確認")
+            .setMessage("您是否確定要送出此信件?")
+            .setListener { _, index ->
+                if (index == 1) {
+                    sendMailPageListener?.onSendMailDialogSendButtonClicked(
+                        this@SendMailPage,
+                        receiver,
+                        title,
+                        content
+                    )
+                    navigationController.popViewController()
+                    clear()
+                }
+            }.show()
+    }
+
+    private fun onInsertExpressionClicked() {
+        val items: Array<String> = articleExpressions
+        DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
+            .setListener(object : DialogInsertExpressionListener {
+                override fun onListDialogItemClicked(
+                    paramASListDialog: DialogInsertExpression,
+                    paramInt: Int,
+                    paramString: String
+                ) {
+                    insertStringAtCursor(items[paramInt])
+                }
+
+                override fun onListDialogSettingClicked() {
+                    setRecover()
+                    navigationController.pushViewController(ArticleExpressionListPage())
+                }
+            }).scheduleDismissOnPageDisappear(this).show()
+    }
+
+    private fun onInsertSymbolClicked() {
         val dialog = DialogInsertSymbol()
         dialog.setListener(this)
         dialog.show()
     }
 
     override fun onSymbolDialogDismissWithSymbol(str: String) {
-        contentField.editableText!!.insert(contentField.selectionStart, str)
+        insertStringAtCursor(str)
     }
 
-    fun setReceiver(aReceiver: String) {
-        fromReceiver = aReceiver
-        refreshReceiverField()
+    private fun onPaintColorClicked() {
+        val dialog = DialogPaintColor()
+        dialog.setListener(this)
+        dialog.show()
     }
-
-    override val isKeepOnOffline: Boolean
-        get() = true
 
     override fun onPaintColorDone(str: String) {
-        contentField.editableText!!.insert(contentField.selectionStart, str)
+        insertStringAtCursor(str)
     }
 
-    // 讀取暫存檔
     private fun loadTempArticle(index: Int) {
         val articleTemp = ArticleTempStore(context).articles[index]
-        receiverField.setText(articleTemp.header)
-        titleField.setText(articleTemp.title)
-        contentField.setText(articleTemp.content)
+        receiverState = TextFieldValue(articleTemp.header ?: "")
+        titleState = TextFieldValue(articleTemp.title ?: "")
+        contentState = TextFieldValue(articleTemp.content ?: "")
     }
 
-    // 儲存暫存檔
     private fun saveTempArticle(index: Int) {
         val store = ArticleTempStore(context)
         val articleTemp = store.articles[index]
-        // 收信者
-        articleTemp.header = receiverField.text.toString()
-        // 標題
-        articleTemp.title = titleField.text.toString()
-        // 內文
-        articleTemp.content = contentField.text.toString()
-
-        // 存檔
+        articleTemp.header = receiverState.text
+        articleTemp.title = titleState.text
+        articleTemp.content = contentState.text
         store.store()
+    }
+
+    @Composable
+    fun SendMailPageContent() {
+        val colors = AppTheme.colors
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 標題與收件人區塊
+            AnimatedVisibility(visible = !isTitleBlockHidden) {
+                Column {
+                    // 標題列
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.title_),
+                            color = colors.textPrimary,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        TextField(
+                            value = titleState,
+                            onValueChange = { titleState = it },
+                            placeholder = {
+                                Text(stringResource(R.string.input_title_here), color = colors.textSecondary)
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = colors.textPrimary,
+                                unfocusedTextColor = colors.textPrimary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                    // 收件人列
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.receiver_),
+                            color = colors.textPrimary,
+                            fontSize = 14.sp,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        TextField(
+                            value = receiverState,
+                            onValueChange = { receiverState = it },
+                            placeholder = {
+                                Text(stringResource(R.string.input_receiver_here), color = colors.textSecondary)
+                            },
+                            singleLine = true,
+                            colors = TextFieldDefaults.colors(
+                                focusedTextColor = colors.textPrimary,
+                                unfocusedTextColor = colors.textPrimary,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent
+                            ),
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                    HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                }
+            }
+
+            // 內文編輯區塊
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                TextField(
+                    value = contentState,
+                    onValueChange = { contentState = it },
+                    placeholder = {
+                        Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = colors.textPrimary,
+                        unfocusedTextColor = colors.textPrimary,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            // 底部工具列 (上色, 符號, 表情, 切換, 送出)
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Row(modifier = Modifier.fillMaxWidth()) {
+                BahaButton(
+                    text = stringResource(R.string.post_article_page_paint_color),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPaintColorClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.symbol),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onInsertSymbolClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.face),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onInsertExpressionClicked() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.change_mode_short),
+                    modifier = Modifier.weight(1f),
+                    onClick = { changeViewMode() }
+                )
+                BahaButton(
+                    text = stringResource(R.string.send),
+                    modifier = Modifier.weight(1f),
+                    onClick = { onPostClicked() }
+                )
+            }
+        }
     }
 }
