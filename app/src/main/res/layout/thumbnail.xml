@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="?attr/bahamut_pageBackground"
+    android:background="?attr/bahamut_thumbnailBackground"
     android:id="@+id/thumbnail_content_view">
     <LinearLayout
         android:id="@+id/thumbnail_default"
@@ -15,8 +15,8 @@
             android:layout_height="36dp"
             android:text="@string/loading"
             style="@style/TextViewNormal"
-            android:textColor="?attr/bahamut_buttonTextColor"
-            android:background="?attr/bahamut_dialogItemBackground"/>
+            android:textColor="?attr/bahamut_thumbnailButtonTextColor"
+            android:background="?attr/bahamut_thumbnailButtonBackground"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/thumbnail_pic"
@@ -42,8 +42,8 @@
             android:layout_height="36dp"
             android:text="@string/thumbnail_show_pic"
             style="@style/TextViewNormal"
-            android:textColor="?attr/bahamut_buttonTextColor"
-            android:background="?attr/bahamut_dialogItemBackground"/>
+            android:textColor="?attr/bahamut_thumbnailButtonTextColor"
+            android:background="?attr/bahamut_thumbnailButtonBackground"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/thumbnail_normal"
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="2"
-            android:textColor="?attr/bahamut_articleContentColor0"
+            android:textColor="?attr/bahamut_thumbnailTitleColor"
             android:visibility="gone"/>
         <TextView
             android:id="@+id/thumbnail_description"
@@ -65,7 +65,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
-            android:textColor="?attr/bahamut_articleContentColor1"
+            android:textColor="?attr/bahamut_thumbnailDescriptionColor"
             android:visibility="gone"/>
     </LinearLayout>
     <TextView
@@ -74,5 +74,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:singleLine="true"
-        android:textColor="?attr/bahamut_articleContentColor1"/>
+        android:textColor="?attr/bahamut_thumbnailUrlColor"/>
 </LinearLayout>

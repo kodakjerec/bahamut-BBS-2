@@ -85,4 +85,12 @@
     <!-- 清單對話框項目 (ASListDialog, DialogInsertExpression) 配色 -->
     <attr name="bahamut_listDialogItemBackground" format="reference" />
     <attr name="bahamut_listDialogItemTextColor" format="reference|color" />
+
+    <!-- 縮圖 (Thumbnail) 配色 -->
+    <attr name="bahamut_thumbnailBackground" format="reference|color" />
+    <attr name="bahamut_thumbnailButtonBackground" format="reference|color" />
+    <attr name="bahamut_thumbnailButtonTextColor" format="reference|color" />
+    <attr name="bahamut_thumbnailTitleColor" format="reference|color" />
+    <attr name="bahamut_thumbnailDescriptionColor" format="reference|color" />
+    <attr name="bahamut_thumbnailUrlColor" format="reference|color" />
 </resources>
