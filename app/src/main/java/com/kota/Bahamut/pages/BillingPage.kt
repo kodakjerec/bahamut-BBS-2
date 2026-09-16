@@ -26,7 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.painterResource
+import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -177,7 +177,7 @@ class BillingPage : TelnetPage() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
-                    painter = painterResource(id = R.mipmap.ic_launcher),
+                    painter = rememberDrawablePainter(resId = R.mipmap.ic_launcher),
                     contentDescription = stringResource(R.string.app_name),
                     modifier = Modifier.size(100.dp)
                 )
