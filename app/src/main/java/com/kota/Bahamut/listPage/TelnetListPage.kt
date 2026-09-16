@@ -1,6 +1,7 @@
 package com.kota.Bahamut.listPage
 
 import android.annotation.SuppressLint
+import android.content.res.Configuration
 import android.database.DataSetObservable
 import android.database.DataSetObserver
 import android.view.View
@@ -108,6 +109,12 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         isInitialed = false
         cleanAllItem()
         stopAutoLoad()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        listView?.invalidateViews()
+        safeNotifyDataSetChanged()
     }
 
     /** android.widget.Adapter

@@ -1,8 +1,10 @@
 package com.kota.Bahamut.pages
 
+import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
@@ -21,6 +23,7 @@ import com.kota.Bahamut.pages.model.ClassPageHandler
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.ClassPageItem.Companion.recycle
 import com.kota.Bahamut.pages.theme.ThemeFunctions
+import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -59,6 +62,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
 
+        updateToolbarColors()
+
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             // 進入洽特
@@ -75,6 +80,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
+        updateToolbarColors()
         var title = this.title
         if (title == null || title.isEmpty()) {
             title = getContextString(R.string.loading)
@@ -101,6 +107,35 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             val detail = "看板列表"
             headerView.setData(title, detail, "")
         }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        onPageRefresh()
+        updateToolbarColors()
+        val listView1: ListView? = mainLayout.findViewById(R.id.ClassPage_listView)
+        listView1?.invalidateViews()
+        safeNotifyDataSetChanged()
+    }
+
+    /** 動態更新分類頁面工具列顏色與底色 */
+    fun updateToolbarColors() {
+        val buttonTextColor = CommonFunctions.getThemeColorStateList(R.attr.bahamut_buttonTextColor)
+        if (buttonTextColor != null) {
+            mainLayout.findViewById<Button>(R.id.ClassPage_SearchButton)?.setTextColor(buttonTextColor)
+            mainLayout.findViewById<Button>(R.id.ClassPage_FirstPageButton)?.setTextColor(buttonTextColor)
+            mainLayout.findViewById<Button>(R.id.ClassPage_LastestPageButton)?.setTextColor(buttonTextColor)
+        }
+
+        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_toolbarItemBackground)
+        if (bgRes != 0) {
+            mainLayout.findViewById<Button>(R.id.ClassPage_SearchButton)?.setBackgroundResource(bgRes)
+            mainLayout.findViewById<Button>(R.id.ClassPage_FirstPageButton)?.setBackgroundResource(bgRes)
+            mainLayout.findViewById<Button>(R.id.ClassPage_LastestPageButton)?.setBackgroundResource(bgRes)
+        }
+
+        val pageBg = CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground)
+        mainLayout.setBackgroundColor(pageBg)
     }
 
     override fun onBackPressed(): Boolean {

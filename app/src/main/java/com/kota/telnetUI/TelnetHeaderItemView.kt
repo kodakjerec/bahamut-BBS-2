@@ -9,6 +9,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.UserSettings
 import androidx.core.view.size
@@ -58,6 +59,27 @@ open class TelnetHeaderItemView : LinearLayout {
                 headerItemView.addView(alViews[j])
             }
         }
+        updateThemeColors()
+    }
+
+    open fun updateThemeColors() {
+        val titleColor = getThemeColor(R.attr.bahamut_titleBarTitleColor)
+        val detail1Color = getThemeColor(R.attr.bahamut_titleBarDetailColor)
+        val detail2Color = getThemeColor(R.attr.bahamut_titleBarDetail2Color)
+        val headerBg = getThemeColor(R.attr.bahamut_titleBarBackground)
+
+        if (myTitle?.text?.contains("系統精靈送信來了") != true) {
+            myTitle?.setTextColor(titleColor)
+        }
+        detail1?.setTextColor(detail1Color)
+        detail2?.setTextColor(detail2Color)
+
+        findViewById<View>(R.id.header_item_view)?.setBackgroundColor(headerBg)
+        findViewById<View>(R.id.title)?.parent?.let { parentView ->
+            if (parentView is View) {
+                parentView.setBackgroundColor(headerBg)
+            }
+        }
     }
 
     open fun setMenuButtonClickListener(aListener: OnClickListener?) {
@@ -73,6 +95,7 @@ open class TelnetHeaderItemView : LinearLayout {
     }
 
     open fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
+        updateThemeColors()
         setTitle(aTitle)
         setDetail1(aDetail1)
         setDetail2(aDetail2)

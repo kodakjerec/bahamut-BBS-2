@@ -2,6 +2,7 @@ package com.kota.asFramework.pageController
 
 import android.content.Intent
 import android.content.res.AssetManager
+import android.content.res.Configuration
 import android.content.res.Resources
 import android.view.View
 import java.util.Vector
@@ -178,6 +179,9 @@ abstract class ASViewController {
     }
 
     fun onSizeChanged(newWidth: Int, newHeight: Int, oldWidth: Int, oldHeight: Int) {
+    }
+
+    open fun onConfigurationChanged(newConfig: Configuration) {
     }
 
     open fun onBackPressed(): Boolean {

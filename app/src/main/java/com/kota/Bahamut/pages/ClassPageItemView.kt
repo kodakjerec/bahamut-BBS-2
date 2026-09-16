@@ -10,6 +10,7 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import java.util.Objects
 
 class ClassPageItemView : LinearLayout {
@@ -35,6 +36,7 @@ class ClassPageItemView : LinearLayout {
         this.boardNameLabel = findViewById(R.id.ClassPage_ItemView_className)
         this.boardManagerLabel = findViewById(R.id.ClassPage_ItemView_classManager)
         this.dividerBottom = findViewById(R.id.ClassPage_ItemView_DividerBottom)
+        updateThemeColors()
     }
 
     fun setDividerBottomVisible(visible: Boolean) {
@@ -73,10 +75,28 @@ class ClassPageItemView : LinearLayout {
             setBoardTitleText(aItem.title)
             setBoardNameText(aItem.name)
             setBoardManagerText(aItem.manager)
-
+            updateThemeColors()
             return
         }
         clear()
+    }
+
+    /** 動態更新各文字與背景色彩以符合當前主題與深淺色模式 */
+    fun updateThemeColors() {
+        this.boardTitleLabel.setTextColor(getThemeColor(R.attr.bahamut_defaultTextColor))
+        this.boardNameLabel.setTextColor(getThemeColor(R.attr.bahamut_classItemNameColor))
+        this.boardManagerLabel.setTextColor(getThemeColor(R.attr.bahamut_classItemManagerColor))
+
+        val bgView = findViewById<View>(R.id.ClassPage_ItemView_backgroundView)
+        if (bgView != null) {
+            bgView.setBackgroundColor(getThemeColor(R.attr.bahamut_pageBackground))
+        }
+
+        val arrowView = findViewById<TextView>(R.id.ListItem_ArrowView)
+        if (arrowView != null) {
+            arrowView.setTextColor(getThemeColor(R.attr.bahamut_arrowColor))
+            arrowView.setBackgroundColor(getThemeColor(R.attr.bahamut_arrowBackground))
+        }
     }
 
     fun clear() {

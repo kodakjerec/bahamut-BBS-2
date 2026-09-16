@@ -558,6 +558,45 @@ open class ASNavigationController : Activity() {
         }
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        initializeDisplayMetrics()
+
+        if (UserSettings.propertiesFollowSystemDarkMode) {
+            val newThemeResId = ThemeStore.getThemeResId()
+            setTheme(newThemeResId)
+            theme.applyStyle(newThemeResId, true)
+
+            updatePageViewsBackground()
+        }
+
+        synchronized(this.controllers) {
+            for (controller in this.controllers) {
+                controller.onConfigurationChanged(newConfig)
+            }
+        }
+    }
+
+    private fun updatePageViewsBackground() {
+        val typedValue = TypedValue()
+        val hasAttr = theme.resolveAttribute(R.attr.bahamut_pageBackground, typedValue, true)
+        synchronized(this.controllers) {
+            for (controller in this.controllers) {
+                val pageView = controller.pageView ?: continue
+                if (hasAttr) {
+                    if (typedValue.resourceId != 0) {
+                        pageView.setBackgroundResource(typedValue.resourceId)
+                    } else {
+                        pageView.setBackgroundColor(typedValue.data)
+                    }
+                } else {
+                    pageView.setBackgroundResource(R.color.page_background)
+                }
+            }
+        }
+    }
+
     override fun onDestroy() {
         // 關閉正在顯示的對話框以防止 WindowLeaked
         dismissAllDialogs()

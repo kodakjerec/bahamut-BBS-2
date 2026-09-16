@@ -2,8 +2,10 @@ package com.kota.Bahamut.service
 
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
+import android.content.res.ColorStateList
 import android.util.Log
 import android.util.TypedValue
+import androidx.core.content.ContextCompat
 import com.kota.telnet.reference.TelnetDef
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
@@ -55,8 +57,28 @@ object CommonFunctions {
     @JvmStatic
     fun getThemeColor(attrItem: Int): Int {
         val typedValue = TypedValue()
-        TempSettings.myContext?.theme?.resolveAttribute(attrItem, typedValue, true)
+        val context = TempSettings.myContext ?: return 0
+        context.theme?.resolveAttribute(attrItem, typedValue, true)
+        if (typedValue.resourceId != 0) {
+            return ContextCompat.getColor(context, typedValue.resourceId)
+        }
         return typedValue.data
+    }
+
+    /**
+     * 取得主題屬性 ColorStateList
+     * @param attrItem R.attr.XX
+     * @return ColorStateList?
+     */
+    @JvmStatic
+    fun getThemeColorStateList(attrItem: Int): ColorStateList? {
+        val typedValue = TypedValue()
+        val context = TempSettings.myContext ?: return null
+        context.theme?.resolveAttribute(attrItem, typedValue, true)
+        if (typedValue.resourceId != 0) {
+            return ContextCompat.getColorStateList(context, typedValue.resourceId)
+        }
+        return ColorStateList.valueOf(typedValue.data)
     }
 
     /**

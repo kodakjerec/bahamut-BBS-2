@@ -35,6 +35,8 @@
     <color name="board_page_item_view_author">#FF8080C0</color>
     <color name="board_page_item_view_gy_title">#FF008080</color>
     <color name="board_page_item_view_gy">#FF008080</color>
+    <color name="class_page_item_view_name">#FFB0B050</color>
+    <color name="class_page_item_view_manager">#FF8080C0</color>
     <color name="board_ex_page_item_view_author_title">#FF60A0A0</color>
     <color name="mail_box_page_item_view_status">#FFB0B050</color>
 

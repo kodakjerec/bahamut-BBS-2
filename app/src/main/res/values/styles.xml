@@ -111,7 +111,7 @@
 
     <!-- 粉紅主題 -->
     <style name="MyTheme.Pink" parent="MyTheme">
-        <item name="bahamut_buttonTextColor">@color/white</item>
+        <item name="bahamut_buttonTextColor">@color/button_text_color</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
@@ -120,7 +120,7 @@
 
     <!-- 粉紅主題 (深色模式) -->
     <style name="MyTheme.Pink.Dark" parent="MyTheme.Dark">
-        <item name="bahamut_buttonTextColor">@color/white</item>
+        <item name="bahamut_buttonTextColor">@color/button_text_color</item>
         <item name="bahamut_toolbarItemBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
