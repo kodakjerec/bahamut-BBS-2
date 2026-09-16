@@ -1,10 +1,34 @@
 package com.kota.Bahamut.pages.login
 
 import android.util.Log
-import android.view.View
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.RelativeLayout
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
@@ -17,102 +41,65 @@ import com.kota.Bahamut.service.TempSettings.clearTempSettings
 import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.TempSettings.setWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
-import com.kota.telnetUI.TelnetPage
+import com.kota.telnetUI.TelnetComposePage
 import com.kota.telnetUI.TelnetView
 import java.util.Calendar
 
-class LoginPage : TelnetPage() {
+/**
+ * 勇者登入頁面 (純 Jetpack Compose 實作)
+ */
+class LoginPage : TelnetComposePage() {
+
     var cacheTelnetView: Boolean = false
     var errorCount: Int = 0
-    var loginListener: View.OnClickListener = View.OnClickListener { v: View? ->
-        username = (findViewById(R.id.Login_UsernameEdit) as EditText).text.toString().trim()
-        password = (findViewById(R.id.Login_passwordEdit) as EditText).text.toString().trim()
-        checkWebSignIn = (findViewById(R.id.LoginWebSignInCheckBox) as CheckBox).isChecked
 
-        val errMessage = if (username.isEmpty() && password.isEmpty()) {
-            "帳號、密碼不可為空，請重新輸入。"
-        } else if (username.isEmpty()) {
-            "帳號不可為空，請重新輸入。"
-        } else if (password.isEmpty()) {
-            "密碼不可為空，請重新輸入。"
-        } else {
-            null
-        }
-        if (errMessage != null) {
-            ASAlertDialog.showErrorDialog(errMessage, this@LoginPage)
-        } else {
-            login()
-        }
-    }
-    var username: String = "" // 使用者名稱
-    var password: String = "" // 密碼
-    var checkWebSignIn: Boolean = false // 是否勾選Web登入
+    // 狀態變數 (由 Compose 響應式持有)
+    var username by mutableStateOf("")
+    var password by mutableStateOf("")
+    var checkWebSignIn by mutableStateOf(false)
+    var saveLogonUser by mutableStateOf(false)
+    var isVip by mutableStateOf(false)
+
     var dialogRemoveLoginUser: ASAlertDialog? = null // 刪除重複登入對話框
     var dialogSaveUnfinishedArticle: ASDialog? = null // 儲存未完成文章對話框
     var telnetView: TelnetView? = null // Telnet視圖
     var dailyCheckThread: Thread? = null // 每日檢查執行緒
-
-    override val pageLayout: Int
-        get() = R.layout.login_page
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_LOGIN
 
     override fun onPageDidLoad() {
         // 清空暫存和執行中變數
-        clearTempSettings() // 清除暫存資料
+        clearTempSettings()
         try {
-            UrlDatabase(context).use { urlDatabase ->  // 清除URL資料庫
+            UrlDatabase(context).use { urlDatabase ->
                 urlDatabase.clearDb()
             }
         } catch (_: Exception) {
             Log.e(javaClass.simpleName, "initial fail")
         }
 
-        // 登入
         navigationController.setNavigationTitle("勇者登入")
-        findViewById(R.id.Login_loginButton)!!.setOnClickListener(loginListener)
-        // checkbox區塊點擊
-        val checkBox = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        checkBox.setOnCheckedChangeListener { _, isChecked ->
-            UserSettings.propertiesSaveLogonUser = isChecked
-        }
-        findViewById(R.id.loginRememberLabel)?.setOnClickListener {
-            checkBox.isChecked = !checkBox.isChecked
-        }
-        // web登入
-        val webLoginCheckBox = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        webLoginCheckBox.setOnCheckedChangeListener { _, isChecked ->
-            UserSettings.propertiesWebSignIn = isChecked
-        }
-        findViewById(R.id.LoginWebSignInLabel)?.setOnClickListener {
-            webLoginCheckBox.isChecked = !webLoginCheckBox.isChecked
-        }
-        // web登入設定按鈕
-        findViewById(R.id.LoginWebSignInSettings)?.setOnClickListener {
-            DialogWebLoginSettings().show()
-        }
-        // TelnetView
-        telnetView = findViewById(R.id.Login_TelnetView) as TelnetView?
 
         // 讀取預設勇者設定
         loadLogonUser()
 
         // VIP 區塊顯示狀態
-        val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as? RelativeLayout
-        if (UserSettings.propertiesVIP) {
-            blockWebSignIn?.visibility = View.VISIBLE
-        } else if (UserSettings.propertiesUsername.isNotEmpty()) {
-            // 若當前不是 VIP 且已載入帳號，才非同步確認雲端購買紀錄並即時更新 VIP 介面
+        isVip = UserSettings.propertiesVIP
+        if (!isVip && UserSettings.propertiesUsername.isNotEmpty()) {
             MyBillingClient.checkPurchaseHistoryCloud { _ ->
                 ASCoroutine.ensureMainThread {
-                    blockWebSignIn?.visibility = if (UserSettings.propertiesVIP) View.VISIBLE else View.GONE
+                    isVip = UserSettings.propertiesVIP
                 }
             }
         }
@@ -125,7 +112,7 @@ class LoginPage : TelnetPage() {
 
     /** 按下返回 */
     override fun onBackPressed(): Boolean {
-        TelnetClient.myInstance!!.close()
+        TelnetClient.myInstance?.close()
         return true
     }
 
@@ -140,7 +127,7 @@ class LoginPage : TelnetPage() {
 
         // 停止每日檢查執行緒
         if (dailyCheckThread != null && dailyCheckThread!!.isAlive) {
-            dailyCheckThread!!.interrupt()
+            dailyCheckThread?.interrupt()
             dailyCheckThread = null
         }
 
@@ -174,12 +161,12 @@ class LoginPage : TelnetPage() {
         } else if (row23.startsWith("★ 密碼輸入錯誤") && cursor.row == 23) {
             errorCount++
             onPasswordError()
-            TelnetClient.myInstance!!.sendStringToServer("")
+            TelnetClient.myInstance?.sendStringToServer("")
             return false
         } else if (row23.startsWith("★ 錯誤的使用者代號") && cursor.row == 23) {
             errorCount++
             onUsernameError()
-            TelnetClient.myInstance!!.sendStringToServer("")
+            TelnetClient.myInstance?.sendStringToServer("")
             return false
         } else if (cursor.equals(23, 16)) {
             // 開啟"自動登入中"
@@ -197,16 +184,11 @@ class LoginPage : TelnetPage() {
      * 讀取預設勇者設定
      */
     fun loadLogonUser() {
-        val loginUsernameField = findViewById(R.id.Login_UsernameEdit) as EditText
-        val loginPasswordField = findViewById(R.id.Login_passwordEdit) as EditText
-        val loginRemember = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        val loginWebSignIn = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        // 只有propertiesSaveLogonUser: true的登入才需要從Properties拿, 否則直接用預設值
         if (UserSettings.propertiesSaveLogonUser) {
-            loginUsernameField.setText(UserSettings.propertiesUsername)
-            loginPasswordField.setText(UserSettings.propertiesPassword)
-            loginRemember.isChecked = true
-            loginWebSignIn.isChecked = UserSettings.propertiesWebSignIn
+            username = UserSettings.propertiesUsername
+            password = UserSettings.propertiesPassword
+            saveLogonUser = true
+            checkWebSignIn = UserSettings.propertiesWebSignIn
         }
     }
 
@@ -214,17 +196,11 @@ class LoginPage : TelnetPage() {
      * 儲存勇者設定到屬性
      */
     fun saveLogonUserToProperties() {
-        val isLoginRemember = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        val username =
-            (findViewById(R.id.Login_UsernameEdit) as EditText).text.toString().trim()
-        val password =
-            (findViewById(R.id.Login_passwordEdit) as EditText).text.toString().trim()
-
-        if (isLoginRemember.isChecked) {
-            UserSettings.propertiesUsername = username
-            UserSettings.propertiesPassword = password
+        if (saveLogonUser) {
+            UserSettings.propertiesUsername = username.trim()
+            UserSettings.propertiesPassword = password.trim()
             UserSettings.propertiesSaveLogonUser = true
-            UserSettings.propertiesWebSignIn = (findViewById(R.id.LoginWebSignInCheckBox) as CheckBox).isChecked
+            UserSettings.propertiesWebSignIn = checkWebSignIn
         } else {
             UserSettings.propertiesUsername = ""
             UserSettings.propertiesPassword = ""
@@ -236,10 +212,37 @@ class LoginPage : TelnetPage() {
      * 設定TelnetView的畫面
      */
     fun setFrameToTelnetView() {
-        val frame = TelnetClient.model.frame!!.clone()
-        frame.removeRow(23)
-        frame.removeRow(22)
-        telnetView!!.frame = frame
+        val modelFrame = TelnetClient.model.frame
+        if (modelFrame != null) {
+            val frame = modelFrame.clone()
+            frame.removeRow(23)
+            frame.removeRow(22)
+            telnetView?.frame = frame
+        }
+    }
+
+    /**
+     * 點擊登入檢核
+     */
+    fun onLoginButtonClicked() {
+        val trimmedUser = username.trim()
+        val trimmedPass = password.trim()
+
+        val errMessage = if (trimmedUser.isEmpty() && trimmedPass.isEmpty()) {
+            "帳號、密碼不可為空，請重新輸入。"
+        } else if (trimmedUser.isEmpty()) {
+            "帳號不可為空，請重新輸入。"
+        } else if (trimmedPass.isEmpty()) {
+            "密碼不可為空，請重新輸入。"
+        } else {
+            null
+        }
+
+        if (errMessage != null) {
+            ASAlertDialog.showErrorDialog(errMessage, this@LoginPage)
+        } else {
+            login()
+        }
     }
 
     /**
@@ -248,7 +251,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
         ASCoroutine.runInNewCoroutine {
-            TelnetClient.myInstance!!.sendStringToServerInBackground(username)
+            TelnetClient.myInstance?.sendStringToServerInBackground(username.trim())
         }
     }
 
@@ -261,25 +264,25 @@ class LoginPage : TelnetPage() {
             if (dialogRemoveLoginUser == null) {
                 dialogRemoveLoginUser = ASAlertDialog.createDialog().setTitle("提示")
                     .setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是")
-                    .setListener { aDialog: ASAlertDialog?, index: Int ->
+                    .setListener { _, index: Int ->
                         if (index == 0) {
-                            TelnetClient.myInstance!!.sendStringToServerInBackground("n")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("n")
                         } else {
-                            TelnetClient.myInstance!!.sendStringToServerInBackground("y")
+                            TelnetClient.myInstance?.sendStringToServerInBackground("y")
                         }
                         dialogRemoveLoginUser = null
                         ASProcessingDialog.showProcessingDialog("登入中")
-                    }.setOnBackDelegate { aDialog: ASDialog? ->
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("n")
+                    }.setOnBackDelegate {
+                        TelnetClient.myInstance?.sendStringToServerInBackground("n")
                         if (dialogRemoveLoginUser != null) {
-                            dialogRemoveLoginUser!!.dismiss()
+                            dialogRemoveLoginUser?.dismiss()
                             dialogRemoveLoginUser = null
                         }
                         ASProcessingDialog.showProcessingDialog("登入中")
                         true
                     } as ASAlertDialog?
             }
-            dialogRemoveLoginUser!!.show()
+            dialogRemoveLoginUser?.show()
         }
     }
 
@@ -330,7 +333,7 @@ class LoginPage : TelnetPage() {
      * 傳送密碼
      */
     fun sendPassword() {
-        TelnetClient.myInstance!!.sendStringToServer(password)
+        TelnetClient.myInstance?.sendStringToServer(password.trim())
     }
 
     /**
@@ -338,7 +341,7 @@ class LoginPage : TelnetPage() {
      */
     fun onLoginSuccess() {
         // 存檔客戶資料
-        TelnetClient.myInstance!!.username = username
+        TelnetClient.myInstance?.username = username.trim()
         saveLogonUserToProperties()
 
         // 登入時重試本機待送達佇列；唯有當不是 VIP 才做購買狀態檢查
@@ -355,72 +358,52 @@ class LoginPage : TelnetPage() {
             ASCoroutine.ensureMainThread {
                 try {
                     ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
-
-                    // 使用 LoginWebDebugView 來顯示和處理自動登入
                     val debugView = LoginWebDebugView(context!!)
                     debugView.startAutoLogin {
-                        // 記錄web自動簽到成功時間
                         setWebAutoLoginSuccessTime()
                         null
                     }
                 } catch (e: Exception) {
                     ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                    Log.e(
-                        javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                    )
+                    Log.e(javaClass.simpleName, e.message ?: "")
                 }
             }
 
             // 每小時檢查是否換日，如果換日則執行自動簽到
-            if (dailyCheckThread== null) {
+            if (dailyCheckThread == null) {
                 dailyCheckThread = Thread {
                     while (true) {
                         try {
-                            Thread.sleep((60 * 60 * 1000).toLong()) // 每小時檢查一次
-
-                            // 檢查今日是否已經自動簽到過
+                            Thread.sleep((60 * 60 * 1000).toLong())
                             if (!this.isWebAutoLoginToday) {
-                                // 換日了，執行自動簽到
                                 ASCoroutine.ensureMainThread {
                                     try {
                                         ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
-
-                                        // 使用 LoginWebDebugView 來處理自動簽到
                                         val debugView = LoginWebDebugView(context!!)
                                         debugView.startAutoLogin {
-                                            // 記錄web自動簽到成功時間
                                             setWebAutoLoginSuccessTime()
                                             null
                                         }
                                     } catch (e: Exception) {
                                         ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                                        Log.e(
-                                            javaClass.simpleName,
-                                            (if (e.message != null) e.message else "")!!
-                                        )
+                                        Log.e(javaClass.simpleName, e.message ?: "")
                                     }
                                 }
                             }
                         } catch (e: InterruptedException) {
-                            Log.e(
-                                javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                            )
+                            Log.e(javaClass.simpleName, e.message ?: "")
                             Thread.currentThread().interrupt()
                             break
                         }
                     }
                 }
-                dailyCheckThread!!.start()
+                dailyCheckThread?.start()
             }
         }
     }
 
     private val isWebAutoLoginToday: Boolean
-        /**
-         * 檢查web自動簽到是否在今日已執行過
-         */
         get() {
-            //
             val lastLoginTime = getWebAutoLoginSuccessTime()
             if (lastLoginTime <= 0L) {
                 return false
@@ -430,7 +413,6 @@ class LoginPage : TelnetPage() {
                 val lastTime = lastLoginTime.toLong()
                 val currentTime = System.currentTimeMillis()
 
-                // 取得昨日與今日的時間邊界 (今日00:00:00)
                 val calendar = Calendar.getInstance()
                 calendar.timeInMillis = currentTime
                 calendar.set(Calendar.HOUR_OF_DAY, 0)
@@ -441,15 +423,11 @@ class LoginPage : TelnetPage() {
 
                 return lastTime >= todayStartTime
             } catch (_: NumberFormatException) {
-                // 如果時間格式錯誤，重置時間
                 setWebAutoLoginSuccessTime()
                 return false
             }
         }
 
-    /**
-     * 設置web自動簽到成功時間
-     */
     private fun setWebAutoLoginSuccessTime() {
         val currentTime = System.currentTimeMillis()
         setWebAutoLoginSuccessTime(currentTime)
@@ -463,14 +441,14 @@ class LoginPage : TelnetPage() {
             dialogSaveUnfinishedArticle =
                 ASAlertDialog.createDialog().setTitle("提示").setMessage("您有一篇文章尚未完成")
                     .addButton("放棄").addButton("寫入暫存檔")
-                    .setListener { aDialog: ASAlertDialog?, index: Int ->
+                    .setListener { _, index: Int ->
                         when (index) {
-                            0 -> TelnetClient.myInstance!!.sendStringToServer("Q")
-                            1 -> TelnetClient.myInstance!!.sendStringToServer("S")
+                            0 -> TelnetClient.myInstance?.sendStringToServer("Q")
+                            1 -> TelnetClient.myInstance?.sendStringToServer("S")
                         }
                         dialogSaveUnfinishedArticle = null
                     }.scheduleDismissOnPageDisappear(this)
-            dialogSaveUnfinishedArticle!!.show()
+            dialogSaveUnfinishedArticle?.show()
         }
     }
 
@@ -483,6 +461,190 @@ class LoginPage : TelnetPage() {
             ASAlertDialog.createDialog().setTitle("警告")
                 .setMessage("您的帳號重覆登入超過上限，請選擇刪除其他重複的登入或將其它帳號登出。")
                 .addButton("確定").show()
+        }
+    }
+
+    @Composable
+    override fun ComposeContent() {
+        val colors = AppTheme.colors
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 1. Telnet 終端文字畫面 (由 TelnetView 繪製)
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { ctx ->
+                        TelnetView(ctx).also {
+                            telnetView = it
+                            setFrameToTelnetView()
+                        }
+                    },
+                    update = { view ->
+                        telnetView = view
+                    }
+                )
+            }
+
+            // 2. 輸入面板區塊
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.pageBackground)
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // VIP Web 簽到區塊 (僅 VIP 顯示)
+                if (isVip) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(4.dp))
+                            .clickable {
+                                checkWebSignIn = !checkWebSignIn
+                                UserSettings.propertiesWebSignIn = checkWebSignIn
+                            }
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = checkWebSignIn,
+                            onCheckedChange = { checked ->
+                                checkWebSignIn = checked
+                                UserSettings.propertiesWebSignIn = checked
+                            },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = colors.checkboxTint,
+                                uncheckedColor = colors.divider
+                            )
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.login_web_sign_in),
+                            color = colors.textPrimary,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            text = stringResource(R.string.login_web_settings_btn),
+                            color = colors.titleBarTitle,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .clickable {
+                                    DialogWebLoginSettings().show()
+                                }
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+                }
+
+                // 帳號輸入行
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.account),
+                        color = colors.textPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.width(64.dp)
+                    )
+                    BahaInputField(
+                        value = username,
+                        onValueChange = { username = it },
+                        placeholder = stringResource(R.string.Username_hint),
+                        maxLength = 12,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // 密碼輸入行
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.password),
+                        color = colors.textPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.width(64.dp)
+                    )
+                    BahaInputField(
+                        value = password,
+                        onValueChange = { password = it },
+                        placeholder = stringResource(R.string.password_hint),
+                        isPassword = true,
+                        maxLength = 8,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+
+                // 記住帳號密碼核取方塊
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable {
+                            saveLogonUser = !saveLogonUser
+                            UserSettings.propertiesSaveLogonUser = saveLogonUser
+                        }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = saveLogonUser,
+                        onCheckedChange = { checked ->
+                            saveLogonUser = checked
+                            UserSettings.propertiesSaveLogonUser = checked
+                        },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colors.checkboxTint,
+                            uncheckedColor = colors.divider
+                        )
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.save_data),
+                        color = colors.textPrimary,
+                        fontSize = 15.sp
+                    )
+                }
+            }
+
+            // 3. 底部登入工具列
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.toolbarBackground)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaButton(
+                    text = stringResource(R.string.login),
+                    type = ButtonType.NORMAL,
+                    onClick = { onLoginButtonClicked() },
+                    modifier = Modifier.fillMaxWidth(),
+                    minHeight = 44.dp
+                )
+            }
         }
     }
 }

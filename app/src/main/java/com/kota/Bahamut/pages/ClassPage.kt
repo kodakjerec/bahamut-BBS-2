@@ -1,14 +1,45 @@
 package com.kota.Bahamut.pages
 
+import android.content.Context
 import android.content.res.Configuration
+import android.database.DataSetObserver
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.RelativeLayout
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -22,13 +53,16 @@ import com.kota.Bahamut.pages.model.ClassPageBlock.Companion.recycle
 import com.kota.Bahamut.pages.model.ClassPageHandler
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.ClassPageItem.Companion.recycle
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaTopAppBar
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.dialogs.BahaListDialog
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASListDialog
-import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
@@ -38,111 +72,79 @@ import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.logic.SearchBoardHandler
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnetUI.TelnetHeaderItemView
+import kotlinx.coroutines.launch
 
+/**
+ * 分類看板列表頁面 (純 Jetpack Compose 實作)
+ */
 class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
-    lateinit var mainLayout: RelativeLayout
-    private var title: String? = ""
+
+    private var classTitle: String? = ""
+    var currentDisplayTitle by mutableStateOf("")
+    var lastVisitBoardText by mutableStateOf("")
+    var searchResultBoards by mutableStateOf<List<String>?>(null)
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_CLASS
 
     override val pageLayout: Int
-        get() = R.layout.class_page
+        get() = 0
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                ClassPageContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
 
     override fun onPageDidLoad() {
         super.onPageDidLoad()
 
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        val listView1: ListView = mainLayout.findViewById(R.id.ClassPage_listView)
-        listView1.emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
-        bindListView(listView1)
-        mainLayout.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
-        mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
-        mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
-
-        updateToolbarColors()
+        updateTitles()
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
-            // 進入洽特
-            // 查詢看板 => Chat => 定位到Chat:Enter
-            object: ASCoroutine() {
+            object : ASCoroutine() {
                 override suspend fun run() {
-                    // 延遲1秒，確保看板列表載入完成
-                    TelnetClient.myInstance!!.sendStringToServerInBackground("sChat")
+                    TelnetClient.myInstance?.sendStringToServerInBackground("sChat")
                 }
             }.postDelayed(500L)
+        }
+    }
+
+    private fun updateTitles() {
+        var displayTitle = this.classTitle
+        if (displayTitle.isNullOrEmpty()) {
+            displayTitle = getContextString(R.string.loading)
+        }
+        currentDisplayTitle = displayTitle
+
+        if (TempSettings.lastVisitBoard.isNotEmpty()) {
+            lastVisitBoardText = TempSettings.lastVisitBoard
+        } else {
+            lastVisitBoardText = ""
         }
     }
 
     @Synchronized
     override fun onPageRefresh() {
         super.onPageRefresh()
-        updateToolbarColors()
-        var title = this.title
-        if (title == null || title.isEmpty()) {
-            title = getContextString(R.string.loading)
-        }
-
-        val headerView =
-            mainLayout.findViewById<TelnetHeaderItemView>(R.id.ClassPage_headerView)
-        if (headerView != null) {
-            if (!TempSettings.lastVisitBoard.isEmpty()) {
-                val finalLastVisitBoard = TempSettings.lastVisitBoard
-                val lastVisitBoard =
-                    finalLastVisitBoard + getContextString(R.string.toolbar_item_rr)
-
-                val detail2 = mainLayout.findViewById<TextView>(R.id.ClassPage_lastVisit)
-                if (detail2!==null) {
-                    detail2.visibility = View.VISIBLE
-                    detail2.bringToFront()
-                    detail2.text = lastVisitBoard
-                    detail2.setOnClickListener { v: View? ->
-                        TelnetClient.myInstance!!.sendStringToServer("s$finalLastVisitBoard")
-                    }
-                }
-            }
-            val detail = "看板列表"
-            headerView.setData(title, detail, "")
-        }
+        updateTitles()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         onPageRefresh()
-        updateToolbarColors()
-        val listView1: ListView? = mainLayout.findViewById(R.id.ClassPage_listView)
-        listView1?.invalidateViews()
         safeNotifyDataSetChanged()
-    }
-
-    /** 動態更新分類頁面工具列顏色與底色 */
-    fun updateToolbarColors() {
-        val buttonTextColor = CommonFunctions.getThemeColorStateList(R.attr.bahamut_buttonTextColor)
-        if (buttonTextColor != null) {
-            mainLayout.findViewById<Button>(R.id.ClassPage_SearchButton)?.setTextColor(buttonTextColor)
-            mainLayout.findViewById<Button>(R.id.ClassPage_FirstPageButton)?.setTextColor(buttonTextColor)
-            mainLayout.findViewById<Button>(R.id.ClassPage_LastestPageButton)?.setTextColor(buttonTextColor)
-        }
-
-        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_toolbarItemBackground)
-        if (bgRes != 0) {
-            mainLayout.findViewById<Button>(R.id.ClassPage_SearchButton)?.setBackgroundResource(bgRes)
-            mainLayout.findViewById<Button>(R.id.ClassPage_FirstPageButton)?.setBackgroundResource(bgRes)
-            mainLayout.findViewById<Button>(R.id.ClassPage_LastestPageButton)?.setBackgroundResource(bgRes)
-        }
-
-        val pageBg = CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground)
-        mainLayout.setBackgroundColor(pageBg)
     }
 
     override fun onBackPressed(): Boolean {
         clear()
-        PageContainer.instance!!.popClassPage()
+        PageContainer.instance?.popClassPage()
         navigationController.popViewController()
-        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance?.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         return true
     }
 
@@ -164,22 +166,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     fun setClassTitle(aTitle: String?) {
-        this.title = aTitle
+        this.classTitle = aTitle
+        this.currentDisplayTitle = aTitle ?: ""
     }
 
     override fun onClick(aView: View) {
-        val getId = aView.id
-        when (getId) {
-            R.id.ClassPage_FirstPageButton -> {
-                moveToFirstPosition()
-            }
-            R.id.ClassPage_LastestPageButton -> {
-                moveToLastPosition()
-            }
-            R.id.ClassPage_SearchButton -> {
-                onSearchButtonClicked()
-            }
-        }
+        // legacy View.OnClickListener 相容 stub
     }
 
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
@@ -187,22 +179,24 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             val itemIndex = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消")
                 .addButton("確定")
-                .setListener { aDialog: ASAlertDialog?, index1: Int ->
+                .setListener { _, index1 ->
                     if (index1 == 1) {
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex\nd")
+                        TelnetClient.myInstance?.sendStringToServerInBackground("$itemIndex\nd")
                         this@ClassPage.loadLastBlock()
                     }
                 }.scheduleDismissOnPageDisappear(this).show()
             return true
-        } else if ((getItem(index) as ClassPageItem).isDirectory) {
-            return false
         } else {
+            val item = getItem(index) as? ClassPageItem
+            if (item?.isDirectory == true) {
+                return false
+            }
             val itemIndex2 = index + 1
             ASAlertDialog.createDialog().setMessage("確定要將此看板加入我的最愛?").addButton("取消")
                 .addButton("確定")
-                .setListener { aDialog: ASAlertDialog?, index12: Int ->
+                .setListener { _, index12 ->
                     if (index12 == 1) {
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex2\na")
+                        TelnetClient.myInstance?.sendStringToServerInBackground("$itemIndex2\na")
                     }
                 }.show()
             return true
@@ -216,42 +210,14 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     fun onSearchBoardFinished() {
-        println("onSearchBoardFinished")
         dismissProcessingDialog()
-        ASListDialog.createDialog().addItems(SearchBoardHandler.instance.boards)
-            .setListener(object : ASListDialogItemClickListener {
-                override fun onListDialogItemClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ) {
-                    val board = SearchBoardHandler.instance.getBoard(index)
-                    if (this@ClassPage.listName == "Favorite") {
-                        this@ClassPage.showAddBoardToFavoriteDialog(board)
-                        return
-                    }
-                    if (TempSettings.lastVisitBoard != board) {
-                        TempSettings.lastVisitArticleNumber = 0
-                    }
-                    TelnetClient.myInstance!!.sendStringToServerInBackground("s$board")
-
-                    SearchBoardHandler.instance.clear()
-                }
-
-                override fun onListDialogItemLongClicked(
-                    paramASListDialog: ASListDialog?,
-                    index: Int,
-                    title: String?
-                ): Boolean {
-                    return false
-                }
-            }).scheduleDismissOnPageDisappear(this).show()
+        searchResultBoards = SearchBoardHandler.instance.boards.toList()
     }
 
     fun showAddBoardToFavoriteDialog(boardName: String?) {
         ASAlertDialog.createDialog().setMessage("是否將看板" + boardName + "加入我的最愛?")
             .addButton("取消").addButton("加入")
-            .setListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { _, index ->
                 if (index == 1) {
                     create().pushKey(TelnetKeyboard.LEFT_ARROW).pushString("B\n")
                         .pushKey(TelnetKeyboard.HOME).pushString("/$boardName\na ")
@@ -262,7 +228,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 if (TempSettings.lastVisitBoard != boardName) {
                     TempSettings.lastVisitArticleNumber = 0
                 }
-                TelnetClient.myInstance!!.sendStringToServerInBackground("s$boardName")
+                TelnetClient.myInstance?.sendStringToServerInBackground("s$boardName")
                 SearchBoardHandler.instance.clear()
             }.scheduleDismissOnPageDisappear(this).show()
     }
@@ -274,15 +240,15 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     override val isAutoLoadEnable: Boolean
         get() = false
 
-    override fun getListIdFromListName(aName: String?): String? {
+    override fun getListIdFromListName(aName: String?): String {
         return "$aName[Class]"
     }
 
     override fun loadItemAtIndex(index: Int) {
-        val item = getItem(index) as ClassPageItem
+        val item = getItem(index) as? ClassPageItem ?: return
 
         if (item.isDirectory) {
-            PageContainer.instance!!.pushClassPage(item.name, item.title)
+            PageContainer.instance?.pushClassPage(item.name, item.title)
             navigationController.pushViewController(PageContainer.instance!!.classPage)
         } else {
             if (TempSettings.lastVisitBoard != item.name) {
@@ -295,23 +261,10 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         super.loadItemAtIndex(index)
     }
 
-    /** 填入看板  */
     override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
-        var itemView = view
-        val itemIndex = i + 1
-        val itemBlock = ItemUtils.getBlock(itemIndex)
-        val item = getItem(i) as ClassPageItem?
-        if (item == null && currentBlock != itemBlock && !isLoadingBlock(itemIndex)) {
-            loadBoardBlock(itemBlock)
-        }
-        if (itemView == null) {
-            itemView = ClassPageItemView(context)
-            itemView.layoutParams = AbsListView.LayoutParams(-1, -2)
-        }
-        (itemView as ClassPageItemView).setItem(item)
-        return itemView
+        // 不再需要 XML ListView getView，由 Compose 負責渲染
+        return null
     }
-
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         recycle(telnetListPageBlock as ClassPageBlock)
@@ -319,5 +272,284 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         recycle(telnetListPageItem as ClassPageItem)
+    }
+
+    // -------------------------------------------------------------
+    // Compose 畫面主體
+    // -------------------------------------------------------------
+
+    @Composable
+    fun ClassPageContent() {
+        val colors = AppTheme.colors
+        val coroutineScope = rememberCoroutineScope()
+        val listState = rememberLazyListState()
+
+        // 監聽 TelnetListPage 資料變更
+        var dataVersion by remember { mutableIntStateOf(0) }
+        DisposableEffect(Unit) {
+            val observer = object : DataSetObserver() {
+                override fun onChanged() {
+                    dataVersion++
+                }
+
+                override fun onInvalidated() {
+                    dataVersion++
+                }
+            }
+            registerDataSetObserver(observer)
+            onDispose {
+                unregisterDataSetObserver(observer)
+            }
+        }
+
+        // 搜尋看板結果對話框
+        val searchBoards = searchResultBoards
+        if (searchBoards != null) {
+            BahaListDialog(
+                title = "搜尋結果",
+                items = searchBoards,
+                onDismissRequest = { searchResultBoards = null },
+                onItemSelected = { index, _ ->
+                    val board = SearchBoardHandler.instance.getBoard(index)
+                    if (this@ClassPage.listName == "Favorite") {
+                        this@ClassPage.showAddBoardToFavoriteDialog(board)
+                    } else {
+                        if (TempSettings.lastVisitBoard != board) {
+                            TempSettings.lastVisitArticleNumber = 0
+                        }
+                        TelnetClient.myInstance?.sendStringToServerInBackground("s$board")
+                        SearchBoardHandler.instance.clear()
+                    }
+                    searchResultBoards = null
+                }
+            )
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 1. 頂部導覽列
+            BahaTopAppBar(
+                title = currentDisplayTitle.ifEmpty { "看板列表" },
+                subtitle = "看板列表",
+                onBackClick = { onBackPressed() }
+            )
+
+            // 前次造訪看板快速連結提示列
+            if (lastVisitBoardText.isNotEmpty()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.dialogTitleBackground)
+                        .clickable {
+                            TelnetClient.myInstance?.sendStringToServer("s$lastVisitBoardText")
+                        }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "前次造訪：$lastVisitBoardText",
+                        color = colors.titleBarTitle,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "點此直接進入 ➔",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.divider)
+                )
+            }
+
+            // 2. 看板清單主體
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                // 讀取版本以觸發重組
+                val currentCount = if (dataVersion >= 0) count else 0
+
+                if (currentCount == 0) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.loading_),
+                            color = colors.textSecondary,
+                            fontSize = 16.sp
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        state = listState,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(count = currentCount) { index ->
+                            val itemIndex = index + 1
+                            val itemBlock = ItemUtils.getBlock(itemIndex)
+                            val item = getItem(index) as? ClassPageItem
+
+                            // 按需觸發 Telnet 區塊加載
+                            if (item == null && currentBlock != itemBlock && !isLoadingBlock(itemIndex)) {
+                                loadBoardBlock(itemBlock)
+                            }
+
+                            ClassPageRowItem(
+                                item = item,
+                                onClick = { loadItemAtIndex(index) },
+                                onLongClick = { onListViewItemLongClicked(null, index) }
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 3. 底部操作工具列
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.toolbarBackground)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaButton(
+                    text = stringResource(R.string.search),
+                    type = ButtonType.NORMAL,
+                    onClick = { onSearchButtonClicked() },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 42.dp
+                )
+                BahaButton(
+                    text = stringResource(R.string.first_page),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        moveToFirstPosition()
+                        coroutineScope.launch { listState.scrollToItem(0) }
+                    },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 42.dp
+                )
+                BahaButton(
+                    text = stringResource(R.string.last_page),
+                    type = ButtonType.NORMAL,
+                    onClick = {
+                        moveToLastPosition()
+                        coroutineScope.launch {
+                            val lastIdx = (count - 1).coerceAtLeast(0)
+                            listState.scrollToItem(lastIdx)
+                        }
+                    },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 42.dp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 分類看板單列項目 Composable
+ */
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+@Composable
+private fun ClassPageRowItem(
+    item: ClassPageItem?,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+    val colors = AppTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+            .background(colors.pageBackground)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                // 看板中文標題
+                Text(
+                    text = item?.title ?: stringResource(R.string.loading_),
+                    color = colors.textPrimary,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                // 看板英文名稱與板主資訊
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = item?.name ?: stringResource(R.string.loading),
+                        color = colors.titleBarTitle,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    val manager = item?.manager
+                    if (!manager.isNullOrEmpty()) {
+                        Text(
+                            text = manager,
+                            color = colors.textSecondary,
+                            fontSize = 12.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            // 右箭頭
+            Text(
+                text = "›",
+                color = colors.titleBarTitle,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Light
+            )
+        }
+
+        // 底部分隔線
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(colors.divider)
+        )
     }
 }

@@ -1,22 +1,66 @@
 package com.kota.Bahamut.pages.articlePage
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.text.util.Linkify
 import android.util.Log
-import android.util.TypedValue
 import android.view.View
 import android.view.View.OnLongClickListener
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemLongClickListener
-import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
-import androidx.core.view.size
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -26,8 +70,6 @@ import com.kota.Bahamut.command.TelnetCommand
 import com.kota.Bahamut.dialogs.DialogQueryHero
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
-import com.kota.Bahamut.pages.model.ToolBarFloating
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
@@ -45,215 +87,167 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardE
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppColors
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
-import com.kota.asFramework.ui.ASListView
-import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
+import com.kota.telnet.TelnetArticlePush
 import com.kota.telnet.TelnetClient
+import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 import java.util.Locale
 import java.util.Vector
+import java.util.regex.Pattern
 
+/**
+ * 文章閱讀頁面 (純 Jetpack Compose 實作)
+ */
 class ArticlePage : TelnetPage() {
-    lateinit var mainLayout: RelativeLayout
+
     var telnetArticle: TelnetArticle? = null
     var telnetView: TelnetView? = null
-    lateinit var listEmptyView: TextView
     var boardMainPage: BoardMainPage? = null
     var isFullScreen: Boolean = false
-    var listAdapter: BaseAdapter = object : BaseAdapter() {
-        private var pushLength = 0 // 推文長度
-        private var editRecordLength = 0 // 修改紀錄長度
 
-        // android.widget.Adapter
-        override fun getCount(): Int {
-            if (telnetArticle != null) {
-                pushLength = telnetArticle!!.pushSize
-                editRecordLength = telnetArticle!!.editRecordSize
-                // 內文個數 + header + PostTime + push + editRecord
-                return telnetArticle!!.itemSize.plus(2) + pushLength + editRecordLength
+    // Compose 響應式狀態
+    var currentArticle by mutableStateOf<TelnetArticle?>(null)
+    var viewModeState by mutableIntStateOf(propertiesArticleViewMode) // 0-Text 1-Telnet
+    var isExtToolbarOpenState by mutableStateOf(propertiesExternalToolbarEnable)
+    var toolbarLocationState by mutableIntStateOf(0)
+    var toolbarOrderState by mutableIntStateOf(0)
+
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_ARTICLE
+
+    override val pageLayout: Int
+        get() = 0
+
+    override val isPopupPage: Boolean
+        get() = true
+
+    override val isKeepOnOffline: Boolean
+        get() = true
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                ArticlePageContent()
+                BahaGlobalDialogHost()
             }
-            return 0
-        }
-
-        // android.widget.Adapter
-        override fun getItem(itemIndex: Int): TelnetArticleItem? {
-            if (telnetArticle == null) {
-                return null
-            }
-            return telnetArticle!!.getItem(itemIndex - 1)
-        }
-
-        // android.widget.Adapter
-        override fun getItemId(itemIndex: Int): Long {
-            return itemIndex.toLong()
-        }
-
-        override fun getItemViewType(itemIndex: Int): Int {
-            if (itemIndex == 0) {
-                // header
-                return ArticlePageItemType.Companion.HEADER
-            } else if (itemIndex == getCount() - 1 - pushLength - editRecordLength) {
-                // postTime
-                return ArticlePageItemType.Companion.POST_TIME
-            } else if (itemIndex >= getCount() - pushLength - editRecordLength && itemIndex < getCount() - editRecordLength) {
-                // push
-                return ArticlePageItemType.Companion.PUSH
-            } else if (itemIndex >= getCount() - editRecordLength) {
-                // editRecord
-                return ArticlePageItemType.Companion.EDIT_RECORD
-            }
-            // content
-            val returnItem = getItem(itemIndex)
-            return returnItem?.type ?: ArticlePageItemType.Companion.CONTENT
-        }
-
-        // android.widget.Adapter
-        override fun getView(itemIndex: Int, itemViewFrom: View?, parentView: ViewGroup?): View {
-            var type = getItemViewType(itemIndex)
-            val item = getItem(itemIndex)
-            // 2-標題 0-本文 1-簽名檔 3-發文時間 4-推文
-            var itemViewOrigin = itemViewFrom
-
-            if (itemViewOrigin == null) {
-                when (type) {
-                    ArticlePageItemType.Companion.SIGN -> itemViewOrigin =
-                        ArticlePageTelnetItemView(context)
-
-                    ArticlePageItemType.Companion.HEADER -> itemViewOrigin =
-                        ArticlePageHeaderItemView(context)
-
-                    ArticlePageItemType.Companion.POST_TIME -> itemViewOrigin =
-                        ArticlePageTimeTimeView(context)
-
-                    ArticlePageItemType.Companion.PUSH -> itemViewOrigin =
-                        ArticlePagePushItemView(context!!)
-
-                    ArticlePageItemType.Companion.EDIT_RECORD -> itemViewOrigin =
-                        ArticlePageEditRecordItemView(context!!)
-
-                    else -> {
-                        type = ArticlePageItemType.Companion.CONTENT
-                        itemViewOrigin = ArticlePageTextItemView(context)
-                    }
-                }
-            } else if (type == ArticlePageItemType.Companion.CONTENT) {
-                itemViewOrigin = ArticlePageTextItemView(context)
-            }
-
-            if (itemViewOrigin is ArticlePageTextItemView) {
-                if (item != null) {
-                    itemViewOrigin.setAuthor(item.author, item.nickname)
-                    itemViewOrigin.setQuote(item.quoteLevel)
-                    itemViewOrigin.setContent(item.content, item.frame!!.rows)
-                    // 分隔線
-                    itemViewOrigin.setDividerHidden(itemIndex >= getCount() - 2)
-                    // 黑名單檢查
-                    itemViewOrigin.setVisible(
-                        !propertiesBlockListEnable || !isBlockListContains(
-                            item.author
-                        )
-                    )
-                }
-            } else if (itemViewOrigin is ArticlePageTelnetItemView) {
-                if (item != null) itemViewOrigin.setFrame(item.frame!!)
-                // 分隔線
-                itemViewOrigin.setDividerHidden(itemIndex >= getCount() - 2)
-            } else if (itemViewOrigin is ArticlePageHeaderItemView) {
-                var author: String? = null
-                var title: String? = null
-                var boardName: String? = null
-                if (telnetArticle != null) {
-                    author = telnetArticle!!.author
-                    title = telnetArticle!!.title
-                    boardName = telnetArticle!!.boardName
-                    if (telnetArticle!!.nickName != null) {
-                        author = author + "(" + telnetArticle!!.nickName + ")"
-                    }
-                }
-                itemViewOrigin.setData(title, author, boardName)
-                itemViewOrigin.setMenuButtonClickListener(mMenuListener)
-            } else if (itemViewOrigin is ArticlePageTimeTimeView) {
-                itemViewOrigin.setTime("《" + telnetArticle!!.dateTime + "》")
-                itemViewOrigin.setIP(telnetArticle!!.fromIP)
-            } else if (itemViewOrigin is ArticlePagePushItemView) {
-                val tempIndex = itemIndex - (getCount() - pushLength - editRecordLength) // itemIndex - 本文長度
-                val itemPush = telnetArticle!!.getPush(tempIndex)
-                if (itemPush != null) {
-                    itemViewOrigin.setContent(itemPush)
-                    itemViewOrigin.setFloor(tempIndex + 1)
-                }
-            } else if (itemViewOrigin is ArticlePageEditRecordItemView) {
-                val tempIndex = itemIndex - (getCount() - editRecordLength) // itemIndex - 修改紀錄開始位置
-                val itemEditRecord = telnetArticle!!.getEditRecord(tempIndex)
-                if (itemEditRecord != null) {
-                    itemViewOrigin.setContent(itemEditRecord)
-                }
-            }
-
-            return itemViewOrigin
-        }
-
-        /** 一共有多少种不同的视图类型  */
-        override fun getViewTypeCount(): Int {
-            return 6
-        }
-
-        override fun hasStableIds(): Boolean {
-            return false
-        }
-
-        override fun isEmpty(): Boolean {
-            return getCount() == 0
-        }
-
-        override fun areAllItemsEnabled(): Boolean {
-            return false
-        }
-
-        override fun isEnabled(itemIndex: Int): Boolean {
-            val type = getItemViewType(itemIndex)
-            return type == 0 || type == 1
         }
     }
 
-    /** 長按內文  */
-    var listLongClickListener: OnItemLongClickListener =
-        OnItemLongClickListener { var1: AdapterView<*>?, view: View?, itemIndex: Int, pressTime: Long ->
-            if (view?.javaClass == ArticlePageTelnetItemView::class.java) {
-                // 開啟切換模式
-                val item = telnetArticle!!.getItem(itemIndex - 1)
+    override fun onPageDidLoad() {
+        showNotification()
+        changeToolbarLocation()
+        changeToolbarOrder()
+        refreshExternalToolbar()
+    }
 
-                val viewMode = item?.type
-                when (viewMode) {
-                    0 -> {
-                        item.type = 1
-                        listAdapter.notifyDataSetChanged()
-                        return@OnItemLongClickListener true
-                    }
-                    1 -> {
-                        item.type = 0
-                        listAdapter.notifyDataSetChanged()
-                        return@OnItemLongClickListener true
-                    }
-                    else -> {
-                        return@OnItemLongClickListener true
-                    }
-                }
-            }
-            false
+    override fun onPageWillAppear() {
+        super.onPageWillAppear()
+        reloadViewMode()
+        refreshExternalToolbar()
+        changeToolbarLocation()
+        changeToolbarOrder()
+    }
+
+    override fun onPageDidDisappear() {
+        telnetView = null
+        super.onPageDidDisappear()
+    }
+
+    override fun clear() {
+        super.clear()
+        telnetArticle = null
+        currentArticle = null
+        telnetView = null
+    }
+
+    /** 第一次進入的提示訊息 */
+    fun showNotification() {
+        val showTopBottomFunction = getShowTopBottomButton()
+        if (!showTopBottomFunction) {
+            showLongToast(getContextString(R.string.notification_article_top_bottom_function))
+            setShowTopBottomButton(true)
         }
+    }
 
-    /** 最前篇  */
+    override fun onBackPressed(): Boolean {
+        clear()
+        navigationController.popViewController()
+        PageContainer.instance!!.cleanArticlePage()
+        return true
+    }
+
+    override fun onMenuButtonClicked(): Boolean {
+        onMenuClicked()
+        return true
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT || isFullScreen) {
+            if (propertiesGestureOnBoardEnable) onBackPressed()
+            return true
+        }
+        return true
+    }
+
+    fun changeToolbarLocation() {
+        toolbarLocationState = propertiesToolbarLocation
+    }
+
+    fun changeToolbarOrder() {
+        toolbarOrderState = propertiesToolbarOrder
+    }
+
+    fun changeViewMode() {
+        exchangeArticleViewMode()
+        notifyDataUpdated()
+        viewModeState = propertiesArticleViewMode
+    }
+
+    fun reloadViewMode() {
+        viewModeState = propertiesArticleViewMode
+    }
+
+    fun onExternalToolbarClicked() {
+        val enable = propertiesExternalToolbarEnable
+        propertiesExternalToolbarEnable = !enable
+        isExtToolbarOpenState = !enable
+    }
+
+    fun refreshExternalToolbar() {
+        var enable = propertiesExternalToolbarEnable
+        val articleMode = propertiesArticleViewMode
+        if (articleMode == ArticleViewMode.Companion.MODE_TELNET) {
+            enable = true
+        }
+        isExtToolbarOpenState = enable
+    }
+
+    /** 變更telnetView大小 */
+    fun reloadTelnetLayout() {}
+
+    /** 載入全部圖片 (保持接口相容) */
+    fun onLoadAllImageClicked() {}
+
+    /** 最前篇 */
     var actionDelay: Long = 500L
     var topAction: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
@@ -265,7 +259,8 @@ class ArticlePage : TelnetPage() {
             moveToBottomArticle()
         }
     }
-    var pageTopListener: OnLongClickListener = OnLongClickListener { v: View? ->
+
+    var pageTopListener: OnLongClickListener = OnLongClickListener {
         if (propertiesArticleMoveEnable) {
             topAction?.cancel()
             topAction?.postDelayed(actionDelay)
@@ -273,8 +268,8 @@ class ArticlePage : TelnetPage() {
         true
     }
 
-    /** 上一篇  */
-    var pageUpListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    /** 上一篇 */
+    var pageUpListener: View.OnClickListener = View.OnClickListener {
         topAction?.cancel()
         if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
@@ -283,8 +278,8 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    /** 最後篇  */
-    var pageBottomListener: OnLongClickListener = OnLongClickListener { v: View? ->
+    /** 最後篇 */
+    var pageBottomListener: OnLongClickListener = OnLongClickListener {
         if (propertiesArticleMoveEnable) {
             bottomAction?.cancel()
             bottomAction?.postDelayed(actionDelay)
@@ -292,8 +287,8 @@ class ArticlePage : TelnetPage() {
         true
     }
 
-    /** 下一篇  */
-    var pageDownListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    /** 下一篇 */
+    var pageDownListener: View.OnClickListener = View.OnClickListener {
         bottomAction?.cancel()
         if (!TelnetClient.myInstance!!.telnetConnector!!.isConnecting || boardMainPage == null) {
             showConnectionClosedToast()
@@ -302,321 +297,31 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    /** 選單  */
-    val mMenuListener: View.OnClickListener = View.OnClickListener { v: View? -> onMenuClicked() }
+    /** 選單 */
+    val mMenuListener: View.OnClickListener = View.OnClickListener { onMenuClicked() }
 
-    /** 推薦  */
-    val mDoGyListener: View.OnClickListener =
-        View.OnClickListener { v: View? -> onGYButtonClicked() }
+    /** 推薦 */
+    val mDoGyListener: View.OnClickListener = View.OnClickListener { onGYButtonClicked() }
 
-    /** 切換模式  */
-    val mChangeModeListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    /** 切換模式 */
+    val mChangeModeListener: View.OnClickListener = View.OnClickListener {
         changeViewMode()
         refreshExternalToolbar()
     }
 
-    /** 開啟連結  */
-    val mShowLinkListener: View.OnClickListener =
-        View.OnClickListener { v: View? -> onOpenLinkClicked() }
+    /** 開啟連結 */
+    val mShowLinkListener: View.OnClickListener = View.OnClickListener { onOpenLinkClicked() }
 
-    /** 靠左對其  */
-    var btnLLListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    /** 靠左對齊 */
+    var btnLLListener: View.OnClickListener = View.OnClickListener {
         propertiesToolbarLocation = 1
         this@ArticlePage.changeToolbarLocation()
     }
 
-    /** 靠右對其  */
-    var btnRRListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    /** 靠右對齊 */
+    var btnRRListener: View.OnClickListener = View.OnClickListener {
         propertiesToolbarLocation = 2
         this@ArticlePage.changeToolbarLocation()
-    }
-
-    override val pageType: Int
-        get() = BahamutPage.BAHAMUT_ARTICLE
-
-    override val pageLayout: Int
-        get() = R.layout.article_page
-
-    override val isPopupPage: Boolean
-        get() = true
-
-    override fun onPageDidLoad() {
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        telnetView = mainLayout.findViewById(R.id.Article_contentTelnetView)
-        reloadTelnetLayout()
-        val listView = mainLayout.findViewById<ASListView>(R.id.Article_contentList)
-        listEmptyView = mainLayout.findViewById(R.id.Article_listEmptyView)
-        listView.adapter = listAdapter
-        listView.emptyView = listEmptyView
-        listView.onItemLongClickListener = listLongClickListener
-
-        val backButton = mainLayout.findViewById<Button>(R.id.Article_backButton)
-        backButton.setOnClickListener(replyListener)
-
-        val pageUpButton = mainLayout.findViewById<Button>(R.id.Article_pageUpButton)
-        pageUpButton.setOnClickListener(pageUpListener)
-        pageUpButton.setOnLongClickListener(pageTopListener)
-
-        val pageDownButton = mainLayout.findViewById<Button>(R.id.Article_pageDownButton)
-        pageDownButton.setOnClickListener(pageDownListener)
-        pageDownButton.setOnLongClickListener(pageBottomListener)
-
-        val doGyButton = mainLayout.findViewById<Button>(R.id.do_gy)
-        doGyButton.setOnClickListener(mDoGyListener)
-        val changeModeButton = mainLayout.findViewById<Button>(R.id.change_mode)
-        changeModeButton.setOnClickListener(mChangeModeListener)
-        val showLinkButton = mainLayout.findViewById<Button>(R.id.show_link)
-        showLinkButton.setOnClickListener(mShowLinkListener)
-
-        mainLayout.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
-        mainLayout.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
-
-        refreshExternalToolbar()
-        showNotification()
-
-        // 工具列位置
-        changeToolbarLocation()
-        changeToolbarOrder()
-    }
-
-    /** 變更工具列位置  */
-    fun changeToolbarLocation() {
-        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
-        val toolbarBlock = mainLayout.findViewById<LinearLayout>(R.id.toolbar_block)
-        val toolBarFloating =
-            mainLayout.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
-        toolBarFloating.visibility = View.GONE
-
-        // 最左邊最右邊
-        val btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
-        val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-        val btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
-        val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-        btnLL.visibility = View.GONE
-        btnLLDivider.visibility = View.GONE
-        btnRR.visibility = View.GONE
-        btnRRDivider.visibility = View.GONE
-
-        val layoutParams = toolbar!!.layoutParams as RelativeLayout.LayoutParams
-        val choiceToolbarLocation = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
-        when (choiceToolbarLocation) {
-            1 -> {
-                // 底部-最左邊
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
-                layoutParams.addRule(RelativeLayout.ALIGN_START)
-                btnRR.visibility = View.VISIBLE
-                btnRRDivider.visibility = View.VISIBLE
-            }
-
-            2 -> {
-                // 底部-最右邊
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_START)
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-                btnLL.visibility = View.VISIBLE
-                btnLLDivider.visibility = View.VISIBLE
-            }
-
-            3 -> {
-                // 浮動
-                // 去除 原本工具列
-                toolbar.visibility = View.GONE
-                // 去除底部卡位用view
-                toolbarBlock.visibility = View.GONE
-                // 浮動工具列
-                toolBarFloating.visibility = View.VISIBLE
-                // button setting
-                toolBarFloating.setOnClickListenerSetting(replyListener)
-                toolBarFloating.setTextSetting(getContextString(R.string.reply))
-                // button 1
-                toolBarFloating.setOnClickListener1(pageUpListener)
-                toolBarFloating.setOnLongClickListener1(pageTopListener)
-                toolBarFloating.setText1(getContextString(R.string.prev_article))
-                // button 2
-                toolBarFloating.setOnClickListener2(pageDownListener)
-                toolBarFloating.setOnLongClickListener2(pageBottomListener)
-                toolBarFloating.setText2(getContextString(R.string.next_article))
-            }
-
-            else -> {
-                // 底部-中間
-                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            }
-        }
-
-        toolbar.layoutParams = layoutParams
-    }
-
-    /** 反轉按鈕順序  */
-    fun changeToolbarOrder() {
-        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
-
-        val choiceToolbarOrder = propertiesToolbarOrder
-        if (choiceToolbarOrder == 1) {
-            // 最左邊最右邊
-            val btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-            val btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-
-            // 擷取中間的元素
-            val allViews = ArrayList<View?>()
-            for (i in toolbar.size - 3 downTo 2) {
-                val view = toolbar.getChildAt(i)
-                allViews.add(view)
-            }
-
-            // 清空
-            toolbar.removeAllViews()
-
-            // 插入
-            toolbar.addView(btnLL)
-            toolbar.addView(btnLLDivider)
-            for (j in allViews.indices) {
-                toolbar.addView(allViews[j])
-            }
-            toolbar.addView(btnRRDivider)
-            toolbar.addView(btnRR)
-        }
-    }
-
-    /** 第一次進入的提示訊息  */
-    fun showNotification() {
-        val showTopBottomFunction = getShowTopBottomButton()
-        if (!showTopBottomFunction) {
-            showLongToast(getContextString(R.string.notification_article_top_bottom_function))
-            setShowTopBottomButton(true)
-        }
-    }
-
-    // com.kota.asFramework.pageController.ASViewController
-    override fun onPageWillAppear() {
-        reloadViewMode()
-    }
-
-    // com.kota.asFramework.pageController.ASViewController
-    override fun onPageDidDisappear() {
-        telnetView = null
-        super.onPageDidDisappear()
-    }
-
-    // com.kota.asFramework.pageController.ASViewController
-    override fun onBackPressed(): Boolean {
-        navigationController.popViewController()
-        PageContainer.instance!!.cleanArticlePage()
-        return true
-    }
-
-    // com.kota.asFramework.pageController.ASViewController
-    override fun onMenuButtonClicked(): Boolean {
-        onMenuClicked()
-        return true
-    }
-
-    fun onMenuClicked() {
-        if (telnetArticle != null) {
-            val author = telnetArticle!!.author.lowercase(Locale.getDefault())
-            val logonUser = propertiesUsername.lowercase(Locale.getDefault())
-            val extToolbarEnable = propertiesExternalToolbarEnable
-            val externalToolbarEnableTitle =
-                if (extToolbarEnable) getContextString(R.string.hide_toolbar) else getContextString(
-                    R.string.open_toolbar
-                )
-            ASListDialog.createDialog()
-                .addItem(getContextString(R.string.do_gy))
-                .addItem(getContextString(R.string.do_push))
-                .addItem(getContextString(R.string.change_mode))
-                .addItem(if (author == logonUser) getContextString(R.string.edit_article) else null)
-                .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null, true)
-                .addItem(externalToolbarEnableTitle)
-                .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
-                .addItem(getContextString(R.string.open_url))
-                .addItem(getContextString(R.string.board_page_item_long_click_1))
-                .addItem(getContextString(R.string.board_page_item_load_all_image))
-                .setListener(object : ASListDialogItemClickListener {
-                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
-                    override fun onListDialogItemClicked(
-                        paramASListDialog: ASListDialog?,
-                        index: Int,
-                        title: String?
-                    ) {
-                        when (index) {
-                            0 -> onGYButtonClicked()
-                            1 -> onPushArticleButtonClicked()
-                            2 -> {
-                                changeViewMode()
-                                refreshExternalToolbar()
-                            }
-
-                            3 -> onEditButtonClicked()
-                            4 -> onDeleteButtonClicked()
-                            5 -> onExternalToolbarClicked()
-                            6 -> onAddBlockListClicked()
-                            7 -> onOpenLinkClicked()
-                            8 -> boardMainPage?.funSendMail()
-                            9 -> onLoadAllImageClicked()
-                            else -> {}
-                        }
-                    }
-
-                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
-                    override fun onListDialogItemLongClicked(
-                        paramASListDialog: ASListDialog?,
-                        index: Int,
-                        title: String?
-                    ): Boolean {
-                        return true
-                    }
-                }).scheduleDismissOnPageDisappear(this).show()
-        }
-    }
-
-    /** 載入全部圖片  */
-    fun onLoadAllImageClicked() {
-        val listView = mainLayout.findViewById<ASListView>(R.id.Article_contentList)
-        val childCount = listView.size
-        for (childIndex in 0..<childCount) {
-            val view = listView.getChildAt(childIndex)
-            if (view.javaClass == ArticlePageTextItemView::class.java) {
-                val firstLLayout = (view as ArticlePageTextItemView).getChildAt(0) as LinearLayout
-                val secondLLayout = firstLLayout.getChildAt(0) as LinearLayout
-                val childCount2 = secondLLayout.childCount
-                for (childIndex2 in 0..<childCount2) {
-                    val view1 = secondLLayout.getChildAt(childIndex2)
-                    if (view1.javaClass == ThumbnailItemView::class.java) {
-                        (view1 as ThumbnailItemView).prepareLoadImage()
-                    }
-                }
-            }
-        }
-    }
-
-    /** 變更telnetView大小  */
-    fun reloadTelnetLayout() {
-        val textWidth = TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_SP,
-            20.0f,
-            context!!.resources.displayMetrics
-        ).toInt()
-        var telnetViewWidth = (textWidth / 2) * 80
-        val screenWidth: Int = if (navigationController.currentOrientation == 2) {
-            navigationController.screenHeight
-        } else {
-            navigationController.screenWidth
-        }
-        if (telnetViewWidth <= screenWidth) {
-            telnetViewWidth = -1
-            isFullScreen = true
-        } else {
-            isFullScreen = false
-        }
-        val layoutParams = telnetView!!.layoutParams!!
-        layoutParams.width = telnetViewWidth
-        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-        telnetView?.layoutParams = layoutParams
     }
 
     fun moveToTopArticle() {
@@ -639,30 +344,27 @@ class ArticlePage : TelnetPage() {
         showShortToast("連線已中斷")
     }
 
-    /** 推薦  */
+    /** 推薦 */
     fun onGYButtonClicked() {
-        if (boardMainPage != null) {
-            boardMainPage?.goodLoadingArticle()
-        }
+        boardMainPage?.goodLoadingArticle()
     }
 
-    /** 推文  */
+    /** 推文 */
     fun onPushArticleButtonClicked() {
-        if (boardMainPage != null) {
-            boardMainPage?.pushArticle()
-        }
+        boardMainPage?.pushArticle()
     }
 
-    /** 刪除文章  */
+    /** 刪除文章 */
     fun onDeleteButtonClicked() {
-        if (telnetArticle != null && boardMainPage != null) {
-            val itemNumber = telnetArticle!!.articleNumber
+        val article = telnetArticle ?: currentArticle
+        if (article != null && boardMainPage != null) {
+            val itemNumber = article.articleNumber
             ASAlertDialog.createDialog()
                 .setTitle(getContextString(R.string.delete))
                 .setMessage(getContextString(R.string.del_this_article))
                 .addButton(getContextString(R.string.cancel))
                 .addButton(getContextString(R.string.delete))
-                .setListener { aDialog: ASAlertDialog?, index: Int ->
+                .setListener { _, index ->
                     if (index == 1) {
                         val command: TelnetCommand = BahamutCommandDeleteArticle(itemNumber)
                         boardMainPage?.pushCommand(command)
@@ -672,21 +374,22 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    /** 回覆文章  */
-    var replyListener: View.OnClickListener = View.OnClickListener { v: View? ->
+    /** 回覆文章 */
+    var replyListener: View.OnClickListener = View.OnClickListener {
         if (TelnetClient.myInstance!!.telnetConnector!!.isConnecting) {
-            if (telnetArticle != null) {
+            val article = telnetArticle ?: currentArticle
+            if (article != null) {
                 val page = PageContainer.instance!!.postArticlePage
-                val replyTitle = telnetArticle!!.generateReplyTitle()
-                val replyContent = telnetArticle!!.generateReplyContent()
+                val replyTitle = article.generateReplyTitle()
+                val replyContent = article.generateReplyContent()
                 page.setBoardPage(boardMainPage)
                 page.setOperationMode(PostArticlePage.OperationMode.Reply)
-                page.setArticleNumber(telnetArticle!!.articleNumber.toString())
+                page.setArticleNumber(article.articleNumber.toString())
                 page.setPostTitle(replyTitle)
                 page.setPostContent(replyContent + "\n\n\n")
                 page.setListener(boardMainPage)
                 page.setHeaderHidden(true)
-                page.setTelnetArticle(telnetArticle)
+                page.setTelnetArticle(article)
                 navigationController.pushViewController(page)
                 return@OnClickListener
             }
@@ -695,111 +398,98 @@ class ArticlePage : TelnetPage() {
         showConnectionClosedToast()
     }
 
-    /** 修改文章  */
+    /** 修改文章 */
     fun onEditButtonClicked() {
-        val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD // 是否為看板內文章
+        val isBoard = boardMainPage?.pageType == BahamutPage.BAHAMUT_BOARD
+        val article = telnetArticle ?: currentArticle
 
-        // 只有在看板內文章才能直接修改
-        if (isBoard && telnetArticle != null) {
+        if (isBoard && article != null) {
             val page = PageContainer.instance!!.postArticlePage
-            val editTitle = telnetArticle!!.generateEditTitle()
-            val editContent = telnetArticle!!.generateEditContent()
-            val editFormat = telnetArticle!!.generateEditFormat()
+            val editTitle = article.generateEditTitle()
+            val editContent = article.generateEditContent()
+            val editFormat = article.generateEditFormat()
             page.setBoardPage(boardMainPage)
-            page.setArticleNumber(telnetArticle!!.articleNumber.toString())
+            page.setArticleNumber(article.articleNumber.toString())
             page.setOperationMode(PostArticlePage.OperationMode.Edit)
             page.setPostTitle(editTitle)
             page.setPostContent(editContent)
             page.setEditFormat(editFormat)
             page.setListener(boardMainPage)
             page.setHeaderHidden(true)
-            page.setTelnetArticle(telnetArticle)
+            page.setTelnetArticle(article)
             navigationController.pushViewController(page)
-        } else {
-            // 透過 t 取得文章編號
-            // 從 boardMainPage 判斷是否為最後一篇文章
+        } else if (article != null) {
             val selectedIndex = boardMainPage?.selectedIndex ?: 0
-            var isFirstInPage = selectedIndex%20 == 1
-            // 如果串接只有一行, 就不適用例外1
-            val totalLength = boardMainPage?.getItemSize() ?: 0
+            var isFirstInPage = selectedIndex % 20 == 1
+            val totalLength = boardMainPage?.itemSize ?: 0
             if (totalLength == 1) isFirstInPage = false
-            boardMainPage?.pushCommand(BahamutCommandLocateArticle(telnetArticle, isFirstInPage))
+            boardMainPage?.pushCommand(BahamutCommandLocateArticle(article, isFirstInPage))
         }
     }
 
-    /** 切換 text <-> telnet  */
-    fun changeViewMode() {
-        exchangeArticleViewMode()
-        notifyDataUpdated()
-        reloadViewMode()
-    }
+    /** 開啟選單 */
+    fun onMenuClicked() {
+        val article = telnetArticle ?: currentArticle
+        if (article != null) {
+            val author = article.author.lowercase(Locale.getDefault())
+            val logonUser = propertiesUsername.lowercase(Locale.getDefault())
+            val extToolbarEnable = propertiesExternalToolbarEnable
+            val externalToolbarEnableTitle =
+                if (extToolbarEnable) getContextString(R.string.hide_toolbar)
+                else getContextString(R.string.open_toolbar)
 
-    fun reloadViewMode() {
-        val textContentView = mainLayout.findViewById<ViewGroup?>(R.id.Article_TextContentView)
-        val telnetViewBlock =
-            mainLayout.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
-        // 文字模式
-        if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT) {
-            if (textContentView != null) {
-                textContentView.visibility = View.VISIBLE
-            }
-            if (telnetViewBlock != null) {
-                telnetViewBlock.visibility = View.GONE
-                return
-            }
-            return
-        }
+            ASListDialog.createDialog()
+                .addItem(getContextString(R.string.do_gy))
+                .addItem(getContextString(R.string.do_push))
+                .addItem(getContextString(R.string.change_mode))
+                .addItem(if (author == logonUser) getContextString(R.string.edit_article) else null)
+                .addItem(if (author == logonUser) getContextString(R.string.delete_article) else null, true)
+                .addItem(externalToolbarEnableTitle)
+                .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
+                .addItem(getContextString(R.string.open_url))
+                .addItem(getContextString(R.string.board_page_item_long_click_1))
+                .setListener(object : ASListDialogItemClickListener {
+                    override fun onListDialogItemClicked(
+                        paramASListDialog: ASListDialog?,
+                        index: Int,
+                        title: String?
+                    ) {
+                        when (index) {
+                            0 -> onGYButtonClicked()
+                            1 -> onPushArticleButtonClicked()
+                            2 -> {
+                                changeViewMode()
+                                refreshExternalToolbar()
+                            }
+                            3 -> onEditButtonClicked()
+                            4 -> onDeleteButtonClicked()
+                            5 -> onExternalToolbarClicked()
+                            6 -> onAddBlockListClicked()
+                            7 -> onOpenLinkClicked()
+                            8 -> boardMainPage?.funSendMail()
+                            else -> {}
+                        }
+                    }
 
-        // telnet模式
-        if (textContentView != null) {
-            textContentView.visibility = View.GONE
-        }
-        if (telnetViewBlock != null) {
-            telnetViewBlock.visibility = View.VISIBLE
-            telnetViewBlock.invalidate()
-        }
-    }
-
-    // com.kota.asFramework.pageController.ASViewController
-    override fun onReceivedGestureRight(): Boolean {
-        if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT || isFullScreen) {
-            if (propertiesGestureOnBoardEnable) onBackPressed()
-            return true
-        }
-        return true
-    }
-
-    override val isKeepOnOffline: Boolean
-        get() = true
-
-    fun onExternalToolbarClicked() {
-        val enable = propertiesExternalToolbarEnable
-        propertiesExternalToolbarEnable = !enable
-        refreshExternalToolbar()
-    }
-
-    fun refreshExternalToolbar() {
-        var enable = propertiesExternalToolbarEnable
-        val articleMode = propertiesArticleViewMode
-        if (articleMode == ArticleViewMode.Companion.MODE_TELNET) {
-            enable = true
-        }
-
-        val toolbarView = mainLayout.findViewById<View>(R.id.ext_toolbar)
-        if (toolbarView != null) {
-            toolbarView.visibility = if (enable) View.VISIBLE else View.GONE
+                    override fun onListDialogItemLongClicked(
+                        paramASListDialog: ASListDialog?,
+                        index: Int,
+                        title: String?
+                    ): Boolean = true
+                }).scheduleDismissOnPageDisappear(this).show()
         }
     }
 
+    /** 開啟連結列表 */
     fun onOpenLinkClicked() {
-        if (telnetArticle != null) {
-            // 擷取文章內的所有連結
+        val article = telnetArticle ?: currentArticle
+        if (article != null) {
             val textView = TextView(context)
-            textView.text = telnetArticle!!.fullText
+            textView.text = article.fullText
             Linkify.addLinks(textView, Linkify.WEB_URLS)
 
             val urls = textView.urls
-            if (urls.size == 0) {
+            if (urls.isEmpty()) {
                 showShortToast(getContextString(R.string.no_url))
                 return
             }
@@ -808,16 +498,12 @@ class ArticlePage : TelnetPage() {
                 listDialog.addItem(url.url)
             }
             listDialog.setListener(object : ASListDialogItemClickListener {
-                // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemLongClicked(
                     paramASListDialog: ASListDialog?,
                     index: Int,
                     title: String?
-                ): Boolean {
-                    return true
-                }
+                ): Boolean = true
 
-                // com.kota.asFramework.dialog.ASListDialogItemClickListener
                 override fun onListDialogItemClicked(
                     paramASListDialog: ASListDialog?,
                     index: Int,
@@ -833,19 +519,17 @@ class ArticlePage : TelnetPage() {
         }
     }
 
-    /** 加入黑名單  */
+    /** 加入黑名單 */
     fun onAddBlockListClicked() {
-        val article = telnetArticle
+        val article = telnetArticle ?: currentArticle
         if (article != null) {
             val buffer: MutableSet<String> = HashSet()
-            // 作者黑名單
             buffer.add(article.author)
-            // 內文黑名單
             val len = article.itemSize
-            for (i in 0..<len) {
+            for (i in 0 until len) {
                 val item = article.getItem(i)
                 val author = item?.author
-                if (author != null && !isBlockListContains(author)) {
+                if (!author.isNullOrEmpty() && !isBlockListContains(author)) {
                     buffer.add(author)
                 }
             }
@@ -853,19 +537,15 @@ class ArticlePage : TelnetPage() {
                 showShortToast("無可加入黑名單的ID")
                 return
             }
-            val names = buffer.toTypedArray<String>()
+            val names = buffer.toTypedArray()
             ASListDialog.createDialog().addItems(names)
                 .setListener(object : ASListDialogItemClickListener {
-                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemLongClicked(
                         paramASListDialog: ASListDialog?,
                         index: Int,
                         title: String?
-                    ): Boolean {
-                        return true
-                    }
+                    ): Boolean = true
 
-                    // com.kota.asFramework.dialog.ASListDialogItemClickListener
                     override fun onListDialogItemClicked(
                         paramASListDialog: ASListDialog?,
                         index: Int,
@@ -883,7 +563,7 @@ class ArticlePage : TelnetPage() {
             .setMessage("是否要將\"$aBlockName\"加入黑名單?")
             .addButton("取消")
             .addButton("加入")
-            .setListener { aDialog: ASAlertDialog?, index: Int ->
+            .setListener { _, index ->
                 if (index == 1) {
                     val newList: MutableList<String> = blockList
                     if (newList.contains(aBlockName)) {
@@ -895,76 +575,58 @@ class ArticlePage : TelnetPage() {
                     blockList = newList
                     notifyDataUpdated()
 
-                    if (propertiesBlockListEnable) {
-                        if (aBlockName == telnetArticle!!.author) {
+                    val article = telnetArticle ?: currentArticle
+                    if (propertiesBlockListEnable && article != null) {
+                        if (aBlockName == article.author) {
                             onBackPressed()
-                        } else {
-                            listAdapter.notifyDataSetChanged()
                         }
                     }
                 }
             }.scheduleDismissOnPageDisappear(this).show()
     }
 
-    /** 給其他頁面託付使用  */
     fun setBoardPage(aBoardMainPage: BoardMainPage) {
         boardMainPage = aBoardMainPage
     }
 
-    /** 給其他網頁顯示文章使用  */
     fun setArticle(aArticle: TelnetArticle): Boolean {
         var isSuccess = true
         telnetArticle = aArticle
+        currentArticle = aArticle
 
-        if (telnetArticle != null) {
-            val boardName = boardMainPage?.listName!!
-            // 加入歷史紀錄
+        val boardName = boardMainPage?.listName ?: ""
+        if (boardName.isNotEmpty()) {
             val store = TempSettings.bookmarkStore
             if (store != null) {
                 val bookmarkList = store.getBookmarkList(boardName)
-                bookmarkList.addHistoryBookmark(telnetArticle!!.title)
+                bookmarkList.addHistoryBookmark(aArticle.title)
                 store.store()
             }
-
-            // 關係到 telnetView
-            telnetView!!.frame = telnetArticle!!.frame!!
-
-            reloadTelnetLayout()
-            val telnetContentView =
-                mainLayout.findViewById<ASScrollView?>(R.id.Article_contentTelnetViewBlock)
-            telnetContentView?.scrollTo(0, 0)
-            listAdapter.notifyDataSetChanged()
         }
-        dismissProcessingDialog()
 
-        // 檢查是否有從串接頁編輯文章的任務
+        if (telnetView != null && aArticle.frame != null) {
+            telnetView?.frame = aArticle.frame!!
+        }
+
+        dismissProcessingDialog()
         isSuccess = verifyAndEditFromLinked(aArticle)
         return isSuccess
     }
 
-    /**
-     * 驗證從串接頁編輯文章的任務
-     *
-     * 當從 LinkPage/SearchPage 觸發編輯時，驗證文章特徵是否一致。
-     * 若一致則進入編輯模式，否則根據狀態嘗試搜尋或提示失敗。
-     *
-     * @param article 當前文章
-     */
     private fun verifyAndEditFromLinked(article: TelnetArticle): Boolean {
         val state = TempSettings.editFromLinkedState ?: return true
         if (state.step != EditFromLinkedStep.READING_ARTICLE &&
             state.step != EditFromLinkedStep.SEARCH_NEXT &&
-            state.step != EditFromLinkedStep.SEARCH_PREV) {
+            state.step != EditFromLinkedStep.SEARCH_PREV
+        ) {
             return true
         }
 
         if (state.matchesTarget(article)) {
-            // 特徵一致，進入編輯
             state.step = EditFromLinkedStep.DONE
             TempSettings.editFromLinkedState = null
             onEditButtonClicked()
         } else {
-            // 特徵不一致
             state.retryCount++
             state.step = EditFromLinkedStep.FAILED
             TempSettings.editFromLinkedState = null
@@ -975,13 +637,11 @@ class ArticlePage : TelnetPage() {
         return true
     }
 
-    /** 給 state handler 更改讀取進度  */
     @SuppressLint("SetTextI18n")
     fun changeLoadingPercentage(percentage: String?) {
         showProcessingDialog(getContextString(R.string.loading_) + "\n" + percentage)
     }
 
-    /** 查詢勇者  */
     fun ctrlQUser(fromStrings: Vector<String>) {
         try {
             ASCoroutine.ensureMainThread {
@@ -990,7 +650,711 @@ class ArticlePage : TelnetPage() {
                 dialogQueryHero.getData(fromStrings)
             }
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, e.message ?: "")
+        }
+    }
+
+    // -------------------------------------------------------------
+    // Compose 畫面主體
+    // -------------------------------------------------------------
+
+    @Composable
+    fun ArticlePageContent() {
+        val colors = AppTheme.colors
+        val article = currentArticle
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 1. 頂部導覽列
+            ArticleTopBar(
+                title = article?.title ?: stringResource(R.string.loading_),
+                subtitle = article?.let {
+                    val nick = if (!it.nickName.isNullOrEmpty()) " (${it.nickName})" else ""
+                    "${it.boardName}  ${it.author}$nick"
+                } ?: "",
+                onBackClick = { onBackPressed() },
+                onMenuClick = { onMenuClicked() }
+            )
+
+            // 2. 外部快捷工具列 (推/噓, 切換模式, 開啟連結)
+            if (isExtToolbarOpenState || viewModeState == ArticleViewMode.Companion.MODE_TELNET) {
+                ArticleExtToolbar(
+                    onDoGy = { onGYButtonClicked() },
+                    onChangeMode = {
+                        changeViewMode()
+                        refreshExternalToolbar()
+                    },
+                    onOpenLink = { onOpenLinkClicked() }
+                )
+            }
+
+            // 3. 文章內容主體
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                if (article == null) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.loading_),
+                            color = colors.textSecondary,
+                            fontSize = 16.sp
+                        )
+                    }
+                } else {
+                    if (viewModeState == ArticleViewMode.Companion.MODE_TEXT) {
+                        // 文字模式
+                        ArticleTextModeContent(
+                            article = article,
+                            colors = colors,
+                            onAuthorClick = { author ->
+                                showAuthorActionDialog(author)
+                            }
+                        )
+                    } else {
+                        // Telnet 畫面模式
+                        ArticleTelnetModeContent(
+                            article = article,
+                            onTelnetViewCreated = { view ->
+                                this@ArticlePage.telnetView = view
+                            }
+                        )
+                    }
+                }
+            }
+
+            // 4. 底部工具列 (回覆, 上一篇, 下一篇)
+            ArticleBottomToolbar(
+                colors = colors,
+                toolbarLocation = toolbarLocationState,
+                toolbarOrder = toolbarOrderState,
+                onReplyClick = { replyListener.onClick(null) },
+                onPrevClick = { pageUpListener.onClick(null) },
+                onFirstClick = { pageTopListener.onLongClick(null) },
+                onNextClick = { pageDownListener.onClick(null) },
+                onLastClick = { pageBottomListener.onLongClick(null) },
+                onLLClick = { btnLLListener.onClick(null) },
+                onRRClick = { btnRRListener.onClick(null) }
+            )
+        }
+    }
+
+    /** 點擊作者動作選單 (查詢勇者 / 寄信) */
+    private fun showAuthorActionDialog(author: String) {
+        var cleanAuthor = author
+        if (cleanAuthor.contains("(")) {
+            cleanAuthor = cleanAuthor.substring(0, cleanAuthor.indexOf("("))
+        }
+        ASListDialog.createDialog()
+            .setTitle(cleanAuthor)
+            .addItem(getContextString(R.string.dialog_query_hero))
+            .addItem(getContextString(R.string.message_sub_send_hero))
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemLongClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ): Boolean = true
+
+                override fun onListDialogItemClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ) {
+                    if (title == getContextString(R.string.dialog_query_hero)) {
+                        TelnetClient.myInstance!!.sendDataToServer(
+                            create().pushKey(TelnetKeyboard.CTRL_Q).build()
+                        )
+                    } else if (title == getContextString(R.string.message_sub_send_hero)) {
+                        val aPage = PageContainer.instance!!.getMessageSub()
+                        ASNavigationController.currentController!!.pushViewController(aPage)
+                        aPage.setSenderName(cleanAuthor)
+                    }
+                }
+            }).show()
+    }
+}
+
+// -------------------------------------------------------------
+// 子元件定義
+// -------------------------------------------------------------
+
+/**
+ * 頂部導覽列
+ */
+@Composable
+fun ArticleTopBar(
+    title: String,
+    subtitle: String,
+    onBackClick: () -> Unit,
+    onMenuClick: () -> Unit
+) {
+    val colors = AppTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.toolbarBackground)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = null,
+                    tint = colors.titleBarTitle
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+            ) {
+                Text(
+                    text = title,
+                    color = colors.titleBarTitle,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                if (subtitle.isNotEmpty()) {
+                    Text(
+                        text = subtitle,
+                        color = colors.titleBarDetail,
+                        fontSize = 11.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Filled.MoreVert,
+                    contentDescription = stringResource(R.string.zero_word),
+                    tint = colors.titleBarTitle
+                )
+            }
+        }
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+    }
+}
+
+/**
+ * 外部快捷操作工具列 (推/噓, 切換模式, 開啟連結)
+ */
+@Composable
+fun ArticleExtToolbar(
+    onDoGy: () -> Unit,
+    onChangeMode: () -> Unit,
+    onOpenLink: () -> Unit
+) {
+    val colors = AppTheme.colors
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.toolbarBackground)
+                .padding(horizontal = 6.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BahaButton(
+                text = stringResource(R.string.do_gy),
+                type = ButtonType.NORMAL,
+                onClick = onDoGy,
+                modifier = Modifier.weight(1f),
+                minHeight = 36.dp
+            )
+            BahaButton(
+                text = stringResource(R.string.change_mode),
+                type = ButtonType.NORMAL,
+                onClick = onChangeMode,
+                modifier = Modifier.weight(1f),
+                minHeight = 36.dp
+            )
+            BahaButton(
+                text = stringResource(R.string.open_url),
+                type = ButtonType.NORMAL,
+                onClick = onOpenLink,
+                modifier = Modifier.weight(1f),
+                minHeight = 36.dp
+            )
+        }
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+    }
+}
+
+/**
+ * 文字模式內容主體
+ */
+@Composable
+fun ArticleTextModeContent(
+    article: TelnetArticle,
+    colors: AppColors,
+    onAuthorClick: (String) -> Unit
+) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 12.dp)
+    ) {
+        // 1. 標頭資訊卡片
+        item {
+            Spacer(modifier = Modifier.height(8.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = colors.surface),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Column(modifier = Modifier.padding(12.dp)) {
+                    Text(
+                        text = article.title,
+                        color = colors.titleBarTitle,
+                        fontSize = 17.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = "作者: ${article.author}${if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""}",
+                            color = colors.titleBarDetail2,
+                            fontSize = 13.sp,
+                            modifier = Modifier.clickable { onAuthorClick(article.author) }
+                        )
+                        Text(
+                            text = "看板: ${article.boardName}",
+                            color = colors.titleBarDetail,
+                            fontSize = 13.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "時間: ${article.dateTime}",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        // 2. 內文區塊
+        items(count = article.itemSize) { i ->
+            val item = article.getItem(i)
+            if (item != null) {
+                // 黑名單過濾判定
+                val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
+                if (!isBlocked) {
+                    ArticleContentBlockItem(item = item, colors = colors)
+                }
+            }
+        }
+
+        // 3. 發文來源 IP 與時間
+        item {
+            Spacer(modifier = Modifier.height(12.dp))
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                if (article.fromIP.isNotEmpty()) {
+                    Text(
+                        text = "※ 發文來源: ${article.fromIP}",
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+                Text(
+                    text = "《 ${article.dateTime} 》",
+                    color = colors.bbsMailDate,
+                    fontSize = 12.sp
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+        }
+
+        // 4. 修改紀錄列表
+        if (article.editRecordSize > 0) {
+            item {
+                Spacer(modifier = Modifier.height(6.dp))
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    for (eIndex in 0 until article.editRecordSize) {
+                        val editRec = article.getEditRecord(eIndex)
+                        if (editRec != null) {
+                            Text(
+                                text = "※ 修改: ${editRec.author} 於 ${editRec.time}",
+                                color = colors.bbsMailMark,
+                                fontSize = 11.sp,
+                                modifier = Modifier.padding(vertical = 1.dp)
+                            )
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(6.dp))
+                HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+            }
+        }
+
+        // 5. 推文列表
+        if (article.pushSize > 0) {
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "── 推文列表 (${article.pushSize}) ──",
+                    color = colors.titleBarTitle,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+
+            items(count = article.pushSize) { pIndex ->
+                val push = article.getPush(pIndex)
+                if (push != null) {
+                    ArticlePushRowItem(
+                        push = push,
+                        floor = pIndex + 1,
+                        colors = colors
+                    )
+                }
+            }
+        }
+
+        // 底部安全留白
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+/**
+ * 內文區塊元件 (支援引言顏色與超連結)
+ */
+@Composable
+fun ArticleContentBlockItem(
+    item: TelnetArticleItem,
+    colors: AppColors
+) {
+    val quoteLevel = item.quoteLevel
+    val isQuote = quoteLevel > 0
+
+    // 作者引述列
+    if (!item.author.isNullOrEmpty()) {
+        val nick = if (!item.nickname.isNullOrEmpty()) "(${item.nickname})" else ""
+        Text(
+            text = "※ 引述《${item.author}$nick》之銘言：",
+            color = if (isQuote) colors.bbsAuthor1 else colors.bbsAuthor0,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
+        )
+    }
+
+    // 正文內容
+    val content = item.content
+    if (content.isNotEmpty()) {
+        val textColor = if (isQuote) colors.bbsContent1 else colors.bbsContent0
+        LinkableText(
+            text = content,
+            defaultColor = textColor,
+            fontSize = 15.sp,
+            modifier = Modifier.padding(
+                start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
+                top = 2.dp,
+                bottom = 4.dp
+            )
+        )
+    }
+}
+
+/**
+ * 推文項目 Row
+ */
+@Composable
+fun ArticlePushRowItem(
+    push: TelnetArticlePush,
+    floor: Int,
+    colors: AppColors
+) {
+    val tagColor = when (push.type) {
+        1 -> Color(0xFF80FF80) // 推 (綠)
+        2 -> Color(0xFFFF6060) // 噓 (紅)
+        else -> Color(0xFFE0E0E0) // → (白/灰)
+    }
+    val tagText = when (push.type) {
+        1 -> "推"
+        2 -> "噓"
+        else -> "→"
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.Top
+        ) {
+            // 樓層編號
+            Text(
+                text = "[$floor 樓]",
+                color = colors.textSecondary,
+                fontSize = 11.sp,
+                modifier = Modifier.width(44.dp)
+            )
+
+            // 推/噓/→ 標籤
+            Text(
+                text = tagText,
+                color = tagColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(18.dp)
+            )
+
+            // 推文作者
+            Text(
+                text = "${push.author}: ",
+                color = Color(0xFF80FFFF),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            // 推文內容
+            LinkableText(
+                text = push.content,
+                defaultColor = colors.textPrimary,
+                fontSize = 13.sp,
+                modifier = Modifier.weight(1f)
+            )
+
+            // 推文時間
+            if (push.date.isNotEmpty() || push.time.isNotEmpty()) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "${push.date} ${push.time}",
+                    color = colors.textSecondary,
+                    fontSize = 10.sp
+                )
+            }
+        }
+        HorizontalDivider(color = colors.divider.copy(alpha = 0.2f), thickness = 0.5.dp)
+    }
+}
+
+/**
+ * 支援點擊超連結的文字元件
+ */
+@Composable
+fun LinkableText(
+    text: String,
+    defaultColor: Color,
+    fontSize: androidx.compose.ui.unit.TextUnit,
+    modifier: Modifier = Modifier
+) {
+    val uriHandler = LocalUriHandler.current
+    val urlPattern = Pattern.compile(
+        "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
+    )
+    val matcher = urlPattern.matcher(text)
+
+    val annotatedString = buildAnnotatedString {
+        var lastIndex = 0
+        while (matcher.find()) {
+            val start = matcher.start()
+            val end = matcher.end()
+            val url = matcher.group()
+
+            // 附加連結前的一般文字
+            if (start > lastIndex) {
+                append(text.substring(lastIndex, start))
+            }
+
+            // 附加超連結
+            pushStringAnnotation(tag = "URL", annotation = url)
+            pushStyle(
+                SpanStyle(
+                    color = Color(0xFF64B5F6),
+                    textDecoration = TextDecoration.Underline
+                )
+            )
+            append(url)
+            pop()
+            pop()
+
+            lastIndex = end
+        }
+
+        // 附加結尾文字
+        if (lastIndex < text.length) {
+            append(text.substring(lastIndex))
+        }
+    }
+
+    ClickableText(
+        text = annotatedString,
+        modifier = modifier,
+        style = androidx.compose.ui.text.TextStyle(
+            color = defaultColor,
+            fontSize = fontSize,
+            fontFamily = FontFamily.Default
+        ),
+        onClick = { offset ->
+            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
+                .firstOrNull()?.let { annotation ->
+                    try {
+                        uriHandler.openUri(annotation.item)
+                    } catch (_: Exception) {}
+                }
+        }
+    )
+}
+
+/**
+ * Telnet 原始終端模式主體
+ */
+@Composable
+fun ArticleTelnetModeContent(
+    article: TelnetArticle,
+    onTelnetViewCreated: (TelnetView) -> Unit
+) {
+    val horizontalScrollState = rememberScrollState()
+    val verticalScrollState = rememberScrollState()
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .horizontalScroll(horizontalScrollState)
+            .verticalScroll(verticalScrollState)
+    ) {
+        AndroidView(
+            factory = { ctx ->
+                TelnetView(ctx).apply {
+                    if (article.frame != null) {
+                        frame = article.frame!!
+                    }
+                    onTelnetViewCreated(this)
+                }
+            },
+            update = { view ->
+                if (article.frame != null) {
+                    view.frame = article.frame!!
+                }
+            }
+        )
+    }
+}
+
+/**
+ * 底部操作工具列
+ */
+@Composable
+fun ArticleBottomToolbar(
+    colors: AppColors,
+    toolbarLocation: Int,
+    toolbarOrder: Int,
+    onReplyClick: () -> Unit,
+    onPrevClick: () -> Unit,
+    onFirstClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onLastClick: () -> Unit,
+    onLLClick: () -> Unit,
+    onRRClick: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.toolbarBackground)
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 靠右對齊時左側切換按鈕
+            if (toolbarLocation == 2) {
+                BahaButton(
+                    text = "<<",
+                    type = ButtonType.NORMAL,
+                    onClick = onLLClick,
+                    modifier = Modifier.width(44.dp),
+                    minHeight = 40.dp
+                )
+            }
+
+            val buttons: List<@Composable () -> Unit> = listOf(
+                {
+                    BahaButton(
+                        text = stringResource(R.string.reply),
+                        type = ButtonType.NORMAL,
+                        onClick = onReplyClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                },
+                {
+                    BahaButton(
+                        text = stringResource(R.string.prev_article),
+                        type = ButtonType.NORMAL,
+                        onClick = onPrevClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                },
+                {
+                    BahaButton(
+                        text = stringResource(R.string.next_article),
+                        type = ButtonType.NORMAL,
+                        onClick = onNextClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                }
+            )
+
+            // 反轉順序判定
+            val orderedButtons = if (toolbarOrder == 1) buttons.reversed() else buttons
+            for (btn in orderedButtons) {
+                btn()
+            }
+
+            // 靠左對齊時右側切換按鈕
+            if (toolbarLocation == 1) {
+                BahaButton(
+                    text = ">>",
+                    type = ButtonType.NORMAL,
+                    onClick = onRRClick,
+                    modifier = Modifier.width(44.dp),
+                    minHeight = 40.dp
+                )
+            }
         }
     }
 }

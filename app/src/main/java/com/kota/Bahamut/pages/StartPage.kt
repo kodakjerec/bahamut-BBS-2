@@ -1,23 +1,57 @@
 package com.kota.Bahamut.pages
 
 import android.Manifest
-import android.view.ViewGroup
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.RadioButton
-import android.widget.RadioGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.content.pm.PackageInfoCompat
 import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getConnectIpAddress
 import com.kota.Bahamut.service.NotificationSettings.getConnectMethod
@@ -27,124 +61,32 @@ import com.kota.Bahamut.service.NotificationSettings.setConnectMethod
 import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissionDialog
 import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
-import com.kota.telnetUI.TelnetPage
-import com.kota.telnetUI.textView.TelnetTextViewSmall
+import com.kota.telnetUI.TelnetComposePage
 
-class StartPage : TelnetPage() {
-    /** 連線  */
-    private val connectListener = View.OnClickListener {
-        onConnectButtonClicked()
-    }
-
-    /** 離開  */
-    private val exitListener = View.OnClickListener {
-        onExitButtonClicked()
-    }
-
-    /** 按下教學  */
-    private val urlClickListener = View.OnClickListener { v ->
-        val url = when (v.id) {
-            R.id.Start_instructions -> "https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/"
-            R.id.Start_Icon_Discord -> "https://discord.gg/YP8dthZ"
-            R.id.Start_Icon_Facebook -> "https://www.facebook.com/groups/264144897071532"
-            R.id.Start_Icon_Reddit -> "https://www.reddit.com/r/bahachat"
-            R.id.Start_Icon_Steam -> "https://steamcommunity.com/groups/BAHACHAT"
-            R.id.Start_Icon_Telegram -> "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A"
-            else -> null
-        }
-
-        url?.let {
-            val intent = Intent(Intent.ACTION_VIEW, it.toUri())
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
-            startActivity(intent)
-        }
-    }
-
-    /** 避難所  */
-    override val pageLayout: Int
-        get() = R.layout.start_page
+/**
+ * 起始連線頁面 (純 Jetpack Compose 實作)
+ */
+class StartPage : TelnetComposePage() {
 
     override val pageType: Int
         get() = BahamutPage.START
 
-    @SuppressLint("SetTextI18n")
     override fun onPageDidLoad() {
         navigationController.setNavigationTitle("勇者入口")
-        findViewById(R.id.Start_exitButton)!!.setOnClickListener(exitListener)
-        findViewById(R.id.Start_connectButton)!!.setOnClickListener(connectListener)
-        findViewById(R.id.Start_instructions)!!.setOnClickListener(urlClickListener)
-        // url
-        findViewById(R.id.Start_Icon_Discord)!!.setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Facebook)!!.setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Reddit)!!.setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Steam)!!.setOnClickListener(urlClickListener)
-        findViewById(R.id.Start_Icon_Telegram)!!.setOnClickListener(urlClickListener)
-        // ip位置
-        val radioGroup = findViewById(R.id.radioButtonIP) as RadioGroup
-        val radioButton1 = findViewById(R.id.radioButtonIP1) as RadioButton
-        val radioButton2 = findViewById(R.id.radioButtonIP2) as RadioButton
-
-        // 連線位址
-        val connectIp = getConnectIpAddress()
-        when (connectIp) {
-            radioButton1.text.toString() -> radioButton1.isChecked = true
-            else -> radioButton2.isChecked = true
-        }
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val rb = findViewById(checkedId) as RadioButton
-            setConnectIpAddress(rb.text.toString())
-        }
-
-        // 連線方式
-        val connectMethodGroup = findViewById(R.id.radioButtonConnectMethod) as RadioGroup
-        val connectMethodButton1 = findViewById(R.id.radioButtonConnectMethod1) as RadioButton
-        val connectMethodButton2 = findViewById(R.id.radioButtonConnectMethod2) as RadioButton
-
-        val connectMethod = getConnectMethod()
-        when (connectMethod) {
-            connectMethodButton1.text.toString() -> connectMethodButton1.isChecked = true
-            else -> connectMethodButton2.isChecked = true
-        }
-        connectMethodGroup.setOnCheckedChangeListener { _, checkedId ->
-            val rb = findViewById(checkedId) as RadioButton
-            setConnectMethod(rb.text.toString())
-            updateIPSelectionState(
-                checkedId == R.id.radioButtonConnectMethod2,
-                radioGroup,
-                radioButton1,
-                radioButton2
-            )
-        }
-
-        // 初始化時設置狀態
-        updateIPSelectionState(
-            connectMethodButton2.isChecked,
-            radioGroup,
-            radioButton1,
-            radioButton2
-        )
-
-        val packageInfo: PackageInfo
-        try {
-            packageInfo =
-                context!!.packageManager.getPackageInfo(context!!.packageName, 0)
-            val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt()
-            val versionName = packageInfo.versionName
-            (findViewById(R.id.version) as TelnetTextViewSmall).text = "$versionCode - $versionName"
-        } catch (e: PackageManager.NameNotFoundException) {
-            throw RuntimeException(e)
-        }
     }
 
     override fun onPageWillAppear() {
-        val pageContainer = PageContainer.instance!!
-        pageContainer.cleanStartPage()
+        val pageContainer = PageContainer.instance
+        pageContainer?.cleanStartPage()
     }
 
     override fun onPageDidDisappear() {
@@ -157,7 +99,7 @@ class StartPage : TelnetPage() {
         super.clear()
     }
 
-    /** 按下離開  */
+    /** 按下離開 */
     fun onExitButtonClicked() {
         ASProcessingDialog.dismissProcessingDialog()
         SyncManager.uploadBeforeExit {
@@ -165,13 +107,13 @@ class StartPage : TelnetPage() {
         }
     }
 
-    /** 手機: 上一步  */
+    /** 手機: 上一步 */
     override fun onBackPressed(): Boolean {
         onExitButtonClicked()
         return true
     }
 
-    /** 按下連線按鈕  */
+    /** 按下連線按鈕 */
     fun onConnectButtonClicked() {
         // 顯示權限對話框
         if (getShowNotificationPermissionDialog()) {
@@ -182,46 +124,338 @@ class StartPage : TelnetPage() {
         }
     }
 
-    /** 連線  */
+    /** 連線 */
     fun connect() {
-        val transportType = navigationController.deviceController!!.isNetworkAvailable
+        val transportType = navigationController.deviceController?.isNetworkAvailable ?: -1
         TempSettings.transportType = transportType
         when {
             transportType > -1 -> {
                 ASProcessingDialog.showProcessingDialog("連線中") {
-                    TelnetClient.myInstance!!.close()
+                    TelnetClient.myInstance?.close()
                     false
                 }
                 val connectIpAddress = getConnectIpAddress()
                 ASCoroutine.runInNewCoroutine {
-                    TelnetClient.myInstance!!.connect(connectIpAddress, 23)
+                    TelnetClient.myInstance?.connect(connectIpAddress, 23)
                 }
             }
             else -> ASToast.showShortToast("您未連接網路")
         }
     }
 
-    // 添加輔助方法
-    private fun updateIPSelectionState(
-        isWebSocket: Boolean,
-        ipGroup: RadioGroup,
-        ip1: RadioButton,
-        ip2: RadioButton
-    ) {
-        when (isWebSocket) {
-            true -> {
-                // WebSocket 模式：禁用 IP 選擇
-                ipGroup.isEnabled = false
-                ip1.isEnabled = false
-                ip2.isEnabled = false
-                ipGroup.alpha = 0.5f
+    private fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+        }
+        context?.startActivity(intent)
+    }
+
+    @Composable
+    override fun ComposeContent() {
+        val colors = AppTheme.colors
+        val currentContext = LocalContext.current
+
+        // 版本號碼
+        val versionText = remember {
+            try {
+                val packageInfo: PackageInfo =
+                    currentContext.packageManager.getPackageInfo(currentContext.packageName, 0)
+                val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt()
+                val versionName = packageInfo.versionName
+                "$versionCode - $versionName"
+            } catch (_: Exception) {
+                ""
             }
-            false -> {
-                // Telnet 模式：啟用 IP 選擇
-                ipGroup.isEnabled = true
-                ip1.isEnabled = true
-                ip2.isEnabled = true
-                ipGroup.alpha = 1.0f
+        }
+
+        // 連線方式狀態 (Telnet vs WebSocket)
+        val methodTelnet = stringResource(R.string.start_connect_method1)
+        val methodWebSocket = stringResource(R.string.start_connect_method2)
+        var selectedMethod by remember {
+            val saved = getConnectMethod()
+            mutableStateOf(if (saved == methodTelnet) methodTelnet else methodWebSocket)
+        }
+
+        // 連線位址狀態 (bbs.gamer.com.tw vs 114.32.114.150)
+        val ip1 = stringResource(R.string.start_connect_ip1)
+        val ip2 = stringResource(R.string.start_connect_ip2)
+        var selectedIp by remember {
+            val saved = getConnectIpAddress()
+            mutableStateOf(if (saved == ip1) ip1 else ip2)
+        }
+
+        // WebSocket 模式下禁用 IP 選擇
+        val isWebSocket = (selectedMethod == methodWebSocket)
+        val isIpEnabled = !isWebSocket
+
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 可捲動內容區塊
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                // 1. 公告標題列與版本號
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.notices),
+                        color = colors.titleBarTitle,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = versionText,
+                        color = colors.textSecondary,
+                        fontSize = 12.sp
+                    )
+                }
+
+                // 2. 公告說明 1
+                Text(
+                    text = stringResource(R.string.start_msg_1),
+                    color = colors.textSecondary,
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp
+                )
+
+                // 3. 公告說明 2
+                Text(
+                    text = stringResource(R.string.start_msg_2),
+                    color = colors.textPrimary,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Medium,
+                    lineHeight = 22.sp
+                )
+
+                // 4. 開啟帳號連結 (啟用 BBS 權限)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = stringResource(R.string.StartPage_open_account),
+                        color = colors.titleBarTitle,
+                        fontSize = 13.sp,
+                        textAlign = TextAlign.Center,
+                        textDecoration = TextDecoration.Underline,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(4.dp))
+                            .clickable {
+                                openUrl("https://user.gamer.com.tw/openBBS.php")
+                            }
+                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
+
+                // 5. 連線位址區塊
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .alpha(if (isIpEnabled) 1.0f else 0.45f)
+                ) {
+                    Text(
+                        text = stringResource(R.string.start_connect_ip),
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectableGroup()
+                    ) {
+                        listOf(ip1, ip2).forEach { ipText ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .selectable(
+                                        selected = (ipText == selectedIp),
+                                        enabled = isIpEnabled,
+                                        role = Role.RadioButton,
+                                        onClick = {
+                                            if (isIpEnabled) {
+                                                selectedIp = ipText
+                                                setConnectIpAddress(ipText)
+                                            }
+                                        }
+                                    )
+                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = (ipText == selectedIp),
+                                    onClick = null,
+                                    enabled = isIpEnabled,
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = colors.titleBarTitle,
+                                        unselectedColor = colors.divider
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = ipText,
+                                    color = if (isIpEnabled) colors.textPrimary else colors.textSecondary,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 6. 連線方式區塊 (Telnet vs WebSocket)
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.start_connect_method),
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .selectableGroup()
+                    ) {
+                        listOf(methodTelnet, methodWebSocket).forEach { methodText ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .selectable(
+                                        selected = (methodText == selectedMethod),
+                                        role = Role.RadioButton,
+                                        onClick = {
+                                            selectedMethod = methodText
+                                            setConnectMethod(methodText)
+                                        }
+                                    )
+                                    .padding(vertical = 4.dp, horizontal = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = (methodText == selectedMethod),
+                                    onClick = null,
+                                    colors = RadioButtonDefaults.colors(
+                                        selectedColor = colors.titleBarTitle,
+                                        unselectedColor = colors.divider
+                                    )
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = methodText,
+                                    color = colors.textPrimary,
+                                    fontSize = 15.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // 7. 避難所標題與圖示按鈕
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                ) {
+                    Text(
+                        text = stringResource(R.string.start_vault),
+                        color = colors.textSecondary,
+                        fontSize = 13.sp,
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    val shelterItems = remember {
+                        listOf(
+                            Triple(R.drawable.icon_discord, "Discord", "https://discord.gg/YP8dthZ"),
+                            Triple(R.drawable.icon_facebook, "Facebook", "https://www.facebook.com/groups/264144897071532"),
+                            Triple(R.drawable.icon_reddit, "Reddit", "https://www.reddit.com/r/bahachat"),
+                            Triple(R.drawable.icon_steam, "Steam", "https://steamcommunity.com/groups/BAHACHAT"),
+                            Triple(R.drawable.icon_telegram, "Telegram", "https://t.me/joinchat/MF5hqkuZN3B0NFqSyiz30A")
+                        )
+                    }
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        shelterItems.forEach { (iconRes, name, url) ->
+                            Box(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(44.dp)
+                                    .padding(horizontal = 4.dp)
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(colors.surface)
+                                    .clickable { openUrl(url) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = painterResource(id = iconRes),
+                                    contentDescription = name,
+                                    modifier = Modifier.size(26.dp)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
+            // 8. 底部操作工具列
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.toolbarBackground)
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaButton(
+                    text = stringResource(R.string.exit),
+                    type = ButtonType.SECONDARY,
+                    onClick = { onExitButtonClicked() },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 40.dp
+                )
+                BahaButton(
+                    text = stringResource(R.string.start_page_instructions),
+                    type = ButtonType.NORMAL,
+                    onClick = { openUrl("https://kodaks-organization-1.gitbook.io/bahabbs-zhan-ba-ha-shi-yong-shou-ce/") },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 40.dp
+                )
+                BahaButton(
+                    text = stringResource(R.string.connect),
+                    type = ButtonType.NORMAL,
+                    onClick = { onConnectButtonClicked() },
+                    modifier = Modifier.weight(1f),
+                    minHeight = 40.dp
+                )
             }
         }
     }
@@ -231,8 +465,7 @@ class StartPage : TelnetPage() {
          * 檢查並要求通知權限 (Android 13+)
          */
         fun checkAndRequestNotificationPermission() {
-            val controller = ASNavigationController.currentController
-            if (controller == null) return
+            val controller = ASNavigationController.currentController ?: return
 
             // 只在 Android 13+ 需要通知權限
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -240,8 +473,6 @@ class StartPage : TelnetPage() {
                         Manifest.permission.POST_NOTIFICATIONS
                     ) != PackageManager.PERMISSION_GRANTED
                 ) {
-                    // 顯示對話框詢問使用者
-
                     ASAlertDialog.createDialog()
                         .setTitle(getContextString(R.string.notification_permission_title))
                         .setMessage(getContextString(R.string.notification_permission_message))
@@ -250,20 +481,16 @@ class StartPage : TelnetPage() {
                         .setDefaultButtonIndex(0)
                         .setListener { _, index ->
                             if (index == 1) {
-                                // 前往設定頁面
                                 try {
-                                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-                                    intent.putExtra(
-                                        Settings.EXTRA_APP_PACKAGE,
-                                        controller.packageName
-                                    )
+                                    val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                                        putExtra(Settings.EXTRA_APP_PACKAGE, controller.packageName)
+                                    }
                                     controller.startActivity(intent)
                                 } catch (_: Exception) {
-                                    // 如果上面的方法失敗，使用應用設定頁面
                                     try {
-                                        val intent =
-                                            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                                        intent.data = ("package:" + controller.packageName).toUri()
+                                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                            data = ("package:" + controller.packageName).toUri()
+                                        }
                                         controller.startActivity(intent)
                                     } catch (_: Exception) {
                                         ASToast.showShortToast("無法開啟設定頁面")

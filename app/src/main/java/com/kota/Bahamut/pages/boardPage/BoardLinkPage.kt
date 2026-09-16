@@ -17,7 +17,7 @@ class BoardLinkPage : BoardMainPage() {
         get() = BahamutPage.BAHAMUT_BOARD_LINK
 
     override val pageLayout: Int
-        get() = R.layout.board_link_page
+        get() = 0
 
     override val listType: Int
         get() = BoardPageAction.Companion.LINK_TITLE

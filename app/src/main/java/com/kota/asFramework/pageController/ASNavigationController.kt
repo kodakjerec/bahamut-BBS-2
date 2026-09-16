@@ -212,7 +212,12 @@ open class ASNavigationController : ComponentActivity() {
         } else {
             pageView.setBackgroundResource(R.color.page_background)
         }
-        layoutInflater.inflate(controller.pageLayout, pageView)
+        val customView = controller.createPageView(this)
+        if (customView != null) {
+            pageView.addView(customView, FrameLayout.LayoutParams(-1, -1))
+        } else if (controller.pageLayout != 0) {
+            layoutInflater.inflate(controller.pageLayout, pageView)
+        }
         controller.pageView = pageView
         this.rootView?.contentView?.addView(pageView)
     }

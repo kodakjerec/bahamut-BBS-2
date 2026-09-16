@@ -1,5 +1,6 @@
 package com.kota.asFramework.pageController
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.AssetManager
 import android.content.res.Configuration
@@ -26,6 +27,9 @@ abstract class ASViewController {
     private var disappearListeners: Vector<ASViewControllerDisappearListener?>? = null
 
     abstract val pageLayout: Int
+
+    /** 支援純 Compose 畫面：若返回非 null 視圖，將不從 XML pageLayout 載入 */
+    open fun createPageView(context: Context): View? = null
 
     var pageView: ASPageView?
         get() = this.aSPageView

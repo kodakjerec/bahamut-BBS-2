@@ -1,21 +1,69 @@
 package com.kota.Bahamut.pages.boardPage
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.content.res.Configuration
+import android.database.DataSetObserver
 import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.BaseAdapter
 import android.widget.Button
-import android.widget.CheckBox
-import android.widget.LinearLayout
 import android.widget.ListView
-import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
@@ -53,15 +101,11 @@ import com.kota.Bahamut.pages.bookmarkPage.BookmarkManagePage
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.pages.model.BoardPageHandler
 import com.kota.Bahamut.pages.model.BoardPageItem
-import com.kota.Bahamut.pages.model.ToolBarFloating
-import androidx.core.content.ContextCompat
-import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContainsFuzzy
 import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
-import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
@@ -70,6 +114,12 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardE
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
+import com.kota.Bahamut.ui.theme.AppColors
+import com.kota.Bahamut.ui.theme.AppTheme
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
@@ -86,7 +136,7 @@ import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
-import com.kota.telnetUI.textView.TelnetTextViewLarge
+import kotlinx.coroutines.launch
 import java.util.Vector
 import kotlin.math.abs
 import kotlin.math.max
@@ -97,45 +147,72 @@ open class BoardMainPage : TelnetListPage(),
     PostArticlePageListener,
     BoardExtendOptionalPageListener,
     ASListViewExtentOptionalDelegate {
-    var mainDrawerLayout: DrawerLayout? = null
-    lateinit var mainLayout: RelativeLayout
+
+    // 狀態驅動變數
     var boardTitle: String = ""
     var boardManager: String = ""
     var lastListAction: Int = BoardPageAction.Companion.LIST
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
-    override var isItemBlockEnable: Boolean = false // 是否啟用黑名單
-    var blockListForTitle: Boolean = false // 是否啟用黑名單套用至標題
-    var isDrawerOpening: Boolean = false // 側邊選單正在開啟中
-    val myBookmarkList: MutableList<Bookmark> = ArrayList<Bookmark>()
-    lateinit var drawerListView: ListView
-    lateinit var drawerListViewNone: TextView
-    var myMode: Int = 0 // 現在開啟的是 0-書籤 1-紀錄
-    lateinit var tabButtons: Array<Button>
-    var showBookmarkButton: Button? = null // 顯示書籤按鈕
-    var showHistoryButton: Button? = null // 顯示記錄按鈕
-    var drawerLocation: Int = GravityCompat.END // 抽屜最後位置
+    // Compose 狀態
+    var boardTitleState by mutableStateOf("")
+    var boardManagerState by mutableStateOf("")
+    var isDrawerOpenState by mutableStateOf(false)
+    var myModeState by mutableIntStateOf(0) // 0-書籤 1-紀錄
+    var isItemBlockEnableState by mutableStateOf(false)
+    val bookmarkListState = mutableStateListOf<Bookmark>()
+    var scrollToItemTrigger by mutableStateOf<Int?>(null)
+    var toolbarLocationState by mutableIntStateOf(0)
+    var toolbarOrderState by mutableIntStateOf(0)
+
+    // 相容性變數
+    var mainDrawerLayout: DrawerLayout? = null
+    override var isItemBlockEnable: Boolean = false
+    var blockListForTitle: Boolean = false
+    var isDrawerOpening: Boolean = false
+    val myBookmarkList: MutableList<Bookmark> = ArrayList()
+    var drawerListView: ListView? = null
+    var drawerListViewNone: TextView? = null
+    var myMode: Int = 0
+    var tabButtons: Array<Button> = emptyArray()
+    var showBookmarkButton: Button? = null
+    var showHistoryButton: Button? = null
+    var drawerLocation: Int = GravityCompat.END
     private var isPostDelayedSuccess = false
 
-    /** 發文  */
-    val mPostListener: View.OnClickListener =
-        View.OnClickListener { view: View? -> this@BoardMainPage.onPostButtonClicked() }
+    override val pageLayout: Int
+        get() = 0
 
-    /** 最前頁  */
-    val mFirstPageClickListener: OnLongClickListener = OnLongClickListener { view: View? ->
+    override val pageType: Int
+        get() = BahamutPage.BAHAMUT_BOARD
+
+    override val isAutoLoadEnable: Boolean
+        get() = true
+
+    override fun createPageView(context: Context): View {
+        return ComposeView(context).apply {
+            setBahamutContent {
+                BoardMainPageContent()
+                BahaGlobalDialogHost()
+            }
+        }
+    }
+
+    /** 發文 / 書籤點擊 */
+    val mPostListener: View.OnClickListener =
+        View.OnClickListener { this@BoardMainPage.onPostButtonClicked() }
+
+    /** 最前頁 */
+    val mFirstPageClickListener: OnLongClickListener = OnLongClickListener {
         this@BoardMainPage.moveToFirstPosition()
+        scrollToPosition(0)
         true
     }
 
-    /** 上一頁  */
-    val mPrevPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listView?.firstVisiblePosition!!
-        val endIndex = listView?.lastVisiblePosition!!
-        val moveIndex = abs(endIndex - firstIndex)
-        firstIndex -= moveIndex
+    /** 上一頁 */
+    val mPrevPageClickListener: View.OnClickListener = View.OnClickListener {
+        var firstIndex = (scrollToItemTrigger ?: 0) - 15
         if (firstIndex < 0) firstIndex = 0
 
-        // 紀錄最後瀏覽的文章編號
         if (this::class == BoardMainPage::class) {
             TempSettings.lastVisitArticleNumber = firstIndex
         }
@@ -143,77 +220,41 @@ open class BoardMainPage : TelnetListPage(),
         setListViewSelection(firstIndex)
     }
 
-    /** 下一頁  */
-    private val lastEndIndexes = IntArray(3) // 最後頁的結束位置
-    private var endIndexCheckCount = 0 // 結束位置檢查次數
-    val mNextPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        var firstIndex = listView?.firstVisiblePosition!!
-        val endIndex = listView?.lastVisiblePosition!!
-        val moveIndex = abs(endIndex - firstIndex)
-        firstIndex += moveIndex
-
-        if (endIndexCheckCount > 0 && endIndex == lastEndIndexes[endIndexCheckCount - 1]) {
-            lastEndIndexes[endIndexCheckCount] = endIndex
-            endIndexCheckCount++
-
-            // 連按超過三次
-            if (endIndexCheckCount >= 3) {
-                // Reset counter
-                endIndexCheckCount = 0
-                // Move to last position
-                this@BoardMainPage.setManualLoadPage()
-                this@BoardMainPage.moveToLastPosition()
-                return@OnClickListener
-            }
-        } else {
-            // Reset counter if endIndex changed
-            endIndexCheckCount = 1
-        }
-
-        // 紀錄最後瀏覽的文章編號
+    /** 下一頁 */
+    private val lastEndIndexes = IntArray(3)
+    private var endIndexCheckCount = 0
+    val mNextPageClickListener: View.OnClickListener = View.OnClickListener {
+        var firstIndex = (scrollToItemTrigger ?: 0) + 15
         if (this::class == BoardMainPage::class) {
             TempSettings.lastVisitArticleNumber = firstIndex
         }
-
-        // Store current endIndex
-        lastEndIndexes[0] = endIndex
         setListViewSelection(firstIndex)
     }
 
-    /** 最後頁  */
-    val mLastPageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    /** 最後頁 */
+    val mLastPageClickListener: View.OnClickListener = View.OnClickListener {
         this@BoardMainPage.setManualLoadPage()
         this@BoardMainPage.moveToLastPosition()
+        scrollToPosition(count - 1)
     }
-    val mLastPageLongClickListener: OnLongClickListener = OnLongClickListener { view: View? ->
+
+    val mLastPageLongClickListener: OnLongClickListener = OnLongClickListener {
         this@BoardMainPage.setManualLoadPage()
         this@BoardMainPage.moveToLastPosition()
+        scrollToPosition(count - 1)
         true
     }
 
-    /** 彈出側邊選單  */
-    val mMenuButtonListener: View.OnClickListener = View.OnClickListener { view: View? ->
-        if (mainDrawerLayout != null) {
-            if (mainDrawerLayout!!.isDrawerOpen(drawerLocation)) {
-                mainDrawerLayout!!.closeDrawer(drawerLocation)
-            } else {
-                drawerLocation = if (propertiesDrawerLocation == 0) {
-                    GravityCompat.END
-                } else {
-                    GravityCompat.START
-                }
-                val menuView = mainDrawerLayout!!.findViewById<LinearLayout>(R.id.menu_view)!!
-                val layoutParamsDrawer = menuView.layoutParams as DrawerLayout.LayoutParams
-                layoutParamsDrawer.gravity = drawerLocation
-                menuView.layoutParams = layoutParamsDrawer
-                mainDrawerLayout!!.openDrawer(drawerLocation, propertiesAnimationEnable)
-            }
+    /** 彈出側邊選單 */
+    val mMenuButtonListener: View.OnClickListener = View.OnClickListener {
+        isDrawerOpenState = !isDrawerOpenState
+        if (isDrawerOpenState) {
             reloadBookmark()
         }
     }
 
-    /** 跳出小視窗 全部已讀/全部未讀  */
-    val mReadAllListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    /** 跳出小視窗 全部已讀/全部未讀 */
+    val mReadAllListener: View.OnClickListener = View.OnClickListener {
         ASListDialog.createDialog()
             .setTitle(getContextString(R.string._article))
             .addItem(getContextString(R.string.board_main_read_all))
@@ -225,15 +266,11 @@ open class BoardMainPage : TelnetListPage(),
                     title: String?
                 ) {
                     if (title == getContextString(R.string.board_main_read_all)) {
-                        val data = create()
-                            .pushString("vV\n")
-                            .build()
+                        val data = create().pushString("vV\n").build()
                         TelnetClient.myInstance!!.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_read_all_msg01))
                     } else if (title == getContextString(R.string.board_main_unread_all)) {
-                        val data = create()
-                            .pushString("vU\n")
-                            .build()
+                        val data = create().pushString("vU\n").build()
                         TelnetClient.myInstance!!.sendDataToServer(data)
                         showShortToast(getContextString(R.string.board_main_unread_all_msg01))
                     }
@@ -243,273 +280,82 @@ open class BoardMainPage : TelnetListPage(),
                     paramASListDialog: ASListDialog?,
                     index: Int,
                     title: String?
-                ): Boolean {
-                    return true
-                }
+                ): Boolean = true
             }).show()
     }
 
     var bookmarkAdapter: BaseAdapter = object : BaseAdapter() {
-        override fun getItemId(i: Int): Long {
-            return i.toLong()
-        }
-
-        override fun getCount(): Int {
-            return this@BoardMainPage.myBookmarkList.size
-        }
-
-        override fun getItem(i: Int): Bookmark? {
-            return this@BoardMainPage.myBookmarkList[i]
-        }
-
-        /** 顯示側邊選單書籤  */
-        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
-            var view = view
-            if (view == null) {
-                view = BoardExtendBookmarkItemView(this@BoardMainPage.context)
-            }
-            val boardExtendBookmarkItemView = view as BoardExtendBookmarkItemView
-            boardExtendBookmarkItemView.setBookmark(getItem(i))
-            boardExtendBookmarkItemView.setDividerTopVisible(i == 0)
-            return view
-        }
+        override fun getItemId(i: Int): Long = i.toLong()
+        override fun getCount(): Int = this@BoardMainPage.myBookmarkList.size
+        override fun getItem(i: Int): Bookmark? = this@BoardMainPage.myBookmarkList.getOrNull(i)
+        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
     }
 
     var historyAdapter: BaseAdapter = object : BaseAdapter() {
-        override fun getItemId(i: Int): Long {
-            return i.toLong()
-        }
-
-        override fun getCount(): Int {
-            return this@BoardMainPage.myBookmarkList.size
-        }
-
-        override fun getItem(i: Int): Bookmark? {
-            return this@BoardMainPage.myBookmarkList[i]
-        }
-
-        /** 顯示側邊選單書籤  */
-        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
-            var view = view
-            if (view == null) {
-                view = BoardExtendHistoryItemView(this@BoardMainPage.context)
-            }
-            val boardExtendHistoryItemView = view as BoardExtendHistoryItemView
-            boardExtendHistoryItemView.setBookmark(getItem(i))
-            boardExtendHistoryItemView.setDividerTopVisible(i == 0)
-            return view
-        }
+        override fun getItemId(i: Int): Long = i.toLong()
+        override fun getCount(): Int = this@BoardMainPage.myBookmarkList.size
+        override fun getItem(i: Int): Bookmark? = this@BoardMainPage.myBookmarkList.getOrNull(i)
+        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
     }
 
-    /** 側邊選單 mListener  */
     var drawerListener: DrawerListener = object : DrawerListener {
         override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-
         override fun onDrawerOpened(drawerView: View) {}
-
         override fun onDrawerClosed(drawerView: View) {}
-
-        override fun onDrawerStateChanged(newState: Int) {
-            isDrawerOpening = newState != DrawerLayout.STATE_IDLE
-
-            // 側邊選單未完全開啟 or 正要啟動狀態
-            if (isDrawerOpening) {
-                this@BoardMainPage.reloadBookmark()
-            }
-        }
+        override fun onDrawerStateChanged(newState: Int) {}
     }
 
-    /** 點書籤  */
-    var bookmarkListener: OnItemClickListener =
-        OnItemClickListener { adapterView: AdapterView<*>?, view: View?, i: Int, j: Long ->
-            this@BoardMainPage.closeDrawer()
-            val bookmark = this@BoardMainPage.myBookmarkList[i]
-            searchArticle(bookmark.keyword, bookmark.author, bookmark.mark, bookmark.gy)
-        }
-
-    /** 切換成書籤清單  */
-    var buttonClickListener: View.OnClickListener = View.OnClickListener { aView ->
-        myMode = if (aView === showBookmarkButton) {
-            0
-        } else {
-            1
-        }
-        reloadBookmark(aView)
-    }
-
-    /** 搜尋文章  */
-    var searchListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var searchListener: View.OnClickListener = View.OnClickListener {
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.showSearchArticleDialog()
     }
 
-    /** 選擇文章  */
-    var selectListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var selectListener: View.OnClickListener = View.OnClickListener {
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.showSelectArticleDialog()
     }
 
-    /** 啟用/停用 黑名單  */
     var enableBlockListener: View.OnClickListener =
-        View.OnClickListener { view: View? -> this@BoardMainPage.onChangeBlockStateButtonClicked() }
+        View.OnClickListener { this@BoardMainPage.onChangeBlockStateButtonClicked() }
 
-    /** 修改黑名單  */
-    var editBlockListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var editBlockListener: View.OnClickListener = View.OnClickListener {
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.onEditBlockListButtonClicked()
     }
 
-    /** 開啟書籤管理  */
-    var editBookmarkListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var editBookmarkListener: View.OnClickListener = View.OnClickListener {
         this@BoardMainPage.closeDrawer()
         this@BoardMainPage.onBookmarkButtonClicked()
     }
 
-    /** 靠左對其  */
-    var btnLLListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnLLListener: View.OnClickListener = View.OnClickListener {
         propertiesToolbarLocation = 1
         this@BoardMainPage.changeToolbarLocation()
     }
 
-    /** 靠右對其  */
-    var btnRRListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var btnRRListener: View.OnClickListener = View.OnClickListener {
         propertiesToolbarLocation = 2
         this@BoardMainPage.changeToolbarLocation()
     }
 
-    override val pageLayout: Int
-        get() = R.layout.board_page
+    override fun onASListViewHandleExtentOptional(paramASListView: ASListView?, paramInt: Int): Boolean = false
 
-    override val pageType: Int
-        get() = BahamutPage.BAHAMUT_BOARD
-
-    override val isAutoLoadEnable: Boolean
-        get() = true
-    
-    override fun onASListViewHandleExtentOptional(paramASListView: ASListView?, paramInt: Int): Boolean {
-        return false
-    }
-
-    @SuppressLint("ClickableViewAccessibility")  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
     override fun onPageDidLoad() {
         super.onPageDidLoad()
 
-        mainDrawerLayout = findViewById(R.id.drawer_layout) as DrawerLayout?
-        mainLayout = findViewById(R.id.content_view) as RelativeLayout
-
-        val aSListView = mainLayout.findViewById<ASListView>(R.id.BoardPageListView)
-        aSListView.extendOptionalDelegate = this
-        aSListView.emptyView = mainLayout.findViewById<View>(R.id.BoardPageListEmptyView)
-        bindListView(aSListView)
-
-        mainLayout.findViewById<View>(R.id.BoardPagePostButton).setOnClickListener(mPostListener)
-        mainLayout.findViewById<View>(R.id.BoardPageFirstPageButton)
-            .setOnClickListener(mPrevPageClickListener)
-        mainLayout.findViewById<View>(R.id.BoardPageFirstPageButton)
-            .setOnLongClickListener(mFirstPageClickListener)
-        // 下一頁
-        val boardPageLatestPageButton =
-            mainLayout.findViewById<Button>(R.id.BoardPageLatestPageButton)
-        if (propertiesBoardMoveEnable > 0) {
-            boardPageLatestPageButton.text = getContextString(R.string.next_page)
-            boardPageLatestPageButton.setOnClickListener(mNextPageClickListener)
-            boardPageLatestPageButton.setOnLongClickListener(mLastPageLongClickListener)
-        } else {
-            boardPageLatestPageButton.setOnClickListener(mLastPageClickListener)
-        }
-        mainLayout.findViewById<View>(R.id.BoardPageLLButton).setOnClickListener(btnLLListener)
-        mainLayout.findViewById<View>(R.id.BoardPageRRButton).setOnClickListener(btnRRListener)
-
-        // 側邊選單
-        if (mainDrawerLayout != null) {
-            val drawerLayout = mainDrawerLayout?.findViewById<DrawerLayout?>(R.id.drawer_layout)
-            if (drawerLayout != null) {
-                val menuView = mainDrawerLayout?.findViewById<LinearLayout>(R.id.menu_view)!!
-                val layoutParamsDrawer = menuView.layoutParams as DrawerLayout.LayoutParams
-                layoutParamsDrawer.gravity = drawerLocation
-                menuView.layoutParams = layoutParamsDrawer
-                drawerLayout.addDrawerListener(drawerListener)
-                // 根據手指位置設定側邊選單位置
-                aSListView.setOnTouchListener { view: View?, motionEvent: MotionEvent? ->
-                    if (isDrawerOpening) return@setOnTouchListener false
-                    val screenWidth: Int =
-                        context!!.resources.displayMetrics.widthPixels / 2
-                    if (motionEvent!!.x < screenWidth) layoutParamsDrawer.gravity =
-                        GravityCompat.START
-                    else layoutParamsDrawer.gravity = GravityCompat.END
-                    drawerLocation = layoutParamsDrawer.gravity
-                    menuView.layoutParams = layoutParamsDrawer
-                    false
-                }
-            }
-            val searchArticleButton =
-                mainDrawerLayout?.findViewById<View>(R.id.search_article_button)
-            searchArticleButton?.setOnClickListener(searchListener)
-            val selectArticleButton =
-                mainDrawerLayout?.findViewById<View>(R.id.select_article_button)
-            selectArticleButton?.setOnClickListener(selectListener)
-            val blockEnableCheckbox =
-                mainDrawerLayout?.findViewById<CheckBox?>(R.id.block_enable_button_checkbox)
-            if (blockEnableCheckbox != null) {
-                blockEnableCheckbox.isChecked = propertiesBlockListEnable
-                blockEnableCheckbox.setOnClickListener(enableBlockListener)
-
-                val textCheckbox =
-                    mainDrawerLayout?.findViewById<TelnetTextViewLarge>(R.id.block_enable_button_checkbox_label)!!
-                textCheckbox.setOnClickListener(enableBlockListener)
-            }
-            val blockSettingButton =
-                mainDrawerLayout?.findViewById<View>(R.id.block_setting_button)
-            blockSettingButton?.setOnClickListener(editBlockListener)
-            val bookmarkEditButton =
-                mainDrawerLayout?.findViewById<View>(R.id.bookmark_edit_button)
-            bookmarkEditButton?.setOnClickListener(editBookmarkListener)
-            // 側邊選單內的書籤
-            drawerListView = mainDrawerLayout?.findViewById<ListView>(R.id.bookmark_list_view)!!
-            drawerListViewNone =
-                mainDrawerLayout?.findViewById<TextView>(R.id.bookmark_list_view_none)!!
-            showBookmarkButton =
-                mainDrawerLayout?.findViewById<Button>(R.id.show_bookmark_button)
-            showHistoryButton =
-                mainDrawerLayout?.findViewById<Button>(R.id.show_history_button)
-            tabButtons = arrayOf<Button>(showBookmarkButton!!, showHistoryButton!!)
-            showBookmarkButton?.setOnClickListener(buttonClickListener)
-            showHistoryButton?.setOnClickListener(buttonClickListener)
-            mainDrawerLayout?.findViewById<View>(R.id.bookmark_tab_button)!!
-                .setOnClickListener(toEssencePageClickListener)
-        }
-
-        // 標題
-        val boardPageHeaderView =
-            mainLayout.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
-        if (pageType == BahamutPage.BAHAMUT_BOARD) {
-            boardPageHeaderView.setMenuButtonClickListener(mMenuButtonListener)
-            boardPageHeaderView.setDetail1ClickListener(mReadAllListener)
-        } else {
-            boardPageHeaderView.setMenuButtonClickListener(null)
-        }
-        refreshHeaderView()
-
         this.isItemBlockEnable = propertiesBlockListEnable
+        this.isItemBlockEnableState = propertiesBlockListEnable
         blockListForTitle = propertiesBlockListForTitle
 
-        // 解決android 14跳出軟鍵盤
-        // 先把 focus 設定到其他目標物, 避免系統在回收過程一個個去 focus
-        // keyword: clearFocusInternal
-        mainLayout.requestFocus()
-
-        // 工具列位置
+        refreshHeaderView()
         changeToolbarLocation()
         changeToolbarOrder()
+        reloadBookmark()
 
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
-            // 任務完成
-            // 關閉"正在自動登入"
-
             TempSettings.isUnderAutoToChat = false
-
-            object: ASCoroutine() {
+            object : ASCoroutine() {
                 override suspend fun run() {
                     dismissProcessingDialog()
                 }
@@ -517,181 +363,63 @@ open class BoardMainPage : TelnetListPage(),
         }
 
         // 跳到指定文章編號
-        // 指定 boardMainPage 才能用，且僅在從 classPage 進入時處理跳轉
         if (this::class == BoardMainPage::class) {
             val isFromClassPage = ASNavigationController.currentController?.lastViewController is ClassPage
             if (isFromClassPage) {
                 if (TempSettings.lastVisitArticleNumber > 0) {
                     object : ASCoroutine() {
                         override suspend fun run() {
-                            // 置中顯示
-                            val firstIndex = listView?.firstVisiblePosition ?: 0
-                            val endIndex = listView?.lastVisiblePosition ?: 0
-                            val moveIndex = abs(endIndex - firstIndex)
-                            val findIndex = max(1, TempSettings.lastVisitArticleNumber - moveIndex / 2)
-
+                            val findIndex = max(1, TempSettings.lastVisitArticleNumber - 10)
                             onSelectDialogDismissWIthIndex(findIndex.toString())
                         }
                     }.postDelayed(100L)
                 } else {
-                    // 送出指令: 跳到文章最後面 (當沒有最後文章編號時, 預設是閱讀最新文章)
                     object : ASCoroutine() {
                         override suspend fun run() {
-                            // 執行「最後一頁」按鈕的點擊邏輯
-                            // 傳入 null 作為 View 參數，因為 Listener 內部通常只用到功能
                             mLastPageClickListener.onClick(null)
                         }
-                    }.postDelayed(100L) // 延遲 100ms 確保連線與頁面狀態穩定
+                    }.postDelayed(100L)
                 }
             }
         }
     }
 
-    /** 按下精華區  */
-    var toEssencePageClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
+    var toEssencePageClickListener: View.OnClickListener = View.OnClickListener {
         this.lastListAction = BoardPageAction.Companion.ESSENCE
         PageContainer.instance!!.pushBoardEssencePage(listName, boardTitle)
         navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
 
-    /** 變更工具列位置  */
     fun changeToolbarLocation() {
-        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
-        val toolbarBlock = mainLayout.findViewById<LinearLayout>(R.id.toolbar_block)
-        val toolBarFloating =
-            mainLayout.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
-        toolBarFloating.visibility = View.GONE
-
-        // 最左邊最右邊
-        val btnLL = toolbar.findViewById<Button>(R.id.BoardPageLLButton)
-        val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-        val btnRR = toolbar.findViewById<Button>(R.id.BoardPageRRButton)
-        val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-        btnLL.visibility = View.GONE
-        btnLLDivider.visibility = View.GONE
-        btnRR.visibility = View.GONE
-        btnRRDivider.visibility = View.GONE
-
-        val layoutParams = toolbar.layoutParams as RelativeLayout.LayoutParams
-        val choiceToolbarLocation = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
-        when (choiceToolbarLocation) {
-            1 -> {
-                // 底部-最左邊
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
-                layoutParams.addRule(RelativeLayout.ALIGN_START)
-                btnRR.visibility = View.VISIBLE
-                btnRRDivider.visibility = View.VISIBLE
-            }
-
-            2 -> {
-                // 底部-最右邊
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_START)
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
-                btnLL.visibility = View.VISIBLE
-                btnLLDivider.visibility = View.VISIBLE
-            }
-
-            3 -> {
-                // 浮動
-                // 去除 原本工具列
-                toolbar.visibility = View.GONE
-                // 去除底部卡位用view
-                toolbarBlock.visibility = View.GONE
-                // 浮動工具列
-                toolBarFloating.visibility = View.VISIBLE
-                // button setting
-                toolBarFloating.setOnClickListenerSetting(mPostListener)
-                val originalBtn = mainLayout.findViewById<Button>(R.id.BoardPagePostButton)
-                toolBarFloating.setTextSetting(originalBtn.text.toString())
-                // button 1
-                toolBarFloating.setOnClickListener1(mPrevPageClickListener)
-                toolBarFloating.setOnLongClickListener1(mFirstPageClickListener)
-                toolBarFloating.setText1(getContextString(R.string.prev_page))
-                // button 2
-                if (propertiesBoardMoveEnable > 0) {
-                    toolBarFloating.setOnClickListener2(mNextPageClickListener)
-                    toolBarFloating.setOnLongClickListener2(mLastPageLongClickListener)
-                    toolBarFloating.setText2(getContextString(R.string.next_page))
-                } else {
-                    toolBarFloating.setOnClickListener2(mLastPageClickListener)
-                    toolBarFloating.setText2(getContextString(R.string.last_page))
-                }
-            }
-
-            else -> {
-                // 底部-中間
-                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
-                layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-            }
-        }
-
-        toolbar.layoutParams = layoutParams
+        toolbarLocationState = propertiesToolbarLocation
     }
 
-    /** 反轉按鈕順序  */
     fun changeToolbarOrder() {
-        val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
-
-        val choiceToolbarOrder = propertiesToolbarOrder
-        if (choiceToolbarOrder == 1) {
-            // 最左邊最右邊
-            val btnLL = toolbar.findViewById<Button?>(R.id.BoardPageLLButton)
-            val btnLLDivider = toolbar.findViewById<View>(R.id.toolbar_divider_0)
-            val btnRR = toolbar.findViewById<Button?>(R.id.BoardPageRRButton)
-            val btnRRDivider = toolbar.findViewById<View>(R.id.toolbar_divider_3)
-
-            // 擷取中間的元素
-            val allViews = ArrayList<View?>()
-            for (i in toolbar.childCount - 3 downTo 2) {
-                val view = toolbar.getChildAt(i)
-                allViews.add(view)
-            }
-
-            // 清空
-            toolbar.removeAllViews()
-
-            // 插入
-            toolbar.addView(btnLL)
-            toolbar.addView(btnLLDivider)
-            for (j in allViews.indices) {
-                toolbar.addView(allViews[j])
-            }
-            toolbar.addView(btnRRDivider)
-            toolbar.addView(btnRR)
-        }
+        toolbarOrderState = propertiesToolbarOrder
     }
 
-    // com.kota.asFramework.pageController.ASViewController
     override fun onMenuButtonClicked(): Boolean {
         mMenuButtonListener.onClick(null)
         return true
     }
 
-    /** 更新headerView  */
     fun refreshHeaderView() {
         var boardTitle1 = boardTitle
         boardTitle1 = boardTitle1.ifEmpty { getContextString(R.string.loading) }
         var boardManager1 = boardManager
         boardManager1 = boardManager1.ifEmpty { getContextString(R.string.loading) }
-        val boardName = listName
-        val headerView = mainLayout.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
-        headerView.setData(boardTitle1, boardName, boardManager1)
+        boardTitleState = boardTitle1
+        boardManagerState = boardManager1
     }
 
-    override fun getListIdFromListName(aName: String?): String? {
-        return "$aName[Board]"
-    }
+    override fun getListIdFromListName(aName: String?): String? = "$aName[Board]"
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun loadPage(): TelnetListPageBlock {
         val load = BoardPageHandler.instance.load()
         if (!isInitialed) {
             val visitBoard = TempSettings.lastVisitBoard
             if (visitBoard != load.boardName) {
-                // 紀錄最後瀏覽的看板
                 TempSettings.lastVisitBoard = load.boardName
                 TempSettings.lastVisitArticleNumber = 0
                 clear()
@@ -706,12 +434,10 @@ open class BoardMainPage : TelnetListPage(),
         return load
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val boardPageItem = getItem(index) as BoardPageItem?
         if (boardPageItem != null) {
             BahamutStateHandler.bahamutStateHandler?.myCursorRow = getIndexInBlock(index) + 3
-            // 紀錄正在看的討論串標題
             TempSettings.boardFollowTitle = boardPageItem.title
             if (this::class == BoardMainPage::class)
                 TempSettings.lastVisitArticleNumber = boardPageItem.itemNumber
@@ -723,17 +449,21 @@ open class BoardMainPage : TelnetListPage(),
         return false
     }
 
-    @Synchronized  // com.kota.Bahamut.ListPage.TelnetListPage, com.kota.asFramework.pageController.ASViewController
+    @Synchronized
     override fun onPageRefresh() {
         refreshHeaderView()
         super.onPageRefresh()
     }
 
-    // com.kota.asFramework.pageController.ASViewController
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        refreshHeaderView()
+        safeNotifyDataSetChanged()
+    }
+
     override fun onBackPressed(): Boolean {
-        val drawerLayout = mainLayout.findViewById<DrawerLayout?>(R.id.drawer_layout)
-        if (drawerLayout != null && drawerLayout.isDrawerOpen(drawerLocation)) {
-            drawerLayout.closeDrawer(drawerLocation)
+        if (isDrawerOpenState) {
+            closeDrawer()
             return true
         }
         clear()
@@ -743,13 +473,11 @@ open class BoardMainPage : TelnetListPage(),
         return true
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         onListArticle(index + 1)
         return true
     }
 
-    // com.kota.asFramework.pageController.ASViewController
     override fun onSearchButtonClicked(): Boolean {
         showSearchArticleDialog()
         return true
@@ -761,13 +489,12 @@ open class BoardMainPage : TelnetListPage(),
         dialogSearchArticle.show()
     }
 
-    protected fun showSelectArticleDialog() {
+    fun showSelectArticleDialog() {
         val dialogSelectArticle = DialogSelectArticle()
         dialogSelectArticle.setListener(this)
         dialogSelectArticle.show()
     }
 
-    // com.kota.Bahamut.Dialogs.Dialog_SearchArticle_Listener
     override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
         searchArticle(
             vector[0]!!,
@@ -777,7 +504,6 @@ open class BoardMainPage : TelnetListPage(),
         )
     }
 
-    /** 搜尋文章  */
     fun searchArticle(keyword: String, author: String, mark: String, myGY: String) {
         this.lastListAction = BoardPageAction.Companion.SEARCH
         val boardSearchPage = PageContainer.instance!!.boardSearchPage
@@ -793,14 +519,12 @@ open class BoardMainPage : TelnetListPage(),
         pushCommand(BahamutCommandSearchArticle(keyword, author, mark, myGY))
     }
 
-    /** 選擇文章  */
-    // com.kota.Bahamut.Dialogs.Dialog_SelectArticle_Listener
     override fun onSelectDialogDismissWIthIndex(str: String) {
         var i: Int
         try {
             i = str.toInt() - 1
         } catch (e: Exception) {
-            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
+            Log.e(javaClass.simpleName, e.message ?: "")
             i = -1
         }
         if (i >= 0) {
@@ -808,11 +532,19 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    fun scrollToPosition(index: Int) {
+        scrollToItemTrigger = index
+    }
+
+    override fun setListViewSelection(selection: Int) {
+        super.setListViewSelection(selection)
+        scrollToPosition(selection)
+    }
+
     fun onBookmarkButtonClicked() {
         navigationController.pushViewController(BookmarkManagePage(listName, this))
     }
 
-    /** 長按串接文章  */
     fun onListArticle(i: Int) {
         this.lastListAction = BoardPageAction.Companion.LINK_TITLE
         val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage
@@ -824,7 +556,6 @@ open class BoardMainPage : TelnetListPage(),
         pushCommand(BahamutCommandListArticle(i))
     }
 
-    // com.kota.asFramework.pageController.ASViewController
     override fun onReceivedGestureRight(): Boolean {
         if (propertiesGestureOnBoardEnable) {
             if (this.isDrawerOpen || isDrawerOpening) {
@@ -836,7 +567,6 @@ open class BoardMainPage : TelnetListPage(),
         return true
     }
 
-    /** 發文  */
     protected open fun onPostButtonClicked() {
         val postArticlePage = PageContainer.instance!!.postArticlePage
         postArticlePage.setBoardPage(this)
@@ -844,39 +574,33 @@ open class BoardMainPage : TelnetListPage(),
         navigationController.pushViewController(postArticlePage)
     }
 
-    /** 按下推薦文章  */
     fun goodLoadingArticle() {
         ASAlertDialog.createDialog()
             .setTitle(getContextString(R.string.do_gy))
             .setMessage(getContextString(R.string.gy_this_article))
             .addButton(getContextString(R.string.cancel))
             .addButton(getContextString(R.string.do_gy))
-            .setListener { aSAlertDialog: ASAlertDialog?, i2: Int ->
+            .setListener { _, i2 ->
                 if (i2 == 1) {
                     this@BoardMainPage.pushCommand(BahamutCommandGoodArticle(loadingItemNumber))
                 }
             }.scheduleDismissOnPageDisappear(this).show()
     }
 
-    /** 按下推文  */
     fun pushArticle() {
         this@BoardMainPage.pushCommand(BahamutCommandPushArticle(loadingItemNumber))
-
         pushArticleASCoroutine?.cancel()
         pushArticleASCoroutine?.postDelayed(2000L)
         isPostDelayedSuccess = false
     }
 
-    /** 開啟推文小視窗  */
     fun openPushArticleDialog() {
         pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
-
         val dialog = DialogPushArticle()
         dialog.show()
     }
 
-    /** 沒有開啟推文小視窗, 視為沒開放功能  */
     var pushArticleASCoroutine: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess) {
@@ -886,42 +610,35 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
-    /** 提供給 stateHandler 的取消介面  */
     fun cancelRunner() {
         pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
     }
 
-    /** 轉寄至信箱  */
     fun funSendMail() {
         pushCommand(BahamutCommandFSendMail(propertiesUsername))
     }
 
-    /** 最前篇  */
     fun loadTheSameTitleTop() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleTop(loadingItemNumber))
     }
 
-    /** 最後篇  */
     fun loadTheSameTitleBottom() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleBottom(loadingItemNumber))
     }
 
-    /** 上一篇  */
     fun loadTheSameTitleUp() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleUp(loadingItemNumber))
     }
 
-    /** 下一篇  */
     fun loadTheSameTitleDown() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleDown(loadingItemNumber))
     }
 
-    // com.kota.Bahamut.ListPage.TelnetListPage
     override fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
         if (aItem != null) {
             return this.isItemBlockEnable && isBlockListContains((aItem as BoardPageItem).author)
@@ -929,24 +646,18 @@ open class BoardMainPage : TelnetListPage(),
         return false
     }
 
-    /** 啟用/停用 黑名單  */
     fun onChangeBlockStateButtonClicked() {
         propertiesBlockListEnable = !this.isItemBlockEnable
         notifyDataUpdated()
         this.isItemBlockEnable = propertiesBlockListEnable
-        if (mainDrawerLayout != null) {
-            val blockEnableCheckbox =
-                mainDrawerLayout?.findViewById<CheckBox>(R.id.block_enable_button_checkbox)!!
-            blockEnableCheckbox.isChecked = this.isItemBlockEnable
-        }
-        reloadListView()
+        this.isItemBlockEnableState = propertiesBlockListEnable
+        safeNotifyDataSetChanged()
     }
 
     fun onEditBlockListButtonClicked() {
         navigationController.pushViewController(BlockListPage())
     }
 
-    /** 點下文章  */
     override fun loadItemAtIndex(index: Int) {
         if (isItemCanLoadAtIndex(index)) {
             val articlePage = PageContainer.instance!!.articlePage
@@ -962,8 +673,6 @@ open class BoardMainPage : TelnetListPage(),
         isInitialed = false
     }
 
-    /** 書籤管理->按下書籤  */
-    // com.kota.Bahamut.BookmarkPage.BoardExtendOptionalPageListener
     override fun onBoardExtendOptionalPageDidSelectBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
             this.lastListAction = BoardPageAction.Companion.SEARCH
@@ -978,57 +687,16 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
-    // android.widget.Adapter
-    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
-        var myView = view
-        val itemIndex = i + 1
-        val block = ItemUtils.getBlock(itemIndex)
-        val boardPageItem = getItem(i) as BoardPageItem?
-        if (boardPageItem == null && currentBlock != block && !isLoadingBlock(itemIndex)) {
-            loadBoardBlock(block)
-        }
-        if (myView == null) {
-            myView = BoardPageItemView(context)
-            myView.layoutParams = AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
 
-        val boardPageItemView = myView as BoardPageItemView
-        boardPageItemView.setItem(boardPageItem)
-        boardPageItemView.setNumber(itemIndex)
-
-        // 黑名單判斷
-        if (boardPageItem != null && this.isItemBlockEnable) {
-            if (isBlockListContains(boardPageItem.author)) {
-                boardPageItem.isBlocked = true
-            } else if (blockListForTitle && isBlockListContainsFuzzy(boardPageItem.title)) {
-                boardPageItem.isBlocked = true
-            } else {
-                boardPageItem.isBlocked = false
-            }
-
-            if (boardPageItem.isBlocked) boardPageItemView.visible = false
-        } else {
-            boardPageItemView.visible = true
-        }
-
-        return myView
-    }
-
-    // com.kota.Bahamut.ListPage.TelnetListPage
-    /** 回收 Block 物件，用於記憶體管理，避免大量文章區塊佔用記憶體 */
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
-    /** 回收 Item 物件，將文章資料清空後放回物件池供後續重複使用 */
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }
 
-    /** 修改文章 訊息發出 */
     override fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -1036,12 +704,9 @@ open class BoardMainPage : TelnetListPage(),
         str3: String?
     ) {
         pushCommand(BahamutCommandEditArticle(str, str2!!, str3!!))
-
-        // 強制刷新列表 UI（執行於主執行緒）
         safeNotifyDataSetChanged()
     }
 
-    /** 發表文章/回覆文章 訊息發出  */
     override fun onPostDialogSendButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -1052,49 +717,41 @@ open class BoardMainPage : TelnetListPage(),
         boolean6: Boolean?
     ) {
         pushCommand(BahamutCommandPostArticle(this, str!!, str2!!, str3, str4, str5, boolean6!!))
+        if (str3 != null && str3 == "M") return
 
-        // 回應到作者信箱
-        if (str3 != null && str3 == "M") {
-            return
-        }
-        // 發文中等待視窗
         showProcessingDialog(getContextString(R.string.board_page_post_waiting_message_1))
         postWaitingDialog1?.postDelayed(3000L)
         postWaitingDialog2?.postDelayed(6000L)
     }
-    // 3秒後跳出
-    val postWaitingDialog1: ASCoroutine? = object: ASCoroutine() {
+
+    val postWaitingDialog1: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             setMessage(getContextString(R.string.board_page_post_waiting_message_2))
         }
     }
-    // 6秒後跳出
-    val postWaitingDialog2: ASCoroutine? = object: ASCoroutine() {
+
+    val postWaitingDialog2: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             setMessage(getContextString(R.string.board_page_post_waiting_message_3))
         }
     }
 
-    /** 引言過多, 回逤發文時的設定  */
     fun recoverPost() {
         ASCoroutine.ensureMainThread {
-                cleanCommand() // 清除引言過多留下的command buffer
-                val page = PageContainer.instance!!.postArticlePage
-                page.setRecover()
+            cleanCommand()
+            val page = PageContainer.instance!!.postArticlePage
+            page.setRecover()
         }
-
         postWaitingDialog1?.cancel()
         postWaitingDialog2?.cancel()
         dismissProcessingDialog()
     }
 
-    /** 完成發文  */
     fun finishPost() {
         ASCoroutine.ensureMainThread {
-            val page = PageContainer. instance!!.postArticlePage
+            val page = PageContainer.instance!!.postArticlePage
             page.closeArticle()
         }
-
         postWaitingDialog1?.cancel()
         postWaitingDialog2?.cancel()
         dismissProcessingDialog()
@@ -1102,69 +759,744 @@ open class BoardMainPage : TelnetListPage(),
 
     fun reloadBookmark(aView: View? = null) {
         val store = TempSettings.bookmarkStore
+        myBookmarkList.clear()
         if (store != null) {
             if (myMode == 0) {
                 store.getBookmarkList(listName).loadBookmarkList(myBookmarkList)
-
             } else {
                 store.getBookmarkList(listName).loadHistoryList(myBookmarkList)
             }
         }
-        if (myBookmarkList.isEmpty()) {
-            drawerListView.visibility = View.GONE
-            drawerListViewNone.visibility = View.VISIBLE
-        } else {
-            drawerListView.visibility = View.VISIBLE
-            drawerListViewNone.visibility = View.GONE
-        }
-
-        // 切換View本體
-        if (myMode == 0)
-            drawerListView.adapter = bookmarkAdapter
-        else
-            drawerListView.adapter = historyAdapter
-            
-        if (isPageAppeared) {
-            // 只更新當前顯示的 adapter
-            if (myMode == 0)
-                bookmarkAdapter.notifyDataSetChanged()
-            else
-                historyAdapter.notifyDataSetChanged()
-        }
-        if (drawerListView.onItemClickListener == null)
-            drawerListView.onItemClickListener = bookmarkListener
-
-        // 填上顏色: 書籤. 紀錄
-        val selectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedBackground)
-        val unselectedBgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedBackground)
-        val selectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedTextColor)
-        val unselectedTextRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedTextColor)
-
-        var selectedView = aView
-        if(selectedView == null) selectedView = tabButtons[myMode]
-        for (tabButton in this@BoardMainPage.tabButtons) {
-            val isSelected = (tabButton === selectedView)
-            tabButton.setBackgroundResource(if (isSelected) selectedBgRes else unselectedBgRes)
-            tabButton.setTextColor(ContextCompat.getColorStateList(tabButton.context, if (isSelected) selectedTextRes else unselectedTextRes))
-        }
+        bookmarkListState.clear()
+        bookmarkListState.addAll(myBookmarkList)
+        myModeState = myMode
     }
 
     fun closeDrawer() {
-        val drawerLayout = mainLayout.findViewById<DrawerLayout?>(R.id.drawer_layout)
-        drawerLayout?.closeDrawers()
+        isDrawerOpenState = false
     }
 
     val isDrawerOpen: Boolean
-        /** 側邊選單已開啟 或 正在開啟中  */
-        get() {
-            val drawerLayout =
-                mainLayout.findViewById<DrawerLayout?>(R.id.drawer_layout)
-            if (drawerLayout != null) {
-                return drawerLayout.isDrawerOpen(drawerLocation)
+        get() = isDrawerOpenState
+
+    override fun onSearchDialogCancelButtonClicked() {}
+
+    // -------------------------------------------------------------
+    // Compose 畫面主體
+    // -------------------------------------------------------------
+
+    @Composable
+    fun BoardMainPageContent() {
+        val colors = AppTheme.colors
+        val coroutineScope = rememberCoroutineScope()
+        val listState = rememberLazyListState()
+
+        // 監聽 TelnetListPage 資料變更
+        var dataVersion by remember { mutableIntStateOf(0) }
+        DisposableEffect(Unit) {
+            val observer = object : DataSetObserver() {
+                override fun onChanged() {
+                    dataVersion++
+                }
+
+                override fun onInvalidated() {
+                    dataVersion++
+                }
             }
-            return false
+            registerDataSetObserver(observer)
+            onDispose {
+                unregisterDataSetObserver(observer)
+            }
         }
 
-    override fun onSearchDialogCancelButtonClicked() {
+        // 監聽平移或滾動觸發
+        val currentCount = if (dataVersion >= 0) count else 0
+        LaunchedEffect(scrollToItemTrigger) {
+            scrollToItemTrigger?.let { target ->
+                val safeTarget = if (target == -1) {
+                    max(0, currentCount - 1)
+                } else {
+                    target.coerceIn(0, max(0, currentCount - 1))
+                }
+                if (currentCount > 0) {
+                    listState.scrollToItem(safeTarget)
+                }
+                scrollToItemTrigger = null
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(colors.pageBackground)
+        ) {
+            // 頁面主佈局
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // 1. 頂部標題列
+                BoardMainTopBar(
+                    title = boardTitleState.ifEmpty { stringResource(R.string.loading) },
+                    subtitle = if (boardManagerState.isNotEmpty()) "$listName  $boardManagerState" else listName,
+                    isBoard = pageType == BahamutPage.BAHAMUT_BOARD,
+                    onBackClick = { onBackPressed() },
+                    onReadAllClick = { mReadAllListener.onClick(null) },
+                    onMenuClick = {
+                        if (pageType == BahamutPage.BAHAMUT_BOARD) {
+                            mMenuButtonListener.onClick(null)
+                        } else {
+                            onMenuButtonClicked()
+                        }
+                    }
+                )
+
+                // 2. 文章列表主體
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    if (currentCount == 0) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.loading_),
+                                color = colors.textSecondary,
+                                fontSize = 16.sp
+                            )
+                        }
+                    } else {
+                        LazyColumn(
+                            state = listState,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(count = currentCount) { index ->
+                                val itemIndex = index + 1
+                                val itemBlock = ItemUtils.getBlock(itemIndex)
+                                val item = getItem(index) as? BoardPageItem
+
+                                // 按需載入區塊
+                                if (item == null && currentBlock != itemBlock && !isLoadingBlock(itemIndex)) {
+                                    loadBoardBlock(itemBlock)
+                                }
+
+                                // 黑名單過濾判定
+                                if (item != null && isItemBlockEnable) {
+                                    item.isBlocked = isBlockListContains(item.author) ||
+                                            (blockListForTitle && isBlockListContainsFuzzy(item.title))
+                                }
+
+                                if (item?.isBlocked != true) {
+                                    BoardPageRowItem(
+                                        item = item,
+                                        itemIndex = itemIndex,
+                                        colors = colors,
+                                        onClick = { loadItemAtIndex(index) },
+                                        onLongClick = { onListViewItemLongClicked(null, index) }
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 3. 底部操作工具列
+                BoardMainToolbar(
+                    colors = colors,
+                    pageType = pageType,
+                    toolbarLocation = toolbarLocationState,
+                    toolbarOrder = toolbarOrderState,
+                    onPostClick = { mPostListener.onClick(null) },
+                    onPrevClick = {
+                        val firstVisible = listState.firstVisibleItemIndex
+                        val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                        val target = max(0, firstVisible - visibleCount)
+                        if (this@BoardMainPage::class == BoardMainPage::class) {
+                            TempSettings.lastVisitArticleNumber = target
+                        }
+                        coroutineScope.launch { listState.scrollToItem(target) }
+                    },
+                    onFirstClick = {
+                        moveToFirstPosition()
+                        coroutineScope.launch { listState.scrollToItem(0) }
+                    },
+                    onNextClick = {
+                        val firstVisible = listState.firstVisibleItemIndex
+                        val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                        val target = (firstVisible + visibleCount).coerceAtMost(max(0, currentCount - 1))
+                        if (this@BoardMainPage::class == BoardMainPage::class) {
+                            TempSettings.lastVisitArticleNumber = target
+                        }
+                        coroutineScope.launch { listState.scrollToItem(target) }
+                    },
+                    onLastClick = {
+                        setManualLoadPage()
+                        moveToLastPosition()
+                        coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
+                    },
+                    onLLClick = { btnLLListener.onClick(null) },
+                    onRRClick = { btnRRListener.onClick(null) }
+                )
+            }
+
+            // 4. 側邊選單 Drawer (若 pageType == BAHAMUT_BOARD)
+            if (pageType == BahamutPage.BAHAMUT_BOARD) {
+                BoardEndDrawer(
+                    isOpen = isDrawerOpenState,
+                    isLeft = propertiesDrawerLocation != 0,
+                    mode = myModeState,
+                    bookmarks = bookmarkListState,
+                    isBlockEnabled = isItemBlockEnableState,
+                    colors = colors,
+                    onClose = { closeDrawer() },
+                    onEssenceClick = {
+                        closeDrawer()
+                        toEssencePageClickListener.onClick(null)
+                    },
+                    onBookmarkManageClick = {
+                        closeDrawer()
+                        onBookmarkButtonClicked()
+                    },
+                    onTabClick = { mode ->
+                        myMode = mode
+                        reloadBookmark()
+                    },
+                    onBookmarkItemClick = { bookmark ->
+                        closeDrawer()
+                        searchArticle(bookmark.keyword, bookmark.author, bookmark.mark, bookmark.gy)
+                    },
+                    onSearchClick = {
+                        closeDrawer()
+                        showSearchArticleDialog()
+                    },
+                    onSelectClick = {
+                        closeDrawer()
+                        showSelectArticleDialog()
+                    },
+                    onToggleBlock = { onChangeBlockStateButtonClicked() },
+                    onBlockSettingClick = {
+                        closeDrawer()
+                        onEditBlockListButtonClicked()
+                    }
+                )
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------
+// 子元件定義
+// -------------------------------------------------------------
+
+/**
+ * 看板頂部導覽列
+ */
+@Composable
+fun BoardMainTopBar(
+    title: String,
+    subtitle: String,
+    isBoard: Boolean,
+    onBackClick: () -> Unit,
+    onReadAllClick: () -> Unit,
+    onMenuClick: () -> Unit
+) {
+    val colors = AppTheme.colors
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.toolbarBackground)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = stringResource(R.string.back),
+                    tint = colors.titleBarTitle
+                )
+            }
+
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 4.dp)
+            ) {
+                Text(
+                    text = title,
+                    color = colors.titleBarTitle,
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = subtitle,
+                        color = colors.titleBarDetail,
+                        fontSize = 12.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (isBoard) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "[全部已讀]",
+                            color = colors.titleBarDetail2,
+                            fontSize = 12.sp,
+                            modifier = Modifier.clickable { onReadAllClick() }
+                        )
+                    }
+                }
+            }
+
+            IconButton(onClick = onMenuClick) {
+                Icon(
+                    imageVector = Icons.Filled.Menu,
+                    contentDescription = stringResource(R.string.zero_word),
+                    tint = colors.titleBarTitle
+                )
+            }
+        }
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+    }
+}
+
+/**
+ * 看板文章項目 Row Item
+ */
+@Composable
+fun BoardPageRowItem(
+    item: BoardPageItem?,
+    itemIndex: Int,
+    colors: AppColors,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit
+) {
+    val titleText = item?.title ?: stringResource(R.string.loading_)
+    val authorText = item?.author ?: ""
+    val dateText = item?.date ?: ""
+    val gyCount = item?.gy ?: 0
+    val isReply = item?.isReply == true
+    val isMarked = item?.isMarked == true
+    val isRead = (item?.isDeleted == true) || (item?.isRead == true)
+    val isFollowed = TempSettings.isBoardFollowTitle(titleText)
+
+    // 決定標題顏色
+    val titleColor = if (isFollowed) {
+        if (!isReply) {
+            if (isRead) colors.bbsBoardFollowFirstRead else colors.bbsBoardFollowFirst
+        } else {
+            if (isRead) colors.bbsBoardFollowOtherRead else colors.bbsBoardFollowOther
+        }
+    } else {
+        if (isRead) colors.bbsBoardNormalRead else colors.bbsBoardNormal
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+            .padding(horizontal = 8.dp, vertical = 6.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 文章編號 (5 碼)
+            Text(
+                text = String.format("%05d", item?.itemNumber ?: itemIndex),
+                color = colors.bbsMailNumber,
+                fontSize = 11.sp,
+                modifier = Modifier.width(42.dp)
+            )
+
+            // 狀態 (◆ 或 Re)
+            Text(
+                text = if (isReply) "Re" else "◆",
+                color = colors.bbsMailStatus,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.width(22.dp)
+            )
+
+            // 標記 M
+            if (isMarked) {
+                Text(
+                    text = "M",
+                    color = colors.bbsMailMark,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.width(14.dp)
+                )
+            }
+
+            // 文章標題
+            Text(
+                text = titleText,
+                color = titleColor,
+                fontSize = 15.sp,
+                fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+
+            // 推文數 / GY
+            if (gyCount > 0) {
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = gyCount.toString(),
+                    color = colors.bbsBoardGy,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // 第二列：作者與日期
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 42.dp, top = 2.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = authorText,
+                color = colors.bbsMailAuthor,
+                fontSize = 12.sp,
+                maxLines = 1
+            )
+            Text(
+                text = dateText,
+                color = colors.bbsMailDate,
+                fontSize = 11.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+        HorizontalDivider(color = colors.divider.copy(alpha = 0.5f), thickness = 0.5.dp)
+    }
+}
+
+/**
+ * 底部操作工具列
+ */
+@Composable
+fun BoardMainToolbar(
+    colors: AppColors,
+    pageType: Int,
+    toolbarLocation: Int,
+    toolbarOrder: Int,
+    onPostClick: () -> Unit,
+    onPrevClick: () -> Unit,
+    onFirstClick: () -> Unit,
+    onNextClick: () -> Unit,
+    onLastClick: () -> Unit,
+    onLLClick: () -> Unit,
+    onRRClick: () -> Unit
+) {
+    val isMoveEnable = propertiesBoardMoveEnable > 0
+    val postText = stringResource(
+        if (pageType == BahamutPage.BAHAMUT_BOARD) R.string.post else R.string.bookmark
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.toolbarBackground)
+                .padding(horizontal = 6.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // 靠右對齊時左側切換按鈕
+            if (toolbarLocation == 2) {
+                BahaButton(
+                    text = "<<",
+                    type = ButtonType.NORMAL,
+                    onClick = onLLClick,
+                    modifier = Modifier.width(44.dp),
+                    minHeight = 40.dp
+                )
+            }
+
+            val buttons: List<@Composable () -> Unit> = listOf(
+                {
+                    BahaButton(
+                        text = postText,
+                        type = ButtonType.PRIMARY,
+                        onClick = onPostClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                },
+                {
+                    BahaButton(
+                        text = stringResource(R.string.prev_page),
+                        type = ButtonType.NORMAL,
+                        onClick = onPrevClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                },
+                {
+                    BahaButton(
+                        text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
+                        type = ButtonType.NORMAL,
+                        onClick = if (isMoveEnable) onNextClick else onLastClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 40.dp
+                    )
+                }
+            )
+
+            // 反轉順序判定
+            val orderedButtons = if (toolbarOrder == 1) buttons.reversed() else buttons
+            for (btn in orderedButtons) {
+                btn()
+            }
+
+            // 靠左對齊時右側切換按鈕
+            if (toolbarLocation == 1) {
+                BahaButton(
+                    text = ">>",
+                    type = ButtonType.NORMAL,
+                    onClick = onRRClick,
+                    modifier = Modifier.width(44.dp),
+                    minHeight = 40.dp
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 側邊選單 Drawer
+ */
+@Composable
+fun BoardEndDrawer(
+    isOpen: Boolean,
+    isLeft: Boolean,
+    mode: Int,
+    bookmarks: List<Bookmark>,
+    isBlockEnabled: Boolean,
+    colors: AppColors,
+    onClose: () -> Unit,
+    onEssenceClick: () -> Unit,
+    onBookmarkManageClick: () -> Unit,
+    onTabClick: (Int) -> Unit,
+    onBookmarkItemClick: (Bookmark) -> Unit,
+    onSearchClick: () -> Unit,
+    onSelectClick: () -> Unit,
+    onToggleBlock: () -> Unit,
+    onBlockSettingClick: () -> Unit
+) {
+    if (isOpen) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.5f))
+                .clickable { onClose() }
+        )
+    }
+
+    AnimatedVisibility(
+        visible = isOpen,
+        enter = slideInHorizontally(
+            initialOffsetX = { if (isLeft) -it else it }
+        ) + fadeIn(),
+        exit = slideOutHorizontally(
+            targetOffsetX = { if (isLeft) -it else it }
+        ) + fadeOut()
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize(),
+            contentAlignment = if (isLeft) Alignment.CenterStart else Alignment.CenterEnd
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .width(280.dp)
+                    .background(colors.pageBackground)
+                    .clickable(enabled = false) {} // 阻止點擊穿透到遮罩
+            ) {
+                // 1. 頂部按鈕：精華區 / 書籤管理
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.toolbarBackground)
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    BahaButton(
+                        text = stringResource(R.string.essence_page),
+                        type = ButtonType.NORMAL,
+                        onClick = onEssenceClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 38.dp
+                    )
+                    BahaButton(
+                        text = stringResource(R.string.bookmark_manager),
+                        type = ButtonType.NORMAL,
+                        onClick = onBookmarkManageClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 38.dp
+                    )
+                }
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 2. 切換分頁：書籤 / 紀錄
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.toolbarBackground)
+                        .padding(horizontal = 6.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    BahaButton(
+                        text = stringResource(R.string.bookmark),
+                        type = if (mode == 0) ButtonType.PRIMARY else ButtonType.SECONDARY,
+                        onClick = { onTabClick(0) },
+                        modifier = Modifier.weight(1f),
+                        minHeight = 36.dp
+                    )
+                    BahaButton(
+                        text = stringResource(R.string.record),
+                        type = if (mode == 1) ButtonType.PRIMARY else ButtonType.SECONDARY,
+                        onClick = { onTabClick(1) },
+                        modifier = Modifier.weight(1f),
+                        minHeight = 36.dp
+                    )
+                }
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 3. 書籤/紀錄 清單
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                ) {
+                    if (bookmarks.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = stringResource(R.string.list_empty),
+                                color = colors.textSecondary,
+                                fontSize = 14.sp
+                            )
+                        }
+                    } else {
+                        LazyColumn(modifier = Modifier.fillMaxSize()) {
+                            items(bookmarks.size) { bIndex ->
+                                val bItem = bookmarks[bIndex]
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { onBookmarkItemClick(bItem) }
+                                        .padding(horizontal = 12.dp, vertical = 8.dp)
+                                ) {
+                                    Text(
+                                        text = bItem.keyword.ifEmpty { "未輸入" },
+                                        color = colors.textPrimary,
+                                        fontSize = 14.sp,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    if (bItem.author.isNotEmpty()) {
+                                        Text(
+                                            text = bItem.author,
+                                            color = colors.textSecondary,
+                                            fontSize = 12.sp,
+                                            maxLines = 1
+                                        )
+                                    }
+                                }
+                                HorizontalDivider(
+                                    color = colors.divider.copy(alpha = 0.3f),
+                                    thickness = 0.5.dp
+                                )
+                            }
+                        }
+                    }
+                }
+
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 4. 底部搜尋 / 選篇
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.toolbarBackground)
+                        .padding(horizontal = 6.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    BahaButton(
+                        text = stringResource(R.string.search),
+                        type = ButtonType.NORMAL,
+                        onClick = onSearchClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 38.dp
+                    )
+                    BahaButton(
+                        text = stringResource(R.string.select),
+                        type = ButtonType.NORMAL,
+                        onClick = onSelectClick,
+                        modifier = Modifier.weight(1f),
+                        minHeight = 38.dp
+                    )
+                }
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+                // 5. 黑名單開關與設定
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(colors.toolbarBackground)
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = isBlockEnabled,
+                        onCheckedChange = { onToggleBlock() },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = colors.buttonText,
+                            uncheckedColor = colors.checkboxTint
+                        )
+                    )
+                    Text(
+                        text = "黑名單: " + if (isBlockEnabled) stringResource(R.string.on) else "關",
+                        color = colors.buttonText,
+                        fontSize = 13.sp,
+                        modifier = Modifier
+                            .clickable { onToggleBlock() }
+                            .padding(end = 8.dp)
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    BahaButton(
+                        text = stringResource(R.string.system_setting_page_chapter_blocklist),
+                        type = ButtonType.NORMAL,
+                        onClick = onBlockSettingClick,
+                        minHeight = 34.dp
+                    )
+                }
+            }
+        }
     }
 }

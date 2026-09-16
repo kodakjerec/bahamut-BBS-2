@@ -22,7 +22,7 @@ class BoardSearchPage : BoardMainPage() {
         get() = BahamutPage.BAHAMUT_BOARD_SEARCH
 
     override val pageLayout: Int
-        get() = R.layout.board_search_page
+        get() = 0
 
     @Synchronized
     override fun onPageRefresh() {

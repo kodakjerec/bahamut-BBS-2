@@ -1,0 +1,94 @@
+package com.kota.Bahamut.ui.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.kota.Bahamut.ui.theme.AppTheme
+
+/**
+ * 專案通用主題適配單行輸入框
+ */
+@Composable
+fun BahaInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    placeholder: String = "",
+    isPassword: Boolean = false,
+    maxLength: Int = Int.MAX_VALUE,
+    singleLine: Boolean = true,
+    height: Dp = 46.dp,
+    keyboardOptions: KeyboardOptions = if (isPassword) {
+        KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
+    } else {
+        KeyboardOptions(keyboardType = KeyboardType.Ascii, imeAction = ImeAction.Next)
+    },
+    keyboardActions: KeyboardActions = KeyboardActions.Default
+) {
+    val colors = AppTheme.colors
+
+    BasicTextField(
+        value = value,
+        onValueChange = {
+            if (it.length <= maxLength) {
+                onValueChange(it)
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
+            .height(height)
+            .clip(RoundedCornerShape(6.dp))
+            .background(colors.inputBoxBackground)
+            .border(1.dp, colors.divider, RoundedCornerShape(6.dp))
+            .padding(horizontal = 14.dp),
+        textStyle = TextStyle(
+            color = colors.inputBoxText,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Medium
+        ),
+        singleLine = singleLine,
+        visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        cursorBrush = SolidColor(colors.titleBarTitle),
+        decorationBox = { innerTextField ->
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (value.isEmpty() && placeholder.isNotEmpty()) {
+                    Text(
+                        text = placeholder,
+                        color = colors.textSecondary.copy(alpha = 0.55f),
+                        fontSize = 16.sp
+                    )
+                }
+                innerTextField()
+            }
+        }
+    )
+}
+
