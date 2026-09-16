@@ -198,11 +198,15 @@ abstract class ASViewController {
     }
 
     fun startActivity(intent: Intent?) {
-        this.navigationController.startActivity(intent)
+        if (intent != null) {
+            this.navigationController.startActivity(intent)
+        }
     }
 
     fun startActivityForResult(intent: Intent?, code: Int) {
-        this.navigationController.startActivityForResult(intent, code)
+        if (intent != null) {
+            this.navigationController.startActivityForResult(intent, code)
+        }
     }
 
     fun reloadLayout() {

@@ -8,6 +8,7 @@ import androidx.core.content.edit
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.theme.ThemeBridge
 
 object ThemeStore {
     private lateinit var perf: SharedPreferences
@@ -88,6 +89,9 @@ object ThemeStore {
     fun setSelectIndex(selectedIndex: Int) {
         if (::perf.isInitialized) {
             perf.edit { putInt(PER_SELECT_THEME_INDEX, selectedIndex) }
+        }
+        TempSettings.myContext?.let { context ->
+            ThemeBridge.syncFromSystem(context)
         }
     }
 

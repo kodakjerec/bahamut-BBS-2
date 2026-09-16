@@ -1,6 +1,6 @@
 package com.kota.asFramework.pageController
 
-import android.app.Activity
+import androidx.activity.ComponentActivity
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
@@ -20,6 +20,7 @@ import androidx.core.view.isVisible
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.theme.ThemeStore
+import com.kota.Bahamut.ui.theme.ThemeBridge
 import com.kota.Bahamut.service.NotificationSettings.getShowMessageFloating
 import com.kota.Bahamut.service.NotificationSettings.upgrade
 import com.kota.Bahamut.service.TempSettings
@@ -34,7 +35,7 @@ import com.kota.telnetUI.TelnetPage
 import java.util.Vector
 import kotlin.math.max
 
-open class ASNavigationController : Activity() {
+open class ASNavigationController : ComponentActivity() {
     var deviceController: ASDeviceController? = null
         private set
     private val displayMetrics = DisplayMetrics()
@@ -162,6 +163,7 @@ open class ASNavigationController : Activity() {
         setupWindowInsets()
 
         onControllerDidLoad()
+        ThemeBridge.syncFromSystem(this)
     }
 
     // android.app.Activity, android.view.KeyEvent.Callback
@@ -570,6 +572,8 @@ open class ASNavigationController : Activity() {
 
             updatePageViewsBackground()
         }
+
+        ThemeBridge.syncFromSystem(this)
 
         synchronized(this.controllers) {
             for (controller in this.controllers) {

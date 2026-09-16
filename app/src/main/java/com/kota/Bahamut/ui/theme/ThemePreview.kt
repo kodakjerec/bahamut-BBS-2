@@ -16,7 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -319,3 +325,71 @@ fun PreviewAllThemes() {
         ThemeShowcase("6. eInk 深色", AppThemeStyle.EINK, true)
     }
 }
+
+/**
+ * 混合過渡期驗證元件：嵌入於 XML 頁面中的 Compose 展示卡片
+ */
+@Composable
+fun ThemeHybridShowcase(modifier: Modifier = Modifier) {
+    val colors = AppTheme.colors
+    val style by ThemeBridge.themeStyle.collectAsState()
+    val isDark by ThemeBridge.isDarkTheme.collectAsState()
+    var clickCount by remember { mutableIntStateOf(0) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(colors.surface)
+            .border(1.dp, colors.dialogBorder, RoundedCornerShape(8.dp))
+            .padding(14.dp)
+    ) {
+        Text(
+            text = "Compose 混合過渡預覽 (Theme Bridge)",
+            color = colors.textPrimary,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.height(6.dp))
+        Text(
+            text = "當前主題: $style | 模式: ${if (isDark) "深色 (Dark)" else "淺色 (Light)"}",
+            color = colors.textSecondary,
+            fontSize = 12.sp
+        )
+        Spacer(modifier = Modifier.height(10.dp))
+
+        // 色票預覽
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            ColorSwatch(name = "Page", color = colors.pageBackground, borderColor = colors.dialogBorder)
+            ColorSwatch(name = "Surface", color = colors.surface, borderColor = colors.dialogBorder)
+            ColorSwatch(name = "Toolbar", color = colors.toolbarBackground, borderColor = colors.dialogBorder)
+            ColorSwatch(name = "Tab", color = colors.tabSelectedBackground, borderColor = colors.dialogBorder)
+            ColorSwatch(name = "Danger", color = colors.buttonDangerBackground, borderColor = colors.dialogBorder)
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // 互動按鈕
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(4.dp))
+                .background(colors.toolbarBackground)
+                .clickable { clickCount++ }
+                .padding(vertical = 10.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Compose 按鈕點擊測試: $clickCount 次",
+                color = colors.buttonText,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+    }
+}
+

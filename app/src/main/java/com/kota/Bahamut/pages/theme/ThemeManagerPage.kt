@@ -2,11 +2,14 @@ package com.kota.Bahamut.pages.theme
 
 import android.widget.Button
 import android.widget.LinearLayout
+import androidx.compose.ui.platform.ComposeView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.ui.theme.ThemeHybridShowcase
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.telnet.TelnetClient
@@ -80,6 +83,16 @@ class ThemeManagerPage: TelnetPage() {
                         }).show()
                 }
             }
+        }
+
+        // 混合過渡驗證：以 ComposeView 包裝並注入至 XML content_view
+        context?.let { ctx ->
+            val composeView = ComposeView(ctx).apply {
+                setBahamutContent {
+                    ThemeHybridShowcase()
+                }
+            }
+            mainLayout.addView(composeView)
         }
 
         findViewById(R.id.Theme_Manager_Page_Toolbar_Back)?.setOnClickListener { onBackPressed() }
