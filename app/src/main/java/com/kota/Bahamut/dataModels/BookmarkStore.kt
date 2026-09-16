@@ -4,8 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
-import com.kota.Bahamut.service.CloudBackup
-import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
 import org.json.JSONArray
@@ -103,11 +102,8 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
             )
         }
 
-        // 雲端備份
-        if (getCloudSave()) {
-            val cloudBackup = CloudBackup()
-            cloudBackup.backup()
-        }
+        // 標記雲端異動
+        SyncManager.markDirty()
     }
 
     private fun load(): BookmarkStore {

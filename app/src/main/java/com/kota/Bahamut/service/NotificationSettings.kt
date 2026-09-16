@@ -16,6 +16,8 @@ object NotificationSettings {
     private const val SHOW_EXPRESSION:String = "show_expression" // 第一次進入表情符號頁面的提示訊息
     private const val SHOW_CLOUD_SAVE: String = "show_cloud_save" // 第一次詢問雲端備份, false-未使用 true-已問過
     private const val CLOUD_SAVE: String = "cloud_save" // 雲端備份, false-不啟用 true-啟用
+    private const val CLOUD_IS_DIRTY: String = "cloud_is_dirty" // 是否有未同步的變更
+    private const val CLOUD_SAVE_LAST_TIME: String = "cloud_save_last_time" // 最後同步時間
     private const val CONNECT_IP_ADDRESS = "connectIpAddress" // 連線IP
     private const val CONNECT_METHOD = "connectMethod" // 連線方式
     private const val SHOW_HERO_STEP = "showHeroStep" // 顯示勇者足跡
@@ -92,6 +94,26 @@ object NotificationSettings {
     @JvmStatic
     fun getCloudSave(): Boolean {
         return perf?.getBoolean(CLOUD_SAVE, false) ?: false
+    }
+
+    @JvmStatic
+    fun setCloudDirty(dirty: Boolean) {
+        perf?.edit { putBoolean(CLOUD_IS_DIRTY, dirty) }
+    }
+
+    @JvmStatic
+    fun isCloudDirty(): Boolean {
+        return perf?.getBoolean(CLOUD_IS_DIRTY, false) ?: false
+    }
+
+    @JvmStatic
+    fun setCloudSaveLastTime(time: Long) {
+        perf?.edit { putLong(CLOUD_SAVE_LAST_TIME, time) }
+    }
+
+    @JvmStatic
+    fun getCloudSaveLastTime(): Long {
+        return perf?.getLong(CLOUD_SAVE_LAST_TIME, 0L) ?: 0L
     }
 
     @JvmStatic

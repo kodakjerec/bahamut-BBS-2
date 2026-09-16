@@ -134,11 +134,8 @@ class UserSettings(var myContext: Context) {
         // 通知更新
         @JvmStatic
         fun notifyDataUpdated() {
-            // 雲端備份
-            if (getCloudSave()) {
-                val cloudBackup = CloudBackup()
-                cloudBackup.backup()
-            }
+            // 標記雲端異動
+            SyncManager.markDirty()
         }
 
         @JvmStatic

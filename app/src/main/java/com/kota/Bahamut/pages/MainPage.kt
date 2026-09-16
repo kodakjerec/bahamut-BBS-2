@@ -22,6 +22,7 @@ import com.kota.Bahamut.service.NotificationSettings.getAlarmIgnoreBatteryOptimi
 import com.kota.Bahamut.service.NotificationSettings.getShowHeroStep
 import com.kota.Bahamut.service.NotificationSettings.setAlarmIgnoreBatteryOptimizations
 import com.kota.Bahamut.service.NotificationSettings.setShowHeroStep
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
@@ -239,8 +240,10 @@ class MainPage : TelnetPage() {
                     this@MainPage.goodbyeDialog = null
                     when (index) {
                         2 -> { // 確定
-                            TelnetClient.myInstance!!.sendStringToServerInBackground("G")
-                            TempSettings.lastVisitArticleNumber = 0
+                            SyncManager.uploadBeforeExit {
+                                TelnetClient.myInstance!!.sendStringToServerInBackground("G")
+                                TempSettings.lastVisitArticleNumber = 0
+                            }
                         }
                         1 -> { // 勇者足跡
                             TelnetClient.myInstance!!.sendStringToServerInBackground("N")
@@ -257,7 +260,9 @@ class MainPage : TelnetPage() {
             this.goodbyeDialog?.setOnDismissListener { dialog: DialogInterface? ->
                 // 預設離開
                 if (this.goodbyeDialog != null) {
-                    TelnetClient.myInstance!!.sendStringToServerInBackground("G")
+                    SyncManager.uploadBeforeExit {
+                        TelnetClient.myInstance!!.sendStringToServerInBackground("G")
+                    }
                 }
             }
         }

@@ -21,19 +21,26 @@ import java.util.Locale.getDefault
 
 class CloudBackup {
     // 文字轉為 long
-    private fun parseTimeToLong(timeString: String?): Long {
+    fun parseTimeToLong(timeString: String?): Long {
         if (timeString.isNullOrEmpty()) return 0L
-        return try {
-            // 請確保這裡的 format 與你伺服器回傳的字串格式一致
-            // 例如: "2026-04-02 13:55:50"
-            val sdf = SimpleDateFormat(
-                "yyyy/MM/dd HH:mm:ss",
-                Locale.getDefault()
-            )
-            sdf.parse(timeString)?.time ?: 0L
-        } catch (e: Exception) {
-            0L
+        val formats = listOf(
+            "yyyy/MM/dd HH:mm:ss",
+            "yyyy/M/d HH:mm:ss",
+            "yyyy/MM/dd a hh:mm:ss",
+            "yyyy/M/d a hh:mm:ss",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-M-d HH:mm:ss",
+            "yyyy-MM-dd'T'HH:mm:ss"
+        )
+        for (format in formats) {
+            try {
+                val sdf = SimpleDateFormat(format, Locale.getDefault())
+                val date = sdf.parse(timeString)
+                if (date != null) return date.time
+            } catch (_: Exception) {
+            }
         }
+        return 0L
     }
 
     // 詢問雲端
@@ -142,11 +149,14 @@ class CloudBackup {
     }
 
     // 備份所有設定
-    fun backup() {
+    fun backup(callback: ((Boolean, String?) -> Unit)? = null) {
         try {
             val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-            if (userId.isEmpty())
+            if (userId.isEmpty()) {
+                callback?.invoke(false, "User ID is empty")
+                final()
                 return
+            }
             val jsonObject = JSONObject()
             val gson = GsonBuilder()
                 .registerTypeAdapter(
@@ -176,37 +186,49 @@ class CloudBackup {
                 .post(body)
                 .build()
             ASCoroutine.runInNewCoroutine {
+                var isSuccess = false
+                var errorMsg: String? = null
                 try {
-                    client.newCall(request).execute().use { response->
+                    client.newCall(request).execute().use { response ->
                         val data = response.body.string()
                         val fromJsonObject = JSONObject(data)
                         val error = fromJsonObject.optString("error")
                         if (error.isNotEmpty()) {
+                            errorMsg = error
                             ASToast.showShortToast("雲端備份失敗：$error")
                         } else {
                             // 雲端備份的時間
-                            TempSettings.cloudSaveLastTime = parseTimeToLong(fromJsonObject.optString("lastTime", ""))
+                            val lastTimeLong = parseTimeToLong(fromJsonObject.optString("lastTime", ""))
+                            TempSettings.cloudSaveLastTime = lastTimeLong
+                            NotificationSettings.setCloudSaveLastTime(lastTimeLong)
+                            isSuccess = true
                         }
                     }
-                }catch (e: Exception) {
+                } catch (e: Exception) {
                     Log.d(javaClass.simpleName, e.toString())
+                    errorMsg = e.message
                 } finally {
+                    callback?.invoke(isSuccess, errorMsg)
                     final()
                 }
             }
         } catch (e: Exception) {
             Log.d(javaClass.simpleName, e.toString())
+            callback?.invoke(false, e.message)
             final()
         }
     }
 
     // 還原設定
-    fun restore() {
+    fun restore(callback: ((Boolean, String?) -> Unit)? = null) {
         try {
             // encrypt
             val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-            if (userId.isEmpty())
+            if (userId.isEmpty()) {
+                callback?.invoke(false, "User ID is empty")
+                final()
                 return
+            }
             val apiUrl = "https://cloud-restore.kodakjerec.work/"
             val client = OkHttpClient()
             val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
@@ -218,12 +240,15 @@ class CloudBackup {
                 .post(body)
                 .build()
             ASCoroutine.runInNewCoroutine {
+                var isSuccess = false
+                var errorMsg: String? = null
                 try {
-                    client.newCall(request).execute().use { response->
+                    client.newCall(request).execute().use { response ->
                         val data = response.body.string()
                         val jsonObject = JSONObject(data)
                         val error = jsonObject.optString("error")
                         if (error.isNotEmpty()) {
+                            errorMsg = error
                             ASToast.showShortToast("雲端備份失敗：$error")
                         } else {
                             val gson = GsonBuilder()
@@ -237,7 +262,9 @@ class CloudBackup {
                                 .create()
 
                             // 雲端備份的時間
-                            TempSettings.cloudSaveLastTime = parseTimeToLong(jsonObject.optString("lastTime", ""))
+                            val lastTimeLong = parseTimeToLong(jsonObject.optString("lastTime", ""))
+                            TempSettings.cloudSaveLastTime = lastTimeLong
+                            NotificationSettings.setCloudSaveLastTime(lastTimeLong)
 
                             val jsonDataString = jsonObject.getString("jsonData")
                             val fromJsonObject = gson.fromJson(
@@ -277,17 +304,21 @@ class CloudBackup {
                             // set bookmark
                             val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
                             TempSettings.bookmarkStore?.importFromJSON(bookmark)
+                            isSuccess = true
                         }
                     }
                 } catch (e: Exception) {
                     Log.d(javaClass.simpleName, e.toString())
+                    errorMsg = e.message
                 } finally {
+                    callback?.invoke(isSuccess, errorMsg)
                     final()
                 }
             }
 
         } catch (e: java.lang.Exception) {
             Log.d(javaClass.simpleName, e.toString())
+            callback?.invoke(false, e.message)
             final()
         }
     }

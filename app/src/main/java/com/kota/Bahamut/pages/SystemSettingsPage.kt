@@ -34,6 +34,7 @@ import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.changeScreenOrientation
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.NotificationSettings.getCloudSaveLastTime
 import com.kota.Bahamut.service.NotificationSettings.setCloudSave
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
@@ -583,7 +584,11 @@ class SystemSettingsPage : TelnetPage() {
                 .setOnClickListener { view: View? -> cloudSaveEnableBox.isChecked = !cloudSaveEnableBox.isChecked }
             val cloudSaveLastTime =
                 mainLayout?.findViewById<TextView>(R.id.SystemSettings_cloudSaveLastTime)!!
-            val lastTime = TempSettings.cloudSaveLastTime
+            var lastTime = TempSettings.cloudSaveLastTime
+            if (lastTime <= 0L) {
+                lastTime = getCloudSaveLastTime()
+                TempSettings.cloudSaveLastTime = lastTime
+            }
             if (lastTime <= 0L) {
                 cloudSaveLastTime.visibility = View.GONE
             } else {

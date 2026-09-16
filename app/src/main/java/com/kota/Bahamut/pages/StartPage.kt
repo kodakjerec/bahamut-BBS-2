@@ -25,6 +25,7 @@ import com.kota.Bahamut.service.NotificationSettings.getShowNotificationPermissi
 import com.kota.Bahamut.service.NotificationSettings.setConnectIpAddress
 import com.kota.Bahamut.service.NotificationSettings.setConnectMethod
 import com.kota.Bahamut.service.NotificationSettings.setShowNotificationPermissionDialog
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
@@ -159,7 +160,9 @@ class StartPage : TelnetPage() {
     /** 按下離開  */
     fun onExitButtonClicked() {
         ASProcessingDialog.dismissProcessingDialog()
-        navigationController.finish()
+        SyncManager.uploadBeforeExit {
+            navigationController.finish()
+        }
     }
 
     /** 手機: 上一步  */

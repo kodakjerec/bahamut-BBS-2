@@ -11,9 +11,8 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.clearTempSettings
 import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
@@ -329,11 +328,8 @@ class LoginPage : TelnetPage() {
         TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
 
-        // 讀取雲端
-        if (getCloudSave()) {
-            val cloudBackup = CloudBackup()
-            cloudBackup.restore()
-        }
+        // 雲端同步 (若有未同步變更優先補傳，否則還原下載並啟動10分鐘輪巡)
+        SyncManager.performLoginSync()
 
         // 調用WebView登入（如果需要的話）
         if (checkWebSignIn) {

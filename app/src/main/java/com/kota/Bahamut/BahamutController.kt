@@ -15,12 +15,11 @@ import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.service.BahaBBSBackgroundService
-import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.changeScreenOrientation
 import com.kota.Bahamut.service.MyBillingClient.checkPurchase
 import com.kota.Bahamut.service.MyBillingClient.closeBillingClient
 import com.kota.Bahamut.service.MyBillingClient.initBillingClient
-import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.TempSettings.setMessageSmall
@@ -129,11 +128,8 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         // 關閉VIP
         closeBillingClient()
 
-        // 備份雲端
-        if (getCloudSave()) {
-            val cloudBackup = CloudBackup()
-            cloudBackup.backup()
-        }
+        // 停止同步與清理資源
+        SyncManager.cleanup()
 
         // 強制關閉連線 (僅在 Activity 真正結束時)
         if (isFinishing) {
@@ -229,10 +225,8 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
 
             dismissProcessingDialog()
 
-            if (getCloudSave()) {
-                val cloudBackup = CloudBackup()
-                cloudBackup.backup()
-            }
+            // 雲端同步斷線處理
+            SyncManager.onConnectionClosed()
 
             if (getMessageSmall() != null) {
                 val messageSmall: MessageSmall? = getMessageSmall()
