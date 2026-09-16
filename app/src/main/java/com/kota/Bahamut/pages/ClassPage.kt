@@ -195,6 +195,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         this@ClassPage.showAddBoardToFavoriteDialog(board)
                         return
                     }
+                    if (TempSettings.lastVisitBoard != board) {
+                        TempSettings.lastVisitArticleNumber = 0
+                    }
                     TelnetClient.myInstance!!.sendStringToServerInBackground("s$board")
 
                     SearchBoardHandler.instance.clear()
@@ -221,6 +224,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         .sendToServerInBackground()
                     return@setListener
                 }
+                if (TempSettings.lastVisitBoard != boardName) {
+                    TempSettings.lastVisitArticleNumber = 0
+                }
                 TelnetClient.myInstance!!.sendStringToServerInBackground("s$boardName")
                 SearchBoardHandler.instance.clear()
             }.scheduleDismissOnPageDisappear(this).show()
@@ -244,6 +250,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             PageContainer.instance!!.pushClassPage(item.name, item.title)
             navigationController.pushViewController(PageContainer.instance!!.classPage)
         } else {
+            if (TempSettings.lastVisitBoard != item.name) {
+                TempSettings.lastVisitArticleNumber = 0
+            }
             val page = PageContainer.instance!!.boardPage
             page.prepareInitial()
             navigationController.pushViewController(page)

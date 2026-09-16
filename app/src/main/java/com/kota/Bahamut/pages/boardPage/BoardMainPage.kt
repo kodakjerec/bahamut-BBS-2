@@ -89,6 +89,7 @@ import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.textView.TelnetTextViewLarge
 import java.util.Vector
 import kotlin.math.abs
+import kotlin.math.max
 
 open class BoardMainPage : TelnetListPage(),
     DialogSearchArticleListener,
@@ -516,33 +517,32 @@ open class BoardMainPage : TelnetListPage(),
         }
 
         // 跳到指定文章編號
-        // 指定 boardMainPage 才能用
+        // 指定 boardMainPage 才能用，且僅在從 classPage 進入時處理跳轉
         if (this::class == BoardMainPage::class) {
-            if (TempSettings.lastVisitArticleNumber > 0 ) {
-                // 從 classPage 進入到 boardMainPage
-                if (ASNavigationController.currentController!!.lastViewController!!::class == ClassPage::class) {
-
+            val isFromClassPage = ASNavigationController.currentController?.lastViewController is ClassPage
+            if (isFromClassPage) {
+                if (TempSettings.lastVisitArticleNumber > 0) {
                     object : ASCoroutine() {
                         override suspend fun run() {
                             // 置中顯示
-                            val firstIndex = listView?.firstVisiblePosition!!
-                            val endIndex = listView?.lastVisiblePosition!!
+                            val firstIndex = listView?.firstVisiblePosition ?: 0
+                            val endIndex = listView?.lastVisiblePosition ?: 0
                             val moveIndex = abs(endIndex - firstIndex)
-                            val findIndex = TempSettings.lastVisitArticleNumber - moveIndex / 2
+                            val findIndex = max(1, TempSettings.lastVisitArticleNumber - moveIndex / 2)
 
                             onSelectDialogDismissWIthIndex(findIndex.toString())
                         }
                     }.postDelayed(100L)
+                } else {
+                    // 送出指令: 跳到文章最後面 (當沒有最後文章編號時, 預設是閱讀最新文章)
+                    object : ASCoroutine() {
+                        override suspend fun run() {
+                            // 執行「最後一頁」按鈕的點擊邏輯
+                            // 傳入 null 作為 View 參數，因為 Listener 內部通常只用到功能
+                            mLastPageClickListener.onClick(null)
+                        }
+                    }.postDelayed(100L) // 延遲 100ms 確保連線與頁面狀態穩定
                 }
-            } else {
-                // 送出指令: 跳到文章最後面
-                object : ASCoroutine() {
-                    override suspend fun run() {
-                        // 執行「最後一頁」按鈕的點擊邏輯
-                        // 傳入 null 作為 View 參數，因為 Listener 內部通常只用到功能
-                        mLastPageClickListener.onClick(null)
-                    }
-                }.postDelayed(100L) // 延遲 200ms 確保連線與頁面狀態穩定
             }
         }
     }
@@ -693,6 +693,7 @@ open class BoardMainPage : TelnetListPage(),
             if (visitBoard != load.boardName) {
                 // 紀錄最後瀏覽的看板
                 TempSettings.lastVisitBoard = load.boardName
+                TempSettings.lastVisitArticleNumber = 0
                 clear()
                 if (load.boardType == BoardPageAction.Companion.SEARCH) {
                     pushRefreshCommand(0)
@@ -739,6 +740,7 @@ open class BoardMainPage : TelnetListPage(),
         navigationController.popViewController()
         TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardPage()
+        TempSettings.lastVisitArticleNumber = 0
         return true
     }
 
