@@ -133,7 +133,7 @@ class CloudBackup {
                 .setTitle(CommonFunctions.getContextString(R.string.cloud_save))
                 .setMessage("已有雲端備份：\n$lastTime\n採用 本地存檔\n或 雲端存檔？")
                 .addButton(CommonFunctions.getContextString(R.string.cloud_save_local))
-                .addButton(CommonFunctions.getContextString(R.string.cloud_save_cloud))
+                .addButton(CommonFunctions.getContextString(R.string.cloud_save))
                 .setDefaultButtonIndex(0)
                 .setListener { _: ASAlertDialog?, index: Int ->
                     if (index == 0) {
@@ -171,8 +171,8 @@ class CloudBackup {
 
             // get bookmark
             jsonObject.put("bookmark", TempSettings.bookmarkStore?.exportToJSON().toString())
-            // get user_settings (排除不要同步到雲端的本地設定: 帳號密碼、記住登入、Web自動簽到與 Web帳號密碼)
-            val notBackupKeys = listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword")
+            // get user_settings (排除不要同步到雲端的本地設定: 帳號密碼、記住登入、Web自動簽到與 Web帳號密碼、VIP 狀態)
+            val notBackupKeys = listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "vip")
             val filteredSettings = UserSettings.mySharedPref?.all?.filterKeys { key ->
                 !notBackupKeys.contains(key.lowercase())
             }
@@ -278,9 +278,9 @@ class CloudBackup {
                             )
                             val userSettings = fromJsonObject["user_settings"] as Map<*, *>
                             // set user_settings
-                            // 不要還原的key: 使用者帳密, 在登入前的設定, 以及 Web 帳密與自動簽到
+                            // 不要還原的key: 使用者帳密, 在登入前的設定, 以及 Web 帳密、自動簽到與 VIP
                             val notRestoreKeys: List<String> =
-                                listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword")
+                                listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "vip")
                             userSettings.forEach { (keyObject, value) ->
                                 val key = keyObject.toString()
                                 if (value != null && !notRestoreKeys.contains(key.lowercase())) {

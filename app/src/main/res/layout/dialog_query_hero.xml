@@ -33,28 +33,28 @@
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="?attr/bahamut_defaultTextColor"
-                        android:text="HP：" />
+                        android:text="@string/dialog_query_hero_hp" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:id="@+id/dialog_query_hero_hp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="@color/red"
-                        android:text="@string/hello_world" />
+                        android:text="@string/zero_word" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="?attr/bahamut_defaultTextColor"
-                        android:text="MP：" />
+                        android:text="@string/dialog_query_hero_mp" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="2"
                         android:id="@+id/dialog_query_hero_mp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="@color/ext_toolbar_background_color_focused"
-                        android:text="@string/hello_world" />
+                        android:text="@string/zero_word" />
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
                     <TextView
@@ -80,7 +80,7 @@
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="?attr/bahamut_defaultTextColor"
-                        android:text="上次" />
+                        android:text="@string/dialog_query_hero_last_time" />
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_weight="5"
@@ -107,7 +107,7 @@
                         android:textSize="16sp"
                         style="@style/ToolbarItem.Hero"
                         android:textColor="?attr/bahamut_defaultTextColor"
-                        android:text="來自" />
+                        android:text="@string/dialog_query_hero_from" />
                     <TextView
                         android:layout_width="0dp"
                         android:layout_weight="5"

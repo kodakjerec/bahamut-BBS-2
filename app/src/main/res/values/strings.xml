@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">BahaBBS</string>
-    <string name="hello_world">Hello world!!</string>
     <string name="account">帳號</string>
     <string name="_back">返回</string>
     <string name="_giveUp">放棄</string>
@@ -36,6 +35,8 @@
     <string name="connect">連線</string>
     <string name="del">DEL</string>
     <string name="delete">刪除</string>
+    <string name="edit_short">改</string>
+    <string name="delete_short">刪</string>
     <string name="article_header_zero_error_message">第一個選項無法被刪除或移動位置</string>
     <string name="insert">加入</string>
     <string name="do_gy">推薦</string>
@@ -78,8 +79,6 @@
     <string name="loading_">讀取中…</string>
     <string name="login">登入</string>
     <string name="logout">登出</string>
-    <string name="mark_n">不限定</string>
-    <string name="mark_y">限定</string>
     <string name="mark_only">限定有m標記的文章？</string>
     <string name="notices">注意事項</string>
     <string name="number_0">0</string>
@@ -92,12 +91,10 @@
     <string name="number_7">7</string>
     <string name="number_8">8</string>
     <string name="number_9">9</string>
-    <string name="open_bookmark">開啟書籤</string>
     <string name="open_url">開啟連結</string>
     <string name="password">密碼</string>
     <string name="Username_hint">最長12位</string>
     <string name="password_hint">最長8位</string>
-    <string name="password_digits">()!@#$%^&amp;*.=-_;:[{]}.?=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLIMNOPQRSTUVWXYZ</string>
     <string name="please_input_article_number">請輸入文章編號</string>
     <string name="please_input_id">請輸入ID</string>
     <string name="post">發表</string>
@@ -120,7 +117,6 @@
     <string name="search">搜尋</string>
     <string name="search_board">搜尋看板</string>
     <string name="search_id">搜尋ID</string>
-    <string name="search_menu_title">Search</string>
     <string name="select">選擇</string>
     <string name="select_sign">選擇簽名檔：</string>
     <string name="select_sign_msg">要使用的簽名檔(0=不加)：</string>
@@ -146,11 +142,9 @@
     <string name="GY_hint">GY</string>
     <string name="author_hint">作者(第一個字打*表模糊搜尋)</string>
     <string name="keyword_hint">請輸入關鍵字</string>
-    <string name="dialog_select_sign_text">0</string>
     <string name="hide_toolbar">隱藏工具列</string>
     <string name="open_toolbar">開啟工具列</string>
     <string name="system_setting_page_keep_wifi_on_sleep">防止Wifi因為待機中斷</string>
-    <string name="system_setting_page_keep_wake">保持螢幕開啟</string>
     <string name="system_setting_page_enable_board_move">看板\"最後頁\"改為\"下一頁\"</string>
     <string name="system_setting_page_enable_article_move">使用文章首篇/末篇功能</string>
     <string name="system_setting_page_enable_page_animation">使用換頁動畫</string>
@@ -215,17 +209,12 @@
     <string name="billing_page_result_success">感謝您的贊助</string>
     <string name="billing_page_result_cancel">使用者取消購買</string>
     <string name="billing_page_result_error">購買發生錯誤</string>
-    <string name="billing_page_result_error_check">檢查購買權限發生錯誤，錯誤碼：</string>
-    <string name="no_use">No use</string>
-    <string name="drawer_button_text_enable">啟用</string>
-    <string name="drawer_button_text_disable">停用</string>
     <string name="StartPage_open_account">第一次登入請先至\n https://user.gamer.com.tw/openBBS.php \n啟用BBS權限 !</string>
     <string name="system_setting_page_checkbox_blocklist_hint">核取方塊, 啟動或關閉黑名單</string>
     <string name="system_setting_page_checkbox_blocklistForTitle_hint">核取方塊, 啟動或關閉黑名單套用至標題</string>
     <string name="system_setting_page_checkbox_animation_hint">核取方塊, 啟動或關閉換頁動畫</string>
     <string name="system_setting_page_checkbox_board_move_hint">核取方塊, 啟動或關閉看板上一頁/下一頁</string>
     <string name="system_setting_page_checkbox_article_move_hint">核取方塊, 啟動或關閉迅速跳到首頁最後頁</string>
-    <string name="system_setting_page_screen_orientation_hint">下拉選單, 切換螢幕方向</string>
     <string name="system_setting_page_checkbox_gesture_hint">核取方塊, 啟動或關閉滑動手勢在看板和閱讀文章</string>
     <string name="system_setting_page_checkbox_auto_chat_hint">核取方塊, 啟動或關閉自動登入洽特</string>
     <string name="system_setting_page_ignore_battery_optimizations">不受電池最佳化限制</string>
@@ -249,10 +238,7 @@
     <string name="system_setting_page_toolbar_idle">閒置多久隱藏</string>
     <string name="system_setting_page_toolbar_alpha">閒置不透明度</string>
     <string name="start_page_instructions">教學</string>
-    <string name="start_page_text_1">教學文件\nhttps://github.com/kodakjerec/bahamut-BBS-2/blob/main/book/outline.md</string>
     <string name="board_page_item_long_click_1">轉寄至信箱</string>
-    <string name="board_page_item_long_click_2">找同標題文章</string>
-    <string name="board_page_item_long_click_3">找同作者文章</string>
     <string name="board_page_send_mail_ing">寄信中</string>
     <string name="board_page_send_mail_finish">寄信完畢</string>
     <string name="thumbnail_show_pic">[顯示圖片]</string>
@@ -267,7 +253,6 @@
     <string name="post_article_page_paint_color_highlight2">*[1;</string>
     <string name="post_article_page_paint_color_recovery">還原</string>
     <string name="post_article_page_paint_color_recovery2">*[m</string>
-    <string name="dialog_paint_color_sample">範例</string>
     <string name="dialog_paint_color_sample_ch">範例Sample</string>
     <string name="dialog_paint_color__1">無</string>
     <string name="dialog_paint_color_0">黑</string>
@@ -296,8 +281,6 @@
     <string name="dialog_shorten_url_button_text1">短</string>
     <string name="dialog_shorten_url_button_text2">網址</string>
     <string name="dialog_shorten_img_title">縮圖</string>
-    <string name="dialog_shorten_img_transfer_album">從相簿</string>
-    <string name="dialog_shorten_img_transfer_camera">從相機</string>
     <string name="dialog_shorten_url_transfer">縮址</string>
     <string name="dialog_shorten_url_under_transfer">轉檔中</string>
     <string name="dialog_shorten_url_same_url">網址已使用過</string>
@@ -320,10 +303,13 @@
     <string name="cloud_save_setting_switch">開啟雲端備份功能</string>
     <string name="cloud_save_question">是否啟用雲端備份？</string>
     <string name="cloud_save_local">本地</string>
-    <string name="cloud_save_cloud">雲端</string>
     <string name="cloud_save_result1">本地備份已上傳雲端</string>
     <string name="cloud_save_result2">已下載雲端備份</string>
     <string name="dialog_query_hero">查詢勇者</string>
+    <string name="dialog_query_hero_hp">HP：</string>
+    <string name="dialog_query_hero_mp">MP：</string>
+    <string name="dialog_query_hero_last_time">上次</string>
+    <string name="dialog_query_hero_from">來自</string>
     <string name="dialog_query_hero_show_web_view">[顯示WEB資訊]</string>
     <string name="essence_page">精華</string>
     <string name="start_connect_ip">連線位址</string>
@@ -347,24 +333,11 @@
     <string name="theme_manager_page">外觀管理</string>
     <string name="theme_manager_palette">調色盤</string>
     <string name="follow_system_dark_mode">跟隨系統深色模式</string>
-    <string name="theme_manager_page_group0">名稱</string>
-    <string name="theme_manager_page_group1">工具列按鈕</string>
-    <string name="theme_manager_page_group2">JSON格式</string>
-    <string name="theme_manager_page_chapter1">一般</string>
-    <string name="theme_manager_page_chapter2">按壓</string>
-    <string name="theme_manager_page_chapter3">失效</string>
-    <string name="theme_manager_page_chapter_text">文字</string>
-    <string name="theme_manager_page_chapter_back">背景</string>
-    <string name="theme_manager_page_chapter_palette">調色</string>
+    <string name="theme_manager_page_guide">請點選上方按鈕切換佈景主題\n變更將立即生效並儲存。</string>
     <string name="theme_manager_page_chapter_update">套用新設定</string>
-    <string name="theme_manager_page_chapter_json_update">匯入</string>
-    <string name="theme_manager_page_chapter_hint">顯示現在設定的JSON，可以複製並分享給別人</string>
     <string name="theme_manager_page_msg01">外觀套用新設定完畢</string>
-    <string name="theme_manager_page_msg02">外觀還原設定</string>
     <string name="user_info">個人資料</string>
     <string name="user_info_nick_name">暱稱</string>
-    <string name="user_info_real_name">真實姓名</string>
-    <string name="user_info_address">居住地址</string>
     <string name="user_info_msg01">個人資料套用新設定完畢</string>
     <string name="user_config">操作模式</string>
     <string name="user_config_cant">不適用</string>
@@ -388,11 +361,9 @@
     <string name="main_push_article_success01">成功推文，請重新整理文章</string>
     <string name="main_online_people">線上人數</string>
     <string name="main_bb_call">呼叫器</string>
-    <string name="main_page_hero_step_author">作者</string>
     <string name="main_page_hero_step_datetime">時間</string>
     <string name="main_page_hero_step_content">內容</string>
     <string name="message_small_show_float">小視窗</string>
-    <string name="message_small_sync">同步</string>
     <string name="message_small_sync_msg01">同步中，請稍後</string>
     <string name="message_main_search_clear">清除</string>
     <string name="message_main_tab_chat">聊天</string>
@@ -412,7 +383,6 @@
     <string name="login_web_sign_in_msg02">Web簽到 失敗!</string>
     <string name="login_web_sign_in_msg03">Web簽到 完成!</string>
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
-    <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
     <string name="login_web_sign_in_msg06">需要手動完成驗證，請在網頁中操作</string>
     <string name="login_web_sign_in_need_manual">未設定 Web 帳密，請在網頁手動登入</string>
     <string name="login_web_settings_title">Web 登入設定</string>

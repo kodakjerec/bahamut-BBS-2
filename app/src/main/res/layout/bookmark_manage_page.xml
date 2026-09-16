@@ -17,6 +17,6 @@
         <View style="@style/ToolbarDivider"/>
         <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/BoardExtendOptionalPage_historyButton" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/record" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:enabled="false" android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/zero_word" style="@style/ToolbarItem" android:contentDescription="@string/no_use"/>
+        <Button android:enabled="false" android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/BoardExtendOptionalPage_waterBallButton" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/zero_word" style="@style/ToolbarItem"/>
     </LinearLayout>
 </LinearLayout>

@@ -1,6 +1,8 @@
 package com.kota.Bahamut.service
 
+import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
+import com.kota.telnet.TelnetClient
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
 import com.android.billingclient.api.BillingResult
@@ -35,8 +37,69 @@ object MyBillingClient {
         }
     }
 
+    private const val TAG = "MyBillingClient"
+
+    /** 取得當前有效帳號（優先使用即時連線帳號，次用偏好設定帳號） */
+    fun getCurrentUsername(): String {
+        return TelnetClient.myInstance?.username?.takeIf { it.isNotBlank() }
+            ?: UserSettings.propertiesUsername
+    }
+
+    /**
+     * 將購買紀錄寫入雲端 API
+     * 確保課金紀錄必定發送到伺服器保存，並帶有完整日誌與例外處理
+     */
+    @JvmStatic
+    fun uploadPurchaseRecordToCloud(
+        purchase: Purchase,
+        buyType: String = "purchase",
+        onComplete: ((Boolean) -> Unit)? = null
+    ) {
+        val username = getCurrentUsername()
+        if (username.isBlank()) {
+            Log.w(TAG, "uploadPurchaseRecordToCloud: 帳號為空，略過雲端購買紀錄寫入 (buyType=$buyType)")
+            onComplete?.invoke(false)
+            return
+        }
+
+        val userId = AESCrypt.encrypt(username)
+        val apiUrl = "https://user-buy-history.kodakjerec.work/"
+        val client = OkHttpClient()
+        val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("userId", userId)
+            .addFormDataPart("buyType", buyType)
+            .addFormDataPart("qty", purchase.quantity.toString())
+            .addFormDataPart("purchaseData", purchase.originalJson)
+            .build()
+        val request: Request = Request.Builder()
+            .url(apiUrl)
+            .post(body)
+            .build()
+
+        ASCoroutine.runInNewCoroutine {
+            try {
+                client.newCall(request).execute().use { response ->
+                    if (response.isSuccessful) {
+                        val respBody = response.body.string()
+                        Log.d(TAG, "雲端寫入購買紀錄成功 (buyType=$buyType, user=$username): $respBody")
+                        onComplete?.invoke(true)
+                    } else {
+                        Log.e(TAG, "雲端寫入購買紀錄失敗 (buyType=$buyType, user=$username): HTTP ${response.code}")
+                        onComplete?.invoke(false)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "雲端寫入購買紀錄發生例外 (buyType=$buyType, user=$username): ${e.message}", e)
+                onComplete?.invoke(false)
+            }
+        }
+    }
+
     /** 確認購買交易，且程式已授予使用者商品 */
     private fun handlePurchase(purchases: Purchase) {
+        if (purchases.purchaseState != Purchase.PurchaseState.PURCHASED) {
+            return
+        }
         if (!purchases.isAcknowledged) {
             billingClient.acknowledgePurchase(
                 AcknowledgePurchaseParams
@@ -45,24 +108,19 @@ object MyBillingClient {
                     .build()
             ) { billingResult: BillingResult ->
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
-                    for (pur in purchases.products) {
-                        //Calling Consume to consume the current purchase
-                        // so user will be able to buy same product again
-                        consumePurchase(purchases)
-                    }
+                    consumePurchase(purchases)
                 }
             }
         } else {
-            for (pur in purchases.products) {
-                //Calling Consume to consume the current purchase
-                // so user will be able to buy same product again
-                consumePurchase(purchases)
-            }
+            consumePurchase(purchases)
         }
     }
 
-    /** 購買後要回應訊息給google和使用者 */
+    /** 購買後要回應訊息給google和使用者，並將購買紀錄寫入雲端 */
     private fun consumePurchase(purchase: Purchase) {
+        // 第一時間寫入雲端購買紀錄，確保已付款資料必定上傳
+        uploadPurchaseRecordToCloud(purchase, "purchase")
+
         val consumeParams = ConsumeParams.newBuilder()
             .setPurchaseToken(purchase.purchaseToken)
             .build()
@@ -73,25 +131,6 @@ object MyBillingClient {
                         UserSettings.propertiesVIP = true
                     }
                     ASToast.showShortToast(TempSettings.applicationContext?.getString(R.string.billing_page_result_success))
-                    // 將購買結果塞入雲端
-                    if (UserSettings.propertiesUsername.isNotEmpty()) {
-                        val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-                        val apiUrl = "https://user-buy-history.kodakjerec.work/"
-                        val client = OkHttpClient()
-                        val body: RequestBody = MultipartBody.Builder().setType(MultipartBody.FORM)
-                            .addFormDataPart("userId", userId)
-                            .addFormDataPart("buyType", "purchase")
-                            .addFormDataPart("qty", purchase.quantity.toString())
-                            .addFormDataPart("purchaseData", purchase.originalJson)
-                            .build()
-                        val request: Request = Request.Builder()
-                            .url(apiUrl)
-                            .post(body)
-                            .build()
-                        ASCoroutine.runInNewCoroutine {
-                            client.newCall(request).execute().use { _ -> }
-                        }
-                    }
                 }
             }
         billingClient.consumeAsync(consumeParams, consumeResponseListener)
@@ -110,48 +149,33 @@ object MyBillingClient {
                     // 如果有成功購買紀錄, 但是沒有開啟VIP, 則開啟
                     if (list.toTypedArray().isNotEmpty()) {
                         UserSettings.propertiesVIP = true
-                        // 將購買結果塞入雲端
-                        if (UserSettings.propertiesUsername.isNotEmpty()) {
-                            list.forEach { record ->
-                                val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
-                                val apiUrl = "https://user-buy-history.kodakjerec.work/"
-                                val client = OkHttpClient()
-                                val body: RequestBody =
-                                    MultipartBody.Builder().setType(MultipartBody.FORM)
-                                        .addFormDataPart("userId", userId)
-                                        .addFormDataPart("buyType", "history")
-                                        .addFormDataPart("qty", record?.quantity.toString())
-                                        .addFormDataPart("purchaseData", record!!.originalJson)
-                                        .build()
-                                val request: Request = Request.Builder()
-                                    .url(apiUrl)
-                                    .post(body)
-                                    .build()
-                                ASCoroutine.runInNewCoroutine {
-                                    try {
-                                        client.newCall(request).execute().use { _ -> }
-                                    } catch (_:Exception) {
-                                        checkPurchaseHistoryCloud{ }
-                                    }
-                                }
-                            }
+                        // 將購買結果補傳至雲端
+                        list.filterNotNull().forEach { record ->
+                            uploadPurchaseRecordToCloud(record, "history")
                         }
                     } else {
-                        // 查不到有可能是函數不能用, 走其他方式
-                        UserSettings.propertiesVIP = false
-                        checkPurchaseHistoryCloud{ }
+                        // Google Play 回傳空清單（因已消耗商品在 queryPurchasesAsync 不會返回），
+                        // 絕不可在此處過早設置 propertiesVIP = false，需等待 checkPurchaseHistoryCloud 查詢後端
+                        checkPurchaseHistoryCloud { }
                     }
                 }
             }
-        }catch (_:Exception) {
-            checkPurchaseHistoryCloud{ }
+        } catch (_: Exception) {
+            checkPurchaseHistoryCloud { }
         }
     }
 
     /** 檢查購買紀錄 */
     @JvmStatic
     fun checkPurchaseHistoryCloud(callback: (Int) -> Unit) {
-        val userId = AESCrypt.encrypt(UserSettings.propertiesUsername)
+        val username = getCurrentUsername()
+        if (username.isBlank()) {
+            Log.w(TAG, "checkPurchaseHistoryCloud: 帳號為空，略過雲端歷史檢查")
+            callback(0)
+            return
+        }
+
+        val userId = AESCrypt.encrypt(username)
         val apiUrl = "https://user-buy-history.kodakjerec.work/"
         val client = OkHttpClient()
         val body: RequestBody =
@@ -175,14 +199,16 @@ object MyBillingClient {
                         } else {
                             UserSettings.propertiesVIP = false
                         }
+                        Log.d(TAG, "checkPurchaseHistoryCloud: 帳號 $username 購買數量=$buyQty, VIP=${UserSettings.propertiesVIP}")
                         callback(buyQty)
                     } else {
-                        // HTTP error response
-                        UserSettings.propertiesVIP = false
+                        // 網路或伺服器異常時，不主動修改使用者 VIP 權限
+                        Log.w(TAG, "checkPurchaseHistoryCloud HTTP error: ${response.code}")
                         callback(0)
                     }
                 }
-            } catch (_: Exception) {
+            } catch (e: Exception) {
+                Log.e(TAG, "checkPurchaseHistoryCloud exception: ${e.message}")
                 callback(0)
             }
         }

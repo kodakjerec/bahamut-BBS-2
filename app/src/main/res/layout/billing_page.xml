@@ -113,20 +113,14 @@
         </LinearLayout>
     </ScrollView>
 
-    <!-- 套用 class_page.xml 風格的底部工具列 -->
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar"
-        android:gravity="center"
         android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/BillingPage_BackButton"
             style="@style/ToolbarItem"
-            android:layout_width="wrap_content"
-            android:layout_weight="0"
-            android:paddingStart="40dp"
-            android:paddingEnd="40dp"
             android:text="@string/_back" />
     </LinearLayout>
 

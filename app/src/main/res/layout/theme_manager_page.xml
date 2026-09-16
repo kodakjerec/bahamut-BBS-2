@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:padding="20dp"
-                android:text="請點選上方按鈕切換佈景主題\n變更將立即生效並儲存。" />
+                android:text="@string/theme_manager_page_guide" />
 
         </LinearLayout>
     </ScrollView>

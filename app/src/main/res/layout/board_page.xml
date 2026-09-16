@@ -150,7 +150,7 @@
                 style="@style/TextViewLarge"
                 android:layout_height="match_parent"
                 android:layout_width="60dp"
-                android:text="@string/drawer_button_text_enable"
+                android:text="@string/on"
                 android:textColor="?attr/bahamut_buttonTextColor"
                 android:gravity="center_vertical"/>
             <View style="@style/ToolbarDivider"/>

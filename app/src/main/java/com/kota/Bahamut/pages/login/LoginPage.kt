@@ -10,6 +10,7 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogWebLoginSettings
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.clearTempSettings
@@ -103,10 +104,18 @@ class LoginPage : TelnetPage() {
         // 讀取預設勇者設定
         loadLogonUser()
 
-        // VIP
+        // VIP 區塊顯示狀態
+        val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as? RelativeLayout
         if (UserSettings.propertiesVIP) {
-            val blockWebSignIn = findViewById(R.id.BlockWebSignIn) as RelativeLayout
-            blockWebSignIn.visibility = View.VISIBLE
+            blockWebSignIn?.visibility = View.VISIBLE
+        }
+        // 若已載入帳號，非同步確認雲端購買紀錄並即時更新 VIP 介面
+        if (UserSettings.propertiesUsername.isNotEmpty()) {
+            MyBillingClient.checkPurchaseHistoryCloud { _ ->
+                ASCoroutine.ensureMainThread {
+                    blockWebSignIn?.visibility = if (UserSettings.propertiesVIP) View.VISIBLE else View.GONE
+                }
+            }
         }
     }
 
@@ -332,6 +341,9 @@ class LoginPage : TelnetPage() {
         // 存檔客戶資料
         TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
+
+        // 登入時檢查課金 VIP 權限 (校驗 Google Play 購買狀態與雲端歷史)
+        MyBillingClient.checkPurchaseHistoryQuery()
 
         // 雲端同步
         SyncManager.performLoginSync()

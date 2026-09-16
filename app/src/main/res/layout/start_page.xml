@@ -159,7 +159,7 @@
     <LinearLayout android:id="@+id/toolbar" style="@style/toolbar" android:layout_alignParentBottom="true">
         <Button android:id="@+id/Start_exitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Start_instructions" android:text="@string/start_page_instructions" style="@style/ToolbarItem" android:autofillHints="" android:contentDescription="@string/no_use"/>
+        <Button android:id="@+id/Start_instructions" android:text="@string/start_page_instructions" style="@style/ToolbarItem" android:autofillHints=""/>
         <View style="@style/ToolbarDivider"/>
         <Button android:id="@+id/Start_connectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
     </LinearLayout>
