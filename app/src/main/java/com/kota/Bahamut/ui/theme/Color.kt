@@ -1,0 +1,108 @@
+package com.kota.Bahamut.ui.theme
+
+import androidx.compose.ui.graphics.Color
+
+/**
+ * 基礎色盤 (參照 res/values/colors.xml 與 res/values-night/colors.xml)
+ */
+object AppPalette {
+    // 基礎中性色
+    val Black = Color(0xFF000000)
+    val DarkGray10 = Color(0xFF101010)
+    val DarkGray20 = Color(0xFF202020)
+    val DarkGray30 = Color(0xFF303030)
+    val DarkGray40 = Color(0xFF404040)
+    val DarkGray60 = Color(0xFF606060)
+    val White = Color(0xFFFFFFFF)
+    val GrayWhite = Color(0xFFC0C0C0)
+    val DarkTextWhite = Color(0xFFE0E0E0) // 深色模式柔和文字
+    val HalfWhite = Color(0xFF808080)
+    val Transparent = Color(0x00000000)
+
+    // 強調與功能色
+    val Yellow = Color(0xFFF0F080)
+    val Red = Color(0xFF800000)
+    val RedBright = Color(0xFFFF0000)
+    val TextLink = Color(0xFF1F5EFF)
+    val Divider = Color(0xFF404040)
+
+    // 預設外觀 (Default Theme)
+    val DefaultToolbarNormal = Color(0xFF003030)
+    val DefaultToolbarPressed = Color(0xFFB5E61D)
+    val DefaultToolbarFocused = Color(0xFF22B14C)
+    val DefaultToolbarDisabled = Color(0xFF001A1A)
+    val DefaultTitleBarBackground = Color(0xFF000060)
+    val DefaultTitleBarMenu = Color(0xFF101090)
+
+    // 預設深色外觀 (Default Dark Theme)
+    val DefaultDarkToolbarNormal = Color(0xFF002020)
+    val DefaultDarkToolbarPressed = Color(0xFF004848)
+    val DefaultDarkToolbarFocused = Color(0xFF004848)
+    val DefaultDarkToolbarDisabled = Color(0xFF001414)
+    val DefaultDarkDangerBackground = Color(0xFF4A1A1A)
+    val DefaultDarkDangerPressed = Color(0xFF8B3A3A)
+
+    // 粉紅外觀 (Pink Theme)
+    val PinkButtonNormal = Color(0xFFFE00FE)
+    val PinkButtonPressed = Color(0xFFE400E4)
+    val PinkButtonDisabled = Color(0xFF650065)
+    val PinkHeaderBackground = Color(0xFFFFC0CB)
+    val PinkHeaderText = Color(0xFFC71585)
+
+    // 粉紅深色外觀 (Pink Dark Theme)
+    val PinkDarkButtonNormal = Color(0xFF701850)
+    val PinkDarkButtonPressed = Color(0xFF902068)
+    val PinkDarkButtonDisabled = Color(0xFF300A24)
+    val PinkDarkHeaderBackground = Color(0xFF401030)
+    val PinkDarkHeaderText = Color(0xFFFF80C0)
+
+    // eInk 電子紙外觀 (eInk Theme - 日間高對比)
+    val EInkButtonNormal = Color(0xFFFFFFFF)
+    val EInkButtonPressed = Color(0xFF000000)
+    val EInkButtonDisabled = Color(0xFFFFFFFF)
+    val EInkButtonTextNormal = Color(0xFF000000)
+    val EInkButtonTextPressed = Color(0xFFFFFFFF)
+    val EInkButtonTextDisabled = Color(0xFF777777)
+    val EInkDangerNormal = Color(0xFF000000)
+    val EInkDangerPressed = Color(0xFF444444)
+
+    // eInk 電子紙外觀 (eInk Dark Theme - 深色黑白對調)
+    val EInkDarkButtonNormal = Color(0xFF000000)
+    val EInkDarkButtonPressed = Color(0xFFFFFFFF)
+    val EInkDarkButtonDisabled = Color(0xFF000000)
+    val EInkDarkButtonTextNormal = Color(0xFFFFFFFF)
+    val EInkDarkButtonTextPressed = Color(0xFF000000)
+    val EInkDarkDangerNormal = Color(0xFFFFFFFF)
+    val EInkDarkDangerPressed = Color(0xFF444444)
+
+    // BBS 專用色彩 (日間)
+    val BbsMailStatus = Color(0xFFF0F080)
+    val BbsMailMark = Color(0xFFFF7F27)
+    val BbsMailReply = Color(0xFF00FFFF)
+    val BbsMailDate = Color(0xFF80C080)
+    val BbsMailAuthor = Color(0xFFB0B0F0)
+    val BbsMailNumber = Color(0xFFC08080)
+    val BbsBoardGy = Color(0xFF00C0C0)
+    val BbsBoardFollowFirst = Color(0xFF00FF00)
+    val BbsBoardFollowFirstRead = Color(0xFF008000)
+    val BbsBoardFollowOther = Color(0xFFFFFF00)
+    val BbsBoardFollowOtherRead = Color(0xFF808000)
+    val BbsArticleAuthor0 = Color(0xFFFFFFFF)
+    val BbsArticleContent0 = Color(0xFFC0C0C0)
+    val BbsArticleAuthor1 = Color(0xFF80FF80)
+    val BbsArticleContent1 = Color(0xFF20FF20)
+
+    // BBS 專用色彩 (深色模式調暗)
+    val BbsDarkMailStatus = Color(0xFFB0B050)
+    val BbsDarkMailMark = Color(0xFFC06018)
+    val BbsDarkMailDate = Color(0xFF60A060)
+    val BbsDarkMailAuthor = Color(0xFF8080C0)
+    val BbsDarkMailNumber = Color(0xFFA07070)
+    val BbsDarkBoardGy = Color(0xFF008080)
+    val BbsDarkBoardFollowFirst = Color(0xFF00A000)
+    val BbsDarkBoardFollowFirstRead = Color(0xFF006000)
+    val BbsDarkBoardFollowOther = Color(0xFFD0D000)
+    val BbsDarkBoardFollowOtherRead = Color(0xFF707000)
+    val BbsDarkArticleAuthor1 = Color(0xFF60A060)
+    val BbsDarkArticleContent1 = Color(0xFF18A018)
+}
