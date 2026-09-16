@@ -114,6 +114,12 @@ open class ASNavigationController : Activity() {
 
     // android.app.Activity
     public override fun onCreate(savedInstanceState: Bundle?) {
+        // 初始化基本設定，供 ThemeStore 與 AppCompatDelegate 使用
+        UserSettings(this)
+        upgrade(this)
+        TempSettings.myContext = this
+        setNavigationController(this)
+
         // 同步設定 AppCompatDelegate 的深色模式
         val nightMode = if (UserSettings.propertiesFollowSystemDarkMode) {
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -121,12 +127,6 @@ open class ASNavigationController : Activity() {
             AppCompatDelegate.MODE_NIGHT_NO
         }
         AppCompatDelegate.setDefaultNightMode(nightMode)
-
-        // 初始化基本設定，供 ThemeStore 使用
-        UserSettings(this)
-        upgrade(this)
-        TempSettings.myContext = this
-        setNavigationController(this)
 
         // 0. 初始化 ThemeStore
         ThemeStore.upgrade(this)

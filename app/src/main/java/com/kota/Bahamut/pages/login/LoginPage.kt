@@ -8,9 +8,9 @@ import android.widget.RelativeLayout
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
-import com.kota.Bahamut.service.CloudBackup
+import com.kota.Bahamut.dialogs.DialogWebLoginSettings
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.service.NotificationSettings.getCloudSave
+import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.clearTempSettings
 import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
@@ -79,17 +79,23 @@ class LoginPage : TelnetPage() {
         findViewById(R.id.Login_loginButton)!!.setOnClickListener(loginListener)
         // checkbox區塊點擊
         val checkBox = findViewById(R.id.Login_loginRememberCheckBox) as CheckBox
-        findViewById(R.id.loginRememberLabel)!!.setOnClickListener { view: View? ->
+        checkBox.setOnCheckedChangeListener { _, isChecked ->
+            UserSettings.propertiesSaveLogonUser = isChecked
+        }
+        findViewById(R.id.loginRememberLabel)?.setOnClickListener {
             checkBox.isChecked = !checkBox.isChecked
-            UserSettings.propertiesSaveLogonUser = checkBox.isChecked
-            UserSettings.notifyDataUpdated()
         }
         // web登入
         val webLoginCheckBox = findViewById(R.id.LoginWebSignInCheckBox) as CheckBox
-        findViewById(R.id.LoginWebSignInLabel)!!.setOnClickListener { view: View? ->
+        webLoginCheckBox.setOnCheckedChangeListener { _, isChecked ->
+            UserSettings.propertiesWebSignIn = isChecked
+        }
+        findViewById(R.id.LoginWebSignInLabel)?.setOnClickListener {
             webLoginCheckBox.isChecked = !webLoginCheckBox.isChecked
-            UserSettings.propertiesWebSignIn = webLoginCheckBox.isChecked
-            UserSettings.notifyDataUpdated()
+        }
+        // web登入設定按鈕
+        findViewById(R.id.LoginWebSignInSettings)?.setOnClickListener {
+            DialogWebLoginSettings().show()
         }
         // TelnetView
         telnetView = findViewById(R.id.Login_TelnetView) as TelnetView?
@@ -210,6 +216,7 @@ class LoginPage : TelnetPage() {
             UserSettings.propertiesUsername = username
             UserSettings.propertiesPassword = password
             UserSettings.propertiesSaveLogonUser = true
+            UserSettings.propertiesWebSignIn = (findViewById(R.id.LoginWebSignInCheckBox) as CheckBox).isChecked
         } else {
             UserSettings.propertiesUsername = ""
             UserSettings.propertiesPassword = ""
@@ -326,11 +333,8 @@ class LoginPage : TelnetPage() {
         TelnetClient.myInstance!!.username = username
         saveLogonUserToProperties()
 
-        // 讀取雲端
-        if (getCloudSave()) {
-            val cloudBackup = CloudBackup()
-            cloudBackup.restore()
-        }
+        // 雲端同步
+        SyncManager.performLoginSync()
 
         // 調用WebView登入（如果需要的話）
         if (checkWebSignIn) {

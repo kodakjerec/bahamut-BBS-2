@@ -1,6 +1,7 @@
 package com.kota.Bahamut.service
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializer
@@ -170,8 +171,8 @@ class CloudBackup {
 
             // get bookmark
             jsonObject.put("bookmark", TempSettings.bookmarkStore?.exportToJSON().toString())
-            // get user_settings (排除不要同步到雲端的本地設定: Web自動簽到與 Web帳號密碼)
-            val notBackupKeys = listOf("websignin", "webusername", "webpassword")
+            // get user_settings (排除不要同步到雲端的本地設定: 帳號密碼、記住登入、Web自動簽到與 Web帳號密碼)
+            val notBackupKeys = listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword")
             val filteredSettings = UserSettings.mySharedPref?.all?.filterKeys { key ->
                 !notBackupKeys.contains(key.lowercase())
             }
@@ -308,6 +309,19 @@ class CloudBackup {
                             // set bookmark
                             val bookmark = JSONObject((fromJsonObject["bookmark"] as String))
                             TempSettings.bookmarkStore?.importFromJSON(bookmark)
+
+                            // 若雲端還原改變了深色模式設定，同步套用到 AppCompatDelegate
+                            ASCoroutine.ensureMainThread {
+                                val targetNightMode = if (UserSettings.propertiesFollowSystemDarkMode) {
+                                    AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                                } else {
+                                    AppCompatDelegate.MODE_NIGHT_NO
+                                }
+                                if (AppCompatDelegate.getDefaultNightMode() != targetNightMode) {
+                                    AppCompatDelegate.setDefaultNightMode(targetNightMode)
+                                }
+                            }
+
                             isSuccess = true
                         }
                     }

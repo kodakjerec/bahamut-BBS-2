@@ -90,6 +90,7 @@ class SystemSettingsPage : TelnetPage() {
                         ) {
                             if (paramInt == 1) {
                                 propertiesFollowSystemDarkMode = isChecked
+                                notifyDataUpdated()
                                 val nightMode = if (isChecked) {
                                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                                 } else {
