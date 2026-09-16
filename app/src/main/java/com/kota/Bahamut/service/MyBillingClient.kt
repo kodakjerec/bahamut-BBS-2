@@ -12,9 +12,7 @@ import com.android.billingclient.api.ConsumeParams
 import com.android.billingclient.api.ConsumeResponseListener
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.Purchase
-import com.android.billingclient.api.PurchaseHistoryRecord
 import com.android.billingclient.api.PurchasesUpdatedListener
-import com.android.billingclient.api.QueryPurchaseHistoryParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.kota.Bahamut.R
 import com.kota.asFramework.thread.ASCoroutine
@@ -266,21 +264,6 @@ object MyBillingClient {
         )
     }
 
-    @JvmStatic
-    fun uploadPurchaseRecordToCloud(
-        record: PurchaseHistoryRecord,
-        buyType: String = "history",
-        onComplete: ((Boolean) -> Unit)? = null
-    ) {
-        uploadPurchaseRecordToCloud(
-            purchaseToken = record.purchaseToken,
-            qty = record.quantity,
-            purchaseData = record.originalJson,
-            buyType = buyType,
-            onComplete = onComplete
-        )
-    }
-
     /** 確認購買交易，且程式已授予使用者商品 */
     private fun handlePurchase(purchases: Purchase) {
         if (purchases.purchaseState != Purchase.PurchaseState.PURCHASED) {
@@ -322,10 +305,10 @@ object MyBillingClient {
         billingClient.consumeAsync(consumeParams, consumeResponseListener)
     }
 
-    /** 重新確認已購買的商品（結合未消耗查詢、Google Play 歷史紀錄與本機待送達佇列） */
+    /** 重新確認已購買的商品（結合未消耗查詢與本機待送達佇列重試） */
     @JvmStatic
     fun checkPurchaseHistoryQuery() {
-        // 先處理本機待重送的訂單（方案 2）
+        // 先處理本機待重送的訂單（方案 2：防漏機制）
         processPendingPurchases()
 
         if (!::billingClient.isInitialized || !billingClient.isReady) {
@@ -335,57 +318,25 @@ object MyBillingClient {
         }
 
         try {
-            // 1. 查詢未消耗中的進行中商品
-            billingClient.queryPurchasesAsync(
-                QueryPurchasesParams.newBuilder()
-                    .setProductType(BillingClient.ProductType.INAPP)
-                    .build()
-            ) { billingResult: BillingResult, list: List<Purchase?>? ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !list.isNullOrEmpty()) {
-                    Log.d(TAG, "queryPurchasesAsync 找到 ${list.size} 筆進行中商品")
-                    UserSettings.propertiesVIP = true
-                    list.filterNotNull().forEach { record ->
-                        uploadPurchaseRecordToCloud(record, "history")
-                    }
-                } else {
-                    // 2. 消耗型商品在消耗後由 queryPurchasesAsync 返回空清單，此時調用 queryPurchaseHistoryAsync 查詢 Google Play 歷史（方案 1）
-                    queryGooglePurchaseHistory()
-                }
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "checkPurchaseHistoryQuery exception: ${e.message}", e)
-            queryGooglePurchaseHistory()
-        }
-    }
-
-    /** 方案 1：向 Google Play 查詢過去所有購買過（包含已消耗 Consumed）的歷史紀錄 */
-    private fun queryGooglePurchaseHistory() {
-        if (!::billingClient.isInitialized || !billingClient.isReady) {
-            checkPurchaseHistoryCloud { }
-            return
-        }
-
-        try {
-            val params = QueryPurchaseHistoryParams.newBuilder()
+            val params = QueryPurchasesParams.newBuilder()
                 .setProductType(BillingClient.ProductType.INAPP)
                 .build()
 
-            billingClient.queryPurchaseHistoryAsync(params) { billingResult, historyList ->
-                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && !historyList.isNullOrEmpty()) {
-                    Log.d(TAG, "queryPurchaseHistoryAsync 成功取得 ${historyList.size} 筆 Google Play 歷史購買紀錄")
-                    // Google Play 確定此 Google 帳號有付款紀錄，啟用 VIP
+            billingClient.queryPurchasesAsync(params) { billingResult: BillingResult, purchaseList: List<Purchase> ->
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchaseList.isNotEmpty()) {
+                    Log.d(TAG, "queryPurchasesAsync 找到 ${purchaseList.size} 筆進行中有效商品")
                     UserSettings.propertiesVIP = true
-                    // 補傳至雲端（內含本機佇列重試防護）
-                    historyList.forEach { historyRecord ->
-                        uploadPurchaseRecordToCloud(historyRecord, "history")
+                    purchaseList.forEach { record ->
+                        uploadPurchaseRecordToCloud(record, "history")
                     }
                 } else {
-                    Log.d(TAG, "Google Play 歷史查無紀錄 (code=${billingResult.responseCode})，回退至後端雲端檢查")
+                    // 因消耗型商品消耗後不在 queryPurchasesAsync 中，
+                    // 依 Google 官方指引，向伺服器端（儲存歷史並可串接 Google Play Developer API）核對紀錄
                     checkPurchaseHistoryCloud { }
                 }
             }
         } catch (e: Exception) {
-            Log.e(TAG, "queryGooglePurchaseHistory exception: ${e.message}", e)
+            Log.e(TAG, "checkPurchaseHistoryQuery exception: ${e.message}", e)
             checkPurchaseHistoryCloud { }
         }
     }
