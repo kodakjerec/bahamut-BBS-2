@@ -36,6 +36,7 @@
     <color name="article_page_header_board">#FFC0FFFF</color>
     <color name="article_page_text_item_author1">#FF80FF80</color>
     <color name="article_page_text_item_content1">#FF20FF20</color>
+    <color name="article_page_text_item_author0">#FFFFFFFF</color>
     <color name="article_page_text_item_content0">#FFC0C0C0</color>
 
     <color name="board_item_follow_first">#FF00FF00</color>
@@ -111,7 +112,6 @@
     <color name="dialog_select_article_background_color_normal">#FF303030</color>
     <color name="dialog_select_article_background_color_focused">#FF606060</color>
     <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
-    <color name="article_page_text_item_author0">#FFC0C0C0</color>
     <color name="item_background_color">@color/page_background</color>
 
     <!-- 輸入框配色 -->

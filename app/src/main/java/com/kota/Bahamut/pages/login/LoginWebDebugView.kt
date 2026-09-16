@@ -28,12 +28,16 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         setDialogWidthHeight(mainLayout)
     }
 
+    var onDismissCallback: (() -> Unit)? = null
+
     /**
      * 初始化並開始自動登入流程
      */
     fun startAutoLogin(
-        onLoginSuccess: (() -> Unit)? = null
+        onLoginSuccess: (() -> Unit)? = null,
+        onComplete: (() -> Unit)? = null
     ): LoginWebDebugView {
+        this.onDismissCallback = onComplete
         loginWeb = LoginWeb(context, webView) // 直接傳遞 WebView 給 LoginWeb
 
         loginWeb?.init(
@@ -66,5 +70,8 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         // 清理 LoginWeb 資源
         loginWeb?.cleanup()
         loginWeb = null
+        val callback = onDismissCallback
+        onDismissCallback = null
+        callback?.invoke()
     }
 }

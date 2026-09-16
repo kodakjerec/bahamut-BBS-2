@@ -158,6 +158,37 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
     
     // 注入登入腳本
     private fun injectLoginScript(webView: WebView?) {
+        val webUsername = UserSettings.propertiesWebUsername
+        val webPassword = UserSettings.propertiesWebPassword
+        val hasCredentials = webUsername.isNotEmpty() && webPassword.isNotEmpty()
+
+        if (!hasCredentials) {
+            // 未提供 Web 帳號或密碼，無法自動填入與提交，呼叫手動登入
+            cancelTimeout()
+            ASCoroutine.ensureMainThread {
+                onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_need_manual))
+            }
+            // 注入輔助腳本：當使用者在網頁上手動點擊登入時，自動記錄帳密到本地
+            val manualHelperScript = """
+                javascript:(function() {
+                    window.waitForElement('#btn-login, .btn-login, button[type="submit"]', function(loginButton) {
+                        loginButton.addEventListener('click', function() {
+                            var u = document.querySelector('input[name="userid"]');
+                            var p = document.querySelector('input[name="password"]');
+                            if (u && p && u.value && p.value) {
+                                Android.saveWebCredentials(u.value, p.value);
+                            }
+                        });
+                    });
+                })();
+            """.trimIndent()
+            webView?.evaluateJavascript(manualHelperScript, null)
+            return
+        }
+
+        val escapedUsername = webUsername.replace("\\", "\\\\").replace("'", "\\'")
+        val escapedPassword = webPassword.replace("\\", "\\\\").replace("'", "\\'")
+
         val script = """
             javascript:(function() {
                 // 設置登入表單
@@ -167,12 +198,12 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
                     // 等待用戶名輸入框
                     window.waitForElement('input[name="userid"]', function(useridInput) {
                         console.log('找到用戶名輸入框');
-                        useridInput.value = '${UserSettings.propertiesUsername}';
+                        useridInput.value = '$escapedUsername';
                         
                         // 等待密碼輸入框
                         window.waitForElement('input[name="password"]', function(passwordInput) {
                             console.log('找到密碼輸入框');
-                            passwordInput.value = '${UserSettings.propertiesPassword}';
+                            passwordInput.value = '$escapedPassword';
                             
                             // 等待一段時間讓伺服器響應和原生腳本處理
                             setTimeout(function() {
@@ -325,6 +356,18 @@ class LoginWeb(private val context: Context, private val externalWebView: WebVie
 
             ASCoroutine.ensureMainThread {
                 onManualCallback?.invoke(context.getString(R.string.login_web_sign_in_msg06))
+            }
+        }
+
+        @JavascriptInterface
+        fun saveWebCredentials(username: String, password: String) {
+            if (username.isNotEmpty() && password.isNotEmpty()) {
+                if (UserSettings.propertiesWebUsername.isEmpty()) {
+                    UserSettings.propertiesWebUsername = username
+                }
+                if (UserSettings.propertiesWebPassword.isEmpty()) {
+                    UserSettings.propertiesWebPassword = password
+                }
             }
         }
         

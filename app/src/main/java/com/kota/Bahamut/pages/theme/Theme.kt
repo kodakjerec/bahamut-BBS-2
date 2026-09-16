@@ -14,7 +14,7 @@ class Theme {
     var contentAuthorColor:String = "#FFC0C0C0"
 
     // 文章內文配色
-    var articleAuthorColor0:String = "#FFC0C0C0"
+    var articleAuthorColor0:String = "#FFFFFFFF"
     var articleContentColor0:String = "#FFC0C0C0"
     var articleAuthorColor1:String = "#FF80FF80"
     var articleContentColor1:String = "#FF20FF20"

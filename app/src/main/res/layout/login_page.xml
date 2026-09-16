@@ -52,6 +52,14 @@
                     android:id="@+id/LoginWebSignInLabel"
                     android:layout_alignParentTop="true"
                     android:text="@string/login_web_sign_in" />
+                <com.kota.telnetUI.textView.TelnetTextViewNormal
+                    style="@style/SystemSettingsCheckboxText"
+                    android:layout_toEndOf="@+id/LoginWebSignInLabel"
+                    android:id="@+id/LoginWebSignInSettings"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginStart="8dp"
+                    android:textColor="@color/text_color_link"
+                    android:text="@string/login_web_settings_btn" />
             </RelativeLayout>
 
             <LinearLayout

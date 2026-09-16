@@ -14,6 +14,7 @@ import com.kota.Bahamut.pages.boardPage.BoardSearchPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
 import com.kota.Bahamut.pages.login.LoginPage
+import com.kota.Bahamut.pages.login.WebAutoSignInManager
 import com.kota.Bahamut.pages.mailPage.MailBoxPage
 import com.kota.Bahamut.pages.messages.MessageMain
 import com.kota.Bahamut.pages.messages.MessageSub
@@ -77,6 +78,7 @@ class PageContainer private constructor() {
         }
 
     fun cleanLoginPage() {
+        WebAutoSignInManager.stop()
         if (this.loginPageInstance != null) {
             this.loginPageInstance?.clear()
             this.loginPageInstance = null

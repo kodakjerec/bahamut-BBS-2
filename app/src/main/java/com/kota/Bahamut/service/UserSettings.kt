@@ -115,6 +115,8 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_ARTICLE_EXPRESSIONS: String = "ArticleExpressions" // 表情符號清單
         const val PROPERTIES_SHORT_URL_NON_ID: String = "ShortUrlNonId" // 短網址,開啟去識別化
         const val PROPERTIES_WEB_SIGN_IN: String = "WebSignIn" // 開啟網頁登入
+        const val PROPERTIES_WEB_USERNAME: String = "WebUsername" // Web 登入帳號 (不雲端同步)
+        const val PROPERTIES_WEB_PASSWORD: String = "WebPassword" // Web 登入密碼 (不雲端同步)
         const val PROPERTIES_FOLLOW_SYSTEM_DARK_MODE: String = "FollowSystemDarkMode" // 跟隨系統深色模式
 
         // 執行階段比較不重要的設定
@@ -660,6 +662,32 @@ class UserSettings(var myContext: Context) {
                     PROPERTIES_WEB_SIGN_IN,
                     enable
                 ).commit()
+            }
+
+        @JvmStatic
+        var propertiesWebUsername: String
+            get() = mySharedPref?.getString(
+                PROPERTIES_WEB_USERNAME,
+                ""
+            ) ?: ""
+            set(username) {
+                myEditor?.putString(
+                    PROPERTIES_WEB_USERNAME,
+                    username
+                )?.commit()
+            }
+
+        @JvmStatic
+        var propertiesWebPassword: String
+            get() = mySharedPref?.getString(
+                PROPERTIES_WEB_PASSWORD,
+                ""
+            ) ?: ""
+            set(password) {
+                myEditor?.putString(
+                    PROPERTIES_WEB_PASSWORD,
+                    password
+                )?.commit()
             }
 
         @JvmStatic
