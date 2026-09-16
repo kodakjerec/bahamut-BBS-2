@@ -414,6 +414,14 @@
     <string name="login_web_sign_in_msg04">Web登入 失敗</string>
     <string name="login_web_sign_in_msg05">Web自動簽到已在今日執行過，跳過此次簽到</string>
     <string name="login_web_sign_in_msg06">需要手動完成驗證，請在網頁中操作</string>
+    <string name="login_web_sign_in_need_manual">未設定 Web 帳密，請在網頁手動登入</string>
+    <string name="login_web_settings_title">Web 登入設定</string>
+    <string name="login_web_settings_tip">Web 帳密與 App 帳密分開，僅儲存於本機，不會同步至雲端。</string>
+    <string name="login_web_username_hint">請輸入 Web 帳號</string>
+    <string name="login_web_password_hint">請輸入 Web 密碼</string>
+    <string name="login_web_debug_view_toggle">每次登入顯示除錯視窗</string>
+    <string name="login_web_settings_saved">Web 登入設定已儲存</string>
+    <string name="login_web_settings_btn">[帳密設定]</string>
     <string name="notification_permission_title">開啟通知權限</string>
     <string name="notification_permission_message">為了讓背景服務正常運作並顯示連線狀態，需要開啟通知權限。是否要前往設定頁面開啟？</string>
     <string name="notification_permission_goto_settings">前往設定</string>

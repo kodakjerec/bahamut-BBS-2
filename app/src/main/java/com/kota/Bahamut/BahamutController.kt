@@ -6,6 +6,7 @@ import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.pages.StartPage
+import com.kota.Bahamut.pages.login.WebAutoSignInManager
 import com.kota.Bahamut.pages.messages.MessageSmall
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
@@ -217,6 +218,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onTelnetClientConnectionClosed(telnetClient: TelnetClient) {
         val intent = Intent(this, BahaBBSBackgroundService::class.java)
         stopService(intent)
+        WebAutoSignInManager.stop()
         ASCoroutine.ensureMainThread {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd kk:hh:ss", Locale.TRADITIONAL_CHINESE)
             dateFormat.timeZone = TimeZone.getTimeZone("GMT+8")

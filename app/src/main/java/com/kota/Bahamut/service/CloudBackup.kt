@@ -160,8 +160,12 @@ class CloudBackup {
 
             // get bookmark
             jsonObject.put("bookmark", TempSettings.bookmarkStore?.exportToJSON().toString())
-            // get user_settings
-            jsonObject.put("user_settings", UserSettings.mySharedPref?.all)
+            // get user_settings (排除不要同步到雲端的本地設定: Web自動簽到與 Web帳號密碼)
+            val notBackupKeys = listOf("websignin", "webusername", "webpassword")
+            val filteredSettings = UserSettings.mySharedPref?.all?.filterKeys { key ->
+                !notBackupKeys.contains(key.lowercase())
+            }
+            jsonObject.put("user_settings", filteredSettings)
             // encrypt
             val jsonDataString = AESCrypt.encrypt(gson.toJson(jsonObject))
             // send data
@@ -246,9 +250,9 @@ class CloudBackup {
                             )
                             val userSettings = fromJsonObject["user_settings"] as Map<*, *>
                             // set user_settings
-                            // 不要還原的key: 使用者帳密, 在登入前的設定
+                            // 不要還原的key: 使用者帳密, 在登入前的設定, 以及 Web 帳密與自動簽到
                             val notRestoreKeys: List<String> =
-                                listOf("username", "password", "savelogonuser")
+                                listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword")
                             userSettings.forEach { (keyObject, value) ->
                                 val key = keyObject.toString()
                                 if (value != null && !notRestoreKeys.contains(key.lowercase())) {

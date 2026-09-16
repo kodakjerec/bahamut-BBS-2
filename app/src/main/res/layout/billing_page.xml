@@ -53,11 +53,15 @@
 
                 <LinearLayout
                     style="@style/toolbar"
+                    android:gravity="center"
                     android:background="@null">
                     <Button
                         android:id="@+id/button_90"
                         style="@style/ToolbarItem"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="0"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp"
                         android:backgroundTint="@null"
                         android:enabled="false"
                         android:text="@string/billing_page_button_90" />
@@ -67,11 +71,15 @@
 
                 <LinearLayout
                     style="@style/toolbar"
+                    android:gravity="center"
                     android:background="@null">
                     <Button
                         android:id="@+id/button_checkPurchaseQuery"
                         style="@style/ToolbarItem"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
+                        android:layout_weight="0"
+                        android:paddingStart="32dp"
+                        android:paddingEnd="32dp"
                         android:backgroundTint="@null"
                         android:text="@string/billing_page_button_check_purchase_query" />
                 </LinearLayout>
@@ -109,11 +117,16 @@
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar"
+        android:gravity="center"
         android:layout_alignParentBottom="true">
 
         <Button
             android:id="@+id/BillingPage_BackButton"
             style="@style/ToolbarItem"
+            android:layout_width="wrap_content"
+            android:layout_weight="0"
+            android:paddingStart="40dp"
+            android:paddingEnd="40dp"
             android:text="@string/_back" />
     </LinearLayout>
 
