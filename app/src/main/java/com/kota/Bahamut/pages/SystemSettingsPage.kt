@@ -26,7 +26,8 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import androidx.compose.material3.Text
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -363,16 +364,14 @@ class SystemSettingsPage : TelnetPage() {
                                 .padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
+                                BahaText(
                                     text = stringResource(R.string.system_setting_page_toolbar_idle),
-                                    color = colors.textPrimary,
-                                    fontSize = 24.sp,
                                     modifier = Modifier.weight(1f)
                                 )
-                                Text(
+                                BahaText(
                                     text = "${toolbarIdleState}s",
                                     color = colors.textSecondary,
-                                    fontSize = 15.sp
+                                    size = BahaTextSize.BODY
                                 )
                             }
                             Slider(
@@ -397,16 +396,14 @@ class SystemSettingsPage : TelnetPage() {
                                 .padding(horizontal = 14.dp, vertical = 6.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
+                                BahaText(
                                     text = stringResource(R.string.system_setting_page_toolbar_alpha),
-                                    color = colors.textPrimary,
-                                    fontSize = 24.sp,
                                     modifier = Modifier.weight(1f)
                                 )
-                                Text(
+                                BahaText(
                                     text = "${toolbarAlphaState.toInt()}%",
                                     color = colors.textSecondary,
-                                    fontSize = 15.sp
+                                    size = BahaTextSize.BODY
                                 )
                             }
                             Slider(
@@ -530,10 +527,10 @@ class SystemSettingsPage : TelnetPage() {
                         onCheckedChange = { onCloudSaveChanged(it) }
                     )
                     if (cloudSaveLastTimeString.isNotEmpty()) {
-                        Text(
+                        BahaText(
                             text = cloudSaveLastTimeString,
                             color = colors.textSecondary,
-                            fontSize = 13.sp,
+                            size = BahaTextSize.CAPTION,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -574,10 +571,9 @@ class SystemSettingsPage : TelnetPage() {
                 .background(colors.chapterBackground)
                 .padding(horizontal = 10.dp, vertical = 6.dp)
         ) {
-            Text(
+            BahaText(
                 text = title,
                 color = colors.chapterText,
-                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -594,16 +590,14 @@ class SystemSettingsPage : TelnetPage() {
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            BahaText(
                 text = title,
-                color = colors.textPrimary,
-                fontSize = 24.sp,
                 modifier = Modifier.weight(1f)
             )
-            Text(
+            BahaText(
                 text = ">",
                 color = colors.textSecondary,
-                fontSize = 18.sp,
+                size = BahaTextSize.SUBTITLE,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -628,10 +622,8 @@ class SystemSettingsPage : TelnetPage() {
                 .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            BahaText(
                 text = title,
-                color = colors.textPrimary,
-                fontSize = 24.sp,
                 modifier = Modifier.weight(1f)
             )
             Box {
@@ -639,16 +631,13 @@ class SystemSettingsPage : TelnetPage() {
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
-                    Text(
-                        text = currentText,
-                        color = colors.textPrimary,
-                        fontSize = 24.sp
+                    BahaText(
+                        text = currentText
                     )
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text(
+                    BahaText(
                         text = "▾",
-                        color = colors.textSecondary,
-                        fontSize = 24.sp
+                        color = colors.textSecondary
                     )
                 }
                 DropdownMenu(
@@ -659,9 +648,8 @@ class SystemSettingsPage : TelnetPage() {
                     items.forEachIndexed { index, label ->
                         DropdownMenuItem(
                             text = {
-                                Text(
+                                BahaText(
                                     text = label,
-                                    fontSize = 24.sp,
                                     color = if (index == selectedIndex) colors.titleBarTitle else colors.textPrimary
                                 )
                             },

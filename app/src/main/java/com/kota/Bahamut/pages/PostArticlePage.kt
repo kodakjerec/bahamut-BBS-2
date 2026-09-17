@@ -9,17 +9,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -28,13 +27,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -58,6 +58,9 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTimes
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -65,7 +68,6 @@ import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
@@ -614,10 +616,10 @@ class PostArticlePage : TelnetPage() {
                 // Header Selector Dropdown (if not hidden)
                 if (!isHeaderHidden && headers.isNotEmpty()) {
                     Box {
-                        Text(
+                        BahaText(
                             text = headers.getOrNull(headerSelectedState) ?: headers[0],
                             color = colors.titleBarTitle,
-                            fontSize = 15.sp,
+                            size = BahaTextSize.SUBTITLE,
                             modifier = Modifier
                                 .clickable { headerDropdownExpanded = true }
                                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -629,7 +631,7 @@ class PostArticlePage : TelnetPage() {
                         ) {
                             headers.forEachIndexed { index, header ->
                                 DropdownMenuItem(
-                                    text = { Text(header, color = colors.textPrimary) },
+                                    text = { BahaText(header, color = colors.textPrimary) },
                                     onClick = {
                                         headerSelectedState = index
                                         headerDropdownExpanded = false
@@ -641,21 +643,10 @@ class PostArticlePage : TelnetPage() {
                 }
 
                 // 標題輸入框
-                TextField(
+                BahaInputField(
                     value = titleState,
                     onValueChange = { titleState = it },
-                    placeholder = {
-                        Text(stringResource(R.string.input_title_here), color = colors.textSecondary)
-                    },
-                    singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
+                    placeholder = stringResource(R.string.input_title_here),
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -667,52 +658,96 @@ class PostArticlePage : TelnetPage() {
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                TextField(
+                BasicTextField(
                     value = contentState,
                     onValueChange = { contentState = it },
-                    placeholder = {
-                        Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    textStyle = TextStyle(
+                        color = colors.textPrimary,
+                        fontSize = AppTheme.fontSize.base,
+                        fontWeight = FontWeight.Normal
                     ),
-                    modifier = Modifier.fillMaxSize()
+                    cursorBrush = SolidColor(colors.textPrimary),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    decorationBox = { innerTextField ->
+                        if (contentState.text.isEmpty()) {
+                            BahaText(
+                                text = stringResource(R.string.input_content_here),
+                                color = colors.textSecondary,
+                                size = BahaTextSize.BASE
+                            )
+                        }
+                        innerTextField()
+                    }
                 )
             }
 
             // 工具列 (可展開/摺疊)
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
 
             AnimatedVisibility(visible = isToolbarExpanded) {
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .background(colors.toolbarBackground),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         BahaButton(
                             text = stringResource(R.string.post_article_page_paint_color),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
                             onClick = { onPaintColorClicked() }
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(colors.toolbarDivider)
                         )
                         BahaButton(
                             text = stringResource(R.string.file),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
                             onClick = { onFileClicked() }
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(colors.toolbarDivider)
                         )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_url_title),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
                             onClick = {
                                 val dialog = DialogShortenUrl()
                                 dialog.setListener { str -> insertString(str) }
                                 dialog.show()
                             }
                         )
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(colors.toolbarDivider)
+                        )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_img_title),
-                            modifier = Modifier.weight(1f),
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
                             onClick = {
                                 if (!propertiesVIP && propertiesNoVipShortenTimes > 30) {
                                     showLongToast(getContextString(R.string.vip_only_message))
@@ -723,35 +758,80 @@ class PostArticlePage : TelnetPage() {
                             }
                         )
                     }
-                    HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(colors.toolbarDivider)
+                    )
                 }
             }
 
             // 主要工具列第一行
-            Row(modifier = Modifier.fillMaxWidth()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 BahaButton(
                     text = if (isToolbarExpanded) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { isToolbarExpanded = !isToolbarExpanded }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.post_article_page_format),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onReferenceClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.symbol),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onInsertSymbolClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.face),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onInsertExpressionClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.post),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPostButtonClicked() }
                 )
             }

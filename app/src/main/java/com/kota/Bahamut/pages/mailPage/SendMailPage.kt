@@ -7,27 +7,31 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
@@ -251,27 +255,15 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                             .padding(horizontal = 12.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.title_),
-                            color = colors.textPrimary,
-                            fontSize = 14.sp,
+                            size = BahaTextSize.SUBTITLE,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        TextField(
+                        BahaInputField(
                             value = titleState,
                             onValueChange = { titleState = it },
-                            placeholder = {
-                                Text(stringResource(R.string.input_title_here), color = colors.textSecondary)
-                            },
-                            singleLine = true,
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = colors.textPrimary,
-                                unfocusedTextColor = colors.textPrimary,
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
+                            placeholder = stringResource(R.string.input_title_here),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -284,27 +276,15 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                             .padding(horizontal = 12.dp, vertical = 2.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.receiver_),
-                            color = colors.textPrimary,
-                            fontSize = 14.sp,
+                            size = BahaTextSize.SUBTITLE,
                             modifier = Modifier.padding(end = 8.dp)
                         )
-                        TextField(
+                        BahaInputField(
                             value = receiverState,
                             onValueChange = { receiverState = it },
-                            placeholder = {
-                                Text(stringResource(R.string.input_receiver_here), color = colors.textSecondary)
-                            },
-                            singleLine = true,
-                            colors = TextFieldDefaults.colors(
-                                focusedTextColor = colors.textPrimary,
-                                unfocusedTextColor = colors.textPrimary,
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
+                            placeholder = stringResource(R.string.input_receiver_here),
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -318,50 +298,102 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                TextField(
+                BasicTextField(
                     value = contentState,
                     onValueChange = { contentState = it },
-                    placeholder = {
-                        Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
-                    },
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
+                    textStyle = TextStyle(
+                        color = colors.textPrimary,
+                        fontSize = AppTheme.fontSize.base,
+                        fontWeight = FontWeight.Normal
                     ),
-                    modifier = Modifier.fillMaxSize()
+                    cursorBrush = SolidColor(colors.textPrimary),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(12.dp),
+                    decorationBox = { innerTextField ->
+                        if (contentState.text.isEmpty()) {
+                            BahaText(
+                                text = stringResource(R.string.input_content_here),
+                                color = colors.textSecondary,
+                                size = BahaTextSize.BASE
+                            )
+                        }
+                        innerTextField()
+                    }
                 )
             }
 
-            // 底部工具列 (上色, 符號, 表情, 切換, 送出)
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            // 底部工具列 (上色, 符號, 表情, 切換, 送出) (滿版無縫 50dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 BahaButton(
                     text = stringResource(R.string.post_article_page_paint_color),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPaintColorClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.symbol),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onInsertSymbolClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.face),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onInsertExpressionClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { changeViewMode() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.send),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPostClicked() }
                 )
             }

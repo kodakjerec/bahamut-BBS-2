@@ -9,8 +9,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -20,7 +22,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -34,7 +35,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
@@ -48,6 +48,8 @@ import com.kota.Bahamut.pages.mailPage.SendMailPageListener
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -278,20 +280,20 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                             .weight(1f)
                             .padding(horizontal = 4.dp)
                     ) {
-                        Text(
+                        BahaText(
                             text = article?.title ?: stringResource(R.string.loading_),
                             color = colors.titleBarTitle,
-                            fontSize = 16.sp,
+                            size = BahaTextSize.BODY,
                             fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                         if (article != null) {
                             val nick = if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""
-                            Text(
+                            BahaText(
                                 text = "${article.boardName}  ${article.author}$nick",
                                 color = colors.titleBarDetail,
-                                fontSize = 11.sp,
+                                size = BahaTextSize.TINY,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -312,28 +314,28 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                             modifier = Modifier.background(colors.surface)
                         ) {
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.change_mode), color = colors.textPrimary) },
+                                text = { BahaText(stringResource(R.string.change_mode), color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     toggleViewMode()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text(stringResource(R.string.open_url), color = colors.textPrimary) },
+                                text = { BahaText(stringResource(R.string.open_url), color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onOpenUrlClicked()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("寄信給原作者", color = colors.textPrimary) },
+                                text = { BahaText("寄信給原作者", color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onSendMailClicked()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("加入黑名單", color = colors.textPrimary) },
+                                text = { BahaText("加入黑名單", color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onAddBlockListClicked()
@@ -356,10 +358,10 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            fontSize = 16.sp
+                            size = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -381,21 +383,32 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
             }
 
             // 底部工具列 (切換模式, 上一篇, 下一篇)
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground)
+            ) {
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { toggleViewMode() }
                 )
                 BahaButton(
                     text = stringResource(R.string.prev_article),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPageUpButtonClicked() }
                 )
                 BahaButton(
                     text = stringResource(R.string.next_article),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPageDownButtonClicked() }
                 )
             }

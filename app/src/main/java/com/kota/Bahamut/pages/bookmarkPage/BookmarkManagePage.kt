@@ -3,13 +3,18 @@ package com.kota.Bahamut.pages.bookmarkPage
 import android.content.Context
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
+import androidx.compose.ui.Alignment
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -278,58 +283,58 @@ open class BookmarkManagePage(
                     .fillMaxWidth()
             )
 
-            // Tab 工具列 (書籤 / 紀錄 / 零字)
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
-                val selectedBg = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabSelectedBackground)
-                val unselectedBg = CommonFunctions.getThemeResourceId(R.attr.bahamut_tabUnselectedBackground)
-                TabButton(
+            // Tab 工具列 (書籤 / 紀錄 / 零字) (滿版無縫 50dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaButton(
                     text = stringResource(R.string.bookmark),
                     isSelected = currentMode == 0,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { switchToBookmark() }
                 )
-                TabButton(
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
+                )
+                BahaButton(
                     text = stringResource(R.string.record),
                     isSelected = currentMode == 1,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { switchToHistory() }
                 )
-                TabButton(
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
+                )
+                BahaButton(
                     text = stringResource(R.string.zero_word),
                     isSelected = false,
                     enabled = false,
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {}
                 )
             }
-        }
-    }
-
-    @Composable
-    private fun TabButton(
-        text: String,
-        isSelected: Boolean,
-        modifier: Modifier = Modifier,
-        enabled: Boolean = true,
-        onClick: () -> Unit
-    ) {
-        val colors = AppTheme.colors
-        val bgColor = if (isSelected) colors.toolbarBackground else colors.pageBackground
-        val textColor = if (isSelected) colors.titleBarTitle else colors.textSecondary
-        androidx.compose.material3.Button(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = modifier,
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = bgColor,
-                contentColor = textColor,
-                disabledContainerColor = colors.pageBackground,
-                disabledContentColor = colors.textSecondary.copy(alpha = 0.4f)
-            ),
-            shape = androidx.compose.foundation.shape.RoundedCornerShape(0.dp)
-        ) {
-            Text(text = text)
         }
     }
 }

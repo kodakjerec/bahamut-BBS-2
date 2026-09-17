@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,10 +74,10 @@ fun BahaCheckboxLeft(
             enabled = enabled
         )
         Spacer(modifier = Modifier.width(6.dp))
-        Text(
+        BahaText(
             text = text,
             color = if (enabled) textColor else colors.textSecondary,
-            fontSize = fontSize
+            size = BahaTextSize.BODY
         )
         if (trailingContent != null) {
             Spacer(modifier = Modifier.weight(1f))
@@ -110,10 +109,10 @@ fun SettingsCheckboxItem(
             .padding(horizontal = paddingHorizontal, vertical = paddingVertical),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        BahaText(
             text = title,
             color = if (enabled) colors.textPrimary else colors.textSecondary,
-            fontSize = AppTheme.fontSize.base,
+            size = BahaTextSize.BASE,
             modifier = Modifier.weight(1f)
         )
         BahaCheckbox(

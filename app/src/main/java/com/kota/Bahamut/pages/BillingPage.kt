@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +29,8 @@ import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
@@ -184,20 +184,19 @@ class BillingPage : TelnetPage() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
+                BahaText(
                     text = stringResource(R.string.billing_page_note),
-                    color = colors.textPrimary,
-                    fontSize = 14.sp,
+                    size = BahaTextSize.CAPTION,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Text(
+                BahaText(
                     text = stringResource(R.string.billing_page_note2),
                     color = colors.titleBarTitle,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -235,17 +234,15 @@ class BillingPage : TelnetPage() {
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.billing_page_already_billing_text),
-                        color = colors.textPrimary,
-                        fontSize = 14.sp,
+                        size = BahaTextSize.CAPTION,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
-                    Text(
+                    BahaText(
                         text = alreadyBillingValueState,
-                        color = colors.textPrimary,
-                        fontSize = 14.sp,
+                        size = BahaTextSize.CAPTION,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
@@ -253,10 +250,17 @@ class BillingPage : TelnetPage() {
             }
 
             // Bottom toolbar
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
             BahaButton(
                 text = stringResource(R.string._back),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp),
                 onClick = {
                     onBackPressed()
                     PageContainer.instance?.cleanBillingPage()

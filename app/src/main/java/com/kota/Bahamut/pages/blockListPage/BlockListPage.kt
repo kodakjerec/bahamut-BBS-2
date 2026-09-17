@@ -13,26 +13,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
+import com.kota.Bahamut.ui.components.BahaInputField
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -245,56 +240,23 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 BahaButton(
                     text = stringResource(R.string.reset),
                     type = ButtonType.DANGER,
-                    modifier = Modifier.height(50.dp),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp,
+                    modifier = Modifier.fillMaxHeight(),
                     onClick = { onResetClicked() }
                 )
-                Box(
+                BahaInputField(
+                    value = inputTextState,
+                    onValueChange = { inputTextState = it },
+                    placeholder = stringResource(R.string.please_input_id),
                     modifier = Modifier
                         .weight(1f)
-                        .fillMaxHeight(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    BasicTextField(
-                        value = inputTextState,
-                        onValueChange = { inputTextState = it },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp),
-                        textStyle = TextStyle(
-                            color = colors.textPrimary,
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center
-                        ),
-                        singleLine = true,
-                        cursorBrush = SolidColor(colors.textPrimary),
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { onAddClicked() }),
-                        decorationBox = { innerTextField ->
-                            Box(
-                                modifier = Modifier.fillMaxWidth(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                if (inputTextState.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.please_input_id),
-                                        color = colors.textSecondary,
-                                        fontSize = 18.sp,
-                                        textAlign = TextAlign.Center
-                                    )
-                                }
-                                innerTextField()
-                            }
-                        }
-                    )
-                }
+                        .padding(horizontal = 8.dp),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { onAddClicked() })
+                )
                 BahaButton(
                     text = stringResource(R.string.add),
                     type = ButtonType.DANGER,
-                    modifier = Modifier.height(50.dp),
-                    fontSize = 18.sp,
-                    minHeight = 50.dp,
+                    modifier = Modifier.fillMaxHeight(),
                     onClick = { onAddClicked() }
                 )
             }
@@ -316,14 +278,17 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             )
 
             // 底部工具列 (滿版無縫)
-            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
             BahaButton(
                 text = stringResource(R.string._back),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                fontSize = 18.sp,
-                minHeight = 50.dp,
                 onClick = { onBackPressed() }
             )
         }

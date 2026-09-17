@@ -11,18 +11,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -35,7 +32,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -43,6 +39,10 @@ import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.myContext
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -305,10 +305,10 @@ class MessageMain : TelnetPage() {
                     .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -320,22 +320,18 @@ class MessageMain : TelnetPage() {
                         NotificationSettings.setShowMessageFloating(newVal)
                     }
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.message_small_show_float),
                         color = colors.textSecondary,
-                        fontSize = 12.sp,
+                        size = BahaTextSize.TINY,
                         modifier = Modifier.padding(end = 4.dp)
                     )
-                    Checkbox(
+                    BahaCheckbox(
                         checked = isFloatCheckedState,
                         onCheckedChange = { newVal ->
                             isFloatCheckedState = newVal
                             NotificationSettings.setShowMessageFloating(newVal)
-                        },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = colors.checkboxTint,
-                            uncheckedColor = colors.textSecondary
-                        )
+                        }
                     )
                 }
             }
@@ -348,29 +344,20 @@ class MessageMain : TelnetPage() {
                     .padding(horizontal = 12.dp, vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextField(
+                BahaInputField(
                     value = searchWordState,
                     onValueChange = { searchWordState = it },
-                    placeholder = {
-                        Text(stringResource(R.string.search_id), color = colors.textSecondary)
-                    },
+                    placeholder = stringResource(R.string.search_id),
                     singleLine = true,
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = Color.Transparent,
-                        unfocusedIndicatorColor = Color.Transparent
-                    ),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = { handleSearchSubmit() }),
                     modifier = Modifier.weight(1f)
                 )
-                Text(
+                Spacer(modifier = Modifier.width(8.dp))
+                BahaText(
                     text = stringResource(R.string.message_main_search_clear),
                     color = colors.titleBarDetail,
-                    fontSize = 14.sp,
+                    size = BahaTextSize.CAPTION,
                     modifier = Modifier
                         .clickable {
                             searchWordState = ""
@@ -400,38 +387,58 @@ class MessageMain : TelnetPage() {
 
             // List mode pagination toolbar (Prev, Next)
             if (currentTabState == 1) {
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-                Row(modifier = Modifier.fillMaxWidth()) {
+                HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .background(colors.toolbarBackground)
+                ) {
                     BahaButton(
                         text = stringResource(R.string.prev_page),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onClick = { TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP) }
                     )
                     BahaButton(
                         text = stringResource(R.string.next_page),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onClick = { TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN) }
                     )
                 }
             }
 
             // Bottom tabs: 聊天, 名單, 設定
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground)
+            ) {
                 BahaButton(
                     text = stringResource(R.string.message_main_tab_chat),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { switchTab(0) }
                 )
                 BahaButton(
                     text = stringResource(R.string.message_main_tab_list),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { switchTab(1) }
                 )
                 if (currentTabState == 0) {
                     BahaButton(
                         text = stringResource(R.string.setting),
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight(),
                         onClick = { openSettings() }
                     )
                 }

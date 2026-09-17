@@ -13,13 +13,17 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -280,17 +284,17 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                     .background(colors.toolbarBackground)
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                Text(
+                BahaText(
                     text = headerTitleState,
                     color = colors.titleBarTitle,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     fontWeight = FontWeight.Bold
                 )
                 if (headerSubtitleState.isNotEmpty()) {
-                    Text(
+                    BahaText(
                         text = headerSubtitleState,
                         color = colors.titleBarDetail,
-                        fontSize = 13.sp
+                        size = BahaTextSize.CAPTION
                     )
                 }
             }
@@ -307,10 +311,10 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.mainbox_no_mail),
                             color = colors.textSecondary,
-                            fontSize = 16.sp
+                            size = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -334,30 +338,67 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 }
             }
 
-            // 底部工具列
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            // 底部工具列 (滿版無縫 50dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 BahaButton(
                     text = stringResource(R.string.write_mail),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPostButtonClicked() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.search),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { showSelectArticleDialog() }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.first_page),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         moveToFirstPosition()
                         showShortToast(getContextString(R.string.already_to_top))
                     }
                 )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
+                )
                 BahaButton(
                     text = stringResource(R.string.last_page),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         setManualLoadPage()
                         moveToLastPosition()
@@ -385,39 +426,39 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 .padding(horizontal = 10.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            BahaText(
                 text = if (item?.isMarked == true) "★" else "  ",
                 color = colors.bbsMailMark,
-                fontSize = 13.sp,
+                size = BahaTextSize.CAPTION,
                 modifier = Modifier.padding(end = 4.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
-                Text(
+                BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
                     color = textColor,
-                    fontSize = 14.sp,
+                    size = BahaTextSize.CAPTION,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row {
-                    Text(
+                    BahaText(
                         text = String.format("%05d", itemIndex),
                         color = colors.bbsMailNumber,
-                        fontSize = 12.sp,
+                        size = BahaTextSize.TINY,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(
+                    BahaText(
                         text = item?.author ?: "",
                         color = colors.bbsMailAuthor,
-                        fontSize = 12.sp,
+                        size = BahaTextSize.TINY,
                         modifier = Modifier.weight(1f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
-                    Text(
+                    BahaText(
                         text = item?.date ?: "",
                         color = colors.bbsMailDate,
-                        fontSize = 12.sp
+                        size = BahaTextSize.TINY
                     )
                 }
             }

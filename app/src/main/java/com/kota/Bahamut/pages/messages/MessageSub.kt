@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,23 +18,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogInsertExpression
@@ -47,6 +43,9 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -267,17 +266,17 @@ class MessageSub : TelnetPage() {
                     .padding(horizontal = 12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
+                BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(
+                BahaText(
                     text = senderNameState,
                     color = colors.titleBarTitle,
-                    fontSize = 17.sp
+                    size = BahaTextSize.SUBTITLE
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -304,32 +303,30 @@ class MessageSub : TelnetPage() {
 
             // Edit Field
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            TextField(
+            BahaInputField(
                 value = contentState,
                 onValueChange = { if (it.text.length <= 59) contentState = it },
-                placeholder = {
-                    Text(stringResource(R.string.input_content_here), color = colors.textSecondary)
-                },
+                placeholder = stringResource(R.string.input_content_here),
+                maxLength = 59,
                 singleLine = true,
-                colors = TextFieldDefaults.colors(
-                    focusedTextColor = colors.textPrimary,
-                    unfocusedTextColor = colors.textPrimary,
-                    focusedContainerColor = colors.surface,
-                    unfocusedContainerColor = colors.surface,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-                ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                 keyboardActions = KeyboardActions(onSend = { onPostClicked() }),
                 modifier = Modifier.fillMaxWidth()
             )
 
-            // Bottom toolbar (符號, 表情, 短網址, 縮圖, 發送)
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Row(modifier = Modifier.fillMaxWidth()) {
+            // 底部工具列 (符號, 表情, 短網址, 縮圖, 發送)
+            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(50.dp)
+                    .background(colors.toolbarBackground)
+            ) {
                 BahaButton(
                     text = stringResource(R.string.symbol),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         val dialog = DialogInsertSymbol()
                         dialog.setListener { str -> insertString(str) }
@@ -338,7 +335,9 @@ class MessageSub : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.face),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         val items = UserSettings.articleExpressions
                         DialogInsertExpression.createDialog().setTitle("表情符號").addItems(items)
@@ -354,7 +353,9 @@ class MessageSub : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.dialog_shorten_url_title),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         val dialog = DialogShortenUrl()
                         dialog.setListener(object : DialogShortenUrlListener {
@@ -367,7 +368,9 @@ class MessageSub : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.dialog_shorten_img_title),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = {
                         val shortenTimes = UserSettings.propertiesNoVipShortenTimes
                         if (!UserSettings.propertiesVIP && shortenTimes > 30) {
@@ -380,7 +383,9 @@ class MessageSub : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.post),
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                     onClick = { onPostClicked() }
                 )
             }

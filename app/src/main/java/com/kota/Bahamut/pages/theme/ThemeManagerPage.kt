@@ -10,13 +10,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -102,14 +104,13 @@ fun ThemeManagerScreen(
         AlertDialog(
             onDismissRequest = { pendingThemeIndex = null },
             title = {
-                Text(
+                BahaText(
                     text = "更換外觀",
-                    color = colors.textPrimary,
                     fontWeight = FontWeight.Bold
                 )
             },
             text = {
-                Text(
+                BahaText(
                     text = "更換為「$targetThemeName」外觀將會中斷目前的連線並重新啟動應用程式，是否確定更換?",
                     color = colors.textSecondary
                 )
@@ -136,7 +137,7 @@ fun ThemeManagerScreen(
                         (context as? Activity)?.recreate()
                     }
                 ) {
-                    Text(
+                    BahaText(
                         text = "確定",
                         color = colors.titleBarTitle,
                         fontWeight = FontWeight.Bold
@@ -145,7 +146,7 @@ fun ThemeManagerScreen(
             },
             dismissButton = {
                 TextButton(onClick = { pendingThemeIndex = null }) {
-                    Text(text = "取消", color = colors.textSecondary)
+                    BahaText(text = "取消", color = colors.textSecondary)
                 }
             },
             containerColor = colors.surface
@@ -202,10 +203,10 @@ fun ThemeManagerScreen(
                     .padding(16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
+                BahaText(
                     text = stringResource(R.string.theme_manager_page_guide),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
+                    size = BahaTextSize.CAPTION,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp
                 )
@@ -215,20 +216,20 @@ fun ThemeManagerScreen(
             ThemeHybridShowcase()
         }
 
-        // 畫面底部固定導覽列
+        // 畫面底部固定導覽列 (滿版無縫 50dp)
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.toolbarBackground)
-                .border(1.dp, colors.divider)
-                .padding(8.dp)
-        ) {
-            BahaButton(
-                text = stringResource(R.string._back),
-                onClick = onBackClick,
-                modifier = Modifier.fillMaxWidth(),
-                type = ButtonType.NORMAL
-            )
-        }
+                .height(1.dp)
+                .background(colors.toolbarDivider)
+        )
+        BahaButton(
+            text = stringResource(R.string._back),
+            onClick = onBackClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            type = ButtonType.NORMAL
+        )
     }
 }

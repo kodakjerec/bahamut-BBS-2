@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -86,10 +85,10 @@ fun BahaButton(
             .padding(contentPadding),
         contentAlignment = Alignment.Center
     ) {
-        Text(
+        BahaText(
             text = text,
             color = textColor,
-            fontSize = fontSize,
+            customFontSize = fontSize,
             fontWeight = if (isSelected || isPressed) FontWeight.Bold else FontWeight.Medium,
             textAlign = TextAlign.Center
         )

@@ -36,12 +36,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -60,7 +57,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
@@ -112,6 +108,9 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppColors
@@ -857,10 +856,10 @@ open class BoardMainPage : TelnetListPage(),
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
+                            BahaText(
                                 text = stringResource(R.string.loading_),
                                 color = colors.textSecondary,
-                                fontSize = 16.sp
+                                size = BahaTextSize.BODY
                             )
                         }
                     } else {
@@ -1024,29 +1023,29 @@ fun BoardMainTopBar(
                     .weight(1f)
                     .padding(horizontal = 4.dp)
             ) {
-                Text(
+                BahaText(
                     text = title,
                     color = colors.titleBarTitle,
-                    fontSize = 17.sp,
+                    size = BahaTextSize.SUBTITLE,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
+                    BahaText(
                         text = subtitle,
                         color = colors.titleBarDetail,
-                        fontSize = 12.sp,
+                        size = BahaTextSize.TINY,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     if (isBoard) {
                         Spacer(modifier = Modifier.width(6.dp))
-                        Text(
+                        BahaText(
                             text = "[全部已讀]",
                             color = colors.titleBarDetail2,
-                            fontSize = 12.sp,
+                            size = BahaTextSize.TINY,
                             modifier = Modifier.clickable { onReadAllClick() }
                         )
                     }
@@ -1111,38 +1110,38 @@ fun BoardPageRowItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 文章編號 (5 碼)
-            Text(
+            BahaText(
                 text = String.format("%05d", item?.itemNumber ?: itemIndex),
                 color = colors.bbsMailNumber,
-                fontSize = 11.sp,
+                size = BahaTextSize.TINY,
                 modifier = Modifier.width(42.dp)
             )
 
             // 狀態 (◆ 或 Re)
-            Text(
+            BahaText(
                 text = if (isReply) "Re" else "◆",
                 color = colors.bbsMailStatus,
-                fontSize = 12.sp,
+                size = BahaTextSize.TINY,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.width(22.dp)
             )
 
             // 標記 M
             if (isMarked) {
-                Text(
+                BahaText(
                     text = "M",
                     color = colors.bbsMailMark,
-                    fontSize = 11.sp,
+                    size = BahaTextSize.TINY,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.width(14.dp)
                 )
             }
 
             // 文章標題
-            Text(
+            BahaText(
                 text = titleText,
                 color = titleColor,
-                fontSize = 15.sp,
+                size = BahaTextSize.BODY,
                 fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -1152,10 +1151,10 @@ fun BoardPageRowItem(
             // 推文數 / GY
             if (gyCount > 0) {
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(
+                BahaText(
                     text = gyCount.toString(),
                     color = colors.bbsBoardGy,
-                    fontSize = 12.sp,
+                    size = BahaTextSize.TINY,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -1169,16 +1168,16 @@ fun BoardPageRowItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            BahaText(
                 text = authorText,
                 color = colors.bbsMailAuthor,
-                fontSize = 12.sp,
+                size = BahaTextSize.TINY,
                 maxLines = 1
             )
-            Text(
+            BahaText(
                 text = dateText,
                 color = colors.bbsMailDate,
-                fontSize = 11.sp
+                size = BahaTextSize.TINY
             )
         }
 
@@ -1210,14 +1209,13 @@ fun BoardMainToolbar(
     )
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+        HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.toolbarBackground)
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                .height(50.dp)
+                .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 靠右對齊時左側切換按鈕
@@ -1226,8 +1224,9 @@ fun BoardMainToolbar(
                     text = "<<",
                     type = ButtonType.NORMAL,
                     onClick = onLLClick,
-                    modifier = Modifier.width(44.dp),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
                 )
             }
 
@@ -1237,8 +1236,9 @@ fun BoardMainToolbar(
                         text = postText,
                         type = ButtonType.NORMAL,
                         onClick = onPostClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 },
                 {
@@ -1246,8 +1246,9 @@ fun BoardMainToolbar(
                         text = stringResource(R.string.prev_page),
                         type = ButtonType.NORMAL,
                         onClick = onPrevClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 },
                 {
@@ -1255,8 +1256,9 @@ fun BoardMainToolbar(
                         text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
                         type = ButtonType.NORMAL,
                         onClick = if (isMoveEnable) onNextClick else onLastClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 }
             )
@@ -1273,8 +1275,9 @@ fun BoardMainToolbar(
                     text = ">>",
                     type = ButtonType.NORMAL,
                     onClick = onRRClick,
-                    modifier = Modifier.width(44.dp),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
                 )
             }
         }
@@ -1344,15 +1347,13 @@ fun BoardEndDrawer(
                         text = stringResource(R.string.essence_page),
                         type = ButtonType.NORMAL,
                         onClick = onEssenceClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 38.dp
+                        modifier = Modifier.weight(1f)
                     )
                     BahaButton(
                         text = stringResource(R.string.bookmark_manager),
                         type = ButtonType.NORMAL,
                         onClick = onBookmarkManageClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 38.dp
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -1369,15 +1370,13 @@ fun BoardEndDrawer(
                         text = stringResource(R.string.bookmark),
                         type = if (mode == 0) ButtonType.NORMAL else ButtonType.SECONDARY,
                         onClick = { onTabClick(0) },
-                        modifier = Modifier.weight(1f),
-                        minHeight = 36.dp
+                        modifier = Modifier.weight(1f)
                     )
                     BahaButton(
                         text = stringResource(R.string.record),
                         type = if (mode == 1) ButtonType.NORMAL else ButtonType.SECONDARY,
                         onClick = { onTabClick(1) },
-                        modifier = Modifier.weight(1f),
-                        minHeight = 36.dp
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -1393,10 +1392,10 @@ fun BoardEndDrawer(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
+                            BahaText(
                                 text = stringResource(R.string.list_empty),
                                 color = colors.textSecondary,
-                                fontSize = 14.sp
+                                size = BahaTextSize.BODY
                             )
                         }
                     } else {
@@ -1409,18 +1408,18 @@ fun BoardEndDrawer(
                                         .clickable { onBookmarkItemClick(bItem) }
                                         .padding(horizontal = 12.dp, vertical = 8.dp)
                                 ) {
-                                    Text(
+                                    BahaText(
                                         text = bItem.keyword.ifEmpty { "未輸入" },
                                         color = colors.textPrimary,
-                                        fontSize = 14.sp,
+                                        size = BahaTextSize.BODY,
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis
                                     )
                                     if (bItem.author.isNotEmpty()) {
-                                        Text(
+                                        BahaText(
                                             text = bItem.author,
                                             color = colors.textSecondary,
-                                            fontSize = 12.sp,
+                                            size = BahaTextSize.TINY,
                                             maxLines = 1
                                         )
                                     }
@@ -1448,15 +1447,13 @@ fun BoardEndDrawer(
                         text = stringResource(R.string.search),
                         type = ButtonType.NORMAL,
                         onClick = onSearchClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 38.dp
+                        modifier = Modifier.weight(1f)
                     )
                     BahaButton(
                         text = stringResource(R.string.select),
                         type = ButtonType.NORMAL,
                         onClick = onSelectClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 38.dp
+                        modifier = Modifier.weight(1f)
                     )
                 }
                 HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -1469,18 +1466,14 @@ fun BoardEndDrawer(
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Checkbox(
+                    BahaCheckbox(
                         checked = isBlockEnabled,
-                        onCheckedChange = { onToggleBlock() },
-                        colors = CheckboxDefaults.colors(
-                            checkedColor = colors.buttonText,
-                            uncheckedColor = colors.checkboxTint
-                        )
+                        onCheckedChange = { onToggleBlock() }
                     )
-                    Text(
+                    BahaText(
                         text = "黑名單: " + if (isBlockEnabled) stringResource(R.string.on) else "關",
                         color = colors.buttonText,
-                        fontSize = 13.sp,
+                        size = BahaTextSize.BODY,
                         modifier = Modifier
                             .clickable { onToggleBlock() }
                             .padding(end = 8.dp)
@@ -1489,8 +1482,7 @@ fun BoardEndDrawer(
                     BahaButton(
                         text = stringResource(R.string.system_setting_page_chapter_blocklist),
                         type = ButtonType.NORMAL,
-                        onClick = onBlockSettingClick,
-                        minHeight = 34.dp
+                        onClick = onBlockSettingClick
                     )
                 }
             }

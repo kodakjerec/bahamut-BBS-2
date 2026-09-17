@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,8 +21,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -32,14 +31,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -56,6 +52,8 @@ import com.kota.Bahamut.pages.model.ClassPageItem.Companion.recycle
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.BahaTopAppBar
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -350,16 +348,16 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = "前次造訪：$lastVisitBoardText",
                         color = colors.titleBarTitle,
-                        fontSize = 13.sp,
+                        size = BahaTextSize.CAPTION,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(
+                    BahaText(
                         text = "點此直接進入 ➔",
                         color = colors.textSecondary,
-                        fontSize = 12.sp
+                        size = BahaTextSize.TINY
                     )
                 }
                 Box(
@@ -384,10 +382,10 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            fontSize = 16.sp
+                            size = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -415,27 +413,33 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 }
             }
 
-            // 3. 底部操作工具列
+            // 3. 底部操作工具列 (滿版無縫 50dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .background(colors.divider)
+                    .background(colors.toolbarDivider)
             )
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    .height(50.dp)
+                    .background(colors.toolbarBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.search),
                     type = ButtonType.NORMAL,
                     onClick = { onSearchButtonClicked() },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.first_page),
@@ -444,8 +448,15 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         moveToFirstPosition()
                         coroutineScope.launch { listState.scrollToItem(0) }
                     },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.last_page),
@@ -457,8 +468,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                             listState.scrollToItem(lastIdx)
                         }
                     },
-                    modifier = Modifier.weight(1f),
-                    minHeight = 42.dp
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
                 )
             }
         }
@@ -496,10 +508,9 @@ private fun ClassPageRowItem(
                 modifier = Modifier.weight(1f)
             ) {
                 // 看板中文標題
-                Text(
+                BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
-                    color = colors.textPrimary,
-                    fontSize = 17.sp,
+                    size = BahaTextSize.SUBTITLE,
                     fontWeight = FontWeight.Medium,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
@@ -513,19 +524,19 @@ private fun ClassPageRowItem(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = item?.name ?: stringResource(R.string.loading),
                         color = colors.titleBarTitle,
-                        fontSize = 13.sp,
+                        size = BahaTextSize.CAPTION,
                         fontWeight = FontWeight.Bold
                     )
 
                     val manager = item?.manager
                     if (!manager.isNullOrEmpty()) {
-                        Text(
+                        BahaText(
                             text = manager,
                             color = colors.textSecondary,
-                            fontSize = 12.sp,
+                            size = BahaTextSize.TINY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -536,10 +547,10 @@ private fun ClassPageRowItem(
             Spacer(modifier = Modifier.width(12.dp))
 
             // 右箭頭
-            Text(
+            BahaText(
                 text = "›",
                 color = colors.titleBarTitle,
-                fontSize = 24.sp,
+                size = BahaTextSize.BASE,
                 fontWeight = FontWeight.Light
             )
         }

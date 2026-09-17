@@ -3,6 +3,7 @@ package com.kota.Bahamut.pages.bbsUser
 import android.content.Context
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,26 +14,24 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -142,10 +141,10 @@ class UserInfoPage : TelnetPage() {
                     .verticalScroll(scrollState)
             ) {
                 // 標題
-                Text(
+                BahaText(
                     text = stringResource(R.string.user_info),
                     color = colors.titleBarTitle,
-                    fontSize = 14.sp,
+                    size = BahaTextSize.CAPTION,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(colors.toolbarBackground)
@@ -160,30 +159,18 @@ class UserInfoPage : TelnetPage() {
                         .padding(horizontal = 12.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.user_info_nick_name),
-                        color = colors.textPrimary,
-                        fontSize = 14.sp,
+                        size = BahaTextSize.CAPTION,
                         modifier = Modifier.weight(1f)
                     )
-                    TextField(
+                    BahaInputField(
                         value = nickNameState,
                         onValueChange = { newVal ->
                             nickNameState = newVal
                             isUpdateEnabled = newVal.trim().isNotEmpty()
                         },
-                        modifier = Modifier
-                            .weight(3f)
-                            .height(60.dp),
-                        singleLine = true,
-                        colors = TextFieldDefaults.colors(
-                            focusedTextColor = colors.textPrimary,
-                            unfocusedTextColor = colors.textPrimary,
-                            focusedContainerColor = colors.surface,
-                            unfocusedContainerColor = colors.surface,
-                            focusedIndicatorColor = Color.Transparent,
-                            unfocusedIndicatorColor = Color.Transparent
-                        ),
+                        modifier = Modifier.weight(3f),
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                     )
                 }
@@ -200,17 +187,22 @@ class UserInfoPage : TelnetPage() {
                 HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
                 // 其他資料
-                Text(
+                BahaText(
                     text = othersState,
                     color = colors.textSecondary,
-                    fontSize = 12.sp,
+                    size = BahaTextSize.TINY,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 )
             }
             // 2. 底部固定工具列（移出滾動區域，放在外層 Column 最底端）
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
             BahaButton(
                 text = stringResource(R.string._back),
                 modifier = Modifier

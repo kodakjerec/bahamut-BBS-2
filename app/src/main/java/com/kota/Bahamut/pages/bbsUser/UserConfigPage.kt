@@ -15,7 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -134,10 +135,10 @@ class UserConfigPage : TelnetPage() {
                         .background(colors.chapterBackground)
                         .padding(horizontal = 12.dp, vertical = 8.dp)
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.user_config),
                         color = colors.chapterText,
-                        fontSize = 14.sp
+                        size = BahaTextSize.CAPTION
                     )
                 }
 
@@ -182,16 +183,16 @@ class UserConfigPage : TelnetPage() {
                         .padding(horizontal = 12.dp, vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = stringResource(R.string.user_config_cant),
                         color = colors.chapterText,
-                        fontSize = 14.sp,
+                        size = BahaTextSize.CAPTION,
                         modifier = Modifier.weight(1f)
                     )
-                    Text(
+                    BahaText(
                         text = if (isCantExpandState) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
                         color = colors.chapterText.copy(alpha = 0.8f),
-                        fontSize = 12.sp
+                        size = BahaTextSize.TINY
                     )
                 }
 
@@ -244,7 +245,12 @@ class UserConfigPage : TelnetPage() {
             }
 
             // 2. 底部固定工具列（移出滾動區域，放在外層 Column 最底端）
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.toolbarDivider)
+            )
             BahaButton(
                 text = stringResource(R.string._back),
                 modifier = Modifier

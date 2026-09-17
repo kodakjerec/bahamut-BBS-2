@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -35,7 +36,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -54,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
@@ -84,6 +83,8 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppColors
@@ -698,10 +699,10 @@ class ArticlePage : TelnetPage() {
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(
+                        BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            fontSize = 16.sp
+                            size = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -818,19 +819,19 @@ fun ArticleTopBar(
                     .weight(1f)
                     .padding(horizontal = 4.dp)
             ) {
-                Text(
+                BahaText(
                     text = title,
                     color = colors.titleBarTitle,
-                    fontSize = 16.sp,
+                    size = BahaTextSize.BODY,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 if (subtitle.isNotEmpty()) {
-                    Text(
+                    BahaText(
                         text = subtitle,
                         color = colors.titleBarDetail,
-                        fontSize = 11.sp,
+                        size = BahaTextSize.TINY,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -873,22 +874,19 @@ fun ArticleExtToolbar(
                 text = stringResource(R.string.do_gy),
                 type = ButtonType.NORMAL,
                 onClick = onDoGy,
-                modifier = Modifier.weight(1f),
-                minHeight = 36.dp
+                modifier = Modifier.weight(1f)
             )
             BahaButton(
                 text = stringResource(R.string.change_mode),
                 type = ButtonType.NORMAL,
                 onClick = onChangeMode,
-                modifier = Modifier.weight(1f),
-                minHeight = 36.dp
+                modifier = Modifier.weight(1f)
             )
             BahaButton(
                 text = stringResource(R.string.open_url),
                 type = ButtonType.NORMAL,
                 onClick = onOpenLink,
-                modifier = Modifier.weight(1f),
-                minHeight = 36.dp
+                modifier = Modifier.weight(1f)
             )
         }
         HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -921,10 +919,10 @@ fun ArticleTextModeContent(
                 shape = RoundedCornerShape(8.dp)
             ) {
                 Column(modifier = Modifier.padding(12.dp)) {
-                    Text(
+                    BahaText(
                         text = article.title,
                         color = colors.titleBarTitle,
-                        fontSize = 17.sp,
+                        size = BahaTextSize.SUBTITLE,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(4.dp))
@@ -932,23 +930,23 @@ fun ArticleTextModeContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
+                        BahaText(
                             text = "作者: ${article.author}${if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""}",
                             color = colors.titleBarDetail2,
-                            fontSize = 13.sp,
+                            size = BahaTextSize.CAPTION,
                             modifier = Modifier.clickable { onAuthorClick(article.author) }
                         )
-                        Text(
+                        BahaText(
                             text = "看板: ${article.boardName}",
                             color = colors.titleBarDetail,
-                            fontSize = 13.sp
+                            size = BahaTextSize.CAPTION
                         )
                     }
                     Spacer(modifier = Modifier.height(2.dp))
-                    Text(
+                    BahaText(
                         text = "時間: ${article.dateTime}",
                         color = colors.textSecondary,
-                        fontSize = 12.sp
+                        size = BahaTextSize.TINY
                     )
                 }
             }
@@ -978,16 +976,16 @@ fun ArticleTextModeContent(
                     .padding(vertical = 4.dp)
             ) {
                 if (article.fromIP.isNotEmpty()) {
-                    Text(
+                    BahaText(
                         text = "※ 發文來源: ${article.fromIP}",
                         color = colors.textSecondary,
-                        fontSize = 12.sp
+                        size = BahaTextSize.TINY
                     )
                 }
-                Text(
+                BahaText(
                     text = "《 ${article.dateTime} 》",
                     color = colors.bbsMailDate,
-                    fontSize = 12.sp
+                    size = BahaTextSize.TINY
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -1002,10 +1000,10 @@ fun ArticleTextModeContent(
                     for (eIndex in 0 until article.editRecordSize) {
                         val editRec = article.getEditRecord(eIndex)
                         if (editRec != null) {
-                            Text(
+                            BahaText(
                                 text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
                                 color = colors.bbsMailMark,
-                                fontSize = 11.sp,
+                                size = BahaTextSize.TINY,
                                 modifier = Modifier.padding(vertical = 1.dp)
                             )
                         }
@@ -1020,10 +1018,10 @@ fun ArticleTextModeContent(
         if (article.pushSize > 0) {
             item {
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
+                BahaText(
                     text = "── 推文列表 (${article.pushSize}) ──",
                     color = colors.titleBarTitle,
-                    fontSize = 13.sp,
+                    size = BahaTextSize.CAPTION,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -1062,10 +1060,10 @@ fun ArticleContentBlockItem(
     // 作者引述列
     if (!item.author.isNullOrEmpty()) {
         val nick = if (!item.nickname.isNullOrEmpty()) "(${item.nickname})" else ""
-        Text(
+        BahaText(
             text = "※ 引述《${item.author}$nick》之銘言：",
             color = if (isQuote) colors.bbsAuthor1 else colors.bbsAuthor0,
-            fontSize = 13.sp,
+            size = BahaTextSize.CAPTION,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
         )
@@ -1078,7 +1076,7 @@ fun ArticleContentBlockItem(
         LinkableText(
             text = content,
             defaultColor = textColor,
-            fontSize = 15.sp,
+            size = BahaTextSize.BODY,
             modifier = Modifier.padding(
                 start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
                 top = 2.dp,
@@ -1118,27 +1116,27 @@ fun ArticlePushRowItem(
             verticalAlignment = Alignment.Top
         ) {
             // 樓層編號
-            Text(
+            BahaText(
                 text = "[$floor 樓]",
                 color = colors.textSecondary,
-                fontSize = 11.sp,
+                size = BahaTextSize.TINY,
                 modifier = Modifier.width(44.dp)
             )
 
             // 推/噓/→ 標籤
-            Text(
+            BahaText(
                 text = tagText,
                 color = tagColor,
-                fontSize = 12.sp,
+                size = BahaTextSize.TINY,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.width(18.dp)
             )
 
             // 推文作者
-            Text(
+            BahaText(
                 text = "${push.author}: ",
                 color = Color(0xFF80FFFF),
-                fontSize = 13.sp,
+                size = BahaTextSize.CAPTION,
                 fontWeight = FontWeight.Bold
             )
 
@@ -1146,17 +1144,17 @@ fun ArticlePushRowItem(
             LinkableText(
                 text = push.content,
                 defaultColor = colors.textPrimary,
-                fontSize = 13.sp,
+                size = BahaTextSize.CAPTION,
                 modifier = Modifier.weight(1f)
             )
 
             // 推文時間
             if (push.date.isNotEmpty() || push.time.isNotEmpty()) {
                 Spacer(modifier = Modifier.width(4.dp))
-                Text(
+                BahaText(
                     text = "${push.date} ${push.time}",
                     color = colors.textSecondary,
-                    fontSize = 10.sp
+                    size = BahaTextSize.TINY
                 )
             }
         }
@@ -1171,7 +1169,7 @@ fun ArticlePushRowItem(
 fun LinkableText(
     text: String,
     defaultColor: Color,
-    fontSize: androidx.compose.ui.unit.TextUnit,
+    size: BahaTextSize = BahaTextSize.BODY,
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
@@ -1213,12 +1211,23 @@ fun LinkableText(
         }
     }
 
+    val resolvedFontSize = when (size) {
+        BahaTextSize.ULTRA_LARGE -> AppTheme.fontSize.ultraLarge
+        BahaTextSize.LARGE -> AppTheme.fontSize.large
+        BahaTextSize.BASE -> AppTheme.fontSize.base
+        BahaTextSize.TITLE -> AppTheme.fontSize.title
+        BahaTextSize.SUBTITLE -> AppTheme.fontSize.subtitle
+        BahaTextSize.BODY -> AppTheme.fontSize.body
+        BahaTextSize.CAPTION -> AppTheme.fontSize.caption
+        BahaTextSize.TINY -> AppTheme.fontSize.tiny
+    }
+
     ClickableText(
         text = annotatedString,
         modifier = modifier,
         style = androidx.compose.ui.text.TextStyle(
             color = defaultColor,
-            fontSize = fontSize,
+            fontSize = resolvedFontSize,
             fontFamily = FontFamily.Default
         ),
         onClick = { offset ->
@@ -1284,14 +1293,13 @@ fun ArticleBottomToolbar(
     onRRClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+        HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.toolbarBackground)
-                .padding(horizontal = 6.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                .height(50.dp)
+                .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 靠右對齊時左側切換按鈕
@@ -1300,8 +1308,9 @@ fun ArticleBottomToolbar(
                     text = "<<",
                     type = ButtonType.NORMAL,
                     onClick = onLLClick,
-                    modifier = Modifier.width(44.dp),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
                 )
             }
 
@@ -1311,8 +1320,9 @@ fun ArticleBottomToolbar(
                         text = stringResource(R.string.reply),
                         type = ButtonType.NORMAL,
                         onClick = onReplyClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 },
                 {
@@ -1320,8 +1330,9 @@ fun ArticleBottomToolbar(
                         text = stringResource(R.string.prev_article),
                         type = ButtonType.NORMAL,
                         onClick = onPrevClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 },
                 {
@@ -1329,8 +1340,9 @@ fun ArticleBottomToolbar(
                         text = stringResource(R.string.next_article),
                         type = ButtonType.NORMAL,
                         onClick = onNextClick,
-                        modifier = Modifier.weight(1f),
-                        minHeight = 40.dp
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 }
             )
@@ -1347,8 +1359,9 @@ fun ArticleBottomToolbar(
                     text = ">>",
                     type = ButtonType.NORMAL,
                     onClick = onRRClick,
-                    modifier = Modifier.width(44.dp),
-                    minHeight = 40.dp
+                    modifier = Modifier
+                        .width(44.dp)
+                        .fillMaxHeight()
                 )
             }
         }
