@@ -44,7 +44,10 @@
 | `dialogButtonDivider` | 對話框按鈕間垂直細線 | 極深色細線 `#001A1A` |
 | `chapterBackground` | 設定頁分類章節列底色 | 深灰 `#202020` (粉紅/電子紙模式依主題變換) |
 | `chapterText` | 設定頁分類章節列文字色 | 灰白 `#C0C0C0` (粗體) |
+| `titleBarBackground` | 標題列/勇者足跡作者底色 | 經典深海藍 `#000060` (BBS TitleBar) |
 | `statusNotice` | 狀態數值/通知警示標示色 | 經典紅 `#800000` / `#C04040` (如線上人數、呼叫器狀態) |
+| `classItemName` | 看板列表看板英文名稱 | 淺黃色 `#F0F080` (BBS Yellow) |
+| `classItemManager` | 看板列表板主名稱 | 淺紫藍色 `#B0B0F0` (BBS Mail/Board Manager) |
 
 ---
 

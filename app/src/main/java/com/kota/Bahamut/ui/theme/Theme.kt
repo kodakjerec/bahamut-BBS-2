@@ -40,6 +40,7 @@ data class AppColors(
     val titleBarTitle: Color,
     val titleBarDetail: Color,
     val titleBarDetail2: Color,
+    val titleBarBackground: Color,
     val buttonText: Color,
     val buttonTextPressed: Color,
     val buttonTextDisabled: Color,
@@ -99,7 +100,11 @@ data class AppColors(
     val bbsMailDate: Color,
     val bbsMailAuthor: Color,
     val bbsMailNumber: Color,
-    val bbsBoardGy: Color
+    val bbsBoardGy: Color,
+
+    // 看板列表項目色彩
+    val classItemName: Color,
+    val classItemManager: Color
 )
 
 /**
@@ -118,6 +123,7 @@ private val DefaultLightColors = AppColors(
     titleBarTitle = AppPalette.Yellow,
     titleBarDetail = AppPalette.White,
     titleBarDetail2 = Color(0xFFC0FFFF),
+    titleBarBackground = AppPalette.DefaultTitleBarBackground,
     buttonText = AppPalette.White,
     buttonTextPressed = AppPalette.Black,
     buttonTextDisabled = Color(0xFF608060),
@@ -171,7 +177,9 @@ private val DefaultLightColors = AppColors(
     bbsMailDate = AppPalette.BbsMailDate,
     bbsMailAuthor = AppPalette.BbsMailAuthor,
     bbsMailNumber = AppPalette.BbsMailNumber,
-    bbsBoardGy = AppPalette.BbsBoardGy
+    bbsBoardGy = AppPalette.BbsBoardGy,
+    classItemName = AppPalette.Yellow,
+    classItemManager = AppPalette.BbsMailAuthor
 )
 
 /**
@@ -190,6 +198,7 @@ private val DefaultDarkColors = AppColors(
     titleBarTitle = AppPalette.Yellow,
     titleBarDetail = AppPalette.DarkTextWhite,
     titleBarDetail2 = Color(0xFFC0FFFF),
+    titleBarBackground = AppPalette.DefaultTitleBarBackground,
     buttonText = AppPalette.DarkTextWhite,
     buttonTextPressed = AppPalette.White,
     buttonTextDisabled = Color(0xFF507050),
@@ -243,7 +252,9 @@ private val DefaultDarkColors = AppColors(
     bbsMailDate = AppPalette.BbsDarkMailDate,
     bbsMailAuthor = AppPalette.BbsDarkMailAuthor,
     bbsMailNumber = AppPalette.BbsDarkMailNumber,
-    bbsBoardGy = AppPalette.BbsDarkBoardGy
+    bbsBoardGy = AppPalette.BbsDarkBoardGy,
+    classItemName = AppPalette.Yellow,
+    classItemManager = AppPalette.BbsDarkMailAuthor
 )
 
 /**
@@ -299,6 +310,7 @@ private val EInkLightColors = AppColors(
     titleBarTitle = AppPalette.Black,
     titleBarDetail = AppPalette.Black,
     titleBarDetail2 = AppPalette.HalfWhite,
+    titleBarBackground = AppPalette.White,
     buttonText = AppPalette.EInkButtonTextNormal,
     buttonTextPressed = AppPalette.EInkButtonTextPressed,
     buttonTextDisabled = AppPalette.EInkButtonTextDisabled,
@@ -352,7 +364,9 @@ private val EInkLightColors = AppColors(
     bbsMailDate = AppPalette.HalfWhite,
     bbsMailAuthor = AppPalette.HalfWhite,
     bbsMailNumber = AppPalette.HalfWhite,
-    bbsBoardGy = AppPalette.HalfWhite
+    bbsBoardGy = AppPalette.HalfWhite,
+    classItemName = AppPalette.Black,
+    classItemManager = AppPalette.HalfWhite
 )
 
 /**
@@ -371,6 +385,7 @@ private val EInkDarkColors = AppColors(
     titleBarTitle = AppPalette.White,
     titleBarDetail = AppPalette.White,
     titleBarDetail2 = AppPalette.HalfWhite,
+    titleBarBackground = AppPalette.Black,
     buttonText = AppPalette.EInkDarkButtonTextNormal,
     buttonTextPressed = AppPalette.EInkDarkButtonTextPressed,
     buttonTextDisabled = AppPalette.EInkButtonTextDisabled,
@@ -424,7 +439,9 @@ private val EInkDarkColors = AppColors(
     bbsMailDate = AppPalette.HalfWhite,
     bbsMailAuthor = AppPalette.HalfWhite,
     bbsMailNumber = AppPalette.HalfWhite,
-    bbsBoardGy = AppPalette.HalfWhite
+    bbsBoardGy = AppPalette.HalfWhite,
+    classItemName = AppPalette.White,
+    classItemManager = AppPalette.HalfWhite
 )
 
 /**

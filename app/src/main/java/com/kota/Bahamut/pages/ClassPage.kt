@@ -11,6 +11,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -54,7 +55,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
-import com.kota.Bahamut.ui.components.BahaTopAppBar
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.dialogs.BahaListDialog
@@ -328,45 +328,31 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 1. 頂部導覽列
-            BahaTopAppBar(
-                title = currentDisplayTitle.ifEmpty { "看板列表" },
-                subtitle = "看板列表",
-                onBackClick = { onBackPressed() }
-            )
-
-            // 前次造訪看板快速連結提示列
-            if (lastVisitBoardText.isNotEmpty()) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colors.dialogTitleBackground)
-                        .clickable {
-                            TelnetClient.myInstance?.sendStringToServer("s$lastVisitBoardText")
-                        }
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    BahaText(
-                        text = "前次造訪：$lastVisitBoardText",
-                        color = colors.titleBarTitle,
-                        size = BahaTextSize.CAPTION,
-                        fontWeight = FontWeight.Bold
-                    )
-                    BahaText(
-                        text = "點此直接進入 ➔",
-                        color = colors.textSecondary,
-                        size = BahaTextSize.TINY
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.divider)
+            // 1. 頂部標題列 (經典 BBS 深海藍底，雙行文字，無返回按鈕)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colors.titleBarBackground)
+                    .padding(horizontal = 10.dp, vertical = 6.dp)
+            ) {
+                BahaText(
+                    text = currentDisplayTitle.ifEmpty { stringResource(R.string.loading) },
+                    color = colors.titleBarTitle,
+                    size = BahaTextSize.TITLE
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                BahaText(
+                    text = "看板列表",
+                    color = colors.titleBarDetail,
+                    size = BahaTextSize.BODY
                 )
             }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
 
             // 2. 看板清單主體
             Box(
@@ -409,6 +395,24 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                                 onLongClick = { onListViewItemLongClicked(null, index) }
                             )
                         }
+                    }
+                }
+
+                // 前次造訪看板快速連結浮動文字 (如 Chat▶▶)，沉底靠右
+                if (lastVisitBoardText.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 12.dp, bottom = 8.dp)
+                            .clickable {
+                                TelnetClient.myInstance?.sendStringToServer("s$lastVisitBoardText")
+                            }
+                    ) {
+                        BahaText(
+                            text = "$lastVisitBoardText▶▶",
+                            color = colors.textPrimary,
+                            size = BahaTextSize.TITLE
+                        )
                     }
                 }
             }
@@ -492,33 +496,36 @@ private fun ClassPageRowItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick
-            )
             .background(colors.pageBackground)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 左側看板文字資訊區塊
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .combinedClickable(
+                        onClick = onClick,
+                        onLongClick = onLongClick
+                    )
+                    .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
             ) {
-                // 看板中文標題
+                // 看板中文標題 (白字)
                 BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
+                    color = colors.textPrimary,
                     size = BahaTextSize.SUBTITLE,
-                    fontWeight = FontWeight.Medium,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
 
-                // 看板英文名稱與板主資訊
+                // 看板英文名稱 (黃字) 與板主資訊 (紫藍字)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -526,17 +533,16 @@ private fun ClassPageRowItem(
                 ) {
                     BahaText(
                         text = item?.name ?: stringResource(R.string.loading),
-                        color = colors.titleBarTitle,
-                        size = BahaTextSize.CAPTION,
-                        fontWeight = FontWeight.Bold
+                        color = colors.classItemName,
+                        size = BahaTextSize.BODY
                     )
 
                     val manager = item?.manager
                     if (!manager.isNullOrEmpty()) {
                         BahaText(
                             text = manager,
-                            color = colors.textSecondary,
-                            size = BahaTextSize.TINY,
+                            color = colors.classItemManager,
+                            size = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -544,15 +550,29 @@ private fun ClassPageRowItem(
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // 右箭頭
-            BahaText(
-                text = "›",
-                color = colors.titleBarTitle,
-                size = BahaTextSize.BASE,
-                fontWeight = FontWeight.Light
+            // 垂直分隔線
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(colors.divider)
             )
+
+            // 右箭頭按鈕區塊 (點擊亦可進入)
+            Box(
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .clickable { onClick() }
+                    .padding(horizontal = 8.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                BahaText(
+                    text = ">",
+                    color = colors.textPrimary,
+                    size = BahaTextSize.BODY,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         // 底部分隔線

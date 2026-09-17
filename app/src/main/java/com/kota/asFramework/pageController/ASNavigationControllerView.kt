@@ -72,7 +72,12 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
 
     // com.kota.asFramework.pageController.ASGestureViewDelegate
     override fun onASGestureDisPathTouchEvent(paramMotionEvent: MotionEvent?) {
-        this.contentView?.dispatchTouchEvent(paramMotionEvent)
+        if (paramMotionEvent != null) {
+            try {
+                this.contentView?.dispatchTouchEvent(paramMotionEvent)
+            } catch (_: Exception) {
+            }
+        }
     }
 
     // com.kota.asFramework.pageController.ASGestureViewDelegate

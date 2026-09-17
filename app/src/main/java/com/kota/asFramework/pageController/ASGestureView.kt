@@ -34,7 +34,6 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
         paramFloat1: Float,
         paramFloat2: Float
     ): Boolean {
-        var paramMotionEvent1: MotionEvent
         var bool1 = false
         if (this.gestureViewDelegate != null) {
             val f2 = abs(paramFloat1)
@@ -57,10 +56,14 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
         }
         this.eventLocked = bool1
         if (bool1 && this.gestureViewDelegate != null) {
-            paramMotionEvent1 = MotionEvent.obtain(paramMotionEvent2)
-            paramMotionEvent1.action = 3
-            this.gestureViewDelegate?.onASGestureDisPathTouchEvent(paramMotionEvent1)
-            paramMotionEvent1.recycle()
+            val cancelEvent = MotionEvent.obtain(paramMotionEvent2)
+            cancelEvent.action = MotionEvent.ACTION_CANCEL
+            try {
+                this.gestureViewDelegate?.onASGestureDisPathTouchEvent(cancelEvent)
+            } catch (_: Exception) {
+            } finally {
+                cancelEvent.recycle()
+            }
         }
         return bool1
     }
@@ -84,11 +87,19 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
-        this.gestureDetector.onTouchEvent(paramMotionEvent)
-        if (!this.eventLocked && this.gestureViewDelegate != null) this.gestureViewDelegate?.onASGestureDisPathTouchEvent(
-            paramMotionEvent
-        )
-        if (paramMotionEvent.action == 1) this.eventLocked = false
+        try {
+            this.gestureDetector.onTouchEvent(paramMotionEvent)
+        } catch (_: Exception) {
+        }
+        if (!this.eventLocked && this.gestureViewDelegate != null) {
+            try {
+                this.gestureViewDelegate?.onASGestureDisPathTouchEvent(paramMotionEvent)
+            } catch (_: Exception) {
+            }
+        }
+        if (paramMotionEvent.action == MotionEvent.ACTION_UP || paramMotionEvent.action == MotionEvent.ACTION_CANCEL) {
+            this.eventLocked = false
+        }
         return true
     }
 

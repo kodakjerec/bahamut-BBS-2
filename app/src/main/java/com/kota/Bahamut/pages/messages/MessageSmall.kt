@@ -101,33 +101,38 @@ class MessageSmall(context: Context): LinearLayout(context) {
 
     // 移動toolbar
     @SuppressLint("ClickableViewAccessibility")
-    private val onTouchListener = OnTouchListener { _: View?, event: MotionEvent ->
-        val duration = event.eventTime - event.downTime
-        var pointX = event.rawX
-        var pointY = event.rawY
-        // 微調手指中心點
-        pointX -= scale * 30
-        pointY -= scale * 60
+    private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent? ->
+        if (event == null) return@OnTouchListener false
+        try {
+            val duration = event.eventTime - event.downTime
+            var pointX = event.rawX
+            var pointY = event.rawY
+            // 微調手指中心點
+            pointX -= scale * 30
+            pointY -= scale * 60
 
-        // 彈出視窗位置
-        val location = IntArray(2)
-        rootView.getLocationOnScreen(location)
-        pointX -= location[0].toFloat()
-        pointY -= location[1].toFloat()
-        when (event.action) {
-            MotionEvent.ACTION_UP -> {
-                if (duration < 200) { // click
-                    val aPage = PageContainer.instance!!.getMessageMain()
-                    ASNavigationController.currentController?.pushViewController(aPage)
-                    BahamutStateHandler.bahamutStateHandler?.currentPage =
-                        BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
-                } else {
-                    updateLayout(pointX, pointY, false)
+            // 彈出視窗位置
+            val location = IntArray(2)
+            rootView.getLocationOnScreen(location)
+            pointX -= location[0].toFloat()
+            pointY -= location[1].toFloat()
+            when (event.action) {
+                MotionEvent.ACTION_UP -> {
+                    if (duration < 200) { // click
+                        view?.performClick()
+                        val aPage = PageContainer.instance!!.getMessageMain()
+                        ASNavigationController.currentController?.pushViewController(aPage)
+                        BahamutStateHandler.bahamutStateHandler?.currentPage =
+                            BahamutPage.BAHAMUT_MESSAGE_MAIN_PAGE
+                    } else {
+                        updateLayout(pointX, pointY, false)
+                    }
                 }
-            }
 
-            MotionEvent.ACTION_MOVE ->
-                updateLayout(pointX, pointY, true)
+                MotionEvent.ACTION_MOVE ->
+                    updateLayout(pointX, pointY, true)
+            }
+        } catch (_: Exception) {
         }
         true
     }

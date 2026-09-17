@@ -6,7 +6,6 @@ import android.os.PowerManager
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,8 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -33,13 +31,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
@@ -50,7 +45,6 @@ import com.kota.Bahamut.pages.messages.MessageDatabase
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.HeroStep
 import com.kota.Bahamut.service.NotificationSettings.getAlarmIgnoreBatteryOptimizations
-import com.kota.Bahamut.service.NotificationSettings.getShowHeroStep
 import com.kota.Bahamut.service.NotificationSettings.setAlarmIgnoreBatteryOptimizations
 import com.kota.Bahamut.service.NotificationSettings.setShowHeroStep
 import com.kota.Bahamut.service.SyncManager
@@ -99,13 +93,7 @@ class MainPage : TelnetComposePage() {
         bbCallText = bbCallStatus ?: ""
 
         // 載入勇者足跡
-        val heroStepList: MutableList<HeroStep> = getHeroStepList()
-        heroStepItems.clear()
-        heroStepItems.addAll(heroStepList)
-        if (heroStepList.isEmpty()) {
-            setShowHeroStep(false)
-        }
-        isShowHeroStep = getShowHeroStep()
+        loadHeroStepData()
 
         // 檢查電池最佳化
         checkBatteryLife()
@@ -121,8 +109,27 @@ class MainPage : TelnetComposePage() {
         }
     }
 
+    override fun onPageDidAppear() {
+        super.onPageDidAppear()
+        loadHeroStepData()
+    }
+
     override fun onPageRefresh() {
         setFrameToTelnetView()
+        loadHeroStepData()
+    }
+
+    fun loadHeroStepData() {
+        val heroStepList = getHeroStepList()
+        if (heroStepList.isNotEmpty()) {
+            if (heroStepItems.size != heroStepList.size || heroStepItems.isEmpty()) {
+                heroStepItems.clear()
+                heroStepItems.addAll(heroStepList)
+            }
+            // 只要有足跡資料就預設顯示（修復先前被誤設為 false 的狀態）
+            isShowHeroStep = true
+            setShowHeroStep(true)
+        }
     }
 
     private fun setFrameToTelnetView() {
@@ -194,6 +201,10 @@ class MainPage : TelnetComposePage() {
     }
 
     fun onToggleHeroStep() {
+        val heroStepList = getHeroStepList()
+        if (heroStepList.isNotEmpty() && heroStepItems.isEmpty()) {
+            heroStepItems.addAll(heroStepList)
+        }
         val nextState = !isShowHeroStep
         isShowHeroStep = nextState
         setShowHeroStep(nextState)
@@ -355,20 +366,14 @@ class MainPage : TelnetComposePage() {
 
             // 2. 勇者足跡展開清單 (若有啟用且非空)
             if (isShowHeroStep && heroStepItems.isNotEmpty()) {
-                Box(
+                LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 144.dp)
                         .background(colors.pageBackground)
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 ) {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(heroStepItems) { heroStep ->
-                            HeroStepRow(heroStep = heroStep)
-                        }
+                    items(heroStepItems) { heroStep ->
+                        HeroStepRow(heroStep = heroStep)
                     }
                 }
             }
@@ -404,8 +409,7 @@ class MainPage : TelnetComposePage() {
                         BahaText(
                             text = onlinePeopleText.ifEmpty { "0" },
                             size = BahaTextSize.TITLE,
-                            color = colors.statusNotice,
-                            fontWeight = FontWeight.Bold
+                            color = colors.statusNotice
                         )
                     }
 
@@ -438,8 +442,7 @@ class MainPage : TelnetComposePage() {
                         BahaText(
                             text = bbCallText.ifEmpty { "0" },
                             size = BahaTextSize.TITLE,
-                            color = colors.statusNotice,
-                            fontWeight = FontWeight.Bold
+                            color = colors.statusNotice
                         )
                     }
 
@@ -454,8 +457,7 @@ class MainPage : TelnetComposePage() {
                         BahaText(
                             text = stringResource(R.string.main_hero_step),
                             size = BahaTextSize.LARGE,
-                            color = colors.buttonText,
-                            fontWeight = FontWeight.Bold
+                            color = colors.buttonText
                         )
                     }
                 }
@@ -554,14 +556,13 @@ private fun MainFolderItem(
             text = title,
             size = BahaTextSize.LARGE,
             color = colors.buttonText,
-            fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center
         )
     }
 }
 
 /**
- * 勇者足跡項目列
+ * 勇者足跡項目列 (經典 BBS 雙色標頭風格)
  */
 @Composable
 private fun HeroStepRow(
@@ -572,34 +573,57 @@ private fun HeroStepRow(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(4.dp))
-            .background(colors.surface)
-            .border(1.dp, colors.divider, RoundedCornerShape(4.dp))
+            .background(colors.pageBackground)
     ) {
+        // 標頭列：左側深藍底作者，右側灰銀底時間
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(colors.dialogTitleBackground)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .height(26.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BahaText(
-                text = heroStep.authorNickname ?: stringResource(R.string.loading_),
-                color = colors.titleBarTitle,
-                size = BahaTextSize.TINY,
-                fontWeight = FontWeight.Bold
-            )
-            BahaText(
-                text = heroStep.datetime ?: "",
-                color = colors.textSecondary,
-                size = BahaTextSize.TINY
-            )
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(colors.titleBarBackground)
+                    .padding(horizontal = 4.dp),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                BahaText(
+                    text = heroStep.authorNickname ?: stringResource(R.string.loading_),
+                    color = colors.textPrimary,
+                    size = BahaTextSize.BODY,
+                    maxLines = 1
+                )
+            }
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
+                    .background(colors.chapterText)
+                    .padding(horizontal = 4.dp),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                BahaText(
+                    text = heroStep.datetime ?: "",
+                    color = colors.titleBarBackground,
+                    size = BahaTextSize.BODY,
+                    textAlign = TextAlign.End,
+                    maxLines = 1
+                )
+            }
         }
+        // 留言內文 (黑底白字)
         BahaText(
             text = heroStep.content ?: stringResource(R.string.loading),
-            size = BahaTextSize.CAPTION,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            color = colors.textPrimary,
+            size = BahaTextSize.BODY,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp, vertical = 4.dp)
         )
+        // 項目底部分隔線
+        HorizontalDivider(color = colors.divider, thickness = 1.dp)
     }
 }

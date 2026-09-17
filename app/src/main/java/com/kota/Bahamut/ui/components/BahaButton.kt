@@ -1,7 +1,8 @@
 package com.kota.Bahamut.ui.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
@@ -30,16 +31,18 @@ enum class ButtonType {
  * 專案通用按鈕 Composable
  * 以狀態邏輯取代舊 XML Selector (button_background_*.xml, pink_toolbar_item_background.xml 等)
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BahaButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    onLongClick: (() -> Unit)? = null,
     type: ButtonType = ButtonType.NORMAL,
     enabled: Boolean = true,
     isSelected: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 10.dp),
-    fontSize: TextUnit = AppTheme.fontSize.base,
+    fontSize: TextUnit = AppTheme.fontSize.subtitle,
     minHeight: Dp = 42.dp
 ) {
     val colors = AppTheme.colors
@@ -76,11 +79,12 @@ fun BahaButton(
         modifier = modifier
             .defaultMinSize(minWidth = 56.dp, minHeight = minHeight)
             .background(backgroundColor)
-            .clickable(
+            .combinedClickable(
                 interactionSource = interactionSource,
                 indication = null, // 自訂狀態色彩切換已包含即時反饋
                 enabled = enabled,
-                onClick = onClick
+                onClick = onClick,
+                onLongClick = onLongClick
             )
             .padding(contentPadding),
         contentAlignment = Alignment.Center

@@ -10,10 +10,10 @@ import android.view.View.OnLongClickListener
 import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -22,30 +22,29 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -665,14 +664,22 @@ class ArticlePage : TelnetPage() {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
+            val authorText = article?.let {
+                val nick = if (!it.nickName.isNullOrEmpty()) "(${it.nickName})" else ""
+                "${it.author}$nick"
+            } ?: ""
+            val boardText = article?.boardName ?: ""
+
             // 1. 頂部導覽列
             ArticleTopBar(
                 title = article?.title ?: stringResource(R.string.loading_),
-                subtitle = article?.let {
-                    val nick = if (!it.nickName.isNullOrEmpty()) " (${it.nickName})" else ""
-                    "${it.boardName}  ${it.author}$nick"
-                } ?: "",
-                onBackClick = { onBackPressed() },
+                author = authorText,
+                boardName = boardText,
+                onAuthorClick = {
+                    if (article != null) {
+                        showAuthorActionDialog(authorText)
+                    }
+                },
                 onMenuClick = { onMenuClicked() }
             )
 
@@ -750,7 +757,7 @@ class ArticlePage : TelnetPage() {
             cleanAuthor = cleanAuthor.substring(0, cleanAuthor.indexOf("("))
         }
         ASListDialog.createDialog()
-            .setTitle(cleanAuthor)
+            .setTitle(author)
             .addItem(getContextString(R.string.dialog_query_hero))
             .addItem(getContextString(R.string.message_sub_send_hero))
             .setListener(object : ASListDialogItemClickListener {
@@ -784,69 +791,112 @@ class ArticlePage : TelnetPage() {
 // -------------------------------------------------------------
 
 /**
- * 頂部導覽列
+ * 頂部導覽列 (經典 BBS 深海藍底，雙行文字，無返回鍵，右側選單按鈕)
  */
 @Composable
 fun ArticleTopBar(
     title: String,
-    subtitle: String,
-    onBackClick: () -> Unit,
+    author: String,
+    boardName: String,
+    onAuthorClick: () -> Unit,
     onMenuClick: () -> Unit
 ) {
     val colors = AppTheme.colors
+    var isExpanded by remember { mutableStateOf(false) }
+    val isFollowed = TempSettings.isBoardFollowTitle(title)
+    val titleColor = if (isFollowed) colors.bbsBoardFollowFirst else colors.titleBarTitle
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(colors.toolbarBackground)
+            .background(colors.titleBarBackground)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 4.dp, vertical = 6.dp),
+                .height(IntrinsicSize.Min),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null,
-                    tint = colors.titleBarTitle
-                )
-            }
-
+            // 左側文章資訊區塊 (雙行)
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 4.dp)
+                    .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
             ) {
+                // 第一列：文章標題 (追蹤時為青色，一般為黃色)
                 BahaText(
                     text = title,
-                    color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY,
+                    color = titleColor,
+                    size = BahaTextSize.TITLE,
                     fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    maxLines = if (isExpanded) 3 else 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.clickable { isExpanded = !isExpanded }
                 )
-                if (subtitle.isNotEmpty()) {
+
+                Spacer(modifier = Modifier.height(2.dp))
+
+                // 第二列：作者 (白色，可點擊呼叫選單) 與 看板 (青色)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     BahaText(
-                        text = subtitle,
+                        text = author,
                         color = colors.titleBarDetail,
-                        size = BahaTextSize.TINY,
+                        size = BahaTextSize.BODY,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .clickable { onAuthorClick() }
                     )
+
+                    if (boardName.isNotEmpty()) {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        BahaText(
+                            text = boardName,
+                            color = colors.titleBarDetail2,
+                            size = BahaTextSize.BODY,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
 
-            IconButton(onClick = onMenuClick) {
+            // 垂直分隔線
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(colors.divider)
+            )
+
+            // 右側選單按鈕 (經典 BBS 選單圖示)
+            Box(
+                modifier = Modifier
+                    .width(56.dp)
+                    .fillMaxHeight()
+                    .clickable { onMenuClick() },
+                contentAlignment = Alignment.Center
+            ) {
                 Icon(
-                    imageVector = Icons.Filled.MoreVert,
+                    painter = painterResource(id = R.drawable.menu_icon),
                     contentDescription = stringResource(R.string.zero_word),
-                    tint = colors.titleBarTitle
+                    tint = colors.textPrimary
                 )
             }
         }
-        HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
+        // 底部分隔線
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(colors.divider)
+        )
     }
 }
 
@@ -1249,16 +1299,17 @@ fun ArticleTelnetModeContent(
     article: TelnetArticle,
     onTelnetViewCreated: (TelnetView) -> Unit
 ) {
-    val horizontalScrollState = rememberScrollState()
     val verticalScrollState = rememberScrollState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .horizontalScroll(horizontalScrollState)
             .verticalScroll(verticalScrollState)
     ) {
         AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
             factory = { ctx ->
                 TelnetView(ctx).apply {
                     if (article.frame != null) {
@@ -1293,7 +1344,12 @@ fun ArticleBottomToolbar(
     onRRClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(1.dp)
+                .background(colors.toolbarDivider)
+        )
 
         Row(
             modifier = Modifier
@@ -1302,15 +1358,28 @@ fun ArticleBottomToolbar(
                 .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 靠右對齊時左側切換按鈕
+            // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
-                BahaButton(
-                    text = "<<",
-                    type = ButtonType.NORMAL,
-                    onClick = onLLClick,
+                Box(
                     modifier = Modifier
-                        .width(44.dp)
+                        .weight(1f)
                         .fillMaxHeight()
+                        .background(colors.pageBackground)
+                        .clickable(onClick = onLLClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BahaText(
+                        text = "<<",
+                        color = colors.textPrimary,
+                        size = BahaTextSize.SUBTITLE,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
             }
 
@@ -1330,6 +1399,7 @@ fun ArticleBottomToolbar(
                         text = stringResource(R.string.prev_article),
                         type = ButtonType.NORMAL,
                         onClick = onPrevClick,
+                        onLongClick = onFirstClick,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
@@ -1340,6 +1410,7 @@ fun ArticleBottomToolbar(
                         text = stringResource(R.string.next_article),
                         type = ButtonType.NORMAL,
                         onClick = onNextClick,
+                        onLongClick = onLastClick,
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
@@ -1349,20 +1420,41 @@ fun ArticleBottomToolbar(
 
             // 反轉順序判定
             val orderedButtons = if (toolbarOrder == 1) buttons.reversed() else buttons
-            for (btn in orderedButtons) {
+            orderedButtons.forEachIndexed { index, btn ->
+                if (index > 0) {
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .fillMaxHeight()
+                            .background(colors.toolbarDivider)
+                    )
+                }
                 btn()
             }
 
-            // 靠左對齊時右側切換按鈕
+            // 靠左對齊時右側切換按鈕 (RR)
             if (toolbarLocation == 1) {
-                BahaButton(
-                    text = ">>",
-                    type = ButtonType.NORMAL,
-                    onClick = onRRClick,
+                Box(
                     modifier = Modifier
-                        .width(44.dp)
+                        .width(1.dp)
                         .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxHeight()
+                        .background(colors.pageBackground)
+                        .clickable(onClick = onRRClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BahaText(
+                        text = ">>",
+                        color = colors.textPrimary,
+                        size = BahaTextSize.SUBTITLE,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }

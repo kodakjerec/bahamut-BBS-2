@@ -100,9 +100,21 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
-        return if (paramMotionEvent.pointerCount == 2) this.scaleDetector!!.onTouchEvent(
-            paramMotionEvent
-        ) else this.scrollDetector!!.onTouchEvent(paramMotionEvent)
+        var handled = false
+        try {
+            if (paramMotionEvent.pointerCount >= 2 && this.scaleDetector != null) {
+                handled = this.scaleDetector?.onTouchEvent(paramMotionEvent) == true
+            } else if (this.scrollDetector != null) {
+                handled = this.scrollDetector?.onTouchEvent(paramMotionEvent) == true
+            }
+        } catch (_: Exception) {
+            // Ignore gesture detector internal pointer exceptions
+        }
+        return handled || try {
+            super.onTouchEvent(paramMotionEvent)
+        } catch (_: Exception) {
+            false
+        }
     }
 
     fun reload() {

@@ -57,11 +57,18 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
     // android.widget.AbsListView, android.view.View
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        this.gestureDetector?.onTouchEvent(event)
-        if (event.action == 0) {
+        try {
+            this.gestureDetector?.onTouchEvent(event)
+        } catch (_: Exception) {
+        }
+        if (event.action == MotionEvent.ACTION_DOWN) {
             detectScrollPosition(event)
         }
-        return super.onTouchEvent(event)
+        return try {
+            super.onTouchEvent(event)
+        } catch (_: Exception) {
+            false
+        }
     }
 
     // 用户轻触触摸屏
@@ -93,9 +100,15 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
                                 index
                             )
                         ) {
-                            val cancelEvent = MotionEvent.obtain(e2)
-                            cancelEvent.action = 3
-                            super.onTouchEvent(cancelEvent)
+                            val targetEvent = e2 ?: e1
+                            val cancelEvent = MotionEvent.obtain(targetEvent)
+                            cancelEvent.action = MotionEvent.ACTION_CANCEL
+                            try {
+                                super.onTouchEvent(cancelEvent)
+                            } catch (_: Exception) {
+                            } finally {
+                                cancelEvent.recycle()
+                            }
                         }
                         return true
                     }
