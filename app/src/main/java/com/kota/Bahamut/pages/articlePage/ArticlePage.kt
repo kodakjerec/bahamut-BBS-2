@@ -1109,28 +1109,33 @@ fun ArticleContentBlockItem(
             )
         }
 
-        // 正文內容
+        // 正文內容 (依據超連結分割，將 ThumbnailView 精確插入至連結正下方)
         if (item.content.isNotEmpty()) {
             val fixedText = remember(item.content) { fixUrlNewlines(item.content) }
             val textColor = if (isQuote) colors.bbsContent1 else colors.bbsContent0
-            LinkableText(
-                text = fixedText,
-                defaultColor = textColor,
-                size = BahaTextSize.BODY,
-                modifier = Modifier.padding(
-                    start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
-                    top = 2.dp,
-                    bottom = 4.dp
-                )
-            )
+            val segments = remember(fixedText) { parseContentSegments(fixedText) }
 
-            // 預覽圖
-            if (UserSettings.linkAutoShow) {
-                val urls = remember(fixedText) { extractUrls(fixedText) }
-                for (url in urls) {
+            for (segment in segments) {
+                if (segment.text.isNotEmpty()) {
+                    LinkableText(
+                        text = segment.text,
+                        defaultColor = textColor,
+                        size = BahaTextSize.BODY,
+                        modifier = Modifier.padding(
+                            start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
+                            top = 2.dp,
+                            bottom = 2.dp
+                        )
+                    )
+                }
+
+                if (UserSettings.linkAutoShow && segment.url != null) {
                     ArticleThumbnail(
-                        url = url,
-                        loadAllTrigger = loadAllTrigger
+                        url = segment.url,
+                        loadAllTrigger = loadAllTrigger,
+                        modifier = Modifier.padding(
+                            start = if (isQuote) (quoteLevel * 8).dp else 0.dp
+                        )
                     )
                 }
             }
@@ -1198,21 +1203,23 @@ fun ArticlePushRowItem(
 
         Spacer(modifier = Modifier.height(2.dp))
 
-        // 推文內容
+        // 推文內容 (依據超連結分割，將 ThumbnailView 精確插入至連結正下方)
         if (push.content.isNotEmpty()) {
             val fixedContent = remember(push.content) { fixUrlNewlines(push.content) }
-            LinkableText(
-                text = fixedContent,
-                defaultColor = colors.textPrimary,
-                size = BahaTextSize.BODY
-            )
+            val segments = remember(fixedContent) { parseContentSegments(fixedContent) }
 
-            // 推文連結預覽圖
-            if (UserSettings.linkAutoShow) {
-                val urls = remember(fixedContent) { extractUrls(fixedContent) }
-                for (url in urls) {
+            for (segment in segments) {
+                if (segment.text.isNotEmpty()) {
+                    LinkableText(
+                        text = segment.text,
+                        defaultColor = colors.textPrimary,
+                        size = BahaTextSize.BODY
+                    )
+                }
+
+                if (UserSettings.linkAutoShow && segment.url != null) {
                     ArticleThumbnail(
-                        url = url,
+                        url = segment.url,
                         loadAllTrigger = loadAllTrigger
                     )
                 }
@@ -1233,7 +1240,8 @@ fun ArticlePushRowItem(
 @Composable
 fun ArticleThumbnail(
     url: String,
-    loadAllTrigger: Int
+    loadAllTrigger: Int,
+    modifier: Modifier = Modifier
 ) {
     var thumbnailView by remember { mutableStateOf<ThumbnailItemView?>(null) }
 
@@ -1244,7 +1252,7 @@ fun ArticleThumbnail(
     }
 
     AndroidView(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         factory = { context ->
@@ -1334,6 +1342,61 @@ fun extractUrls(text: String): List<String> {
         }
     }
     return urls
+}
+
+/**
+ * 文章內容段落結構
+ * @param text 本段顯示之文字（若包含超連結，則到該超連結結尾為止）
+ * @param url 若此段末尾包含超連結，則為該超連結 URL，供下方精確插入預覽圖
+ */
+data class ContentSegment(
+    val text: String,
+    val url: String? = null
+)
+
+/**
+ * 依據超連結分割文章文字內容，使縮圖預覽可以直接插入至各超連結正下方，隨後再接續後續內文
+ */
+fun parseContentSegments(rawText: String): List<ContentSegment> {
+    val urlPattern = Pattern.compile(
+        "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
+    )
+    val matcher = urlPattern.matcher(rawText)
+    val segments = mutableListOf<ContentSegment>()
+    var lastIndex = 0
+
+    while (matcher.find()) {
+        val url = matcher.group().trim()
+        val urlEnd = matcher.end()
+        // 本段文字為從上一段結尾到當前網址結尾 (包含網址)
+        val partText = rawText.substring(lastIndex, urlEnd)
+        segments.add(ContentSegment(text = partText, url = url))
+
+        // 若網址後方緊接換行符號 (\r\n 或 \n)，略過該換行符，避免圖片下方產生多餘空行
+        var nextStart = urlEnd
+        if (nextStart < rawText.length && rawText[nextStart] == '\r') {
+            nextStart++
+        }
+        if (nextStart < rawText.length && rawText[nextStart] == '\n') {
+            nextStart++
+        }
+        lastIndex = nextStart
+    }
+
+    // 若最後一個網址後方還有剩餘文字
+    if (lastIndex < rawText.length) {
+        val remainingText = rawText.substring(lastIndex)
+        if (remainingText.isNotEmpty()) {
+            segments.add(ContentSegment(text = remainingText, url = null))
+        }
+    }
+
+    // 若全文完全沒有任何網址，直接返回完整文字區段
+    if (segments.isEmpty() && rawText.isNotEmpty()) {
+        segments.add(ContentSegment(text = rawText, url = null))
+    }
+
+    return segments
 }
 
 /**
