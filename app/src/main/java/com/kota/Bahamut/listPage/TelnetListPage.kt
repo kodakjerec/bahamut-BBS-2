@@ -59,7 +59,6 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     var currentBlock: Int = 0
         private set
     var lastLoadItemIndex: Int = 0
-        private set
     var isInitialed = false
     private var isManualLoadPending = false
 
@@ -618,7 +617,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         loadItemAtIndex(index)
     }
 
-    protected fun saveListState() {
+    protected open fun saveListState() {
         if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
             state.position = listView?.firstVisiblePosition!!
@@ -629,7 +628,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    protected fun loadListState() {
+    protected open fun loadListState() {
         if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
             setListViewSelectionFromTop(state.position, state.top)

@@ -5,12 +5,7 @@ import android.content.res.Configuration
 import android.database.DataSetObserver
 import android.util.Log
 import android.view.View
-import android.view.View.OnLongClickListener
 import android.view.ViewGroup
-import android.widget.BaseAdapter
-import android.widget.Button
-import android.widget.ListView
-import android.widget.TextView
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -31,7 +26,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -52,12 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
@@ -158,19 +148,11 @@ open class BoardMainPage : TelnetListPage(),
     var toolbarLocationState by mutableIntStateOf(0)
     var toolbarOrderState by mutableIntStateOf(0)
 
-    // 相容性變數
-    var mainDrawerLayout: DrawerLayout? = null
     override var isItemBlockEnable: Boolean = false
     var blockListForTitle: Boolean = false
     var isDrawerOpening: Boolean = false
     val myBookmarkList: MutableList<Bookmark> = ArrayList()
-    var drawerListView: ListView? = null
-    var drawerListViewNone: TextView? = null
     var myMode: Int = 0
-    var tabButtons: Array<Button> = emptyArray()
-    var showBookmarkButton: Button? = null
-    var showHistoryButton: Button? = null
-    var drawerLocation: Int = GravityCompat.END
     private var isPostDelayedSuccess = false
 
     override val pageLayout: Int
@@ -194,50 +176,6 @@ open class BoardMainPage : TelnetListPage(),
     /** 發文 / 書籤點擊 */
     val mPostListener: View.OnClickListener =
         View.OnClickListener { this@BoardMainPage.onPostButtonClicked() }
-
-    /** 最前頁 */
-    val mFirstPageClickListener: OnLongClickListener = OnLongClickListener {
-        this@BoardMainPage.moveToFirstPosition()
-        scrollToPosition(0)
-        true
-    }
-
-    /** 上一頁 */
-    val mPrevPageClickListener: View.OnClickListener = View.OnClickListener {
-        var firstIndex = (scrollToItemTrigger ?: 0) - 15
-        if (firstIndex < 0) firstIndex = 0
-
-        if (this::class == BoardMainPage::class) {
-            TempSettings.lastVisitArticleNumber = firstIndex
-        }
-
-        setListViewSelection(firstIndex)
-    }
-
-    /** 下一頁 */
-    private val lastEndIndexes = IntArray(3)
-    private var endIndexCheckCount = 0
-    val mNextPageClickListener: View.OnClickListener = View.OnClickListener {
-        var firstIndex = (scrollToItemTrigger ?: 0) + 15
-        if (this::class == BoardMainPage::class) {
-            TempSettings.lastVisitArticleNumber = firstIndex
-        }
-        setListViewSelection(firstIndex)
-    }
-
-    /** 最後頁 */
-    val mLastPageClickListener: View.OnClickListener = View.OnClickListener {
-        this@BoardMainPage.setManualLoadPage()
-        this@BoardMainPage.moveToLastPosition()
-        scrollToPosition(count - 1)
-    }
-
-    val mLastPageLongClickListener: OnLongClickListener = OnLongClickListener {
-        this@BoardMainPage.setManualLoadPage()
-        this@BoardMainPage.moveToLastPosition()
-        scrollToPosition(count - 1)
-        true
-    }
 
     /** 彈出側邊選單 */
     val mMenuButtonListener: View.OnClickListener = View.OnClickListener {
@@ -278,48 +216,11 @@ open class BoardMainPage : TelnetListPage(),
             }).show()
     }
 
-    var bookmarkAdapter: BaseAdapter = object : BaseAdapter() {
-        override fun getItemId(i: Int): Long = i.toLong()
-        override fun getCount(): Int = this@BoardMainPage.myBookmarkList.size
-        override fun getItem(i: Int): Bookmark? = this@BoardMainPage.myBookmarkList.getOrNull(i)
-        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
-    }
-
-    var historyAdapter: BaseAdapter = object : BaseAdapter() {
-        override fun getItemId(i: Int): Long = i.toLong()
-        override fun getCount(): Int = this@BoardMainPage.myBookmarkList.size
-        override fun getItem(i: Int): Bookmark? = this@BoardMainPage.myBookmarkList.getOrNull(i)
-        override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
-    }
-
-    var drawerListener: DrawerListener = object : DrawerListener {
-        override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
-        override fun onDrawerOpened(drawerView: View) {}
-        override fun onDrawerClosed(drawerView: View) {}
-        override fun onDrawerStateChanged(newState: Int) {}
-    }
-
-    var searchListener: View.OnClickListener = View.OnClickListener {
-        this@BoardMainPage.closeDrawer()
-        this@BoardMainPage.showSearchArticleDialog()
-    }
-
-    var selectListener: View.OnClickListener = View.OnClickListener {
-        this@BoardMainPage.closeDrawer()
-        this@BoardMainPage.showSelectArticleDialog()
-    }
-
-    var enableBlockListener: View.OnClickListener =
-        View.OnClickListener { this@BoardMainPage.onChangeBlockStateButtonClicked() }
-
-    var editBlockListener: View.OnClickListener = View.OnClickListener {
-        this@BoardMainPage.closeDrawer()
-        this@BoardMainPage.onEditBlockListButtonClicked()
-    }
-
-    var editBookmarkListener: View.OnClickListener = View.OnClickListener {
-        this@BoardMainPage.closeDrawer()
-        this@BoardMainPage.onBookmarkButtonClicked()
+    /** 最後頁 */
+    val mLastPageClickListener: View.OnClickListener = View.OnClickListener {
+        this@BoardMainPage.setManualLoadPage()
+        this@BoardMainPage.moveToLastPosition()
+        scrollToPosition(count - 1)
     }
 
     var btnLLListener: View.OnClickListener = View.OnClickListener {
@@ -654,12 +555,39 @@ open class BoardMainPage : TelnetListPage(),
 
     override fun loadItemAtIndex(index: Int) {
         if (isItemCanLoadAtIndex(index)) {
+            lastLoadItemIndex = index
+            listId?.let { id ->
+                val state = instance.getState(id)
+                state.position = index
+            }
             val articlePage = PageContainer.instance!!.articlePage
             articlePage.setBoardPage(this)
             articlePage.clear()
             navigationController.pushViewController(articlePage)
 
             super.loadItemAtIndex(index)
+        }
+    }
+
+    override fun saveListState() {
+        super.saveListState()
+        listId?.let { id ->
+            val state = instance.getState(id)
+            if (state.position < 0 && lastLoadItemIndex >= 0) {
+                state.position = lastLoadItemIndex
+            }
+        }
+    }
+
+    override fun loadListState() {
+        super.loadListState()
+        listId?.let { id ->
+            val state = instance.getState(id)
+            if (state.position >= 0) {
+                scrollToPosition(state.position)
+            } else if (lastLoadItemIndex >= 0) {
+                scrollToPosition(lastLoadItemIndex)
+            }
         }
     }
 
@@ -783,7 +711,34 @@ open class BoardMainPage : TelnetListPage(),
     fun BoardMainPageContent() {
         val colors = AppTheme.colors
         val coroutineScope = rememberCoroutineScope()
-        val listState = rememberLazyListState()
+
+        val savedPosition = remember {
+            val s = listId?.let { instance.getState(it) }
+            when {
+                s != null && s.position >= 0 -> s.position
+                lastLoadItemIndex >= 0 -> lastLoadItemIndex
+                TempSettings.lastVisitArticleNumber > 0 -> max(0, TempSettings.lastVisitArticleNumber - 1)
+                else -> -1
+            }
+        }
+        val savedOffset = remember {
+            val s = listId?.let { instance.getState(it) }
+            if (s != null && s.top > 0) s.top else 0
+        }
+        val initialIndex = if (savedPosition >= 0) savedPosition else 0
+        val listState = rememberLazyListState(
+            initialFirstVisibleItemIndex = initialIndex,
+            initialFirstVisibleItemScrollOffset = savedOffset
+        )
+
+        // 即時同步滾動位置至 ListStateStore
+        LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+            listId?.let { id ->
+                val state = instance.getState(id)
+                state.position = listState.firstVisibleItemIndex
+                state.top = listState.firstVisibleItemScrollOffset
+            }
+        }
 
         // 監聽 TelnetListPage 資料變更
         var dataVersion by remember { mutableIntStateOf(0) }
@@ -803,8 +758,19 @@ open class BoardMainPage : TelnetListPage(),
             }
         }
 
-        // 監聽平移或滾動觸發
         val currentCount = if (dataVersion >= 0) count else 0
+
+        // 當列表資料載入或返回時，若初始在 0 且有保存的位置，確保滾動到保存的位置
+        var hasRestoredSavedPosition by remember { mutableStateOf(false) }
+        LaunchedEffect(currentCount) {
+            if (!hasRestoredSavedPosition && currentCount > 0 && savedPosition >= 0) {
+                val target = savedPosition.coerceIn(0, currentCount - 1)
+                listState.scrollToItem(target, savedOffset)
+                hasRestoredSavedPosition = true
+            }
+        }
+
+        // 監聽平移或滾動觸發
         LaunchedEffect(scrollToItemTrigger) {
             scrollToItemTrigger?.let { target ->
                 val safeTarget = if (target == -1) {
@@ -1020,7 +986,6 @@ fun BoardMainTopBar(
                     text = title,
                     color = colors.titleBarTitle,
                     size = BahaTextSize.TITLE,
-                    fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -1081,8 +1046,7 @@ fun BoardMainTopBar(
                 Icon(
                     painter = rememberDrawablePainter(resId = R.drawable.menu_icon),
                     contentDescription = stringResource(R.string.zero_word),
-                    tint = colors.textPrimary,
-                    modifier = Modifier.size(24.dp)
+                    tint = colors.textPrimary
                 )
             }
         }
@@ -1160,7 +1124,6 @@ fun BoardPageRowItem(
                         text = if (isReply) "Re" else "◆",
                         color = colors.bbsMailStatus,
                         size = BahaTextSize.BODY,
-                        fontWeight = FontWeight.Bold,
                         modifier = Modifier.padding(end = 4.dp)
                     )
 
@@ -1169,7 +1132,6 @@ fun BoardPageRowItem(
                         text = titleText,
                         color = titleColor,
                         size = BahaTextSize.BODY,
-                        fontWeight = if (!isRead) FontWeight.Bold else FontWeight.Normal,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -1195,8 +1157,7 @@ fun BoardPageRowItem(
                         BahaText(
                             text = "M",
                             color = colors.bbsMailMark,
-                            size = BahaTextSize.BODY,
-                            fontWeight = FontWeight.Bold
+                            size = BahaTextSize.BODY
                         )
                     }
 
@@ -1219,8 +1180,7 @@ fun BoardPageRowItem(
                         BahaText(
                             text = gyCount.toString(),
                             color = colors.bbsBoardGy,
-                            size = BahaTextSize.BODY,
-                            fontWeight = FontWeight.Bold
+                            size = BahaTextSize.BODY
                         )
                     }
 
@@ -1256,8 +1216,7 @@ fun BoardPageRowItem(
                 BahaText(
                     text = ">",
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Bold
+                    size = BahaTextSize.BODY
                 )
             }
         }
@@ -1322,8 +1281,7 @@ fun BoardMainToolbar(
                     BahaText(
                         text = "<<",
                         color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE,
-                        fontWeight = FontWeight.Bold
+                        size = BahaTextSize.SUBTITLE
                     )
                 }
                 Box(
@@ -1402,8 +1360,7 @@ fun BoardMainToolbar(
                     BahaText(
                         text = ">>",
                         color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE,
-                        fontWeight = FontWeight.Bold
+                        size = BahaTextSize.SUBTITLE
                     )
                 }
             }

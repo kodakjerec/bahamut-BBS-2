@@ -152,6 +152,9 @@ open class BookmarkManagePage(
         val page = PageContainer.instance!!.boardSearchPage
         if (bookmark == null) return
         page.clear()
+        page.listName = boardName
+        page.boardManager = "文章搜尋"
+        page.refreshHeaderView()
         instance.getState(page.getListIdFromListName(boardName)).let { state ->
             state.top = 0
             state.position = 0

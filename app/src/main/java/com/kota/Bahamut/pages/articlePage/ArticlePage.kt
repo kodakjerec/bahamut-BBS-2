@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -46,7 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -826,7 +824,6 @@ fun ArticleTopBar(
                     text = title,
                     color = titleColor,
                     size = BahaTextSize.TITLE,
-                    fontWeight = FontWeight.Bold,
                     maxLines = if (isExpanded) 3 else 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { isExpanded = !isExpanded }
@@ -876,8 +873,7 @@ fun ArticleTopBar(
                 Icon(
                     painter = rememberDrawablePainter(resId = R.drawable.menu_icon),
                     contentDescription = stringResource(R.string.zero_word),
-                    tint = colors.textPrimary,
-                    modifier = Modifier.size(24.dp)
+                    tint = colors.textPrimary
                 )
             }
         }
@@ -951,16 +947,26 @@ fun ArticleTextModeContent(
         modifier = Modifier.fillMaxSize()
     ) {
         // 1. 內文區塊 (還原原生 BBS 文字項目，無額外 Material 卡片)
-        items(count = article.itemSize) { i ->
-            val item = article.getItem(i)
-            if (item != null) {
-                val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
-                if (!isBlocked) {
-                    ArticleContentBlockItem(
-                        item = item,
-                        colors = colors,
-                        onAuthorClick = onAuthorClick
-                    )
+        if (article.itemSize == 0 && article.frame != null) {
+            item {
+                ArticleTelnetBlockItem(frame = article.frame!!)
+            }
+        } else {
+            items(count = article.itemSize) { i ->
+                val item = article.getItem(i)
+                if (item != null) {
+                    val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
+                    if (!isBlocked) {
+                        if (item.type == ArticlePageItemType.SIGN && item.frame != null) {
+                            ArticleTelnetBlockItem(frame = item.frame!!)
+                        } else {
+                            ArticleContentBlockItem(
+                                item = item,
+                                colors = colors,
+                                onAuthorClick = onAuthorClick
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -986,7 +992,7 @@ fun ArticleTextModeContent(
                     ) {
                         BahaText(
                             text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
-                            color = colors.bbsMailMark,
+                            color = colors.dialogBorder,
                             size = BahaTextSize.BODY
                         )
                     }
@@ -1014,6 +1020,27 @@ fun ArticleTextModeContent(
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
+}
+
+/**
+ * 簽名檔或 ANSI 圖形區塊元件
+ */
+@Composable
+fun ArticleTelnetBlockItem(frame: com.kota.telnet.model.TelnetFrame) {
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        factory = { ctx ->
+            TelnetView(ctx).apply {
+                this.frame = frame
+            }
+        },
+        update = { view ->
+            view.frame = frame
+        }
+    )
 }
 
 /**
@@ -1097,7 +1124,16 @@ fun ArticleContentBlockItem(
                     bottom = 4.dp
                 )
             )
+        } else if (item.frame != null) {
+            ArticleTelnetBlockItem(frame = item.frame!!)
         }
+
+        // 底部微弱分隔線
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 4.dp),
+            color = colors.divider.copy(alpha = 0.25f),
+            thickness = 0.5.dp
+        )
     }
 }
 
@@ -1125,7 +1161,6 @@ fun ArticlePushRowItem(
                 text = push.author,
                 color = colors.bbsMailAuthor,
                 size = BahaTextSize.BODY,
-                fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable { onAuthorClick(push.author) }
             )
 
@@ -1320,8 +1355,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        size = BahaTextSize.TITLE,
-                        fontWeight = FontWeight.Bold
+                        size = BahaTextSize.TITLE
                     )
                 }
                 Box(
@@ -1400,8 +1434,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        size = BahaTextSize.TITLE,
-                        fontWeight = FontWeight.Bold
+                        size = BahaTextSize.TITLE
                     )
                 }
             }

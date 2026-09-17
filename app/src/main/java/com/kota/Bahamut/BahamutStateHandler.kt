@@ -594,15 +594,32 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         val topPage =
             ASNavigationController.currentController?.topController as TelnetPage?
         when (topPage) {
+            is BoardLinkPage -> {
+                currentPage = BahamutPage.BAHAMUT_BOARD_LINK
+            }
+
+            is BoardSearchPage -> {
+                currentPage = BahamutPage.BAHAMUT_BOARD_SEARCH
+            }
+
             is BoardMainPage -> {
                 currentPage = BahamutPage.BAHAMUT_ARTICLE
             }
 
-            is MailBoxPage -> {
+            is ArticlePage -> {
+                val board = topPage.boardMainPage
+                currentPage = when (board) {
+                    is BoardLinkPage -> BahamutPage.BAHAMUT_BOARD_LINK
+                    is BoardSearchPage -> BahamutPage.BAHAMUT_BOARD_SEARCH
+                    else -> BahamutPage.BAHAMUT_ARTICLE
+                }
+            }
+
+            is MailBoxPage, is MailPage -> {
                 currentPage = BahamutPage.BAHAMUT_MAIL
             }
 
-            is BoardEssencePage -> {
+            is BoardEssencePage, is ArticleEssencePage -> {
                 currentPage = BahamutPage.BAHAMUT_ARTICLE_ESSENCE
             }
         }
@@ -1053,7 +1070,8 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 // 檢查最上層的頁面是不是 mail page
                 // 如果不是=>就把mail page推到最上層
                 if (lastPage == null || lastPage.pageType != BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
-                    articleEssencePage = ArticleEssencePage()
+                    articleEssencePage = PageContainer.instance!!.getArticleEssencePage()
+                    articleEssencePage.setBoardEssencePage(PageContainer.instance!!.boardEssencePage)
                     ASNavigationController.currentController!!.pushViewController(articleEssencePage)
                 } else {
                     articleEssencePage = lastPage as ArticleEssencePage

@@ -10,7 +10,6 @@ import com.kota.telnet.model.TelnetRow
 
 class BoardEssencePageHandler private constructor() {
     fun load(): TelnetListPageBlock {
-        var row: TelnetRow
         val boardPageBlock = BoardPageBlock.create()
         val firstRowString = TelnetClient.model.getRowString(0)
 
@@ -32,22 +31,28 @@ class BoardEssencePageHandler private constructor() {
         }
         val endIndex = 3 + 20
         var i6 = 3
-        row = TelnetClient.model.getRow(i6)!!
-        while (i6 < endIndex && row.toString().isNotEmpty()) {
-            row.reloadSpace()
-            val articleSelected = row.getSpaceString(0, 0).trim()
-            val articleNumber = TelnetUtils.getIntegerFromData(row, 1, 5)
+        val model = TelnetClient.model
+        while (i6 < endIndex) {
+            val r = model.getRow(i6) ?: break
+            val rowStr = r.toString()
+            if (rowStr.trim().isEmpty()) {
+                i6++
+                continue
+            }
+            r.reloadSpace()
+            val articleSelected = r.getSpaceString(0, 0).trim()
+            val articleNumber = TelnetUtils.getIntegerFromData(r, 1, 5)
             if (articleNumber != 0) {
                 var isSelected = false
                 if (articleSelected.isNotEmpty() && articleSelected[0] == '>') {
                     boardPageBlock.selectedItemNumber = articleNumber
                     isSelected = true
                 }
-                val info = row.getSpaceString(8, 8).trim()
-                val originMark = row.getSpaceString(6, 7).trim()
-                val title = row.getSpaceString(10, 55).trim()
-                val author = row.getSpaceString(56, 68).trim()
-                val date = row.getSpaceString(69, 77).trim()
+                val info = r.getSpaceString(8, 8).trim()
+                val originMark = r.getSpaceString(6, 7).trim()
+                val title = r.getSpaceString(10, 55).trim()
+                val author = r.getSpaceString(56, 68).trim()
+                val date = r.getSpaceString(69, 77).trim()
                 val item = BoardEssencePageItem.create()
                 if (i6 == 3) {
                     boardPageBlock.minimumItemNumber = articleNumber
@@ -66,7 +71,6 @@ class BoardEssencePageHandler private constructor() {
                 }
             }
             i6++
-            row = TelnetClient.model.getRow(i6)!!
         }
         return boardPageBlock
     }

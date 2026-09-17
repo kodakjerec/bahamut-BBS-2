@@ -95,7 +95,9 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
 
     override fun onBackPressed(): Boolean {
         clear()
-        return super.onBackPressed()
+        val result = super.onBackPressed()
+        PageContainer.instance!!.cleanArticleEssencePage()
+        return result
     }
 
     override fun onReceivedGestureRight(): Boolean {
@@ -259,7 +261,7 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
+                    .background(colors.titleBarBackground)
             ) {
                 Row(
                     modifier = Modifier

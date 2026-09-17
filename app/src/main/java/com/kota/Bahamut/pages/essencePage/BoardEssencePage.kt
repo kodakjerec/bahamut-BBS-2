@@ -17,13 +17,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
+import com.kota.Bahamut.listPage.ListStateStore
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
@@ -46,6 +56,7 @@ import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -54,6 +65,8 @@ import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
+import kotlinx.coroutines.launch
+import kotlin.math.max
 
 class BoardEssencePage : TelnetListPage() {
     private var myTitle: String = ""
@@ -90,7 +103,7 @@ class BoardEssencePage : TelnetListPage() {
         get() = BoardPageAction.ESSENCE
 
     override fun getListIdFromListName(aName: String?): String {
-        return "[Board][Essence]"
+        return "$aName[Board][Essence][$myTitle]"
     }
 
     // 搜尋, 現在為不做事
@@ -143,27 +156,31 @@ class BoardEssencePage : TelnetListPage() {
     }
 
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
-        val boardEssencePageItem = getItem(index) as BoardEssencePageItem
+        val boardEssencePageItem = getItem(index) as? BoardEssencePageItem ?: return false
         return !boardEssencePageItem.isDeleted && boardEssencePageItem.isBBSClickable
     }
 
     // 點下文章
     override fun loadItemAtIndex(index: Int) {
-        val item = getItem(index) as BoardEssencePageItem? ?: return
+        val item = getItem(index) as? BoardEssencePageItem ?: return
         if (!item.isBBSClickable) {
             ASToast.showShortToast("找沒有了耶...:(")
             return
         }
 
+        lastLoadItemIndex = index
+        val listId = getListIdFromListName(listName)
+        val state = ListStateStore.instance.getState(listId)
+        state.position = index
+
         if (item.isDirectory) {
             // 目錄
-            // 如果現在最上層是article essence page, 表示是在內文按上一篇/下一篇
-            val lastPage = ASNavigationController.currentController!!.viewControllers.lastElement()!!
-            if (lastPage.pageType == BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
+            val lastPage = ASNavigationController.currentController?.viewControllers?.lastOrNull()
+            if (lastPage?.pageType == BahamutPage.BAHAMUT_ARTICLE_ESSENCE) {
                 ASToast.showShortToast("找沒有了耶...:(")
             } else {
                 // 進入目錄
-                PageContainer.instance!!.pushBoardEssencePage(listName, myTitle)
+                PageContainer.instance!!.pushBoardEssencePage(listName, item.title ?: "")
                 navigationController.pushViewController(PageContainer.instance!!.boardEssencePage)
                 super.loadItemAtIndex(index)
             }
@@ -178,11 +195,10 @@ class BoardEssencePage : TelnetListPage() {
     }
 
     override fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
-        return if (aItem != null) {
-            val boardEssencePageItem = aItem as BoardEssencePageItem
-            return !boardEssencePageItem.isBBSClickable
-        } else
-            false
+        if (aItem != null && aItem is BoardEssencePageItem) {
+            return !aItem.isBBSClickable
+        }
+        return false
     }
 
     override fun onReceivedGestureRight(): Boolean {
@@ -220,7 +236,25 @@ class BoardEssencePage : TelnetListPage() {
     @Composable
     fun BoardEssencePageContent() {
         val colors = AppTheme.colors
-        val listState = rememberLazyListState()
+        val coroutineScope = rememberCoroutineScope()
+        val listId = getListIdFromListName(listName)
+        val savedPosition = remember(listId) {
+            ListStateStore.instance.getState(listId).position
+        }
+        val savedOffset = remember(listId) {
+            ListStateStore.instance.getState(listId).top
+        }
+        val listState = rememberLazyListState(
+            initialFirstVisibleItemIndex = savedPosition.coerceAtLeast(0),
+            initialFirstVisibleItemScrollOffset = savedOffset
+        )
+
+        // 即時同步滾動位置至 ListStateStore
+        LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+            val state = ListStateStore.instance.getState(listId)
+            state.position = listState.firstVisibleItemIndex
+            state.top = listState.firstVisibleItemScrollOffset
+        }
 
         var dataVersion by remember { mutableIntStateOf(0) }
         DisposableEffect(Unit) {
@@ -234,40 +268,88 @@ class BoardEssencePage : TelnetListPage() {
 
         val currentCount = if (dataVersion >= 0) count else 0
 
+        // 恢復保存的位置
+        var hasRestoredSavedPosition by remember { mutableStateOf(false) }
+        LaunchedEffect(currentCount) {
+            if (!hasRestoredSavedPosition && currentCount > 0 && savedPosition >= 0) {
+                val target = savedPosition.coerceIn(0, currentCount - 1)
+                listState.scrollToItem(target, savedOffset)
+                hasRestoredSavedPosition = true
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 頂部 header
+            // 頂部標題列 (BBS 深海藍底，雙行資訊，左側返回鍵)
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
+                    .background(colors.titleBarBackground)
             ) {
-                BahaText(
-                    text = headerTitleState.ifEmpty { stringResource(R.string.loading) },
-                    color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                if (headerSubtitleState.isNotEmpty() || headerDetailState.isNotEmpty()) {
-                    BahaText(
-                        text = listOfNotNull(
-                            headerSubtitleState.takeIf { it.isNotEmpty() },
-                            headerDetailState.takeIf { it.isNotEmpty() }
-                        ).joinToString("  "),
-                        color = colors.titleBarDetail,
-                        size = BahaTextSize.CAPTION,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(
+                        onClick = { onBackPressed() },
+                        modifier = Modifier.padding(start = 4.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            tint = colors.titleBarTitle
+                        )
+                    }
+
+                    Column(
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(start = 2.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
+                    ) {
+                        BahaText(
+                            text = headerTitleState.ifEmpty { stringResource(R.string.loading) },
+                            color = colors.titleBarTitle,
+                            size = BahaTextSize.TITLE,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            if (headerSubtitleState.isNotEmpty()) {
+                                BahaText(
+                                    text = headerSubtitleState,
+                                    color = colors.titleBarDetail,
+                                    size = BahaTextSize.BODY,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            if (headerSubtitleState.isNotEmpty() && headerDetailState.isNotEmpty()) {
+                                Spacer(modifier = Modifier.width(8.dp))
+                            }
+                            if (headerDetailState.isNotEmpty()) {
+                                BahaText(
+                                    text = headerDetailState,
+                                    color = colors.titleBarDetail2,
+                                    size = BahaTextSize.BODY,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
                 }
+                HorizontalDivider(color = colors.divider, thickness = 1.dp)
             }
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
             // 文章列表
             Box(
@@ -306,27 +388,42 @@ class BoardEssencePage : TelnetListPage() {
                 }
             }
 
-            // 底部工具列
+            // 底部操作工具列
             HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .background(colors.toolbarBackground)
+                    .background(colors.toolbarBackground),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.first_page),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    onClick = { moveToFirstPosition() }
+                    onClick = {
+                        moveToFirstPosition()
+                        coroutineScope.launch { listState.scrollToItem(0) }
+                    }
+                )
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarDivider)
                 )
                 BahaButton(
                     text = stringResource(R.string.last_page),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
-                    onClick = { moveToLastPosition() }
+                    onClick = {
+                        moveToLastPosition()
+                        coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
+                    }
                 )
             }
         }
@@ -339,54 +436,74 @@ class BoardEssencePage : TelnetListPage() {
         onClick: () -> Unit
     ) {
         val colors = AppTheme.colors
+        val isDir = item?.isDirectory == true
         val statusText = when {
             item == null -> "..."
-            item.isDirectory -> "◆"
+            isDir -> "◆"
             !item.isBBSClickable -> "◇("
             else -> "◇"
         }
-        Row(
+        val titleColor = when {
+            isDir -> colors.titleBarTitle
+            else -> colors.bbsBoardNormal
+        }
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(colors.pageBackground)
                 .clickable(onClick = onClick)
-                .padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 8.dp, vertical = 5.dp)
         ) {
-            BahaText(
-                text = statusText,
-                color = colors.bbsBoardNormal,
-                size = BahaTextSize.CAPTION,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
+            // 第一列：狀態圖示 + 標題
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaText(
+                    text = statusText,
+                    color = if (isDir) colors.titleBarTitle else colors.bbsMailStatus,
+                    size = BahaTextSize.BODY,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(end = 6.dp)
+                )
                 BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
-                    color = colors.bbsBoardNormal,
+                    color = titleColor,
+                    size = BahaTextSize.BODY,
+                    fontWeight = if (isDir) FontWeight.Bold else FontWeight.Normal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(2.dp))
+
+            // 第二列：編號、作者、日期
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                BahaText(
+                    text = String.format("%05d", itemIndex),
+                    color = colors.bbsMailNumber,
                     size = BahaTextSize.CAPTION,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                BahaText(
+                    text = item?.author ?: "",
+                    color = colors.bbsMailAuthor,
+                    size = BahaTextSize.CAPTION,
+                    modifier = Modifier.weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                Row {
-                    BahaText(
-                        text = String.format("%05d", itemIndex),
-                        color = colors.bbsMailNumber,
-                        size = BahaTextSize.TINY,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    BahaText(
-                        text = item?.author ?: "",
-                        color = colors.bbsMailAuthor,
-                        size = BahaTextSize.TINY,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    BahaText(
-                        text = item?.date ?: "",
-                        color = colors.bbsMailDate,
-                        size = BahaTextSize.TINY
-                    )
-                }
+                BahaText(
+                    text = item?.date ?: "",
+                    color = colors.bbsMailDate,
+                    size = BahaTextSize.CAPTION
+                )
             }
         }
     }
