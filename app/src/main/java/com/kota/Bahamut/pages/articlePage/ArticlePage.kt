@@ -952,7 +952,7 @@ fun ArticleTextModeContent(
                 if (item != null) {
                     val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
                     if (!isBlocked) {
-                        if (item.type == ArticlePageItemType.SIGN && item.frame != null) {
+                        if (item.type == 1 && item.frame != null) {
                             ArticleTelnetBlockItem(frame = item.frame!!)
                         } else {
                             ArticleContentBlockItem(

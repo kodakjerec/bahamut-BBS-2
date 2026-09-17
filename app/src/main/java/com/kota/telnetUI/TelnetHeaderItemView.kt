@@ -2,7 +2,6 @@ package com.kota.telnetUI
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -12,7 +11,6 @@ import androidx.core.view.size
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.telnetUI.textView.TelnetTextViewNormal
 import com.kota.telnetUI.textView.TelnetTextViewSmall

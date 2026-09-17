@@ -20,8 +20,8 @@ class Theme {
     var articleContentColor1:String = "#FF20FF20"
 
     // 文章推文配色
-    var articlePushAuthorColor:String = "#FF808080"
-    var articlePushContentColor:String = "#FF808000"
+    var articlePushAuthorColor:String = "#FFB0B0F0"
+    var articlePushContentColor:String = "#FFFFFFFF"
 
     // 工具列按鈕 (Danger)
     var textColorDanger:String = "#FFFFFFFF"

@@ -152,6 +152,8 @@ object ThemeStore {
                 // 引用文章配色 (深色模式調暗，降低亮度)
                 themeDarkMode.articleAuthorColor1 = "#FF60A060"
                 themeDarkMode.articleContentColor1 = "#FF18A018"
+                themeDarkMode.articlePushAuthorColor = "#FF8080C0"
+                themeDarkMode.articlePushContentColor = "#FFE0E0E0"
                 return themeDarkMode
             }
             3 -> { // EInk (真實電子紙專用高對比版)
@@ -198,6 +200,8 @@ object ThemeStore {
                 // 引用文章配色 (深色模式調暗，降低亮度)
                 themePinkDark.articleAuthorColor1 = "#FF60A060"
                 themePinkDark.articleContentColor1 = "#FF18A018"
+                themePinkDark.articlePushAuthorColor = "#FF8080C0"
+                themePinkDark.articlePushContentColor = "#FFE0E0E0"
                 return themePinkDark
             }
             5 -> { // EInk 深色模式 (保留作為系統跟隨用，黑白對調)

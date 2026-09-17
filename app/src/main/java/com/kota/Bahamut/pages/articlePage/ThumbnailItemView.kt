@@ -7,7 +7,6 @@ import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.DisplayMetrics
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
@@ -29,7 +28,6 @@ import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogImageView
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail

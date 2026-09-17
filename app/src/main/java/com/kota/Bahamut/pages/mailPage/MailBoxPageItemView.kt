@@ -3,14 +3,11 @@ package com.kota.Bahamut.pages.mailPage
 import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.MailBoxPageItem
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import java.util.Objects

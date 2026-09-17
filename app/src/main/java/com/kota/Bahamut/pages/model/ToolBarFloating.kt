@@ -9,7 +9,6 @@ import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.floatingLocation

@@ -4,11 +4,9 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.view.View
 import android.view.ViewGroup
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASViewController
 import com.kota.asFramework.pageController.ASViewControllerDisappearListener
-import androidx.core.view.isNotEmpty
 import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner

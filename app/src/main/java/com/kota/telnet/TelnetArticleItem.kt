@@ -13,7 +13,7 @@ class TelnetArticleItem {
     var nickname: String? = ""
     var quoteLevel: Int = 0
     val rows = Vector<TelnetRow>()
-    var type: Int = 0
+    var type: Int = 0 // 0:content 1:SIGN
 
     fun addRow(row: TelnetRow?) {
         this.rows.add(row)

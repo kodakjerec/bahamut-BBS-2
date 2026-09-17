@@ -12,7 +12,6 @@ import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import java.util.Vector
 import kotlin.math.ceil
