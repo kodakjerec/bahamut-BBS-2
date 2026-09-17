@@ -642,7 +642,9 @@ open class ASNavigationController : ComponentActivity() {
         synchronized(this.pageCommands) {
             this.pageCommands.add(aCommand)
         }
-        executePageCommand()
+        android.os.Handler(android.os.Looper.getMainLooper()).post {
+            executePageCommand()
+        }
     }
 
     fun executePageCommand() {

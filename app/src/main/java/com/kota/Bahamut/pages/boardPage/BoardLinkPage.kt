@@ -102,6 +102,7 @@ class BoardLinkPage : BoardMainPage() {
         navigationController.popViewController()
         TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardTitleLinkedPage()
+        PageContainer.instance!!.boardPage.lastListAction = BoardPageAction.LIST
         return true
     }
 }

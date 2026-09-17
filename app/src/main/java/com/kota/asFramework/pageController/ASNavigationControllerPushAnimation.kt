@@ -87,7 +87,7 @@ open class ASNavigationControllerPushAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            ASCoroutine.ensureMainThread {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
                 this@ASNavigationControllerPushAnimation.onAnimationFinished()
             }
             this.isFinished = true

@@ -120,6 +120,7 @@ class BoardSearchPage : BoardMainPage() {
         navigationController.popViewController()
         TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardSearchPage()
+        PageContainer.instance!!.boardPage.lastListAction = BoardPageAction.LIST
         return true
     }
 }

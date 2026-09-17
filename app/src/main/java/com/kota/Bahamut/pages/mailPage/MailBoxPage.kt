@@ -30,7 +30,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -258,6 +260,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     @Composable
     fun MailBoxPageContent() {
         val colors = AppTheme.colors
+        val coroutineScope = rememberCoroutineScope()
         val listState = rememberLazyListState()
 
         var dataVersion by remember { mutableIntStateOf(0) }
@@ -329,8 +332,16 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                             MailBoxRowItem(
                                 item = item,
                                 itemIndex = itemIndex,
-                                onClick = { loadItemAtIndex(index) },
-                                onLongClick = { onListViewItemLongClicked(null, index) }
+                                onClick = {
+                                    coroutineScope.launch {
+                                        loadItemAtIndex(index)
+                                    }
+                                },
+                                onLongClick = {
+                                    coroutineScope.launch {
+                                        onListViewItemLongClicked(null, index)
+                                    }
+                                }
                             )
                             HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
                         }

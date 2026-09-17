@@ -391,8 +391,16 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
                             ClassPageRowItem(
                                 item = item,
-                                onClick = { loadItemAtIndex(index) },
-                                onLongClick = { onListViewItemLongClicked(null, index) }
+                                onClick = {
+                                    coroutineScope.launch {
+                                        loadItemAtIndex(index)
+                                    }
+                                },
+                                onLongClick = {
+                                    coroutineScope.launch {
+                                        onListViewItemLongClicked(null, index)
+                                    }
+                                }
                             )
                         }
                     }

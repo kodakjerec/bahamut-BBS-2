@@ -91,7 +91,7 @@ open class ASNavigationControllerPopAnimation(
 
     private fun finish() {
         if (!this.isFinished) {
-            ASCoroutine.ensureMainThread {
+            android.os.Handler(android.os.Looper.getMainLooper()).post {
                 this@ASNavigationControllerPopAnimation.onAnimationFinished()
             }
             this.isFinished = true

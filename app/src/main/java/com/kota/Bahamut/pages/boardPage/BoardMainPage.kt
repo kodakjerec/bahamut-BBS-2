@@ -403,6 +403,9 @@ open class BoardMainPage : TelnetListPage(),
         this.lastListAction = BoardPageAction.SEARCH
         val boardSearchPage = PageContainer.instance!!.boardSearchPage
         boardSearchPage.clear()
+        boardSearchPage.listName = this.listName
+        boardSearchPage.boardTitle = this.boardTitle
+        boardSearchPage.boardManager = "文章搜尋"
         navigationController.pushViewController(boardSearchPage)
         val state = instance.getState(boardSearchPage.getListIdFromListName(listName))
         state.top = 0
@@ -444,6 +447,9 @@ open class BoardMainPage : TelnetListPage(),
         this.lastListAction = BoardPageAction.LINK_TITLE
         val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage
         boardLinkedTitlePage.clear()
+        boardLinkedTitlePage.listName = this.listName
+        boardLinkedTitlePage.boardTitle = this.boardTitle
+        boardLinkedTitlePage.boardManager = "主題串列"
         navigationController.pushViewController(boardLinkedTitlePage)
         val state = instance.getState(boardLinkedTitlePage.getListIdFromListName(listName))
         state.top = 0
@@ -853,8 +859,16 @@ open class BoardMainPage : TelnetListPage(),
                                         item = item,
                                         itemIndex = itemIndex,
                                         colors = colors,
-                                        onClick = { loadItemAtIndex(index) },
-                                        onLongClick = { onListViewItemLongClicked(null, index) }
+                                        onClick = {
+                                            coroutineScope.launch {
+                                                loadItemAtIndex(index)
+                                            }
+                                        },
+                                        onLongClick = {
+                                            coroutineScope.launch {
+                                                onListViewItemLongClicked(null, index)
+                                            }
+                                        }
                                     )
                                 }
                             }
