@@ -34,7 +34,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.BahamutPage
@@ -379,7 +378,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         state = listState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(count = currentCount) { index ->
+                        items(
+                            count = currentCount,
+                            key = { index -> index }
+                        ) { index ->
+                            @Suppress("UNUSED_VARIABLE")
+                            val version = dataVersion
                             val itemIndex = index + 1
                             val itemBlock = ItemUtils.getBlock(itemIndex)
                             val item = getItem(index) as? ClassPageItem
@@ -577,8 +581,7 @@ private fun ClassPageRowItem(
                 BahaText(
                     text = ">",
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Bold
+                    size = BahaTextSize.BODY
                 )
             }
         }

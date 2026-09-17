@@ -26,7 +26,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.ui.components.BahaInputField
@@ -303,8 +302,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     onValueChange = { contentState = it },
                     textStyle = TextStyle(
                         color = colors.textPrimary,
-                        fontSize = AppTheme.fontSize.base,
-                        fontWeight = FontWeight.Normal
+                        fontSize = AppTheme.fontSize.base
                     ),
                     cursorBrush = SolidColor(colors.textPrimary),
                     modifier = Modifier

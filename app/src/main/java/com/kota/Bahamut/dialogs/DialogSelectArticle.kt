@@ -21,7 +21,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -80,8 +79,7 @@ class DialogSelectArticle : ASDialog() {
                     Text(
                         text = CommonFunctions.getContextString(R.string.select_article),
                         color = colors.titleBarTitle,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 16.sp
                     )
                 }
 
@@ -104,7 +102,6 @@ class DialogSelectArticle : ASDialog() {
                         text = if (contentString.isEmpty()) CommonFunctions.getContextString(R.string.please_input_article_number) else contentString,
                         color = if (contentString.isEmpty()) colors.textSecondary else colors.textPrimary,
                         fontSize = if (contentString.isEmpty()) 15.sp else 24.sp,
-                        fontWeight = FontWeight.Bold
                     )
                 }
 
@@ -132,7 +129,7 @@ class DialogSelectArticle : ASDialog() {
                                     .clickable { onDigit(digit) },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Text(text = digit, color = colors.textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Medium)
+                                Text(text = digit, color = colors.textPrimary, fontSize = 20.sp)
                             }
                             if (index < row.size - 1) {
                                 Box(
@@ -156,7 +153,7 @@ class DialogSelectArticle : ASDialog() {
                             .clickable { onDigit("0") },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "0", color = colors.textPrimary, fontSize = 20.sp, fontWeight = FontWeight.Medium)
+                        Text(text = "0", color = colors.textPrimary, fontSize = 20.sp)
                     }
                     Box(
                         modifier = Modifier
@@ -171,7 +168,7 @@ class DialogSelectArticle : ASDialog() {
                             .clickable { onBackspace() },
                         contentAlignment = Alignment.Center
                     ) {
-                        Text(text = CommonFunctions.getContextString(R.string.del), color = colors.textPrimary, fontSize = 18.sp, fontWeight = FontWeight.Medium)
+                        Text(text = CommonFunctions.getContextString(R.string.del), color = colors.textPrimary, fontSize = 18.sp)
                     }
                 }
 

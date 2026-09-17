@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -286,7 +285,6 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                             text = article?.title ?: stringResource(R.string.loading_),
                             color = colors.titleBarTitle,
                             size = BahaTextSize.BODY,
-                            fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

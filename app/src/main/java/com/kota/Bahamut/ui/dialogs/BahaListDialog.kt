@@ -19,7 +19,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -61,8 +60,7 @@ fun BahaListDialogContent(
                     Text(
                         text = title,
                         color = colors.titleBarTitle,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 16.sp
                     )
                 }
                 Box(
@@ -105,15 +103,13 @@ fun BahaListDialogContent(
                                 text = itemText,
                                 color = colors.textPrimary,
                                 fontSize = 14.sp,
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                                 modifier = Modifier.weight(1f)
                             )
                             if (isSelected) {
                                 Text(
                                     text = "✓",
                                     color = colors.titleBarTitle,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Bold
+                                    fontSize = 14.sp
                                 )
                             }
                         }

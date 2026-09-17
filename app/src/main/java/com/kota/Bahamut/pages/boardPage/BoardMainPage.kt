@@ -838,7 +838,12 @@ open class BoardMainPage : TelnetListPage(),
                             state = listState,
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            items(count = currentCount) { index ->
+                            items(
+                                count = currentCount,
+                                key = { index -> index }
+                            ) { index ->
+                                @Suppress("UNUSED_VARIABLE")
+                                val version = dataVersion
                                 val itemIndex = index + 1
                                 val itemBlock = ItemUtils.getBlock(itemIndex)
                                 val item = getItem(index) as? BoardPageItem

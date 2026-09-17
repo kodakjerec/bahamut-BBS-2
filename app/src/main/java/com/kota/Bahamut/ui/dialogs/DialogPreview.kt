@@ -13,7 +13,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -40,8 +39,7 @@ private fun DialogShowcase() {
         Text(
             text = "BahaAlertDialog (提示與確認)",
             color = colors.textPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 14.sp
         )
         BahaAlertDialogContent(
             title = "系統提示",
@@ -56,8 +54,7 @@ private fun DialogShowcase() {
         Text(
             text = "BahaProcessingDialog (連線與載入)",
             color = colors.textPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 14.sp
         )
         BahaProcessingDialogContent(
             message = "連線至 bbs.gamer.com.tw..."
@@ -67,8 +64,7 @@ private fun DialogShowcase() {
         Text(
             text = "BahaListDialog (清單選擇)",
             color = colors.textPrimary,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 14.sp
         )
         BahaListDialogContent(
             title = "選擇表情符號",

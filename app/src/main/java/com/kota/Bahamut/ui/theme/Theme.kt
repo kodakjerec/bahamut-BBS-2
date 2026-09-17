@@ -272,10 +272,7 @@ private val PinkLightColors = DefaultLightColors.copy(
     tabSelectedBackground = AppPalette.PinkButtonNormal,
     tabSelectedText = AppPalette.White,
     tabUnselectedBackground = AppPalette.Transparent,
-    tabUnselectedText = AppPalette.HalfWhite,
-    chapterBackground = AppPalette.PinkHeaderBackground,
-    chapterText = AppPalette.PinkHeaderText,
-    statusNotice = AppPalette.PinkHeaderText
+    tabUnselectedText = AppPalette.HalfWhite
 )
 
 /**
@@ -291,10 +288,7 @@ private val PinkDarkColors = DefaultDarkColors.copy(
     tabSelectedBackground = AppPalette.PinkDarkButtonNormal,
     tabSelectedText = AppPalette.White,
     tabUnselectedBackground = AppPalette.Transparent,
-    tabUnselectedText = AppPalette.HalfWhite,
-    chapterBackground = AppPalette.PinkDarkHeaderBackground,
-    chapterText = AppPalette.PinkDarkHeaderText,
-    statusNotice = AppPalette.PinkDarkHeaderText
+    tabUnselectedText = AppPalette.HalfWhite
 )
 
 /**

@@ -314,6 +314,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         if (telnetListPageBlock.maximumItemNumber > this.itemSize) {
             this.itemSize = telnetListPageBlock.maximumItemNumber
         }
+        safeNotifyDataSetChanged()
     }
 
     val firstVisibleBlockIndex: Int

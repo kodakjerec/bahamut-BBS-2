@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -64,8 +63,7 @@ fun BahaInputField(
             .padding(horizontal = 8.dp),
         textStyle = TextStyle(
             color = colors.inputBoxText,
-            fontSize = AppTheme.fontSize.base,
-            fontWeight = FontWeight.Normal
+            fontSize = AppTheme.fontSize.base
         ),
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
@@ -127,8 +125,7 @@ fun BahaInputField(
             .padding(horizontal = 8.dp),
         textStyle = TextStyle(
             color = colors.inputBoxText,
-            fontSize = AppTheme.fontSize.base,
-            fontWeight = FontWeight.Normal
+            fontSize = AppTheme.fontSize.base
         ),
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,

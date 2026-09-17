@@ -42,7 +42,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -254,8 +253,7 @@ class DialogShortenImage : AppCompatActivity() {
                             Text(
                                 text = outputParam,
                                 color = colors.bbsAuthor0,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 14.sp
                             )
                         }
                     }

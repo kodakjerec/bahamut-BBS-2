@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -58,7 +57,6 @@ fun RowScope.BahaTabItem(
             text = text,
             color = textColor,
             fontSize = 13.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
             textAlign = TextAlign.Center,
             maxLines = 1
         )

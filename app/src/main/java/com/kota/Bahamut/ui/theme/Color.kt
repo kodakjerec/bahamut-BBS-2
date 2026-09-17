@@ -51,15 +51,11 @@ object AppPalette {
     val PinkButtonNormal = Color(0xFFFE00FE)
     val PinkButtonPressed = Color(0xFFE400E4)
     val PinkButtonDisabled = Color(0xFF650065)
-    val PinkHeaderBackground = Color(0xFFFFC0CB)
-    val PinkHeaderText = Color(0xFFC71585)
 
     // 粉紅深色外觀 (Pink Dark Theme)
     val PinkDarkButtonNormal = Color(0xFF701850)
     val PinkDarkButtonPressed = Color(0xFF902068)
     val PinkDarkButtonDisabled = Color(0xFF300A24)
-    val PinkDarkHeaderBackground = Color(0xFF401030)
-    val PinkDarkHeaderText = Color(0xFFFF80C0)
 
     // eInk 電子紙外觀 (eInk Theme - 日間高對比)
     val EInkButtonNormal = Color(0xFFFFFFFF)

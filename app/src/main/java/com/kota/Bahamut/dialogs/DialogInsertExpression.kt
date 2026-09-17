@@ -24,7 +24,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -72,8 +71,7 @@ class DialogInsertExpression : ASDialog() {
                     Text(
                         text = dialogTitle,
                         color = colors.titleBarTitle,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 16.sp
                     )
                     BahaButton(
                         text = CommonFunctions.getContextString(R.string.setting),

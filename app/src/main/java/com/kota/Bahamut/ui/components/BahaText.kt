@@ -1,10 +1,12 @@
 package com.kota.Bahamut.ui.components
 
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
@@ -37,7 +39,6 @@ fun BahaText(
     size: BahaTextSize = BahaTextSize.BASE,
     customFontSize: TextUnit? = null,
     color: Color = AppTheme.colors.textPrimary,
-    fontWeight: FontWeight? = null,
     textAlign: TextAlign? = null,
     lineHeight: TextUnit = TextUnit.Unspecified,
     textDecoration: TextDecoration? = null,
@@ -61,12 +62,18 @@ fun BahaText(
         modifier = modifier,
         color = color,
         fontSize = resolvedFontSize,
-        fontWeight = fontWeight,
         textAlign = textAlign,
         lineHeight = lineHeight,
         textDecoration = textDecoration,
         overflow = overflow,
-        maxLines = maxLines
+        maxLines = maxLines,
+        style = LocalTextStyle.current.copy(
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center,
+                trim = LineHeightStyle.Trim.Both
+            )
+        )
     )
 }
 

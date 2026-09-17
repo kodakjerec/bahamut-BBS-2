@@ -40,7 +40,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
@@ -573,8 +572,7 @@ class SystemSettingsPage : TelnetPage() {
         ) {
             BahaText(
                 text = title,
-                color = colors.chapterText,
-                fontWeight = FontWeight.Bold
+                color = colors.chapterText
             )
         }
         HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
@@ -597,8 +595,7 @@ class SystemSettingsPage : TelnetPage() {
             BahaText(
                 text = ">",
                 color = colors.textSecondary,
-                size = BahaTextSize.SUBTITLE,
-                fontWeight = FontWeight.Bold
+                size = BahaTextSize.SUBTITLE
             )
         }
         HorizontalDivider(color = colors.divider, thickness = 0.5.dp)

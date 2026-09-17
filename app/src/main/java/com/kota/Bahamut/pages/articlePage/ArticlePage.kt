@@ -31,6 +31,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +44,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
@@ -64,6 +66,7 @@ import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton
 import com.kota.Bahamut.service.NotificationSettings.setShowTopBottomButton
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.blockList
 import com.kota.Bahamut.service.UserSettings.Companion.exchangeArticleViewMode
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
@@ -99,15 +102,19 @@ import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetArticlePush
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
+import com.kota.telnet.model.TelnetFrame
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
 import java.util.Locale
 import java.util.Vector
 import java.util.regex.Pattern
+import kotlin.math.min
 
 /**
  * 文章閱讀頁面 (純 Jetpack Compose 實作)
+ *
+ * 具備雙模式：文字閱讀模式 (TextMode) 與 原始 Telnet 畫面模式 (TelnetMode)。
  */
 class ArticlePage : TelnetPage() {
 
@@ -122,6 +129,7 @@ class ArticlePage : TelnetPage() {
     var isExtToolbarOpenState by mutableStateOf(propertiesExternalToolbarEnable)
     var toolbarLocationState by mutableIntStateOf(0)
     var toolbarOrderState by mutableIntStateOf(0)
+    var loadAllImagesTrigger by mutableIntStateOf(0)
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_ARTICLE
@@ -193,7 +201,7 @@ class ArticlePage : TelnetPage() {
     }
 
     override fun onReceivedGestureRight(): Boolean {
-        if (propertiesArticleViewMode == ArticleViewMode.Companion.MODE_TEXT || isFullScreen) {
+        if (propertiesArticleViewMode == ArticleViewMode.MODE_TEXT || isFullScreen) {
             if (propertiesGestureOnBoardEnable) onBackPressed()
             return true
         }
@@ -227,17 +235,16 @@ class ArticlePage : TelnetPage() {
     fun refreshExternalToolbar() {
         var enable = propertiesExternalToolbarEnable
         val articleMode = propertiesArticleViewMode
-        if (articleMode == ArticleViewMode.Companion.MODE_TELNET) {
+        if (articleMode == ArticleViewMode.MODE_TELNET) {
             enable = true
         }
         isExtToolbarOpenState = enable
     }
 
-    /** 變更telnetView大小 */
-    fun reloadTelnetLayout() {}
-
-    /** 載入全部圖片 (保持接口相容) */
-    fun onLoadAllImageClicked() {}
+    /** 載入全部圖片 */
+    fun onLoadAllImageClicked() {
+        loadAllImagesTrigger++
+    }
 
     /** 最前篇 */
     var actionDelay: Long = 500L
@@ -288,21 +295,6 @@ class ArticlePage : TelnetPage() {
             boardMainPage?.loadTheSameTitleDown()
         }
     }
-
-    /** 選單 */
-    val mMenuListener: View.OnClickListener = View.OnClickListener { onMenuClicked() }
-
-    /** 推薦 */
-    val mDoGyListener: View.OnClickListener = View.OnClickListener { onGYButtonClicked() }
-
-    /** 切換模式 */
-    val mChangeModeListener: View.OnClickListener = View.OnClickListener {
-        changeViewMode()
-        refreshExternalToolbar()
-    }
-
-    /** 開啟連結 */
-    val mShowLinkListener: View.OnClickListener = View.OnClickListener { onOpenLinkClicked() }
 
     /** 靠左對齊 */
     var btnLLListener: View.OnClickListener = View.OnClickListener {
@@ -440,6 +432,7 @@ class ArticlePage : TelnetPage() {
                 .addItem(getContextString(R.string.insert) + getContextString(R.string.system_setting_page_chapter_blocklist))
                 .addItem(getContextString(R.string.open_url))
                 .addItem(getContextString(R.string.board_page_item_long_click_1))
+                .addItem(getContextString(R.string.board_page_item_load_all_image))
                 .setListener(object : ASListDialogItemClickListener {
                     override fun onListDialogItemClicked(
                         paramASListDialog: ASListDialog?,
@@ -459,6 +452,7 @@ class ArticlePage : TelnetPage() {
                             6 -> onAddBlockListClicked()
                             7 -> onOpenLinkClicked()
                             8 -> boardMainPage?.funSendMail()
+                            9 -> onLoadAllImageClicked()
                             else -> {}
                         }
                     }
@@ -582,7 +576,6 @@ class ArticlePage : TelnetPage() {
     }
 
     fun setArticle(aArticle: TelnetArticle): Boolean {
-        var isSuccess = true
         telnetArticle = aArticle
         currentArticle = aArticle
 
@@ -601,7 +594,7 @@ class ArticlePage : TelnetPage() {
         }
 
         dismissProcessingDialog()
-        isSuccess = verifyAndEditFromLinked(aArticle)
+        val isSuccess: Boolean = verifyAndEditFromLinked(aArticle)
         return isSuccess
     }
 
@@ -680,7 +673,7 @@ class ArticlePage : TelnetPage() {
             )
 
             // 2. 外部快捷工具列 (推/噓, 切換模式, 開啟連結)
-            if (isExtToolbarOpenState || viewModeState == ArticleViewMode.Companion.MODE_TELNET) {
+            if (isExtToolbarOpenState || viewModeState == ArticleViewMode.MODE_TELNET) {
                 ArticleExtToolbar(
                     onDoGy = { onGYButtonClicked() },
                     onChangeMode = {
@@ -709,11 +702,12 @@ class ArticlePage : TelnetPage() {
                         )
                     }
                 } else {
-                    if (viewModeState == ArticleViewMode.Companion.MODE_TEXT) {
+                    if (viewModeState == ArticleViewMode.MODE_TEXT) {
                         // 文字模式
                         ArticleTextModeContent(
                             article = article,
                             colors = colors,
+                            loadAllTrigger = loadAllImagesTrigger,
                             onAuthorClick = { author ->
                                 showAuthorActionDialog(author)
                             }
@@ -938,6 +932,7 @@ fun ArticleExtToolbar(
 fun ArticleTextModeContent(
     article: TelnetArticle,
     colors: AppColors,
+    loadAllTrigger: Int = 0,
     onAuthorClick: (String) -> Unit
 ) {
     val listState = rememberLazyListState()
@@ -963,6 +958,7 @@ fun ArticleTextModeContent(
                             ArticleContentBlockItem(
                                 item = item,
                                 colors = colors,
+                                loadAllTrigger = loadAllTrigger,
                                 onAuthorClick = onAuthorClick
                             )
                         }
@@ -1009,6 +1005,7 @@ fun ArticleTextModeContent(
                         push = push,
                         floor = pIndex + 1,
                         colors = colors,
+                        loadAllTrigger = loadAllTrigger,
                         onAuthorClick = onAuthorClick
                     )
                 }
@@ -1026,7 +1023,7 @@ fun ArticleTextModeContent(
  * 簽名檔或 ANSI 圖形區塊元件
  */
 @Composable
-fun ArticleTelnetBlockItem(frame: com.kota.telnet.model.TelnetFrame) {
+fun ArticleTelnetBlockItem(frame: TelnetFrame) {
     AndroidView(
         modifier = Modifier
             .fillMaxWidth()
@@ -1081,12 +1078,13 @@ fun ArticlePostTimeBar(
 }
 
 /**
- * 內文區塊元件 (原生格式：作者名說: + 內文，支援引言顏色與超連結)
+ * 內文區塊元件 (原生格式：作者名說: + 內文，支援引言顏色與超連結，並支援預覽縮圖)
  */
 @Composable
 fun ArticleContentBlockItem(
     item: TelnetArticleItem,
     colors: AppColors,
+    loadAllTrigger: Int = 0,
     onAuthorClick: (String) -> Unit
 ) {
     val quoteLevel = item.quoteLevel
@@ -1113,9 +1111,10 @@ fun ArticleContentBlockItem(
 
         // 正文內容
         if (item.content.isNotEmpty()) {
+            val fixedText = remember(item.content) { fixUrlNewlines(item.content) }
             val textColor = if (isQuote) colors.bbsContent1 else colors.bbsContent0
             LinkableText(
-                text = item.content,
+                text = fixedText,
                 defaultColor = textColor,
                 size = BahaTextSize.BODY,
                 modifier = Modifier.padding(
@@ -1124,6 +1123,17 @@ fun ArticleContentBlockItem(
                     bottom = 4.dp
                 )
             )
+
+            // 預覽圖
+            if (UserSettings.linkAutoShow) {
+                val urls = remember(fixedText) { extractUrls(fixedText) }
+                for (url in urls) {
+                    ArticleThumbnail(
+                        url = url,
+                        loadAllTrigger = loadAllTrigger
+                    )
+                }
+            }
         } else if (item.frame != null) {
             ArticleTelnetBlockItem(frame = item.frame!!)
         }
@@ -1138,13 +1148,14 @@ fun ArticleContentBlockItem(
 }
 
 /**
- * 推文項目 Row (還原原生 ArticlePagePushItemView 佈局)
+ * 推文項目 Row (還原原生 ArticlePagePushItemView 佈局，支援網址與預覽縮圖)
  */
 @Composable
 fun ArticlePushRowItem(
     push: TelnetArticlePush,
     floor: Int,
     colors: AppColors,
+    loadAllTrigger: Int = 0,
     onAuthorClick: (String) -> Unit
 ) {
     Column(
@@ -1188,17 +1199,147 @@ fun ArticlePushRowItem(
         Spacer(modifier = Modifier.height(2.dp))
 
         // 推文內容
-        LinkableText(
-            text = push.content,
-            defaultColor = colors.textPrimary,
-            size = BahaTextSize.BODY
+        if (push.content.isNotEmpty()) {
+            val fixedContent = remember(push.content) { fixUrlNewlines(push.content) }
+            LinkableText(
+                text = fixedContent,
+                defaultColor = colors.textPrimary,
+                size = BahaTextSize.BODY
+            )
+
+            // 推文連結預覽圖
+            if (UserSettings.linkAutoShow) {
+                val urls = remember(fixedContent) { extractUrls(fixedContent) }
+                for (url in urls) {
+                    ArticleThumbnail(
+                        url = url,
+                        loadAllTrigger = loadAllTrigger
+                    )
+                }
+            }
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(top = 4.dp),
+            color = colors.divider.copy(alpha = 0.25f),
+            thickness = 0.5.dp
         )
     }
 }
 
 /**
+ * 連結預覽縮圖元件 (嵌入 Android 原生 ThumbnailItemView)
+ */
+@Composable
+fun ArticleThumbnail(
+    url: String,
+    loadAllTrigger: Int
+) {
+    var thumbnailView by remember { mutableStateOf<ThumbnailItemView?>(null) }
+
+    LaunchedEffect(loadAllTrigger) {
+        if (loadAllTrigger > 0) {
+            thumbnailView?.prepareLoadImage()
+        }
+    }
+
+    AndroidView(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        factory = { context ->
+            ThumbnailItemView(context).apply {
+                loadUrl(url)
+                thumbnailView = this
+            }
+        },
+        update = { view ->
+            thumbnailView = view
+            if (view.myUrl != url) {
+                view.loadUrl(url)
+            }
+        }
+    )
+}
+
+/** 修正 BBS 每行 78 字元導致的網址換行 */
+fun fixUrlNewlines(text: String): String {
+    val result = StringBuilder()
+    val lines = text.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+    val urlBuffer = StringBuilder()
+    var inUrl = false
+
+    for (line in lines) {
+        if (inUrl) {
+            if (line.length < 78) {
+                urlBuffer.append(line)
+                result.append(urlBuffer).append("\n")
+                urlBuffer.setLength(0)
+                inUrl = false
+            } else {
+                urlBuffer.append(line)
+            }
+        } else {
+            if (line.contains("http://") || line.contains("https://")) {
+                inUrl = true
+                if (line.startsWith("http://") || line.startsWith("https://")) {
+                    urlBuffer.append(line)
+                    if (line.length < 78) {
+                        result.append(urlBuffer).append("\n")
+                        urlBuffer.setLength(0)
+                        inUrl = false
+                    }
+                } else {
+                    val httpIndex = line.indexOf("http://")
+                    val httpsIndex = line.indexOf("https://")
+                    var urlStartIndex = -1
+
+                    if (httpIndex != -1 && httpsIndex != -1) {
+                        urlStartIndex = min(httpIndex, httpsIndex)
+                    } else if (httpIndex != -1) {
+                        urlStartIndex = httpIndex
+                    } else if (httpsIndex != -1) {
+                        urlStartIndex = httpsIndex
+                    }
+
+                    if (urlStartIndex > 0) {
+                        result.append(line.substring(0, urlStartIndex)).append("\n")
+                        urlBuffer.append(line.substring(urlStartIndex))
+                    } else {
+                        urlBuffer.append(line)
+                    }
+                }
+            } else {
+                result.append(line).append("\n")
+            }
+        }
+    }
+    if (urlBuffer.isNotEmpty()) {
+        result.append(urlBuffer)
+    }
+    return result.toString()
+}
+
+/** 從文字中擷取所有 http/https 網址 */
+fun extractUrls(text: String): List<String> {
+    val urlPattern = Pattern.compile(
+        "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
+    )
+    val matcher = urlPattern.matcher(text)
+    val urls = mutableListOf<String>()
+    while (matcher.find()) {
+        val url = matcher.group().trim()
+        if (url.isNotEmpty() && !urls.contains(url)) {
+            urls.add(url)
+        }
+    }
+    return urls
+}
+
+/**
  * 支援點擊超連結的文字元件
  */
+@Suppress("DEPRECATION")
 @Composable
 fun LinkableText(
     text: String,
@@ -1207,6 +1348,7 @@ fun LinkableText(
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
+    val linkColor = AppTheme.colors.textLink
     val urlPattern = Pattern.compile(
         "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
     )
@@ -1228,7 +1370,7 @@ fun LinkableText(
             pushStringAnnotation(tag = "URL", annotation = url)
             pushStyle(
                 SpanStyle(
-                    color = Color(0xFF64B5F6),
+                    color = linkColor,
                     textDecoration = TextDecoration.Underline
                 )
             )
@@ -1259,7 +1401,7 @@ fun LinkableText(
     ClickableText(
         text = annotatedString,
         modifier = modifier,
-        style = androidx.compose.ui.text.TextStyle(
+        style = TextStyle(
             color = defaultColor,
             fontSize = resolvedFontSize,
             fontFamily = FontFamily.Default

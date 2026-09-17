@@ -19,7 +19,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -94,7 +93,6 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     text = CommonFunctions.getContextString(R.string.account),
                     color = colors.textPrimary,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(
@@ -113,7 +111,6 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     text = CommonFunctions.getContextString(R.string.password),
                     color = colors.textPrimary,
                     fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(

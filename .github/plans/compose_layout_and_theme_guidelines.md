@@ -108,7 +108,7 @@
      - 底色使用 `colors.pageBackground`。
   2. **標題列 (Title Bar)**：
      - 滿版頂部配置，底色為 `colors.dialogTitleBackground`。
-     - 標題文字為 **白色粗體** (`colors.textPrimary`, `18sp`, `FontWeight.Bold`)，**不可使用黃色**。
+     - 標題文字為 **白色粗體** (`colors.textPrimary`, `18sp`)，**不可使用黃色**。
      - 標題下方附帶 1dp 的橫向分隔線 (`colors.divider`)。
   3. **內容區 (Content Area)**：
      - 左右內距 `16.dp`，垂直內距 `14.dp`。
@@ -120,7 +120,7 @@
      - 高度固定為 `48.dp`。
      - 頂部與內容以 1dp 分隔線 (`colors.dialogButtonDivider`) 區隔。
      - 按鈕採等寬配置 (`Modifier.weight(1f)`)，底色為深暗紅 (`colors.dialogButtonBackground` / `#400000`)。
-     - 按鈕文字為粗體白色 (`colors.dialogButtonText`, `18sp`, `FontWeight.Bold`)。
+     - 按鈕文字為粗體白色 (`colors.dialogButtonText`, `18sp`)。
      - 按鈕之間以 1dp 垂直細線 (`colors.dialogButtonDivider`) 分隔。
 
 ---

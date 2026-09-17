@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -290,8 +289,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 BahaText(
                     text = headerTitleState,
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Bold
+                    size = BahaTextSize.BODY
                 )
                 if (headerSubtitleState.isNotEmpty()) {
                     BahaText(
@@ -322,7 +320,12 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                     }
                 } else {
                     LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                        items(count = currentCount) { index ->
+                        items(
+                            count = currentCount,
+                            key = { index -> index }
+                        ) { index ->
+                            @Suppress("UNUSED_VARIABLE")
+                            val version = dataVersion
                             val itemIndex = index + 1
                             val block = ItemUtils.getBlock(itemIndex)
                             val item = getItem(index) as? MailBoxPageItem

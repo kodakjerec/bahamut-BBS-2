@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -105,8 +104,7 @@ fun ThemeManagerScreen(
             onDismissRequest = { pendingThemeIndex = null },
             title = {
                 BahaText(
-                    text = "更換外觀",
-                    fontWeight = FontWeight.Bold
+                    text = "更換外觀"
                 )
             },
             text = {
@@ -139,8 +137,7 @@ fun ThemeManagerScreen(
                 ) {
                     BahaText(
                         text = "確定",
-                        color = colors.titleBarTitle,
-                        fontWeight = FontWeight.Bold
+                        color = colors.titleBarTitle
                     )
                 }
             },

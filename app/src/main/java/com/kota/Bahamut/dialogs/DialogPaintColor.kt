@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -308,8 +307,7 @@ class DialogPaintColor : ASDialog() {
                     Text(
                         text = outputParam,
                         color = colors.textSecondary,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.Medium
+                        fontSize = 15.sp
                     )
                     Box(
                         modifier = Modifier
@@ -320,8 +318,7 @@ class DialogPaintColor : ASDialog() {
                         Text(
                             text = CommonFunctions.getContextString(R.string.dialog_paint_color_sample_ch),
                             color = sampleTextColor,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 16.sp
                         )
                     }
                 }

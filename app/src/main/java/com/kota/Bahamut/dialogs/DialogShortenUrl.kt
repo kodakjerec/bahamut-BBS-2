@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -229,8 +228,7 @@ class DialogShortenUrl : ASDialog() {
                             Text(
                                 text = outputShortUrl,
                                 color = colors.bbsAuthor0,
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.Bold
+                                fontSize = 15.sp
                             )
                         }
                     }
@@ -254,8 +252,7 @@ class DialogShortenUrl : ASDialog() {
                                 Text(
                                     text = item.title ?: item.shortenUrl ?: "",
                                     color = colors.textPrimary,
-                                    fontSize = 15.sp,
-                                    fontWeight = FontWeight.Medium
+                                    fontSize = 15.sp
                                 )
                                 if (!item.description.isNullOrEmpty()) {
                                     Text(

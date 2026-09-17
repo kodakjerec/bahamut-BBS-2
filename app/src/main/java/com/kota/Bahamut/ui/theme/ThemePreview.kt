@@ -2,6 +2,7 @@ package com.kota.Bahamut.ui.theme
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,7 +17,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.foundation.clickable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -54,8 +53,7 @@ fun ThemeShowcase(
             Text(
                 text = "$themeName (${if (isDark) "Dark" else "Light"})",
                 color = colors.textPrimary,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontSize = 18.sp
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -77,8 +75,7 @@ fun ThemeShowcase(
                         Text(
                             text = "看板名稱 (Title)",
                             color = colors.titleBarTitle,
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.Bold
+                            fontSize = 15.sp
                         )
                         Text(
                             text = "文章標題與副標 (Detail)",
@@ -115,8 +112,7 @@ fun ThemeShowcase(
                     Text(
                         text = "選中 Tab",
                         color = colors.tabSelectedText,
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Bold
+                        fontSize = 13.sp
                     )
                 }
                 // 未選中的 Tab
@@ -348,8 +344,7 @@ fun ThemeHybridShowcase(modifier: Modifier = Modifier) {
         Text(
             text = "Compose 混合過渡預覽 (Theme Bridge)",
             color = colors.textPrimary,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Bold
+            fontSize = 15.sp
         )
         Spacer(modifier = Modifier.height(6.dp))
         Text(
@@ -386,8 +381,7 @@ fun ThemeHybridShowcase(modifier: Modifier = Modifier) {
             Text(
                 text = "Compose 按鈕點擊測試: $clickCount 次",
                 color = colors.buttonText,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 13.sp
             )
         }
     }

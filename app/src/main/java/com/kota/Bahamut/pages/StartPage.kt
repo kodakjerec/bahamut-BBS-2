@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -208,8 +207,7 @@ class StartPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.notices),
-                        size = BahaTextSize.TITLE,
-                        fontWeight = FontWeight.Bold
+                        size = BahaTextSize.TITLE
                     )
                     BahaText(
                         text = versionText,
@@ -230,7 +228,6 @@ class StartPage : TelnetComposePage() {
                 BahaText(
                     text = stringResource(R.string.start_msg_2),
                     size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Medium,
                     lineHeight = 22.sp
                 )
 

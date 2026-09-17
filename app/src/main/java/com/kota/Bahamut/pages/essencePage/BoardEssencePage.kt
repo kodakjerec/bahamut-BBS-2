@@ -9,17 +9,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.HorizontalDivider
@@ -38,7 +38,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.BahamutPage
@@ -315,7 +314,6 @@ class BoardEssencePage : TelnetListPage() {
                             text = headerTitleState.ifEmpty { stringResource(R.string.loading) },
                             color = colors.titleBarTitle,
                             size = BahaTextSize.TITLE,
-                            fontWeight = FontWeight.Bold,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -370,7 +368,12 @@ class BoardEssencePage : TelnetListPage() {
                     }
                 } else {
                     LazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
-                        items(count = currentCount) { index ->
+                        items(
+                            count = currentCount,
+                            key = { index -> index }
+                        ) { index ->
+                            @Suppress("UNUSED_VARIABLE")
+                            val version = dataVersion
                             val itemIndex = index + 1
                             val block = ItemUtils.getBlock(itemIndex)
                             val item = getItem(index) as? BoardEssencePageItem
@@ -464,14 +467,12 @@ class BoardEssencePage : TelnetListPage() {
                     text = statusText,
                     color = if (isDir) colors.titleBarTitle else colors.bbsMailStatus,
                     size = BahaTextSize.BODY,
-                    fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(end = 6.dp)
                 )
                 BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
                     color = titleColor,
                     size = BahaTextSize.BODY,
-                    fontWeight = if (isDir) FontWeight.Bold else FontWeight.Normal,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f)
