@@ -5,7 +5,6 @@ import android.content.res.Configuration
 import android.database.DataSetObserver
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -43,7 +41,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,6 +92,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardE
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaText
@@ -646,17 +644,17 @@ open class BoardMainPage : TelnetListPage(),
         if (str3 != null && str3 == "M") return
 
         showProcessingDialog(getContextString(R.string.board_page_post_waiting_message_1))
-        postWaitingDialog1?.postDelayed(3000L)
-        postWaitingDialog2?.postDelayed(6000L)
+        postWaitingDialog1.postDelayed(3000L)
+        postWaitingDialog2.postDelayed(6000L)
     }
 
-    val postWaitingDialog1: ASCoroutine? = object : ASCoroutine() {
+    val postWaitingDialog1: ASCoroutine = object : ASCoroutine() {
         override suspend fun run() {
             setMessage(getContextString(R.string.board_page_post_waiting_message_2))
         }
     }
 
-    val postWaitingDialog2: ASCoroutine? = object : ASCoroutine() {
+    val postWaitingDialog2: ASCoroutine = object : ASCoroutine() {
         override suspend fun run() {
             setMessage(getContextString(R.string.board_page_post_waiting_message_3))
         }
@@ -668,8 +666,8 @@ open class BoardMainPage : TelnetListPage(),
             val page = PageContainer.instance!!.postArticlePage
             page.setRecover()
         }
-        postWaitingDialog1?.cancel()
-        postWaitingDialog2?.cancel()
+        postWaitingDialog1.cancel()
+        postWaitingDialog2.cancel()
         dismissProcessingDialog()
     }
 
@@ -678,8 +676,8 @@ open class BoardMainPage : TelnetListPage(),
             val page = PageContainer.instance!!.postArticlePage
             page.closeArticle()
         }
-        postWaitingDialog1?.cancel()
-        postWaitingDialog2?.cancel()
+        postWaitingDialog1.cancel()
+        postWaitingDialog2.cancel()
         dismissProcessingDialog()
     }
 
@@ -1296,9 +1294,9 @@ fun BoardMainToolbar(
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
-                        text = "<<",
-                        color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE
+                        text = stringResource(R.string.toolbar_item_ll),
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        size = BahaTextSize.TITLE
                     )
                 }
                 Box(
@@ -1375,9 +1373,9 @@ fun BoardMainToolbar(
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
-                        text = ">>",
-                        color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE
+                        text = stringResource(R.string.toolbar_item_rr),
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        size = BahaTextSize.TITLE
                     )
                 }
             }
@@ -1410,7 +1408,7 @@ fun BoardEndDrawer(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.5f))
+                .background(colors.pageBackground.copy(alpha = 0.5f))
                 .clickable { onClose() }
         )
     }
@@ -1425,8 +1423,7 @@ fun BoardEndDrawer(
         ) + fadeOut()
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = if (isLeft) Alignment.CenterStart else Alignment.CenterEnd
         ) {
             Column(
@@ -1436,53 +1433,40 @@ fun BoardEndDrawer(
                     .background(colors.pageBackground)
                     .clickable(enabled = false) {} // 阻止點擊穿透到遮罩
             ) {
-                // 1. 頂部按鈕：精華區 / 書籤管理
+                // 1. 頂部工具列：精華區 / 書籤管理 / 關閉按鈕 (>)
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
-                        .padding(horizontal = 6.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        .height(50.dp)
+                        .background(colors.toolbarBackground),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     BahaButton(
                         text = stringResource(R.string.essence_page),
                         type = ButtonType.NORMAL,
                         onClick = onEssenceClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
+                    BBSToolbarDivider()
                     BahaButton(
-                        text = stringResource(R.string.bookmark_manager),
+                        text = stringResource(R.string.bookmark_manager)+" >",
                         type = ButtonType.NORMAL,
                         onClick = onBookmarkManageClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1.5f)
+                            .fillMaxHeight()
                     )
                 }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-
-                // 2. 切換分頁：書籤 / 紀錄
-                Row(
+                Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
-                        .padding(horizontal = 6.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    BahaButton(
-                        text = stringResource(R.string.bookmark),
-                        type = if (mode == 0) ButtonType.NORMAL else ButtonType.SECONDARY,
-                        onClick = { onTabClick(0) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    BahaButton(
-                        text = stringResource(R.string.record),
-                        type = if (mode == 1) ButtonType.NORMAL else ButtonType.SECONDARY,
-                        onClick = { onTabClick(1) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                        .height(1.dp)
+                        .background(colors.toolbarDivider)
+                )
 
-                // 3. 書籤/紀錄 清單
+                // 2. 中間清單：書籤 / 紀錄 清單
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -1503,87 +1487,195 @@ fun BoardEndDrawer(
                         LazyColumn(modifier = Modifier.fillMaxSize()) {
                             items(bookmarks.size) { bIndex ->
                                 val bItem = bookmarks[bIndex]
+                                val gyValue = bItem.gy.trim().ifEmpty { "0" }
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .clickable { onBookmarkItemClick(bItem) }
-                                        .padding(horizontal = 12.dp, vertical = 8.dp)
                                 ) {
-                                    BahaText(
-                                        text = bItem.keyword.ifEmpty { "未輸入" },
-                                        color = colors.textPrimary,
-                                        size = BahaTextSize.BODY,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    if (bItem.author.isNotEmpty()) {
-                                        BahaText(
-                                            text = bItem.author,
-                                            color = colors.textSecondary,
-                                            size = BahaTextSize.TINY,
-                                            maxLines = 1
-                                        )
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp, vertical = 6.dp)
+                                    ) {
+                                        if (mode == 0) {
+                                            // 第一列：關鍵字 / 標題
+                                            BahaText(
+                                                text = bItem.keyword.ifEmpty { stringResource(R.string.un_input) },
+                                                color = colors.textPrimary,
+                                                size = BahaTextSize.BODY,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            // 第二列：作者、標記 M、GY值
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                BahaText(
+                                                    text = stringResource(R.string.author_),
+                                                    color = colors.titleBarDetail2,
+                                                    size = BahaTextSize.CAPTION
+                                                )
+                                                BahaText(
+                                                    text = bItem.author.ifEmpty { stringResource(R.string.un_input) },
+                                                    color = colors.titleBarDetail2,
+                                                    size = BahaTextSize.CAPTION,
+                                                    maxLines = 1,
+                                                    overflow = TextOverflow.Ellipsis,
+                                                    modifier = Modifier.weight(1f, fill = false)
+                                                )
+                                                if (bItem.mark == "y") {
+                                                    Spacer(modifier = Modifier.width(6.dp))
+                                                    BahaText(
+                                                        text = stringResource(R.string.word_m),
+                                                        color = colors.bbsMailMark,
+                                                        size = BahaTextSize.CAPTION
+                                                    )
+                                                }
+                                                Spacer(modifier = Modifier.weight(1f))
+                                                BahaText(
+                                                    text = stringResource(R.string.gy_),
+                                                    color = colors.bbsContent0,
+                                                    size = BahaTextSize.CAPTION
+                                                )
+                                                BahaText(
+                                                    text = gyValue,
+                                                    color = colors.bbsBoardGy,
+                                                    size = BahaTextSize.CAPTION
+                                                )
+                                            }
+                                        } else {
+                                            // 第一列：關鍵字 / 標題
+                                            BahaText(
+                                                text = bItem.keyword.ifEmpty { stringResource(R.string.un_input) },
+                                                color = colors.textPrimary,
+                                                size = BahaTextSize.SUBTITLE,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
                                     }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(1.dp)
+                                            .background(colors.divider)
+                                    )
                                 }
-                                HorizontalDivider(
-                                    color = colors.divider.copy(alpha = 0.3f),
-                                    thickness = 0.5.dp
-                                )
                             }
                         }
                     }
                 }
 
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-
-                // 4. 底部搜尋 / 選篇
+                // 3. 底部第一列：切換分頁 [書籤] | [紀錄]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.toolbarDivider)
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
-                        .padding(horizontal = 6.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        .height(50.dp)
+                        .background(colors.toolbarBackground),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BahaButton(
+                        text = stringResource(R.string.bookmark),
+                        type = if (mode == 0) ButtonType.NORMAL else ButtonType.SECONDARY,
+                        onClick = { onTabClick(0) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                    BBSToolbarDivider()
+                    BahaButton(
+                        text = stringResource(R.string.record),
+                        type = if (mode == 1) ButtonType.NORMAL else ButtonType.SECONDARY,
+                        onClick = { onTabClick(1) },
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
+                    )
+                }
+
+                // 4. 底部第二列：操作 [搜尋] | [選擇]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.toolbarDivider)
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp)
+                        .background(colors.toolbarBackground),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     BahaButton(
                         text = stringResource(R.string.search),
                         type = ButtonType.NORMAL,
                         onClick = onSearchClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
+                    BBSToolbarDivider()
                     BahaButton(
                         text = stringResource(R.string.select),
                         type = ButtonType.NORMAL,
                         onClick = onSelectClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
                 }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-                // 5. 黑名單開關與設定
+                // 5. 底部第三列：黑名單 [☑ 啟用] | [黑名單 >]
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(colors.toolbarDivider)
+                )
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colors.toolbarBackground)
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                        .height(50.dp)
+                        .background(colors.toolbarBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    BahaCheckbox(
-                        checked = isBlockEnabled,
-                        onCheckedChange = { onToggleBlock() }
-                    )
-                    BahaText(
-                        text = "黑名單: " + if (isBlockEnabled) stringResource(R.string.on) else "關",
-                        color = colors.buttonText,
-                        size = BahaTextSize.BODY,
+                    Row(
                         modifier = Modifier
+                            .weight(1.1f)
+                            .fillMaxHeight()
                             .clickable { onToggleBlock() }
-                            .padding(end = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        BahaCheckbox(
+                            checked = isBlockEnabled,
+                            onCheckedChange = { onToggleBlock() }
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
+                        BahaText(
+                            text = stringResource(R.string.on),
+                            color = colors.buttonText
+                        )
+                    }
+                    BBSToolbarDivider()
                     BahaButton(
-                        text = stringResource(R.string.system_setting_page_chapter_blocklist),
+                        text = stringResource(R.string.system_setting_page_chapter_blocklist)+" >",
                         type = ButtonType.NORMAL,
-                        onClick = onBlockSettingClick
+                        onClick = onBlockSettingClick,
+                        modifier = Modifier
+                            .weight(1.4f)
+                            .fillMaxHeight()
                     )
                 }
             }

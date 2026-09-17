@@ -3,7 +3,6 @@ package com.kota.Bahamut.pages.essencePage
 import android.content.Context
 import android.database.DataSetObserver
 import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -19,11 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +44,9 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BBSToolbar
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
+import com.kota.Bahamut.ui.components.BBSTopBar
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
@@ -259,72 +256,12 @@ class BoardEssencePage : TelnetListPage() {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 頂部標題列 (BBS 深海藍底，雙行資訊，左側返回鍵)
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colors.titleBarBackground)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(IntrinsicSize.Min),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(
-                        onClick = { onBackPressed() },
-                        modifier = Modifier.padding(start = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = colors.titleBarTitle
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 2.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
-                    ) {
-                        BahaText(
-                            text = headerTitleState.ifEmpty { stringResource(R.string.loading) },
-                            color = colors.titleBarTitle,
-                            size = BahaTextSize.TITLE,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (headerSubtitleState.isNotEmpty()) {
-                                BahaText(
-                                    text = headerSubtitleState,
-                                    color = colors.titleBarDetail,
-                                    size = BahaTextSize.BODY,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            if (headerSubtitleState.isNotEmpty() && headerDetailState.isNotEmpty()) {
-                                Spacer(modifier = Modifier.width(8.dp))
-                            }
-                            if (headerDetailState.isNotEmpty()) {
-                                BahaText(
-                                    text = headerDetailState,
-                                    color = colors.titleBarDetail2,
-                                    size = BahaTextSize.BODY,
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-                    }
-                }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            }
+            // 頂部標題列 (BBS 經典深海藍底，雙行資訊)
+            BBSTopBar(
+                title = headerTitleState.ifEmpty { "精華文章" },
+                subtitle = headerSubtitleState,
+                subtitleTrailing = headerDetailState
+            )
 
             // 文章列表
             Box(
@@ -362,21 +299,13 @@ class BoardEssencePage : TelnetListPage() {
                                 itemIndex = itemIndex,
                                 onClick = { loadItemAtIndex(index) }
                             )
-                            HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
                         }
                     }
                 }
             }
 
             // 底部操作工具列
-            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(colors.toolbarBackground),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            BBSToolbar {
                 BahaButton(
                     text = stringResource(R.string.first_page),
                     type = ButtonType.NORMAL,
@@ -388,12 +317,7 @@ class BoardEssencePage : TelnetListPage() {
                         coroutineScope.launch { listState.scrollToItem(0) }
                     }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.last_page),
                     type = ButtonType.NORMAL,
@@ -432,57 +356,107 @@ class BoardEssencePage : TelnetListPage() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(colors.pageBackground)
-                .clickable(onClick = onClick)
-                .padding(horizontal = 8.dp, vertical = 5.dp)
         ) {
-            // 第一列：狀態圖示 + 標題
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BahaText(
-                    text = statusText,
-                    color = if (isDir) colors.titleBarTitle else colors.bbsMailStatus,
-                    size = BahaTextSize.BODY,
-                    modifier = Modifier.padding(end = 6.dp)
+                // 左側項目資訊區塊
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable(onClick = onClick)
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                ) {
+                    // 第一列：狀態圖示 + 標題 (目錄用黃色)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BahaText(
+                            text = statusText,
+                            color = if (isDir) colors.titleBarTitle else colors.bbsMailStatus,
+                            size = BahaTextSize.BODY,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        BahaText(
+                            text = item?.title ?: stringResource(R.string.loading_),
+                            color = titleColor,
+                            size = BahaTextSize.BODY,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    // 第二列：編號、日期、作者 (靠右)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 編號 (5 碼)
+                        BahaText(
+                            text = String.format("%05d", itemIndex),
+                            color = colors.bbsMailNumber,
+                            size = BahaTextSize.BODY
+                        )
+
+                        // 日期
+                        Spacer(modifier = Modifier.width(12.dp))
+                        BahaText(
+                            text = item?.date ?: "",
+                            color = colors.bbsMailDate,
+                            size = BahaTextSize.BODY
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // 作者 (靠右對齊)
+                        BahaText(
+                            text = item?.author ?: "",
+                            color = colors.bbsMailAuthor,
+                            size = BahaTextSize.BODY,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // 垂直分隔線
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.divider)
                 )
-                BahaText(
-                    text = item?.title ?: stringResource(R.string.loading_),
-                    color = titleColor,
-                    size = BahaTextSize.BODY,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
+
+                // 右側箭頭按鈕區塊
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable { onClick() }
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BahaText(
+                        text = ">",
+                        color = colors.textPrimary,
+                        size = BahaTextSize.BODY
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.height(2.dp))
-
-            // 第二列：編號、作者、日期
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BahaText(
-                    text = String.format("%05d", itemIndex),
-                    color = colors.bbsMailNumber,
-                    size = BahaTextSize.CAPTION,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                BahaText(
-                    text = item?.author ?: "",
-                    color = colors.bbsMailAuthor,
-                    size = BahaTextSize.CAPTION,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                BahaText(
-                    text = item?.date ?: "",
-                    color = colors.bbsMailDate,
-                    size = BahaTextSize.CAPTION
-                )
-            }
+            // 底部分隔線
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
         }
     }
 }

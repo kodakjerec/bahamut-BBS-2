@@ -31,6 +31,7 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ReferenceAuthor
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.NotificationSettings
+import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaCheckboxLeft
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
@@ -184,7 +185,6 @@ class DialogReference : ASDialog() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(4.dp))
                 .background(colors.dialogBlockBackground)
                 .padding(8.dp)
         ) {
@@ -192,29 +192,41 @@ class DialogReference : ASDialog() {
                 text = title,
                 checked = enabled,
                 onCheckedChange = onEnabledChange,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 18.sp
             )
 
             if (enabled) {
                 Spacer(modifier = Modifier.height(6.dp))
-                // 去除空白行
-                BahaCheckboxLeft(
-                    text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
-                    checked = removeBlank,
-                    onCheckedChange = onRemoveBlankChange,
-                    fontSize = 14.sp,
+
+                // 去除空白行 (文字在左，核取方塊在右)
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 28.dp)
-                )
+                        .clickable { onRemoveBlankChange(!removeBlank) }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
+                        color = colors.textPrimary,
+                        fontSize = 18.sp
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    BahaCheckbox(
+                        checked = removeBlank,
+                        onCheckedChange = onRemoveBlankChange
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(6.dp))
+
                 // 保留行數
                 Text(
                     text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
-                    color = colors.textSecondary,
-                    fontSize = 13.sp,
-                    modifier = Modifier.padding(start = 36.dp, bottom = 4.dp)
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
 
                 val types = listOf(
@@ -224,10 +236,8 @@ class DialogReference : ASDialog() {
                 )
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(start = 32.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     types.forEach { (index, label) ->
                         Row(
@@ -238,14 +248,14 @@ class DialogReference : ASDialog() {
                                 selected = (reservedType == index),
                                 onClick = { onReservedTypeChange(index) },
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.toolbarBackgroundFocused,
-                                    unselectedColor = colors.textSecondary
+                                    selectedColor = colors.checkboxTint,
+                                    unselectedColor = colors.checkboxUncheckedTint
                                 )
                             )
                             Text(
                                 text = label,
                                 color = colors.textPrimary,
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
                                 modifier = Modifier.padding(start = 2.dp)
                             )
                         }

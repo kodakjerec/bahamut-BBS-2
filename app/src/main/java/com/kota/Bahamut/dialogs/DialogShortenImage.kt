@@ -21,19 +21,17 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -41,7 +39,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -54,7 +53,6 @@ import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.CommonFunctions
-import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.ButtonType
@@ -104,24 +102,23 @@ class DialogShortenImage : AppCompatActivity() {
     @Composable
     private fun Content() {
         val colors = AppTheme.colors
-        val scrollState = rememberScrollState()
 
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             BahaAlertDialogContent(
-                modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
-                title = CommonFunctions.getContextString(R.string.dialog_shorten_img_title),
+                modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
+                title = stringResource(R.string.dialog_shorten_img_title),
+                contentPadding = PaddingValues(0.dp),
                 buttons = listOf(
                     BahaDialogButton(
-                        text = CommonFunctions.getContextString(R.string.cancel),
-                        type = ButtonType.SECONDARY,
+                        text = stringResource(R.string.cancel),
                         onClick = { finish() }
                     ),
                     BahaDialogButton(
-                        text = CommonFunctions.getContextString(R.string.send),
-                        type = ButtonType.NORMAL,
+                        text = stringResource(R.string.send),
+                        enabled = outputParam.isNotEmpty(),
                         onClick = {
                             if (outputParam.isNotEmpty()) {
                                 postUrl(outputParam)
@@ -132,67 +129,19 @@ class DialogShortenImage : AppCompatActivity() {
                 )
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(scrollState),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    if (selectedImageUri == null && selectedVideoUri == null) {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.dialog_shorten_img_hint),
-                            color = colors.textSecondary,
-                            fontSize = 14.sp,
-                            modifier = Modifier.padding(vertical = 12.dp)
-                        )
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            BahaButton(
-                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_album),
-                                type = ButtonType.NORMAL,
-                                onClick = {
-                                    pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
-                                },
-                                modifier = Modifier.weight(1f),
-                                minHeight = 36.dp
-                            )
-                            BahaButton(
-                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_camera),
-                                type = ButtonType.NORMAL,
-                                onClick = {
-                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                        openCameraIntent()
-                                    } else {
-                                        permissionLauncher.launch(CAMERA)
-                                    }
-                                },
-                                modifier = Modifier.weight(1f),
-                                minHeight = 36.dp
-                            )
-                            BahaButton(
-                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_video),
-                                type = ButtonType.NORMAL,
-                                onClick = {
-                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                        openVideoIntent()
-                                    } else {
-                                        permissionVideoLauncher.launch(CAMERA)
-                                    }
-                                },
-                                modifier = Modifier.weight(1f),
-                                minHeight = 36.dp
-                            )
-                        }
-                    } else {
-                        // 顯示預覽
+                    // 預覽區 (圖片 / 影片 / 空黑底)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(230.dp)
+                            .background(colors.pageBackground),
+                        contentAlignment = Alignment.Center
+                    ) {
                         if (selectedImageUri != null) {
                             AndroidView(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
+                                modifier = Modifier.fillMaxSize(),
                                 factory = { ctx ->
                                     ImageView(ctx).apply {
                                         scaleType = ImageView.ScaleType.FIT_CENTER
@@ -205,10 +154,7 @@ class DialogShortenImage : AppCompatActivity() {
                             )
                         } else if (selectedVideoUri != null) {
                             AndroidView(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp)
-                                    .clip(RoundedCornerShape(4.dp)),
+                                modifier = Modifier.fillMaxSize(),
                                 factory = { ctx ->
                                     VideoView(ctx).apply {
                                         setVideoURI(selectedVideoUri)
@@ -217,45 +163,103 @@ class DialogShortenImage : AppCompatActivity() {
                                 }
                             )
                         }
-
-                        Spacer(modifier = Modifier.height(10.dp))
-
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            BahaButton(
-                                text = CommonFunctions.getContextString(R.string.reset),
-                                type = ButtonType.SECONDARY,
-                                onClick = { resetState() },
-                                modifier = Modifier.weight(1f),
-                                minHeight = 36.dp
-                            )
-                            BahaButton(
-                                text = CommonFunctions.getContextString(R.string.dialog_shorten_img_title),
-                                type = ButtonType.NORMAL,
-                                onClick = { startTransfer() },
-                                modifier = Modifier.weight(1f),
-                                minHeight = 36.dp
-                            )
-                        }
                     }
 
-                    if (outputParam.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(12.dp))
+                    // 分隔線
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(colors.divider)
+                    )
+
+                    // 選擇來源按鈕列 (相簿 | 拍照 | 錄影)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
+                    ) {
+                        BahaButton(
+                            text = stringResource(R.string.dialog_shorten_img_album),
+                            type = ButtonType.NORMAL,
+                            onClick = {
+                                pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            minHeight = 44.dp
+                        )
                         Box(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(colors.dialogBlockBackground)
-                                .padding(10.dp)
-                        ) {
-                            Text(
-                                text = outputParam,
-                                color = colors.bbsAuthor0,
-                                fontSize = 14.sp
-                            )
-                        }
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(colors.toolbarDivider)
+                        )
+                        BahaButton(
+                            text = stringResource(R.string.dialog_shorten_img_camera),
+                            type = ButtonType.NORMAL,
+                            onClick = {
+                                if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                    openCameraIntent()
+                                } else {
+                                    permissionLauncher.launch(CAMERA)
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            minHeight = 44.dp
+                        )
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .fillMaxHeight()
+                                .background(colors.toolbarDivider)
+                        )
+                        BahaButton(
+                            text = stringResource(R.string.dialog_shorten_img_video),
+                            type = ButtonType.NORMAL,
+                            onClick = {
+                                if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                    openVideoIntent()
+                                } else {
+                                    permissionVideoLauncher.launch(CAMERA)
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            minHeight = 44.dp
+                        )
+                    }
+
+                    // 分隔線
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(1.dp)
+                            .background(colors.divider)
+                    )
+
+                    // 縮址預覽 / 範例文字列
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(38.dp)
+                            .background(colors.pageBackground)
+                            .padding(horizontal = 8.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = outputParam.ifEmpty {
+                                stringResource(R.string.dialog_paint_color_sample_ch)
+                            },
+                            color = if (outputParam.isNotEmpty()) colors.bbsAuthor0 else colors.textPrimary,
+                            fontSize = 15.sp,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     }
                 }
             }
@@ -264,27 +268,20 @@ class DialogShortenImage : AppCompatActivity() {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(colors.surface.copy(alpha = 0.5f))
+                        .background(colors.pageBackground.copy(alpha = 0.5f))
                         .clickable { isUploading = false },
                     contentAlignment = Alignment.Center
                 ) {
-                    BahaProcessingDialogContent(message = CommonFunctions.getContextString(R.string.dialog_shorten_url_under_transfer))
+                    BahaProcessingDialogContent(message = stringResource(R.string.dialog_shorten_url_under_transfer))
                 }
             }
         }
     }
 
-    private fun resetState() {
-        outputParam = ""
-        selectedImageUri = null
-        selectedVideoUri = null
-        isUploading = false
-    }
-
     private fun startTransfer() {
         val finalUri = selectedImageUri ?: selectedVideoUri
         if (finalUri == null) {
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error02))
+            ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error02))
             return
         }
 
@@ -303,7 +300,7 @@ class DialogShortenImage : AppCompatActivity() {
 
                 override fun onError(message: String) {
                     ASCoroutine.ensureMainThread {
-                        ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error03) + " " + message)
+                        ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error03) + " " + message)
                         isUploading = false
                     }
                 }
@@ -359,11 +356,12 @@ class DialogShortenImage : AppCompatActivity() {
             photoFile?.also {
                 val uri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
                 selectedImageUri = uri
+                selectedVideoUri = null
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
             }
         } catch (e: Exception) {
             Log.d(javaClass.simpleName, e.message.toString())
-            ASToast.showShortToast(getContextString(R.string.dialog_shorten_image_error04))
+            ASToast.showShortToast(CommonFunctions.getContextString(R.string.dialog_shorten_image_error04))
             return
         }
         intentCameraLauncher.launch(intent)

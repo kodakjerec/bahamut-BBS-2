@@ -13,13 +13,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import com.kota.Bahamut.ui.components.BBSTopBar
+import com.kota.Bahamut.ui.components.BBSToolbar
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
+import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,9 +29,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -39,7 +37,6 @@ import com.kota.Bahamut.pages.articlePage.ArticleTelnetModeContent
 import com.kota.Bahamut.pages.articlePage.ArticleTextModeContent
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.service.CommonFunctions.getContextString
-import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -176,52 +173,13 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 頂部導覽列
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { onBackPressed() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = colors.titleBarTitle
-                        )
-                    }
-
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
-                    ) {
-                        BahaText(
-                            text = article?.title ?: stringResource(R.string.loading_),
-                            color = colors.titleBarTitle,
-                            size = BahaTextSize.BODY,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        if (article != null) {
-                            val nick = if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""
-                            BahaText(
-                                text = "${article.author}$nick  ${article.dateTime}",
-                                color = colors.titleBarDetail,
-                                size = BahaTextSize.TINY,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-                }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            }
+            // 頂部導覽列 (BBS 經典深海藍底，雙行文章資訊)
+            val nick = if (!article?.nickName.isNullOrEmpty()) "(${article?.nickName})" else ""
+            BBSTopBar(
+                title = article?.title ?: stringResource(R.string.loading_),
+                subtitle = if (article != null) "${article.author}$nick" else "",
+                subtitleTrailing = article?.dateTime ?: ""
+            )
 
             // 信件內容主體
             Box(
@@ -258,61 +216,38 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 }
             }
 
-            // 底部工具列 (回信, 切換模式, 上一篇, 下一篇) (滿版無縫 50dp)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(colors.toolbarDivider)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(colors.toolbarBackground),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            // 底部操作工具列 (回信, 切換模式, 上一篇, 下一篇)
+            BBSToolbar {
                 BahaButton(
                     text = stringResource(R.string.reply_mail),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { onReplyButtonClicked() }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { reloadViewMode() }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.prev_article),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { onPageUpButtonClicked() }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.next_article),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

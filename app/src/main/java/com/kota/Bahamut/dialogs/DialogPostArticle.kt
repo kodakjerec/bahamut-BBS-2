@@ -1,6 +1,8 @@
 package com.kota.Bahamut.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,14 +10,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -25,11 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
-import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -64,16 +65,15 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
         val scrollState = rememberScrollState()
 
         BahaAlertDialogContent(
-            title = CommonFunctions.getContextString(R.string.confirm),
+            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
+            title = stringResource(R.string.confirm),
             buttons = listOf(
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    text = stringResource(R.string.cancel),
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.send),
-                    type = ButtonType.NORMAL,
+                    text = stringResource(R.string.send),
                     onClick = {
                         val sign = if (selectedSignIndex > 0) (selectedSignIndex - 1).toString() else ""
                         dialogPostArticleListener?.onPostArticleDoneWithTarget(selectedTarget, sign)
@@ -87,83 +87,97 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                Text(
-                    text = CommonFunctions.getContextString(R.string.is_post_article),
+                BahaText(
+                    text = stringResource(R.string.is_post_article),
                     color = colors.textPrimary,
-                    fontSize = 15.sp,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    modifier = Modifier.padding(bottom = 6.dp),
+                    customFontSize = AppTheme.fontSize.title
                 )
 
                 if (myTarget != TelnetArticle.NEW) {
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = CommonFunctions.getContextString(R.string.is_post_article_reply),
+                    BahaText(
+                        text = stringResource(R.string.is_post_article_reply),
                         color = colors.textPrimary,
-                        fontSize = 14.sp,
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
 
                     val targets = listOf(
-                        "F" to CommonFunctions.getContextString(R.string.post_to_board),
-                        "M" to CommonFunctions.getContextString(R.string.post_to_mail),
-                        "B" to CommonFunctions.getContextString(R.string.post_to_both)
+                        "F" to stringResource(R.string.post_to_board),
+                        "M" to stringResource(R.string.post_to_mail),
+                        "B" to stringResource(R.string.post_to_both)
                     )
 
                     targets.forEach { (key, label) ->
-                        Row(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
+                                .height(48.dp)
                                 .clickable { selectedTarget = key }
-                                .padding(vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(horizontal = 4.dp)
                         ) {
                             RadioButton(
                                 selected = (selectedTarget == key),
                                 onClick = { selectedTarget = key },
                                 colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.toolbarBackgroundFocused,
+                                    selectedColor = colors.checkboxTint,
                                     unselectedColor = colors.textSecondary
-                                )
+                                ),
+                                modifier = Modifier.align(Alignment.CenterStart)
                             )
-                            Text(
+                            BahaText(
                                 text = label,
                                 color = colors.textPrimary,
-                                fontSize = 15.sp,
-                                modifier = Modifier.padding(start = 8.dp)
+                                modifier = Modifier.align(Alignment.Center),
+                                customFontSize = AppTheme.fontSize.title
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = CommonFunctions.getContextString(R.string.select_sign),
+                Spacer(modifier = Modifier.height(10.dp))
+                BahaText(
+                    text = stringResource(R.string.select_sign),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(bottom = 6.dp)
+                    modifier = Modifier.padding(bottom = 4.dp)
                 )
 
                 Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedCard(
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(48.dp)
                             .clickable { isSignDropdownExpanded = true }
+                            .padding(horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
+                        BahaText(
                             text = signList.getOrElse(selectedSignIndex) { "" },
                             color = colors.textPrimary,
-                            fontSize = 15.sp,
-                            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp)
+                            customFontSize = AppTheme.fontSize.title
+                        )
+                        BahaText(
+                            text = "▼",
+                            color = colors.textPrimary,
+                            modifier = Modifier.padding(end = 4.dp),
+                            customFontSize = AppTheme.fontSize.title
                         )
                     }
 
                     DropdownMenu(
                         expanded = isSignDropdownExpanded,
-                        onDismissRequest = { isSignDropdownExpanded = false }
+                        onDismissRequest = { isSignDropdownExpanded = false },
+                        modifier = Modifier.background(colors.pageBackground)
                     ) {
                         signList.forEachIndexed { index, name ->
                             DropdownMenuItem(
-                                text = { Text(text = name, color = colors.textPrimary) },
+                                text = {
+                                    BahaText(
+                                        text = name,
+                                        color = if (selectedSignIndex == index) colors.checkboxTint else colors.textPrimary
+                                    )
+                                },
                                 onClick = {
                                     selectedSignIndex = index
                                     isSignDropdownExpanded = false

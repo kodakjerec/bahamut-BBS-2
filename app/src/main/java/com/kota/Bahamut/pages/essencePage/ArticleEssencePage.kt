@@ -12,15 +12,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -45,9 +42,14 @@ import com.kota.Bahamut.pages.mailPage.SendMailPage
 import com.kota.Bahamut.pages.mailPage.SendMailPageListener
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
+import com.kota.Bahamut.ui.components.BBSTopBar
+import com.kota.Bahamut.ui.components.BBSToolbar
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -255,58 +257,36 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 頂部導覽列
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colors.titleBarBackground)
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 4.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    IconButton(onClick = { onBackPressed() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null,
-                            tint = colors.titleBarTitle
-                        )
-                    }
+            val authorText = article?.let {
+                val nick = if (!it.nickName.isNullOrEmpty()) "(${it.nickName})" else ""
+                "${it.author}$nick"
+            } ?: ""
+            val boardText = article?.boardName ?: ""
 
-                    Column(
+            // 頂部導覽列 (BBS 經典雙行標題列，右側為選單按鈕)
+            BBSTopBar(
+                title = article?.title ?: stringResource(R.string.loading_),
+                subtitle = authorText,
+                subtitleTrailing = boardText,
+                onSubtitleClick = {
+                    if (article != null) {
+                        onSendMailClicked()
+                    }
+                },
+                actions = {
+                    Box(
                         modifier = Modifier
-                            .weight(1f)
-                            .padding(horizontal = 4.dp)
+                            .width(60.dp)
+                            .fillMaxHeight()
+                            .background(colors.titleBarMenu)
+                            .clickable { menuExpanded = true },
+                        contentAlignment = Alignment.Center
                     ) {
-                        BahaText(
-                            text = article?.title ?: stringResource(R.string.loading_),
-                            color = colors.titleBarTitle,
-                            size = BahaTextSize.BODY,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                        Icon(
+                            painter = rememberDrawablePainter(resId = R.drawable.menu_icon),
+                            contentDescription = stringResource(R.string.zero_word),
+                            tint = colors.textPrimary
                         )
-                        if (article != null) {
-                            val nick = if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""
-                            BahaText(
-                                text = "${article.boardName}  ${article.author}$nick",
-                                color = colors.titleBarDetail,
-                                size = BahaTextSize.TINY,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
-
-                    Box {
-                        IconButton(onClick = { menuExpanded = true }) {
-                            Icon(
-                                imageVector = Icons.Filled.MoreVert,
-                                contentDescription = stringResource(R.string.zero_word),
-                                tint = colors.titleBarTitle
-                            )
-                        }
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false },
@@ -343,8 +323,7 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                         }
                     }
                 }
-                HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            }
+            )
 
             // 文章內容主體
             Box(
@@ -381,30 +360,29 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                 }
             }
 
-            // 底部工具列 (切換模式, 上一篇, 下一篇)
-            HorizontalDivider(color = colors.toolbarDivider, thickness = 1.dp)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(colors.toolbarBackground)
-            ) {
+            // 底部操作工具列 (切換模式, 上一篇, 下一篇)
+            BBSToolbar {
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { toggleViewMode() }
                 )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.prev_article),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { onPageUpButtonClicked() }
                 )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.next_article),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

@@ -8,14 +8,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -23,11 +19,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -112,46 +109,37 @@ class DialogSearchArticle : ASDialog() {
                     .verticalScroll(scrollState)
             ) {
                 // 關鍵字
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.keyword),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
-                OutlinedTextField(
+                BahaInputField(
                     value = keyword,
                     onValueChange = { keyword = it },
-                    placeholder = { Text(CommonFunctions.getContextString(R.string.keyword_hint), color = colors.textSecondary) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    placeholder = stringResource(R.string.keyword_hint)
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // 作者
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.author),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
-                OutlinedTextField(
+                BahaInputField(
                     value = author,
                     onValueChange = { author = it },
-                    placeholder = { Text(CommonFunctions.getContextString(R.string.author_hint), color = colors.textSecondary) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    placeholder = stringResource(R.string.author_hint)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // 標記限定
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.mark_only),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 Row(
@@ -170,10 +158,9 @@ class DialogSearchArticle : ASDialog() {
                                 unselectedColor = colors.textSecondary
                             )
                         )
-                        Text(
+                        BahaText(
                             text = CommonFunctions.getContextString(R.string.limit),
                             color = colors.textPrimary,
-                            fontSize = 14.sp,
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }
@@ -190,10 +177,9 @@ class DialogSearchArticle : ASDialog() {
                                 unselectedColor = colors.textSecondary
                             )
                         )
-                        Text(
+                        BahaText(
                             text = CommonFunctions.getContextString(R.string.un_limit),
                             color = colors.textPrimary,
-                            fontSize = 14.sp,
                             modifier = Modifier.padding(start = 4.dp)
                         )
                     }
@@ -206,20 +192,18 @@ class DialogSearchArticle : ASDialog() {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(
+                    BahaText(
                         text = CommonFunctions.getContextString(R.string.gy_minimum),
                         color = colors.textPrimary,
-                        fontSize = 14.sp,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    OutlinedTextField(
+                    BahaInputField(
                         value = gy,
                         onValueChange = { if (it.length <= 2) gy = it },
-                        placeholder = { Text(CommonFunctions.getContextString(R.string.GY_hint), color = colors.textSecondary) },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.width(100.dp),
-                        colors = textFieldColors
+                        placeholder = stringResource(R.string.GY_hint),
+                        maxLength = 12,
+                        height = 40.dp,
+                        modifier = Modifier.weight(1f)
                     )
                 }
             }

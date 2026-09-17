@@ -24,9 +24,13 @@ import androidx.compose.ui.window.DialogProperties
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+
 data class BahaDialogButton(
     val text: String,
     val type: ButtonType = ButtonType.NORMAL,
+    val enabled: Boolean = true,
     val onClick: () -> Unit
 )
 
@@ -37,8 +41,10 @@ data class BahaDialogButton(
 fun BahaAlertDialogContent(
     modifier: Modifier = Modifier,
     title: String? = null,
+    titleAction: (@Composable () -> Unit)? = null,
     message: String? = null,
     buttons: List<BahaDialogButton> = emptyList(),
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
     content: (@Composable () -> Unit)? = null
 ) {
     val colors = AppTheme.colors
@@ -53,18 +59,29 @@ fun BahaAlertDialogContent(
             modifier = Modifier.fillMaxWidth()
         ) {
             // 1. 標題列
-            if (!title.isNullOrEmpty()) {
-                Box(
+            if (!title.isNullOrEmpty() || titleAction != null) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(colors.dialogTitleBackground)
-                        .padding(horizontal = 14.dp, vertical = 10.dp)
+                        .height(IntrinsicSize.Min),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = title,
-                        color = colors.textPrimary,
-                        fontSize = 18.sp
-                    )
+                    if (!title.isNullOrEmpty()) {
+                        Text(
+                            text = title,
+                            color = colors.textPrimary,
+                            fontSize = 18.sp,
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 14.dp, vertical = 10.dp)
+                        )
+                    } else {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                    if (titleAction != null) {
+                        titleAction()
+                    }
                 }
                 Box(
                     modifier = Modifier
@@ -78,7 +95,7 @@ fun BahaAlertDialogContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 14.dp)
+                    .padding(contentPadding)
             ) {
                 if (!message.isNullOrEmpty()) {
                     Text(
@@ -119,17 +136,19 @@ fun BahaAlertDialogContent(
                                     .background(colors.dialogButtonDivider)
                             )
                         }
+                        val btnBg = if (btn.enabled) colors.dialogButtonBackground else colors.buttonDangerDisabled
+                        val btnTextColor = if (btn.enabled) colors.dialogButtonText else colors.buttonTextDisabled
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
-                                .background(colors.dialogButtonBackground)
-                                .clickable { btn.onClick() },
+                                .background(btnBg)
+                                .clickable(enabled = btn.enabled) { btn.onClick() },
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = btn.text,
-                                color = colors.dialogButtonText,
+                                color = btnTextColor,
                                 fontSize = 18.sp
                             )
                         }

@@ -1,7 +1,6 @@
 package com.kota.Bahamut.dialogs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,12 +12,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.OutlinedCard
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -27,14 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
-import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -114,15 +110,15 @@ class DialogPaintColor : ASDialog() {
         }
 
         BahaAlertDialogContent(
-            title = CommonFunctions.getContextString(R.string.post_article_page_paint_color),
+            title = stringResource(R.string.post_article_page_paint_color),
             buttons = listOf(
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.cancel),
+                    text = stringResource(R.string.cancel),
                     type = ButtonType.SECONDARY,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.send),
+                    text = stringResource(R.string.send),
                     type = ButtonType.NORMAL,
                     onClick = {
                         dialogPaintColorListener?.onPaintColorDone(outputParam)
@@ -136,75 +132,79 @@ class DialogPaintColor : ASDialog() {
                     .fillMaxWidth()
                     .verticalScroll(scrollState)
             ) {
-                // 還原 Checkbox
-                BahaCheckboxLeft(
-                    text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_recovery),
-                    checked = isRecovery,
-                    onCheckedChange = { isChecked ->
-                        isRecovery = isChecked
-                        if (isChecked) {
-                            frontColor = 0
-                            backColor = 0
-                            isHighlight = false
-                        }
-                    },
+                // 還原 Checkbox (文字在左，核取方塊在右)
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    trailingContent = {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_recovery2),
-                            color = colors.textSecondary,
-                            fontSize = 14.sp
-                        )
-                    }
-                )
+                        .clickable {
+                            val newRecovery = !isRecovery
+                            isRecovery = newRecovery
+                            if (newRecovery) {
+                                frontColor = 0
+                                backColor = 0
+                                isHighlight = false
+                            }
+                        }
+                        .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_recovery),
+                        color = colors.textPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_recovery2),
+                        color = colors.textSecondary
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    BahaCheckbox(
+                        checked = isRecovery,
+                        onCheckedChange = { isChecked ->
+                            isRecovery = isChecked
+                            if (isChecked) {
+                                frontColor = 0
+                                backColor = 0
+                                isHighlight = false
+                            }
+                        }
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 前景色
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable { frontExpanded = true }
                         .padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_front),
-                            color = colors.textPrimary,
-                            fontSize = 16.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_front2),
-                            color = colors.textSecondary,
-                            fontSize = 14.sp
-                        )
-                    }
-
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_front),
+                        color = colors.textPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_front2),
+                        color = colors.textSecondary
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
                     Box {
-                        OutlinedCard(
-                            modifier = Modifier
-                                .width(120.dp)
-                                .clickable { frontExpanded = true }
-                        ) {
-                            Text(
-                                text = colorOptions.getOrElse(frontColor) { "" },
-                                color = colors.textPrimary,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
-                            )
-                        }
-
+                        BahaText(
+                            text = colorOptions.getOrElse(frontColor) { "" },
+                            color = colors.textPrimary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
                         DropdownMenu(
                             expanded = frontExpanded,
-                            onDismissRequest = { frontExpanded = false }
+                            onDismissRequest = { frontExpanded = false },
+                            modifier = Modifier.background(colors.surface)
                         ) {
                             colorOptions.forEachIndexed { index, optionName ->
                                 DropdownMenuItem(
-                                    text = { Text(text = optionName, color = colors.textPrimary) },
+                                    text = { BahaText(text = optionName, color = colors.textPrimary) },
                                     onClick = {
                                         frontColor = index
                                         if (index > 0 && isRecovery) isRecovery = false
@@ -216,51 +216,40 @@ class DialogPaintColor : ASDialog() {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 背景色
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clickable { backExpanded = true }
                         .padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_back),
-                            color = colors.textPrimary,
-                            fontSize = 16.sp
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_back2),
-                            color = colors.textSecondary,
-                            fontSize = 14.sp
-                        )
-                    }
-
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_back),
+                        color = colors.textPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_back2),
+                        color = colors.textSecondary
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
                     Box {
-                        OutlinedCard(
-                            modifier = Modifier
-                                .width(120.dp)
-                                .clickable { backExpanded = true }
-                        ) {
-                            Text(
-                                text = colorOptions.getOrElse(backColor) { "" },
-                                color = colors.textPrimary,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
-                            )
-                        }
-
+                        BahaText(
+                            text = colorOptions.getOrElse(backColor) { "" },
+                            color = colors.textPrimary,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
                         DropdownMenu(
                             expanded = backExpanded,
-                            onDismissRequest = { backExpanded = false }
+                            onDismissRequest = { backExpanded = false },
+                            modifier = Modifier.background(colors.surface)
                         ) {
                             colorOptions.forEachIndexed { index, optionName ->
                                 DropdownMenuItem(
-                                    text = { Text(text = optionName, color = colors.textPrimary) },
+                                    text = { BahaText(text = optionName, color = colors.textPrimary) },
                                     onClick = {
                                         backColor = index
                                         if (index > 0 && isRecovery) isRecovery = false
@@ -272,53 +261,61 @@ class DialogPaintColor : ASDialog() {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 // 亮色 Checkbox
-                BahaCheckboxLeft(
-                    text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_highlight),
-                    checked = isHighlight,
-                    onCheckedChange = { isChecked ->
-                        isHighlight = isChecked
-                        if (isChecked && isRecovery) isRecovery = false
-                    },
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    trailingContent = {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.post_article_page_paint_color_highlight2),
-                            color = colors.textSecondary,
-                            fontSize = 14.sp
-                        )
-                    }
-                )
+                        .clickable {
+                            val newHighlight = !isHighlight
+                            isHighlight = newHighlight
+                            if (newHighlight && isRecovery) isRecovery = false
+                        }
+                        .padding(vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_highlight),
+                        color = colors.textPrimary
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    BahaText(
+                        text = stringResource(R.string.post_article_page_paint_color_highlight2),
+                        color = colors.textSecondary
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    BahaCheckbox(
+                        checked = isHighlight,
+                        onCheckedChange = { isChecked ->
+                            isHighlight = isChecked
+                            if (isChecked && isRecovery) isRecovery = false
+                        }
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(12.dp))
-                Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
                 Spacer(modifier = Modifier.height(10.dp))
 
                 // 預覽參數與預覽樣本
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = outputParam,
-                        color = colors.textSecondary,
-                        fontSize = 15.sp
+                        color = colors.textSecondary
                     )
                     Box(
                         modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
                             .background(sampleBgColor)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                            .padding(horizontal = 10.dp, vertical = 4.dp)
                     ) {
-                        Text(
-                            text = CommonFunctions.getContextString(R.string.dialog_paint_color_sample_ch),
-                            color = sampleTextColor,
-                            fontSize = 16.sp
+                        BahaText(
+                            text = stringResource(R.string.dialog_paint_color_sample_ch),
+                            color = sampleTextColor
                         )
                     }
                 }

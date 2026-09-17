@@ -4,14 +4,16 @@ import android.content.Context
 import android.database.DataSetObserver
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ListAdapter
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,9 +22,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.HorizontalDivider
-import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -31,14 +30,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import kotlinx.coroutines.launch
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteArticle
@@ -55,7 +52,13 @@ import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageHandler
 import com.kota.Bahamut.pages.model.MailBoxPageItem
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.ui.components.BBSToolbar
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
+import com.kota.Bahamut.ui.components.BBSTopBar
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -64,7 +67,9 @@ import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.logic.ItemUtils
 import com.kota.telnet.reference.TelnetKeyboard
+import kotlinx.coroutines.launch
 import java.util.Vector
+import kotlin.math.max
 
 @OptIn(ExperimentalFoundationApi::class)
 class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
@@ -256,27 +261,11 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 .fillMaxSize()
                 .background(colors.pageBackground)
         ) {
-            // 頂部 header
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                BahaText(
-                    text = headerTitleState,
-                    color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY
-                )
-                if (headerSubtitleState.isNotEmpty()) {
-                    BahaText(
-                        text = headerSubtitleState,
-                        color = colors.titleBarDetail,
-                        size = BahaTextSize.CAPTION
-                    )
-                }
-            }
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
+            // 頂部導覽列 (BBS 經典深海藍底，雙行文字資訊)
+            BBSTopBar(
+                title = headerTitleState.ifEmpty { "我的信箱" },
+                subtitle = headerSubtitleState
+            )
 
             // 郵件列表
             Box(
@@ -323,76 +312,54 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                                     }
                                 }
                             )
-                            HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
                         }
                     }
                 }
             }
 
-            // 底部工具列 (滿版無縫 50dp)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(colors.toolbarDivider)
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
-                    .background(colors.toolbarBackground),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            // 底部工具列 (BBS 50dp 全寬操作列)
+            BBSToolbar {
                 BahaButton(
                     text = stringResource(R.string.write_mail),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { onPostButtonClicked() }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.search),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = { showSelectArticleDialog() }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.first_page),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = {
                         moveToFirstPosition()
+                        coroutineScope.launch { listState.scrollToItem(0) }
                         showShortToast(getContextString(R.string.already_to_top))
                     }
                 )
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.toolbarDivider)
-                )
+                BBSToolbarDivider()
                 BahaButton(
                     text = stringResource(R.string.last_page),
+                    type = ButtonType.NORMAL,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
                     onClick = {
                         setManualLoadPage()
                         moveToLastPosition()
+                        coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
                         showShortToast(getContextString(R.string.already_to_bottom))
                     }
                 )
@@ -410,49 +377,137 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         val colors = AppTheme.colors
         val isRead = item?.isRead ?: false
         val textColor = if (isRead) colors.bbsBoardNormalRead else colors.bbsBoardNormal
-        Row(
+        val statusText = if (isRead) "◇" else "◆"
+        val isMarked = item?.isMarked == true
+        val isReply = item?.isReply == true
+
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .combinedClickable(onClick = onClick, onLongClick = onLongClick)
-                .padding(horizontal = 10.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .background(colors.pageBackground)
         ) {
-            BahaText(
-                text = if (item?.isMarked == true) "★" else "  ",
-                color = colors.bbsMailMark,
-                size = BahaTextSize.CAPTION,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-            Column(modifier = Modifier.weight(1f)) {
-                BahaText(
-                    text = item?.title ?: stringResource(R.string.loading_),
-                    color = textColor,
-                    size = BahaTextSize.CAPTION,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // 左側信件資訊區塊
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .combinedClickable(
+                            onClick = onClick,
+                            onLongClick = onLongClick
+                        )
+                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                ) {
+                    // 第一列：狀態圖示與信件標題
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BahaText(
+                            text = statusText,
+                            color = colors.bbsMailStatus,
+                            size = BahaTextSize.BODY,
+                            modifier = Modifier.padding(end = 6.dp)
+                        )
+                        BahaText(
+                            text = item?.title ?: stringResource(R.string.loading_),
+                            color = textColor,
+                            size = BahaTextSize.BODY,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    // 第二列：編號、標記(M)、回信(R)、日期、作者
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // 編號 (5 碼)
+                        BahaText(
+                            text = String.format("%05d", itemIndex),
+                            color = colors.bbsMailNumber,
+                            size = BahaTextSize.BODY
+                        )
+
+                        // 標記 M
+                        if (isMarked) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            BahaText(
+                                text = "M",
+                                color = colors.bbsMailMark,
+                                size = BahaTextSize.BODY
+                            )
+                        }
+
+                        // 回信 R
+                        if (isReply) {
+                            Spacer(modifier = Modifier.width(8.dp))
+                            BahaText(
+                                text = "R",
+                                color = colors.bbsMailReply,
+                                size = BahaTextSize.BODY
+                            )
+                        }
+
+                        // 日期
+                        Spacer(modifier = Modifier.width(12.dp))
+                        BahaText(
+                            text = item?.date ?: "",
+                            color = colors.bbsMailDate,
+                            size = BahaTextSize.BODY
+                        )
+
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // 作者 (靠右對齊)
+                        BahaText(
+                            text = item?.author ?: "",
+                            color = colors.bbsMailAuthor,
+                            size = BahaTextSize.BODY,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // 垂直分隔線
+                Box(
+                    modifier = Modifier
+                        .width(1.dp)
+                        .fillMaxHeight()
+                        .background(colors.divider)
                 )
-                Row {
+
+                // 右側箭頭按鈕區塊
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .clickable { onClick() }
+                        .padding(horizontal = 8.dp),
+                    contentAlignment = Alignment.Center
+                ) {
                     BahaText(
-                        text = String.format("%05d", itemIndex),
-                        color = colors.bbsMailNumber,
-                        size = BahaTextSize.TINY,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    BahaText(
-                        text = item?.author ?: "",
-                        color = colors.bbsMailAuthor,
-                        size = BahaTextSize.TINY,
-                        modifier = Modifier.weight(1f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    BahaText(
-                        text = item?.date ?: "",
-                        color = colors.bbsMailDate,
-                        size = BahaTextSize.TINY
+                        text = ">",
+                        color = colors.textPrimary,
+                        size = BahaTextSize.BODY
                     )
                 }
             }
+
+            // 底部分隔線
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(colors.divider)
+            )
         }
     }
 }

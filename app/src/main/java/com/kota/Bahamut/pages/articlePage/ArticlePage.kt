@@ -1049,6 +1049,8 @@ fun ArticlePostTimeBar(
     time: String,
     colors: AppColors
 ) {
+    if (ip.isEmpty() && time.isEmpty()) return
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -1553,7 +1555,7 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(colors.toolbarBackground)
+                        .background(colors.pageBackground)
                         .clickable(onClick = onLLClick),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1632,7 +1634,7 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(colors.toolbarBackground)
+                        .background(colors.pageBackground)
                         .clickable(onClick = onRRClick),
                     contentAlignment = Alignment.Center
                 ) {

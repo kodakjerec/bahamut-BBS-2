@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
@@ -42,10 +43,10 @@ class DialogPushArticle : ASDialog() {
         val colors = AppTheme.colors
 
         BahaAlertDialogContent(
-            title = CommonFunctions.getContextString(R.string.do_push),
+            title = stringResource(R.string.do_push),
             buttons = listOf(
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.cancel),
+                    text = stringResource(R.string.cancel),
                     type = ButtonType.SECONDARY,
                     onClick = {
                         isClickButton = true
@@ -57,7 +58,7 @@ class DialogPushArticle : ASDialog() {
                     }
                 ),
                 BahaDialogButton(
-                    text = CommonFunctions.getContextString(R.string.send),
+                    text = stringResource(R.string.send),
                     type = ButtonType.NORMAL,
                     onClick = {
                         isClickButton = true
@@ -85,7 +86,7 @@ class DialogPushArticle : ASDialog() {
                     onValueChange = { if (it.length <= 48) textContent = it },
                     placeholder = {
                         Text(
-                            CommonFunctions.getContextString(R.string.main_push_article_msg01),
+                            stringResource(R.string.main_push_article_msg01),
                             color = colors.textSecondary,
                             fontSize = 16.sp
                         )

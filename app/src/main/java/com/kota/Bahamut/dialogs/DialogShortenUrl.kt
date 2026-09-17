@@ -6,23 +6,21 @@ import android.text.util.Linkify
 import android.util.Log
 import android.widget.TextView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
@@ -35,8 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
@@ -45,7 +41,8 @@ import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -110,6 +107,27 @@ class DialogShortenUrl : ASDialog() {
         BahaAlertDialogContent(
             modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
             title = CommonFunctions.getContextString(R.string.dialog_shorten_url_title),
+            titleAction = {
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .background(colors.dialogButtonBackground)
+                        .clickable {
+                            isTransferMode = !isTransferMode
+                            if (!isTransferMode) {
+                                historyList.clear()
+                                historyList.addAll(urlDatabase.shortenUrls)
+                            }
+                        }
+                        .padding(horizontal = 14.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    BahaText(
+                        text = if (isTransferMode) CommonFunctions.getContextString(R.string.record) else CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
+                        color = colors.dialogButtonText
+                    )
+                }
+            },
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
@@ -128,78 +146,74 @@ class DialogShortenUrl : ASDialog() {
             )
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                // 切換模式按鈕
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (isTransferMode) "縮網址" else CommonFunctions.getContextString(R.string.record),
-                        color = colors.textSecondary,
-                        fontSize = 14.sp
-                    )
-                    BahaButton(
-                        text = if (isTransferMode) CommonFunctions.getContextString(R.string.record) else CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
-                        type = ButtonType.NORMAL,
-                        onClick = {
-                            isTransferMode = !isTransferMode
-                            if (!isTransferMode) {
-                                historyList.clear()
-                                historyList.addAll(urlDatabase.shortenUrls)
-                            }
-                        },
-                        minHeight = 32.dp
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
                 if (isTransferMode) {
-                    // 輸入網址
+                    // 輸入網址 / 說明
+                    val hintText = "1. 把網址貼到這裏面\n2. 按鈕\"縮址\"產生短網址\n3. 按鈕\"送出\"貼到文章內"
                     OutlinedTextField(
                         value = inputUrl,
                         onValueChange = { inputUrl = it },
-                        placeholder = { Text(CommonFunctions.getContextString(R.string.keyword_hint), color = colors.textSecondary) },
-                        modifier = Modifier.fillMaxWidth(),
-                        minLines = 2,
-                        maxLines = 4,
+                        placeholder = {
+                            BahaText(
+                                text = hintText,
+                                color = colors.textSecondary,
+                                lineHeight = 22.sp
+                            )
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(130.dp),
                         colors = textFieldColors
                     )
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                    // 去識別化 Checkbox
-                    BahaCheckboxLeft(
-                        text = CommonFunctions.getContextString(R.string.dialog_shorten_url_non_id),
-                        checked = nonIdEnabled,
-                        onCheckedChange = { checked ->
-                            nonIdEnabled = checked
-                            UserSettings.setPropertiesShortUrlNonId(checked)
-                            inputUrl = filterUrl(inputUrl, checked)
-                        },
-                        fontSize = 14.sp,
+                    // 去識別化 Checkbox (居中，綠色勾選)
+                    Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                    )
+                            .clickable {
+                                val newNonId = !nonIdEnabled
+                                nonIdEnabled = newNonId
+                                UserSettings.setPropertiesShortUrlNonId(newNonId)
+                                inputUrl = filterUrl(inputUrl, newNonId)
+                            }
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        BahaCheckbox(
+                            checked = nonIdEnabled,
+                            onCheckedChange = { checked ->
+                                nonIdEnabled = checked
+                                UserSettings.setPropertiesShortUrlNonId(checked)
+                                inputUrl = filterUrl(inputUrl, checked)
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        BahaText(
+                            text = CommonFunctions.getContextString(R.string.dialog_shorten_url_non_id),
+                            color = colors.textPrimary
+                        )
+                    }
 
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                    // 清除 與 轉檔 按鈕
+                    // 重置 與 縮址 按鈕 (深紅底 + 藍綠底)
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(44.dp)
                     ) {
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.reset),
-                            type = ButtonType.SECONDARY,
+                            type = ButtonType.DANGER,
                             onClick = {
                                 inputUrl = ""
                                 outputShortUrl = ""
                             },
-                            modifier = Modifier.weight(1f),
-                            minHeight = 36.dp
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight()
                         )
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
@@ -209,28 +223,26 @@ class DialogShortenUrl : ASDialog() {
                                     outputShortUrl = shortUrl
                                 }
                             },
-                            modifier = Modifier.weight(1f),
-                            minHeight = 36.dp
+                            modifier = Modifier
+                                .weight(2f)
+                                .fillMaxHeight()
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(6.dp))
 
-                    // 預覽縮網址
-                    if (outputShortUrl.isNotEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(colors.dialogBlockBackground)
-                                .padding(10.dp)
-                        ) {
-                            Text(
-                                text = outputShortUrl,
-                                color = colors.bbsAuthor0,
-                                fontSize = 15.sp
-                            )
-                        }
+                    // 預覽縮網址 / 範例
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(40.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = if (outputShortUrl.isNotEmpty()) outputShortUrl else CommonFunctions.getContextString(R.string.dialog_paint_color_sample_ch),
+                            color = if (outputShortUrl.isNotEmpty()) colors.textLink else colors.textPrimary,
+                            fontSize = 16.sp
+                        )
                     }
                 } else {
                     // 歷史紀錄列表
@@ -249,23 +261,20 @@ class DialogShortenUrl : ASDialog() {
                                     }
                                     .padding(vertical = 8.dp, horizontal = 4.dp)
                             ) {
-                                Text(
+                                BahaText(
                                     text = item.title ?: item.shortenUrl ?: "",
-                                    color = colors.textPrimary,
-                                    fontSize = 15.sp
+                                    color = colors.textPrimary
                                 )
                                 if (!item.description.isNullOrEmpty()) {
-                                    Text(
+                                    BahaText(
                                         text = item.description ?: "",
                                         color = colors.textSecondary,
-                                        fontSize = 12.sp,
                                         maxLines = 2
                                     )
                                 }
-                                Text(
+                                BahaText(
                                     text = item.shortenUrl ?: "",
-                                    color = colors.bbsAuthor0,
-                                    fontSize = 13.sp
+                                    color = colors.bbsAuthor0
                                 )
                             }
                             Box(modifier = Modifier.fillMaxWidth().height(1.dp).background(colors.divider))
