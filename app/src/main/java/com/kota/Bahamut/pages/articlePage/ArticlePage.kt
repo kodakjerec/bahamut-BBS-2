@@ -21,16 +21,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -44,7 +42,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -85,6 +82,7 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppColors
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -866,26 +864,20 @@ fun ArticleTopBar(
                 }
             }
 
-            // 垂直分隔線
+            // 右側選單按鈕 (經典 BBS 選單圖示，60dp 寬，背景為 titleBarMenu #101090，無垂直分隔線)
             Box(
                 modifier = Modifier
-                    .width(1.dp)
+                    .width(60.dp)
                     .fillMaxHeight()
-                    .background(colors.divider)
-            )
-
-            // 右側選單按鈕 (經典 BBS 選單圖示)
-            Box(
-                modifier = Modifier
-                    .width(56.dp)
-                    .fillMaxHeight()
+                    .background(colors.titleBarMenu)
                     .clickable { onMenuClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.menu_icon),
+                    painter = rememberDrawablePainter(resId = R.drawable.menu_icon),
                     contentDescription = stringResource(R.string.zero_word),
-                    tint = colors.textPrimary
+                    tint = colors.textPrimary,
+                    modifier = Modifier.size(24.dp)
                 )
             }
         }
@@ -956,134 +948,62 @@ fun ArticleTextModeContent(
 
     LazyColumn(
         state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 12.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        // 1. 標頭資訊卡片
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = colors.surface),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Column(modifier = Modifier.padding(12.dp)) {
-                    BahaText(
-                        text = article.title,
-                        color = colors.titleBarTitle,
-                        size = BahaTextSize.SUBTITLE,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        BahaText(
-                            text = "作者: ${article.author}${if (!article.nickName.isNullOrEmpty()) " (${article.nickName})" else ""}",
-                            color = colors.titleBarDetail2,
-                            size = BahaTextSize.CAPTION,
-                            modifier = Modifier.clickable { onAuthorClick(article.author) }
-                        )
-                        BahaText(
-                            text = "看板: ${article.boardName}",
-                            color = colors.titleBarDetail,
-                            size = BahaTextSize.CAPTION
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(2.dp))
-                    BahaText(
-                        text = "時間: ${article.dateTime}",
-                        color = colors.textSecondary,
-                        size = BahaTextSize.TINY
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
-        // 2. 內文區塊
+        // 1. 內文區塊 (還原原生 BBS 文字項目，無額外 Material 卡片)
         items(count = article.itemSize) { i ->
             val item = article.getItem(i)
             if (item != null) {
-                // 黑名單過濾判定
                 val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
                 if (!isBlocked) {
-                    ArticleContentBlockItem(item = item, colors = colors)
-                }
-            }
-        }
-
-        // 3. 發文來源 IP 與時間
-        item {
-            Spacer(modifier = Modifier.height(12.dp))
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            ) {
-                if (article.fromIP.isNotEmpty()) {
-                    BahaText(
-                        text = "※ 發文來源: ${article.fromIP}",
-                        color = colors.textSecondary,
-                        size = BahaTextSize.TINY
+                    ArticleContentBlockItem(
+                        item = item,
+                        colors = colors,
+                        onAuthorClick = onAuthorClick
                     )
                 }
-                BahaText(
-                    text = "《 ${article.dateTime} 》",
-                    color = colors.bbsMailDate,
-                    size = BahaTextSize.TINY
-                )
             }
-            Spacer(modifier = Modifier.height(8.dp))
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
         }
 
-        // 4. 修改紀錄列表
+        // 2. 發文來源 IP 與時間長條 (原生 ArticlePageTimeTimeView 樣式：深藍色全寬橫條)
+        item {
+            ArticlePostTimeBar(
+                ip = article.fromIP,
+                time = article.dateTime,
+                colors = colors
+            )
+        }
+
+        // 3. 修改紀錄列表
         if (article.editRecordSize > 0) {
-            item {
-                Spacer(modifier = Modifier.height(6.dp))
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    for (eIndex in 0 until article.editRecordSize) {
-                        val editRec = article.getEditRecord(eIndex)
-                        if (editRec != null) {
-                            BahaText(
-                                text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
-                                color = colors.bbsMailMark,
-                                size = BahaTextSize.TINY,
-                                modifier = Modifier.padding(vertical = 1.dp)
-                            )
-                        }
+            items(count = article.editRecordSize) { eIndex ->
+                val editRec = article.getEditRecord(eIndex)
+                if (editRec != null) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp, vertical = 2.dp)
+                    ) {
+                        BahaText(
+                            text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
+                            color = colors.bbsMailMark,
+                            size = BahaTextSize.BODY
+                        )
                     }
                 }
-                Spacer(modifier = Modifier.height(6.dp))
-                HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
             }
         }
 
-        // 5. 推文列表
+        // 4. 推文列表
         if (article.pushSize > 0) {
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-                BahaText(
-                    text = "── 推文列表 (${article.pushSize}) ──",
-                    color = colors.titleBarTitle,
-                    size = BahaTextSize.CAPTION,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-
             items(count = article.pushSize) { pIndex ->
                 val push = article.getPush(pIndex)
                 if (push != null) {
                     ArticlePushRowItem(
                         push = push,
                         floor = pIndex + 1,
-                        colors = colors
+                        colors = colors,
+                        onAuthorClick = onAuthorClick
                     )
                 }
             }
@@ -1097,118 +1017,147 @@ fun ArticleTextModeContent(
 }
 
 /**
- * 內文區塊元件 (支援引言顏色與超連結)
+ * 原生發文 IP 與時間長條元件 (深藍底全寬，左側為 IP，右側為日期時間)
  */
 @Composable
-fun ArticleContentBlockItem(
-    item: TelnetArticleItem,
+fun ArticlePostTimeBar(
+    ip: String,
+    time: String,
     colors: AppColors
 ) {
-    val quoteLevel = item.quoteLevel
-    val isQuote = quoteLevel > 0
-
-    // 作者引述列
-    if (!item.author.isNullOrEmpty()) {
-        val nick = if (!item.nickname.isNullOrEmpty()) "(${item.nickname})" else ""
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.titleBarBackground)
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         BahaText(
-            text = "※ 引述《${item.author}$nick》之銘言：",
-            color = if (isQuote) colors.bbsAuthor1 else colors.bbsAuthor0,
-            size = BahaTextSize.CAPTION,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(top = 4.dp, bottom = 2.dp)
-        )
-    }
-
-    // 正文內容
-    val content = item.content
-    if (content.isNotEmpty()) {
-        val textColor = if (isQuote) colors.bbsContent1 else colors.bbsContent0
-        LinkableText(
-            text = content,
-            defaultColor = textColor,
+            text = ip,
+            color = colors.titleBarDetail,
             size = BahaTextSize.BODY,
-            modifier = Modifier.padding(
-                start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
-                top = 2.dp,
-                bottom = 4.dp
-            )
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false)
         )
+        if (time.isNotEmpty()) {
+            Spacer(modifier = Modifier.width(8.dp))
+            BahaText(
+                text = "《$time》",
+                color = colors.titleBarDetail,
+                size = BahaTextSize.BODY,
+                maxLines = 1
+            )
+        }
     }
 }
 
 /**
- * 推文項目 Row
+ * 內文區塊元件 (原生格式：作者名說: + 內文，支援引言顏色與超連結)
+ */
+@Composable
+fun ArticleContentBlockItem(
+    item: TelnetArticleItem,
+    colors: AppColors,
+    onAuthorClick: (String) -> Unit
+) {
+    val quoteLevel = item.quoteLevel
+    val isQuote = quoteLevel > 0
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        // 作者列: 例如 "syo0093("順番に殴るね") 說:"
+        if (!item.author.isNullOrEmpty()) {
+            val nick = if (!item.nickname.isNullOrEmpty()) "(${item.nickname})" else ""
+            val authorColor = if (isQuote) colors.bbsAuthor1 else colors.bbsAuthor0
+            BahaText(
+                text = "${item.author}$nick 說:",
+                color = authorColor,
+                size = BahaTextSize.BODY,
+                modifier = Modifier
+                    .clickable { onAuthorClick(item.author ?: "") }
+                    .padding(bottom = 2.dp)
+            )
+        }
+
+        // 正文內容
+        if (item.content.isNotEmpty()) {
+            val textColor = if (isQuote) colors.bbsContent1 else colors.bbsContent0
+            LinkableText(
+                text = item.content,
+                defaultColor = textColor,
+                size = BahaTextSize.BODY,
+                modifier = Modifier.padding(
+                    start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
+                    top = 2.dp,
+                    bottom = 4.dp
+                )
+            )
+        }
+    }
+}
+
+/**
+ * 推文項目 Row (還原原生 ArticlePagePushItemView 佈局)
  */
 @Composable
 fun ArticlePushRowItem(
     push: TelnetArticlePush,
     floor: Int,
-    colors: AppColors
+    colors: AppColors,
+    onAuthorClick: (String) -> Unit
 ) {
-    val tagColor = when (push.type) {
-        1 -> Color(0xFF80FF80) // 推 (綠)
-        2 -> Color(0xFFFF6060) // 噓 (紅)
-        else -> Color(0xFFE0E0E0) // → (白/灰)
-    }
-    val tagText = when (push.type) {
-        1 -> "推"
-        2 -> "噓"
-        else -> "→"
-    }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 3.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // 樓層編號
-            BahaText(
-                text = "[$floor 樓]",
-                color = colors.textSecondary,
-                size = BahaTextSize.TINY,
-                modifier = Modifier.width(44.dp)
-            )
-
-            // 推/噓/→ 標籤
-            BahaText(
-                text = tagText,
-                color = tagColor,
-                size = BahaTextSize.TINY,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.width(18.dp)
-            )
-
             // 推文作者
             BahaText(
-                text = "${push.author}: ",
-                color = Color(0xFF80FFFF),
-                size = BahaTextSize.CAPTION,
-                fontWeight = FontWeight.Bold
+                text = push.author,
+                color = colors.bbsMailAuthor,
+                size = BahaTextSize.BODY,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onAuthorClick(push.author) }
             )
 
-            // 推文內容
-            LinkableText(
-                text = push.content,
-                defaultColor = colors.textPrimary,
-                size = BahaTextSize.CAPTION,
-                modifier = Modifier.weight(1f)
+            Spacer(modifier = Modifier.width(4.dp))
+
+            // 樓層編號
+            BahaText(
+                text = " [ $floor 樓]",
+                color = colors.textSecondary,
+                size = BahaTextSize.BODY
             )
+
+            Spacer(modifier = Modifier.weight(1f))
 
             // 推文時間
             if (push.date.isNotEmpty() || push.time.isNotEmpty()) {
-                Spacer(modifier = Modifier.width(4.dp))
                 BahaText(
-                    text = "${push.date} ${push.time}",
+                    text = "${push.date} ${push.time}".trim(),
                     color = colors.textSecondary,
-                    size = BahaTextSize.TINY
+                    size = BahaTextSize.BODY
                 )
             }
         }
-        HorizontalDivider(color = colors.divider.copy(alpha = 0.2f), thickness = 0.5.dp)
+
+        Spacer(modifier = Modifier.height(2.dp))
+
+        // 推文內容
+        LinkableText(
+            text = push.content,
+            defaultColor = colors.textPrimary,
+            size = BahaTextSize.BODY
+        )
     }
 }
 
@@ -1364,14 +1313,14 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
+                        .background(colors.toolbarBackground)
                         .clickable(onClick = onLLClick),
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
-                        text = "<<",
-                        color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE,
+                        text = stringResource(R.string.toolbar_item_ll),
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        size = BahaTextSize.TITLE,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -1444,14 +1393,14 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
+                        .background(colors.toolbarBackground)
                         .clickable(onClick = onRRClick),
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
-                        text = ">>",
-                        color = colors.textPrimary,
-                        size = BahaTextSize.SUBTITLE,
+                        text = stringResource(R.string.toolbar_item_rr),
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        size = BahaTextSize.TITLE,
                         fontWeight = FontWeight.Bold
                     )
                 }
