@@ -4,7 +4,6 @@ import android.content.Context
 import android.database.DataSetObserver
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -49,7 +48,6 @@ import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
-import com.kota.Bahamut.pages.model.BoardEssencePageItemView
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaButton
@@ -131,27 +129,6 @@ class BoardEssencePage : TelnetListPage() {
 
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardEssencePageItem.recycle(telnetListPageItem as BoardEssencePageItem)
-    }
-
-    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View {
-        var view1 = view
-        val itemIndex = i + 1
-        val block = ItemUtils.getBlock(itemIndex)
-        val boardEssencePageItem = getItem(i) as BoardEssencePageItem?
-        if (boardEssencePageItem == null && currentBlock != block && !isLoadingBlock(itemIndex)) {
-            loadBoardBlock(block)
-        }
-        if (view1 == null) {
-            view1 = BoardEssencePageItemView(context)
-            view1.layoutParams = AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-        val boardEssencePageItemView = view1 as BoardEssencePageItemView
-        boardEssencePageItemView.setItem(boardEssencePageItem)
-        boardEssencePageItemView.setNumber(itemIndex)
-        return boardEssencePageItemView
     }
 
     override fun isItemCanLoadAtIndex(index: Int): Boolean {

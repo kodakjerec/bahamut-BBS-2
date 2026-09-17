@@ -15,8 +15,8 @@ mailPage 模組實現 BBS 信箱功能，提供信件收發和管理。
 寄信頁面，撰寫和發送信件
 - `SendMailPageListener` - 寄信監聽器
 
-### 視圖元件
-- `MailBoxPageItemView` - 信箱項目視圖
+### UI 架構
+- 純 Jetpack Compose 實作 (`setBahamutContent`)，列表使用 `LazyColumn` 與 `MailBoxRowItem`
 
 ## 功能
 - 收件匣瀏覽

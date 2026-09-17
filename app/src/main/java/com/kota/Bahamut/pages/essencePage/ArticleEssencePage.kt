@@ -2,9 +2,8 @@ package com.kota.Bahamut.pages.essencePage
 
 import android.content.Context
 import android.content.Intent
-import android.text.util.Linkify
+import android.util.Patterns
 import android.view.View
-import android.widget.TextView
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -165,23 +164,23 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
     // 選單: 開啟文章連結
     private fun onOpenUrlClicked() {
         val article = currentArticle ?: telnetArticle ?: return
-        val textView = TextView(context).apply {
-            text = article.fullText
+        val urls = mutableListOf<String>()
+        val matcher = Patterns.WEB_URL.matcher(article.fullText)
+        while (matcher.find()) {
+            urls.add(matcher.group())
         }
-        Linkify.addLinks(textView, Linkify.WEB_URLS)
-        val urls = textView.urls
-        if (urls.isNullOrEmpty()) {
+        if (urls.isEmpty()) {
             ASToast.showShortToast("本頁面沒有超連結")
             return
         }
 
-        val urlTitles = urls.map { it.url }.toTypedArray()
+        val urlTitles = urls.toTypedArray()
         ASListDialog.createDialog()
             .setTitle("連結")
             .addItems(urlTitles)
             .setListener(object : ASListDialogItemClickListener {
                 override fun onListDialogItemClicked(paramASListDialog: ASListDialog?, index: Int, title: String?) {
-                    val url = urls[index].url
+                    val url = urls[index]
                     val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
                     }

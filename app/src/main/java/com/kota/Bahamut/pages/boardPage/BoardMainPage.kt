@@ -615,8 +615,6 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
-    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
-
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }

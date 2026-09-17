@@ -258,11 +258,6 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         super.loadItemAtIndex(index)
     }
 
-    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
-        // 不再需要 XML ListView getView，由 Compose 負責渲染
-        return null
-    }
-
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         recycle(telnetListPageBlock as ClassPageBlock)
     }

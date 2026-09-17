@@ -8,12 +8,8 @@ bookmarkPage 模組提供書籤和瀏覽歷史管理功能。
 ### BookmarkManagePage
 書籤管理頁面，管理使用者的看板書籤
 
-### Adapter 和 ViewHolder
-- `BookmarkAdapter` - 書籤適配器
-- `BookmarkViewHolder` - 書籤 ViewHolder
-- `BookmarkClickListener` - 書籤點擊監聽器
-- `HistoryAdapter` - 歷史記錄適配器
-- `HistoryViewHolder` - 歷史記錄 ViewHolder
+### UI 架構
+- 純 Jetpack Compose 實作 (`setBahamutContent`)，列表使用 `LazyColumn` 與 `BookmarkRowItem` / `HistoryRowItem`
 
 ### 介面
 - `BoardExtendOptionalPageListener` - 看板擴充頁面監聽器
@@ -35,7 +31,7 @@ bookmarkPage 模組提供書籤和瀏覽歷史管理功能。
 - 清除歷史記錄
 
 ## 技術特點
-- RecyclerView 實現
-- ItemTouchHelper 拖曳排序
+- Jetpack Compose LazyColumn 實現
+- VIP 排序功能
 - 本地資料持久化
 - 使用 Kotlin 開發

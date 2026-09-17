@@ -12,8 +12,8 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 36 // 更新到36以支援Android 16的edge-to-edge
-        versionCode 61
-        versionName "3.2"
+        versionCode 62
+        versionName '3.3'
     }
 
     buildTypes {
@@ -59,6 +59,7 @@ dependencies {
     // billing
     implementation 'com.android.billingclient:billing:8.0.0'
     implementation 'com.google.android.play:integrity:1.5.0'
+    implementation 'com.google.android.gms:play-services-games-v2:22.1.0'
 
     // define a BOM and its version
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
@@ -67,9 +68,6 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:5.1.0"
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-
-    // 調色盤
-    implementation 'com.github.skydoves:colorpickerview:2.3.0'
 
     // Jetpack Compose
     def composeBom = platform('androidx.compose:compose-bom:2024.12.01')
@@ -81,4 +79,8 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.activity:activity-compose:1.10.1'
     debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    // google play games
+    implementation 'com.google.android.gms:play-services-games-v2:+'
+
 }

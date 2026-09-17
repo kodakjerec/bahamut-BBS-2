@@ -22,7 +22,6 @@ model 模組提供頁面共用的資料模型、處理器和工具元件。
 
 ### 精華區頁面模型
 - `BoardEssencePageItem` - 精華區項目
-- `BoardEssencePageItemView` - 精華區項目視圖
 
 ### UI 元件
 - `PostEditText` - 發文編輯文字框

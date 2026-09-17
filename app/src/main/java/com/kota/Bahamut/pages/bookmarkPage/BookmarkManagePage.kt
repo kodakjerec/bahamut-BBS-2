@@ -3,32 +3,37 @@ package com.kota.Bahamut.pages.bookmarkPage
 import android.content.Context
 import android.view.View
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Text
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -37,82 +42,38 @@ import com.kota.Bahamut.dataModels.BookmarkStore
 import com.kota.Bahamut.dialogs.DialogSearchArticle
 import com.kota.Bahamut.dialogs.DialogSearchArticleListener
 import com.kota.Bahamut.listPage.ListStateStore.Companion.instance
-import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.asFramework.dialog.ASAlertDialog.Companion.createDialog
 import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
-import java.util.Collections
 import java.util.Vector
 
 open class BookmarkManagePage(
     aBoardName: String,
     private val boardExtendOptionalPageListener: BoardExtendOptionalPageListener?
-) : TelnetPage(), BookmarkClickListener, DialogSearchArticleListener {
+) : TelnetPage(), DialogSearchArticleListener {
 
     var boardName: String = aBoardName
-    private val bookmarks: MutableList<Bookmark> = Vector()
+    val bookmarks = mutableStateListOf<Bookmark>()
     var bookmarkStore: BookmarkStore? = TempSettings.bookmarkStore
 
     // Compose state
     var currentMode by mutableIntStateOf(0) // 0=書籤 1=紀錄
-    private var isUnderRecycleView = false
-
-    private var bookmarkAdapter: BookmarkAdapter? = null
-    private var historyAdapter: HistoryAdapter? = null
-    private var recyclerViewRef: RecyclerView? = null
     private var editBookmarkIndex = -1
 
     override val pageLayout: Int
         get() = 0
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_BOOKMARK
-
-    val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
-        ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
-    ) {
-        private var dragView: View? = null
-
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
-            val start = viewHolder.bindingAdapterPosition
-            val end = target.bindingAdapterPosition
-            if (this@BookmarkManagePage.currentMode == 0 && propertiesVIP) {
-                Collections.swap(bookmarks, start, end)
-                bookmarkAdapter?.notifyItemMoved(start, end)
-            }
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-            isUnderRecycleView = actionState != ItemTouchHelper.ACTION_STATE_IDLE
-            if (this@BookmarkManagePage.currentMode == 0) {
-                when (actionState) {
-                    ItemTouchHelper.ACTION_STATE_DRAG -> {
-                        dragView = viewHolder?.itemView
-                        dragView?.setBackgroundResource(R.color.ripple_material)
-                    }
-                    ItemTouchHelper.ACTION_STATE_IDLE -> {
-                        dragView?.let {
-                            it.setBackgroundResource(R.color.transparent)
-                            dragView = null
-                            val bookmarkList = bookmarkStore?.getBookmarkList(this@BookmarkManagePage.boardName)
-                            bookmarkList?.clear()
-                            for (bookmark in bookmarks) { bookmarkList?.addBookmark(bookmark) }
-                            bookmarkStore?.store()
-                        }
-                    }
-                }
-            }
-        }
-    })
 
     override fun createPageView(context: Context): View {
         return ComposeView(context).apply {
@@ -124,33 +85,26 @@ open class BookmarkManagePage(
     }
 
     private fun reloadList() {
+        bookmarks.clear()
         val bookmarkList = bookmarkStore?.getBookmarkList(boardName)
-        if (currentMode == 1) bookmarkList?.loadHistoryList(bookmarks)
-        else bookmarkList?.loadBookmarkList(bookmarks)
+        val temp = mutableListOf<Bookmark>()
+        if (currentMode == 1) bookmarkList?.loadHistoryList(temp)
+        else bookmarkList?.loadBookmarkList(temp)
+        bookmarks.addAll(temp)
     }
 
     private fun switchToBookmark() {
         currentMode = 0
         reloadList()
-        bookmarkAdapter = BookmarkAdapter(bookmarks).also {
-            it.setOnItemClickListener(this)
-        }
-        recyclerViewRef?.adapter = bookmarkAdapter
     }
 
     private fun switchToHistory() {
         currentMode = 1
         reloadList()
-        historyAdapter = HistoryAdapter(bookmarks).also {
-            it.setOnItemClickListener(this)
-        }
-        recyclerViewRef?.adapter = historyAdapter
     }
 
-    override fun onItemClick(view: View?, position: Int) {
-        val bookmark = if (currentMode == 0) bookmarkAdapter?.getItem(position) else historyAdapter?.getItem(position)
+    fun onItemClick(bookmark: Bookmark) {
         val page = PageContainer.instance!!.boardSearchPage
-        if (bookmark == null) return
         page.clear()
         page.listName = boardName
         page.boardManager = "文章搜尋"
@@ -159,7 +113,10 @@ open class BookmarkManagePage(
             state.top = 0
             state.position = 0
         }
-        page.setKeyword(bookmark.keyword); page.setAuthor(bookmark.author); page.setMark(bookmark.mark); page.setGy(bookmark.gy)
+        page.setKeyword(bookmark.keyword)
+        page.setAuthor(bookmark.author)
+        page.setMark(bookmark.mark)
+        page.setGy(bookmark.gy)
         val controllers = navigationController.viewControllers
         controllers.removeAt(controllers.size - 1)
         controllers.add(page)
@@ -167,7 +124,7 @@ open class BookmarkManagePage(
         boardExtendOptionalPageListener?.onBoardExtendOptionalPageDidSelectBookmark(bookmark)
     }
 
-    override fun onEditClick(view: View?, position: Int) {
+    fun onEditClick(position: Int) {
         if (propertiesVIP) {
             editBookmarkIndex = position
             showSearchArticleDialog()
@@ -176,7 +133,8 @@ open class BookmarkManagePage(
         }
     }
 
-    override fun onDeleteClick(view: View?, position: Int) {
+    fun onDeleteClick(position: Int) {
+        if (position !in bookmarks.indices) return
         val bookmark = bookmarks[position]
         createDialog()
             .setTitle(getContextString(R.string.delete) + getContextString(R.string.bookmark))
@@ -189,20 +147,29 @@ open class BookmarkManagePage(
                     else bookmarkStore?.getBookmarkList(boardName)?.removeHistoryBookmark(position)
                     bookmarkStore?.store()
                     reloadList()
-                    if (currentMode == 0) bookmarkAdapter?.notifyDataSetChanged()
-                    else historyAdapter?.notifyDataSetChanged()
                 }
             }.scheduleDismissOnPageDisappear(this).show()
     }
 
+    fun moveBookmark(from: Int, to: Int) {
+        if (currentMode == 0 && propertiesVIP && from in bookmarks.indices && to in bookmarks.indices) {
+            val item = bookmarks.removeAt(from)
+            bookmarks.add(to, item)
+            val bookmarkList = bookmarkStore?.getBookmarkList(boardName)
+            bookmarkList?.clear()
+            for (b in bookmarks) { bookmarkList?.addBookmark(b) }
+            bookmarkStore?.store()
+        }
+    }
+
     override fun onReceivedGestureRight(): Boolean {
-        if (!isUnderRecycleView) { onBackPressed(); return true }
-        return false
+        onBackPressed()
+        return true
     }
 
     private fun showSearchArticleDialog() {
-        if (editBookmarkIndex > -1) {
-            val bookmark = bookmarkAdapter?.getItem(editBookmarkIndex) ?: return
+        if (editBookmarkIndex in bookmarks.indices) {
+            val bookmark = bookmarks[editBookmarkIndex]
             val searchOptions = Vector<String?>().apply {
                 add(bookmark.keyword); add(bookmark.author); add(bookmark.mark); add(bookmark.gy)
             }
@@ -215,19 +182,19 @@ open class BookmarkManagePage(
     }
 
     override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
-        val bookmark = bookmarkAdapter?.getItem(editBookmarkIndex) ?: return
-        bookmark.keyword = vector[0]; bookmark.author = vector[1]
-        bookmark.mark = if (vector[2] == "YES") "y" else "n"
-        bookmark.gy = vector[3]; bookmark.title = bookmark.generateTitle()
-        bookmarkStore?.getBookmarkList(boardName)?.updateBookmark(editBookmarkIndex, bookmark)
-        bookmarkStore?.store()
-        reloadList()
-        bookmarkAdapter?.notifyItemChanged(editBookmarkIndex)
+        if (editBookmarkIndex in bookmarks.indices) {
+            val bookmark = bookmarks[editBookmarkIndex]
+            bookmark.keyword = vector[0]; bookmark.author = vector[1]
+            bookmark.mark = if (vector[2] == "YES") "y" else "n"
+            bookmark.gy = vector[3]; bookmark.title = bookmark.generateTitle()
+            bookmarkStore?.getBookmarkList(boardName)?.updateBookmark(editBookmarkIndex, bookmark)
+            bookmarkStore?.store()
+            reloadList()
+        }
         editBookmarkIndex = -1
     }
 
     override fun onSearchDialogCancelButtonClicked() {
-        bookmarkAdapter?.notifyItemChanged(editBookmarkIndex)
         editBookmarkIndex = -1
     }
 
@@ -240,8 +207,10 @@ open class BookmarkManagePage(
         val colors = AppTheme.colors
 
         // Initialize on first composition
-        if (bookmarkAdapter == null) {
-            switchToBookmark()
+        LaunchedEffect(Unit) {
+            if (bookmarks.isEmpty()) {
+                switchToBookmark()
+            }
         }
 
         Column(
@@ -256,35 +225,70 @@ open class BookmarkManagePage(
                     .background(colors.toolbarBackground)
                     .padding(horizontal = 12.dp, vertical = 6.dp)
             ) {
-                Text(
+                BahaText(
                     text = if (currentMode == 0) "我的書籤" else "瀏覽紀錄",
                     color = colors.titleBarTitle,
+                    size = BahaTextSize.BODY,
                     modifier = Modifier.padding(bottom = 2.dp)
                 )
-                Text(
+                BahaText(
                     text = boardName,
-                    color = colors.titleBarDetail
+                    color = colors.titleBarDetail,
+                    size = BahaTextSize.CAPTION
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-            // RecyclerView
-            AndroidView(
-                factory = { ctx ->
-                    RecyclerView(ctx).apply {
-                        layoutManager = LinearLayoutManager(ctx)
-                        adapter = bookmarkAdapter
-                        itemTouchHelper.attachToRecyclerView(this)
-                        recyclerViewRef = this
-                    }
-                },
-                update = { rv ->
-                    recyclerViewRef = rv
-                },
+            // Content list
+            Box(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-            )
+            ) {
+                if (bookmarks.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BahaText(
+                            text = if (currentMode == 0) "沒有書籤" else "沒有瀏覽紀錄",
+                            color = colors.textSecondary,
+                            size = BahaTextSize.BODY
+                        )
+                    }
+                } else {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        items(
+                            count = bookmarks.size,
+                            key = { index -> "${currentMode}_${index}_${bookmarks[index].title}_${bookmarks[index].keyword}" }
+                        ) { index ->
+                            val bookmark = bookmarks[index]
+                            if (currentMode == 0) {
+                                BookmarkRowItem(
+                                    bookmark = bookmark,
+                                    isVip = propertiesVIP,
+                                    canMoveUp = index > 0,
+                                    canMoveDown = index < bookmarks.size - 1,
+                                    onClick = { onItemClick(bookmark) },
+                                    onEdit = { onEditClick(index) },
+                                    onDelete = { onDeleteClick(index) },
+                                    onMoveUp = { moveBookmark(index, index - 1) },
+                                    onMoveDown = { moveBookmark(index, index + 1) }
+                                )
+                            } else {
+                                HistoryRowItem(
+                                    bookmark = bookmark,
+                                    onClick = { onItemClick(bookmark) },
+                                    onDelete = { onDeleteClick(index) }
+                                )
+                            }
+                            HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
+                        }
+                    }
+                }
+            }
 
             // Tab 工具列 (書籤 / 紀錄 / 零字) (滿版無縫 50dp)
             Box(
@@ -338,6 +342,168 @@ open class BookmarkManagePage(
                     onClick = {}
                 )
             }
+        }
+    }
+
+    @Composable
+    private fun BookmarkRowItem(
+        bookmark: Bookmark,
+        isVip: Boolean,
+        canMoveUp: Boolean,
+        canMoveDown: Boolean,
+        onClick: () -> Unit,
+        onEdit: () -> Unit,
+        onDelete: () -> Unit,
+        onMoveUp: () -> Unit,
+        onMoveDown: () -> Unit
+    ) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.pageBackground)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 10.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(end = 8.dp)
+            ) {
+                BahaText(
+                    text = bookmark.keyword.ifEmpty { stringResource(R.string.un_input) },
+                    color = colors.textPrimary,
+                    size = BahaTextSize.BODY,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    BahaText(
+                        text = stringResource(R.string.author_),
+                        color = colors.textSecondary,
+                        size = BahaTextSize.TINY
+                    )
+                    BahaText(
+                        text = bookmark.author.ifEmpty { stringResource(R.string.un_input) },
+                        color = colors.bbsMailAuthor,
+                        size = BahaTextSize.TINY,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    if (bookmark.mark == "y") {
+                        Spacer(modifier = Modifier.width(6.dp))
+                        BahaText(
+                            text = stringResource(R.string.word_m),
+                            color = colors.bbsMailMark,
+                            size = BahaTextSize.TINY
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    BahaText(
+                        text = stringResource(R.string.gy_),
+                        color = colors.textSecondary,
+                        size = BahaTextSize.TINY
+                    )
+                    BahaText(
+                        text = if (bookmark.gy.isEmpty()) stringResource(R.string.number_0) else bookmark.gy,
+                        color = colors.bbsBoardGy,
+                        size = BahaTextSize.TINY
+                    )
+                }
+            }
+
+            // 右側按鈕區塊
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (isVip) {
+                    IconButton(
+                        onClick = onMoveUp,
+                        enabled = canMoveUp,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowUp,
+                            contentDescription = "Move Up",
+                            tint = if (canMoveUp) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                        )
+                    }
+                    IconButton(
+                        onClick = onMoveDown,
+                        enabled = canMoveDown,
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.KeyboardArrowDown,
+                            contentDescription = "Move Down",
+                            tint = if (canMoveDown) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                        )
+                    }
+                }
+                BahaButton(
+                    text = stringResource(R.string.edit_short),
+                    type = ButtonType.NORMAL,
+                    modifier = Modifier.height(34.dp),
+                    onClick = onEdit
+                )
+                Box(
+                    modifier = Modifier
+                        .padding(horizontal = 4.dp)
+                        .width(1.dp)
+                        .height(24.dp)
+                        .background(colors.divider)
+                )
+                BahaButton(
+                    text = stringResource(R.string.delete_short),
+                    type = ButtonType.DANGER,
+                    modifier = Modifier.height(34.dp),
+                    onClick = onDelete
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun HistoryRowItem(
+        bookmark: Bookmark,
+        onClick: () -> Unit,
+        onDelete: () -> Unit
+    ) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(colors.pageBackground)
+                .clickable(onClick = onClick)
+                .padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BahaText(
+                text = stringResource(R.string.title_),
+                color = colors.textSecondary,
+                size = BahaTextSize.BODY,
+                modifier = Modifier.padding(end = 4.dp)
+            )
+            BahaText(
+                text = bookmark.keyword.ifEmpty { stringResource(R.string.un_input) },
+                color = colors.textPrimary,
+                size = BahaTextSize.BODY,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            BahaButton(
+                text = stringResource(R.string.delete_short),
+                type = ButtonType.DANGER,
+                modifier = Modifier.height(34.dp),
+                onClick = onDelete
+            )
         }
     }
 }

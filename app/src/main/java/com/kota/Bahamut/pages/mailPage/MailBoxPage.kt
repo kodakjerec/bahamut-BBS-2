@@ -5,7 +5,6 @@ import android.database.DataSetObserver
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
 import android.widget.ListAdapter
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -216,28 +215,6 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
 
     override var listName: String = ""
         get() = "[MailBox]"
-
-    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? {
-        var v = view
-        val itemIndex = i + 1
-        val itemBlock = ItemUtils.getBlock(itemIndex)
-        val item = getItem(i) as MailBoxPageItem?
-        val curBlock = currentBlock
-        if (item == null && curBlock != itemBlock && !isLoadingBlock(itemIndex)) {
-            loadBoardBlock(itemBlock)
-        }
-        if (v == null) {
-            v = MailBoxPageItemView(context)
-            v.layoutParams = AbsListView.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-        val itemView = v as MailBoxPageItemView
-        itemView.setItem(item)
-        itemView.setIndex(itemIndex)
-        return v
-    }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         MailBoxPageBlock.recycle(telnetListPageBlock as MailBoxPageBlock)

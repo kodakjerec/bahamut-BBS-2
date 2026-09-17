@@ -6,8 +6,7 @@ ui 模組提供自訂的 UI 元件庫，包含列表視圖、捲動視圖、通�
 ## 主要元件
 
 ### ASListView
-自訂列表視圖，提供高效的列表顯示功能
-- `ASListViewItemView` - 列表項目視圖介面
+自訂列表視圖，提供列表顯示功能
 - `ASListViewOverscrollDelegate` - 過度捲動委派
 - `ASListViewExtentOptionalDelegate` - 擴充選項委派
 

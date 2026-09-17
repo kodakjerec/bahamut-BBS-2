@@ -67,8 +67,8 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         HashMap()
     private val mDataSetObservable = DataSetObservable()
 
-    // android.widget.Adapter
-    abstract override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View?
+    // android.widget.Adapter (Compose 架構下由 LazyColumn 負責渲染，此處提供預設實作回傳 null)
+    override fun getView(i: Int, view: View?, viewGroup: ViewGroup?): View? = null
 
     abstract val isAutoLoadEnable: Boolean
 
