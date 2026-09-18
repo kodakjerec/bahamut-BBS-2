@@ -45,3 +45,8 @@ BBS 命令實現，包含文章操作（讀取、發文、推文、搜尋、刪�
 - 本地資料快取和書籤管理
 - 雲端備份功能
 - 使用 Kotlin 開發
+
+## 開發與 AI 指引
+- **禁止編譯**：嚴禁由 AI 執行 Gradle 編譯、測試或建置指令（如 `./gradlew compileDebugKotlin`、`assembleDebug` 等），由使用者自行編譯。
+- **共用規範**：盡量使用共用的 components（如 `com.kota.Bahamut.ui.components.*`）、colors 與 themes（如 `AppTheme.colors`、`BahamutAppTheme`）。
+

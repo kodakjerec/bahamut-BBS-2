@@ -144,6 +144,7 @@ open class BoardMainPage : TelnetListPage(),
     var boardTitleState by mutableStateOf("")
     var boardManagerState by mutableStateOf("")
     var isDrawerOpenState by mutableStateOf(false)
+    var isDrawerLeftState by mutableStateOf(propertiesDrawerLocation != 0)
     var myModeState by mutableIntStateOf(0) // 0-書籤 1-紀錄
     var isItemBlockEnableState by mutableStateOf(false)
     val bookmarkListState = mutableStateListOf<Bookmark>()
@@ -283,19 +284,23 @@ open class BoardMainPage : TelnetListPage(),
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.TAB)
     }
 
+    /** 變更工具列位置狀態 */
     fun changeToolbarLocation() {
         toolbarLocationState = propertiesToolbarLocation
     }
 
+    /** 變更工具列按鈕排序狀態 */
     fun changeToolbarOrder() {
         toolbarOrderState = propertiesToolbarOrder
     }
 
+    /** 實作實體選單鍵或標題列選單點擊 */
     override fun onMenuButtonClicked(): Boolean {
         mMenuButtonListener.onClick(null)
         return true
     }
 
+    /** 重新整理看板抬頭標題與板主資訊 */
     fun refreshHeaderView() {
         var boardTitle1 = boardTitle
         boardTitle1 = boardTitle1.ifEmpty { getContextString(R.string.loading) }
@@ -305,8 +310,10 @@ open class BoardMainPage : TelnetListPage(),
         boardManagerState = boardManager1
     }
 
+    /** 取得看板快取識別碼 */
     override fun getListIdFromListName(aName: String?): String? = "$aName[Board]"
 
+    /** 從資料處理器載入當前板面區塊資料 */
     override fun loadPage(): TelnetListPageBlock {
         val load = BoardPageHandler.instance.load()
         if (!isInitialed) {
@@ -326,6 +333,7 @@ open class BoardMainPage : TelnetListPage(),
         return load
     }
 
+    /** 檢查指定索引文章項目是否可點擊與載入 */
     override fun isItemCanLoadAtIndex(index: Int): Boolean {
         val boardPageItem = getItem(index) as BoardPageItem?
         if (boardPageItem != null) {
@@ -341,40 +349,47 @@ open class BoardMainPage : TelnetListPage(),
         return false
     }
 
+    /** 頁面刷新生命週期 */
     @Synchronized
     override fun onPageRefresh() {
         refreshHeaderView()
         super.onPageRefresh()
     }
 
+    /** 裝置旋轉與組態變更回呼 */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         refreshHeaderView()
         safeNotifyDataSetChanged()
     }
 
+    /** 列表項目長按事件 (開啟同標題主題串連) */
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         onListArticle(index + 1)
         return true
     }
 
+    /** 搜尋按鈕點擊觸發 */
     override fun onSearchButtonClicked(): Boolean {
         showSearchArticleDialog()
         return true
     }
 
+    /** 顯示文章搜尋條件設定對話框 */
     fun showSearchArticleDialog() {
         val dialogSearchArticle = DialogSearchArticle()
         dialogSearchArticle.setListener(this)
         dialogSearchArticle.show()
     }
 
+    /** 顯示跳轉指定文章編號對話框 */
     fun showSelectArticleDialog() {
         val dialogSelectArticle = DialogSelectArticle()
         dialogSelectArticle.setListener(this)
         dialogSelectArticle.show()
     }
 
+    /** 搜尋對話框確定搜尋按鈕回呼 */
     override fun onSearchDialogSearchButtonClickedWithValues(vector: Vector<String>) {
         searchArticle(
             vector[0]!!,
@@ -384,6 +399,7 @@ open class BoardMainPage : TelnetListPage(),
         )
     }
 
+    /** 執行文章關鍵字/作者/標記搜尋並跳轉頁面 */
     fun searchArticle(keyword: String, author: String, mark: String, myGY: String) {
         this.lastListAction = BoardPageAction.SEARCH
         val boardSearchPage = PageContainer.instance!!.boardSearchPage
@@ -402,6 +418,7 @@ open class BoardMainPage : TelnetListPage(),
         pushCommand(BahamutCommandSearchArticle(keyword, author, mark, myGY))
     }
 
+    /** 處理跳轉文章對話框關閉並移動滾動位置 */
     override fun onSelectDialogDismissWIthIndex(str: String) {
         var i: Int
         try {
@@ -415,19 +432,23 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 觸發列表平滑滾動至指定項目索引 */
     fun scrollToPosition(index: Int) {
         scrollToItemTrigger = index
     }
 
+    /** 設定列表選擇位置 */
     override fun setListViewSelection(selection: Int) {
         super.setListViewSelection(selection)
         scrollToPosition(selection)
     }
 
+    /** 開啟書籤管理頁面 */
     fun onBookmarkButtonClicked() {
         navigationController.pushViewController(BookmarkManagePage(listName, this))
     }
 
+    /** 開啟主題串列頁面 */
     fun onListArticle(i: Int) {
         this.lastListAction = BoardPageAction.LINK_TITLE
         val boardLinkedTitlePage = PageContainer.instance!!.boardLinkedTitlePage
@@ -442,6 +463,7 @@ open class BoardMainPage : TelnetListPage(),
         pushCommand(BahamutCommandListArticle(i))
     }
 
+    /** 開啟發表文章頁面 */
     protected open fun onPostButtonClicked() {
         val postArticlePage = PageContainer.instance!!.postArticlePage
         postArticlePage.setBoardPage(this)
@@ -449,6 +471,7 @@ open class BoardMainPage : TelnetListPage(),
         navigationController.pushViewController(postArticlePage)
     }
 
+    /** 對當前載入的文章點讚/給 GY */
     fun goodLoadingArticle() {
         ASAlertDialog.createDialog()
             .setTitle(getContextString(R.string.do_gy))
@@ -462,6 +485,7 @@ open class BoardMainPage : TelnetListPage(),
             }.scheduleDismissOnPageDisappear(this).show()
     }
 
+    /** 發送推文指令 */
     fun pushArticle() {
         this@BoardMainPage.pushCommand(BahamutCommandPushArticle(loadingItemNumber))
         pushArticleASCoroutine?.cancel()
@@ -469,6 +493,7 @@ open class BoardMainPage : TelnetListPage(),
         isPostDelayedSuccess = false
     }
 
+    /** 開啟推文輸入對話框 */
     fun openPushArticleDialog() {
         pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
@@ -476,6 +501,7 @@ open class BoardMainPage : TelnetListPage(),
         dialog.show()
     }
 
+    /** 推文發送逾時檢查協程 */
     var pushArticleASCoroutine: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             if (!isPostDelayedSuccess) {
@@ -485,35 +511,42 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 取消推文逾時檢查 */
     fun cancelRunner() {
         pushArticleASCoroutine?.cancel()
         isPostDelayedSuccess = true
     }
 
+    /** 發送站內信給板主或作者 */
     fun funSendMail() {
         pushCommand(BahamutCommandFSendMail(propertiesUsername))
     }
 
+    /** 載入同標題最舊一篇 (頂端) */
     fun loadTheSameTitleTop() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleTop(loadingItemNumber))
     }
 
+    /** 載入同標題最新一篇 (底端) */
     fun loadTheSameTitleBottom() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleBottom(loadingItemNumber))
     }
 
+    /** 載入同標題上一篇 */
     fun loadTheSameTitleUp() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleUp(loadingItemNumber))
     }
 
+    /** 載入同標題下一篇 */
     fun loadTheSameTitleDown() {
         onLoadItemStart()
         pushCommand(BahamutCommandTheSameTitleDown(loadingItemNumber))
     }
 
+    /** 判定項目作者是否地位於黑名單中 */
     override fun isItemBlocked(aItem: TelnetListPageItem?): Boolean {
         if (aItem != null) {
             return this.isItemBlockEnable && isBlockListContains((aItem as BoardPageItem).author)
@@ -521,6 +554,7 @@ open class BoardMainPage : TelnetListPage(),
         return false
     }
 
+    /** 切換黑名單過濾啟用狀態 */
     fun onChangeBlockStateButtonClicked() {
         propertiesBlockListEnable = !this.isItemBlockEnable
         notifyDataUpdated()
@@ -529,10 +563,12 @@ open class BoardMainPage : TelnetListPage(),
         safeNotifyDataSetChanged()
     }
 
+    /** 開啟黑名單編輯頁面 */
     fun onEditBlockListButtonClicked() {
         navigationController.pushViewController(BlockListPage())
     }
 
+    /** 點擊並開啟指定索引的文章頁面 */
     override fun loadItemAtIndex(index: Int) {
         if (isItemCanLoadAtIndex(index)) {
             lastLoadItemIndex = index
@@ -549,6 +585,7 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 保存當前列表狀態與位置 */
     override fun saveListState() {
         super.saveListState()
         listId?.let { id ->
@@ -559,6 +596,7 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 載入已保存的列表狀態與位置 */
     override fun loadListState() {
         super.loadListState()
         listId?.let { id ->
@@ -571,10 +609,12 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 準備重置初始化狀態 */
     fun prepareInitial() {
         isInitialed = false
     }
 
+    /** 處理擴充選單選取書籤項目回呼 */
     override fun onBoardExtendOptionalPageDidSelectBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
             this.lastListAction = BoardPageAction.SEARCH
@@ -589,14 +629,17 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 回收板面 Block */
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {
         BoardPageBlock.recycle(telnetListPageBlock as BoardPageBlock)
     }
 
+    /** 回收板面 Item */
     override fun recycleItem(telnetListPageItem: TelnetListPageItem) {
         BoardPageItem.recycle(telnetListPageItem as BoardPageItem?)
     }
 
+    /** 處理文章編輯對話框發送 */
     override fun onPostDialogEditButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -607,6 +650,7 @@ open class BoardMainPage : TelnetListPage(),
         safeNotifyDataSetChanged()
     }
 
+    /** 處理文章發布對話框發送 */
     override fun onPostDialogSendButtonClicked(
         postArticlePage: PostArticlePage?,
         str: String?,
@@ -636,6 +680,7 @@ open class BoardMainPage : TelnetListPage(),
         }
     }
 
+    /** 恢復發文草稿 */
     fun recoverPost() {
         ASCoroutine.ensureMainThread {
             cleanCommand()
@@ -647,6 +692,7 @@ open class BoardMainPage : TelnetListPage(),
         dismissProcessingDialog()
     }
 
+    /** 完成貼文並關閉發文頁 */
     fun finishPost() {
         ASCoroutine.ensureMainThread {
             val page = PageContainer.instance!!.postArticlePage
@@ -657,6 +703,7 @@ open class BoardMainPage : TelnetListPage(),
         dismissProcessingDialog()
     }
 
+    /** 重新載入書籤與歷史紀錄清單 */
     fun reloadBookmark(aView: View? = null) {
         val store = TempSettings.bookmarkStore
         myBookmarkList.clear()
@@ -672,18 +719,39 @@ open class BoardMainPage : TelnetListPage(),
         myModeState = myMode
     }
 
-    fun openDrawer() {
+    /** 開啟側邊選單 Drawer (可指定方向: true 表示由左向右滑出，false 表示由右向左滑出) */
+    fun openDrawer(isLeft: Boolean = propertiesDrawerLocation != 0) {
+        isDrawerLeftState = isLeft
         isDrawerOpenState = true
         reloadBookmark()
     }
 
+    /** 關閉側邊選單 Drawer */
     fun closeDrawer() {
         isDrawerOpenState = false
     }
 
+    /** 接收向左滑動手勢 (從右向左滑動) */
+    override fun onReceivedGestureLeft(): Boolean {
+        if (pageType == BahamutPage.BAHAMUT_BOARD) {
+            if (!isDrawerOpenState) {
+                openDrawer(isLeft = false)
+                return true
+            } else if (!isDrawerLeftState) {
+                closeDrawer()
+                return true
+            }
+        }
+        return super.onReceivedGestureLeft()
+    }
+
+    /** 接收向右滑動手勢 (從左向右滑動) */
     override fun onReceivedGestureRight(): Boolean {
         if (pageType == BahamutPage.BAHAMUT_BOARD) {
-            if (propertiesDrawerLocation == 0 && isDrawerOpenState) {
+            if (!isDrawerOpenState) {
+                openDrawer(isLeft = true)
+                return true
+            } else if (isDrawerLeftState) {
                 closeDrawer()
                 return true
             }
@@ -699,6 +767,7 @@ open class BoardMainPage : TelnetListPage(),
         return false
     }
 
+    /** 處理系統返回鍵事件 */
     override fun onBackPressed(): Boolean {
         if (isDrawerOpenState) {
             closeDrawer()
@@ -711,6 +780,7 @@ open class BoardMainPage : TelnetListPage(),
         return true
     }
 
+    /** 搜尋對話框取消事件回呼 */
     override fun onSearchDialogCancelButtonClicked() {}
 
     // -------------------------------------------------------------
@@ -883,6 +953,38 @@ open class BoardMainPage : TelnetListPage(),
                             }
                         }
                     }
+
+                    // 側邊選單 Drawer 手勢觸發區 (限定在文章列表極邊緣 16dp，未開啟時不擋 Header)
+                    if (pageType == BahamutPage.BAHAMUT_BOARD && !isDrawerOpenState) {
+                        // 左側極邊緣觸發區 (16dp 寬) - 從最左邊緣向內 (右) 滑動開啟左側選單
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(16.dp)
+                                .align(Alignment.CenterStart)
+                                .pointerInput(Unit) {
+                                    detectHorizontalDragGestures { _, dragAmount ->
+                                        if (dragAmount > 15f) {
+                                            openDrawer(isLeft = true)
+                                        }
+                                    }
+                                }
+                        )
+                        // 右側極邊緣觸發區 (16dp 寬) - 從最右邊緣向內 (左) 滑動開啟右側選單
+                        Box(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(16.dp)
+                                .align(Alignment.CenterEnd)
+                                .pointerInput(Unit) {
+                                    detectHorizontalDragGestures { _, dragAmount ->
+                                        if (dragAmount < -15f) {
+                                            openDrawer(isLeft = false)
+                                        }
+                                    }
+                                }
+                        )
+                    }
                 }
 
                 // 3. 底部操作工具列 (僅在 toolbarLocationState <= 2 時顯示)
@@ -985,10 +1087,11 @@ open class BoardMainPage : TelnetListPage(),
             }
 
             // 6. 側邊選單 Drawer (若 pageType == BAHAMUT_BOARD)
+            // 放置於最外層 Box，開啟時覆蓋畫面的整個邊側 (全螢幕高度，涵蓋 Header 與 Toolbar)
             if (pageType == BahamutPage.BAHAMUT_BOARD) {
                 BoardEndDrawer(
                     isOpen = isDrawerOpenState,
-                    isLeft = propertiesDrawerLocation != 0,
+                    isLeft = isDrawerLeftState,
                     mode = myModeState,
                     bookmarks = bookmarkListState,
                     isBlockEnabled = isItemBlockEnableState,

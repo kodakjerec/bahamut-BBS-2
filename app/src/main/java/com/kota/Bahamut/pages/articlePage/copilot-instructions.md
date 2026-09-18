@@ -36,7 +36,12 @@ articlePage 模組實現文章內容頁面，提供文章閱讀、推文顯示�
 - Telnet 模式：保留原始 ANSI 畫面
 
 ## 技術特點
-- RecyclerView 多類型項目
-- 圖片延遲載入
-- URL 自動識別
+- Jetpack Compose 頁面與項目渲染
+- 圖片延遲載入與手勢縮放
+- URL 自動識別與預覽
 - 使用 Kotlin 開發
+
+## 開發與 AI 指引
+- **禁止編譯**：嚴禁由 AI 執行 Gradle 編譯、測試或建置指令（如 `./gradlew compileDebugKotlin` 等），由使用者自行編譯。
+- **共用規範**：盡量使用共用的 components（如 `com.kota.Bahamut.ui.components.*`）、colors 與 themes（如 `AppTheme.colors`、`BahamutAppTheme`）。
+

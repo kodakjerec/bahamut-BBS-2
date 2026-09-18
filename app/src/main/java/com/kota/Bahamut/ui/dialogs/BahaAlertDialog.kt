@@ -54,7 +54,7 @@ fun BahaAlertDialogContent(
         modifier = modifier
             .widthIn(min = 280.dp, max = 340.dp)
             .background(colors.pageBackground)
-            .border(1.5.dp, colors.dialogBorder)
+            .border(3.dp, colors.dialogBorder)
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()

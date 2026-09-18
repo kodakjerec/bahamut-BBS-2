@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -792,7 +791,7 @@ fun ArticleTopBar(
     onMenuClick: () -> Unit
 ) {
     val colors = AppTheme.colors
-    var isExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(true) }
 
     Column(
         modifier = Modifier
@@ -1232,7 +1231,7 @@ fun ArticlePushRowItem(
 }
 
 /**
- * 連結預覽縮圖元件 (嵌入 Android 原生 ThumbnailItemView)
+ * 連結預覽縮圖元件 (Compose)
  */
 @Composable
 fun ArticleThumbnail(
@@ -1240,32 +1239,15 @@ fun ArticleThumbnail(
     loadAllTrigger: Int,
     modifier: Modifier = Modifier
 ) {
-    var thumbnailView by remember { mutableStateOf<ThumbnailItemView?>(null) }
-
-    LaunchedEffect(loadAllTrigger) {
-        if (loadAllTrigger > 0) {
-            thumbnailView?.prepareLoadImage()
-        }
-    }
-
-    AndroidView(
+    ThumbnailItem(
+        url = url,
+        loadAllTrigger = loadAllTrigger,
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        factory = { context ->
-            ThumbnailItemView(context).apply {
-                loadUrl(url)
-                thumbnailView = this
-            }
-        },
-        update = { view ->
-            thumbnailView = view
-            if (view.myUrl != url) {
-                view.loadUrl(url)
-            }
-        }
+            .padding(vertical = 4.dp)
     )
 }
+
 
 /** 修正 BBS 每行 78 字元導致的網址換行 */
 fun fixUrlNewlines(text: String): String {

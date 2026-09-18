@@ -13,6 +13,8 @@ import androidx.core.content.ContextCompat
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.articlePage.MyUrlSpan
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
+import androidx.compose.ui.platform.ComposeView
+import com.kota.Bahamut.ui.theme.setBahamutContent
 import com.kota.Bahamut.service.UserSettings
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -125,8 +127,11 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
                     mainLayout.removeViewAt(originalIndex)
                     mainLayout.addView(textView1, originalIndex)
                     val url = urlSpan.url
-                    val thumbnail = ThumbnailItemView(context)
-                    thumbnail.loadUrl(url)
+                    val thumbnail = ComposeView(context).apply {
+                        setBahamutContent {
+                            ThumbnailItemView(url = url)
+                        }
+                    }
                     mainLayout.addView(thumbnail, originalIndex + 1)
                     if (textView2.text.isNotEmpty()) {
                         mainLayout.addView(textView2, originalIndex + 2)
@@ -146,9 +151,8 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
                         textView.background = txtMessageBackgroundColor
                         textView.maxWidth = txtMessageMaxWidth
                         stringNewUrlSpan(textView)
-                    } else if (view.javaClass == ThumbnailItemView::class.java) {
-                        val thumbnail = view as ThumbnailItemView
-                        thumbnail.layoutParams.width = txtMessageMaxWidth
+                    } else if (view is ComposeView) {
+                        view.layoutParams.width = txtMessageMaxWidth
                     }
                 }
             }
@@ -156,4 +160,5 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
             stringNewUrlSpan(txtMessage)
         }
     }
+
 }

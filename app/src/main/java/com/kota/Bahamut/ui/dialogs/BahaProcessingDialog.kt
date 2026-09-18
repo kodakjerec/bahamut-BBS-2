@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -16,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
@@ -45,22 +45,22 @@ fun BahaProcessingDialog(
         Box(
             modifier = Modifier
                 .background(colors.pageBackground)
-                .border(1.dp, colors.dialogBorder)
+                .border(3.dp, colors.dialogBorder)
                 .padding(horizontal = 24.dp, vertical = 20.dp),
             contentAlignment = Alignment.Center
         ) {
             Column (
             ) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(32.dp).align(Alignment.CenterHorizontally),
+                    modifier = Modifier.size(42.dp)
+                        .align(Alignment.CenterHorizontally),
                     color = colors.textLink,
                     strokeWidth = 3.dp
                 )
-                Spacer(modifier = Modifier.width(16.dp))
+                Spacer(modifier = Modifier.width(16.dp).height(16.dp))
                 BahaText(
                     text = message,
-                    color = colors.textPrimary,
-                    fontSize = BahaTextSize.CAPTION
+                    color = colors.textPrimary
                 )
             }
         }

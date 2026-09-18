@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -21,9 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ReferenceAuthor
 import com.kota.Bahamut.service.CommonFunctions
@@ -127,7 +124,7 @@ class DialogReference : ASDialog() {
                         reservedType = author1ReservedType,
                         onReservedTypeChange = { author1ReservedType = it }
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 // Author 0 (前一)
@@ -145,7 +142,7 @@ class DialogReference : ASDialog() {
                         reservedType = author0ReservedType,
                         onReservedTypeChange = { author0ReservedType = it }
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 // Author None (無)
@@ -161,9 +158,8 @@ class DialogReference : ASDialog() {
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(4.dp))
                         .background(colors.dialogBlockBackground)
-                        .padding(horizontal = 12.dp, vertical = 10.dp)
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
                 )
             }
         }
@@ -185,14 +181,14 @@ class DialogReference : ASDialog() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(colors.dialogBlockBackground)
-                .padding(8.dp)
+                .padding(4.dp)
         ) {
             BahaCheckboxLeft(
                 text = title,
                 checked = enabled,
                 onCheckedChange = onEnabledChange,
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 18.sp
+                fontSize = AppTheme.fontSize.subtitle
             )
 
             if (enabled) {
@@ -209,7 +205,7 @@ class DialogReference : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.CAPTION
+                        fontSize = BahaTextSize.SUBTITLE
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     BahaCheckbox(

@@ -99,7 +99,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                 BahaInputField(
                     value = username,
                     onValueChange = { username = it },
-                    placeholder = "",
+                    placeholder = "web 帳號",
                     singleLine = true,
                     maxLength = 20,
                     height = 42.dp,
@@ -117,7 +117,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                 BahaInputField(
                     value = password,
                     onValueChange = { password = it },
-                    placeholder = "",
+                    placeholder = "web 密碼",
                     singleLine = true,
                     isPassword = true,
                     maxLength = 30,

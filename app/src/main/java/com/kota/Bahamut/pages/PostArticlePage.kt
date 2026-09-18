@@ -594,7 +594,7 @@ class PostArticlePage : TelnetPage() {
     @Composable
     fun PostArticlePageContent() {
         val colors = AppTheme.colors
-        var headerDropdownExpanded by remember { mutableStateOf(false) }
+        var expanded by remember { mutableStateOf(false) }
 
         if (headers.isEmpty()) {
             headers = articleHeaders
@@ -618,22 +618,26 @@ class PostArticlePage : TelnetPage() {
                         BahaText(
                             text = headers.getOrNull(headerSelectedState) ?: headers[0],
                             color = colors.titleBarTitle,
-                            fontSize = BahaTextSize.SUBTITLE,
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier
-                                .clickable { headerDropdownExpanded = true }
+                                .clickable { expanded = true }
                                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
                         )
                         DropdownMenu(
-                            expanded = headerDropdownExpanded,
-                            onDismissRequest = { headerDropdownExpanded = false },
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
                             modifier = Modifier.background(colors.surface)
                         ) {
                             headers.forEachIndexed { index, header ->
                                 DropdownMenuItem(
-                                    text = { BahaText(header, color = colors.textPrimary) },
+                                    text = {
+                                        BahaText(
+                                            header,
+                                            color = colors.textPrimary,
+                                            fontSize = BahaTextSize.TITLE) },
                                     onClick = {
                                         headerSelectedState = index
-                                        headerDropdownExpanded = false
+                                        expanded = false
                                     }
                                 )
                             }
@@ -646,7 +650,10 @@ class PostArticlePage : TelnetPage() {
                     value = titleState,
                     onValueChange = { titleState = it },
                     placeholder = stringResource(R.string.input_title_here),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    fontSize = BahaTextSize.TITLE,
+                    fontColor = colors.inputBoxBackground,
+                    backgroundColor = colors.inputBoxText
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -662,7 +669,7 @@ class PostArticlePage : TelnetPage() {
                     onValueChange = { contentState = it },
                     textStyle = TextStyle(
                         color = colors.textPrimary,
-                        fontSize = AppTheme.fontSize.base
+                        fontSize = AppTheme.fontSize.title
                     ),
                     cursorBrush = SolidColor(colors.textPrimary),
                     modifier = Modifier
@@ -673,7 +680,7 @@ class PostArticlePage : TelnetPage() {
                             BahaText(
                                 text = stringResource(R.string.input_content_here),
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.BASE
+                                fontSize = BahaTextSize.TITLE
                             )
                         }
                         innerTextField()
