@@ -52,7 +52,7 @@ fun BahaProcessingDialog(
             Column (
             ) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(42.dp)
+                    modifier = Modifier.size(48.dp)
                         .align(Alignment.CenterHorizontally),
                     color = colors.textLink,
                     strokeWidth = 3.dp

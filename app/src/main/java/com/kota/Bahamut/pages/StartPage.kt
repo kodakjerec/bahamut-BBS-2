@@ -301,7 +301,7 @@ class StartPage : TelnetComposePage() {
                                         }
                                     )
                                     .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    .height(42.dp),
+                                    .height(48.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
@@ -352,7 +352,7 @@ class StartPage : TelnetComposePage() {
                                         }
                                     )
                                     .padding(vertical = 4.dp, horizontal = 4.dp)
-                                    .height(42.dp),
+                                    .height(48.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(

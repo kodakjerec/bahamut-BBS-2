@@ -41,7 +41,7 @@ fun BahaInputField(
     singleLine: Boolean = true,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    height: Dp = 40.dp,
+    height: Dp = 48.dp,
     keyboardOptions: KeyboardOptions = if (isPassword) {
         KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
     } else {
@@ -117,7 +117,7 @@ fun BahaInputField(
     singleLine: Boolean = false,
     maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
     minLines: Int = 1,
-    height: Dp = 40.dp,
+    height: Dp = 48.dp,
     keyboardOptions: KeyboardOptions = if (isPassword) {
         KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
     } else {

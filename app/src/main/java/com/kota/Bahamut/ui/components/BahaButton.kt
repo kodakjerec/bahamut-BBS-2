@@ -14,6 +14,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -41,11 +43,18 @@ fun BahaButton(
     isSelected: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
     fontSize: BahaTextSize = BahaTextSize.BASE,
-    minHeight: Dp = 42.dp
+    minHeight: Dp = 48.dp
 ) {
     val colors = AppTheme.colors
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
+    val haptic = LocalHapticFeedback.current
+    val hapticLongClick = onLongClick?.let { action ->
+        { 
+            action();
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
 
     // 依據狀態決定背景色與文字色
     val (backgroundColor, textColor) = when (type) {
@@ -82,7 +91,7 @@ fun BahaButton(
                 indication = null, // 自訂狀態色彩切換已包含即時反饋
                 enabled = enabled,
                 onClick = onClick,
-                onLongClick = onLongClick
+                onLongClick = hapticLongClick
             )
             .padding(contentPadding),
         contentAlignment = Alignment.Center

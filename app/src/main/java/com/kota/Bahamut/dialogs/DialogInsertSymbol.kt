@@ -63,7 +63,7 @@ class DialogInsertSymbol : ASDialog() {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(44.dp)
+                            .height(48.dp)
                             .clickable {
                                 _listener?.onSymbolDialogDismissWithSymbol(sym)
                                 dismiss()

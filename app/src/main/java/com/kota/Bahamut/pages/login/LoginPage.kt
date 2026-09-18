@@ -571,7 +571,7 @@ class LoginPage : TelnetComposePage() {
                         onValueChange = { username = it },
                         placeholder = stringResource(R.string.Username_hint),
                         maxLength = 12,
-                        height = 40.dp,
+                        height = 48.dp,
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -592,7 +592,7 @@ class LoginPage : TelnetComposePage() {
                         placeholder = stringResource(R.string.password_hint),
                         isPassword = true,
                         maxLength = 8,
-                        height = 40.dp,
+                        height = 48.dp,
                         modifier = Modifier.weight(1f)
                     )
                 }

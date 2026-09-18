@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,6 +58,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTimes
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
@@ -614,36 +616,39 @@ class PostArticlePage : TelnetPage() {
             ) {
                 // Header Selector Dropdown (if not hidden)
                 if (!isHeaderHidden && headers.isNotEmpty()) {
+                    val currentHeader = headers.getOrNull(headerSelectedState) ?: headers[0]
                     Box {
-                        BahaText(
-                            text = headers.getOrNull(headerSelectedState) ?: headers[0],
-                            color = colors.titleBarTitle,
-                            fontSize = BahaTextSize.TITLE,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .clickable { expanded = true }
                                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
-                        )
-                        DropdownMenu(
+                        ) {
+                            BahaText(
+                                text = currentHeader,
+                                fontSize = BahaTextSize.TITLE
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            BahaText(
+                                text = "▾",
+                                color = colors.textSecondary,
+                                fontSize = BahaTextSize.TITLE
+                            )
+                        }
+                        BahaDropdownMenu(
                             expanded = expanded,
                             onDismissRequest = { expanded = false },
-                            modifier = Modifier.background(colors.surface)
-                        ) {
-                            headers.forEachIndexed { index, header ->
-                                DropdownMenuItem(
-                                    text = {
-                                        BahaText(
-                                            header,
-                                            color = colors.textPrimary,
-                                            fontSize = BahaTextSize.TITLE) },
-                                    onClick = {
-                                        headerSelectedState = index
-                                        expanded = false
-                                    }
-                                )
-                            }
-                        }
+                            items = headers,
+                            selectedIndex = headerSelectedState,
+                            onItemSelected = { index ->
+                                headerSelectedState = index
+                            },
+                            fontSize = BahaTextSize.TITLE
+                        )
                     }
                 }
+
+
 
                 // 標題輸入框
                 BahaInputField(

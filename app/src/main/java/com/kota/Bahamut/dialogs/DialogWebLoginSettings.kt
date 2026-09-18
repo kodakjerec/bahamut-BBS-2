@@ -102,7 +102,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     placeholder = "web 帳號",
                     singleLine = true,
                     maxLength = 20,
-                    height = 42.dp,
+                    height = 48.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -121,7 +121,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     singleLine = true,
                     isPassword = true,
                     maxLength = 30,
-                    height = 42.dp,
+                    height = 48.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
 

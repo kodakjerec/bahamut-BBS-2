@@ -204,7 +204,7 @@ class DialogShortenUrl : ASDialog() {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(44.dp)
+                            .height(48.dp)
                     ) {
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.reset),

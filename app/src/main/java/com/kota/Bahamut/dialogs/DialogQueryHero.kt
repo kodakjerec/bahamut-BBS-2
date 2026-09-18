@@ -244,7 +244,7 @@ class DialogQueryHero : ASDialog() {
                         type = ButtonType.SECONDARY,
                         onClick = { showWebView = true },
                         modifier = Modifier.fillMaxWidth(),
-                        minHeight = 36.dp
+                        minHeight = 48.dp
                     )
                 }
 

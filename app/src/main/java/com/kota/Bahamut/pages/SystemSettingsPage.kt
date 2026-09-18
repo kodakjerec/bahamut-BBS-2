@@ -21,8 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
@@ -634,28 +633,16 @@ class SystemSettingsPage : TelnetPage() {
                         color = colors.textSecondary
                     )
                 }
-                DropdownMenu(
+                BahaDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
-                    modifier = Modifier.background(colors.surface)
-                ) {
-                    items.forEachIndexed { index, label ->
-                        DropdownMenuItem(
-                            text = {
-                                BahaText(
-                                    text = label,
-                                    color = if (index == selectedIndex) colors.titleBarTitle else colors.textPrimary
-                                )
-                            },
-                            onClick = {
-                                expanded = false
-                                onItemSelected(index)
-                            }
-                        )
-                    }
-                }
+                    items = items,
+                    selectedIndex = selectedIndex,
+                    onItemSelected = onItemSelected
+                )
             }
         }
+
         HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
     }
 }

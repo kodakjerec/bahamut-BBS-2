@@ -449,7 +449,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                                 fontSize = BahaTextSize.BODY
                             )
                         } else {
-                            Spacer(modifier = Modifier.width(42.dp))
+                            Spacer(modifier = Modifier.width(48.dp))
                         }
 
                         // 回信 R
@@ -461,7 +461,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                                 fontSize = BahaTextSize.BODY
                             )
                         } else {
-                            Spacer(modifier = Modifier.width(42.dp))
+                            Spacer(modifier = Modifier.width(48.dp))
                         }
 
                         // 日期

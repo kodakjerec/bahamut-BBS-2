@@ -13,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -30,7 +28,9 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -192,27 +192,31 @@ class DialogPaintColor : ASDialog() {
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Box {
-                        BahaText(
-                            text = colorOptions.getOrElse(frontColor) { "" },
-                            color = colors.textPrimary,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                        DropdownMenu(
+                        ) {
+                            BahaText(
+                                text = colorOptions.getOrElse(frontColor) { "" },
+                                color = colors.textPrimary
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            BahaText(
+                                text = "▾",
+                                color = colors.textSecondary
+                            )
+                        }
+                        BahaDropdownMenu(
                             expanded = frontExpanded,
                             onDismissRequest = { frontExpanded = false },
-                            modifier = Modifier.background(colors.surface)
-                        ) {
-                            colorOptions.forEachIndexed { index, optionName ->
-                                DropdownMenuItem(
-                                    text = { BahaText(text = optionName, color = colors.textPrimary) },
-                                    onClick = {
-                                        frontColor = index
-                                        if (index > 0 && isRecovery) isRecovery = false
-                                        frontExpanded = false
-                                    }
-                                )
-                            }
-                        }
+                            items = colorOptions,
+                            selectedIndex = frontColor,
+                            onItemSelected = { index ->
+                                frontColor = index
+                                if (index > 0 && isRecovery) isRecovery = false
+                            },
+                            fontSize = BahaTextSize.BODY
+                        )
                     }
                 }
 
@@ -237,27 +241,31 @@ class DialogPaintColor : ASDialog() {
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Box {
-                        BahaText(
-                            text = colorOptions.getOrElse(backColor) { "" },
-                            color = colors.textPrimary,
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
-                        DropdownMenu(
+                        ) {
+                            BahaText(
+                                text = colorOptions.getOrElse(backColor) { "" },
+                                color = colors.textPrimary
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            BahaText(
+                                text = "▾",
+                                color = colors.textSecondary
+                            )
+                        }
+                        BahaDropdownMenu(
                             expanded = backExpanded,
                             onDismissRequest = { backExpanded = false },
-                            modifier = Modifier.background(colors.surface)
-                        ) {
-                            colorOptions.forEachIndexed { index, optionName ->
-                                DropdownMenuItem(
-                                    text = { BahaText(text = optionName, color = colors.textPrimary) },
-                                    onClick = {
-                                        backColor = index
-                                        if (index > 0 && isRecovery) isRecovery = false
-                                        backExpanded = false
-                                    }
-                                )
-                            }
-                        }
+                            items = colorOptions,
+                            selectedIndex = backColor,
+                            onItemSelected = { index ->
+                                backColor = index
+                                if (index > 0 && isRecovery) isRecovery = false
+                            },
+                            fontSize = BahaTextSize.BODY
+                        )
                     }
                 }
 

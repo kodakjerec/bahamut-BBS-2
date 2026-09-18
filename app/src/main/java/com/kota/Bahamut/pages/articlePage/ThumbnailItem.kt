@@ -485,7 +485,7 @@ fun ThumbnailItemView(
                         Box(
                             modifier = modifier
                                 .fillMaxWidth()
-                                .height(42.dp)
+                                .height(48.dp)
                                 .background(colors.dialogTitleBackground)
                                 .combinedClickable(
                                     onClick = { imageRequested = true }

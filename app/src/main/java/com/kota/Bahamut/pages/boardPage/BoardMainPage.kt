@@ -1336,7 +1336,7 @@ fun BoardPageRowItem(
                             fontSize = BahaTextSize.BODY
                         )
                     } else {
-                        Spacer(modifier = Modifier.width(42.dp))
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
 
                     // 日期
@@ -1361,7 +1361,7 @@ fun BoardPageRowItem(
                             fontSize = BahaTextSize.BODY
                         )
                     } else {
-                        Spacer(modifier = Modifier.width(42.dp))
+                        Spacer(modifier = Modifier.width(48.dp))
                     }
 
                     Spacer(modifier = Modifier.weight(1f))

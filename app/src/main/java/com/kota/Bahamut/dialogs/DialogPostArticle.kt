@@ -13,8 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
@@ -159,34 +158,25 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                             fontSize = BahaTextSize.TITLE
                         )
                         BahaText(
-                            text = "▼",
-                            color = colors.textPrimary,
+                            text = "▾",
+                            color = colors.textSecondary,
                             modifier = Modifier.padding(end = 4.dp),
                             fontSize = BahaTextSize.TITLE
                         )
                     }
 
-                    DropdownMenu(
+                    BahaDropdownMenu(
                         expanded = isSignDropdownExpanded,
                         onDismissRequest = { isSignDropdownExpanded = false },
-                        modifier = Modifier.background(colors.pageBackground)
-                    ) {
-                        signList.forEachIndexed { index, name ->
-                            DropdownMenuItem(
-                                text = {
-                                    BahaText(
-                                        text = name,
-                                        color = if (selectedSignIndex == index) colors.checkboxTint else colors.textPrimary
-                                    )
-                                },
-                                onClick = {
-                                    selectedSignIndex = index
-                                    isSignDropdownExpanded = false
-                                }
-                            )
-                        }
-                    }
+                        items = signList,
+                        selectedIndex = selectedSignIndex,
+                        onItemSelected = { index ->
+                            selectedSignIndex = index
+                        },
+                        fontSize = BahaTextSize.TITLE
+                    )
                 }
+
             }
         }
     }

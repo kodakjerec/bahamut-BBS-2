@@ -202,7 +202,7 @@ class DialogSearchArticle : ASDialog() {
                         onValueChange = { if (it.length <= 2) gy = it },
                         placeholder = stringResource(R.string.GY_hint),
                         maxLength = 12,
-                        height = 40.dp,
+                        height = 48.dp,
                         modifier = Modifier.weight(1f)
                     )
                 }

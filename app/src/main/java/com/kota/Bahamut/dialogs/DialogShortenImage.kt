@@ -195,7 +195,7 @@ class DialogShortenImage : AppCompatActivity() {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(44.dp)
+                                .height(48.dp)
                         ) {
                             BahaButton(
                                 text = stringResource(R.string.dialog_shorten_img_album),
@@ -207,7 +207,7 @@ class DialogShortenImage : AppCompatActivity() {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight(),
-                                minHeight = 44.dp
+                                minHeight = 48.dp
                             )
                             Box(
                                 modifier = Modifier
@@ -229,7 +229,7 @@ class DialogShortenImage : AppCompatActivity() {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight(),
-                                minHeight = 44.dp
+                                minHeight = 48.dp
                             )
                             Box(
                                 modifier = Modifier
@@ -251,7 +251,7 @@ class DialogShortenImage : AppCompatActivity() {
                                 modifier = Modifier
                                     .weight(1f)
                                     .fillMaxHeight(),
-                                minHeight = 44.dp
+                                minHeight = 48.dp
                             )
                         }
 

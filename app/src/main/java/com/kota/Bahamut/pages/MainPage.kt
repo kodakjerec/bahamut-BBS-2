@@ -369,7 +369,7 @@ class MainPage : TelnetComposePage() {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 144.dp)
+                        .heightIn(max = 148.dp)
                         .background(colors.pageBackground)
                 ) {
                     items(heroStepItems) { heroStep ->

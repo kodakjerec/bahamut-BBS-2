@@ -72,7 +72,7 @@
 ### 2. 輸入框 (`BahaInputField`)
 - 檔案：`app/src/main/java/com/kota/Bahamut/ui/components/BahaInputField.kt`
 - 特色：基於 `BasicTextField` 實作的經典實心矩形輸入框（非 Material OutlinedTextField）：
-  - 高度固定為 `40.dp` ~ `42.dp`
+  - 高度固定為 `48.dp` 以上
   - 外觀：`2.dp` 輕微圓角或直角、實心淺灰底色 (`colors.inputBoxBackground`)、純黑文字 (`colors.inputBoxText`)
   - 支援密碼遮罩、最大字數限制與單行輸入。
 

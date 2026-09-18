@@ -3,24 +3,26 @@ package com.kota.Bahamut.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.RadioButton
-import androidx.compose.material3.RadioButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ReferenceAuthor
 import com.kota.Bahamut.service.CommonFunctions
@@ -216,44 +218,57 @@ class DialogReference : ASDialog() {
 
                 Spacer(modifier = Modifier.height(6.dp))
 
-                // 保留行數
-                BahaText(
-                    text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
-                    color = colors.textPrimary,
-                    fontSize = BahaTextSize.CAPTION
-                )
+                var dropdownExpanded by remember { mutableStateOf(false) }
+                val types = remember {
+                    listOf(
+                        CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_0),
+                        CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_1),
+                        CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_2)
+                    )
+                }
 
-                val types = listOf(
-                    0 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_0),
-                    1 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_1),
-                    2 to CommonFunctions.getContextString(R.string.dialog_reference_reserved_type_2)
-                )
-
+                // 保留行數 (下拉選單，單行呈現)
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { dropdownExpanded = true }
+                        .padding(vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    types.forEach { (index, label) ->
+                    BahaText(
+                        text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
+                        color = colors.textPrimary,
+                        fontSize = BahaTextSize.SUBTITLE
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Box {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.clickable { onReservedTypeChange(index) }
+                            horizontalArrangement = Arrangement.End
                         ) {
-                            RadioButton(
-                                selected = (reservedType == index),
-                                onClick = { onReservedTypeChange(index) },
-                                colors = RadioButtonDefaults.colors(
-                                    selectedColor = colors.checkboxTint,
-                                    unselectedColor = colors.checkboxUncheckedTint
-                                )
-                            )
                             BahaText(
-                                text = label,
+                                text = types.getOrElse(reservedType) { "" },
                                 color = colors.textPrimary,
-                                fontSize = BahaTextSize.CAPTION
+                                fontSize = BahaTextSize.SUBTITLE
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            BahaText(
+                                text = "▾",
+                                color = colors.textSecondary,
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                         }
+                        BahaDropdownMenu(
+                            expanded = dropdownExpanded,
+                            onDismissRequest = { dropdownExpanded = false },
+                            items = types,
+                            selectedIndex = reservedType,
+                            onItemSelected = onReservedTypeChange,
+                            fontSize = BahaTextSize.SUBTITLE
+                        )
                     }
                 }
+
             }
         }
     }
