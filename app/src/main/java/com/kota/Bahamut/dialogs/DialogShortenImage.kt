@@ -63,7 +63,7 @@ import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
-import com.kota.Bahamut.ui.dialogs.BahaProcessingDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaProcessingDialog
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.BahamutAppTheme
 import com.kota.asFramework.pageController.ASNavigationController
@@ -294,7 +294,7 @@ class DialogShortenImage : AppCompatActivity() {
                         .clickable { isUploading = false },
                     contentAlignment = Alignment.Center
                 ) {
-                    BahaProcessingDialogContent(message = stringResource(R.string.dialog_shorten_url_under_transfer))
+                    BahaProcessingDialog(message = stringResource(R.string.dialog_shorten_url_under_transfer))
                 }
             }
         }

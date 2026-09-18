@@ -36,7 +36,7 @@ enum class BahaTextSize {
 fun BahaText(
     text: String,
     modifier: Modifier = Modifier,
-    size: BahaTextSize = BahaTextSize.BASE,
+    fontSize: BahaTextSize = BahaTextSize.BASE,
     color: Color = AppTheme.colors.textPrimary,
     textAlign: TextAlign? = null,
     lineHeight: TextUnit = TextUnit.Unspecified,
@@ -45,7 +45,7 @@ fun BahaText(
     maxLines: Int = Int.MAX_VALUE
 ) {
     val fontSizes = AppTheme.fontSize
-    val resolvedFontSize = when (size) {
+    val resolvedFontSize = when (fontSize) {
         BahaTextSize.ULTRA_LARGE -> fontSizes.ultraLarge
         BahaTextSize.LARGE -> fontSizes.large
         BahaTextSize.BASE -> fontSizes.base

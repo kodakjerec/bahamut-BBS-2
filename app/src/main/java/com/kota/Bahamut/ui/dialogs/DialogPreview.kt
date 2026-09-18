@@ -3,10 +3,7 @@ package com.kota.Bahamut.ui.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -56,7 +53,7 @@ private fun DialogShowcase() {
             color = colors.textPrimary,
             fontSize = 14.sp
         )
-        BahaProcessingDialogContent(
+        BahaProcessingDialog(
             message = "連線至 bbs.gamer.com.tw..."
         )
 

@@ -281,7 +281,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = stringResource(R.string.mainbox_no_mail),
                             color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -322,6 +322,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 BahaButton(
                     text = stringResource(R.string.write_mail),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -331,6 +332,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 BahaButton(
                     text = stringResource(R.string.search),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -340,6 +342,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 BahaButton(
                     text = stringResource(R.string.first_page),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -353,6 +356,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                 BahaButton(
                     text = stringResource(R.string.last_page),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -400,7 +404,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                             onClick = onClick,
                             onLongClick = onLongClick
                         )
-                        .padding(horizontal = 10.dp, vertical = 5.dp)
+                        .padding(horizontal = 10.dp, vertical = 10.dp)
                 ) {
                     // 第一列：狀態圖示與信件標題
                     Row(
@@ -410,13 +414,13 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = statusText,
                             color = colors.bbsMailStatus,
-                            size = BahaTextSize.TITLE,
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier.padding(end = 6.dp)
                         )
                         BahaText(
                             text = item?.title ?: stringResource(R.string.loading_),
                             color = textColor,
-                            size = BahaTextSize.TITLE,
+                            fontSize = BahaTextSize.TITLE,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -433,7 +437,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = String.format("%05d", itemIndex),
                             color = colors.bbsMailNumber,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
 
                         // 標記 M
@@ -442,7 +446,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                             BahaText(
                                 text = "M",
                                 color = colors.bbsMailMark,
-                                size = BahaTextSize.BODY
+                                fontSize = BahaTextSize.BODY
                             )
                         } else {
                             Spacer(modifier = Modifier.width(42.dp))
@@ -454,7 +458,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                             BahaText(
                                 text = "R",
                                 color = colors.bbsMailReply,
-                                size = BahaTextSize.BODY
+                                fontSize = BahaTextSize.BODY
                             )
                         } else {
                             Spacer(modifier = Modifier.width(42.dp))
@@ -465,7 +469,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = item?.date ?: "",
                             color = colors.bbsMailDate,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -474,7 +478,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = item?.author ?: "",
                             color = colors.bbsMailAuthor,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

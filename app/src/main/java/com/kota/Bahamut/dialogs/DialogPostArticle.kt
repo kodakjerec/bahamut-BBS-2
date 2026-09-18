@@ -92,7 +92,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                     text = stringResource(R.string.is_post_article),
                     color = colors.textPrimary,
                     modifier = Modifier.padding(bottom = 6.dp),
-                    size = BahaTextSize.TITLE
+                    fontSize = BahaTextSize.TITLE
                 )
 
                 if (myTarget != TelnetArticle.NEW) {
@@ -130,7 +130,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                                 text = label,
                                 color = colors.textPrimary,
                                 modifier = Modifier.align(Alignment.Center),
-                                size = BahaTextSize.TITLE
+                                fontSize = BahaTextSize.TITLE
                             )
                         }
                     }
@@ -156,13 +156,13 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                         BahaText(
                             text = signList.getOrElse(selectedSignIndex) { "" },
                             color = colors.textPrimary,
-                            size = BahaTextSize.TITLE
+                            fontSize = BahaTextSize.TITLE
                         )
                         BahaText(
                             text = "▼",
                             color = colors.textPrimary,
                             modifier = Modifier.padding(end = 4.dp),
-                            size = BahaTextSize.TITLE
+                            fontSize = BahaTextSize.TITLE
                         )
                     }
 

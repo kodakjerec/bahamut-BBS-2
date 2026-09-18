@@ -618,7 +618,7 @@ class PostArticlePage : TelnetPage() {
                         BahaText(
                             text = headers.getOrNull(headerSelectedState) ?: headers[0],
                             color = colors.titleBarTitle,
-                            size = BahaTextSize.SUBTITLE,
+                            fontSize = BahaTextSize.SUBTITLE,
                             modifier = Modifier
                                 .clickable { headerDropdownExpanded = true }
                                 .padding(end = 8.dp, top = 8.dp, bottom = 8.dp)
@@ -673,7 +673,7 @@ class PostArticlePage : TelnetPage() {
                             BahaText(
                                 text = stringResource(R.string.input_content_here),
                                 color = colors.textSecondary,
-                                size = BahaTextSize.BASE
+                                fontSize = BahaTextSize.BASE
                             )
                         }
                         innerTextField()

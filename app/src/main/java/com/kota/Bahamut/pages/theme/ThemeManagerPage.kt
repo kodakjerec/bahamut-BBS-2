@@ -203,7 +203,7 @@ fun ThemeManagerScreen(
                 BahaText(
                     text = stringResource(R.string.theme_manager_page_guide),
                     color = colors.textPrimary,
-                    size = BahaTextSize.CAPTION,
+                    fontSize = BahaTextSize.CAPTION,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp
                 )

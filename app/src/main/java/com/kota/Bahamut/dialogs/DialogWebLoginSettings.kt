@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +26,8 @@ import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -81,18 +82,18 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
             )
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.login_web_settings_tip),
                     color = colors.textPrimary,
-                    fontSize = 14.sp,
+                    fontSize = BahaTextSize.BODY,
                     lineHeight = 20.sp,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
 
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.account),
                     color = colors.textPrimary,
-                    fontSize = 18.sp,
+                    fontSize = BahaTextSize.SUBTITLE,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(
@@ -107,10 +108,10 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
 
                 Spacer(modifier = Modifier.height(10.dp))
 
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.password),
                     color = colors.textPrimary,
-                    fontSize = 18.sp,
+                    fontSize = BahaTextSize.SUBTITLE,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(
@@ -139,10 +140,10 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                         onCheckedChange = { showDebugView = it }
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
+                    BahaText(
                         text = CommonFunctions.getContextString(R.string.login_web_debug_view_toggle),
                         color = colors.textPrimary,
-                        fontSize = 16.sp
+                        fontSize = BahaTextSize.CAPTION
                     )
                 }
             }

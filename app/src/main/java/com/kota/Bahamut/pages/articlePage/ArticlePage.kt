@@ -698,7 +698,7 @@ class ArticlePage : TelnetPage() {
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -815,7 +815,7 @@ fun ArticleTopBar(
                 BahaText(
                     text = title,
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.TITLE,
+                    fontSize = BahaTextSize.TITLE,
                     maxLines = if (isExpanded) 3 else 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { isExpanded = !isExpanded }
@@ -832,7 +832,7 @@ fun ArticleTopBar(
                     BahaText(
                         text = author,
                         color = colors.titleBarDetail,
-                        size = BahaTextSize.BODY,
+                        fontSize = BahaTextSize.BODY,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -845,7 +845,7 @@ fun ArticleTopBar(
                         BahaText(
                             text = boardName,
                             color = colors.titleBarDetail2,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -994,7 +994,7 @@ fun ArticleTextModeContent(
                         BahaText(
                             text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
                             color = colors.dialogBorder,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 }
@@ -1067,7 +1067,7 @@ fun ArticlePostTimeBar(
         BahaText(
             text = ip,
             color = colors.titleBarDetail,
-            size = BahaTextSize.BODY,
+            fontSize = BahaTextSize.BODY,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false)
@@ -1077,7 +1077,7 @@ fun ArticlePostTimeBar(
             BahaText(
                 text = "《$time》",
                 color = colors.titleBarDetail,
-                size = BahaTextSize.BODY,
+                fontSize = BahaTextSize.BODY,
                 maxLines = 1
             )
         }
@@ -1109,7 +1109,7 @@ fun ArticleContentBlockItem(
             BahaText(
                 text = "${item.author}$nick 說:",
                 color = authorColor,
-                size = BahaTextSize.TITLE,
+                fontSize = BahaTextSize.TITLE,
                 modifier = Modifier
                     .clickable { onAuthorClick(item.author ?: "") }
                     .padding(bottom = if (isQuote) 2.dp else 10.dp)
@@ -1174,7 +1174,7 @@ fun ArticlePushRowItem(
             BahaText(
                 text = push.author,
                 color = colors.textSecondary,
-                size = BahaTextSize.BODY,
+                fontSize = BahaTextSize.BODY,
                 modifier = Modifier.clickable { onAuthorClick(push.author) }
             )
 
@@ -1184,7 +1184,7 @@ fun ArticlePushRowItem(
             BahaText(
                 text = " [ $floor 樓]",
                 color = colors.textSecondary,
-                size = BahaTextSize.BODY
+                fontSize = BahaTextSize.BODY
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -1194,7 +1194,7 @@ fun ArticlePushRowItem(
                 BahaText(
                     text = "${push.date} ${push.time}".trim(),
                     color = colors.textSecondary,
-                    size = BahaTextSize.BODY
+                    fontSize = BahaTextSize.BODY
                 )
             }
         }
@@ -1534,7 +1534,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        size = BahaTextSize.TITLE
+                        fontSize = BahaTextSize.TITLE
                     )
                 }
                 Box(
@@ -1616,7 +1616,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        size = BahaTextSize.TITLE
+                        fontSize = BahaTextSize.TITLE
                     )
                 }
             }

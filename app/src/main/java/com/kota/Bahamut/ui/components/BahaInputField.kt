@@ -78,7 +78,7 @@ fun BahaInputField(
                     BahaText(
                         text = placeholder,
                         color = colors.textSecondary,
-                        size = BahaTextSize.BASE
+                        fontSize = BahaTextSize.BASE
                     )
                 }
                 innerTextField()
@@ -140,7 +140,7 @@ fun BahaInputField(
                     BahaText(
                         text = placeholder,
                         color = colors.textSecondary,
-                        size = BahaTextSize.SUBTITLE
+                        fontSize = BahaTextSize.SUBTITLE
                     )
                 }
                 innerTextField()

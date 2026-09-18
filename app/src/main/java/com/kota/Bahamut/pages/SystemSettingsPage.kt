@@ -370,7 +370,7 @@ class SystemSettingsPage : TelnetPage() {
                                 BahaText(
                                     text = "${toolbarIdleState}s",
                                     color = colors.textSecondary,
-                                    size = BahaTextSize.BODY
+                                    fontSize = BahaTextSize.BODY
                                 )
                             }
                             Slider(
@@ -402,7 +402,7 @@ class SystemSettingsPage : TelnetPage() {
                                 BahaText(
                                     text = "${toolbarAlphaState.toInt()}%",
                                     color = colors.textSecondary,
-                                    size = BahaTextSize.BODY
+                                    fontSize = BahaTextSize.BODY
                                 )
                             }
                             Slider(
@@ -529,7 +529,7 @@ class SystemSettingsPage : TelnetPage() {
                         BahaText(
                             text = cloudSaveLastTimeString,
                             color = colors.textSecondary,
-                            size = BahaTextSize.CAPTION,
+                            fontSize = BahaTextSize.CAPTION,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 14.dp, vertical = 4.dp)

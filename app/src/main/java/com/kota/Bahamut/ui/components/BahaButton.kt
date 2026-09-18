@@ -90,7 +90,7 @@ fun BahaButton(
         BahaText(
             text = text,
             color = textColor,
-            size = fontSize,
+            fontSize = fontSize,
             textAlign = TextAlign.Center
         )
     }

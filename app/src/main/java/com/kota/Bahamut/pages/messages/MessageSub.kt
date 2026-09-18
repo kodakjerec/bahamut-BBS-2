@@ -269,14 +269,14 @@ class MessageSub : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.BODY,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 BahaText(
                     text = senderNameState,
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.SUBTITLE
+                    fontSize = BahaTextSize.SUBTITLE
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)

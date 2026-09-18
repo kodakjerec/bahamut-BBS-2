@@ -185,7 +185,7 @@ class BillingPage : TelnetPage() {
 
                 BahaText(
                     text = stringResource(R.string.billing_page_note),
-                    size = BahaTextSize.CAPTION,
+                    fontSize = BahaTextSize.CAPTION,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -195,7 +195,7 @@ class BillingPage : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string.billing_page_note2),
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.BODY,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -237,13 +237,13 @@ class BillingPage : TelnetPage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.billing_page_already_billing_text),
-                        size = BahaTextSize.CAPTION,
+                        fontSize = BahaTextSize.CAPTION,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
                     BahaText(
                         text = alreadyBillingValueState,
-                        size = BahaTextSize.CAPTION,
+                        fontSize = BahaTextSize.CAPTION,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )

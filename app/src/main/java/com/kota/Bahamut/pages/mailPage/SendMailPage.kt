@@ -256,7 +256,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     ) {
                         BahaText(
                             text = stringResource(R.string.title_),
-                            size = BahaTextSize.SUBTITLE,
+                            fontSize = BahaTextSize.SUBTITLE,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         BahaInputField(
@@ -277,7 +277,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     ) {
                         BahaText(
                             text = stringResource(R.string.receiver_),
-                            size = BahaTextSize.SUBTITLE,
+                            fontSize = BahaTextSize.SUBTITLE,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         BahaInputField(
@@ -313,7 +313,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                             BahaText(
                                 text = stringResource(R.string.input_content_here),
                                 color = colors.textSecondary,
-                                size = BahaTextSize.BASE
+                                fontSize = BahaTextSize.BASE
                             )
                         }
                         innerTextField()

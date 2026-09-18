@@ -125,7 +125,7 @@ class DialogShortenUrl : ASDialog() {
                 ) {
                     BahaText(
                         text = if (isTransferMode) CommonFunctions.getContextString(R.string.record) else CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
-                        size = BahaTextSize.TITLE,
+                        fontSize = BahaTextSize.TITLE,
                         color = colors.dialogButtonText
                     )
                 }

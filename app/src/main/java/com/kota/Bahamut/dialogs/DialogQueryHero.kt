@@ -121,7 +121,7 @@ class DialogQueryHero : ASDialog() {
                 BahaText(
                     text = heroId,
                     color = colors.textPrimary,
-                    size = BahaTextSize.SUBTITLE,
+                    fontSize = BahaTextSize.SUBTITLE,
                     textAlign = TextAlign.Center
                 )
 
@@ -131,7 +131,7 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = heroNick,
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY,
+                        fontSize = BahaTextSize.BODY,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -147,23 +147,23 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = "HP: ",
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                     BahaText(
                         text = heroHp,
                         color = colors.buttonDangerBackground,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     BahaText(
                         text = "MP: ",
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                     BahaText(
                         text = heroMp,
                         color = colors.textLink,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                 }
 
@@ -179,12 +179,12 @@ class DialogQueryHero : ASDialog() {
                         BahaText(
                             text = heroAuth1,
                             color = colors.textPrimary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                         BahaText(
                             text = heroAuth2,
                             color = colors.textPrimary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
@@ -198,19 +198,19 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_query_hero_last_time),
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY,
+                        fontSize = BahaTextSize.BODY,
                         modifier = Modifier.width(48.dp)
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         BahaText(
                             text = heroLastDate,
                             color = colors.textPrimary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                         BahaText(
                             text = heroLastTime,
                             color = colors.textPrimary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 }
@@ -225,13 +225,13 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_query_hero_from),
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY,
+                        fontSize = BahaTextSize.BODY,
                         modifier = Modifier.width(48.dp)
                     )
                     BahaText(
                         text = heroFromIp,
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                 }
 

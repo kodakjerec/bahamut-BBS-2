@@ -3,8 +3,6 @@ package com.kota.Bahamut.pages.messages
 import android.content.Context
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -27,7 +25,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -308,7 +305,7 @@ class MessageMain : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.BODY,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -323,7 +320,7 @@ class MessageMain : TelnetPage() {
                     BahaText(
                         text = stringResource(R.string.message_small_show_float),
                         color = colors.textSecondary,
-                        size = BahaTextSize.TINY,
+                        fontSize = BahaTextSize.TINY,
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     BahaCheckbox(
@@ -357,7 +354,7 @@ class MessageMain : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string.message_main_search_clear),
                     color = colors.titleBarDetail,
-                    size = BahaTextSize.CAPTION,
+                    fontSize = BahaTextSize.CAPTION,
                     modifier = Modifier
                         .clickable {
                             searchWordState = ""

@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import com.kota.Bahamut.ui.dialogs.BahaProcessingDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaProcessingDialog
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 
@@ -14,7 +14,7 @@ class ASProcessingDialog : ASDialog() {
 
     init {
         setComposeContent {
-            BahaProcessingDialogContent(message = messageText)
+            BahaProcessingDialog(message = messageText)
         }
     }
 

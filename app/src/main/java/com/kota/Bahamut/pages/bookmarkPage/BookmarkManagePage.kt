@@ -216,28 +216,25 @@ open class BookmarkManagePage(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(colors.pageBackground)
         ) {
-            // Header row showing board name
+            // 1. 頂部標題列
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(colors.toolbarBackground)
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .background(colors.titleBarBackground)
+                    .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
             ) {
                 BahaText(
                     text = if (currentMode == 0) "我的書籤" else "瀏覽紀錄",
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.BODY,
-                    modifier = Modifier.padding(bottom = 2.dp)
+                    fontSize = BahaTextSize.TITLE
                 )
                 BahaText(
                     text = boardName,
                     color = colors.titleBarDetail,
-                    size = BahaTextSize.CAPTION
+                    fontSize = BahaTextSize.BODY
                 )
             }
-            HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
             // Content list
             Box(
@@ -252,8 +249,7 @@ open class BookmarkManagePage(
                     ) {
                         BahaText(
                             text = if (currentMode == 0) "沒有書籤" else "沒有瀏覽紀錄",
-                            color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            color = colors.textSecondary
                         )
                     }
                 } else {
@@ -374,7 +370,7 @@ open class BookmarkManagePage(
                 BahaText(
                     text = bookmark.keyword.ifEmpty { stringResource(R.string.un_input) },
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.TITLE,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -386,12 +382,12 @@ open class BookmarkManagePage(
                     BahaText(
                         text = stringResource(R.string.author_),
                         color = colors.textSecondary,
-                        size = BahaTextSize.TINY
+                        fontSize = BahaTextSize.TINY
                     )
                     BahaText(
                         text = bookmark.author.ifEmpty { stringResource(R.string.un_input) },
                         color = colors.bbsMailAuthor,
-                        size = BahaTextSize.TINY,
+                        fontSize = BahaTextSize.TINY,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -401,19 +397,19 @@ open class BookmarkManagePage(
                         BahaText(
                             text = stringResource(R.string.word_m),
                             color = colors.bbsMailMark,
-                            size = BahaTextSize.TINY
+                            fontSize = BahaTextSize.TINY
                         )
                     }
                     Spacer(modifier = Modifier.width(10.dp))
                     BahaText(
                         text = stringResource(R.string.gy_),
                         color = colors.textSecondary,
-                        size = BahaTextSize.TINY
+                        fontSize = BahaTextSize.TINY
                     )
                     BahaText(
                         text = if (bookmark.gy.isEmpty()) stringResource(R.string.number_0) else bookmark.gy,
                         color = colors.bbsBoardGy,
-                        size = BahaTextSize.TINY
+                        fontSize = BahaTextSize.TINY
                     )
                 }
             }
@@ -449,6 +445,7 @@ open class BookmarkManagePage(
                 BahaButton(
                     text = stringResource(R.string.edit_short),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.BODY,
                     modifier = Modifier.height(34.dp),
                     onClick = onEdit
                 )
@@ -462,6 +459,7 @@ open class BookmarkManagePage(
                 BahaButton(
                     text = stringResource(R.string.delete_short),
                     type = ButtonType.DANGER,
+                    fontSize = BahaTextSize.BODY,
                     modifier = Modifier.height(34.dp),
                     onClick = onDelete
                 )
@@ -485,15 +483,9 @@ open class BookmarkManagePage(
             verticalAlignment = Alignment.CenterVertically
         ) {
             BahaText(
-                text = stringResource(R.string.title_),
-                color = colors.textSecondary,
-                size = BahaTextSize.BODY,
-                modifier = Modifier.padding(end = 4.dp)
-            )
-            BahaText(
                 text = bookmark.keyword.ifEmpty { stringResource(R.string.un_input) },
                 color = colors.textPrimary,
-                size = BahaTextSize.BODY,
+                fontSize = BahaTextSize.TITLE,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f)

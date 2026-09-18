@@ -332,13 +332,13 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 BahaText(
                     text = currentDisplayTitle.ifEmpty { stringResource(R.string.loading) },
                     color = colors.titleBarTitle,
-                    size = BahaTextSize.TITLE
+                    fontSize = BahaTextSize.TITLE
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 BahaText(
                     text = "看板列表",
                     color = colors.titleBarDetail,
-                    size = BahaTextSize.BODY
+                    fontSize = BahaTextSize.BODY
                 )
             }
             Box(
@@ -365,7 +365,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -418,7 +418,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         BahaText(
                             text = "$lastVisitBoardText▶▶",
                             color = colors.textPrimary,
-                            size = BahaTextSize.TITLE
+                            fontSize = BahaTextSize.TITLE
                         )
                     }
                 }
@@ -525,7 +525,7 @@ private fun ClassPageRowItem(
                 BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
                     color = colors.textPrimary,
-                    size = BahaTextSize.SUBTITLE,
+                    fontSize = BahaTextSize.SUBTITLE,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -541,7 +541,7 @@ private fun ClassPageRowItem(
                     BahaText(
                         text = item?.name ?: stringResource(R.string.loading),
                         color = colors.classItemName,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
 
                     val manager = item?.manager
@@ -549,7 +549,7 @@ private fun ClassPageRowItem(
                         BahaText(
                             text = manager,
                             color = colors.classItemManager,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

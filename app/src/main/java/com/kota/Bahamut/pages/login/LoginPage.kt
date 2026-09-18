@@ -538,14 +538,14 @@ class LoginPage : TelnetComposePage() {
                             Spacer(modifier = Modifier.width(4.dp))
                             BahaText(
                                 text = stringResource(R.string.login_web_sign_in),
-                                size = BahaTextSize.BODY
+                                fontSize = BahaTextSize.BODY
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         BahaText(
                             text = stringResource(R.string.login_web_settings_btn),
                             color = colors.textLink,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .clickable {
@@ -563,7 +563,7 @@ class LoginPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.account),
-                        size = BahaTextSize.SUBTITLE,
+                        fontSize = BahaTextSize.SUBTITLE,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
@@ -583,7 +583,7 @@ class LoginPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.password),
-                        size = BahaTextSize.SUBTITLE,
+                        fontSize = BahaTextSize.SUBTITLE,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(

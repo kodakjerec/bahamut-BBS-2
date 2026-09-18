@@ -402,13 +402,13 @@ class MainPage : TelnetComposePage() {
                     ) {
                         BahaText(
                             text = stringResource(R.string.main_online_people),
-                            size = BahaTextSize.CAPTION,
+                            fontSize = BahaTextSize.CAPTION,
                             color = colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         BahaText(
                             text = onlinePeopleText.ifEmpty { "0" },
-                            size = BahaTextSize.TITLE,
+                            fontSize = BahaTextSize.TITLE,
                             color = colors.statusNotice
                         )
                     }
@@ -428,7 +428,7 @@ class MainPage : TelnetComposePage() {
                         ) {
                             BahaText(
                                 text = stringResource(R.string.main_bb_call),
-                                size = BahaTextSize.CAPTION,
+                                fontSize = BahaTextSize.CAPTION,
                                 color = colors.textSecondary
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -441,7 +441,7 @@ class MainPage : TelnetComposePage() {
                         Spacer(modifier = Modifier.height(2.dp))
                         BahaText(
                             text = bbCallText.ifEmpty { "0" },
-                            size = BahaTextSize.TITLE,
+                            fontSize = BahaTextSize.TITLE,
                             color = colors.statusNotice
                         )
                     }
@@ -456,7 +456,7 @@ class MainPage : TelnetComposePage() {
                     ) {
                         BahaText(
                             text = stringResource(R.string.main_hero_step),
-                            size = BahaTextSize.LARGE,
+                            fontSize = BahaTextSize.LARGE,
                             color = colors.buttonText
                         )
                     }
@@ -554,7 +554,7 @@ private fun MainFolderItem(
     ) {
         BahaText(
             text = title,
-            size = BahaTextSize.LARGE,
+            fontSize = BahaTextSize.LARGE,
             color = colors.buttonText,
             textAlign = TextAlign.Center
         )
@@ -593,7 +593,7 @@ private fun HeroStepRow(
                 BahaText(
                     text = heroStep.authorNickname ?: stringResource(R.string.loading_),
                     color = colors.textPrimary,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.BODY,
                     maxLines = 1
                 )
             }
@@ -608,7 +608,7 @@ private fun HeroStepRow(
                 BahaText(
                     text = heroStep.datetime ?: "",
                     color = colors.titleBarBackground,
-                    size = BahaTextSize.BODY,
+                    fontSize = BahaTextSize.BODY,
                     textAlign = TextAlign.End,
                     maxLines = 1
                 )
@@ -618,7 +618,7 @@ private fun HeroStepRow(
         BahaText(
             text = heroStep.content ?: stringResource(R.string.loading),
             color = colors.textPrimary,
-            size = BahaTextSize.BODY,
+            fontSize = BahaTextSize.BODY,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 4.dp)

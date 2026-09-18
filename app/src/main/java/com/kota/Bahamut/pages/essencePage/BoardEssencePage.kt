@@ -277,7 +277,7 @@ class BoardEssencePage : TelnetListPage() {
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 } else {
@@ -378,13 +378,13 @@ class BoardEssencePage : TelnetListPage() {
                         BahaText(
                             text = statusText,
                             color = if (isDir) colors.titleBarTitle else colors.bbsMailStatus,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             modifier = Modifier.padding(end = 6.dp)
                         )
                         BahaText(
                             text = item?.title ?: stringResource(R.string.loading_),
                             color = titleColor,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f)
@@ -402,7 +402,7 @@ class BoardEssencePage : TelnetListPage() {
                         BahaText(
                             text = String.format("%05d", itemIndex),
                             color = colors.bbsMailNumber,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
 
                         // 日期
@@ -410,7 +410,7 @@ class BoardEssencePage : TelnetListPage() {
                         BahaText(
                             text = item?.date ?: "",
                             color = colors.bbsMailDate,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
 
                         Spacer(modifier = Modifier.weight(1f))
@@ -419,7 +419,7 @@ class BoardEssencePage : TelnetListPage() {
                         BahaText(
                             text = item?.author ?: "",
                             color = colors.bbsMailAuthor,
-                            size = BahaTextSize.BODY,
+                            fontSize = BahaTextSize.BODY,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -445,7 +445,7 @@ class BoardEssencePage : TelnetListPage() {
                     BahaText(
                         text = ">",
                         color = colors.textPrimary,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                 }
             }

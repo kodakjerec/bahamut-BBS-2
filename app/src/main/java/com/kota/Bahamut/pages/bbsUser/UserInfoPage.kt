@@ -187,7 +187,7 @@ class UserInfoPage : TelnetPage() {
                 BahaText(
                     text = othersState,
                     color = colors.textSecondary,
-                    size = BahaTextSize.SUBTITLE,
+                    fontSize = BahaTextSize.SUBTITLE,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)

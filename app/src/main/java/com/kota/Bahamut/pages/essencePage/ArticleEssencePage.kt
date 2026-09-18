@@ -7,13 +7,10 @@ import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -28,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
@@ -293,28 +289,28 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                             modifier = Modifier.background(colors.surface)
                         ) {
                             DropdownMenuItem(
-                                text = { BahaText(stringResource(R.string.change_mode), color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
+                                text = { BahaText(stringResource(R.string.change_mode), color = colors.textPrimary, fontSize = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     toggleViewMode()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { BahaText(stringResource(R.string.open_url), color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
+                                text = { BahaText(stringResource(R.string.open_url), color = colors.textPrimary, fontSize = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onOpenUrlClicked()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { BahaText("寄信給原作者", color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
+                                text = { BahaText("寄信給原作者", color = colors.textPrimary, fontSize = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onSendMailClicked()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { BahaText("加入黑名單", color = colors.textPrimary, size = BahaTextSize.SUBTITLE) },
+                                text = { BahaText("加入黑名單", color = colors.textPrimary, fontSize = BahaTextSize.SUBTITLE) },
                                 onClick = {
                                     menuExpanded = false
                                     onAddBlockListClicked()
@@ -339,7 +335,7 @@ class ArticleEssencePage : TelnetPage(), SendMailPageListener {
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            fontSize = BahaTextSize.BODY
                         )
                     }
                 } else {

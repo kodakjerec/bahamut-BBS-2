@@ -65,7 +65,7 @@ class DialogInsertExpression : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.setting),
                         color = colors.buttonText,
-                        size = BahaTextSize.BODY
+                        fontSize = BahaTextSize.BODY
                     )
                 }
             },

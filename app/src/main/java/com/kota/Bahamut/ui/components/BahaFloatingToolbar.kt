@@ -240,7 +240,7 @@ fun BahaFloatingToolbar(
                     BahaText(
                         text = item.text,
                         color = colors.buttonText,
-                        size = BahaTextSize.TITLE,
+                        fontSize = BahaTextSize.TITLE,
                         maxLines = 1
                     )
                 }

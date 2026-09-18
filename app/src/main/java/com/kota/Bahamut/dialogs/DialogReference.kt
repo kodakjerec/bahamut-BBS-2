@@ -1,10 +1,8 @@
 package com.kota.Bahamut.dialogs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +14,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -33,6 +30,8 @@ import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaCheckboxLeft
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -207,10 +206,10 @@ class DialogReference : ASDialog() {
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
+                    BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
                         color = colors.textPrimary,
-                        fontSize = 18.sp
+                        fontSize = BahaTextSize.CAPTION
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     BahaCheckbox(
@@ -222,11 +221,10 @@ class DialogReference : ASDialog() {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 // 保留行數
-                Text(
+                BahaText(
                     text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
                     color = colors.textPrimary,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    fontSize = BahaTextSize.CAPTION
                 )
 
                 val types = listOf(
@@ -252,11 +250,10 @@ class DialogReference : ASDialog() {
                                     unselectedColor = colors.checkboxUncheckedTint
                                 )
                             )
-                            Text(
+                            BahaText(
                                 text = label,
                                 color = colors.textPrimary,
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(start = 2.dp)
+                                fontSize = BahaTextSize.CAPTION
                             )
                         }
                     }
