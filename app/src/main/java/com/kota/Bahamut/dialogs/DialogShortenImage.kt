@@ -6,11 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.VideoView
 import androidx.activity.compose.setContent
@@ -21,6 +23,7 @@ import androidx.activity.result.contract.ActivityResultContracts.StartActivityFo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +59,7 @@ import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -90,7 +95,9 @@ class DialogShortenImage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemeStore.getDialogThemeResId())
         super.onCreate(savedInstanceState)
-        window.setBackgroundDrawable(null)
+        window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        window.decorView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
+        window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
         setContent {
             BahamutAppTheme {
@@ -104,162 +111,177 @@ class DialogShortenImage : AppCompatActivity() {
         val colors = AppTheme.colors
 
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { finish() },
             contentAlignment = Alignment.Center
         ) {
-            BahaAlertDialogContent(
-                modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
-                title = stringResource(R.string.dialog_shorten_img_title),
-                contentPadding = PaddingValues(0.dp),
-                buttons = listOf(
-                    BahaDialogButton(
-                        text = stringResource(R.string.cancel),
-                        onClick = { finish() }
-                    ),
-                    BahaDialogButton(
-                        text = stringResource(R.string.send),
-                        enabled = outputParam.isNotEmpty(),
-                        onClick = {
-                            if (outputParam.isNotEmpty()) {
-                                postUrl(outputParam)
-                            }
-                            finish()
-                        }
-                    )
-                )
+            Box(
+                modifier = Modifier.clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { /* 點擊對話框本體不關閉 */ }
             ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
+                BahaAlertDialogContent(
+                    modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
+                    title = stringResource(R.string.dialog_shorten_img_title),
+                    contentPadding = PaddingValues(0.dp),
+                    buttons = listOf(
+                        BahaDialogButton(
+                            text = stringResource(R.string.cancel),
+                            onClick = { finish() }
+                        ),
+                        BahaDialogButton(
+                            text = stringResource(R.string.send),
+                            enabled = outputParam.isNotEmpty(),
+                            onClick = {
+                                if (outputParam.isNotEmpty()) {
+                                    postUrl(outputParam)
+                                }
+                                finish()
+                            }
+                        )
+                    )
                 ) {
-                    // 預覽區 (圖片 / 影片 / 空黑底)
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(230.dp)
-                            .background(colors.pageBackground),
-                        contentAlignment = Alignment.Center
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        if (selectedImageUri != null) {
-                            AndroidView(
-                                modifier = Modifier.fillMaxSize(),
-                                factory = { ctx ->
-                                    ImageView(ctx).apply {
-                                        scaleType = ImageView.ScaleType.FIT_CENTER
-                                        Glide.with(ctx).load(selectedImageUri).into(this)
+                        // 預覽區 (圖片 / 影片 / 空黑底)
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(230.dp)
+                                .background(colors.pageBackground),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            if (selectedImageUri != null) {
+                                AndroidView(
+                                    modifier = Modifier.fillMaxSize(),
+                                    factory = { ctx ->
+                                        ImageView(ctx).apply {
+                                            scaleType = ImageView.ScaleType.FIT_CENTER
+                                            Glide.with(ctx).load(selectedImageUri).into(this)
+                                        }
+                                    },
+                                    update = { imageView ->
+                                        Glide.with(imageView.context).load(selectedImageUri).into(imageView)
+                                    }
+                                )
+                            } else if (selectedVideoUri != null) {
+                                AndroidView(
+                                    modifier = Modifier.fillMaxSize(),
+                                    factory = { ctx ->
+                                        VideoView(ctx).apply {
+                                            setVideoURI(selectedVideoUri)
+                                            start()
+                                        }
+                                    }
+                                )
+                            }
+                        }
+
+                        // 分隔線
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(colors.divider)
+                        )
+
+                        // 選擇來源按鈕列 (相簿 | 相機 | 錄影)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp)
+                        ) {
+                            BahaButton(
+                                text = stringResource(R.string.dialog_shorten_img_album),
+                                type = ButtonType.NORMAL,
+                                fontSize = BahaTextSize.TITLE,
+                                onClick = {
+                                    pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                minHeight = 44.dp
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .fillMaxHeight()
+                                    .background(colors.toolbarDivider)
+                            )
+                            BahaButton(
+                                text = stringResource(R.string.dialog_shorten_img_camera),
+                                type = ButtonType.NORMAL,
+                                fontSize = BahaTextSize.TITLE,
+                                onClick = {
+                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                        openCameraIntent()
+                                    } else {
+                                        permissionLauncher.launch(CAMERA)
                                     }
                                 },
-                                update = { imageView ->
-                                    Glide.with(imageView.context).load(selectedImageUri).into(imageView)
-                                }
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                minHeight = 44.dp
                             )
-                        } else if (selectedVideoUri != null) {
-                            AndroidView(
-                                modifier = Modifier.fillMaxSize(),
-                                factory = { ctx ->
-                                    VideoView(ctx).apply {
-                                        setVideoURI(selectedVideoUri)
-                                        start()
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .fillMaxHeight()
+                                    .background(colors.toolbarDivider)
+                            )
+                            BahaButton(
+                                text = stringResource(R.string.dialog_shorten_img_video),
+                                type = ButtonType.NORMAL,
+                                fontSize = BahaTextSize.TITLE,
+                                onClick = {
+                                    if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                                        openVideoIntent()
+                                    } else {
+                                        permissionVideoLauncher.launch(CAMERA)
                                     }
-                                }
+                                },
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                                minHeight = 44.dp
                             )
                         }
-                    }
 
-                    // 分隔線
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(colors.divider)
-                    )
-
-                    // 選擇來源按鈕列 (相簿 | 拍照 | 錄影)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp)
-                    ) {
-                        BahaButton(
-                            text = stringResource(R.string.dialog_shorten_img_album),
-                            type = ButtonType.NORMAL,
-                            onClick = {
-                                pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight(),
-                            minHeight = 44.dp
-                        )
+                        // 分隔線
                         Box(
                             modifier = Modifier
-                                .width(1.dp)
-                                .fillMaxHeight()
-                                .background(colors.toolbarDivider)
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(colors.divider)
                         )
-                        BahaButton(
-                            text = stringResource(R.string.dialog_shorten_img_camera),
-                            type = ButtonType.NORMAL,
-                            onClick = {
-                                if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                    openCameraIntent()
-                                } else {
-                                    permissionLauncher.launch(CAMERA)
-                                }
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight(),
-                            minHeight = 44.dp
-                        )
+
+                        // 縮址預覽 / 範例文字列
                         Box(
                             modifier = Modifier
-                                .width(1.dp)
-                                .fillMaxHeight()
-                                .background(colors.toolbarDivider)
-                        )
-                        BahaButton(
-                            text = stringResource(R.string.dialog_shorten_img_video),
-                            type = ButtonType.NORMAL,
-                            onClick = {
-                                if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                                    openVideoIntent()
-                                } else {
-                                    permissionVideoLauncher.launch(CAMERA)
-                                }
-                            },
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxHeight(),
-                            minHeight = 44.dp
-                        )
-                    }
-
-                    // 分隔線
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(1.dp)
-                            .background(colors.divider)
-                    )
-
-                    // 縮址預覽 / 範例文字列
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(38.dp)
-                            .background(colors.pageBackground)
-                            .padding(horizontal = 8.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = outputParam.ifEmpty {
-                                stringResource(R.string.dialog_paint_color_sample_ch)
-                            },
-                            color = if (outputParam.isNotEmpty()) colors.bbsAuthor0 else colors.textPrimary,
-                            fontSize = 15.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                                .fillMaxWidth()
+                                .height(38.dp)
+                                .background(colors.pageBackground)
+                                .padding(horizontal = 8.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = outputParam.ifEmpty {
+                                    stringResource(R.string.dialog_paint_color_sample_ch)
+                                },
+                                color = if (outputParam.isNotEmpty()) colors.bbsAuthor0 else colors.textPrimary,
+                                fontSize = 15.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
                     }
                 }
             }
@@ -354,7 +376,7 @@ class DialogShortenImage : AppCompatActivity() {
                 currentPhotoPath = absolutePath
             }
             photoFile?.also {
-                val uri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
+                val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", it)
                 selectedImageUri = uri
                 selectedVideoUri = null
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)

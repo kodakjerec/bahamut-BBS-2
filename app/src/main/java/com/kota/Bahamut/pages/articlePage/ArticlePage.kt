@@ -659,6 +659,18 @@ class ArticlePage : TelnetPage() {
             } ?: ""
             val boardText = article?.boardName ?: ""
 
+            // 0. 外部快捷工具列 (推/噓, 切換模式, 開啟連結)
+            if (isExtToolbarOpenState || viewModeState == ArticleViewMode.MODE_TELNET) {
+                ArticleExtToolbar(
+                    onDoGy = { onGYButtonClicked() },
+                    onChangeMode = {
+                        changeViewMode()
+                        refreshExternalToolbar()
+                    },
+                    onOpenLink = { onOpenLinkClicked() }
+                )
+            }
+
             // 1. 頂部導覽列
             ArticleTopBar(
                 title = article?.title ?: stringResource(R.string.loading_),
@@ -671,18 +683,6 @@ class ArticlePage : TelnetPage() {
                 },
                 onMenuClick = { onMenuClicked() }
             )
-
-            // 2. 外部快捷工具列 (推/噓, 切換模式, 開啟連結)
-            if (isExtToolbarOpenState || viewModeState == ArticleViewMode.MODE_TELNET) {
-                ArticleExtToolbar(
-                    onDoGy = { onGYButtonClicked() },
-                    onChangeMode = {
-                        changeViewMode()
-                        refreshExternalToolbar()
-                    },
-                    onOpenLink = { onOpenLinkClicked() }
-                )
-            }
 
             // 3. 文章內容主體
             Box(
@@ -793,8 +793,6 @@ fun ArticleTopBar(
 ) {
     val colors = AppTheme.colors
     var isExpanded by remember { mutableStateOf(false) }
-    val isFollowed = TempSettings.isBoardFollowTitle(title)
-    val titleColor = if (isFollowed) colors.bbsBoardFollowFirst else colors.titleBarTitle
 
     Column(
         modifier = Modifier
@@ -813,10 +811,10 @@ fun ArticleTopBar(
                     .weight(1f)
                     .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
             ) {
-                // 第一列：文章標題 (追蹤時為青色，一般為黃色)
+                // 第一列：文章標題
                 BahaText(
                     text = title,
-                    color = titleColor,
+                    color = colors.titleBarTitle,
                     size = BahaTextSize.TITLE,
                     maxLines = if (isExpanded) 3 else 1,
                     overflow = TextOverflow.Ellipsis,
@@ -871,14 +869,6 @@ fun ArticleTopBar(
                 )
             }
         }
-
-        // 底部分隔線
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(colors.divider)
-        )
     }
 }
 
@@ -897,31 +887,46 @@ fun ArticleExtToolbar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .height(50.dp)
                 .background(colors.toolbarBackground)
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .padding(horizontal = 6.dp, vertical = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BahaButton(
                 text = stringResource(R.string.do_gy),
                 type = ButtonType.NORMAL,
+                fontSize = BahaTextSize.TITLE,
                 onClick = onDoGy,
                 modifier = Modifier.weight(1f)
+            )
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(colors.toolbarDivider)
             )
             BahaButton(
                 text = stringResource(R.string.change_mode),
                 type = ButtonType.NORMAL,
+                fontSize = BahaTextSize.TITLE,
                 onClick = onChangeMode,
                 modifier = Modifier.weight(1f)
+            )
+            Box(
+                modifier = Modifier
+                    .width(1.dp)
+                    .fillMaxHeight()
+                    .background(colors.toolbarDivider)
             )
             BahaButton(
                 text = stringResource(R.string.open_url),
                 type = ButtonType.NORMAL,
+                fontSize = BahaTextSize.TITLE,
                 onClick = onOpenLink,
                 modifier = Modifier.weight(1f)
             )
         }
-        HorizontalDivider(color = colors.divider, thickness = 1.dp)
     }
 }
 
@@ -1104,10 +1109,10 @@ fun ArticleContentBlockItem(
             BahaText(
                 text = "${item.author}$nick 說:",
                 color = authorColor,
-                size = BahaTextSize.BODY,
+                size = BahaTextSize.TITLE,
                 modifier = Modifier
                     .clickable { onAuthorClick(item.author ?: "") }
-                    .padding(bottom = 2.dp)
+                    .padding(bottom = if (isQuote) 2.dp else 10.dp)
             )
         }
 
@@ -1122,22 +1127,14 @@ fun ArticleContentBlockItem(
                     LinkableText(
                         text = segment.text,
                         defaultColor = textColor,
-                        size = BahaTextSize.BODY,
-                        modifier = Modifier.padding(
-                            start = if (isQuote) (quoteLevel * 8).dp else 0.dp,
-                            top = 2.dp,
-                            bottom = 2.dp
-                        )
+                        modifier = Modifier.padding(vertical = 2.dp)
                     )
                 }
 
                 if (UserSettings.linkAutoShow && segment.url != null) {
                     ArticleThumbnail(
                         url = segment.url,
-                        loadAllTrigger = loadAllTrigger,
-                        modifier = Modifier.padding(
-                            start = if (isQuote) (quoteLevel * 8).dp else 0.dp
-                        )
+                        loadAllTrigger = loadAllTrigger
                     )
                 }
             }
@@ -1147,7 +1144,6 @@ fun ArticleContentBlockItem(
 
         // 底部微弱分隔線
         HorizontalDivider(
-            modifier = Modifier.padding(top = 4.dp),
             color = colors.divider.copy(alpha = 0.25f),
             thickness = 0.5.dp
         )
@@ -1177,7 +1173,7 @@ fun ArticlePushRowItem(
             // 推文作者
             BahaText(
                 text = push.author,
-                color = colors.bbsMailAuthor,
+                color = colors.textSecondary,
                 size = BahaTextSize.BODY,
                 modifier = Modifier.clickable { onAuthorClick(push.author) }
             )
@@ -1214,8 +1210,7 @@ fun ArticlePushRowItem(
                 if (segment.text.isNotEmpty()) {
                     LinkableText(
                         text = segment.text,
-                        defaultColor = colors.textPrimary,
-                        size = BahaTextSize.BODY
+                        defaultColor = colors.bbsBoardFollowOtherRead
                     )
                 }
 
@@ -1330,22 +1325,6 @@ fun fixUrlNewlines(text: String): String {
     return result.toString()
 }
 
-/** 從文字中擷取所有 http/https 網址 */
-fun extractUrls(text: String): List<String> {
-    val urlPattern = Pattern.compile(
-        "https?://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]"
-    )
-    val matcher = urlPattern.matcher(text)
-    val urls = mutableListOf<String>()
-    while (matcher.find()) {
-        val url = matcher.group().trim()
-        if (url.isNotEmpty() && !urls.contains(url)) {
-            urls.add(url)
-        }
-    }
-    return urls
-}
-
 /**
  * 文章內容段落結構
  * @param text 本段顯示之文字（若包含超連結，則到該超連結結尾為止）
@@ -1409,7 +1388,6 @@ fun parseContentSegments(rawText: String): List<ContentSegment> {
 fun LinkableText(
     text: String,
     defaultColor: Color,
-    size: BahaTextSize = BahaTextSize.BODY,
     modifier: Modifier = Modifier
 ) {
     val uriHandler = LocalUriHandler.current
@@ -1452,23 +1430,12 @@ fun LinkableText(
         }
     }
 
-    val resolvedFontSize = when (size) {
-        BahaTextSize.ULTRA_LARGE -> AppTheme.fontSize.ultraLarge
-        BahaTextSize.LARGE -> AppTheme.fontSize.large
-        BahaTextSize.BASE -> AppTheme.fontSize.base
-        BahaTextSize.TITLE -> AppTheme.fontSize.title
-        BahaTextSize.SUBTITLE -> AppTheme.fontSize.subtitle
-        BahaTextSize.BODY -> AppTheme.fontSize.body
-        BahaTextSize.CAPTION -> AppTheme.fontSize.caption
-        BahaTextSize.TINY -> AppTheme.fontSize.tiny
-    }
-
     ClickableText(
         text = annotatedString,
         modifier = modifier,
         style = TextStyle(
             color = defaultColor,
-            fontSize = resolvedFontSize,
+            fontSize = AppTheme.fontSize.title,
             fontFamily = FontFamily.Default
         ),
         onClick = { offset ->
@@ -1549,6 +1516,11 @@ fun ArticleBottomToolbar(
                 .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 按鈕文字大小
+            var newFontSize = BahaTextSize.BASE
+            if (toolbarLocation == 1 || toolbarLocation == 2)
+                newFontSize = BahaTextSize.TITLE
+
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
                 Box(
@@ -1578,6 +1550,7 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.reply),
                         type = ButtonType.NORMAL,
+                        fontSize = newFontSize,
                         onClick = onReplyClick,
                         modifier = Modifier
                             .weight(1f)
@@ -1588,6 +1561,7 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.prev_article),
                         type = ButtonType.NORMAL,
+                        fontSize = newFontSize,
                         onClick = onPrevClick,
                         onLongClick = onFirstClick,
                         modifier = Modifier
@@ -1599,6 +1573,7 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.next_article),
                         type = ButtonType.NORMAL,
+                        fontSize = newFontSize,
                         onClick = onNextClick,
                         onLongClick = onLastClick,
                         modifier = Modifier

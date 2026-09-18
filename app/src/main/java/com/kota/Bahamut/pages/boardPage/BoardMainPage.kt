@@ -14,6 +14,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -95,9 +97,12 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
 import com.kota.Bahamut.ui.components.BBSToolbarDivider
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
+import com.kota.Bahamut.ui.components.BahaFloatingToolbar
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.FloatingToolbarButtonItem
+import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppColors
@@ -148,7 +153,6 @@ open class BoardMainPage : TelnetListPage(),
 
     override var isItemBlockEnable: Boolean = false
     var blockListForTitle: Boolean = false
-    var isDrawerOpening: Boolean = false
     val myBookmarkList: MutableList<Bookmark> = ArrayList()
     var myMode: Int = 0
     private var isPostDelayedSuccess = false
@@ -354,18 +358,6 @@ open class BoardMainPage : TelnetListPage(),
         safeNotifyDataSetChanged()
     }
 
-    override fun onBackPressed(): Boolean {
-        if (isDrawerOpenState) {
-            closeDrawer()
-            return true
-        }
-        clear()
-        navigationController.popViewController()
-        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
-        PageContainer.instance!!.cleanBoardPage()
-        return true
-    }
-
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         onListArticle(index + 1)
         return true
@@ -453,17 +445,6 @@ open class BoardMainPage : TelnetListPage(),
         state.top = 0
         state.position = 0
         pushCommand(BahamutCommandListArticle(i))
-    }
-
-    override fun onReceivedGestureRight(): Boolean {
-        if (propertiesGestureOnBoardEnable) {
-            if (this.isDrawerOpen || isDrawerOpening) {
-                return false
-            }
-            onBackPressed()
-            return true
-        }
-        return true
     }
 
     protected open fun onPostButtonClicked() {
@@ -696,12 +677,56 @@ open class BoardMainPage : TelnetListPage(),
         myModeState = myMode
     }
 
+    fun openDrawer() {
+        isDrawerOpenState = true
+        reloadBookmark()
+    }
+
     fun closeDrawer() {
         isDrawerOpenState = false
     }
 
-    val isDrawerOpen: Boolean
-        get() = isDrawerOpenState
+    override fun onReceivedGestureLeft(): Boolean {
+        if (pageType == BahamutPage.BAHAMUT_BOARD) {
+            if (propertiesDrawerLocation == 0 && !isDrawerOpenState) {
+                openDrawer()
+                return true
+            } else if (propertiesDrawerLocation != 0 && isDrawerOpenState) {
+                closeDrawer()
+                return true
+            }
+        }
+        return super.onReceivedGestureLeft()
+    }
+
+    override fun onReceivedGestureRight(): Boolean {
+        if (pageType == BahamutPage.BAHAMUT_BOARD) {
+            if (propertiesDrawerLocation != 0 && !isDrawerOpenState) {
+                openDrawer()
+                return true
+            } else if (propertiesDrawerLocation == 0 && isDrawerOpenState) {
+                closeDrawer()
+                return true
+            }
+        }
+        if (propertiesGestureOnBoardEnable) {
+            if (isDrawerOpenState) {
+                closeDrawer()
+                return true
+            }
+            onBackPressed()
+            return true
+        }
+        return false
+    }
+
+    override fun onBackPressed(): Boolean {
+        if (isDrawerOpenState) {
+            closeDrawer()
+            return true
+        }
+        return super.onBackPressed()
+    }
 
     override fun onSearchDialogCancelButtonClicked() {}
 
@@ -877,46 +902,124 @@ open class BoardMainPage : TelnetListPage(),
                     }
                 }
 
-                // 3. 底部操作工具列
-                BoardMainToolbar(
-                    colors = colors,
-                    pageType = pageType,
-                    toolbarLocation = toolbarLocationState,
-                    toolbarOrder = toolbarOrderState,
-                    onPostClick = { mPostListener.onClick(null) },
-                    onPrevClick = {
-                        val firstVisible = listState.firstVisibleItemIndex
-                        val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
-                        val target = max(0, firstVisible - visibleCount)
-                        if (this@BoardMainPage::class == BoardMainPage::class) {
-                            TempSettings.lastVisitArticleNumber = target
+                // 3. 底部操作工具列 (僅在 toolbarLocationState <= 2 時顯示)
+                if (toolbarLocationState <= 2) {
+                    BoardMainToolbar(
+                        colors = colors,
+                        pageType = pageType,
+                        toolbarLocation = toolbarLocationState,
+                        toolbarOrder = toolbarOrderState,
+                        onPostClick = { mPostListener.onClick(null) },
+                        onPrevClick = {
+                            val firstVisible = listState.firstVisibleItemIndex
+                            val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                            val target = max(0, firstVisible - visibleCount)
+                            if (this@BoardMainPage::class == BoardMainPage::class) {
+                                TempSettings.lastVisitArticleNumber = target
+                            }
+                            coroutineScope.launch { listState.scrollToItem(target) }
+                        },
+                        onFirstClick = {
+                            moveToFirstPosition()
+                            coroutineScope.launch { listState.scrollToItem(0) }
+                        },
+                        onNextClick = {
+                            val firstVisible = listState.firstVisibleItemIndex
+                            val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                            val target = (firstVisible + visibleCount).coerceAtMost(max(0, currentCount - 1))
+                            if (this@BoardMainPage::class == BoardMainPage::class) {
+                                TempSettings.lastVisitArticleNumber = target
+                            }
+                            coroutineScope.launch { listState.scrollToItem(target) }
+                        },
+                        onLastClick = {
+                            setManualLoadPage()
+                            moveToLastPosition()
+                            coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
+                        },
+                        onLLClick = { btnLLListener.onClick(null) },
+                        onRRClick = { btnRRListener.onClick(null) }
+                    )
+                }
+            }
+
+            // 4. 側邊選單 Drawer 手勢觸發區 (若為看板且尚未開啟)
+            if (pageType == BahamutPage.BAHAMUT_BOARD && !isDrawerOpenState) {
+                val isLeftDrawer = propertiesDrawerLocation != 0
+                Box(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .width(48.dp)
+                        .align(if (isLeftDrawer) Alignment.CenterStart else Alignment.CenterEnd)
+                        .pointerInput(isLeftDrawer) {
+                            detectHorizontalDragGestures { _, dragAmount ->
+                                if ((!isLeftDrawer && dragAmount < -20f) || (isLeftDrawer && dragAmount > 20f)) {
+                                    openDrawer()
+                                }
+                            }
                         }
-                        coroutineScope.launch { listState.scrollToItem(target) }
-                    },
-                    onFirstClick = {
-                        moveToFirstPosition()
-                        coroutineScope.launch { listState.scrollToItem(0) }
-                    },
-                    onNextClick = {
-                        val firstVisible = listState.firstVisibleItemIndex
-                        val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
-                        val target = (firstVisible + visibleCount).coerceAtMost(max(0, currentCount - 1))
-                        if (this@BoardMainPage::class == BoardMainPage::class) {
-                            TempSettings.lastVisitArticleNumber = target
-                        }
-                        coroutineScope.launch { listState.scrollToItem(target) }
-                    },
-                    onLastClick = {
-                        setManualLoadPage()
-                        moveToLastPosition()
-                        coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
-                    },
-                    onLLClick = { btnLLListener.onClick(null) },
-                    onRRClick = { btnRRListener.onClick(null) }
                 )
             }
 
-            // 4. 側邊選單 Drawer (若 pageType == BAHAMUT_BOARD)
+            // 5. 浮動工具列 (toolbarLocationState == 3)
+            if (toolbarLocationState == 3) {
+                val isMoveEnable = propertiesBoardMoveEnable > 0
+                val postText = stringResource(
+                    if (pageType == BahamutPage.BAHAMUT_BOARD) R.string.post else R.string.bookmark
+                )
+                val floatingButtons = listOf(
+                    FloatingToolbarButtonItem(
+                        text = postText,
+                        onClick = { mPostListener.onClick(null) }
+                    ),
+                    FloatingToolbarButtonItem(
+                        text = stringResource(R.string.prev_page),
+                        onClick = {
+                            val firstVisible = listState.firstVisibleItemIndex
+                            val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                            val target = max(0, firstVisible - visibleCount)
+                            if (this@BoardMainPage::class == BoardMainPage::class) {
+                                TempSettings.lastVisitArticleNumber = target
+                            }
+                            coroutineScope.launch { listState.scrollToItem(target) }
+                        },
+                        onLongClick = {
+                            moveToFirstPosition()
+                            coroutineScope.launch { listState.scrollToItem(0) }
+                        }
+                    ),
+                    FloatingToolbarButtonItem(
+                        text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
+                        onClick = {
+                            if (isMoveEnable) {
+                                val firstVisible = listState.firstVisibleItemIndex
+                                val visibleCount = listState.layoutInfo.visibleItemsInfo.size.coerceAtLeast(10)
+                                val target = (firstVisible + visibleCount).coerceAtMost(max(0, currentCount - 1))
+                                if (this@BoardMainPage::class == BoardMainPage::class) {
+                                    TempSettings.lastVisitArticleNumber = target
+                                }
+                                coroutineScope.launch { listState.scrollToItem(target) }
+                            } else {
+                                setManualLoadPage()
+                                moveToLastPosition()
+                                coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
+                            }
+                        },
+                        onLongClick = {
+                            setManualLoadPage()
+                            moveToLastPosition()
+                            coroutineScope.launch { listState.scrollToItem(max(0, currentCount - 1)) }
+                        }
+                    )
+                )
+
+                BahaFloatingToolbar(
+                    buttons = floatingButtons,
+                    toolbarOrder = toolbarOrderState
+                )
+            }
+
+            // 6. 側邊選單 Drawer (若 pageType == BAHAMUT_BOARD)
             if (pageType == BahamutPage.BAHAMUT_BOARD) {
                 BoardEndDrawer(
                     isOpen = isDrawerOpenState,
@@ -1027,7 +1130,7 @@ fun BoardMainTopBar(
                         if (isBoard) {
                             BahaText(
                                 text = stringResource(R.string.board_main_vV),
-                                color = colors.titleBarDetail2,
+                                color = colors.textSecondary,
                                 size = BahaTextSize.BODY,
                                 modifier = Modifier
                                     .clickable { onReadAllClick() }
@@ -1127,7 +1230,7 @@ fun BoardPageRowItem(
                         onClick = onClick,
                         onLongClick = onLongClick
                     )
-                    .padding(horizontal = 8.dp, vertical = 5.dp)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
             ) {
                 // 第一列：狀態與標題
                 Row(
@@ -1138,7 +1241,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = if (isReply) "Re" else "◆",
                         color = colors.bbsMailStatus,
-                        size = BahaTextSize.BODY,
+                        size = BahaTextSize.TITLE,
                         modifier = Modifier.padding(end = 4.dp)
                     )
 
@@ -1146,9 +1249,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = titleText,
                         color = titleColor,
-                        size = BahaTextSize.BODY,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        size = BahaTextSize.TITLE
                     )
                 }
 
@@ -1174,6 +1275,8 @@ fun BoardPageRowItem(
                             color = colors.bbsMailMark,
                             size = BahaTextSize.BODY
                         )
+                    } else {
+                        Spacer(modifier = Modifier.width(42.dp))
                     }
 
                     // 日期
@@ -1197,6 +1300,8 @@ fun BoardPageRowItem(
                             color = colors.bbsBoardGy,
                             size = BahaTextSize.BODY
                         )
+                    } else {
+                        Spacer(modifier = Modifier.width(42.dp))
                     }
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -1212,28 +1317,8 @@ fun BoardPageRowItem(
                 }
             }
 
-            // 垂直分隔線
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .fillMaxHeight()
-                    .background(colors.divider)
-            )
-
             // 右箭頭按鈕區塊
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable { onClick() }
-                    .padding(horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                BahaText(
-                    text = ">",
-                    color = colors.textPrimary,
-                    size = BahaTextSize.BODY
-                )
-            }
+            RightArrow { onClick() }
         }
 
         // 底部分隔線
@@ -1283,6 +1368,11 @@ fun BoardMainToolbar(
                 .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // 按鈕文字大小
+            var newFontSize = BahaTextSize.BASE
+            if (toolbarLocation == 1 || toolbarLocation == 2)
+                newFontSize = BahaTextSize.TITLE
+
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
                 Box(
@@ -1296,7 +1386,7 @@ fun BoardMainToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        size = BahaTextSize.TITLE
+                        size = newFontSize
                     )
                 }
                 Box(
@@ -1312,6 +1402,7 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = postText,
                         type = ButtonType.NORMAL,
+                        fontSize = newFontSize,
                         onClick = onPostClick,
                         modifier = Modifier
                             .weight(1f)
@@ -1322,6 +1413,7 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = stringResource(R.string.prev_page),
                         type = ButtonType.NORMAL,
+                        fontSize = newFontSize,
                         onClick = onPrevClick,
                         onLongClick = onFirstClick,
                         modifier = Modifier
@@ -1333,6 +1425,7 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
                         type = ButtonType.NORMAL,
+                        fontSize = BahaTextSize.TITLE,
                         onClick = if (isMoveEnable) onNextClick else onLastClick,
                         onLongClick = onLastClick,
                         modifier = Modifier
@@ -1432,6 +1525,13 @@ fun BoardEndDrawer(
                     .width(280.dp)
                     .background(colors.pageBackground)
                     .clickable(enabled = false) {} // 阻止點擊穿透到遮罩
+                    .pointerInput(isLeft) {
+                        detectHorizontalDragGestures { _, dragAmount ->
+                            if ((!isLeft && dragAmount > 20f) || (isLeft && dragAmount < -20f)) {
+                                onClose()
+                            }
+                        }
+                    }
             ) {
                 // 1. 頂部工具列：精華區 / 書籤管理 / 關閉按鈕 (>)
                 Row(

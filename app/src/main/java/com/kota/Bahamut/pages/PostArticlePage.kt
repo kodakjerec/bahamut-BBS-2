@@ -700,6 +700,7 @@ class PostArticlePage : TelnetPage() {
                     ) {
                         BahaButton(
                             text = stringResource(R.string.post_article_page_paint_color),
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -713,6 +714,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.file),
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -726,6 +728,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_url_title),
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -743,6 +746,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_img_title),
+                            fontSize = BahaTextSize.TITLE,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -775,6 +779,7 @@ class PostArticlePage : TelnetPage() {
             ) {
                 BahaButton(
                     text = if (isToolbarExpanded) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -788,6 +793,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.post_article_page_format),
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -801,6 +807,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.symbol),
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -814,6 +821,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.face),
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -827,6 +835,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.post),
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

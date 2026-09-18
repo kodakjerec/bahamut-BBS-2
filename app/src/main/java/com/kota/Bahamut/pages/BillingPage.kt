@@ -18,19 +18,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
 import com.android.billingclient.api.BillingFlowParams.ProductDetailsParams
@@ -46,6 +42,9 @@ import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryQuery
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -206,6 +205,7 @@ class BillingPage : TelnetPage() {
                 // Purchase button (com.kota.billing.90)
                 BahaButton(
                     text = productDetailsState?.name ?: stringResource(R.string.billing_page_button_90),
+                    fontSize = BahaTextSize.BODY,
                     enabled = productDetailsState != null,
                     modifier = Modifier.padding(horizontal = 32.dp),
                     onClick = { launchPurchase() }
@@ -218,6 +218,7 @@ class BillingPage : TelnetPage() {
                 // Check purchase button
                 BahaButton(
                     text = stringResource(R.string.billing_page_button_check_purchase_query),
+                    fontSize = BahaTextSize.BODY,
                     modifier = Modifier.padding(horizontal = 32.dp),
                     onClick = {
                         checkPurchaseHistory()

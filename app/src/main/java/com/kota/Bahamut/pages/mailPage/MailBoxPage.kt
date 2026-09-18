@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ListAdapter
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -59,6 +58,7 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -400,7 +400,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                             onClick = onClick,
                             onLongClick = onLongClick
                         )
-                        .padding(horizontal = 8.dp, vertical = 5.dp)
+                        .padding(horizontal = 10.dp, vertical = 5.dp)
                 ) {
                     // 第一列：狀態圖示與信件標題
                     Row(
@@ -410,13 +410,13 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                         BahaText(
                             text = statusText,
                             color = colors.bbsMailStatus,
-                            size = BahaTextSize.BODY,
+                            size = BahaTextSize.TITLE,
                             modifier = Modifier.padding(end = 6.dp)
                         )
                         BahaText(
                             text = item?.title ?: stringResource(R.string.loading_),
                             color = textColor,
-                            size = BahaTextSize.BODY,
+                            size = BahaTextSize.TITLE,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -444,6 +444,8 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                                 color = colors.bbsMailMark,
                                 size = BahaTextSize.BODY
                             )
+                        } else {
+                            Spacer(modifier = Modifier.width(42.dp))
                         }
 
                         // 回信 R
@@ -454,6 +456,8 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                                 color = colors.bbsMailReply,
                                 size = BahaTextSize.BODY
                             )
+                        } else {
+                            Spacer(modifier = Modifier.width(42.dp))
                         }
 
                         // 日期
@@ -477,28 +481,8 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                     }
                 }
 
-                // 垂直分隔線
-                Box(
-                    modifier = Modifier
-                        .width(1.dp)
-                        .fillMaxHeight()
-                        .background(colors.divider)
-                )
-
                 // 右側箭頭按鈕區塊
-                Box(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .clickable { onClick() }
-                        .padding(horizontal = 8.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    BahaText(
-                        text = ">",
-                        color = colors.textPrimary,
-                        size = BahaTextSize.BODY
-                    )
-                }
+                RightArrow { onClick() }
             }
 
             // 底部分隔線

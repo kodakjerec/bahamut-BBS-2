@@ -10,7 +10,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,10 +59,10 @@ fun BahaInputField(
             .height(height)
             .clip(RoundedCornerShape(2.dp))
             .background(colors.inputBoxBackground)
-            .padding(horizontal = 8.dp),
+            .padding(horizontal = 4.dp),
         textStyle = TextStyle(
             color = colors.inputBoxText,
-            fontSize = AppTheme.fontSize.base
+            fontSize = AppTheme.fontSize.large
         ),
         singleLine = singleLine,
         visualTransformation = if (isPassword) PasswordVisualTransformation() else VisualTransformation.None,
@@ -79,7 +78,7 @@ fun BahaInputField(
                     BahaText(
                         text = placeholder,
                         color = colors.textSecondary,
-                        size = BahaTextSize.SUBTITLE
+                        size = BahaTextSize.BASE
                     )
                 }
                 innerTextField()

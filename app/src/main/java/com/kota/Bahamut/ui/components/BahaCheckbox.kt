@@ -57,7 +57,7 @@ fun BahaCheckboxLeft(
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    fontSize: TextUnit = AppTheme.fontSize.body,
+    fontSize: TextUnit = AppTheme.fontSize.base,
     textColor: Color = AppTheme.colors.textPrimary,
     trailingContent: (@Composable () -> Unit)? = null
 ) {
@@ -77,7 +77,7 @@ fun BahaCheckboxLeft(
         BahaText(
             text = text,
             color = if (enabled) textColor else colors.textSecondary,
-            size = BahaTextSize.BODY
+            size = BahaTextSize.BASE
         )
         if (trailingContent != null) {
             Spacer(modifier = Modifier.weight(1f))

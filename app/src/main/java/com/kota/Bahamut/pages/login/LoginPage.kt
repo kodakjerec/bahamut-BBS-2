@@ -623,8 +623,7 @@ class LoginPage : TelnetComposePage() {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         BahaText(
-                            text = stringResource(R.string.save_data),
-                            size = BahaTextSize.BODY
+                            text = stringResource(R.string.save_data)
                         )
                     }
                 }

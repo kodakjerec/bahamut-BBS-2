@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -91,7 +92,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                     text = stringResource(R.string.is_post_article),
                     color = colors.textPrimary,
                     modifier = Modifier.padding(bottom = 6.dp),
-                    customFontSize = AppTheme.fontSize.title
+                    size = BahaTextSize.TITLE
                 )
 
                 if (myTarget != TelnetArticle.NEW) {
@@ -129,7 +130,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                                 text = label,
                                 color = colors.textPrimary,
                                 modifier = Modifier.align(Alignment.Center),
-                                customFontSize = AppTheme.fontSize.title
+                                size = BahaTextSize.TITLE
                             )
                         }
                     }
@@ -155,13 +156,13 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                         BahaText(
                             text = signList.getOrElse(selectedSignIndex) { "" },
                             color = colors.textPrimary,
-                            customFontSize = AppTheme.fontSize.title
+                            size = BahaTextSize.TITLE
                         )
                         BahaText(
                             text = "▼",
                             color = colors.textPrimary,
                             modifier = Modifier.padding(end = 4.dp),
-                            customFontSize = AppTheme.fontSize.title
+                            size = BahaTextSize.TITLE
                         )
                     }
 

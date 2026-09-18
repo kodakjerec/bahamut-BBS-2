@@ -143,8 +143,6 @@ class UserInfoPage : TelnetPage() {
                 // 標題
                 BahaText(
                     text = stringResource(R.string.user_info),
-                    color = colors.titleBarTitle,
-                    size = BahaTextSize.CAPTION,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(colors.toolbarBackground)
@@ -161,7 +159,6 @@ class UserInfoPage : TelnetPage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.user_info_nick_name),
-                        size = BahaTextSize.CAPTION,
                         modifier = Modifier.weight(1f)
                     )
                     BahaInputField(
@@ -190,7 +187,7 @@ class UserInfoPage : TelnetPage() {
                 BahaText(
                     text = othersState,
                     color = colors.textSecondary,
-                    size = BahaTextSize.TINY,
+                    size = BahaTextSize.SUBTITLE,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)

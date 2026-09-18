@@ -1,12 +1,10 @@
 package com.kota.Bahamut.dialogs
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -14,8 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -23,13 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
-import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
+import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASDialog
 
@@ -51,105 +47,71 @@ class DialogInsertExpression : ASDialog() {
     private fun Content() {
         val colors = AppTheme.colors
 
-        Box(
-            modifier = Modifier
-                .widthIn(min = 280.dp, max = 340.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(colors.pageBackground)
-                .border(1.dp, colors.dialogBorder, RoundedCornerShape(6.dp))
-        ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                // 標題列 + 設定按鈕
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colors.dialogTitleBackground)
-                        .padding(horizontal = 14.dp, vertical = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = dialogTitle,
-                        color = colors.titleBarTitle,
-                        fontSize = 16.sp
-                    )
-                    BahaButton(
-                        text = CommonFunctions.getContextString(R.string.setting),
-                        type = ButtonType.NORMAL,
-                        onClick = {
-                            listener?.onListDialogSettingClicked()
-                            dismiss()
-                        },
-                        minHeight = 32.dp
-                    )
-                }
-
+        BahaAlertDialogContent(
+            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
+            title = dialogTitle,
+            titleAction = {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.divider)
-                )
-
-                // 項目列表
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 350.dp)
+                        .fillMaxHeight()
+                        .background(colors.toolbarBackground)
+                        .clickable {
+                            listener?.onListDialogSettingClicked()
+                            dismiss()
+                        }
+                        .padding(horizontal = 14.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    itemsIndexed(itemList) { index, itemTitle ->
+                    BahaText(
+                        text = CommonFunctions.getContextString(R.string.setting),
+                        color = colors.buttonText,
+                        size = BahaTextSize.BODY
+                    )
+                }
+            },
+            contentPadding = PaddingValues(0.dp),
+            buttons = listOf(
+                BahaDialogButton(
+                    text = CommonFunctions.getContextString(R.string.cancel),
+                    onClick = { dismiss() }
+                )
+            )
+        ) {
+            // 項目列表
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 360.dp)
+            ) {
+                itemsIndexed(itemList) { index, itemTitle ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .clickable {
+                                listener?.onListDialogItemClicked(
+                                    this@DialogInsertExpression,
+                                    index,
+                                    itemTitle
+                                )
+                                dismiss()
+                            }
+                            .padding(horizontal = 16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        BahaText(
+                            text = itemTitle,
+                            color = colors.textPrimary
+                        )
+                    }
+                    if (index < itemList.size - 1) {
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .clickable {
-                                    listener?.onListDialogItemClicked(
-                                        this@DialogInsertExpression,
-                                        index,
-                                        itemTitle
-                                    )
-                                    dismiss()
-                                }
-                                .padding(horizontal = 16.dp, vertical = 14.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = itemTitle,
-                                color = colors.textPrimary,
-                                fontSize = 16.sp
-                            )
-                        }
-                        if (index < itemList.size - 1) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(1.dp)
-                                    .background(colors.divider)
-                            )
-                        }
+                                .height(1.dp)
+                                .background(colors.divider)
+                        )
                     }
-                }
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.divider)
-                )
-
-                // 底部關閉
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(colors.dialogTitleBackground)
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
-                    contentAlignment = Alignment.CenterEnd
-                ) {
-                    BahaButton(
-                        text = CommonFunctions.getContextString(R.string.cancel),
-                        type = ButtonType.SECONDARY,
-                        onClick = { dismiss() },
-                        minHeight = 36.dp
-                    )
                 }
             }
         }

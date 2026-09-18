@@ -3,7 +3,6 @@ package com.kota.Bahamut.dialogs
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -12,9 +11,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -85,10 +84,9 @@ class DialogPushArticle : ASDialog() {
                     value = textContent,
                     onValueChange = { if (it.length <= 48) textContent = it },
                     placeholder = {
-                        Text(
+                        BahaText(
                             stringResource(R.string.main_push_article_msg01),
-                            color = colors.textSecondary,
-                            fontSize = 16.sp
+                            color = colors.textSecondary
                         )
                     },
                     minLines = 3,

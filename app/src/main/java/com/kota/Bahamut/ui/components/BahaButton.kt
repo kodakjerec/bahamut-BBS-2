@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.ui.theme.AppTheme
 
@@ -40,8 +39,8 @@ fun BahaButton(
     type: ButtonType = ButtonType.NORMAL,
     enabled: Boolean = true,
     isSelected: Boolean = false,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 0.dp, vertical = 0.dp),
-    fontSize: TextUnit = AppTheme.fontSize.base,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+    fontSize: BahaTextSize = BahaTextSize.BASE,
     minHeight: Dp = 42.dp
 ) {
     val colors = AppTheme.colors
@@ -91,7 +90,7 @@ fun BahaButton(
         BahaText(
             text = text,
             color = textColor,
-            customFontSize = fontSize,
+            size = fontSize,
             textAlign = TextAlign.Center
         )
     }

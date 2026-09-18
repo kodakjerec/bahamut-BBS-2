@@ -491,6 +491,9 @@
     </style>
 
     <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowIsTranslucent">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="bahamut_defaultTextColor">@color/white</item>

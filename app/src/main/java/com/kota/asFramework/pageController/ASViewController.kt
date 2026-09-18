@@ -225,7 +225,7 @@ abstract class ASViewController {
         return false
     }
 
-    fun onReceivedGestureLeft(): Boolean {
+    open fun onReceivedGestureLeft(): Boolean {
         return false
     }
 

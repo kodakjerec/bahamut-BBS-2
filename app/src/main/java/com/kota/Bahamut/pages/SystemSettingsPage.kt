@@ -26,8 +26,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
-import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -41,7 +39,6 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
@@ -79,6 +76,9 @@ import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesLinkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.components.SettingsCheckboxItem
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -584,19 +584,16 @@ class SystemSettingsPage : TelnetPage() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(horizontal = 12.dp, vertical = 10.dp),
+                .height(50.dp)
+                .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically
         ) {
             BahaText(
                 text = title,
                 modifier = Modifier.weight(1f)
+                .padding(horizontal = 12.dp)
             )
-            BahaText(
-                text = ">",
-                color = colors.textSecondary,
-                size = BahaTextSize.SUBTITLE
-            )
+            RightArrow { }
         }
         HorizontalDivider(color = colors.divider, thickness = 0.5.dp)
     }

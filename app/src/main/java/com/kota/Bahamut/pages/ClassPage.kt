@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.res.Configuration
 import android.database.DataSetObserver
 import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -55,6 +54,7 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
+import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.dialogs.BahaListDialog
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -519,7 +519,7 @@ private fun ClassPageRowItem(
                         onClick = onClick,
                         onLongClick = onLongClick
                     )
-                    .padding(start = 10.dp, end = 8.dp, top = 6.dp, bottom = 6.dp)
+                    .padding(horizontal = 12.dp, vertical = 10.dp)
             ) {
                 // 看板中文標題 (白字)
                 BahaText(
@@ -557,28 +557,8 @@ private fun ClassPageRowItem(
                 }
             }
 
-            // 垂直分隔線
-            Box(
-                modifier = Modifier
-                    .width(1.dp)
-                    .fillMaxHeight()
-                    .background(colors.divider)
-            )
-
             // 右箭頭按鈕區塊 (點擊亦可進入)
-            Box(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .clickable { onClick() }
-                    .padding(horizontal = 8.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                BahaText(
-                    text = ">",
-                    color = colors.textPrimary,
-                    size = BahaTextSize.BODY
-                )
-            }
+            RightArrow { onClick() }
         }
 
         // 底部分隔線

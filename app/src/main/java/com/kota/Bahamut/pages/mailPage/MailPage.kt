@@ -6,20 +6,9 @@ import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import com.kota.Bahamut.ui.components.BBSTopBar
-import com.kota.Bahamut.ui.components.BBSToolbar
-import com.kota.Bahamut.ui.components.BBSToolbarDivider
-import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
-import com.kota.Bahamut.ui.components.ButtonType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -29,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -37,6 +25,13 @@ import com.kota.Bahamut.pages.articlePage.ArticleTelnetModeContent
 import com.kota.Bahamut.pages.articlePage.ArticleTextModeContent
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.service.CommonFunctions.getContextString
+import com.kota.Bahamut.ui.components.BBSToolbar
+import com.kota.Bahamut.ui.components.BBSToolbarDivider
+import com.kota.Bahamut.ui.components.BBSTopBar
+import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.BahaTextSize
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -194,8 +189,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                     ) {
                         BahaText(
                             text = stringResource(R.string.loading_),
-                            color = colors.textSecondary,
-                            size = BahaTextSize.BODY
+                            color = colors.textSecondary
                         )
                     }
                 } else {
@@ -221,6 +215,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.reply_mail),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -230,6 +225,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -239,6 +235,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.prev_article),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -248,6 +245,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.next_article),
                     type = ButtonType.NORMAL,
+                    fontSize = BahaTextSize.TITLE,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
