@@ -43,7 +43,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -791,6 +793,7 @@ open class BoardMainPage : TelnetListPage(),
     fun BoardMainPageContent() {
         val colors = AppTheme.colors
         val coroutineScope = rememberCoroutineScope()
+        val haptic = LocalHapticFeedback.current
 
         val savedPosition = remember {
             val s = listId?.let { instance.getState(it) }
@@ -944,6 +947,7 @@ open class BoardMainPage : TelnetListPage(),
                                             }
                                         },
                                         onLongClick = {
+                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                             coroutineScope.launch {
                                                 onListViewItemLongClicked(null, index)
                                             }

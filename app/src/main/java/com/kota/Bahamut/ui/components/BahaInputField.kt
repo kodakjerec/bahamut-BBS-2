@@ -46,7 +46,7 @@ fun BahaInputField(
         KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
     } else {
         KeyboardOptions(
-            keyboardType = KeyboardType.Ascii,
+            keyboardType = KeyboardType.Text,
             imeAction = if (singleLine) ImeAction.Next else ImeAction.Default
         )
     },
@@ -122,7 +122,7 @@ fun BahaInputField(
         KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done)
     } else {
         KeyboardOptions(
-            keyboardType = KeyboardType.Ascii,
+            keyboardType = KeyboardType.Text,
             imeAction = if (singleLine) ImeAction.Next else ImeAction.Default
         )
     },

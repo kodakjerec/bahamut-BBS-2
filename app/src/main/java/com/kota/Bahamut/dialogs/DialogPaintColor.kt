@@ -198,12 +198,14 @@ class DialogPaintColor : ASDialog() {
                         ) {
                             BahaText(
                                 text = colorOptions.getOrElse(frontColor) { "" },
-                                color = colors.textPrimary
+                                color = colors.textPrimary,
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
-                                color = colors.textSecondary
+                                color = colors.textSecondary,
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                         }
                         BahaDropdownMenu(
@@ -215,7 +217,7 @@ class DialogPaintColor : ASDialog() {
                                 frontColor = index
                                 if (index > 0 && isRecovery) isRecovery = false
                             },
-                            fontSize = BahaTextSize.BODY
+                            fontSize = BahaTextSize.SUBTITLE
                         )
                     }
                 }
@@ -247,12 +249,14 @@ class DialogPaintColor : ASDialog() {
                         ) {
                             BahaText(
                                 text = colorOptions.getOrElse(backColor) { "" },
-                                color = colors.textPrimary
+                                color = colors.textPrimary,
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
-                                color = colors.textSecondary
+                                color = colors.textSecondary,
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                         }
                         BahaDropdownMenu(
@@ -264,7 +268,7 @@ class DialogPaintColor : ASDialog() {
                                 backColor = index
                                 if (index > 0 && isRecovery) isRecovery = false
                             },
-                            fontSize = BahaTextSize.BODY
+                            fontSize = BahaTextSize.SUBTITLE
                         )
                     }
                 }

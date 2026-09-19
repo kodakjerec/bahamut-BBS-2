@@ -173,7 +173,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                         onItemSelected = { index ->
                             selectedSignIndex = index
                         },
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = BahaTextSize.SUBTITLE
                     )
                 }
 

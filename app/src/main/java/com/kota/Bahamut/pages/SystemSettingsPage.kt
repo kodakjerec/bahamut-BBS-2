@@ -630,7 +630,8 @@ class SystemSettingsPage : TelnetPage() {
                     Spacer(modifier = Modifier.width(6.dp))
                     BahaText(
                         text = "▾",
-                        color = colors.textSecondary
+                        color = colors.textSecondary,
+                        fontSize = BahaTextSize.SUBTITLE
                     )
                 }
                 BahaDropdownMenu(
@@ -638,7 +639,8 @@ class SystemSettingsPage : TelnetPage() {
                     onDismissRequest = { expanded = false },
                     items = items,
                     selectedIndex = selectedIndex,
-                    onItemSelected = onItemSelected
+                    onItemSelected = onItemSelected,
+                    fontSize = BahaTextSize.SUBTITLE
                 )
             }
         }

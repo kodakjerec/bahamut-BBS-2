@@ -48,6 +48,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
@@ -1209,7 +1210,8 @@ fun ArticlePushRowItem(
                 if (segment.text.isNotEmpty()) {
                     LinkableText(
                         text = segment.text,
-                        defaultColor = colors.bbsBoardFollowOtherRead
+                        defaultColor = colors.bbsBoardFollowOtherRead,
+                        fontSize = AppTheme.fontSize.body
                     )
                 }
 
@@ -1370,7 +1372,8 @@ fun parseContentSegments(rawText: String): List<ContentSegment> {
 fun LinkableText(
     text: String,
     defaultColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = AppTheme.fontSize.title
 ) {
     val uriHandler = LocalUriHandler.current
     val linkColor = AppTheme.colors.textLink
@@ -1417,7 +1420,7 @@ fun LinkableText(
         modifier = modifier,
         style = TextStyle(
             color = defaultColor,
-            fontSize = AppTheme.fontSize.title,
+            fontSize = fontSize,
             fontFamily = FontFamily.Default
         ),
         onClick = { offset ->

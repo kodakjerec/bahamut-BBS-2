@@ -20,7 +20,7 @@ fun BahaDropdownMenu(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fontSize: BahaTextSize = BahaTextSize.TITLE
+    fontSize: BahaTextSize = BahaTextSize.SUBTITLE
 ) {
     val colors = AppTheme.colors
     DropdownMenu(
@@ -57,7 +57,7 @@ fun BahaDropdownMenu(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fontSize: BahaTextSize = BahaTextSize.TITLE
+    fontSize: BahaTextSize = BahaTextSize.SUBTITLE
 ) {
     BahaDropdownMenu(
         expanded = expanded,
