@@ -97,12 +97,15 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.telnet.TelnetAnsi
 import com.kota.telnet.TelnetArticle
 import com.kota.telnet.TelnetArticleItem
 import com.kota.telnet.TelnetArticlePush
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetOutputBuilder.Companion.create
 import com.kota.telnet.model.TelnetFrame
+import com.kota.telnet.model.TelnetRow
+import com.kota.telnet.reference.TelnetAnsiCode
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
@@ -1124,11 +1127,20 @@ fun ArticleContentBlockItem(
 
             for (segment in segments) {
                 if (segment.text.isNotEmpty()) {
-                    LinkableText(
-                        text = segment.text,
-                        defaultColor = textColor,
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
+                    if (isQuote) {
+                        LinkableText(
+                            text = segment.text,
+                            defaultColor = textColor,
+                            modifier = Modifier.padding(vertical = 2.dp)
+                        )
+                    } else {
+                        LinkableText(
+                            text = segment.text,
+                            defaultColor = textColor,
+                            modifier = Modifier.padding(vertical = 2.dp),
+                            rows = item.rows
+                        )
+                    }
                 }
 
                 if (UserSettings.linkAutoShow && segment.url != null) {
@@ -1373,7 +1385,8 @@ fun LinkableText(
     text: String,
     defaultColor: Color,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = AppTheme.fontSize.title
+    fontSize: TextUnit = AppTheme.fontSize.title,
+    rows: Vector<TelnetRow>? = null
 ) {
     val uriHandler = LocalUriHandler.current
     val linkColor = AppTheme.colors.textLink
@@ -1391,7 +1404,7 @@ fun LinkableText(
 
             // 附加連結前的一般文字
             if (start > lastIndex) {
-                append(text.substring(lastIndex, start))
+                appendColorizedText(this, text.substring(lastIndex, start), defaultColor, rows)
             }
 
             // 附加超連結
@@ -1411,7 +1424,7 @@ fun LinkableText(
 
         // 附加結尾文字
         if (lastIndex < text.length) {
-            append(text.substring(lastIndex))
+            appendColorizedText(this, text.substring(lastIndex), defaultColor, rows)
         }
     }
 
@@ -1419,7 +1432,6 @@ fun LinkableText(
         text = annotatedString,
         modifier = modifier,
         style = TextStyle(
-            color = defaultColor,
             fontSize = fontSize,
             fontFamily = FontFamily.Default
         ),
@@ -1432,6 +1444,55 @@ fun LinkableText(
                 }
         }
     )
+}
+
+private fun appendColorizedText(
+    builder: androidx.compose.ui.text.AnnotatedString.Builder,
+    text: String,
+    defaultColor: Color,
+    rows: Vector<TelnetRow>?
+) {
+    if (rows == null || rows.isEmpty()) {
+        builder.pushStyle(SpanStyle(color = defaultColor))
+        builder.append(text)
+        builder.pop()
+        return
+    }
+
+    // 將所有 row 轉換並結合
+    val allColors = ArrayList<Color>()
+    val allBackgrounds = ArrayList<Color>()
+    
+    for (row in rows) {
+        row.reloadSpace()
+        val textColors = row.getTextColorArray()
+        val backColors = row.getBackgroundColor()
+        val length = row.rawString.length
+        
+        for (i in 0 until length) {
+            val tc = if (i < textColors.size) textColors[i] else TelnetAnsi.DEFAULT_TEXT_COLOR
+            val bc = if (i < backColors.size) backColors[i] else TelnetAnsi.DEFAULT_BACKGROUND_COLOR
+            
+            allColors.add(if (tc == TelnetAnsi.DEFAULT_TEXT_COLOR) defaultColor else Color(TelnetAnsiCode.getTextColor(tc)))
+            allBackgrounds.add(if (bc == TelnetAnsi.DEFAULT_BACKGROUND_COLOR) Color.Transparent else Color(TelnetAnsiCode.getBackgroundColor(bc)))
+        }
+        // 加上換行符號對應的顏色
+        allColors.add(defaultColor)
+        allBackgrounds.add(Color.Transparent)
+    }
+
+    // 目前要 append 的字串可能只是全文的一小段，這裡簡化處理，先嘗試套用
+    // 注意：原本 text 可能經過去頭尾或縮圖等處理，不一定完全和 rows 原始字串長度匹配
+    // 在這裡，我們將盡可能套用與它字數相符的顏色 (非常簡單的 mapping)
+    
+    for (i in text.indices) {
+        val color = if (i < allColors.size) allColors[i] else defaultColor
+        val back = if (i < allBackgrounds.size) allBackgrounds[i] else Color.Transparent
+        
+        builder.pushStyle(SpanStyle(color = color, background = back))
+        builder.append(text[i].toString())
+        builder.pop()
+    }
 }
 
 /**
