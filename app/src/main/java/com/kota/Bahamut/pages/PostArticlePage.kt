@@ -17,8 +17,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,7 +57,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTim
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaDropdownMenu
-import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaPostEditText
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -626,13 +624,13 @@ class PostArticlePage : TelnetPage() {
                         ) {
                             BahaText(
                                 text = currentHeader,
-                                fontSize = BahaTextSize.TITLE
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.TITLE
+                                fontSize = BahaTextSize.SUBTITLE
                             )
                         }
                         BahaDropdownMenu(
@@ -643,7 +641,7 @@ class PostArticlePage : TelnetPage() {
                             onItemSelected = { index ->
                                 headerSelectedState = index
                             },
-                            fontSize = BahaTextSize.TITLE
+                            fontSize = BahaTextSize.SUBTITLE
                         )
                     }
                 }
@@ -651,14 +649,34 @@ class PostArticlePage : TelnetPage() {
 
 
                 // 標題輸入框
-                BahaInputField(
+                BasicTextField(
                     value = titleState,
-                    onValueChange = { titleState = it },
-                    placeholder = stringResource(R.string.input_title_here),
+                    onValueChange = { newValue -> 
+                        // 去除貼上時可能帶有的樣式 (重構原 PostEditText 行為)
+                        titleState = TextFieldValue(
+                            text = newValue.text,
+                            selection = newValue.selection,
+                            composition = newValue.composition
+                        ) 
+                    },
+                    textStyle = TextStyle(
+                        color = colors.textPrimary,
+                        fontSize = AppTheme.fontSize.title
+                    ),
+                    cursorBrush = SolidColor(colors.textPrimary),
                     modifier = Modifier.fillMaxWidth(),
-                    fontSize = BahaTextSize.TITLE,
-                    fontColor = colors.inputBoxBackground,
-                    backgroundColor = colors.inputBoxText
+                    decorationBox = { innerTextField ->
+                        Box(contentAlignment = Alignment.CenterStart) {
+                            if (titleState.text.isEmpty()) {
+                                BahaText(
+                                    text = stringResource(R.string.input_title_here),
+                                    color = colors.textSecondary,
+                                    fontSize = BahaTextSize.TITLE
+                                )
+                            }
+                            innerTextField()
+                        }
+                    }
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
@@ -669,27 +687,10 @@ class PostArticlePage : TelnetPage() {
                     .weight(1f)
                     .fillMaxWidth()
             ) {
-                BasicTextField(
+                BahaPostEditText(
                     value = contentState,
                     onValueChange = { contentState = it },
-                    textStyle = TextStyle(
-                        color = colors.textPrimary,
-                        fontSize = AppTheme.fontSize.title
-                    ),
-                    cursorBrush = SolidColor(colors.textPrimary),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(12.dp),
-                    decorationBox = { innerTextField ->
-                        if (contentState.text.isEmpty()) {
-                            BahaText(
-                                text = stringResource(R.string.input_content_here),
-                                color = colors.textSecondary,
-                                fontSize = BahaTextSize.TITLE
-                            )
-                        }
-                        innerTextField()
-                    }
+                    modifier = Modifier.fillMaxSize()
                 )
             }
 
