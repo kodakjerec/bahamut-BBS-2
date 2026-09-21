@@ -113,12 +113,12 @@ class DialogPaintColor : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = stringResource(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = stringResource(R.string.send),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         dialogPaintColorListener?.onPaintColorDone(outputParam)
                         dismiss()

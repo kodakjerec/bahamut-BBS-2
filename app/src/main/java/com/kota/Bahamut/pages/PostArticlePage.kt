@@ -57,6 +57,7 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesNoVipShortenTim
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaDropdownMenu
+import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaPostEditText
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -645,37 +646,15 @@ class PostArticlePage : TelnetPage() {
                     }
                 }
 
-
-
                 // 標題輸入框
-                BasicTextField(
+                BahaInputField(
                     value = titleState,
-                    onValueChange = { newValue -> 
-                        // 去除貼上時可能帶有的樣式 (重構原 PostEditText 行為)
-                        titleState = TextFieldValue(
-                            text = newValue.text,
-                            selection = newValue.selection,
-                            composition = newValue.composition
-                        ) 
-                    },
-                    textStyle = TextStyle(
-                        color = colors.textPrimary,
-                        fontSize = AppTheme.fontSize.title
-                    ),
-                    cursorBrush = SolidColor(colors.textPrimary),
+                    onValueChange = { titleState = it },
+                    singleLine = false,
+                    fontColor = colors.textPrimary,
+                    backgroundColor = colors.tabUnselectedBackground,
                     modifier = Modifier.fillMaxWidth(),
-                    decorationBox = { innerTextField ->
-                        Box(contentAlignment = Alignment.CenterStart) {
-                            if (titleState.text.isEmpty()) {
-                                BahaText(
-                                    text = stringResource(R.string.input_title_here),
-                                    color = colors.textSecondary,
-                                    fontSize = AppTheme.fontSize.title
-                                )
-                            }
-                            innerTextField()
-                        }
-                    }
+                    placeholder = stringResource(R.string.input_title_here)
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)

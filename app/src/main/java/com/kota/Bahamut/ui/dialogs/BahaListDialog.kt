@@ -14,15 +14,14 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
@@ -57,10 +56,10 @@ fun BahaListDialogContent(
                         .background(colors.dialogTitleBackground)
                         .padding(horizontal = 14.dp, vertical = 10.dp)
                 ) {
-                    Text(
+                    BahaText(
                         text = title,
                         color = colors.titleBarTitle,
-                        fontSize = 16.sp
+                        fontSize = AppTheme.fontSize.title
                     )
                 }
                 Box(
@@ -99,17 +98,17 @@ fun BahaListDialogContent(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
+                            BahaText(
                                 text = itemText,
                                 color = colors.textPrimary,
-                                fontSize = 14.sp,
+                                fontSize = AppTheme.fontSize.body,
                                 modifier = Modifier.weight(1f)
                             )
                             if (isSelected) {
-                                Text(
+                                BahaText(
                                     text = "✓",
                                     color = colors.titleBarTitle,
-                                    fontSize = 14.sp
+                                    fontSize = AppTheme.fontSize.body
                                 )
                             }
                         }

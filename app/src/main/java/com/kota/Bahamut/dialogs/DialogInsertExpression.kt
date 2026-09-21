@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -47,7 +48,6 @@ class DialogInsertExpression : ASDialog() {
         val colors = AppTheme.colors
 
         BahaAlertDialogContent(
-            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
             title = dialogTitle,
             titleAction = {
                 Box(
@@ -72,6 +72,7 @@ class DialogInsertExpression : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 )
             )

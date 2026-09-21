@@ -36,7 +36,7 @@ import com.kota.asFramework.ui.ASToast
 
 class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDialog() {
 
-    override val name: String?
+    override val name: String
         get() = "BahamutWebLoginSettingsDialog"
 
     init {
@@ -60,12 +60,12 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.confirm),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         val newUsername = username.trim()
                         val newPassword = password
@@ -99,10 +99,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     value = username,
                     onValueChange = { username = it },
                     placeholder = "web 帳號",
-                    singleLine = true,
-                    maxLength = 20,
-                    height = 48.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    maxLength = 20
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
@@ -117,11 +114,8 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     value = password,
                     onValueChange = { password = it },
                     placeholder = "web 密碼",
-                    singleLine = true,
                     isPassword = true,
-                    maxLength = 30,
-                    height = 48.dp,
-                    modifier = Modifier.fillMaxWidth()
+                    maxLength = 30
                 )
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -141,8 +135,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     Spacer(modifier = Modifier.width(8.dp))
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.login_web_debug_view_toggle),
-                        color = colors.textPrimary,
-                        fontSize = AppTheme.fontSize.caption
+                        fontSize = AppTheme.fontSize.subtitle
                     )
                 }
             }

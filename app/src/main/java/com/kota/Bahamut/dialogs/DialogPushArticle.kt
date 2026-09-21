@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
@@ -26,7 +27,7 @@ import com.kota.telnet.TelnetOutputBuilder
 class DialogPushArticle : ASDialog() {
     private var isClickButton = false
 
-    override val name: String?
+    override val name: String
         get() = "BahamutPushArticleDialog"
 
     init {
@@ -46,7 +47,7 @@ class DialogPushArticle : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = stringResource(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = {
                         isClickButton = true
                         val builder = TelnetOutputBuilder.create()
@@ -58,7 +59,7 @@ class DialogPushArticle : ASDialog() {
                 ),
                 BahaDialogButton(
                     text = stringResource(R.string.send),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         isClickButton = true
                         if (textContent.isNotEmpty()) {
@@ -79,27 +80,15 @@ class DialogPushArticle : ASDialog() {
                 )
             )
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
+            Column {
+                BahaInputField(
                     value = textContent,
-                    onValueChange = { if (it.length <= 48) textContent = it },
-                    placeholder = {
-                        BahaText(
-                            stringResource(R.string.main_push_article_msg01),
-                            color = colors.textSecondary
-                        )
-                    },
-                    minLines = 3,
+                    onValueChange = { textContent = it },
+                    maxLength = 48,
+                    placeholder = stringResource(R.string.main_push_article_msg01),
+                    singleLine = false,
                     maxLines = 3,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        focusedTextColor = colors.textPrimary,
-                        unfocusedTextColor = colors.textPrimary,
-                        focusedContainerColor = colors.pageBackground,
-                        unfocusedContainerColor = colors.pageBackground,
-                        focusedIndicatorColor = colors.toolbarBackgroundFocused,
-                        unfocusedIndicatorColor = colors.divider
-                    )
+                    minLines = 3
                 )
             }
         }

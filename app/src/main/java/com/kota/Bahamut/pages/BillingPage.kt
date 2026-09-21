@@ -7,6 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -204,9 +205,8 @@ class BillingPage : TelnetPage() {
                 // Purchase button (com.kota.billing.90)
                 BahaButton(
                     text = productDetailsState?.name ?: stringResource(R.string.billing_page_button_90),
-                    fontSize = AppTheme.fontSize.body,
                     enabled = productDetailsState != null,
-                    modifier = Modifier.padding(horizontal = 32.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
                     onClick = { launchPurchase() }
                 )
 
@@ -217,12 +217,11 @@ class BillingPage : TelnetPage() {
                 // Check purchase button
                 BahaButton(
                     text = stringResource(R.string.billing_page_button_check_purchase_query),
-                    fontSize = AppTheme.fontSize.body,
-                    modifier = Modifier.padding(horizontal = 32.dp),
                     onClick = {
                         checkPurchaseHistory()
                         showShortToast(getContextString(R.string.billing_page_result_success))
-                    }
+                    },
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

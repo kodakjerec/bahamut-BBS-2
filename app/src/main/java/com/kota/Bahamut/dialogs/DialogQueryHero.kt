@@ -99,7 +99,6 @@ class DialogQueryHero : ASDialog() {
         val scrollState = rememberScrollState()
 
         BahaAlertDialogContent(
-            modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
             title = CommonFunctions.getContextString(R.string.dialog_query_hero),
             buttons = listOf(
                 BahaDialogButton(

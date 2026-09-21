@@ -7,12 +7,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.AppThemeStyle
@@ -33,10 +32,10 @@ private fun DialogShowcase() {
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         // 1. Alert Dialog 預覽
-        Text(
+        BahaText(
             text = "BahaAlertDialog (提示與確認)",
             color = colors.textPrimary,
-            fontSize = 14.sp
+            fontSize = AppTheme.fontSize.body
         )
         BahaAlertDialogContent(
             title = "系統提示",
@@ -48,20 +47,20 @@ private fun DialogShowcase() {
         )
 
         // 2. Processing Dialog 預覽
-        Text(
+        BahaText(
             text = "BahaProcessingDialog (連線與載入)",
             color = colors.textPrimary,
-            fontSize = 14.sp
+            fontSize = AppTheme.fontSize.body
         )
         BahaProcessingDialog(
             message = "連線至 bbs.gamer.com.tw..."
         )
 
         // 3. List Dialog 預覽
-        Text(
+        BahaText(
             text = "BahaListDialog (清單選擇)",
             color = colors.textPrimary,
-            fontSize = 14.sp
+            fontSize = AppTheme.fontSize.body
         )
         BahaListDialogContent(
             title = "選擇表情符號",

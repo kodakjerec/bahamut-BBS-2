@@ -71,7 +71,7 @@ class DialogSearchArticle : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = {
                         dismiss()
                         listener?.onSearchDialogCancelButtonClicked()
@@ -79,7 +79,7 @@ class DialogSearchArticle : ASDialog() {
                 ),
                 BahaDialogButton(
                     text = searchButtonText,
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         val cleanKeyword = keyword.replace("\n", "").trim()
                         val cleanAuthor = author.replace("\n", "").trim()
@@ -154,8 +154,8 @@ class DialogSearchArticle : ASDialog() {
                             selected = markOnly,
                             onClick = { markOnly = true },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = colors.toolbarBackgroundFocused,
-                                unselectedColor = colors.textSecondary
+                                selectedColor = colors.checkboxTint,
+                                unselectedColor = colors.checkboxUncheckedTint
                             )
                         )
                         BahaText(
@@ -173,8 +173,8 @@ class DialogSearchArticle : ASDialog() {
                             selected = !markOnly,
                             onClick = { markOnly = false },
                             colors = RadioButtonDefaults.colors(
-                                selectedColor = colors.toolbarBackgroundFocused,
-                                unselectedColor = colors.textSecondary
+                                selectedColor = colors.checkboxTint,
+                                unselectedColor = colors.checkboxUncheckedTint
                             )
                         )
                         BahaText(

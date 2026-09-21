@@ -14,10 +14,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -52,7 +54,7 @@ class DialogHeroStep : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = {
                         isClickButton = true
                         val builder = TelnetOutputBuilder.create()
@@ -65,7 +67,7 @@ class DialogHeroStep : ASDialog() {
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.send),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         isClickButton = true
                         var sendContent = ""
@@ -109,31 +111,26 @@ class DialogHeroStep : ASDialog() {
                     unfocusedIndicatorColor = colors.divider
                 )
 
-                OutlinedTextField(
+                BahaInputField(
                     value = content1,
-                    onValueChange = { if (it.length <= 48) content1 = it },
-                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_1), color = colors.textSecondary) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    onValueChange = { content1 = it },
+                    maxLength = 48,
+                    placeholder = stringResource(R.string.number_1)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
+                BahaInputField(
                     value = content2,
-                    onValueChange = { if (it.length <= 48) content2 = it },
-                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_2), color = colors.textSecondary) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    onValueChange = { content2 = it },
+                    maxLength = 48,
+                    placeholder = stringResource(R.string.number_2)
                 )
+
                 Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
+                BahaInputField(
                     value = content3,
-                    onValueChange = { if (it.length <= 48) content3 = it },
-                    placeholder = { Text(CommonFunctions.getContextString(R.string.number_3), color = colors.textSecondary) },
-                    singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    onValueChange = { content3 = it },
+                    maxLength = 48,
+                    placeholder = stringResource(R.string.number_3)
                 )
             }
         }

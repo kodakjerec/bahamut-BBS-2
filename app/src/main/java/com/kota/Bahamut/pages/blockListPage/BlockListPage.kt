@@ -1,36 +1,42 @@
 package com.kota.Bahamut.pages.blockListPage
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.kota.Bahamut.ui.components.BahaInputField
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -41,6 +47,8 @@ import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetBlockList
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -53,13 +61,13 @@ import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
 import java.util.Collections
 
-class BlockListPage : TelnetPage(), BlockListClickListener {
+class BlockListPage : TelnetPage() {
 
     // Compose state for input text
     var inputTextState by mutableStateOf("")
 
-    private var blockListAdapter: BlockListAdapter? = null
-    private var blockList: MutableList<String> = ArrayList()
+    // Compose state list for block list
+    private val blockList = mutableStateListOf<String>()
 
     override val isPopupPage: Boolean
         get() = true
@@ -73,56 +81,9 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     override val isKeepOnOffline: Boolean
         get() = true
 
-    val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object :
-        ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-        var isSwiped: Boolean = false
-        var isDragged: Boolean = false
-        var start: Int = -1
-        var end: Int = -1
-        private var dragView: View? = null
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            start = viewHolder.bindingAdapterPosition
-            end = target.bindingAdapterPosition
-            if (propertiesVIP) {
-                Collections.swap(this@BlockListPage.blockList, start, end)
-                blockListAdapter?.notifyItemMoved(start, end)
-            } else {
-                showShortToast(getContextString(R.string.vip_only_message))
-            }
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-            when (actionState) {
-                ItemTouchHelper.ACTION_STATE_DRAG -> {
-                    isSwiped = false; isDragged = true
-                    dragView = viewHolder?.itemView
-                    dragView?.setBackgroundResource(R.color.ripple_material)
-                }
-                ItemTouchHelper.ACTION_STATE_SWIPE -> {
-                    isSwiped = true; isDragged = false
-                }
-                ItemTouchHelper.ACTION_STATE_IDLE -> {
-                    if (isSwiped) Log.e("swipe", "swipe is over")
-                    if (!isSwiped && isDragged) {
-                        dragView?.setBackgroundResource(R.color.transparent)
-                        dragView = null
-                        UserSettings.blockList = this@BlockListPage.blockList
-                    }
-                    isSwiped = false; isDragged = false
-                }
-            }
-        }
-    })
-
     override fun createPageView(context: Context): View {
+        showNotification()
+        reload()
         return ComposeView(context).apply {
             setBahamutContent {
                 BlockListPageContent()
@@ -136,16 +97,14 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     }
 
     override fun onPageDidDisappear() {
-        blockList = ArrayList()
+        blockList.clear()
         super.onPageDidDisappear()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun reload() {
-        val temp: MutableList<String> = UserSettings.blockList
+        val temp: List<String> = UserSettings.blockList
         blockList.clear()
         blockList.addAll(temp)
-        blockListAdapter?.notifyDataSetChanged()
     }
 
     private fun showNotification() {
@@ -173,6 +132,28 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         }
     }
 
+    private fun onDeleteClicked(index: Int) {
+        if (index in blockList.indices) {
+            blockList.removeAt(index)
+            UserSettings.blockList = ArrayList(blockList)
+            notifyDataUpdated()
+            reload()
+        }
+    }
+
+    private fun moveBlockListItem(fromIndex: Int, toIndex: Int) {
+        if (propertiesVIP) {
+            if (fromIndex in blockList.indices && toIndex in blockList.indices) {
+                Collections.swap(blockList, fromIndex, toIndex)
+                UserSettings.blockList = ArrayList(blockList)
+                notifyDataUpdated()
+                reload()
+            }
+        } else {
+            showShortToast(getContextString(R.string.vip_only_message))
+        }
+    }
+
     private fun onResetClicked() {
         createDialog()
             .setTitle(getContextString(R.string.reset))
@@ -195,16 +176,6 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
         return true
     }
 
-    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {}
-
-    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
-        val deletedIndex = blockListPageItemView.bindingAdapterPosition
-        val newList = this@BlockListPage.blockList
-        newList.removeAt(deletedIndex)
-        UserSettings.blockList = this@BlockListPage.blockList
-        reload()
-    }
-
     // ---------------------------------------------------------------
     // Compose UI
     // ---------------------------------------------------------------
@@ -212,15 +183,6 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
     @Composable
     fun BlockListPageContent() {
         val colors = AppTheme.colors
-
-        // Init adapter and load data on first composition
-        if (blockListAdapter == null) {
-            blockListAdapter = BlockListAdapter(blockList).also {
-                it.setOnItemClickListener(this)
-            }
-            showNotification()
-            reload()
-        }
 
         Column(
             modifier = Modifier
@@ -255,7 +217,6 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 )
                 BahaButton(
                     text = stringResource(R.string.add),
-                    type = ButtonType.DANGER,
                     modifier = Modifier.fillMaxHeight().weight(1f),
                     onClick = { onAddClicked() }
                 )
@@ -263,19 +224,28 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
 
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-            // RecyclerView with ItemTouchHelper (kept in AndroidView for drag-reorder)
-            AndroidView(
-                factory = { ctx ->
-                    RecyclerView(ctx).apply {
-                        layoutManager = LinearLayoutManager(ctx)
-                        adapter = blockListAdapter
-                        itemTouchHelper.attachToRecyclerView(this)
-                    }
-                },
+            // 黑名單列表 (LazyColumn)
+            LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth()
-            )
+            ) {
+                itemsIndexed(
+                    items = blockList,
+                    key = { index, item -> "${index}_$item" }
+                ) { index, item ->
+                    BlockListItemRow(
+                        name = item,
+                        isVip = propertiesVIP,
+                        canMoveUp = index > 0,
+                        canMoveDown = index < blockList.size - 1,
+                        onDelete = { onDeleteClicked(index) },
+                        onMoveUp = { moveBlockListItem(index, index - 1) },
+                        onMoveDown = { moveBlockListItem(index, index + 1) }
+                    )
+                    HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                }
+            }
 
             // 底部工具列 (滿版無縫)
             Box(
@@ -290,6 +260,74 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                     .fillMaxWidth()
                     .height(60.dp),
                 onClick = { onBackPressed() }
+            )
+        }
+    }
+
+    @Composable
+    private fun BlockListItemRow(
+        name: String,
+        isVip: Boolean,
+        canMoveUp: Boolean,
+        canMoveDown: Boolean,
+        onDelete: () -> Unit,
+        onMoveUp: () -> Unit,
+        onMoveDown: () -> Unit
+    ) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(colors.pageBackground)
+                .padding(start = 12.dp, end = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BahaText(
+                text = name,
+                color = colors.textPrimary,
+                fontSize = AppTheme.fontSize.title,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics {
+                        contentDescription = "從名單中剔除$name"
+                    }
+            )
+
+            if (isVip) {
+                IconButton(
+                    onClick = onMoveUp,
+                    enabled = canMoveUp,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Move Up",
+                        tint = if (canMoveUp) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                    )
+                }
+                IconButton(
+                    onClick = onMoveDown,
+                    enabled = canMoveDown,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Move Down",
+                        tint = if (canMoveDown) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+
+            BahaButton(
+                text = stringResource(R.string.delete),
+                type = ButtonType.DANGER,
+                fontSize = AppTheme.fontSize.body,
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(36.dp),
+                onClick = onDelete
             )
         }
     }

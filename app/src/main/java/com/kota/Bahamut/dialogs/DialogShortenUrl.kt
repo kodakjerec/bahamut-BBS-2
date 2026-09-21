@@ -105,7 +105,6 @@ class DialogShortenUrl : ASDialog() {
         )
 
         BahaAlertDialogContent(
-            modifier = Modifier.widthIn(min = 280.dp, max = 360.dp),
             title = CommonFunctions.getContextString(R.string.dialog_shorten_url_title),
             titleAction = {
                 Box(
@@ -132,12 +131,12 @@ class DialogShortenUrl : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.send),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         val result = if (outputShortUrl.isNotEmpty()) outputShortUrl else inputUrl
                         shortenUrlListener?.onShortenUrlDone(result)
@@ -146,7 +145,7 @@ class DialogShortenUrl : ASDialog() {
                 )
             )
         ) {
-            Column(modifier = Modifier.fillMaxWidth()) {
+            Column {
                 if (isTransferMode) {
                     // 輸入網址 / 說明
                     val hintText = "1. 把網址貼到這裏面\n2. 按鈕\"縮址\"產生短網址\n3. 按鈕\"送出\"貼到文章內"
@@ -177,8 +176,7 @@ class DialogShortenUrl : ASDialog() {
                                 nonIdEnabled = newNonId
                                 UserSettings.setPropertiesShortUrlNonId(newNonId)
                                 inputUrl = filterUrl(inputUrl, newNonId)
-                            }
-                            .padding(vertical = 4.dp),
+                            },
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -207,7 +205,6 @@ class DialogShortenUrl : ASDialog() {
                     ) {
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.reset),
-                            fontSize = AppTheme.fontSize.title,
                             type = ButtonType.DANGER,
                             onClick = {
                                 inputUrl = ""
@@ -219,7 +216,6 @@ class DialogShortenUrl : ASDialog() {
                         )
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
-                            fontSize = AppTheme.fontSize.title,
                             type = ButtonType.NORMAL,
                             onClick = {
                                 transferUrl(inputUrl) { shortUrl ->

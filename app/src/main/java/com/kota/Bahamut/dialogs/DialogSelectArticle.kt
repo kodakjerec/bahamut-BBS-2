@@ -64,12 +64,12 @@ class DialogSelectArticle : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.search),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         if (contentString.isEmpty()) {
                             ASToast.showShortToast(CommonFunctions.getContextString(R.string.please_input_article_number))
@@ -128,6 +128,7 @@ class DialogSelectArticle : ASDialog() {
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
+                                .background(colors.dialogBlockBackground)
                                 .clickable { onDigit(digit) },
                             contentAlignment = Alignment.Center
                         ) {
@@ -151,8 +152,9 @@ class DialogSelectArticle : ASDialog() {
             ) {
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .fillMaxHeight()
+                        .background(colors.dialogBlockBackground)
                         .clickable { onDigit("0") },
                     contentAlignment = Alignment.Center
                 ) {
@@ -166,8 +168,9 @@ class DialogSelectArticle : ASDialog() {
                 )
                 Box(
                     modifier = Modifier
-                        .weight(2f)
+                        .weight(1f)
                         .fillMaxHeight()
+                        .background(colors.dialogBlockBackground)
                         .clickable { onBackspace() },
                     contentAlignment = Alignment.Center
                 ) {

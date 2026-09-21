@@ -74,7 +74,7 @@ class DialogReference : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = {
                         saveSettings()
                         dismiss()
@@ -82,7 +82,7 @@ class DialogReference : ASDialog() {
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.send),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         if (myAuthors.isNotEmpty()) {
                             myAuthors[0].enabled = author0Enabled

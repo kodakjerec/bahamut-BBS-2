@@ -2,7 +2,6 @@ package com.kota.Bahamut.ui.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -19,10 +18,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -44,14 +45,14 @@ fun BahaAlertDialogContent(
     titleAction: (@Composable () -> Unit)? = null,
     message: String? = null,
     buttons: List<BahaDialogButton> = emptyList(),
-    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 14.dp),
+    contentPadding: PaddingValues = PaddingValues(8.dp),
     content: (@Composable () -> Unit)? = null
 ) {
     val colors = AppTheme.colors
 
     Box(
         modifier = modifier
-            .widthIn(min = 280.dp, max = 340.dp)
+            .widthIn(min = 280.dp, max = 400.dp)
             .background(colors.pageBackground)
             .border(3.dp, colors.dialogBorder)
     ) {
@@ -83,12 +84,6 @@ fun BahaAlertDialogContent(
                         titleAction()
                     }
                 }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.divider)
-                )
             }
 
             // 2. 內容文字或客製化區塊
@@ -113,19 +108,12 @@ fun BahaAlertDialogContent(
                 }
             }
 
-            // 3. 底部按鈕列 (滿版無縫，深紅底白字，按鈕間帶垂直細線)
+            // 3. 底部按鈕列 (滿版無縫，套用 BahaButton)
             if (buttons.isNotEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(1.dp)
-                        .background(colors.dialogButtonDivider)
-                )
-
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(48.dp)
+                        .height(60.dp)
                 ) {
                     buttons.forEachIndexed { index, btn ->
                         if (index > 0) {
@@ -136,22 +124,16 @@ fun BahaAlertDialogContent(
                                     .background(colors.dialogButtonDivider)
                             )
                         }
-                        val btnBg = if (btn.enabled) colors.dialogButtonBackground else colors.buttonDangerDisabled
-                        val btnTextColor = if (btn.enabled) colors.dialogButtonText else colors.buttonTextDisabled
-                        Box(
+                        BahaButton(
+                            text = btn.text,
+                            onClick = btn.onClick,
                             modifier = Modifier
                                 .weight(1f)
-                                .fillMaxHeight()
-                                .background(btnBg)
-                                .clickable(enabled = btn.enabled) { btn.onClick() },
-                            contentAlignment = Alignment.Center
-                        ) {
-                            BahaText(
-                                text = btn.text,
-                                color = btnTextColor,
-                                fontSize = AppTheme.fontSize.subtitle
-                            )
-                        }
+                                .fillMaxHeight(),
+                            type = btn.type,
+                            enabled = btn.enabled,
+                            fontSize = AppTheme.fontSize.subtitle
+                        )
                     }
                 }
             }

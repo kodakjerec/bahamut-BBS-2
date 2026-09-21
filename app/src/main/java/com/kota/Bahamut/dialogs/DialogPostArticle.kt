@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -64,15 +65,16 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
         val scrollState = rememberScrollState()
 
         BahaAlertDialogContent(
-            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
             title = stringResource(R.string.confirm),
             buttons = listOf(
                 BahaDialogButton(
                     text = stringResource(R.string.cancel),
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = stringResource(R.string.send),
+                    type = ButtonType.DANGER,
                     onClick = {
                         val sign = if (selectedSignIndex > 0) (selectedSignIndex - 1).toString() else ""
                         dialogPostArticleListener?.onPostArticleDoneWithTarget(selectedTarget, sign)
@@ -120,7 +122,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                                 onClick = { selectedTarget = key },
                                 colors = RadioButtonDefaults.colors(
                                     selectedColor = colors.checkboxTint,
-                                    unselectedColor = colors.textSecondary
+                                    unselectedColor = colors.checkboxUncheckedTint
                                 ),
                                 modifier = Modifier.align(Alignment.CenterStart)
                             )

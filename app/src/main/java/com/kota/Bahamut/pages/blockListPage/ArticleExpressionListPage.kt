@@ -1,36 +1,42 @@
 package com.kota.Bahamut.pages.blockListPage
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import android.view.View
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
-import com.kota.Bahamut.ui.components.BahaInputField
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -42,6 +48,8 @@ import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetArticleExpressions
 import com.kota.Bahamut.ui.components.BahaButton
+import com.kota.Bahamut.ui.components.BahaInputField
+import com.kota.Bahamut.ui.components.BahaText
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -54,12 +62,11 @@ import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnetUI.TelnetPage
 import java.util.Collections
 
-class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
+class ArticleExpressionListPage : TelnetPage() {
 
     var inputTextState by mutableStateOf("")
 
-    private var articleExpressionListAdapter: BlockListAdapter? = null
-    private var articleExpressionsList: MutableList<String> = ArrayList()
+    private val articleExpressionsList = mutableStateListOf<String>()
 
     override val isPopupPage: Boolean
         get() = true
@@ -73,52 +80,9 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     override val isKeepOnOffline: Boolean
         get() = true
 
-    val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object :
-        ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0) {
-        var isSwiped: Boolean = false
-        var isDragged: Boolean = false
-        private var dragView: View? = null
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            val start = viewHolder.bindingAdapterPosition
-            val end = target.bindingAdapterPosition
-            if (propertiesVIP) {
-                Collections.swap(articleExpressionsList, start, end)
-                articleExpressionListAdapter?.notifyItemMoved(start, end)
-            } else {
-                showShortToast(getContextString(R.string.vip_only_message))
-            }
-            return true
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-
-        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-            when (actionState) {
-                ItemTouchHelper.ACTION_STATE_DRAG -> {
-                    isSwiped = false; isDragged = true
-                    dragView = viewHolder?.itemView
-                    dragView?.setBackgroundResource(R.color.ripple_material)
-                }
-                ItemTouchHelper.ACTION_STATE_SWIPE -> { isSwiped = true; isDragged = false }
-                ItemTouchHelper.ACTION_STATE_IDLE -> {
-                    if (isSwiped) Log.e("swipe", "swipe is over")
-                    if (!isSwiped && isDragged) {
-                        dragView?.setBackgroundResource(R.color.transparent)
-                        dragView = null
-                        UserSettings.setArticleExpressions(articleExpressionsList)
-                    }
-                    isSwiped = false; isDragged = false
-                }
-            }
-        }
-    })
-
     override fun createPageView(context: Context): View {
+        showNotification()
+        reload()
         return ComposeView(context).apply {
             setBahamutContent {
                 ArticleExpressionListPageContent()
@@ -132,16 +96,14 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
     }
 
     override fun onPageDidDisappear() {
-        articleExpressionsList = ArrayList()
+        articleExpressionsList.clear()
         super.onPageDidDisappear()
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun reload() {
         val elements = listOf(*articleExpressions)
         articleExpressionsList.clear()
         articleExpressionsList.addAll(elements)
-        articleExpressionListAdapter?.notifyDataSetChanged()
     }
 
     private fun showNotification() {
@@ -169,6 +131,28 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
         }
     }
 
+    private fun onDeleteClicked(index: Int) {
+        if (index in articleExpressionsList.indices) {
+            articleExpressionsList.removeAt(index)
+            UserSettings.setArticleExpressions(ArrayList(articleExpressionsList))
+            notifyDataUpdated()
+            reload()
+        }
+    }
+
+    private fun moveArticleExpressionListItem(fromIndex: Int, toIndex: Int) {
+        if (propertiesVIP) {
+            if (fromIndex in articleExpressionsList.indices && toIndex in articleExpressionsList.indices) {
+                Collections.swap(articleExpressionsList, fromIndex, toIndex)
+                UserSettings.setArticleExpressions(ArrayList(articleExpressionsList))
+                notifyDataUpdated()
+                reload()
+            }
+        } else {
+            showShortToast(getContextString(R.string.vip_only_message))
+        }
+    }
+
     private fun onResetClicked() {
         createDialog()
             .setTitle(getContextString(R.string.reset))
@@ -191,26 +175,13 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
         return true
     }
 
-    override fun onBlockListPageItemViewClicked(blockListPageItemView: BlockListViewHolder) {}
-
-    override fun onBlockListPageItemViewDeleteClicked(blockListPageItemView: BlockListViewHolder) {
-        val deletedIndex = blockListPageItemView.bindingAdapterPosition
-        articleExpressionsList.removeAt(deletedIndex)
-        UserSettings.setArticleExpressions(articleExpressionsList)
-        reload()
-    }
+    // ---------------------------------------------------------------
+    // Compose UI
+    // ---------------------------------------------------------------
 
     @Composable
     fun ArticleExpressionListPageContent() {
         val colors = AppTheme.colors
-
-        if (articleExpressionListAdapter == null) {
-            articleExpressionListAdapter = BlockListAdapter(articleExpressionsList).also {
-                it.setOnItemClickListener(this)
-            }
-            showNotification()
-            reload()
-        }
 
         Column(
             modifier = Modifier
@@ -218,6 +189,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                 .background(colors.pageBackground)
         ) {
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -228,7 +200,7 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                 BahaButton(
                     text = stringResource(R.string.reset),
                     type = ButtonType.DANGER,
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().weight(1f),
                     onClick = { onResetClicked() }
                 )
                 BahaInputField(
@@ -236,29 +208,41 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                     onValueChange = { inputTextState = it },
                     placeholder = stringResource(R.string.please_input_id),
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(3f)
                         .padding(horizontal = 8.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { onAddClicked() })
                 )
                 BahaButton(
                     text = stringResource(R.string.add),
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().weight(1f),
                     onClick = { onAddClicked() }
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
 
-            AndroidView(
-                factory = { ctx ->
-                    RecyclerView(ctx).apply {
-                        layoutManager = LinearLayoutManager(ctx)
-                        adapter = articleExpressionListAdapter
-                        itemTouchHelper.attachToRecyclerView(this)
-                    }
-                },
-                modifier = Modifier.weight(1f).fillMaxWidth()
-            )
+            // 表情符號列表 (LazyColumn)
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) {
+                itemsIndexed(
+                    items = articleExpressionsList,
+                    key = { index, item -> "${index}_$item" }
+                ) { index, item ->
+                    ArticleExpressionItemRow(
+                        name = item,
+                        isVip = propertiesVIP,
+                        canMoveUp = index > 0,
+                        canMoveDown = index < articleExpressionsList.size - 1,
+                        onDelete = { onDeleteClicked(index) },
+                        onMoveUp = { moveArticleExpressionListItem(index, index - 1) },
+                        onMoveDown = { moveArticleExpressionListItem(index, index + 1) }
+                    )
+                    HorizontalDivider(color = colors.divider, thickness = 1.dp)
+                }
+            }
 
             // 底部工具列 (滿版無縫)
             Box(
@@ -273,6 +257,74 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                     .fillMaxWidth()
                     .height(60.dp),
                 onClick = { onBackPressed() }
+            )
+        }
+    }
+
+    @Composable
+    private fun ArticleExpressionItemRow(
+        name: String,
+        isVip: Boolean,
+        canMoveUp: Boolean,
+        canMoveDown: Boolean,
+        onDelete: () -> Unit,
+        onMoveUp: () -> Unit,
+        onMoveDown: () -> Unit
+    ) {
+        val colors = AppTheme.colors
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp)
+                .background(colors.pageBackground)
+                .padding(start = 12.dp, end = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BahaText(
+                text = name,
+                color = colors.textPrimary,
+                fontSize = AppTheme.fontSize.title,
+                modifier = Modifier
+                    .weight(1f)
+                    .semantics {
+                        contentDescription = "刪除$name"
+                    }
+            )
+
+            if (isVip) {
+                IconButton(
+                    onClick = onMoveUp,
+                    enabled = canMoveUp,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowUp,
+                        contentDescription = "Move Up",
+                        tint = if (canMoveUp) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                    )
+                }
+                IconButton(
+                    onClick = onMoveDown,
+                    enabled = canMoveDown,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.KeyboardArrowDown,
+                        contentDescription = "Move Down",
+                        tint = if (canMoveDown) colors.textPrimary else colors.textSecondary.copy(alpha = 0.3f)
+                    )
+                }
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+
+            BahaButton(
+                text = stringResource(R.string.delete),
+                type = ButtonType.DANGER,
+                fontSize = AppTheme.fontSize.body,
+                modifier = Modifier
+                    .width(80.dp)
+                    .height(36.dp),
+                onClick = onDelete
             )
         }
     }

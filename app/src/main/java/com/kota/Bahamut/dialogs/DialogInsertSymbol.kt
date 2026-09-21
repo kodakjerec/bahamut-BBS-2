@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -42,12 +43,12 @@ class DialogInsertSymbol : ASDialog() {
         val symbolList = symbols.map { it.toString() }
 
         BahaAlertDialogContent(
-            modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
             title = "符號表",
             contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 )
             )

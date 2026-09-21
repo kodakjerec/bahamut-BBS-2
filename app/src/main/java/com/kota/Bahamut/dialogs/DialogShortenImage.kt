@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -34,7 +33,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -49,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.toDrawable
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -94,7 +93,7 @@ class DialogShortenImage : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(ThemeStore.getDialogThemeResId())
         super.onCreate(savedInstanceState)
-        window.setBackgroundDrawable(ColorDrawable(android.graphics.Color.TRANSPARENT))
+        window.setBackgroundDrawable(android.graphics.Color.TRANSPARENT.toDrawable())
         window.decorView.setBackgroundColor(android.graphics.Color.TRANSPARENT)
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
 
@@ -125,16 +124,17 @@ class DialogShortenImage : AppCompatActivity() {
                 ) { /* 點擊對話框本體不關閉 */ }
             ) {
                 BahaAlertDialogContent(
-                    modifier = Modifier.widthIn(min = 280.dp, max = 340.dp),
                     title = stringResource(R.string.dialog_shorten_img_title),
                     contentPadding = PaddingValues(0.dp),
                     buttons = listOf(
                         BahaDialogButton(
                             text = stringResource(R.string.cancel),
+                            type = ButtonType.DANGER,
                             onClick = { finish() }
                         ),
                         BahaDialogButton(
                             text = stringResource(R.string.send),
+                            type = ButtonType.DANGER,
                             enabled = outputParam.isNotEmpty(),
                             onClick = {
                                 if (outputParam.isNotEmpty()) {

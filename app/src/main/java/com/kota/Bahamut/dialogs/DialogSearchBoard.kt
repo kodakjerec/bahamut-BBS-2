@@ -25,7 +25,7 @@ import com.kota.asFramework.dialog.ASDialog
 class DialogSearchBoard : ASDialog() {
     var dialogSearchBoardListener: DialogSearchBoardListener? = null
 
-    override val name: String?
+    override val name: String
         get() = "BahamutBoardsSearchDialog"
 
     init {
@@ -45,12 +45,12 @@ class DialogSearchBoard : ASDialog() {
             buttons = listOf(
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.cancel),
-                    type = ButtonType.SECONDARY,
+                    type = ButtonType.DANGER,
                     onClick = { dismiss() }
                 ),
                 BahaDialogButton(
                     text = CommonFunctions.getContextString(R.string.search),
-                    type = ButtonType.NORMAL,
+                    type = ButtonType.DANGER,
                     onClick = {
                         dialogSearchBoardListener?.onSearchButtonClickedWithKeyword(keyword.replace("\n", ""))
                         dismiss()
