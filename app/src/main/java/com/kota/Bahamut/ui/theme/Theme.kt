@@ -139,9 +139,9 @@ private val DefaultLightColors = AppColors(
     toolbarBackgroundFocused = AppPalette.DefaultToolbarFocused,
     toolbarBackgroundDisabled = AppPalette.DefaultToolbarDisabled,
     toolbarDivider = AppPalette.ToolbarDivider,
-    buttonDangerBackground = AppPalette.Red,
-    buttonDangerPressed = AppPalette.RedBright,
-    buttonDangerDisabled = Color(0xFF400000),
+    buttonDangerBackground = Color(0xFF400000),
+    buttonDangerPressed = Color(0xFFFFC90E),
+    buttonDangerDisabled = Color(0xFF200000),
 
     dialogButtonBackground = AppPalette.DialogItemNormal,
     dialogButtonBackgroundPressed = AppPalette.DialogItemPressed,
