@@ -2,20 +2,22 @@ package com.kota.Bahamut.pages.articlePage
 
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.widget.ImageView
+import com.kota.Bahamut.ui.components.ZoomableImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -32,11 +34,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
@@ -303,6 +305,7 @@ fun ThumbnailItemView(
 
     var imageRequested by remember(url) { mutableStateOf(false) }
     var isImageLoading by remember(url) { mutableStateOf(false) }
+    var isImageError by remember(url) { mutableStateOf(false) }
     var loadedDrawable by remember(url) { mutableStateOf<Drawable?>(null) }
 
     var isTitleExpanded by remember(url) { mutableStateOf(false) }
@@ -332,13 +335,21 @@ fun ThumbnailItemView(
         }
     }
 
-    // 載入圖片 (Glide)
-    LaunchedEffect(imageRequested, thumbnailData?.imageUrl) {
+    // 載入圖片 (Glide，包含淡入動畫、縮圖 multiplier 0.2f 與失敗狀態處置)
+    LaunchedEffect(imageRequested, thumbnailData?.imageUrl, isImageError) {
         val imageUrl = thumbnailData?.imageUrl
-        if (imageRequested && !imageUrl.isNullOrEmpty() && loadedDrawable == null && !isImageLoading) {
+        if (imageRequested && !imageUrl.isNullOrEmpty() && loadedDrawable == null && !isImageLoading && !isImageError) {
             isImageLoading = true
+            isImageError = false
+
             Glide.with(context)
                 .load(imageUrl)
+                .transition(DrawableTransitionOptions.withCrossFade(300))
+                .thumbnail(
+                    Glide.with(context)
+                        .load(imageUrl)
+                        .sizeMultiplier(0.2f)
+                )
                 .listener(object : RequestListener<Drawable?> {
                     override fun onLoadFailed(
                         e: GlideException?,
@@ -348,6 +359,7 @@ fun ThumbnailItemView(
                     ): Boolean {
                         Log.e("ThumbnailItemView", "Image load failed for URL: $imageUrl", e)
                         isImageLoading = false
+                        isImageError = true
                         return false
                     }
 
@@ -368,9 +380,12 @@ fun ThumbnailItemView(
                     ) {
                         loadedDrawable = resource
                         isImageLoading = false
+                        isImageError = false
                     }
 
-                    override fun onLoadCleared(placeholder: Drawable?) {}
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        loadedDrawable = null
+                    }
                 })
         }
     }
@@ -405,32 +420,62 @@ fun ThumbnailItemView(
                 // 圖片區域
                 if (data.imageUrl.isNotEmpty()) {
                     if (isImageLoading) {
-                        // 圖片載入中圓圈動畫
+                        // 圖片載入中預設狀態
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(32.dp)
+                                .height(36.dp)
                                 .background(colors.dialogTitleBackground),
                             contentAlignment = Alignment.Center
                         ) {
-                            Column {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp).align(Alignment.CenterHorizontally),
+                                    modifier = Modifier.size(20.dp),
                                     color = colors.textLink,
                                     strokeWidth = 2.dp
                                 )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                BahaText(
+                                    text = stringResource(R.string.loading),
+                                    color = colors.buttonText,
+                                    fontSize = AppTheme.fontSize.caption
+                                )
                             }
                         }
+                    } else if (isImageError) {
+                        // 圖片載入失敗狀態 (點擊重試)
+                        Box(
+                            modifier = modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
+                                .background(colors.buttonDangerDisabled)
+                                .combinedClickable(
+                                    onClick = {
+                                        isImageError = false
+                                        isImageLoading = false
+                                        loadedDrawable = null
+                                    }
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            BahaText(
+                                text = "圖片載入失敗，點擊重試",
+                                color = colors.buttonTextDisabled,
+                                fontSize = AppTheme.fontSize.body,
+                                textAlign = TextAlign.Center
+                            )
+                        }
                     } else if (loadedDrawable != null) {
-                        // 圖片已載入成功，內嵌預覽使用 ImageView 優先維持列表滾動手勢，點擊可開連結，長按開啟 DialogImageView 手勢縮放
+                        // 圖片已載入成功，使用 ZoomableImageView 支援雙指與雙擊縮放，並在 1.0x 原始大小時不鎖定手勢、維繫 ArticlePage 滑動
                         AndroidView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight(),
                             factory = { ctx ->
-                                ImageView(ctx).apply {
+                                ZoomableImageView(ctx).apply {
                                     adjustViewBounds = true
-                                    scaleType = ImageView.ScaleType.FIT_CENTER
                                     setOnClickListener {
                                         try {
                                             val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
@@ -449,34 +494,14 @@ fun ThumbnailItemView(
                                     }
                                 }
                             },
-                            update = { imageView ->
-                                imageView.contentDescription = data.description
+                            update = { zoomImageView ->
+                                zoomImageView.contentDescription = data.description
                                 val drawable = loadedDrawable
                                 if (drawable is GifDrawable) {
                                     drawable.startFromFirstFrame()
-                                    imageView.setImageDrawable(drawable)
-                                } else if (drawable is BitmapDrawable) {
-                                    val bitmap = drawable.bitmap
-                                    val picHeight = bitmap.height
-                                    val picWidth = bitmap.width
-                                    val metrics = context.resources.displayMetrics
-                                    val targetWidth = metrics.widthPixels
-                                    val targetHeight = metrics.heightPixels
-
-                                    val scaleWidth = targetWidth.toFloat() / picWidth
-                                    val scaleHeight = targetHeight.toFloat() / picHeight
-                                    val scale = minOf(scaleWidth, scaleHeight, 1f)
-
-                                    val finalWidth = minOf((picWidth * scale).toInt(), targetWidth)
-                                    val finalHeight = minOf((picHeight * scale).toInt(), targetHeight)
-
-                                    imageView.minimumWidth = finalWidth
-                                    imageView.minimumHeight = finalHeight
-
-                                    val newBitmap = bitmap.scale(finalWidth, finalHeight)
-                                    imageView.setImageBitmap(newBitmap)
+                                    zoomImageView.setImageDrawable(drawable)
                                 } else if (drawable != null) {
-                                    imageView.setImageDrawable(drawable)
+                                    zoomImageView.setImageDrawable(drawable)
                                 }
                             }
                         )
@@ -496,7 +521,7 @@ fun ThumbnailItemView(
                                 text = stringResource(R.string.thumbnail_show_pic),
                                 color = colors.textPrimary,
                                 fontSize = AppTheme.fontSize.title,
-                                textAlign = TextAlign.Center,
+                                textAlign = TextAlign.Center
                             )
                         }
                     }

@@ -1,32 +1,150 @@
 package com.kota.Bahamut.dialogs
 
-import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
-import android.util.TypedValue
-import android.view.Gravity
-import android.view.View
-import android.widget.FrameLayout
-import androidx.core.graphics.scale
-import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.load.resource.gif.GifDrawable
 import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
-import com.bumptech.glide.request.transition.Transition
-import com.github.chrisbanes.photoview.PhotoView
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.Bahamut.service.CommonFunctions.getContextColor
-import com.kota.asFramework.thread.ASCoroutine
-import kotlin.math.min
+import com.kota.Bahamut.ui.components.BahaText
+import com.kota.Bahamut.ui.components.ZoomableImageView
+import com.kota.Bahamut.ui.dialogs.BahaDialogManager
+import com.kota.Bahamut.ui.theme.AppTheme
 
-class DialogImageView : ASDialog() {
-    private lateinit var photoView: PhotoView
+/**
+ * Compose 架構之圖片全螢幕大圖預覽對話框
+ * 支援雙指捏合縮放、三階雙擊放大與拖曳平移，點擊背景黑色區域可直接關閉對話框。
+ */
+@Composable
+fun DialogImageViewContent(
+    imageUrl: String,
+    onDismissRequest: () -> Unit
+) {
+    val context = LocalContext.current
+    val colors = AppTheme.colors
+
+    var loadedDrawable by remember(imageUrl) { mutableStateOf<Drawable?>(null) }
+    var isLoading by remember(imageUrl) { mutableStateOf(true) }
+    var isError by remember(imageUrl) { mutableStateOf(false) }
+
+    LaunchedEffect(imageUrl) {
+        if (imageUrl.isEmpty()) {
+            onDismissRequest()
+            return@LaunchedEffect
+        }
+        isLoading = true
+        isError = false
+
+        Glide.with(context)
+            .load(imageUrl)
+            .listener(object : RequestListener<Drawable?> {
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable?>,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    Log.e("DialogImageView", "Image load failed for URL: $imageUrl", e)
+                    isError = true
+                    isLoading = false
+                    return false
+                }
+
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable?>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    loadedDrawable = resource
+                    isLoading = false
+                    return false
+                }
+            })
+            .submit()
+    }
+
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        )
+    ) {
+        // 全螢幕深色半透明背景，點擊背景直接關閉對話框
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.2f))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onDismissRequest() },
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(48.dp),
+                    color = colors.textLink,
+                    strokeWidth = 3.dp
+                )
+            } else if (loadedDrawable != null) {
+                AndroidView(
+                    modifier = Modifier.fillMaxSize(),
+                    factory = { ctx ->
+                        ZoomableImageView(ctx).apply {
+                            setOnClickListener {
+                                onDismissRequest()
+                            }
+                        }
+                    },
+                    update = { zoomImageView ->
+                        val drawable = loadedDrawable
+                        if (drawable is GifDrawable) {
+                            drawable.startFromFirstFrame()
+                        }
+                        zoomImageView.setImageDrawable(drawable)
+                    }
+                )
+            } else if (isError) {
+                BahaText(
+                    text = "載入圖片失敗，點擊背景關閉",
+                    color = Color.White
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 外部輔助類別 (向下相容舊有呼叫方式 `DialogImageView().setImageUrl(url).show()`)
+ */
+class DialogImageView {
     private var imageUrl: String = ""
 
     fun setImageUrl(url: String): DialogImageView {
@@ -34,148 +152,15 @@ class DialogImageView : ASDialog() {
         return this
     }
 
-    override fun show() {
-        super.show()
+    fun show() {
         if (imageUrl.isNotEmpty()) {
-            loadImage()
-        } else {
-            dismiss()
+            BahaDialogManager.showImage(imageUrl)
         }
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
-    private fun loadImage() {
-        ASCoroutine.ensureMainThread {
-            try {
-                val circularProgressDrawable = CircularProgressDrawable(context)
-                circularProgressDrawable.setStrokeWidth(10f)
-                circularProgressDrawable.setCenterRadius(60f)
-
-                // 進度條顏色
-                val typedValue = TypedValue()
-                context.theme.resolveAttribute(androidx.appcompat.R.attr.colorAccent, typedValue, true)
-                circularProgressDrawable.setColorSchemeColors(getContextColor(typedValue.resourceId))
-                circularProgressDrawable.start()
-
-                // 使用 Glide 載入圖片
-                Glide.with(this@DialogImageView.context)
-                    .load(imageUrl)
-                    .placeholder(circularProgressDrawable)
-                    .listener(object : RequestListener<Drawable?> {
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable?>,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            Log.e("DialogImageView", "Image load failed for URL: $imageUrl", e)
-                            ASCoroutine.ensureMainThread {
-                                dismiss()
-                            }
-                            return false
-                        }
-
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable?>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean
-                        ): Boolean {
-                            return false
-                        }
-                    })
-                    .into(object : CustomTarget<Drawable?>() {
-                        override fun onResourceReady(
-                            resource: Drawable,
-                            transition: Transition<in Drawable?>?
-                        ) {
-                            try {
-                                val bitmap: Bitmap
-                                if (resource is GifDrawable) {
-                                    bitmap = resource.firstFrame
-                                } else {
-                                    bitmap = (resource as BitmapDrawable).bitmap
-                                }
-
-                                val picHeight = bitmap.height
-                                val picWidth = bitmap.width
-
-                                // 固定視窗尺寸 (80% 螢幕寬高)
-                                val fixedHeight = (context.resources.displayMetrics.heightPixels * 0.7).toInt()
-                                val fixedWidth = (context.resources.displayMetrics.widthPixels * 0.8).toInt()
-                                setDialogWidthHeight(photoView)
-
-                                // 計算縮放比例，讓圖片最大化填滿視窗（碰到寬或高為止），維持比例
-                                val scale = min(fixedWidth.toFloat() / picWidth, fixedHeight.toFloat() / picHeight)
-                                val targetWidth = (picWidth * scale).toInt()
-                                val targetHeight = (picHeight * scale).toInt()
-
-
-                                // 顯示圖片，縮放到 targetWidth/targetHeight
-                                if (resource is GifDrawable) {
-                                    resource.startFromFirstFrame()
-                                    // GIF 直接設置 Drawable，PhotoView 會自動處理縮放
-                                    photoView.setImageDrawable(resource)
-                                } else {
-                                    val newBitmap = bitmap.scale(targetWidth, targetHeight)
-                                    photoView.setImageBitmap(newBitmap)
-                                }
-                            } catch (e: Exception) {
-                                Log.e("DialogImageView", "Error processing image", e)
-                                ASCoroutine.ensureMainThread {
-                                    dismiss()
-                                }
-                            }
-                        }
-
-                        override fun onLoadCleared(placeholder: Drawable?) {
-                        }
-                    })
-            } catch (e: Exception) {
-                Log.e("DialogImageView", "Error loading image", e)
-                dismiss()
-            }
+    companion object {
+        fun show(imageUrl: String) {
+            BahaDialogManager.showImage(imageUrl)
         }
-    }
-
-    override val name: String?
-        get() = "DialogImageView"
-
-    init {
-        requestWindowFeature(1)
-        window?.setBackgroundDrawable(null)
-
-        // 創建主容器 - 透明背景，點擊外圍可關閉
-        val mainContainer = FrameLayout(context)
-        mainContainer.setBackgroundColor(android.graphics.Color.argb(128, 0, 0, 0))
-        mainContainer.setOnClickListener { dismiss() }
-
-        // 創建 PhotoView 容器
-        val photoViewContainer = FrameLayout(context)
-        photoView = PhotoView(context)
-        photoView.maximumScale = 20.0f
-        photoView.mediumScale = 3.0f
-
-        val photoViewParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
-        photoViewParams.gravity = Gravity.CENTER
-
-        photoViewContainer.addView(photoView, photoViewParams)
-
-        // 防止點擊 PhotoView 時關閉
-        photoViewContainer.setOnClickListener { }
-
-        val containerParams = FrameLayout.LayoutParams(
-            FrameLayout.LayoutParams.MATCH_PARENT,
-            FrameLayout.LayoutParams.MATCH_PARENT
-        )
-        mainContainer.addView(photoViewContainer, containerParams)
-
-        setContentView(mainContainer)
-        setCancelable(true)
-        setDialogWidthHeight(photoView)
     }
 }

@@ -53,7 +53,6 @@ dependencies {
     implementation 'org.jsoup:jsoup:1.21.2'
     // for image loading
     implementation 'com.github.bumptech.glide:glide:5.0.4'
-    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
     // drawer
     implementation 'androidx.drawerlayout:drawerlayout:1.2.0'

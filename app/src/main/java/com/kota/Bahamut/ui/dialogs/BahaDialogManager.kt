@@ -29,11 +29,20 @@ object BahaDialogManager {
         val onDismiss: (() -> Unit)? = null
     )
 
+    data class ImageState(
+        val isShowing: Boolean = false,
+        val imageUrl: String = "",
+        val onDismiss: (() -> Unit)? = null
+    )
+
     private val _processingState = MutableStateFlow(ProcessingState())
     val processingState: StateFlow<ProcessingState> = _processingState.asStateFlow()
 
     private val _alertState = MutableStateFlow(AlertState())
     val alertState: StateFlow<AlertState> = _alertState.asStateFlow()
+
+    private val _imageState = MutableStateFlow(ImageState())
+    val imageState: StateFlow<ImageState> = _imageState.asStateFlow()
 
     /**
      * 顯示處理中 / 載入中對話框
@@ -129,6 +138,24 @@ object BahaDialogManager {
     fun dismissAlert() {
         _alertState.value = _alertState.value.copy(isShowing = false)
     }
+
+    /**
+     * 顯示大圖全螢幕預覽對話框
+     */
+    fun showImage(imageUrl: String, onDismiss: (() -> Unit)? = null) {
+        _imageState.value = ImageState(
+            isShowing = true,
+            imageUrl = imageUrl,
+            onDismiss = onDismiss
+        )
+    }
+
+    /**
+     * 關閉大圖全螢幕預覽對話框
+     */
+    fun dismissImage() {
+        _imageState.value = _imageState.value.copy(isShowing = false)
+    }
 }
 
 /**
@@ -139,6 +166,7 @@ object BahaDialogManager {
 fun BahaGlobalDialogHost() {
     val processingState by BahaDialogManager.processingState.collectAsState()
     val alertState by BahaDialogManager.alertState.collectAsState()
+    val imageState by BahaDialogManager.imageState.collectAsState()
 
     if (processingState.isShowing) {
         BahaProcessingDialog(
@@ -159,6 +187,16 @@ fun BahaGlobalDialogHost() {
             onDismissRequest = {
                 alertState.onDismiss?.invoke()
                 BahaDialogManager.dismissAlert()
+            }
+        )
+    }
+
+    if (imageState.isShowing) {
+        com.kota.Bahamut.dialogs.DialogImageViewContent(
+            imageUrl = imageState.imageUrl,
+            onDismissRequest = {
+                imageState.onDismiss?.invoke()
+                BahaDialogManager.dismissImage()
             }
         )
     }
