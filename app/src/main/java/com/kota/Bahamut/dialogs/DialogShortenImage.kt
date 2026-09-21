@@ -124,6 +124,7 @@ class DialogShortenImage : AppCompatActivity() {
                 ) { /* 點擊對話框本體不關閉 */ }
             ) {
                 BahaAlertDialogContent(
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     title = stringResource(R.string.dialog_shorten_img_title),
                     contentPadding = PaddingValues(0.dp),
                     buttons = listOf(

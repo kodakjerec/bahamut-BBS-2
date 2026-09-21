@@ -5,6 +5,7 @@ import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
 import android.util.Log
+import android.widget.ImageView
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -41,7 +42,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
-import com.github.chrisbanes.photoview.PhotoView
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
 import com.kota.Bahamut.R
@@ -422,15 +422,15 @@ fun ThumbnailItemView(
                             }
                         }
                     } else if (loadedDrawable != null) {
-                        // 圖片已載入成功，使用 PhotoView 支援手勢縮放、GIF 動畫與全螢幕檢視
+                        // 圖片已載入成功，內嵌預覽使用 ImageView 優先維持列表滾動手勢，點擊可開連結，長按開啟 DialogImageView 手勢縮放
                         AndroidView(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight(),
                             factory = { ctx ->
-                                PhotoView(ctx).apply {
-                                    maximumScale = 20.0f
-                                    mediumScale = 3.0f
+                                ImageView(ctx).apply {
+                                    adjustViewBounds = true
+                                    scaleType = ImageView.ScaleType.FIT_CENTER
                                     setOnClickListener {
                                         try {
                                             val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
@@ -449,12 +449,12 @@ fun ThumbnailItemView(
                                     }
                                 }
                             },
-                            update = { photoView ->
-                                photoView.contentDescription = data.description
+                            update = { imageView ->
+                                imageView.contentDescription = data.description
                                 val drawable = loadedDrawable
                                 if (drawable is GifDrawable) {
                                     drawable.startFromFirstFrame()
-                                    photoView.setImageDrawable(drawable)
+                                    imageView.setImageDrawable(drawable)
                                 } else if (drawable is BitmapDrawable) {
                                     val bitmap = drawable.bitmap
                                     val picHeight = bitmap.height
@@ -470,13 +470,13 @@ fun ThumbnailItemView(
                                     val finalWidth = minOf((picWidth * scale).toInt(), targetWidth)
                                     val finalHeight = minOf((picHeight * scale).toInt(), targetHeight)
 
-                                    photoView.minimumWidth = finalWidth
-                                    photoView.minimumHeight = finalHeight
+                                    imageView.minimumWidth = finalWidth
+                                    imageView.minimumHeight = finalHeight
 
                                     val newBitmap = bitmap.scale(finalWidth, finalHeight)
-                                    photoView.setImageBitmap(newBitmap)
+                                    imageView.setImageBitmap(newBitmap)
                                 } else if (drawable != null) {
-                                    photoView.setImageDrawable(drawable)
+                                    imageView.setImageDrawable(drawable)
                                 }
                             }
                         )

@@ -10,10 +10,15 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,7 +32,7 @@ import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
  * 專案通用主題適配輸入框 (String 版本)
- * 將 String 自動轉換為 TextFieldValue 後呼叫主實作。
+ * 內部維護帶有游標與選取範圍 (selection) 的 TextFieldValue State，並統一委派給 TextFieldValue 核心實作。
  */
 @Composable
 fun BahaInputField(
@@ -46,7 +51,7 @@ fun BahaInputField(
     } else {
         KeyboardOptions(
             keyboardType = KeyboardType.Text,
-            imeAction = if (singleLine) ImeAction.Next else ImeAction.Default
+            imeAction = if (singleLine) ImeAction.Next else ImeAction.Default,
         )
     },
     keyboardActions: KeyboardActions = KeyboardActions.Default,
@@ -54,9 +59,27 @@ fun BahaInputField(
     fontColor: Color = AppTheme.colors.inputBoxText,
     backgroundColor: Color = AppTheme.colors.inputBoxBackground
 ) {
-    BahaInputField(
-        value = TextFieldValue(value),
-        onValueChange = { onValueChange(it.text) },
+    // 內部維護包含游標與選取範圍 (selection) 的 TextFieldValue State
+    var textFieldValueState by remember {
+        mutableStateOf(TextFieldValue(text = value, selection = TextRange(value.length)))
+    }
+
+    // 當外部 String value 發生改變 (如清空或由外部設定) 時，同步更新內部 TextFieldValue 內容並修正游標至末尾
+    if (textFieldValueState.text != value) {
+        textFieldValueState = textFieldValueState.copy(
+            text = value,
+            selection = TextRange(value.length)
+        )
+    }
+
+    BahaInputFieldInternal(
+        value = textFieldValueState,
+        onValueChange = { newValue ->
+            textFieldValueState = newValue
+            if (value != newValue.text) {
+                onValueChange(newValue.text)
+            }
+        },
         modifier = modifier,
         placeholder = placeholder,
         isPassword = isPassword,
@@ -78,7 +101,7 @@ fun BahaInputField(
  * 自動適配螢幕/容器寬度，當 [singleLine] 為 false 時可隨內容長度自動換行並延展高度。
  */
 @Composable
-fun BahaInputField(
+fun BahaInputFieldInternal(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     modifier: Modifier = Modifier,

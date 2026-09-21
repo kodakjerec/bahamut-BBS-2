@@ -87,8 +87,8 @@ class PostArticlePage : TelnetPage() {
     // Compose states
     var headers: Array<String> = emptyArray()
     var headerSelectedState by mutableIntStateOf(0)
-    var titleState by mutableStateOf(TextFieldValue(""))
-    var contentState by mutableStateOf(TextFieldValue(""))
+    var titleState by mutableStateOf("")
+    var contentState by mutableStateOf("")
     var isToolbarExpanded by mutableStateOf(false)
 
     enum class OperationMode {
@@ -131,13 +131,11 @@ class PostArticlePage : TelnetPage() {
     }
 
     fun setPostTitle(aTitle: String?) {
-        val t = aTitle ?: ""
-        titleState = TextFieldValue(t, TextRange(t.length))
+        titleState = aTitle ?: ""
     }
 
     fun setPostContent(aContent: String?) {
-        val c = aContent ?: ""
-        contentState = TextFieldValue(c, TextRange(c.length))
+        contentState = aContent ?: ""
     }
 
     fun setTelnetArticle(article: TelnetArticle?) {
@@ -173,16 +171,16 @@ class PostArticlePage : TelnetPage() {
         get() {
             if (editFormat == null) return null
             val editTitle = judgeDoubleWord(
-                titleState.text,
+                titleState,
                 TelnetFrame.DEFAULT_COLUMN - 9
             ).split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-            val editContentStr = contentState.text
+            val editContentStr = contentState
             return String.format(editFormat!!, editTitle, editContentStr)
         }
 
     override fun clear() {
-        titleState = TextFieldValue("")
-        contentState = TextFieldValue("")
+        titleState = ""
+        contentState = ""
         headerSelectedState = 0
         postArticlePageListener = null
         recover = false
@@ -207,12 +205,7 @@ class PostArticlePage : TelnetPage() {
 
     fun insertString(str: String?) {
         if (str.isNullOrEmpty()) return
-        val current = contentState
-        val start = current.selection.start.coerceIn(0, current.text.length)
-        val end = current.selection.end.coerceIn(0, current.text.length)
-        val newText = current.text.replaceRange(start, end, str)
-        val newCursor = start + str.length
-        contentState = TextFieldValue(newText, TextRange(newCursor))
+        contentState += str
     }
 
     private fun post(title: String, content: String?) {
@@ -274,8 +267,8 @@ class PostArticlePage : TelnetPage() {
 
     private fun onPostButtonClicked() {
         if (postArticlePageListener == null) return
-        val title = getArticleHeader(headerSelectedState) + titleState.text.replace("\n", "")
-        val content = contentState.text
+        val title = getArticleHeader(headerSelectedState) + titleState.replace("\n", "")
+        val content = contentState
         var errMsg: String? = null
         if (title.isEmpty() && content.isEmpty()) {
             errMsg = "標題與內文不可為空"
@@ -438,16 +431,16 @@ class PostArticlePage : TelnetPage() {
     private fun loadTempArticle(index: Int) {
         val articleTemp = ArticleTempStore(context).articles[index]
         headerSelectedState = getIndexOfHeader(articleTemp.header).coerceAtLeast(0)
-        titleState = TextFieldValue(articleTemp.title ?: "")
-        contentState = TextFieldValue(articleTemp.content ?: "")
+        titleState = articleTemp.title ?: ""
+        contentState = articleTemp.content ?: ""
     }
 
     private fun saveTempArticle(index: Int) {
         val store = ArticleTempStore(context)
         val articleTemp = store.articles[index]
         articleTemp.header = if (headerSelectedState > 0) getArticleHeader(headerSelectedState) else ""
-        articleTemp.title = titleState.text
-        articleTemp.content = contentState.text
+        articleTemp.title = titleState
+        articleTemp.content = contentState
         store.store()
         if (index < 8) {
             ASAlertDialog.createDialog().setTitle(getContextString(R.string._save))
@@ -563,16 +556,16 @@ class PostArticlePage : TelnetPage() {
         }
 
         val joinedParentContent = finalParentContent.joinToString("\n")
-        val originFromContent = contentState.text.split("\n").dropLastWhile { it.isEmpty() }
+        val originFromContent = contentState.split("\n").dropLastWhile { it.isEmpty() }
         val selfContent = originFromContent.filter { !it.startsWith("※ 引述") && !it.startsWith("> ") }
         val joinedSelfContent = selfContent.joinToString("\n")
 
         val result = if (joinedParentContent.isNotEmpty()) "$joinedParentContent\n$joinedSelfContent" else joinedSelfContent
-        contentState = TextFieldValue(result, TextRange(result.length))
+        contentState = result
     }
 
     override fun onBackPressed(): Boolean {
-        if (titleState.text.isEmpty() && contentState.text.isEmpty()) {
+        if (titleState.isEmpty() && contentState.isEmpty()) {
             return super.onBackPressed()
         }
         ASAlertDialog.createDialog()

@@ -24,9 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
@@ -58,9 +56,9 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
     var recover: Boolean = false
 
     // Compose state
-    var receiverState by mutableStateOf(TextFieldValue(""))
-    var titleState by mutableStateOf(TextFieldValue(""))
-    var contentState by mutableStateOf(TextFieldValue(""))
+    var receiverState by mutableStateOf("")
+    var titleState by mutableStateOf("")
+    var contentState by mutableStateOf("")
     var isTitleBlockHidden by mutableStateOf(false)
 
     val name: String
@@ -99,21 +97,21 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
     }
 
     fun setPostTitle(aTitle: String) {
-        titleState = TextFieldValue(aTitle, TextRange(aTitle.length))
+        titleState = aTitle
     }
 
     fun setPostContent(aContent: String) {
-        contentState = TextFieldValue(aContent, TextRange(aContent.length))
+        contentState = aContent
     }
 
     fun setReceiver(aReceiver: String) {
-        receiverState = TextFieldValue(aReceiver, TextRange(aReceiver.length))
+        receiverState = aReceiver
     }
 
     override fun clear() {
-        receiverState = TextFieldValue("")
-        titleState = TextFieldValue("")
-        contentState = TextFieldValue("")
+        receiverState = ""
+        titleState = ""
+        contentState = ""
         sendMailPageListener = null
     }
 
@@ -127,20 +125,15 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
     }
 
     private fun insertStringAtCursor(str: String) {
-        val current = contentState
-        val start = current.selection.start.coerceIn(0, current.text.length)
-        val end = current.selection.end.coerceIn(0, current.text.length)
-        val newText = current.text.replaceRange(start, end, str)
-        val newCursor = start + str.length
-        contentState = TextFieldValue(newText, TextRange(newCursor))
+        contentState += str
     }
 
     private fun onPostClicked() {
         if (sendMailPageListener == null) return
 
-        val receiver = receiverState.text.replace("\n", "").trim()
-        val title = titleState.text.replace("\n", "").trim()
-        val content = contentState.text
+        val receiver = receiverState.replace("\n", "").trim()
+        val title = titleState.replace("\n", "").trim()
+        val content = contentState
 
         val empty = Vector<String?>()
         if (receiver.isEmpty()) empty.add("收件人")
@@ -220,17 +213,17 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
 
     private fun loadTempArticle(index: Int) {
         val articleTemp = ArticleTempStore(context).articles[index]
-        receiverState = TextFieldValue(articleTemp.header ?: "")
-        titleState = TextFieldValue(articleTemp.title ?: "")
-        contentState = TextFieldValue(articleTemp.content ?: "")
+        receiverState = articleTemp.header ?: ""
+        titleState = articleTemp.title ?: ""
+        contentState = articleTemp.content ?: ""
     }
 
     private fun saveTempArticle(index: Int) {
         val store = ArticleTempStore(context)
         val articleTemp = store.articles[index]
-        articleTemp.header = receiverState.text
-        articleTemp.title = titleState.text
-        articleTemp.content = contentState.text
+        articleTemp.header = receiverState
+        articleTemp.title = titleState
+        articleTemp.content = contentState
         store.store()
     }
 
@@ -308,7 +301,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                         .fillMaxSize()
                         .padding(12.dp),
                     decorationBox = { innerTextField ->
-                        if (contentState.text.isEmpty()) {
+                        if (contentState.isEmpty()) {
                             BahaText(
                                 text = stringResource(R.string.input_content_here),
                                 color = colors.textSecondary,

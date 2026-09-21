@@ -26,9 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
@@ -63,7 +61,7 @@ class MessageSub : TelnetPage() {
 
     // Compose states
     var senderNameState by mutableStateOf("")
-    var contentState by mutableStateOf(TextFieldValue(""))
+    var contentState by mutableStateOf("")
 
     override val pageLayout: Int
         get() = 0
@@ -122,25 +120,20 @@ class MessageSub : TelnetPage() {
     }
 
     fun insertString(str: String) {
-        val current = contentState
-        val start = current.selection.start.coerceIn(0, current.text.length)
-        val end = current.selection.end.coerceIn(0, current.text.length)
-        val newText = current.text.replaceRange(start, end, str).take(59)
-        val newCursor = (start + str.length).coerceAtMost(59)
-        contentState = TextFieldValue(newText, TextRange(newCursor))
+        contentState = (contentState + str).take(59)
     }
 
     private fun onPostClicked() {
-        if (contentState.text.isNotEmpty()) {
+        if (contentState.isNotEmpty()) {
             sendMessagePart1()
-            contentState = TextFieldValue("")
+            contentState = ""
         }
     }
 
     /** 送出訊息-1 試著啟動訊息 */
     private fun sendMessagePart1() {
         val aSenderName = senderNameState.trim()
-        val aMessage = contentState.text.trim()
+        val aMessage = contentState.trim()
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_S)
 
         val db = MessageDatabase(context)
@@ -304,7 +297,7 @@ class MessageSub : TelnetPage() {
             HorizontalDivider(color = colors.divider, thickness = 1.dp)
             BahaInputField(
                 value = contentState,
-                onValueChange = { if (it.text.length <= 59) contentState = it },
+                onValueChange = { if (it.length <= 59) contentState = it },
                 placeholder = stringResource(R.string.input_content_here),
                 maxLength = 59,
                 singleLine = true,

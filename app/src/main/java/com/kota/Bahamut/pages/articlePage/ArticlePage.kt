@@ -26,7 +26,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,8 +42,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextDecoration
@@ -940,84 +941,86 @@ fun ArticleTextModeContent(
 ) {
     val listState = rememberLazyListState()
 
-    LazyColumn(
-        state = listState,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        // 1. 內文區塊 (還原原生 BBS 文字項目，無額外 Material 卡片)
-        if (article.itemSize == 0 && article.frame != null) {
-            item {
-                ArticleTelnetBlockItem(frame = article.frame!!)
+    SelectionContainer {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            // 1. 內文區塊 (還原原生 BBS 文字項目，無額外 Material 卡片)
+            if (article.itemSize == 0 && article.frame != null) {
+                item {
+                    ArticleTelnetBlockItem(frame = article.frame!!)
+                }
+            } else {
+                items(count = article.itemSize) { i ->
+                    val item = article.getItem(i)
+                    if (item != null) {
+                        val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
+                        if (!isBlocked) {
+                            if (item.type == 1 && item.frame != null) {
+                                ArticleTelnetBlockItem(frame = item.frame!!)
+                            } else {
+                                ArticleContentBlockItem(
+                                    item = item,
+                                    colors = colors,
+                                    loadAllTrigger = loadAllTrigger,
+                                    onAuthorClick = onAuthorClick
+                                )
+                            }
+                        }
+                    }
+                }
             }
-        } else {
-            items(count = article.itemSize) { i ->
-                val item = article.getItem(i)
-                if (item != null) {
-                    val isBlocked = propertiesBlockListEnable && isBlockListContains(item.author)
-                    if (!isBlocked) {
-                        if (item.type == 1 && item.frame != null) {
-                            ArticleTelnetBlockItem(frame = item.frame!!)
-                        } else {
-                            ArticleContentBlockItem(
-                                item = item,
-                                colors = colors,
-                                loadAllTrigger = loadAllTrigger,
-                                onAuthorClick = onAuthorClick
+
+            // 2. 發文來源 IP 與時間長條 (原生 ArticlePageTimeTimeView 樣式：深藍色全寬橫條)
+            item {
+                ArticlePostTimeBar(
+                    ip = article.fromIP,
+                    time = article.dateTime,
+                    colors = colors
+                )
+            }
+
+            // 3. 修改紀錄列表
+            if (article.editRecordSize > 0) {
+                items(count = article.editRecordSize) { eIndex ->
+                    val editRec = article.getEditRecord(eIndex)
+                    if (editRec != null) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp, vertical = 2.dp)
+                        ) {
+                            BahaText(
+                                text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
+                                color = colors.dialogBorder,
+                                fontSize = AppTheme.fontSize.body
                             )
                         }
                     }
                 }
             }
-        }
 
-        // 2. 發文來源 IP 與時間長條 (原生 ArticlePageTimeTimeView 樣式：深藍色全寬橫條)
-        item {
-            ArticlePostTimeBar(
-                ip = article.fromIP,
-                time = article.dateTime,
-                colors = colors
-            )
-        }
-
-        // 3. 修改紀錄列表
-        if (article.editRecordSize > 0) {
-            items(count = article.editRecordSize) { eIndex ->
-                val editRec = article.getEditRecord(eIndex)
-                if (editRec != null) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 8.dp, vertical = 2.dp)
-                    ) {
-                        BahaText(
-                            text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
-                            color = colors.dialogBorder,
-                            fontSize = AppTheme.fontSize.body
+            // 4. 推文列表
+            if (article.pushSize > 0) {
+                items(count = article.pushSize) { pIndex ->
+                    val push = article.getPush(pIndex)
+                    if (push != null) {
+                        ArticlePushRowItem(
+                            push = push,
+                            floor = pIndex + 1,
+                            colors = colors,
+                            loadAllTrigger = loadAllTrigger,
+                            onAuthorClick = onAuthorClick
                         )
                     }
                 }
             }
-        }
 
-        // 4. 推文列表
-        if (article.pushSize > 0) {
-            items(count = article.pushSize) { pIndex ->
-                val push = article.getPush(pIndex)
-                if (push != null) {
-                    ArticlePushRowItem(
-                        push = push,
-                        floor = pIndex + 1,
-                        colors = colors,
-                        loadAllTrigger = loadAllTrigger,
-                        onAuthorClick = onAuthorClick
-                    )
-                }
+            // 底部安全留白
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
             }
-        }
-
-        // 底部安全留白
-        item {
-            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -1373,9 +1376,8 @@ fun parseContentSegments(rawText: String): List<ContentSegment> {
 }
 
 /**
- * 支援點擊超連結的文字元件
+ * 支援點擊超連結與長按選取文字的通用文字元件
  */
-@Suppress("DEPRECATION")
 @Composable
 fun LinkableText(
     text: String,
@@ -1403,16 +1405,23 @@ fun LinkableText(
                 appendColorizedText(this, text.substring(lastIndex, start), defaultColor, rows)
             }
 
-            // 附加超連結
-            pushStringAnnotation(tag = "URL", annotation = url)
-            pushStyle(
-                SpanStyle(
-                    color = linkColor,
-                    textDecoration = TextDecoration.Underline
-                )
+            // 附加超連結 (使用 LinkAnnotation.Url 支援連結點擊與長按文字選取)
+            pushLink(
+                LinkAnnotation.Url(
+                    url = url,
+                    styles = TextLinkStyles(
+                        style = SpanStyle(
+                            color = linkColor,
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                ) {
+                    try {
+                        uriHandler.openUri(url)
+                    } catch (_: Exception) {}
+                }
             )
             append(url)
-            pop()
             pop()
 
             lastIndex = end
@@ -1424,21 +1433,10 @@ fun LinkableText(
         }
     }
 
-    ClickableText(
+    BahaText(
         text = annotatedString,
         modifier = modifier,
-        style = TextStyle(
-            fontSize = fontSize,
-            fontFamily = FontFamily.Default
-        ),
-        onClick = { offset ->
-            annotatedString.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
-                    try {
-                        uriHandler.openUri(annotation.item)
-                    } catch (_: Exception) {}
-                }
-        }
+        fontSize = fontSize
     )
 }
 

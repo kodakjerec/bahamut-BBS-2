@@ -52,7 +52,7 @@ fun BahaAlertDialogContent(
 
     Box(
         modifier = modifier
-            .widthIn(min = 280.dp, max = 400.dp)
+            .widthIn(min = 280.dp, max = 320.dp)
             .background(colors.pageBackground)
             .border(3.dp, colors.dialogBorder)
     ) {

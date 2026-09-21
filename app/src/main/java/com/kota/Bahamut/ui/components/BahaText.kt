@@ -5,6 +5,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -21,6 +22,41 @@ import com.kota.Bahamut.ui.theme.AppTheme
 @Composable
 fun BahaText(
     text: String,
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = AppTheme.fontSize.base,
+    color: Color = AppTheme.colors.textPrimary,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE
+) {
+    Text(
+        text = text,
+        modifier = modifier,
+        color = color,
+        fontSize = fontSize,
+        textAlign = textAlign,
+        lineHeight = lineHeight,
+        textDecoration = textDecoration,
+        overflow = overflow,
+        maxLines = maxLines,
+        style = LocalTextStyle.current.copy(
+            platformStyle = PlatformTextStyle(includeFontPadding = false),
+            lineHeightStyle = LineHeightStyle(
+                alignment = LineHeightStyle.Alignment.Center,
+                trim = LineHeightStyle.Trim.Both
+            )
+        )
+    )
+}
+
+/**
+ * BahaText 重載版本，支援 [AnnotatedString]
+ */
+@Composable
+fun BahaText(
+    text: AnnotatedString,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = AppTheme.fontSize.base,
     color: Color = AppTheme.colors.textPrimary,
