@@ -229,7 +229,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
                     .background(colors.pageBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -279,7 +279,7 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                 text = stringResource(R.string._back),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(60.dp),
                 onClick = { onBackPressed() }
             )
         }

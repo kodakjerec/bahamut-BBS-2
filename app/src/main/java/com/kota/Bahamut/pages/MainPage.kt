@@ -491,7 +491,7 @@ class MainPage : TelnetComposePage() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
                     .background(colors.toolbarBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {

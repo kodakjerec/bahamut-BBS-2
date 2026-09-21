@@ -233,14 +233,14 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
                     .background(colors.pageBackground),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 BahaButton(
                     text = stringResource(R.string.reset),
                     type = ButtonType.DANGER,
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().weight(1f),
                     onClick = { onResetClicked() }
                 )
                 BahaInputField(
@@ -248,7 +248,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                     onValueChange = { inputTextState = it },
                     placeholder = stringResource(R.string.please_input_id),
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(3f)
                         .padding(horizontal = 8.dp),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(onDone = { onAddClicked() })
@@ -256,7 +256,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 BahaButton(
                     text = stringResource(R.string.add),
                     type = ButtonType.DANGER,
-                    modifier = Modifier.fillMaxHeight(),
+                    modifier = Modifier.fillMaxHeight().weight(1f),
                     onClick = { onAddClicked() }
                 )
             }
@@ -288,7 +288,7 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 text = stringResource(R.string._back),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(60.dp),
                 onClick = { onBackPressed() }
             )
         }

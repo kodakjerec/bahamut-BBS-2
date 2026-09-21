@@ -25,8 +25,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
@@ -1416,26 +1418,14 @@ fun BoardMainToolbar(
         if (pageType == BahamutPage.BAHAMUT_BOARD) R.string.post else R.string.bookmark
     )
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(colors.toolbarDivider)
-        )
-
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 按鈕文字大小
-            var newFontSize = AppTheme.fontSize.base
-            if (toolbarLocation == 1 || toolbarLocation == 2)
-                newFontSize = AppTheme.fontSize.title
-
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
                 Box(
@@ -1448,8 +1438,7 @@ fun BoardMainToolbar(
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
-                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        fontSize = newFontSize
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f)
                     )
                 }
                 Box(
@@ -1465,7 +1454,6 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = postText,
                         type = ButtonType.NORMAL,
-                        fontSize = newFontSize,
                         onClick = onPostClick,
                         modifier = Modifier
                             .weight(1f)
@@ -1476,7 +1464,6 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = stringResource(R.string.prev_page),
                         type = ButtonType.NORMAL,
-                        fontSize = newFontSize,
                         onClick = onPrevClick,
                         onLongClick = onFirstClick,
                         modifier = Modifier
@@ -1488,7 +1475,6 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
                         type = ButtonType.NORMAL,
-                        fontSize = AppTheme.fontSize.title,
                         onClick = if (isMoveEnable) onNextClick else onLastClick,
                         onLongClick = onLastClick,
                         modifier = Modifier
@@ -1530,8 +1516,7 @@ fun BoardMainToolbar(
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
-                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        fontSize = AppTheme.fontSize.title
+                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f)
                     )
                 }
             }
@@ -1585,7 +1570,8 @@ fun BoardEndDrawer(
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(280.dp)
+                    .fillMaxWidth(0.7f)
+                    .widthIn(max = 280.dp)
                     .background(colors.pageBackground)
                     .clickable(enabled = false) {} // 阻止點擊穿透到遮罩
                     .pointerInput(isLeft) {
@@ -1600,7 +1586,7 @@ fun BoardEndDrawer(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(60.dp)
                         .background(colors.toolbarBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1742,7 +1728,7 @@ fun BoardEndDrawer(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(60.dp)
                         .background(colors.toolbarBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1775,7 +1761,7 @@ fun BoardEndDrawer(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(60.dp)
                         .background(colors.toolbarBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1808,7 +1794,7 @@ fun BoardEndDrawer(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(60.dp)
                         .background(colors.toolbarBackground),
                     verticalAlignment = Alignment.CenterVertically
                 ) {

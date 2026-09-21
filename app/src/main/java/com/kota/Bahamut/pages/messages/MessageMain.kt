@@ -387,7 +387,7 @@ class MessageMain : TelnetPage() {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp)
+                        .height(60.dp)
                         .background(colors.toolbarBackground)
                 ) {
                     BahaButton(
@@ -412,7 +412,7 @@ class MessageMain : TelnetPage() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
                     .background(colors.toolbarBackground)
             ) {
                 BahaButton(

@@ -285,11 +285,11 @@ Box(
         .height(1.dp)
         .background(colors.toolbarDivider)
 )
-// 50dp 工具列容器
+// 60dp 工具列容器
 Row(
     modifier = Modifier
         .fillMaxWidth()
-        .height(50.dp)
+        .height(60.dp)
         .background(colors.toolbarBackground),
     verticalAlignment = Alignment.CenterVertically
 ) {

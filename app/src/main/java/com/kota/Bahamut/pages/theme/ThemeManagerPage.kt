@@ -224,7 +224,7 @@ fun ThemeManagerScreen(
             onClick = onBackClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(60.dp),
             type = ButtonType.NORMAL
         )
     }

@@ -203,7 +203,7 @@ class UserInfoPage : TelnetPage() {
                 text = stringResource(R.string._back),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp),
+                    .height(60.dp),
                 onClick = { onBackPressed() }
             )
         }

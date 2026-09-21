@@ -630,7 +630,7 @@ class LoginPage : TelnetComposePage() {
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // 3. 底部登入工具列 (滿版無縫，50dp)
+            // 3. 底部登入工具列 (滿版無縫，60dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -642,7 +642,7 @@ class LoginPage : TelnetComposePage() {
                 onClick = { onLoginButtonClicked() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
             )
         }
     }

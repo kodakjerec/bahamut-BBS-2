@@ -554,7 +554,7 @@ class SystemSettingsPage : TelnetPage() {
                 onClick = { onBackPressed() },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(60.dp)
             )
         }
     }
@@ -582,7 +582,7 @@ class SystemSettingsPage : TelnetPage() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .clickable(onClick = onClick),
             verticalAlignment = Alignment.CenterVertically
         ) {

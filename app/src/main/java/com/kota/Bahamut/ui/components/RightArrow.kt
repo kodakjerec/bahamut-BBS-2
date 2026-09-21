@@ -27,7 +27,8 @@ fun RightArrow (
     ) {
         BahaText(
             text = ">",
-            color = colors.textPrimary
+            color = colors.textPrimary,
+            fontSize = AppTheme.fontSize.subtitle
         )
     }
 }

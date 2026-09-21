@@ -699,8 +699,7 @@ class ArticlePage : TelnetPage() {
                     ) {
                         BahaText(
                             text = stringResource(R.string.loading_),
-                            color = colors.textSecondary,
-                            fontSize = AppTheme.fontSize.body
+                            color = colors.textSecondary
                         )
                     }
                 } else {
@@ -819,7 +818,6 @@ fun ArticleTopBar(
                     color = colors.titleBarTitle,
                     fontSize = AppTheme.fontSize.title,
                     maxLines = if (isExpanded) 3 else 1,
-                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { isExpanded = !isExpanded }
                 )
 
@@ -836,7 +834,6 @@ fun ArticleTopBar(
                         color = colors.titleBarDetail,
                         fontSize = AppTheme.fontSize.body,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .weight(1f, fill = false)
                             .clickable { onAuthorClick() }
@@ -848,8 +845,7 @@ fun ArticleTopBar(
                             text = boardName,
                             color = colors.titleBarDetail2,
                             fontSize = AppTheme.fontSize.body,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            maxLines = 1
                         )
                     }
                 }
@@ -889,7 +885,7 @@ fun ArticleExtToolbar(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .background(colors.toolbarBackground)
                 .padding(horizontal = 6.dp, vertical = 0.dp),
             horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -1049,6 +1045,7 @@ fun ArticleTelnetBlockItem(frame: TelnetFrame) {
 
 /**
  * 原生發文 IP 與時間長條元件 (深藍底全寬，左側為 IP，右側為日期時間)
+ * 優先順序：IP > 時間 (當畫面狹窄時，IP 優先完整顯示，時間自動截斷)
  */
 @Composable
 fun ArticlePostTimeBar(
@@ -1063,24 +1060,24 @@ fun ArticlePostTimeBar(
             .fillMaxWidth()
             .background(colors.titleBarBackground)
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BahaText(
-            text = ip,
-            color = colors.titleBarDetail,
-            fontSize = AppTheme.fontSize.body,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false)
-        )
+        if (ip.isNotEmpty()) {
+            BahaText(
+                text = ip,
+                color = colors.titleBarDetail,
+                fontSize = AppTheme.fontSize.body,
+                maxLines = 1
+            )
+        }
+        Spacer(modifier = Modifier.weight(1f))
         if (time.isNotEmpty()) {
-            Spacer(modifier = Modifier.width(8.dp))
             BahaText(
                 text = "《$time》",
                 color = colors.titleBarDetail,
                 fontSize = AppTheme.fontSize.body,
-                maxLines = 1
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -1546,19 +1543,14 @@ fun ArticleBottomToolbar(
     onLLClick: () -> Unit,
     onRRClick: () -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp)
+                .height(60.dp)
                 .background(colors.toolbarBackground),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // 按鈕文字大小
-            var newFontSize = AppTheme.fontSize.base
-            if (toolbarLocation == 1 || toolbarLocation == 2)
-                newFontSize = AppTheme.fontSize.title
-
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
                 Box(
@@ -1571,8 +1563,7 @@ fun ArticleBottomToolbar(
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
-                        color = colors.textPrimary.copy(alpha = 0.5f),
-                        fontSize = AppTheme.fontSize.title
+                        color = colors.textPrimary.copy(alpha = 0.5f)
                     )
                 }
                 Box(
@@ -1588,7 +1579,6 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.reply),
                         type = ButtonType.NORMAL,
-                        fontSize = newFontSize,
                         onClick = onReplyClick,
                         modifier = Modifier
                             .weight(1f)
@@ -1599,7 +1589,6 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.prev_article),
                         type = ButtonType.NORMAL,
-                        fontSize = newFontSize,
                         onClick = onPrevClick,
                         onLongClick = onFirstClick,
                         modifier = Modifier
@@ -1611,7 +1600,6 @@ fun ArticleBottomToolbar(
                     BahaButton(
                         text = stringResource(R.string.next_article),
                         type = ButtonType.NORMAL,
-                        fontSize = newFontSize,
                         onClick = onNextClick,
                         onLongClick = onLastClick,
                         modifier = Modifier
@@ -1653,8 +1641,7 @@ fun ArticleBottomToolbar(
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
-                        color = colors.textPrimary.copy(alpha = 0.5f),
-                        fontSize = AppTheme.fontSize.title
+                        color = colors.textPrimary.copy(alpha = 0.5f)
                     )
                 }
             }
