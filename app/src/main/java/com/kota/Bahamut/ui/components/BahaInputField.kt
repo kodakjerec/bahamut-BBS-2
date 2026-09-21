@@ -24,6 +24,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
@@ -93,7 +94,7 @@ fun BahaInputField(
                     BahaText(
                         text = placeholder,
                         color = AppTheme.colors.textSecondary,
-                        fontSize = BahaTextSize.BASE
+                        fontSize = AppTheme.fontSize.base
                     )
                 }
                 innerTextField()
@@ -127,7 +128,7 @@ fun BahaInputField(
         )
     },
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    fontSize: BahaTextSize = BahaTextSize.TITLE,
+    fontSize: TextUnit = AppTheme.fontSize.title,
     fontColor: Color = AppTheme.colors.inputBoxText,
     backgroundColor: Color = AppTheme.colors.inputBoxBackground
 ) {

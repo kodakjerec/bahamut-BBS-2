@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.kota.Bahamut.R
@@ -17,9 +18,11 @@ import com.kota.Bahamut.ui.theme.AppTheme
 fun BahaPostEditText(
     value: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    fontSize: TextUnit = AppTheme.fontSize.title
 ) {
     val colors = AppTheme.colors
+
 
     AndroidView(
         modifier = modifier
@@ -35,6 +38,9 @@ fun BahaPostEditText(
                 inputType = android.text.InputType.TYPE_CLASS_TEXT or
                         android.text.InputType.TYPE_TEXT_FLAG_MULTI_LINE
 
+                // 設定單位為 SP，直接讀取 Compose TextUnit 的 value
+                setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSize.value)
+
                 // 監聽原生文字變動通知 Compose
                 addTextChangedListener(object : android.text.TextWatcher {
                     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -49,10 +55,16 @@ fun BahaPostEditText(
             }
         },
         update = { editText ->
+            // 動態更新字級（當使用者縮放或切換主題字體大小時生效）
+            editText.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, fontSize.value)
+
             if (editText.text.toString() != value.text) {
                 editText.setText(value.text)
-                editText.setSelection(value.selection.end.coerceIn(0, value.text.length))
+                val safeCursor = value.selection.end.coerceIn(0, value.text.length)
+                editText.setSelection(safeCursor)
             }
+            editText.setTextColor(colors.textPrimary.toArgb())
+            editText.setHintTextColor(colors.textSecondary.toArgb())
         }
     )
 }

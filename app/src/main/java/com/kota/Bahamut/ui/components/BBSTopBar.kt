@@ -70,7 +70,7 @@ fun BBSTopBar(
                 BahaText(
                     text = title,
                     color = titleColor,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = if (onTitleClick != null) Modifier.clickable(onClick = onTitleClick) else Modifier
@@ -87,7 +87,7 @@ fun BBSTopBar(
                         BahaText(
                             text = subtitle,
                             color = colors.titleBarDetail,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = if (onSubtitleClick != null) {
@@ -104,7 +104,7 @@ fun BBSTopBar(
                             BahaText(
                                 text = subtitleTrailing,
                                 color = colors.titleBarDetail2,
-                                fontSize = BahaTextSize.BODY,
+                                fontSize = AppTheme.fontSize.body,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )

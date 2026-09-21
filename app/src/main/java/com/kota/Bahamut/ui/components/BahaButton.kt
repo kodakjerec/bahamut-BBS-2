@@ -20,6 +20,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.TextUnit
 import com.kota.Bahamut.ui.theme.AppTheme
 
 enum class ButtonType {
@@ -43,7 +44,7 @@ fun BahaButton(
     enabled: Boolean = true,
     isSelected: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-    fontSize: BahaTextSize = BahaTextSize.BASE,
+    fontSize: TextUnit = AppTheme.fontSize.base,
     minHeight: Dp = 48.dp
 ) {
     val colors = AppTheme.colors

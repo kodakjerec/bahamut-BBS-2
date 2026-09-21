@@ -59,7 +59,6 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import com.kota.Bahamut.ui.components.BahaPostEditText
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -624,13 +623,13 @@ class PostArticlePage : TelnetPage() {
                         ) {
                             BahaText(
                                 text = currentHeader,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                         }
                         BahaDropdownMenu(
@@ -641,7 +640,7 @@ class PostArticlePage : TelnetPage() {
                             onItemSelected = { index ->
                                 headerSelectedState = index
                             },
-                            fontSize = BahaTextSize.SUBTITLE
+                            fontSize = AppTheme.fontSize.subtitle
                         )
                     }
                 }
@@ -671,7 +670,7 @@ class PostArticlePage : TelnetPage() {
                                 BahaText(
                                     text = stringResource(R.string.input_title_here),
                                     color = colors.textSecondary,
-                                    fontSize = BahaTextSize.TITLE
+                                    fontSize = AppTheme.fontSize.title
                                 )
                             }
                             innerTextField()
@@ -690,7 +689,8 @@ class PostArticlePage : TelnetPage() {
                 BahaPostEditText(
                     value = contentState,
                     onValueChange = { contentState = it },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    fontSize = AppTheme.fontSize.title
                 )
             }
 
@@ -713,7 +713,7 @@ class PostArticlePage : TelnetPage() {
                     ) {
                         BahaButton(
                             text = stringResource(R.string.post_article_page_paint_color),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -727,7 +727,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.file),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -741,7 +741,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_url_title),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -759,7 +759,7 @@ class PostArticlePage : TelnetPage() {
                         )
                         BahaButton(
                             text = stringResource(R.string.dialog_shorten_img_title),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight(),
@@ -792,7 +792,7 @@ class PostArticlePage : TelnetPage() {
             ) {
                 BahaButton(
                     text = if (isToolbarExpanded) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -806,7 +806,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.post_article_page_format),
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -820,7 +820,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.symbol),
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -834,7 +834,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.face),
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -848,7 +848,7 @@ class PostArticlePage : TelnetPage() {
                 )
                 BahaButton(
                     text = stringResource(R.string.post),
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

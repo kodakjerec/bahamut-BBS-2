@@ -5,6 +5,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.TextUnit
 import com.kota.Bahamut.ui.theme.AppTheme
 
 /**
@@ -20,7 +21,7 @@ fun BahaDropdownMenu(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fontSize: BahaTextSize = BahaTextSize.SUBTITLE
+    fontSize: TextUnit = AppTheme.fontSize.subtitle
 ) {
     val colors = AppTheme.colors
     DropdownMenu(
@@ -57,7 +58,7 @@ fun BahaDropdownMenu(
     selectedIndex: Int,
     onItemSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    fontSize: BahaTextSize = BahaTextSize.SUBTITLE
+    fontSize: TextUnit = AppTheme.fontSize.subtitle
 ) {
     BahaDropdownMenu(
         expanded = expanded,

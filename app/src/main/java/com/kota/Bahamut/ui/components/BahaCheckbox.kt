@@ -77,7 +77,7 @@ fun BahaCheckboxLeft(
         BahaText(
             text = text,
             color = if (enabled) textColor else colors.textSecondary,
-            fontSize = BahaTextSize.BASE
+            fontSize = AppTheme.fontSize.base
         )
         if (trailingContent != null) {
             Spacer(modifier = Modifier.weight(1f))
@@ -112,7 +112,7 @@ fun SettingsCheckboxItem(
         BahaText(
             text = title,
             color = if (enabled) colors.textPrimary else colors.textSecondary,
-            fontSize = BahaTextSize.BASE,
+            fontSize = AppTheme.fontSize.base,
             modifier = Modifier.weight(1f)
         )
         BahaCheckbox(

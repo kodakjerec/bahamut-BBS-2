@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.theme.AppTheme
 
@@ -72,7 +71,7 @@ fun BahaAlertDialogContent(
                         BahaText(
                             text = title,
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.SUBTITLE,
+                            fontSize = AppTheme.fontSize.subtitle,
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 14.dp, vertical = 10.dp)
@@ -102,7 +101,7 @@ fun BahaAlertDialogContent(
                     BahaText(
                         text = message,
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         lineHeight = 20.sp
                     )
                 }
@@ -150,7 +149,7 @@ fun BahaAlertDialogContent(
                             BahaText(
                                 text = btn.text,
                                 color = btnTextColor,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                         }
                     }
