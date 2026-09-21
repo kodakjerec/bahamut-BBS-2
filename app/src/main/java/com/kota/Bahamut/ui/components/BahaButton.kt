@@ -6,9 +6,7 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -42,7 +40,6 @@ fun BahaButton(
     type: ButtonType = ButtonType.NORMAL,
     enabled: Boolean = true,
     isSelected: Boolean = false,
-    contentPadding: PaddingValues = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
     fontSize: TextUnit = AppTheme.fontSize.base,
     minHeight: Dp = 48.dp
 ) {
@@ -94,8 +91,7 @@ fun BahaButton(
                 enabled = enabled,
                 onClick = onClick,
                 onLongClick = hapticLongClick
-            )
-            .padding(contentPadding),
+            ),
         contentAlignment = Alignment.Center
     ) {
         BahaText(

@@ -1565,12 +1565,13 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(2f)
                         .fillMaxHeight()
+                        .background(colors.toolbarBackgroundDisabled)
                         .clickable(onClick = onLLClick),
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
-                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        color = colors.textPrimary.copy(alpha = 0.5f),
                         fontSize = AppTheme.fontSize.title
                     )
                 }
@@ -1646,12 +1647,13 @@ fun ArticleBottomToolbar(
                     modifier = Modifier
                         .weight(2f)
                         .fillMaxHeight()
+                        .background(colors.toolbarBackgroundDisabled)
                         .clickable(onClick = onRRClick),
                     contentAlignment = Alignment.Center
                 ) {
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
-                        color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
+                        color = colors.textPrimary.copy(alpha = 0.5f),
                         fontSize = AppTheme.fontSize.title
                     )
                 }

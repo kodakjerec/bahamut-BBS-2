@@ -117,7 +117,7 @@
      - 選項一律使用 `BahaCheckbox`。
   4. **底部按鈕列 (Button Bar)**：
      - **滿版無縫貼底**（移除所有外圍 padding）。
-     - 高度固定為 `48.dp`。
+     - 高度固定為 `60.dp`。
      - 頂部與內容以 1dp 分隔線 (`colors.dialogButtonDivider`) 區隔。
      - 按鈕採等寬配置 (`Modifier.weight(1f)`)，底色為深暗紅 (`colors.dialogButtonBackground` / `#400000`)。
      - 按鈕文字為粗體白色 (`colors.dialogButtonText`, `18sp`)。

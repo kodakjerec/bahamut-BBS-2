@@ -42,8 +42,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -1440,9 +1440,9 @@ fun BoardMainToolbar(
             if (toolbarLocation == 2) {
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
+                        .background(colors.toolbarBackgroundDisabled)
                         .clickable(onClick = onLLClick),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1522,9 +1522,9 @@ fun BoardMainToolbar(
                 )
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
+                        .background(colors.toolbarBackgroundDisabled)
                         .clickable(onClick = onRRClick),
                     contentAlignment = Alignment.Center
                 ) {
