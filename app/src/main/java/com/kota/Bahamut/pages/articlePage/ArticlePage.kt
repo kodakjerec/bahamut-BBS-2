@@ -1547,13 +1547,6 @@ fun ArticleBottomToolbar(
     onRRClick: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(colors.toolbarDivider)
-        )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1570,9 +1563,8 @@ fun ArticleBottomToolbar(
             if (toolbarLocation == 2) {
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
                         .clickable(onClick = onLLClick),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1652,9 +1644,8 @@ fun ArticleBottomToolbar(
                 )
                 Box(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(2f)
                         .fillMaxHeight()
-                        .background(colors.pageBackground)
                         .clickable(onClick = onRRClick),
                     contentAlignment = Alignment.Center
                 ) {

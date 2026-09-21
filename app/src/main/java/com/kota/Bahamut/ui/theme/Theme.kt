@@ -116,7 +116,7 @@ private val DefaultLightColors = AppColors(
     surface = AppPalette.DarkGray20,
     dialogTitleBackground = AppPalette.DarkGray20,
     dialogBlockBackground = AppPalette.DarkGray20,
-    dialogSelectArticleFocused = AppPalette.DarkGray60,
+    dialogSelectArticleFocused = AppPalette.DarkGray40,
 
     textPrimary = AppPalette.White,
     textSecondary = AppPalette.HalfWhite,

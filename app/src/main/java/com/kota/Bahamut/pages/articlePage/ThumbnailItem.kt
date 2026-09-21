@@ -382,7 +382,7 @@ fun ThumbnailItemView(
         modifier = modifier
             .fillMaxWidth()
             .background(colors.surface)
-            .padding(vertical = 4.dp)
+            .padding(bottom = 4.dp)
     ) {
         if (isLoadingUrl) {
             // URL 解析中預設狀態
@@ -409,14 +409,15 @@ fun ThumbnailItemView(
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 8.dp),
+                                .height(32.dp)
+                                .background(colors.dialogTitleBackground),
                             contentAlignment = Alignment.Center
                         ) {
                             Column {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(32.dp).align(Alignment.CenterHorizontally),
+                                    modifier = Modifier.size(24.dp).align(Alignment.CenterHorizontally),
                                     color = colors.textLink,
-                                    strokeWidth = 3.dp
+                                    strokeWidth = 2.dp
                                 )
                             }
                         }
@@ -485,7 +486,7 @@ fun ThumbnailItemView(
                             modifier = modifier
                                 .fillMaxWidth()
                                 .height(48.dp)
-                                .background(colors.dialogTitleBackground)
+                                .background(colors.dialogSelectArticleFocused)
                                 .combinedClickable(
                                     onClick = { imageRequested = true }
                                 ),
@@ -494,7 +495,7 @@ fun ThumbnailItemView(
                             BahaText(
                                 text = stringResource(R.string.thumbnail_show_pic),
                                 color = colors.textPrimary,
-                                fontSize = AppTheme.fontSize.subtitle,
+                                fontSize = AppTheme.fontSize.title,
                                 textAlign = TextAlign.Center,
                             )
                         }
@@ -507,7 +508,7 @@ fun ThumbnailItemView(
                         BahaText(
                             text = data.title,
                             color = colors.bbsContent0,
-                            fontSize = AppTheme.fontSize.body,
+                            fontSize = AppTheme.fontSize.title,
                             maxLines = if (isTitleExpanded) 9 else 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
@@ -520,7 +521,7 @@ fun ThumbnailItemView(
                         BahaText(
                             text = data.description,
                             color = colors.textSecondary,
-                            fontSize = AppTheme.fontSize.caption,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = if (isDescExpanded) 9 else 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
