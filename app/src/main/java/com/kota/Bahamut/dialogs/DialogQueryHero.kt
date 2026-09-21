@@ -29,7 +29,6 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -121,7 +120,7 @@ class DialogQueryHero : ASDialog() {
                 BahaText(
                     text = heroId,
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.SUBTITLE,
+                    fontSize = AppTheme.fontSize.subtitle,
                     textAlign = TextAlign.Center
                 )
 
@@ -131,7 +130,7 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = heroNick,
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY,
+                        fontSize = AppTheme.fontSize.body,
                         textAlign = TextAlign.Center
                     )
                 }
@@ -147,23 +146,23 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = "HP: ",
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                     BahaText(
                         text = heroHp,
                         color = colors.buttonDangerBackground,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                     Spacer(modifier = Modifier.width(16.dp))
                     BahaText(
                         text = "MP: ",
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                     BahaText(
                         text = heroMp,
                         color = colors.textLink,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                 }
 
@@ -179,12 +178,12 @@ class DialogQueryHero : ASDialog() {
                         BahaText(
                             text = heroAuth1,
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                         BahaText(
                             text = heroAuth2,
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     }
                     Spacer(modifier = Modifier.height(6.dp))
@@ -198,19 +197,19 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_query_hero_last_time),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY,
+                        fontSize = AppTheme.fontSize.body,
                         modifier = Modifier.width(48.dp)
                     )
                     Column(modifier = Modifier.weight(1f)) {
                         BahaText(
                             text = heroLastDate,
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                         BahaText(
                             text = heroLastTime,
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     }
                 }
@@ -225,13 +224,13 @@ class DialogQueryHero : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_query_hero_from),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY,
+                        fontSize = AppTheme.fontSize.body,
                         modifier = Modifier.width(48.dp)
                     )
                     BahaText(
                         text = heroFromIp,
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                 }
 

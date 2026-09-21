@@ -18,7 +18,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -203,7 +202,7 @@ fun ThemeManagerScreen(
                 BahaText(
                     text = stringResource(R.string.theme_manager_page_guide),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.CAPTION,
+                    fontSize = AppTheme.fontSize.caption,
                     textAlign = TextAlign.Center,
                     lineHeight = 22.sp
                 )

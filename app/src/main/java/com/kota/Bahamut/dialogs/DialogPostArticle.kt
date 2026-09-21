@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -91,7 +90,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                     text = stringResource(R.string.is_post_article),
                     color = colors.textPrimary,
                     modifier = Modifier.padding(bottom = 6.dp),
-                    fontSize = BahaTextSize.TITLE
+                    fontSize = AppTheme.fontSize.title
                 )
 
                 if (myTarget != TelnetArticle.NEW) {
@@ -129,7 +128,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                                 text = label,
                                 color = colors.textPrimary,
                                 modifier = Modifier.align(Alignment.Center),
-                                fontSize = BahaTextSize.TITLE
+                                fontSize = AppTheme.fontSize.title
                             )
                         }
                     }
@@ -155,13 +154,13 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                         BahaText(
                             text = signList.getOrElse(selectedSignIndex) { "" },
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.TITLE
+                            fontSize = AppTheme.fontSize.title
                         )
                         BahaText(
                             text = "▾",
                             color = colors.textSecondary,
                             modifier = Modifier.padding(end = 4.dp),
-                            fontSize = BahaTextSize.TITLE
+                            fontSize = AppTheme.fontSize.title
                         )
                     }
 
@@ -173,7 +172,7 @@ class DialogPostArticle(private val myTarget: Int) : ASDialog() {
                         onItemSelected = { index ->
                             selectedSignIndex = index
                         },
-                        fontSize = BahaTextSize.SUBTITLE
+                        fontSize = AppTheme.fontSize.subtitle
                     )
                 }
 

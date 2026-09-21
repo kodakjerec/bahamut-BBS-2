@@ -53,7 +53,6 @@ import com.kota.Bahamut.service.TempSettings.getHeroStepList
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -402,13 +401,13 @@ class MainPage : TelnetComposePage() {
                     ) {
                         BahaText(
                             text = stringResource(R.string.main_online_people),
-                            fontSize = BahaTextSize.CAPTION,
+                            fontSize = AppTheme.fontSize.caption,
                             color = colors.textSecondary
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         BahaText(
                             text = onlinePeopleText.ifEmpty { "0" },
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             color = colors.statusNotice
                         )
                     }
@@ -428,7 +427,7 @@ class MainPage : TelnetComposePage() {
                         ) {
                             BahaText(
                                 text = stringResource(R.string.main_bb_call),
-                                fontSize = BahaTextSize.CAPTION,
+                                fontSize = AppTheme.fontSize.caption,
                                 color = colors.textSecondary
                             )
                             Spacer(modifier = Modifier.width(4.dp))
@@ -441,7 +440,7 @@ class MainPage : TelnetComposePage() {
                         Spacer(modifier = Modifier.height(2.dp))
                         BahaText(
                             text = bbCallText.ifEmpty { "0" },
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             color = colors.statusNotice
                         )
                     }
@@ -456,7 +455,7 @@ class MainPage : TelnetComposePage() {
                     ) {
                         BahaText(
                             text = stringResource(R.string.main_hero_step),
-                            fontSize = BahaTextSize.LARGE,
+                            fontSize = AppTheme.fontSize.large,
                             color = colors.buttonText
                         )
                     }
@@ -554,7 +553,7 @@ private fun MainFolderItem(
     ) {
         BahaText(
             text = title,
-            fontSize = BahaTextSize.LARGE,
+            fontSize = AppTheme.fontSize.large,
             color = colors.buttonText,
             textAlign = TextAlign.Center
         )
@@ -593,7 +592,7 @@ private fun HeroStepRow(
                 BahaText(
                     text = heroStep.authorNickname ?: stringResource(R.string.loading_),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     maxLines = 1
                 )
             }
@@ -608,7 +607,7 @@ private fun HeroStepRow(
                 BahaText(
                     text = heroStep.datetime ?: "",
                     color = colors.titleBarBackground,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     textAlign = TextAlign.End,
                     maxLines = 1
                 )
@@ -618,7 +617,7 @@ private fun HeroStepRow(
         BahaText(
             text = heroStep.content ?: stringResource(R.string.loading),
             color = colors.textPrimary,
-            fontSize = BahaTextSize.BODY,
+            fontSize = AppTheme.fontSize.body,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 4.dp, vertical = 4.dp)

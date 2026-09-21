@@ -30,7 +30,6 @@ import com.kota.Bahamut.ui.components.BBSToolbarDivider
 import com.kota.Bahamut.ui.components.BBSTopBar
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -215,7 +214,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.reply_mail),
                     type = ButtonType.NORMAL,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -225,7 +224,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.change_mode_short),
                     type = ButtonType.NORMAL,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -235,7 +234,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.prev_article),
                     type = ButtonType.NORMAL,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),
@@ -245,7 +244,7 @@ class MailPage : TelnetPage(), SendMailPageListener {
                 BahaButton(
                     text = stringResource(R.string.next_article),
                     type = ButtonType.NORMAL,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight(),

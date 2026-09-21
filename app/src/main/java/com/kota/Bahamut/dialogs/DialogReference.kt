@@ -30,7 +30,6 @@ import com.kota.Bahamut.service.NotificationSettings
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaCheckboxLeft
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -207,7 +206,7 @@ class DialogReference : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_reference_remove_blank),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.SUBTITLE
+                        fontSize = AppTheme.fontSize.subtitle
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     BahaCheckbox(
@@ -238,7 +237,7 @@ class DialogReference : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.dialog_reference_reserved_type),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.SUBTITLE
+                        fontSize = AppTheme.fontSize.subtitle
                     )
                     Spacer(modifier = Modifier.weight(1f))
                     Box {
@@ -249,13 +248,13 @@ class DialogReference : ASDialog() {
                             BahaText(
                                 text = types.getOrElse(reservedType) { "" },
                                 color = colors.textPrimary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                         }
                         BahaDropdownMenu(
@@ -264,7 +263,7 @@ class DialogReference : ASDialog() {
                             items = types,
                             selectedIndex = reservedType,
                             onItemSelected = onReservedTypeChange,
-                            fontSize = BahaTextSize.SUBTITLE
+                            fontSize = AppTheme.fontSize.subtitle
                         )
                     }
                 }

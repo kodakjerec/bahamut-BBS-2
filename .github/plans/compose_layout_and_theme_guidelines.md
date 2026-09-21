@@ -81,10 +81,10 @@
   - 元件：`app/src/main/java/com/kota/Bahamut/ui/components/BahaText.kt`
   - 規格：`app/src/main/java/com/kota/Bahamut/ui/theme/Theme.kt` (`AppFontSize`)
 - **核心設計概念**：
-  - **App 基準大小為 24.sp**（對應 `BahaTextSize.BASE`），預設字色為 `colors.textPrimary`。
+  - **App 基準大小為 24.sp**（對應 `AppTheme.fontSize.base`），預設字色為 `colors.textPrimary`。
   - 杜絕在各 Composable 寫死 `fontSize = 18.sp` 等魔術數字，一律透過 `BahaText(size = ...)` 語意化指定。
   - `AppFontSize` 內建 `scaleFactor: Float = 1.0f`，未來支援使用者在設定中動態縮放字體大小（全域即時響應重組）。
-- **字級層級對應表 (`BahaTextSize`)**：
+- **字級層級對應表 (`AppTheme.fontSize`)**：
   | 層級列舉 | 基準大小 | 適用場景 |
   |---|---|---|
   | `ULTRA_LARGE` | 28.sp | 特大標題 / 無障礙模式 |

@@ -51,7 +51,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -397,7 +396,7 @@ fun ThumbnailItemView(
                 BahaText(
                     text = stringResource(R.string.loading),
                     color = colors.buttonText,
-                    fontSize = BahaTextSize.CAPTION
+                    fontSize = AppTheme.fontSize.caption
                 )
             }
         } else {
@@ -495,7 +494,7 @@ fun ThumbnailItemView(
                             BahaText(
                                 text = stringResource(R.string.thumbnail_show_pic),
                                 color = colors.textPrimary,
-                                fontSize = BahaTextSize.SUBTITLE,
+                                fontSize = AppTheme.fontSize.subtitle,
                                 textAlign = TextAlign.Center,
                             )
                         }
@@ -508,7 +507,7 @@ fun ThumbnailItemView(
                         BahaText(
                             text = data.title,
                             color = colors.bbsContent0,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = if (isTitleExpanded) 9 else 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
@@ -521,7 +520,7 @@ fun ThumbnailItemView(
                         BahaText(
                             text = data.description,
                             color = colors.textSecondary,
-                            fontSize = BahaTextSize.CAPTION,
+                            fontSize = AppTheme.fontSize.caption,
                             maxLines = if (isDescExpanded) 9 else 1,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier

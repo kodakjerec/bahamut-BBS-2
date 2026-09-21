@@ -52,7 +52,6 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -332,13 +331,13 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 BahaText(
                     text = currentDisplayTitle.ifEmpty { stringResource(R.string.loading) },
                     color = colors.titleBarTitle,
-                    fontSize = BahaTextSize.TITLE
+                    fontSize = AppTheme.fontSize.title
                 )
                 Spacer(modifier = Modifier.height(2.dp))
                 BahaText(
                     text = "看板列表",
                     color = colors.titleBarDetail,
-                    fontSize = BahaTextSize.BODY
+                    fontSize = AppTheme.fontSize.body
                 )
             }
             Box(
@@ -365,7 +364,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     }
                 } else {
@@ -418,7 +417,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                         BahaText(
                             text = "$lastVisitBoardText▶▶",
                             color = colors.textPrimary,
-                            fontSize = BahaTextSize.TITLE
+                            fontSize = AppTheme.fontSize.title
                         )
                     }
                 }
@@ -525,7 +524,7 @@ private fun ClassPageRowItem(
                 BahaText(
                     text = item?.title ?: stringResource(R.string.loading_),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.SUBTITLE,
+                    fontSize = AppTheme.fontSize.subtitle,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -541,7 +540,7 @@ private fun ClassPageRowItem(
                     BahaText(
                         text = item?.name ?: stringResource(R.string.loading),
                         color = colors.classItemName,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
 
                     val manager = item?.manager
@@ -549,7 +548,7 @@ private fun ClassPageRowItem(
                         BahaText(
                             text = manager,
                             color = colors.classItemManager,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

@@ -81,7 +81,6 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -701,7 +700,7 @@ class ArticlePage : TelnetPage() {
                         BahaText(
                             text = stringResource(R.string.loading_),
                             color = colors.textSecondary,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     }
                 } else {
@@ -818,7 +817,7 @@ fun ArticleTopBar(
                 BahaText(
                     text = title,
                     color = colors.titleBarTitle,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     maxLines = if (isExpanded) 3 else 1,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.clickable { isExpanded = !isExpanded }
@@ -835,7 +834,7 @@ fun ArticleTopBar(
                     BahaText(
                         text = author,
                         color = colors.titleBarDetail,
-                        fontSize = BahaTextSize.BODY,
+                        fontSize = AppTheme.fontSize.body,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -848,7 +847,7 @@ fun ArticleTopBar(
                         BahaText(
                             text = boardName,
                             color = colors.titleBarDetail2,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -899,7 +898,7 @@ fun ArticleExtToolbar(
             BahaButton(
                 text = stringResource(R.string.do_gy),
                 type = ButtonType.NORMAL,
-                fontSize = BahaTextSize.TITLE,
+                fontSize = AppTheme.fontSize.title,
                 onClick = onDoGy,
                 modifier = Modifier.weight(1f)
             )
@@ -912,7 +911,7 @@ fun ArticleExtToolbar(
             BahaButton(
                 text = stringResource(R.string.change_mode),
                 type = ButtonType.NORMAL,
-                fontSize = BahaTextSize.TITLE,
+                fontSize = AppTheme.fontSize.title,
                 onClick = onChangeMode,
                 modifier = Modifier.weight(1f)
             )
@@ -925,7 +924,7 @@ fun ArticleExtToolbar(
             BahaButton(
                 text = stringResource(R.string.open_url),
                 type = ButtonType.NORMAL,
-                fontSize = BahaTextSize.TITLE,
+                fontSize = AppTheme.fontSize.title,
                 onClick = onOpenLink,
                 modifier = Modifier.weight(1f)
             )
@@ -997,7 +996,7 @@ fun ArticleTextModeContent(
                         BahaText(
                             text = "※ 修改: ${editRec.author} 於 ${editRec.dateTime}",
                             color = colors.dialogBorder,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     }
                 }
@@ -1070,7 +1069,7 @@ fun ArticlePostTimeBar(
         BahaText(
             text = ip,
             color = colors.titleBarDetail,
-            fontSize = BahaTextSize.BODY,
+            fontSize = AppTheme.fontSize.body,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false)
@@ -1080,7 +1079,7 @@ fun ArticlePostTimeBar(
             BahaText(
                 text = "《$time》",
                 color = colors.titleBarDetail,
-                fontSize = BahaTextSize.BODY,
+                fontSize = AppTheme.fontSize.body,
                 maxLines = 1
             )
         }
@@ -1112,7 +1111,7 @@ fun ArticleContentBlockItem(
             BahaText(
                 text = "${item.author}$nick 說:",
                 color = authorColor,
-                fontSize = BahaTextSize.TITLE,
+                fontSize = AppTheme.fontSize.title,
                 modifier = Modifier
                     .clickable { onAuthorClick(item.author ?: "") }
                     .padding(bottom = if (isQuote) 2.dp else 10.dp)
@@ -1186,7 +1185,7 @@ fun ArticlePushRowItem(
             BahaText(
                 text = push.author,
                 color = colors.textSecondary,
-                fontSize = BahaTextSize.BODY,
+                fontSize = AppTheme.fontSize.body,
                 modifier = Modifier.clickable { onAuthorClick(push.author) }
             )
 
@@ -1196,7 +1195,7 @@ fun ArticlePushRowItem(
             BahaText(
                 text = " [ $floor 樓]",
                 color = colors.textSecondary,
-                fontSize = BahaTextSize.BODY
+                fontSize = AppTheme.fontSize.body
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -1206,7 +1205,7 @@ fun ArticlePushRowItem(
                 BahaText(
                     text = "${push.date} ${push.time}".trim(),
                     color = colors.textSecondary,
-                    fontSize = BahaTextSize.BODY
+                    fontSize = AppTheme.fontSize.body
                 )
             }
         }
@@ -1563,9 +1562,9 @@ fun ArticleBottomToolbar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 按鈕文字大小
-            var newFontSize = BahaTextSize.BASE
+            var newFontSize = AppTheme.fontSize.base
             if (toolbarLocation == 1 || toolbarLocation == 2)
-                newFontSize = BahaTextSize.TITLE
+                newFontSize = AppTheme.fontSize.title
 
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
@@ -1580,7 +1579,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_ll),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = AppTheme.fontSize.title
                     )
                 }
                 Box(
@@ -1662,7 +1661,7 @@ fun ArticleBottomToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = AppTheme.fontSize.title
                     )
                 }
             }

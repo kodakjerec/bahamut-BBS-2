@@ -39,7 +39,6 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -305,7 +304,7 @@ class MessageMain : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.weight(1f))
@@ -320,7 +319,7 @@ class MessageMain : TelnetPage() {
                     BahaText(
                         text = stringResource(R.string.message_small_show_float),
                         color = colors.textSecondary,
-                        fontSize = BahaTextSize.TINY,
+                        fontSize = AppTheme.fontSize.tiny,
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     BahaCheckbox(
@@ -354,7 +353,7 @@ class MessageMain : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string.message_main_search_clear),
                     color = colors.titleBarDetail,
-                    fontSize = BahaTextSize.CAPTION,
+                    fontSize = AppTheme.fontSize.caption,
                     modifier = Modifier
                         .clickable {
                             searchWordState = ""

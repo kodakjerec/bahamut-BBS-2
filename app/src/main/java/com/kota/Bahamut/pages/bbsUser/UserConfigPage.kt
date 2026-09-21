@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
@@ -136,7 +135,7 @@ class UserConfigPage : TelnetPage() {
                     BahaText(
                         text = stringResource(R.string.user_config),
                         color = colors.chapterText,
-                        fontSize = BahaTextSize.CAPTION
+                        fontSize = AppTheme.fontSize.caption
                     )
                 }
 
@@ -184,13 +183,13 @@ class UserConfigPage : TelnetPage() {
                     BahaText(
                         text = stringResource(R.string.user_config_cant),
                         color = colors.chapterText,
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         modifier = Modifier.weight(1f)
                     )
                     BahaText(
                         text = if (isCantExpandState) stringResource(R.string.post_toolbar_collapse) else stringResource(R.string.post_toolbar_show),
                         color = colors.chapterText.copy(alpha = 0.8f),
-                        fontSize = BahaTextSize.TINY
+                        fontSize = AppTheme.fontSize.tiny
                     )
                 }
 

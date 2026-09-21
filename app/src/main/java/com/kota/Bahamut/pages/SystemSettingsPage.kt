@@ -76,7 +76,6 @@ import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.RightArrow
 import com.kota.Bahamut.ui.components.SettingsCheckboxItem
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
@@ -369,7 +368,7 @@ class SystemSettingsPage : TelnetPage() {
                                 BahaText(
                                     text = "${toolbarIdleState}s",
                                     color = colors.textSecondary,
-                                    fontSize = BahaTextSize.BODY
+                                    fontSize = AppTheme.fontSize.body
                                 )
                             }
                             Slider(
@@ -401,7 +400,7 @@ class SystemSettingsPage : TelnetPage() {
                                 BahaText(
                                     text = "${toolbarAlphaState.toInt()}%",
                                     color = colors.textSecondary,
-                                    fontSize = BahaTextSize.BODY
+                                    fontSize = AppTheme.fontSize.body
                                 )
                             }
                             Slider(
@@ -528,7 +527,7 @@ class SystemSettingsPage : TelnetPage() {
                         BahaText(
                             text = cloudSaveLastTimeString,
                             color = colors.textSecondary,
-                            fontSize = BahaTextSize.CAPTION,
+                            fontSize = AppTheme.fontSize.caption,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 14.dp, vertical = 4.dp)
@@ -631,7 +630,7 @@ class SystemSettingsPage : TelnetPage() {
                     BahaText(
                         text = "▾",
                         color = colors.textSecondary,
-                        fontSize = BahaTextSize.SUBTITLE
+                        fontSize = AppTheme.fontSize.subtitle
                     )
                 }
                 BahaDropdownMenu(
@@ -640,7 +639,7 @@ class SystemSettingsPage : TelnetPage() {
                     items = items,
                     selectedIndex = selectedIndex,
                     onItemSelected = onItemSelected,
-                    fontSize = BahaTextSize.SUBTITLE
+                    fontSize = AppTheme.fontSize.subtitle
                 )
             }
         }

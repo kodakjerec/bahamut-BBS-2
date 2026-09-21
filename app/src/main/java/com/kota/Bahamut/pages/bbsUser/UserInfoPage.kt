@@ -31,7 +31,6 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -187,7 +186,7 @@ class UserInfoPage : TelnetPage() {
                 BahaText(
                     text = othersState,
                     color = colors.textSecondary,
-                    fontSize = BahaTextSize.SUBTITLE,
+                    fontSize = AppTheme.fontSize.subtitle,
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp, vertical = 8.dp)

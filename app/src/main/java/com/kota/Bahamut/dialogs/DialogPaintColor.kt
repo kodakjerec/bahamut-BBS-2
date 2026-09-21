@@ -30,7 +30,6 @@ import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaDropdownMenu
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -199,13 +198,13 @@ class DialogPaintColor : ASDialog() {
                             BahaText(
                                 text = colorOptions.getOrElse(frontColor) { "" },
                                 color = colors.textPrimary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                         }
                         BahaDropdownMenu(
@@ -217,7 +216,7 @@ class DialogPaintColor : ASDialog() {
                                 frontColor = index
                                 if (index > 0 && isRecovery) isRecovery = false
                             },
-                            fontSize = BahaTextSize.SUBTITLE
+                            fontSize = AppTheme.fontSize.subtitle
                         )
                     }
                 }
@@ -250,13 +249,13 @@ class DialogPaintColor : ASDialog() {
                             BahaText(
                                 text = colorOptions.getOrElse(backColor) { "" },
                                 color = colors.textPrimary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             BahaText(
                                 text = "▾",
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.SUBTITLE
+                                fontSize = AppTheme.fontSize.subtitle
                             )
                         }
                         BahaDropdownMenu(
@@ -268,7 +267,7 @@ class DialogPaintColor : ASDialog() {
                                 backColor = index
                                 if (index > 0 && isRecovery) isRecovery = false
                             },
-                            fontSize = BahaTextSize.SUBTITLE
+                            fontSize = AppTheme.fontSize.subtitle
                         )
                     }
                 }

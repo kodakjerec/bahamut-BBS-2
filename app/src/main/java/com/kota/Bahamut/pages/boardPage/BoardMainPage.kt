@@ -101,7 +101,6 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaFloatingToolbar
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.components.FloatingToolbarButtonItem
 import com.kota.Bahamut.ui.components.RightArrow
@@ -907,7 +906,7 @@ open class BoardMainPage : TelnetListPage(),
                             BahaText(
                                 text = stringResource(R.string.loading_),
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.BODY
+                                fontSize = AppTheme.fontSize.body
                             )
                         }
                     } else {
@@ -1175,7 +1174,7 @@ fun BoardMainTopBar(
                 BahaText(
                     text = title,
                     color = colors.titleBarTitle,
-                    fontSize = BahaTextSize.TITLE,
+                    fontSize = AppTheme.fontSize.title,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -1195,7 +1194,7 @@ fun BoardMainTopBar(
                         BahaText(
                             text = listName,
                             color = colors.titleBarDetail,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -1203,7 +1202,7 @@ fun BoardMainTopBar(
                             BahaText(
                                 text = stringResource(R.string.board_main_vV),
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.BODY,
+                                fontSize = AppTheme.fontSize.body,
                                 modifier = Modifier
                                     .clickable { onReadAllClick() }
                                     .padding(start = 2.dp)
@@ -1216,7 +1215,7 @@ fun BoardMainTopBar(
                         BahaText(
                             text = manager,
                             color = colors.titleBarDetail2,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -1305,7 +1304,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = if (isReply) "Re" else "◆",
                         color = colors.bbsMailStatus,
-                        fontSize = BahaTextSize.TITLE,
+                        fontSize = AppTheme.fontSize.title,
                         modifier = Modifier.padding(end = 4.dp)
                     )
 
@@ -1313,7 +1312,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = titleText,
                         color = titleColor,
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = AppTheme.fontSize.title
                     )
                 }
 
@@ -1328,7 +1327,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = String.format("%05d", item?.itemNumber ?: itemIndex),
                         color = colors.bbsMailNumber,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
 
                     // 標記 M
@@ -1337,7 +1336,7 @@ fun BoardPageRowItem(
                         BahaText(
                             text = "M",
                             color = colors.bbsMailMark,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     } else {
                         Spacer(modifier = Modifier.width(48.dp))
@@ -1348,7 +1347,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = dateText,
                         color = colors.bbsMailDate,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
 
                     // GY 推文數
@@ -1357,12 +1356,12 @@ fun BoardPageRowItem(
                         BahaText(
                             text = stringResource(R.string.gy_),
                             color = colors.bbsContent0,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                         BahaText(
                             text = gyCount.toString(),
                             color = colors.bbsBoardGy,
-                            fontSize = BahaTextSize.BODY
+                            fontSize = AppTheme.fontSize.body
                         )
                     } else {
                         Spacer(modifier = Modifier.width(48.dp))
@@ -1374,7 +1373,7 @@ fun BoardPageRowItem(
                     BahaText(
                         text = authorText,
                         color = colors.bbsMailAuthor,
-                        fontSize = BahaTextSize.BODY,
+                        fontSize = AppTheme.fontSize.body,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -1433,9 +1432,9 @@ fun BoardMainToolbar(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // 按鈕文字大小
-            var newFontSize = BahaTextSize.BASE
+            var newFontSize = AppTheme.fontSize.base
             if (toolbarLocation == 1 || toolbarLocation == 2)
-                newFontSize = BahaTextSize.TITLE
+                newFontSize = AppTheme.fontSize.title
 
             // 靠右對齊時左側切換按鈕 (LL)
             if (toolbarLocation == 2) {
@@ -1489,7 +1488,7 @@ fun BoardMainToolbar(
                     BahaButton(
                         text = stringResource(if (isMoveEnable) R.string.next_page else R.string.last_page),
                         type = ButtonType.NORMAL,
-                        fontSize = BahaTextSize.TITLE,
+                        fontSize = AppTheme.fontSize.title,
                         onClick = if (isMoveEnable) onNextClick else onLastClick,
                         onLongClick = onLastClick,
                         modifier = Modifier
@@ -1532,7 +1531,7 @@ fun BoardMainToolbar(
                     BahaText(
                         text = stringResource(R.string.toolbar_item_rr),
                         color = colors.dialogSelectArticleFocused.copy(alpha = 0.5f),
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = AppTheme.fontSize.title
                     )
                 }
             }
@@ -1667,7 +1666,7 @@ fun BoardEndDrawer(
                                             BahaText(
                                                 text = bItem.keyword.ifEmpty { stringResource(R.string.un_input) },
                                                 color = colors.textPrimary,
-                                                fontSize = BahaTextSize.TITLE,
+                                                fontSize = AppTheme.fontSize.title,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis
                                             )
@@ -1680,12 +1679,12 @@ fun BoardEndDrawer(
                                                 BahaText(
                                                     text = stringResource(R.string.author_),
                                                     color = colors.textSecondary,
-                                                    fontSize = BahaTextSize.CAPTION
+                                                    fontSize = AppTheme.fontSize.caption
                                                 )
                                                 BahaText(
                                                     text = bItem.author.ifEmpty { stringResource(R.string.un_input) },
                                                     color = colors.bbsMailAuthor,
-                                                    fontSize = BahaTextSize.CAPTION,
+                                                    fontSize = AppTheme.fontSize.caption,
                                                     maxLines = 1,
                                                     overflow = TextOverflow.Ellipsis,
                                                     modifier = Modifier.weight(1f, fill = false)
@@ -1695,19 +1694,19 @@ fun BoardEndDrawer(
                                                     BahaText(
                                                         text = stringResource(R.string.word_m),
                                                         color = colors.bbsMailMark,
-                                                        fontSize = BahaTextSize.CAPTION
+                                                        fontSize = AppTheme.fontSize.caption
                                                     )
                                                 }
                                                 Spacer(modifier = Modifier.weight(1f))
                                                 BahaText(
                                                     text = stringResource(R.string.gy_),
                                                     color = colors.textSecondary,
-                                                    fontSize = BahaTextSize.CAPTION
+                                                    fontSize = AppTheme.fontSize.caption
                                                 )
                                                 BahaText(
                                                     text = gyValue,
                                                     color = colors.bbsBoardGy,
-                                                    fontSize = BahaTextSize.CAPTION
+                                                    fontSize = AppTheme.fontSize.caption
                                                 )
                                             }
                                         } else {
@@ -1715,7 +1714,7 @@ fun BoardEndDrawer(
                                             BahaText(
                                                 text = bItem.keyword.ifEmpty { stringResource(R.string.un_input) },
                                                 color = colors.textPrimary,
-                                                fontSize = BahaTextSize.TITLE,
+                                                fontSize = AppTheme.fontSize.title,
                                                 maxLines = 1,
                                                 overflow = TextOverflow.Ellipsis
                                             )

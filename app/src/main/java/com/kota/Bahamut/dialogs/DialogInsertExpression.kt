@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -65,7 +64,7 @@ class DialogInsertExpression : ASDialog() {
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.setting),
                         color = colors.buttonText,
-                        fontSize = BahaTextSize.BODY
+                        fontSize = AppTheme.fontSize.body
                     )
                 }
             },

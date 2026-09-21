@@ -44,7 +44,6 @@ import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
@@ -538,14 +537,14 @@ class LoginPage : TelnetComposePage() {
                             Spacer(modifier = Modifier.width(4.dp))
                             BahaText(
                                 text = stringResource(R.string.login_web_sign_in),
-                                fontSize = BahaTextSize.BODY
+                                fontSize = AppTheme.fontSize.body
                             )
                         }
                         Spacer(modifier = Modifier.width(8.dp))
                         BahaText(
                             text = stringResource(R.string.login_web_settings_btn),
                             color = colors.textLink,
-                            fontSize = BahaTextSize.BODY,
+                            fontSize = AppTheme.fontSize.body,
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .clickable {
@@ -563,7 +562,7 @@ class LoginPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.account),
-                        fontSize = BahaTextSize.SUBTITLE,
+                        fontSize = AppTheme.fontSize.subtitle,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(
@@ -583,7 +582,7 @@ class LoginPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.password),
-                        fontSize = BahaTextSize.SUBTITLE,
+                        fontSize = AppTheme.fontSize.subtitle,
                         modifier = Modifier.width(52.dp)
                     )
                     BahaInputField(

@@ -45,7 +45,6 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.Bahamut.ui.theme.setBahamutContent
@@ -269,14 +268,14 @@ class MessageSub : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string._back),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     modifier = Modifier.clickable { onBackPressed() }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 BahaText(
                     text = senderNameState,
                     color = colors.titleBarTitle,
-                    fontSize = BahaTextSize.SUBTITLE
+                    fontSize = AppTheme.fontSize.subtitle
                 )
             }
             HorizontalDivider(color = colors.divider, thickness = 1.dp)

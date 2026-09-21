@@ -43,7 +43,6 @@ import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryQuery
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.rememberDrawablePainter
 import com.kota.Bahamut.ui.dialogs.BahaGlobalDialogHost
 import com.kota.Bahamut.ui.theme.AppTheme
@@ -185,7 +184,7 @@ class BillingPage : TelnetPage() {
 
                 BahaText(
                     text = stringResource(R.string.billing_page_note),
-                    fontSize = BahaTextSize.CAPTION,
+                    fontSize = AppTheme.fontSize.caption,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -195,7 +194,7 @@ class BillingPage : TelnetPage() {
                 BahaText(
                     text = stringResource(R.string.billing_page_note2),
                     color = colors.titleBarTitle,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -205,7 +204,7 @@ class BillingPage : TelnetPage() {
                 // Purchase button (com.kota.billing.90)
                 BahaButton(
                     text = productDetailsState?.name ?: stringResource(R.string.billing_page_button_90),
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     enabled = productDetailsState != null,
                     modifier = Modifier.padding(horizontal = 32.dp),
                     onClick = { launchPurchase() }
@@ -218,7 +217,7 @@ class BillingPage : TelnetPage() {
                 // Check purchase button
                 BahaButton(
                     text = stringResource(R.string.billing_page_button_check_purchase_query),
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     modifier = Modifier.padding(horizontal = 32.dp),
                     onClick = {
                         checkPurchaseHistory()
@@ -237,13 +236,13 @@ class BillingPage : TelnetPage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.billing_page_already_billing_text),
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )
                     BahaText(
                         text = alreadyBillingValueState,
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
                     )

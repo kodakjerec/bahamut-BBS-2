@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
@@ -256,7 +255,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     ) {
                         BahaText(
                             text = stringResource(R.string.title_),
-                            fontSize = BahaTextSize.SUBTITLE,
+                            fontSize = AppTheme.fontSize.subtitle,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         BahaInputField(
@@ -277,7 +276,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                     ) {
                         BahaText(
                             text = stringResource(R.string.receiver_),
-                            fontSize = BahaTextSize.SUBTITLE,
+                            fontSize = AppTheme.fontSize.subtitle,
                             modifier = Modifier.padding(end = 8.dp)
                         )
                         BahaInputField(
@@ -313,7 +312,7 @@ class SendMailPage : TelnetPage(), DialogInsertSymbolListener, DialogPaintColorL
                             BahaText(
                                 text = stringResource(R.string.input_content_here),
                                 color = colors.textSecondary,
-                                fontSize = BahaTextSize.BASE
+                                fontSize = AppTheme.fontSize.base
                             )
                         }
                         innerTextField()

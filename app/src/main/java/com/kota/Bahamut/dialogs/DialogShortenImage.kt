@@ -59,7 +59,6 @@ import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -200,7 +199,7 @@ class DialogShortenImage : AppCompatActivity() {
                             BahaButton(
                                 text = stringResource(R.string.dialog_shorten_img_album),
                                 type = ButtonType.NORMAL,
-                                fontSize = BahaTextSize.TITLE,
+                                fontSize = AppTheme.fontSize.title,
                                 onClick = {
                                     pickMediaLauncher.launch(PickVisualMediaRequest(PickVisualMedia.ImageAndVideo))
                                 },
@@ -218,7 +217,7 @@ class DialogShortenImage : AppCompatActivity() {
                             BahaButton(
                                 text = stringResource(R.string.dialog_shorten_img_camera),
                                 type = ButtonType.NORMAL,
-                                fontSize = BahaTextSize.TITLE,
+                                fontSize = AppTheme.fontSize.title,
                                 onClick = {
                                     if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                         openCameraIntent()
@@ -240,7 +239,7 @@ class DialogShortenImage : AppCompatActivity() {
                             BahaButton(
                                 text = stringResource(R.string.dialog_shorten_img_video),
                                 type = ButtonType.NORMAL,
-                                fontSize = BahaTextSize.TITLE,
+                                fontSize = AppTheme.fontSize.title,
                                 onClick = {
                                     if (checkSelfPermission(CAMERA) == PackageManager.PERMISSION_GRANTED) {
                                         openVideoIntent()

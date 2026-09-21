@@ -27,7 +27,6 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaInputField
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -85,7 +84,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                 BahaText(
                     text = CommonFunctions.getContextString(R.string.login_web_settings_tip),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     lineHeight = 20.sp,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
@@ -93,7 +92,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                 BahaText(
                     text = CommonFunctions.getContextString(R.string.account),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.SUBTITLE,
+                    fontSize = AppTheme.fontSize.subtitle,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(
@@ -111,7 +110,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                 BahaText(
                     text = CommonFunctions.getContextString(R.string.password),
                     color = colors.textPrimary,
-                    fontSize = BahaTextSize.SUBTITLE,
+                    fontSize = AppTheme.fontSize.subtitle,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
                 BahaInputField(
@@ -143,7 +142,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
                     BahaText(
                         text = CommonFunctions.getContextString(R.string.login_web_debug_view_toggle),
                         color = colors.textPrimary,
-                        fontSize = BahaTextSize.CAPTION
+                        fontSize = AppTheme.fontSize.caption
                     )
                 }
             }

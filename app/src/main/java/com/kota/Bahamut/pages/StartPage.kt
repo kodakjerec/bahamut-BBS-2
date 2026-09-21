@@ -59,7 +59,6 @@ import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.theme.AppTheme
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
@@ -207,11 +206,11 @@ class StartPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.notices),
-                        fontSize = BahaTextSize.TITLE
+                        fontSize = AppTheme.fontSize.title
                     )
                     BahaText(
                         text = versionText,
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary
                     )
                 }
@@ -219,7 +218,7 @@ class StartPage : TelnetComposePage() {
                 // 2. 公告說明 1
                 BahaText(
                     text = stringResource(R.string.start_msg_1).trim(),
-                    fontSize = BahaTextSize.CAPTION,
+                    fontSize = AppTheme.fontSize.caption,
                     color = colors.textSecondary,
                     lineHeight = 20.sp
                 )
@@ -227,7 +226,7 @@ class StartPage : TelnetComposePage() {
                 // 3. 公告說明 2
                 BahaText(
                     text = stringResource(R.string.start_msg_2),
-                    fontSize = BahaTextSize.BODY,
+                    fontSize = AppTheme.fontSize.body,
                     lineHeight = 22.sp
                 )
 
@@ -240,14 +239,14 @@ class StartPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = "第一次登入請先至",
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary,
                         textAlign = TextAlign.Center
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     BahaText(
                         text = "https://user.gamer.com.tw/openBBS.php",
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textLink,
                         textAlign = TextAlign.Center,
                         textDecoration = TextDecoration.Underline,
@@ -260,7 +259,7 @@ class StartPage : TelnetComposePage() {
                     Spacer(modifier = Modifier.height(2.dp))
                     BahaText(
                         text = "啟用BBS權限 ！",
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary,
                         textAlign = TextAlign.Center
                     )
@@ -274,7 +273,7 @@ class StartPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.start_connect_ip),
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
@@ -316,7 +315,7 @@ class StartPage : TelnetComposePage() {
                                 Spacer(modifier = Modifier.width(6.dp))
                                 BahaText(
                                     text = ipText,
-                                    fontSize = BahaTextSize.BASE,
+                                    fontSize = AppTheme.fontSize.base,
                                     color = if (isIpEnabled) colors.textPrimary else colors.textSecondary
                                 )
                             }
@@ -328,7 +327,7 @@ class StartPage : TelnetComposePage() {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     BahaText(
                         text = stringResource(R.string.start_connect_method),
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center
@@ -366,7 +365,7 @@ class StartPage : TelnetComposePage() {
                                 Spacer(modifier = Modifier.width(6.dp))
                                 BahaText(
                                     text = methodText,
-                                    fontSize = BahaTextSize.BASE
+                                    fontSize = AppTheme.fontSize.base
                                 )
                             }
                         }
@@ -381,7 +380,7 @@ class StartPage : TelnetComposePage() {
                 ) {
                     BahaText(
                         text = stringResource(R.string.start_vault),
-                        fontSize = BahaTextSize.CAPTION,
+                        fontSize = AppTheme.fontSize.caption,
                         color = colors.textSecondary,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center

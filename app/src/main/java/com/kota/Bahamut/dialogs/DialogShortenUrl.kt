@@ -43,7 +43,6 @@ import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.ui.components.BahaButton
 import com.kota.Bahamut.ui.components.BahaCheckbox
 import com.kota.Bahamut.ui.components.BahaText
-import com.kota.Bahamut.ui.components.BahaTextSize
 import com.kota.Bahamut.ui.components.ButtonType
 import com.kota.Bahamut.ui.dialogs.BahaAlertDialogContent
 import com.kota.Bahamut.ui.dialogs.BahaDialogButton
@@ -125,7 +124,7 @@ class DialogShortenUrl : ASDialog() {
                 ) {
                     BahaText(
                         text = if (isTransferMode) CommonFunctions.getContextString(R.string.record) else CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
-                        fontSize = BahaTextSize.TITLE,
+                        fontSize = AppTheme.fontSize.title,
                         color = colors.dialogButtonText
                     )
                 }
@@ -208,7 +207,7 @@ class DialogShortenUrl : ASDialog() {
                     ) {
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.reset),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             type = ButtonType.DANGER,
                             onClick = {
                                 inputUrl = ""
@@ -220,7 +219,7 @@ class DialogShortenUrl : ASDialog() {
                         )
                         BahaButton(
                             text = CommonFunctions.getContextString(R.string.dialog_shorten_url_transfer),
-                            fontSize = BahaTextSize.TITLE,
+                            fontSize = AppTheme.fontSize.title,
                             type = ButtonType.NORMAL,
                             onClick = {
                                 transferUrl(inputUrl) { shortUrl ->
