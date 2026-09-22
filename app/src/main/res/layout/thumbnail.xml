@@ -44,6 +44,15 @@
             style="@style/TextViewNormal"
             android:textColor="?attr/bahamut_thumbnailButtonTextColor"
             android:background="?attr/bahamut_thumbnailButtonBackground"/>
+        <Button
+            android:id="@+id/thumbnail_retry_button"
+            android:layout_width="match_parent"
+            android:layout_height="36dp"
+            android:text="@string/thumbnail_load_failed_retry"
+            style="@style/TextViewNormal"
+            android:textColor="?attr/bahamut_thumbnailButtonTextColor"
+            android:background="?attr/bahamut_thumbnailButtonBackground"
+            android:visibility="gone"/>
     </LinearLayout>
     <LinearLayout
         android:id="@+id/thumbnail_normal"

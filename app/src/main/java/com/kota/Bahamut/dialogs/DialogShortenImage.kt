@@ -37,7 +37,6 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.uploadImgMethod.UploaderBahaImg
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.messages.MessageSub
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.pages.theme.ThemeStore
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.UserSettings
@@ -329,7 +328,7 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
                     currentPhotoPath = absolutePath
                 }
             photoFile?.also {
-                selectedImageUri = FileProvider.getUriForFile(this, "com.kota.Bahamut.fileprovider", it)
+                selectedImageUri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", it)
                 intent.putExtra(MediaStore.EXTRA_OUTPUT, selectedImageUri)
             }
         } catch (e: Exception) {

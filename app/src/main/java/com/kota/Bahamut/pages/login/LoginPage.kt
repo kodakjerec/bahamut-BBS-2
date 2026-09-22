@@ -93,6 +93,11 @@ class LoginPage : TelnetPage() {
         }
         findViewById(R.id.LoginWebSignInLabel)?.setOnClickListener {
             webLoginCheckBox.isChecked = !webLoginCheckBox.isChecked
+            if (webLoginCheckBox.isChecked) {
+                if (UserSettings.propertiesWebUsername.isEmpty() || UserSettings.propertiesWebPassword.isEmpty()) {
+                    DialogWebLoginSettings().show()
+                }
+            }
         }
         // web登入設定按鈕
         findViewById(R.id.LoginWebSignInSettings)?.setOnClickListener {

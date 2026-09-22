@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -22,7 +21,6 @@ import com.kota.Bahamut.pages.model.ClassPageBlock.Companion.recycle
 import com.kota.Bahamut.pages.model.ClassPageHandler
 import com.kota.Bahamut.pages.model.ClassPageItem
 import com.kota.Bahamut.pages.model.ClassPageItem.Companion.recycle
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
@@ -288,11 +286,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             if (TempSettings.lastVisitBoard != item.name) {
                 TempSettings.lastVisitArticleNumber = 0
             }
-            val page = PageContainer.instance!!.boardPage
-            page.prepareInitial()
-            navigationController.pushViewController(page)
+            TelnetClient.myInstance!!.sendStringToServerInBackground("s"+item.name)
         }
-        super.loadItemAtIndex(index)
     }
 
     /** 填入看板  */

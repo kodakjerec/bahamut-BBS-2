@@ -242,6 +242,7 @@
     <string name="board_page_send_mail_ing">寄信中</string>
     <string name="board_page_send_mail_finish">寄信完畢</string>
     <string name="thumbnail_show_pic">[顯示圖片]</string>
+    <string name="thumbnail_load_failed_retry">[讀取失敗，點擊重新讀取]</string>
     <string name="board_page_item_load_all_image">載入全部圖片</string>
     <string name="post_article_page_format">引用</string>
     <string name="post_article_page_paint_color">上色</string>

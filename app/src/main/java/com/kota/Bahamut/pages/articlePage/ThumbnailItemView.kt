@@ -29,7 +29,6 @@ import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogImageView
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
@@ -67,6 +66,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     lateinit var loadingView: ProgressBar
     lateinit var photoViewPic: PhotoView
     lateinit var imageViewButton: Button
+    lateinit var retryButton: Button
 
     // 內容圖層
     lateinit var layoutNormal: LinearLayout
@@ -305,8 +305,9 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         loadOnlyWifi = linkShowOnlyWifi // 只在wifi下預覽設定
         val transportType = TempSettings.transportType
 
-        if (isPic) { // 純圖片
-            ASCoroutine.ensureMainThread {
+        ASCoroutine.ensureMainThread {
+            retryButton.visibility = GONE
+            if (isPic) { // 純圖片
                 layoutDefault.visibility = GONE
 
                 // 圖片
@@ -319,9 +320,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                 // 內容
                 layoutNormal.visibility = GONE
-            }
-        } else { // 內容網址
-            ASCoroutine.ensureMainThread {
+            } else { // 內容網址
                 layoutDefault.visibility = GONE
 
                 // 圖片
@@ -362,11 +361,15 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
     /** 意外處理  */
     private fun setFail() {
+        imgLoaded = false
         layoutDefault.visibility = GONE
 
         // 圖片
+        layoutPic.visibility = VISIBLE
         loadingView.visibility = GONE
         photoViewPic.visibility = GONE
+        imageViewButton.visibility = GONE
+        retryButton.visibility = VISIBLE
 
         // 內容
         layoutNormal.visibility = GONE
@@ -377,13 +380,13 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         imgLoaded = true
         // 立即顯示 loading，隱藏其他
         imageViewButton.visibility = GONE
+        retryButton.visibility = GONE
         loadingView.visibility = VISIBLE
         photoViewPic.visibility = GONE
         photoViewPic.contentDescription = myDescription
 
         if (myImageUrl.isEmpty()) {
-            // 如果圖片URL為空，隱藏 loading
-            loadingView.visibility = GONE
+            setFail()
             return
         }
 
@@ -401,7 +404,9 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             isFirstResource: Boolean
                         ): Boolean {
                             Log.e("GlideError", "Image load failed for URL: $myImageUrl", e) // 記錄錯誤訊息
-                            loadingView.visibility = GONE
+                            ASCoroutine.ensureMainThread {
+                                setFail()
+                            }
                             return false
                         }
 
@@ -526,6 +531,19 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
         imageViewButton = mainLayout!!.findViewById(R.id.thumbnail_image_button)
         imageViewButton.setOnClickListener { view: View? -> prepareLoadImage() }
+
+        retryButton = mainLayout!!.findViewById(R.id.thumbnail_retry_button)
+        retryButton.setOnClickListener {
+            retryButton.visibility = GONE
+            imgLoaded = false
+            if (myImageUrl.isNotEmpty()) {
+                prepareLoadImage()
+            } else {
+                layoutDefault.visibility = VISIBLE
+                layoutPic.visibility = GONE
+                loadUrl(myUrl)
+            }
+        }
 
         layoutNormal = mainLayout!!.findViewById(R.id.thumbnail_normal)
 

@@ -47,7 +47,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:text="@string/board_main_vV"
-                    android:textColor="?attr/bahamut_titleBarDetail2Color"
+                    android:textColor="?attr/bahamut_dialogBorderColor"
                     app:layout_constraintStart_toEndOf="@+id/detail_1"
                     app:layout_constraintTop_toTopOf="parent"
                     android:visibility="gone"/>
