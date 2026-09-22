@@ -250,11 +250,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             if (TempSettings.lastVisitBoard != item.name) {
                 TempSettings.lastVisitArticleNumber = 0
             }
-            val page = PageContainer.instance!!.boardPage
-            page.prepareInitial()
-            navigationController.pushViewController(page)
+            TelnetClient.myInstance?.sendStringToServerInBackground("s"+ item.name)
         }
-        super.loadItemAtIndex(index)
     }
 
     override fun recycleBlock(telnetListPageBlock: TelnetListPageBlock) {

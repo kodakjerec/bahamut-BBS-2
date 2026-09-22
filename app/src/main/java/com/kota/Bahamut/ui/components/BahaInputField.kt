@@ -55,7 +55,7 @@ fun BahaInputField(
         )
     },
     keyboardActions: KeyboardActions = KeyboardActions.Default,
-    fontSize: TextUnit = AppTheme.fontSize.title,
+    fontSize: TextUnit = AppTheme.fontSize.base,
     fontColor: Color = AppTheme.colors.inputBoxText,
     backgroundColor: Color = AppTheme.colors.inputBoxBackground
 ) {

@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -94,7 +93,6 @@ import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesDrawerLocation
-import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarOrder
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesUsername
@@ -258,8 +256,8 @@ open class BoardMainPage : TelnetListPage(),
 
         // 跳到指定文章編號
         if (this::class == BoardMainPage::class) {
-            val isFromClassPage = ASNavigationController.currentController?.lastViewController is ClassPage
-            if (isFromClassPage) {
+            val checkPreviousPage = ASNavigationController.currentController?.lastViewController is ClassPage
+            if (checkPreviousPage) {
                 if (TempSettings.lastVisitArticleNumber > 0) {
                     object : ASCoroutine() {
                         override suspend fun run() {
@@ -267,15 +265,16 @@ open class BoardMainPage : TelnetListPage(),
                             onSelectDialogDismissWIthIndex(findIndex.toString())
                         }
                     }.postDelayed(100L)
-                } else {
-                    object : ASCoroutine() {
-                        override suspend fun run() {
-                            setManualLoadPage()
-                            moveToLastPosition()
-                            scrollToPosition(count - 1)
-                        }
-                    }.postDelayed(100L)
                 }
+//                else {
+//                    object : ASCoroutine() {
+//                        override suspend fun run() {
+//                            setManualLoadPage()
+//                            moveToLastPosition()
+//                            scrollToPosition(count - 1)
+//                        }
+//                    }.postDelayed(100L)
+//                }
             }
         }
     }
@@ -602,6 +601,7 @@ open class BoardMainPage : TelnetListPage(),
     /** 載入已保存的列表狀態與位置 */
     override fun loadListState() {
         super.loadListState()
+
         listId?.let { id ->
             val state = instance.getState(id)
             if (state.position >= 0) {
@@ -734,40 +734,10 @@ open class BoardMainPage : TelnetListPage(),
         isDrawerOpenState = false
     }
 
-    /** 接收向左滑動手勢 (從右向左滑動) */
-    override fun onReceivedGestureLeft(): Boolean {
-        if (pageType == BahamutPage.BAHAMUT_BOARD) {
-            if (!isDrawerOpenState) {
-                openDrawer(isLeft = false)
-                return true
-            } else if (!isDrawerLeftState) {
-                closeDrawer()
-                return true
-            }
-        }
-        return super.onReceivedGestureLeft()
-    }
-
     /** 接收向右滑動手勢 (從左向右滑動) */
     override fun onReceivedGestureRight(): Boolean {
-        if (pageType == BahamutPage.BAHAMUT_BOARD) {
-            if (!isDrawerOpenState) {
-                openDrawer(isLeft = true)
-                return true
-            } else if (isDrawerLeftState) {
-                closeDrawer()
-                return true
-            }
-        }
-        if (propertiesGestureOnBoardEnable) {
-            if (isDrawerOpenState) {
-                closeDrawer()
-                return true
-            }
-            onBackPressed()
-            return true
-        }
-        return false
+        onBackPressed()
+        return true
     }
 
     /** 處理系統返回鍵事件 */
@@ -780,6 +750,7 @@ open class BoardMainPage : TelnetListPage(),
         navigationController.popViewController()
         TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardPage()
+        TempSettings.lastVisitArticleNumber = 0
         return true
     }
 
@@ -809,7 +780,7 @@ open class BoardMainPage : TelnetListPage(),
             val s = listId?.let { instance.getState(it) }
             if (s != null && s.top > 0) s.top else 0
         }
-        val initialIndex = if (savedPosition >= 0) savedPosition else 0
+        val initialIndex = if (savedPosition > 0 ) savedPosition else 99999
         val listState = rememberLazyListState(
             initialFirstVisibleItemIndex = initialIndex,
             initialFirstVisibleItemScrollOffset = savedOffset
@@ -843,31 +814,6 @@ open class BoardMainPage : TelnetListPage(),
         }
 
         val currentCount = if (dataVersion >= 0) count else 0
-
-        // 當列表資料載入或返回時，若初始在 0 且有保存的位置，確保滾動到保存的位置
-        var hasRestoredSavedPosition by remember { mutableStateOf(false) }
-        LaunchedEffect(currentCount) {
-            if (!hasRestoredSavedPosition && currentCount > 0 && savedPosition >= 0) {
-                val target = savedPosition.coerceIn(0, currentCount - 1)
-                listState.scrollToItem(target, savedOffset)
-                hasRestoredSavedPosition = true
-            }
-        }
-
-        // 監聽平移或滾動觸發
-        LaunchedEffect(scrollToItemTrigger) {
-            scrollToItemTrigger?.let { target ->
-                val safeTarget = if (target == -1) {
-                    max(0, currentCount - 1)
-                } else {
-                    target.coerceIn(0, max(0, currentCount - 1))
-                }
-                if (currentCount > 0) {
-                    listState.scrollToItem(safeTarget)
-                }
-                scrollToItemTrigger = null
-            }
-        }
 
         Box(
             modifier = Modifier
@@ -957,38 +903,6 @@ open class BoardMainPage : TelnetListPage(),
                                 }
                             }
                         }
-                    }
-
-                    // 側邊選單 Drawer 手勢觸發區 (限定在文章列表極邊緣 16dp，未開啟時不擋 Header)
-                    if (pageType == BahamutPage.BAHAMUT_BOARD && !isDrawerOpenState) {
-                        // 左側極邊緣觸發區 (16dp 寬) - 從最左邊緣向內 (右) 滑動開啟左側選單
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(16.dp)
-                                .align(Alignment.CenterStart)
-                                .pointerInput(Unit) {
-                                    detectHorizontalDragGestures { _, dragAmount ->
-                                        if (dragAmount > 15f) {
-                                            openDrawer(isLeft = true)
-                                        }
-                                    }
-                                }
-                        )
-                        // 右側極邊緣觸發區 (16dp 寬) - 從最右邊緣向內 (左) 滑動開啟右側選單
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .width(16.dp)
-                                .align(Alignment.CenterEnd)
-                                .pointerInput(Unit) {
-                                    detectHorizontalDragGestures { _, dragAmount ->
-                                        if (dragAmount < -15f) {
-                                            openDrawer(isLeft = false)
-                                        }
-                                    }
-                                }
-                        )
                     }
                 }
 
