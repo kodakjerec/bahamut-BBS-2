@@ -60,7 +60,11 @@ object CommonFunctions {
         val context = TempSettings.myContext ?: return 0
         context.theme?.resolveAttribute(attrItem, typedValue, true)
         if (typedValue.resourceId != 0) {
-            return ContextCompat.getColor(context, typedValue.resourceId)
+            try {
+                return ContextCompat.getColor(context, typedValue.resourceId)
+            } catch (_: Exception) {
+                // If resourceId points to a drawable or non-color resource
+            }
         }
         return typedValue.data
     }

@@ -9,10 +9,10 @@
     <color name="transparent">#00000000</color>
     <color name="yellow">#FFF0F080</color>
     <color name="red">#FF800000</color>
-    <color name="text_color_link">#FF1F5EFF</color>
     <color name="halfWhite">#FF808080</color>
 
     <!-- 功能性顏色 (保留給程式碼引用) -->
+    <color name="text_color_link">#FF1F5EFF</color>
     <color name="page_background">@color/black</color>
     <color name="dialog_title_background">@color/dark_gray_20</color>
     <color name="chapter_background">@color/dark_gray_20</color>

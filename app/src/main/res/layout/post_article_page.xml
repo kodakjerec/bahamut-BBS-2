@@ -44,7 +44,8 @@
                 android:gravity="center_vertical"
                 android:hint="@string/input_title_here"
                 android:inputType="textMultiLine"
-                android:singleLine="true"/>
+                android:singleLine="true"
+                android:background="@color/transparent"/>
         </FrameLayout>
     </LinearLayout>
 
@@ -70,7 +71,8 @@
             android:hint="@string/input_content_here"
             android:importantForAutofill="no"
             android:inputType="textMultiLine"
-            android:padding="10dp"/>
+            android:padding="10dp"
+            android:background="@color/transparent"/>
     </LinearLayout>
 
     <LinearLayout

@@ -12,6 +12,7 @@ class PostEditText @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = android.R.attr.editTextStyle
 ) : androidx.appcompat.widget.AppCompatEditText(context, attrs, defStyleAttr) {
+
     override fun onTextContextMenuItem(id: Int): Boolean {
         if (id == android.R.id.paste) {
             onInterceptClipDataToPlainText()

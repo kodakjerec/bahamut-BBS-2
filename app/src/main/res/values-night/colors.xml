@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- 當系統進入深色模式時，將看板列表等原本為純白的文字調暗 -->
+    <!-- 功能性顏色 (保留給程式碼引用) -->
+    <color name="text_color_link">#FF64B5F6</color>
     <color name="page_background">@color/dark_gray_10</color>
-    <color name="board_item_normal">@color/gray_white</color>
+    <color name="board_item_normal">#FFE1E1E1</color>
 
     <!-- 看板追蹤顏色調暗 -->
     <color name="board_item_follow_first">#FF00A000</color>
@@ -52,4 +53,7 @@
     <color name="dialog_item_background_pressed">#FF404040</color>
     <color name="dialog_item_background_focused">#FF404040</color>
     <color name="dialog_item_background_disabled">#FF100000</color>
+
+
+    <color name="article_page_header_board">#FFAEEDED</color>
 </resources>
