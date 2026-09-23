@@ -12,6 +12,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"
             android:id="@+id/recycleView"/>
+    <View style="@style/HorizontalDivider"/>
     <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content">
         <Button android:textColor="?attr/bahamut_tabSelectedTextColor" android:id="@+id/BoardExtendOptionalPage_bookmarkButton" android:background="?attr/bahamut_tabSelectedBackground" android:text="@string/bookmark" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>

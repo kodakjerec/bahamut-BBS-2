@@ -57,7 +57,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/toolbar"
+        android:layout_above="@+id/Post_BottomDivider"
         android:layout_below="@+id/Post_MiddleDivider"
         android:orientation="horizontal">
 
@@ -74,6 +74,11 @@
             android:padding="10dp"
             android:background="@color/transparent"/>
     </LinearLayout>
+
+    <View
+        android:id="@+id/Post_BottomDivider"
+        style="@style/HorizontalDivider"
+        android:layout_above="@+id/toolbar" />
 
     <RelativeLayout
         android:id="@+id/toolbar"

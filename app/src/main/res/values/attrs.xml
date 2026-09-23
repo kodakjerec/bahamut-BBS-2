@@ -11,8 +11,6 @@
     <attr name="bahamut_editTextColor" format="reference|color" />
     <attr name="bahamut_editTextBackground" format="reference|color" />
     <attr name="bahamut_dividerColor" format="reference|color" />
-    <attr name="bahamut_listItemHorizontalDivider" format="reference|color" />
-    <attr name="bahamut_listItemVerticalDivider" format="reference|color" />
     <attr name="bahamut_defaultTextColor" format="reference|color" />
     <attr name="bahamut_itemBackground" format="reference|color" />
     <attr name="bahamut_chapterBackground" format="reference|color" />

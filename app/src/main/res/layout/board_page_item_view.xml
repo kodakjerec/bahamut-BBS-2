@@ -28,7 +28,7 @@
                     android:textColor="?attr/bahamut_boardItemAuthorColor" android:gravity="end" android:id="@+id/BoardPage_ItemView_Author" android:paddingStart="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
             </LinearLayout>
         </LinearLayout>
-        <View style="@style/ItemViewDividerVertical"/>
+        <View style="@style/ToolbarDivider"/>
         <include
             layout="@layout/right_arrow_item_view"
             android:id="@+id/ListItem_ArrowView" />

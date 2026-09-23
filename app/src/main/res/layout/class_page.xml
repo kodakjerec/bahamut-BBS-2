@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/ClassPage_headerView"
-        android:layout_above="@id/toolbar">
+        android:layout_above="@id/toolbar_container">
 
         <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
             android:id="@+id/ClassPage_listEmptyView"
@@ -42,7 +42,7 @@
         android:id="@+id/ClassPage_lastVisit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/toolbar"
+        android:layout_above="@+id/toolbar_container"
         android:layout_alignParentEnd="true"
         android:minWidth="60dp"
         android:height="60dp"
@@ -50,28 +50,38 @@
         android:gravity="center_vertical"
         android:textColor="?attr/bahamut_articleContentColor0"
         android:visibility="gone" />
+
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <Button
-            android:id="@+id/ClassPage_SearchButton"
-            style="@style/ToolbarItem"
-            android:text="@string/search" />
+        <View style="@style/HorizontalDivider" />
 
-        <View style="@style/ToolbarDivider" />
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
 
-        <Button
-            android:id="@+id/ClassPage_FirstPageButton"
-            style="@style/ToolbarItem"
-            android:text="@string/first_page" />
+            <Button
+                android:id="@+id/ClassPage_SearchButton"
+                style="@style/ToolbarItem"
+                android:text="@string/search" />
 
-        <View style="@style/ToolbarDivider" />
+            <View style="@style/ToolbarDivider" />
 
-        <Button
-            android:id="@+id/ClassPage_LastestPageButton"
-            style="@style/ToolbarItem"
-            android:text="@string/last_page" />
+            <Button
+                android:id="@+id/ClassPage_FirstPageButton"
+                style="@style/ToolbarItem"
+                android:text="@string/first_page" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/ClassPage_LastestPageButton"
+                style="@style/ToolbarItem"
+                android:text="@string/last_page" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

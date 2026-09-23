@@ -10,27 +10,36 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <!-- 底部登入按鈕工具列 -->
+    <!-- 底部登入按鈕工具列 (含頂部 1dp 橫線) -->
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
-        android:layout_alignParentBottom="true"
-        android:clickable="true"
-        android:focusable="true">
-        <Button
-            android:id="@+id/Login_loginButton"
-            style="@style/ToolbarItem"
-            android:layout_weight="1"
-            android:text="@string/login" />
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <View style="@style/HorizontalDivider" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar"
+            android:clickable="true"
+            android:focusable="true">
+            <Button
+                android:id="@+id/Login_loginButton"
+                style="@style/ToolbarItem"
+                android:layout_weight="1"
+                android:text="@string/login" />
+        </LinearLayout>
     </LinearLayout>
 
-    <!-- 輸入區塊置於工具列上方 -->
+    <!-- 輸入區塊置於工具列容器上方 -->
     <LinearLayout
             android:id="@+id/Login_InputBlock"
             style="@style/TouchBlock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/toolbar"
+            android:layout_above="@+id/toolbar_container"
             android:background="?attr/bahamut_pageBackground"
             android:orientation="vertical"
             android:paddingLeft="0px"

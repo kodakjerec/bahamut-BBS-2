@@ -77,18 +77,28 @@
         android:id="@+id/Message_Main_Scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
-    <LinearLayout android:id="@+id/toolbar_List" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_above="@+id/toolbar" android:visibility="gone">
+    <LinearLayout android:id="@+id/toolbar_List" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_above="@+id/toolbar_container" android:visibility="gone">
         <Button android:text="@string/zero_word" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button  android:id="@+id/Message_Main_Button_Prev" android:text="@string/prev_page" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
         <Button  android:id="@+id/Message_Main_Button_Next" android:text="@string/next_page" style="@style/ToolbarItem"/>
     </LinearLayout>
-    <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_alignParentBottom="true">
-        <Button android:textColor="?attr/bahamut_tabSelectedTextColor" android:id="@+id/Message_Main_Button_Chat" android:background="?attr/bahamut_tabSelectedBackground" android:text="@string/message_main_tab_chat" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/Message_Main_Button_List" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/message_main_tab_list" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/Message_Main_Settings" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/setting" style="@style/ToolbarItem"/>
+    <LinearLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <View style="@style/HorizontalDivider"/>
+
+        <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content">
+            <Button android:textColor="?attr/bahamut_tabSelectedTextColor" android:id="@+id/Message_Main_Button_Chat" android:background="?attr/bahamut_tabSelectedBackground" android:text="@string/message_main_tab_chat" style="@style/ToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/Message_Main_Button_List" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/message_main_tab_list" style="@style/ToolbarItem"/>
+            <View style="@style/ToolbarDivider"/>
+            <Button android:textColor="?attr/bahamut_tabUnselectedTextColor" android:id="@+id/Message_Main_Settings" android:background="?attr/bahamut_tabUnselectedBackground" android:text="@string/setting" style="@style/ToolbarItem"/>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

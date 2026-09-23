@@ -24,8 +24,6 @@
         <item name="bahamut_editTextColor">@color/input_box_text</item>
         <item name="bahamut_editTextBackground">@color/input_box_background</item>
         <item name="bahamut_dividerColor">@color/divider_color</item>
-        <item name="bahamut_listItemHorizontalDivider">#404040</item>
-        <item name="bahamut_listItemVerticalDivider">@color/transparent</item>
         <item name="bahamut_defaultTextColor">@color/board_item_normal</item>
         <item name="bahamut_itemBackground">@color/transparent</item>
         <item name="bahamut_chapterBackground">@color/chapter_background</item>
@@ -148,8 +146,6 @@
         <item name="bahamut_buttonDangerBackground">@drawable/eink_button_danger_background</item>
         <item name="bahamut_dialogItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_dividerColor">@color/page_background</item>
-        <item name="bahamut_listItemHorizontalDivider">@color/page_background</item>
-        <item name="bahamut_listItemVerticalDivider">@color/page_background</item>
         <item name="bahamut_articleAuthorColor0">@color/page_background</item>
         <item name="bahamut_articleContentColor0">@color/page_background</item>
         <item name="bahamut_articleAuthorColor1">@color/halfWhite</item>
@@ -232,8 +228,6 @@
         <item name="bahamut_buttonDangerBackground">@drawable/eink_dark_tab_selected_background</item>
         <item name="bahamut_dialogItemBackground">@drawable/eink_dark_toolbar_item_background</item>
         <item name="bahamut_dividerColor">@color/white</item>
-        <item name="bahamut_listItemHorizontalDivider">@color/white</item>
-        <item name="bahamut_listItemVerticalDivider">@color/white</item>
         <item name="bahamut_articleAuthorColor0">@color/white</item>
         <item name="bahamut_articleContentColor0">@color/white</item>
         <item name="bahamut_articleAuthorColor1">@color/halfWhite</item>
@@ -436,21 +430,21 @@
     </style>
 
     <style name="HorizontalDivider">
-        <item name="android:background">?attr/bahamut_dividerColor</item>
+        <item name="android:background">?attr/bahamut_toolbarDivider</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
     </style>
 
     <style name="ItemViewDividerHorizontal">
-        <item name="android:background">?attr/bahamut_listItemHorizontalDivider</item>
+        <item name="android:background">?attr/bahamut_toolbarDivider</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
     </style>
 
     <style name="ItemViewDividerVertical">
-        <item name="android:background">?attr/bahamut_listItemVerticalDivider</item>
+        <item name="android:background">?attr/bahamut_toolbarDivider</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:minWidth">1px</item>

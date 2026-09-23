@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:background="?attr/bahamut_pageBackground"
         android:layout_alignParentTop="true"
-        android:layout_above="@+id/toolbar">
+        android:layout_above="@+id/toolbar_container">
 
         <LinearLayout
             style="@style/TouchBlock"
@@ -156,11 +156,38 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
-    <LinearLayout android:id="@+id/toolbar" style="@style/toolbar" android:layout_alignParentBottom="true">
-        <Button android:id="@+id/Start_exitButton" android:text="@string/exit" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Start_instructions" android:text="@string/start_page_instructions" style="@style/ToolbarItem" android:autofillHints=""/>
-        <View style="@style/ToolbarDivider"/>
-        <Button android:id="@+id/Start_connectButton" android:text="@string/connect" style="@style/ToolbarItem"/>
+    <LinearLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <View style="@style/HorizontalDivider" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/Start_exitButton"
+                style="@style/ToolbarItem"
+                android:text="@string/exit" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Start_instructions"
+                style="@style/ToolbarItem"
+                android:autofillHints=""
+                android:text="@string/start_page_instructions" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Start_connectButton"
+                style="@style/ToolbarItem"
+                android:text="@string/connect" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

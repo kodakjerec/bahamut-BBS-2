@@ -51,13 +51,23 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/User_Info_Page_Update" />
 
-    <LinearLayout style="@style/toolbar"
-        android:id="@+id/toolbar"
+    <LinearLayout
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true">
-        
-        <Button
-            android:id="@+id/User_Info_Page_Reset"
-            style="@style/ToolbarItem"
-            android:text="@string/_back" />
+
+        <View style="@style/HorizontalDivider" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/User_Info_Page_Reset"
+                style="@style/ToolbarItem"
+                android:text="@string/_back" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

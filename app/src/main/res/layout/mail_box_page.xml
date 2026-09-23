@@ -13,6 +13,7 @@
             android:textColor="?attr/bahamut_defaultTextColor" android:gravity="center" android:id="@+id/MailBoxPage_listEmptyView" android:visibility="invisible" android:layout_width="match_parent" android:layout_height="match_parent" android:text="@string/mainbox_no_mail" style="@style/TextViewUltraLarge"/>
         <ListView android:id="@+id/MailBoxPage_listView" android:layout_width="match_parent" android:layout_height="match_parent" android:layout_marginBottom="-1dp" android:divider="@null" android:dividerHeight="0dp" style="@style/List"/>
     </FrameLayout>
+    <View style="@style/HorizontalDivider"/>
     <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
         <Button android:id="@+id/Mail_backButton" android:text="@string/write_mail" style="@style/ToolbarItem"/>
         <View style="@style/ToolbarDivider"/>

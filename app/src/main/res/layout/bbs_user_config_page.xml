@@ -7,7 +7,7 @@
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_above="@+id/toolbar">
+        android:layout_above="@+id/toolbar_container">
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -108,13 +108,22 @@
         </RelativeLayout>
     </ScrollView>
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <Button
-            android:id="@+id/UserConfig_BackButton"
-            style="@style/ToolbarItem"
-            android:text="@string/_back" />
+        <View style="@style/HorizontalDivider" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/UserConfig_BackButton"
+                style="@style/ToolbarItem"
+                android:text="@string/_back" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

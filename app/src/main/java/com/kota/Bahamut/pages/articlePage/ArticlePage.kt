@@ -383,6 +383,7 @@ class ArticlePage : TelnetPage() {
     /** 變更工具列位置  */
     fun changeToolbarLocation() {
         val toolbar = mainLayout.findViewById<LinearLayout>(R.id.toolbar)
+        val toolbarContainer = mainLayout.findViewById<LinearLayout>(R.id.toolbar_container)
         val toolbarBlock = mainLayout.findViewById<LinearLayout>(R.id.toolbar_block)
         val toolBarFloating =
             mainLayout.findViewById<ToolBarFloating>(R.id.ToolbarFloatingComponent)
@@ -398,23 +399,27 @@ class ArticlePage : TelnetPage() {
         btnRR.visibility = View.GONE
         btnRRDivider.visibility = View.GONE
 
-        val layoutParams = toolbar!!.layoutParams as RelativeLayout.LayoutParams
+        val layoutParams = toolbar.layoutParams as LinearLayout.LayoutParams
         val choiceToolbarLocation = propertiesToolbarLocation // 0-中間 1-靠左 2-靠右 3-浮動
         when (choiceToolbarLocation) {
             1 -> {
                 // 底部-最左邊
+                toolbarContainer?.visibility = View.VISIBLE
+                toolbar.visibility = View.VISIBLE
+                toolbarBlock.visibility = View.VISIBLE
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_PARENT_END)
-                layoutParams.addRule(RelativeLayout.ALIGN_START)
                 btnRR.visibility = View.VISIBLE
                 btnRRDivider.visibility = View.VISIBLE
             }
 
             2 -> {
                 // 底部-最右邊
+                toolbarContainer?.visibility = View.VISIBLE
+                toolbar.visibility = View.VISIBLE
+                toolbarBlock.visibility = View.VISIBLE
+                layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
-                layoutParams.removeRule(RelativeLayout.ALIGN_START)
-                layoutParams.addRule(RelativeLayout.ALIGN_PARENT_END)
                 btnLL.visibility = View.VISIBLE
                 btnLLDivider.visibility = View.VISIBLE
             }
@@ -422,6 +427,7 @@ class ArticlePage : TelnetPage() {
             3 -> {
                 // 浮動
                 // 去除 原本工具列
+                toolbarContainer?.visibility = View.GONE
                 toolbar.visibility = View.GONE
                 // 去除底部卡位用view
                 toolbarBlock.visibility = View.GONE
@@ -442,6 +448,9 @@ class ArticlePage : TelnetPage() {
 
             else -> {
                 // 底部-中間
+                toolbarContainer?.visibility = View.VISIBLE
+                toolbar.visibility = View.VISIBLE
+                toolbarBlock.visibility = View.VISIBLE
                 layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT
                 layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT
             }

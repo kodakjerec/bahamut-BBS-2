@@ -50,33 +50,42 @@
         </LinearLayout>
     </LinearLayout>
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true">
-        <Button
-            android:id="@+id/Mail_backButton"
-            style="@style/ToolbarItem"
-            android:text="@string/reply_mail" />
 
-        <View style="@style/ToolbarDivider" />
+        <View style="@style/HorizontalDivider" />
 
-        <Button
-            android:id="@+id/Mail_changeModeButton"
-            style="@style/ToolbarItem"
-            android:text="@string/change_mode_short" />
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+            <Button
+                android:id="@+id/Mail_backButton"
+                style="@style/ToolbarItem"
+                android:text="@string/reply_mail" />
 
-        <View style="@style/ToolbarDivider" />
+            <View style="@style/ToolbarDivider" />
 
-        <Button
-            android:id="@+id/Mail_pageUpButton"
-            style="@style/ToolbarItem"
-            android:text="@string/prev_article" />
+            <Button
+                android:id="@+id/Mail_changeModeButton"
+                style="@style/ToolbarItem"
+                android:text="@string/change_mode_short" />
 
-        <View style="@style/ToolbarDivider" />
+            <View style="@style/ToolbarDivider" />
 
-        <Button
-            android:id="@+id/Mail_pageDownButton"
-            style="@style/ToolbarItem"
-            android:text="@string/next_article" />
+            <Button
+                android:id="@+id/Mail_pageUpButton"
+                style="@style/ToolbarItem"
+                android:text="@string/prev_article" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Mail_pageDownButton"
+                style="@style/ToolbarItem"
+                android:text="@string/next_article" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

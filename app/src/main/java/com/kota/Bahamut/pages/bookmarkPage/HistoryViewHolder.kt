@@ -11,13 +11,11 @@ import com.kota.Bahamut.pages.theme.ThemeFunctions
 class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
     private val titleLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Title)
-    private val btnEdit: Button? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Edit)
     private val btnDelete: Button? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Delete)
     private val buttonBlock: View? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_ButtonBlock)
 
     init {
         view.setOnClickListener(this)
-        btnEdit?.visibility = View.GONE // 歷史紀錄不需要修改
         btnDelete?.setOnClickListener(this)
         buttonBlock?.visibility = View.VISIBLE
     }

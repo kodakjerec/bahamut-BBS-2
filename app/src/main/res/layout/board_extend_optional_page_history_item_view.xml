@@ -52,20 +52,12 @@
             android:gravity="center"
             android:visibility="gone">
 
-            <Button
-                android:id="@+id/BoardExtendOptionalPage_historyItemView_Edit"
-                style="@style/ToolbarItem"
-                android:layout_width="45dp"
-                android:layout_height="match_parent"
-                android:text="@string/edit_short"
-                android:textSize="14sp" />
-
             <View style="@style/ToolbarDivider" />
 
             <Button
                 android:id="@+id/BoardExtendOptionalPage_historyItemView_Delete"
                 style="@style/ToolbarItem.Danger"
-                android:layout_width="45dp"
+                android:layout_width="60dp"
                 android:layout_height="match_parent"
                 android:text="@string/delete_short"
                 android:textSize="14sp" />

@@ -46,6 +46,7 @@
                 android:textColor="?attr/bahamut_defaultTextColor" android:gravity="top|left|center_vertical|center_horizontal|center" android:id="@+id/SendMailDialog_EditField" android:background="@null" android:padding="10dp" android:layout_width="0dp" android:layout_height="match_parent" android:hint="@string/input_content_here" android:layout_weight="1" style="@style/TextViewNormal" android:inputType="textMultiLine" android:autofillHints=""/>
             <LinearLayout android:orientation="vertical" android:id="@+id/SendMail_SymbolList" android:background="?attr/bahamut_pageBackground" android:visibility="gone" android:layout_width="0dp" android:layout_height="match_parent" android:layout_weight="2"/>
         </LinearLayout>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button android:id="@+id/ArticlePostDialog_Color" android:text="@string/post_article_page_paint_color" style="@style/ToolbarItem"/>
             <View style="@style/ToolbarDivider"/>

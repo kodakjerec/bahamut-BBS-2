@@ -40,7 +40,7 @@
         android:id="@+id/Main_ItemBlock"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/toolbar"
+        android:layout_above="@+id/toolbar_container"
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="match_parent"
@@ -158,27 +158,36 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <Button
-            android:id="@+id/Main_LogoutButton"
-            style="@style/ToolbarItem"
-            android:text="@string/logout" />
+        <View style="@style/HorizontalDivider" />
 
-        <View style="@style/ToolbarDivider" />
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
 
-        <Button
-            android:id="@+id/Main_MailButton"
-            style="@style/ToolbarItem"
-            android:text="@string/mailbox" />
+            <Button
+                android:id="@+id/Main_LogoutButton"
+                style="@style/ToolbarItem"
+                android:text="@string/logout" />
 
-        <View style="@style/ToolbarDivider" />
+            <View style="@style/ToolbarDivider" />
 
-        <Button
-            android:id="@+id/Main_SystemSettingsButton"
-            style="@style/ToolbarItem"
-            android:text="@string/setting" />
+            <Button
+                android:id="@+id/Main_MailButton"
+                style="@style/ToolbarItem"
+                android:text="@string/mailbox" />
+
+            <View style="@style/ToolbarDivider" />
+
+            <Button
+                android:id="@+id/Main_SystemSettingsButton"
+                style="@style/ToolbarItem"
+                android:text="@string/setting" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

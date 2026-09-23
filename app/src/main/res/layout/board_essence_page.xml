@@ -22,23 +22,31 @@
     </LinearLayout>
     <!-- toolbar 0 1 2 -->
     <LinearLayout
-        android:id="@+id/toolbar"
-        style="@style/toolbar"
-        android:layout_alignParentBottom="true"
-        >
-        <Button
-            android:id="@+id/BoardPagePostButton"
-            style="@style/ToolbarItem"
-            android:text="@string/zero_word" />
-        <View android:id="@+id/toolbar_divider_1" style="@style/ToolbarDivider" />
-        <Button
-            android:id="@+id/BoardPageFirstPageButton"
-            style="@style/ToolbarItem"
-            android:text="@string/first_page" />
-        <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
-        <Button
-            android:id="@+id/BoardPageLatestPageButton"
-            style="@style/ToolbarItem"
-            android:text="@string/last_page" />
+        android:id="@+id/toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
+
+        <View style="@style/HorizontalDivider" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+            <Button
+                android:id="@+id/BoardPagePostButton"
+                style="@style/ToolbarItem"
+                android:text="@string/zero_word" />
+            <View android:id="@+id/toolbar_divider_1" style="@style/ToolbarDivider" />
+            <Button
+                android:id="@+id/BoardPageFirstPageButton"
+                style="@style/ToolbarItem"
+                android:text="@string/first_page" />
+            <View android:id="@+id/toolbar_divider_2" style="@style/ToolbarDivider" />
+            <Button
+                android:id="@+id/BoardPageLatestPageButton"
+                style="@style/ToolbarItem"
+                android:text="@string/last_page" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
