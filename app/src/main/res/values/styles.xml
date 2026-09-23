@@ -37,7 +37,7 @@
 
         <!-- board title bar -->
         <item name="bahamut_titleBarMenuIconBackground">#FF101090</item>
-        <item name="bahamut_titleBarTitleColor">@color/board_item_follow_other</item>
+        <item name="bahamut_titleBarTitleColor">@color/board_page_item_view_status</item>
         <item name="bahamut_titleBarDetailColor">@color/board_item_normal</item>
         <item name="bahamut_titleBarDetail2Color">@color/article_page_header_board</item>
 

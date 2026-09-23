@@ -46,7 +46,6 @@
         <ImageButton
             android:gravity="center"
             android:id="@+id/menu_button"
-            android:tint="@color/board_item_normal"
             app:tint="@color/board_item_normal"
             android:background="?attr/bahamut_titleBarMenuIconBackground"
             android:visibility="gone"

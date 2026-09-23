@@ -10,7 +10,7 @@
         style="@style/TextViewSmall"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="?attr/bahamut_articleContentColor1"
+        android:textColor="?attr/bahamut_dividerColor"
         android:textIsSelectable="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

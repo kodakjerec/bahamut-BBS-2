@@ -282,11 +282,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         if (item.isDirectory) {
             PageContainer.instance!!.pushClassPage(item.name, item.title)
             navigationController.pushViewController(PageContainer.instance!!.classPage)
+            super.loadItemAtIndex(index)
         } else {
             if (TempSettings.lastVisitBoard != item.name) {
                 TempSettings.lastVisitArticleNumber = 0
             }
-            TelnetClient.myInstance!!.sendStringToServerInBackground("s"+item.name)
+            TelnetClient.myInstance!!.sendStringToServerInBackground((index+1).toString() + "\n")
         }
     }
 
