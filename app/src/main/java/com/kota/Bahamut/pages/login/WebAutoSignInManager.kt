@@ -47,7 +47,11 @@ object WebAutoSignInManager {
     /**
      * 是否在 Web 登入時開啟 DebugView 觀看登入過程
      */
-    var showDebugView: Boolean = false
+    var showDebugView: Boolean
+        get() = UserSettings.propertiesWebDebugView
+        set(value) {
+            UserSettings.propertiesWebDebugView = value
+        }
 
     /**
      * 是否具備 Web 登入帳號與密碼

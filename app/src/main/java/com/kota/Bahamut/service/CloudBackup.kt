@@ -172,7 +172,7 @@ class CloudBackup {
             // get bookmark
             jsonObject.put("bookmark", TempSettings.bookmarkStore?.exportToJSON().toString())
             // get user_settings (排除不要同步到雲端的本地設定: 帳號密碼、記住登入、Web自動簽到與 Web帳號密碼、VIP 狀態)
-            val notBackupKeys = listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "vip")
+            val notBackupKeys = listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "webdebugview", "vip")
             val filteredSettings = UserSettings.mySharedPref?.all?.filterKeys { key ->
                 !notBackupKeys.contains(key.lowercase())
             }
@@ -280,7 +280,7 @@ class CloudBackup {
                             // set user_settings
                             // 不要還原的key: 使用者帳密, 在登入前的設定, 以及 Web 帳密、自動簽到與 VIP
                             val notRestoreKeys: List<String> =
-                                listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "vip")
+                                listOf("username", "password", "savelogonuser", "websignin", "webusername", "webpassword", "webdebugview", "vip")
                             userSettings.forEach { (keyObject, value) ->
                                 val key = keyObject.toString()
                                 if (value != null && !notRestoreKeys.contains(key.lowercase())) {

@@ -9,23 +9,18 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
 import com.kota.Bahamut.dialogs.DialogWebLoginSettings
-import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.clearTempSettings
-import com.kota.Bahamut.service.TempSettings.getWebAutoLoginSuccessTime
-import com.kota.Bahamut.service.TempSettings.setWebAutoLoginSuccessTime
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
-import com.kota.asFramework.ui.ASToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.TelnetView
-import java.util.Calendar
 
 class LoginPage : TelnetPage() {
     var cacheTelnetView: Boolean = false
@@ -56,7 +51,6 @@ class LoginPage : TelnetPage() {
     var dialogRemoveLoginUser: ASAlertDialog? = null // 刪除重複登入對話框
     var dialogSaveUnfinishedArticle: ASDialog? = null // 儲存未完成文章對話框
     var telnetView: TelnetView? = null // Telnet視圖
-    var dailyCheckThread: Thread? = null // 每日檢查執行緒
 
     override val pageLayout: Int
         get() = R.layout.login_page
@@ -142,12 +136,6 @@ class LoginPage : TelnetPage() {
         telnetView = null
         dialogRemoveLoginUser = null
         dialogSaveUnfinishedArticle = null
-
-        // 停止每日檢查執行緒
-        if (dailyCheckThread != null && dailyCheckThread!!.isAlive) {
-            dailyCheckThread!!.interrupt()
-            dailyCheckThread = null
-        }
 
         super.onPageDidUnload()
     }
@@ -355,109 +343,10 @@ class LoginPage : TelnetPage() {
         // 雲端同步
         SyncManager.performLoginSync()
 
-        // 調用WebView登入（如果需要的話）
-        if (checkWebSignIn) {
-            ASCoroutine.ensureMainThread {
-                try {
-                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
-
-                    // 使用 LoginWebDebugView 來顯示和處理自動登入
-                    val debugView = LoginWebDebugView(context!!)
-                    debugView.startAutoLogin {
-                        // 記錄web自動簽到成功時間
-                        setWebAutoLoginSuccessTime()
-                        null
-                    }
-                } catch (e: Exception) {
-                    ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                    Log.e(
-                        javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                    )
-                }
-            }
-
-            // 每小時檢查是否換日，如果換日則執行自動簽到
-            if (dailyCheckThread== null) {
-                dailyCheckThread = Thread {
-                    while (true) {
-                        try {
-                            Thread.sleep((60 * 60 * 1000).toLong()) // 每小時檢查一次
-
-                            // 檢查今日是否已經自動簽到過
-                            if (!this.isWebAutoLoginToday) {
-                                // 換日了，執行自動簽到
-                                ASCoroutine.ensureMainThread {
-                                    try {
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg01))
-
-                                        // 使用 LoginWebDebugView 來處理自動簽到
-                                        val debugView = LoginWebDebugView(context!!)
-                                        debugView.startAutoLogin {
-                                            // 記錄web自動簽到成功時間
-                                            setWebAutoLoginSuccessTime()
-                                            null
-                                        }
-                                    } catch (e: Exception) {
-                                        ASToast.showShortToast(getContextString(R.string.login_web_sign_in_msg04))
-                                        Log.e(
-                                            javaClass.simpleName,
-                                            (if (e.message != null) e.message else "")!!
-                                        )
-                                    }
-                                }
-                            }
-                        } catch (e: InterruptedException) {
-                            Log.e(
-                                javaClass.simpleName, (if (e.message != null) e.message else "")!!
-                            )
-                            Thread.currentThread().interrupt()
-                            break
-                        }
-                    }
-                }
-                dailyCheckThread!!.start()
-            }
+        // 調用 Web 登入與自動簽到
+        if (checkWebSignIn || UserSettings.propertiesWebSignIn) {
+            WebAutoSignInManager.onLoginSuccess(context)
         }
-    }
-
-    private val isWebAutoLoginToday: Boolean
-        /**
-         * 檢查web自動簽到是否在今日已執行過
-         */
-        get() {
-            //
-            val lastLoginTime = getWebAutoLoginSuccessTime()
-            if (lastLoginTime <= 0L) {
-                return false
-            }
-
-            try {
-                val lastTime = lastLoginTime.toLong()
-                val currentTime = System.currentTimeMillis()
-
-                // 取得昨日與今日的時間邊界 (今日00:00:00)
-                val calendar = Calendar.getInstance()
-                calendar.timeInMillis = currentTime
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val todayStartTime = calendar.timeInMillis
-
-                return lastTime >= todayStartTime
-            } catch (_: NumberFormatException) {
-                // 如果時間格式錯誤，重置時間
-                setWebAutoLoginSuccessTime()
-                return false
-            }
-        }
-
-    /**
-     * 設置web自動簽到成功時間
-     */
-    private fun setWebAutoLoginSuccessTime() {
-        val currentTime = System.currentTimeMillis()
-        setWebAutoLoginSuccessTime(currentTime)
     }
 
     /**
