@@ -223,6 +223,7 @@
 
     <!-- eInk 主題 (深色模式 - 黑白對調) -->
     <style name="MyTheme.eInk.Dark" parent="MyTheme.Dark">
+        <item name="bahamut_toolbarDivider">@color/white</item>
         <item name="bahamut_pageBackground">@color/page_background</item>
         <item name="bahamut_defaultTextColor">@color/white</item>
         <item name="bahamut_buttonTextColor">@color/white</item>
@@ -559,6 +560,7 @@
 
     <!-- 對話框 eInk 主題 (深色模式 - 黑白對調) -->
     <style name="Dialog.NoTitleBar.eInk.Dark" parent="Dialog.NoTitleBar.Dark">
+        <item name="bahamut_toolbarDivider">@color/white</item>
         <item name="bahamut_pageBackground">@color/page_background</item>
         <item name="bahamut_defaultTextColor">@color/white</item>
         <item name="bahamut_buttonTextColor">@color/white</item>

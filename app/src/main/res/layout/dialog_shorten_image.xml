@@ -70,7 +70,9 @@
                         android:layout_height="match_parent"
                         android:orientation="horizontal">
                         <Button android:id="@+id/dialog_shorten_image_album" android:text="@string/dialog_shorten_image_album" style="@style/ToolbarItem"/>
+                        <View style="@style/ToolbarDivider"/>
                         <Button android:id="@+id/dialog_shorten_image_camera_shot" android:text="@string/dialog_shorten_image_camera_shot" style="@style/ToolbarItem"/>
+                        <View style="@style/ToolbarDivider"/>
                         <Button android:id="@+id/dialog_shorten_image_camera_video" android:text="@string/dialog_shorten_image_camera_video" style="@style/ToolbarItem"/>
                     </LinearLayout>
                     <LinearLayout
@@ -83,6 +85,7 @@
                             style="@style/ToolbarItem.Danger"
                             android:layout_weight="0"
                             android:text="@string/reset" />
+                        <View style="@style/ToolbarDivider"/>
                         <Button
                             android:id="@+id/dialog_shorten_image_transfer"
                             style="@style/ToolbarItem"

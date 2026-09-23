@@ -113,22 +113,29 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     // 尋找URL資料
                     ASCoroutine.runInNewCoroutine {
                         try {
-                            // 使用共用的 sharedClient
-                            val response: Response = sharedClient.newCall(request).execute()
-                            val data = response.body
-                            val jsonObject: JSONObject = JSONObject(data.string())
-                            var contentType: String = jsonObject.getString("contentType")
+                            var contentType = ""
+                            try {
+                                // 嘗試使用共用的 sharedClient 向 Cloudflare Worker 取得網址資料
+                                val response: Response = sharedClient.newCall(request).execute()
+                                val data = response.body
+                                if (data != null) {
+                                    val jsonObject = JSONObject(data.string())
+                                    contentType = jsonObject.optString("contentType", "")
 
-                            if (contentType.contains("image") || contentType.contains("video") || contentType.contains("audio")) {
-                                isPic = true
+                                    if (contentType.contains("image") || contentType.contains("video") || contentType.contains("audio")) {
+                                        isPic = true
+                                    }
+                                    myTitle = jsonObject.optString("title", "")
+                                    myDescription = jsonObject.optString("desc", "")
+                                    myImageUrl = jsonObject.optString("imageUrl", "")
+                                }
+                            } catch (e: Exception) {
+                                Log.e("loadUrl", "Cloudflare request failed: ${e.message}")
                             }
-                            myTitle = jsonObject.getString("title")
-                            myDescription = jsonObject.getString("desc")
-                            myImageUrl = jsonObject.getString("imageUrl")
 
-                            // 遠端詢問 cloudflare 解讀失敗，改由本地直接連線獲取內容
-                            if (myTitle == "" || myDescription == "") {
-                                var userAgent: String = System.getProperty("http.agent")!!
+                            // 遠端詢問 cloudflare 失敗（沒資料或發生 exception），改由本地直接連線獲取內容
+                            if (myTitle.isEmpty() || myDescription.isEmpty()) {
+                                var userAgent: String = System.getProperty("http.agent") ?: ""
                                 if (myUrl.contains("youtu") || myUrl.contains("amazon"))
                                     userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
 
@@ -218,19 +225,21 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
 
                             // 上傳至cloudflare, 方便之後擷取
-                            val uploadBody: RequestBody = MultipartBody.Builder()
-                                .setType(MultipartBody.FORM)
-                                .addFormDataPart("url", myUrl)
-                                .addFormDataPart("title", myTitle)
-                                .addFormDataPart("description", myDescription)
-                                .addFormDataPart("imageUrl",myImageUrl)
-                                .addFormDataPart("contentType", contentType)
-                                .build()
-                            val uploadRequest: Request = Request.Builder()
-                                .url(apiUrl)
-                                .post(uploadBody)
-                                .build()
-                            sharedClient.newCall(uploadRequest).execute()
+                            try {
+                                val uploadBody: RequestBody = MultipartBody.Builder()
+                                    .setType(MultipartBody.FORM)
+                                    .addFormDataPart("url", myUrl)
+                                    .addFormDataPart("title", myTitle)
+                                    .addFormDataPart("description", myDescription)
+                                    .addFormDataPart("imageUrl", myImageUrl)
+                                    .addFormDataPart("contentType", contentType)
+                                    .build()
+                                val uploadRequest: Request = Request.Builder()
+                                    .url(apiUrl)
+                                    .post(uploadBody)
+                                    .build()
+                                sharedClient.newCall(uploadRequest).execute()
+                            } catch (_: Exception) {}
 
                         } catch (e: Exception) {
                             Log.e("loadUrl", e.message.toString())

@@ -7,12 +7,11 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.size
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.UserSettings
-import androidx.core.view.size
 
 open class TelnetHeaderItemView : LinearLayout {
     protected var detail1: TextView? = null

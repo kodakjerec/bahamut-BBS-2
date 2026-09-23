@@ -9,10 +9,10 @@ import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.kota.asFramework.dialog.ASDialog
-import com.kota.asFramework.dialog.ASLayoutParams.Companion.instance
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions
+import com.kota.asFramework.dialog.ASDialog
+import com.kota.asFramework.dialog.ASLayoutParams.Companion.instance
 import java.util.Vector
 import kotlin.math.ceil
 
@@ -44,10 +44,15 @@ class DialogInsertExpression : ASDialog() {
         itemBlock = findViewById<LinearLayout>(R.id.dialog_insert_expressions_content)
 
         val settingButton = findViewById<View>(R.id.dialog_insert_expressions_setting)
-        settingButton.setOnClickListener(
+        settingButton?.setOnClickListener(
             settingListener
         )
-        setDialogWidth(mainView)
+        val cancelButton = findViewById<View>(R.id.cancel)
+        cancelButton?.setOnClickListener {
+            dismiss()
+        }
+        val mainLayout = findViewById<View>(R.id.dialog_insert_expressions_main_layout)
+        setDialogWidthHeight(mainLayout)
     }
 
     fun setListener(aListener: DialogInsertExpressionListener?): DialogInsertExpression {

@@ -1,14 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:id="@+id/dialog_insert_symbol_main_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="?attr/bahamut_dialogBorderColor"
-    android:padding="3dp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
-    <LinearLayout android:background="?attr/bahamut_pageBackground"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <GridView android:id="@+id/SymbolDialog_GridView" android:layout_width="wrap_content" android:layout_height="wrap_content" android:numColumns="4"/>
+    android:orientation="vertical"
+    android:padding="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?attr/bahamut_pageBackground"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
+            android:id="@+id/dialog_title"
+            style="@style/TextViewLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/bahamut_dialogTitleBackground"
+            android:padding="6dp"
+            android:text="@string/symbol"
+            android:textColor="?attr/bahamut_dialogTitleTextColor" />
+
+        <View style="@style/HorizontalDivider" />
+
+        <!-- Middle Content (GridView 本身具備滾動功能，不可放在 ScrollView 內) -->
+        <GridView
+            android:id="@+id/SymbolDialog_GridView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:numColumns="4"/>
+
+        <!-- Footer Toolbar -->
+        <LinearLayout
+            android:id="@+id/dialog_toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/cancel"
+                style="@style/DialogToolbarItem"
+                android:text="@string/cancel" />
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
-

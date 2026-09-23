@@ -1,11 +1,13 @@
 package com.kota.Bahamut.pages
 
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.text.Selection
 import android.util.TypedValue
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.animation.DecelerateInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.EditText
@@ -28,7 +30,6 @@ import com.kota.Bahamut.dialogs.DialogShortenImage
 import com.kota.Bahamut.dialogs.DialogShortenUrl
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.CommonFunctions.judgeDoubleWord
 import com.kota.Bahamut.service.TempSettings
@@ -688,27 +689,40 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
     /** 按下 展開/摺疊  */
     var postToolbarShowOnClickListener: View.OnClickListener = View.OnClickListener { view: View? ->
         val thisBtn = view as TextView
-        val toolBar = mainLayout?.findViewById<LinearLayout>(R.id.toolbar)!!
-        val layoutParams = toolBar.layoutParams as RelativeLayout.LayoutParams
+        val toolBar = mainLayout?.findViewById<RelativeLayout>(R.id.toolbar)!!
+        val startHeight = toolBar.height
+        val targetHeight: Int
+
         if (isToolbarShow) {
             // 從展開->摺疊
             isToolbarShow = false
             thisBtn.text = getContextString(R.string.post_toolbar_show)
-            layoutParams.height = TypedValue.applyDimension(
+            targetHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 60f,
                 resource?.displayMetrics
             ).toInt()
         } else {
+            // 從摺疊->展開
             isToolbarShow = true
             thisBtn.text = getContextString(R.string.post_toolbar_collapse)
-            layoutParams.height = TypedValue.applyDimension(
+            targetHeight = TypedValue.applyDimension(
                 TypedValue.COMPLEX_UNIT_DIP,
                 120f,
                 resource?.displayMetrics
             ).toInt()
         }
-        toolBar.layoutParams = layoutParams
+
+        val animator = ValueAnimator.ofInt(startHeight, targetHeight)
+        animator.duration = 250L
+        animator.interpolator = DecelerateInterpolator()
+        animator.addUpdateListener { animation ->
+            val value = animation.animatedValue as Int
+            val layoutParams = toolBar.layoutParams as RelativeLayout.LayoutParams
+            layoutParams.height = value
+            toolBar.layoutParams = layoutParams
+        }
+        animator.start()
     }
 
     fun insertString(str: String?) {

@@ -1,18 +1,19 @@
 package com.kota.Bahamut.dialogs
 
 import android.database.DataSetObserver
+import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.view.Gravity
+import android.widget.AbsListView
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.ArrayAdapter
 import android.widget.GridView
 import android.widget.ListAdapter
 import android.widget.TextView
-import com.kota.Bahamut.pages.theme.ThemeFunctions
-import com.kota.asFramework.dialog.ASDialog
 import com.kota.Bahamut.R
+import com.kota.Bahamut.service.CommonFunctions
+import com.kota.asFramework.dialog.ASDialog
 
 class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     var mainView: GridView
@@ -31,7 +32,11 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
             list[i] = this.symbols[i].toString()
         }
         this.mainView.adapter = this
-        setDialogWidth(mainView)
+        findViewById<View>(R.id.cancel)?.setOnClickListener {
+            dismiss()
+        }
+        val mainLayout = findViewById<View>(R.id.dialog_insert_symbol_main_layout)
+        setDialogWidthHeight(mainLayout)
     }
 
     override fun onItemClick(adapterView: AdapterView<*>?, arg1: View?, index: Int, id: Long) {
@@ -58,19 +63,35 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val itemSizePx = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            52f, // > 48dp 方便點選
+            context.resources.displayMetrics
+        ).toInt()
+
         var view = convertView
         if (view == null) {
-            view = TextView(context)
-            view.layoutParams = ViewGroup.LayoutParams(100, 100)
-            view.gravity = Gravity.CENTER
-            view.textSize = 24f
+            val textView = TextView(context)
+            textView.layoutParams = AbsListView.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                itemSizePx
+            )
+            textView.gravity = Gravity.CENTER
+            textView.textSize = 22f
+
+            // 水波紋點擊回饋背景
+            val outValue = TypedValue()
+            context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
+            textView.setBackgroundResource(outValue.resourceId)
+
+            view = textView
         }
         val textView = view as TextView
         textView.text = getItem(position)
-        
+
         // 套用主題顏色
-        textView.setTextColor(com.kota.Bahamut.service.CommonFunctions.getThemeColor(R.attr.bahamut_defaultTextColor))
-        
+        textView.setTextColor(CommonFunctions.getThemeColor(R.attr.bahamut_defaultTextColor))
+
         return textView
     }
 
@@ -93,11 +114,11 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
     }
 
     override fun areAllItemsEnabled(): Boolean {
-        return false
+        return true
     }
 
     override fun isEnabled(position: Int): Boolean {
-        return false
+        return true
     }
 
     fun setListener(aListener: DialogInsertSymbolListener?) {

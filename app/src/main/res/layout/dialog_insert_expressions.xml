@@ -1,50 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_insert_expressions_main_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?attr/bahamut_dialogBorderColor"
-    android:orientation="vertical">
-    <RelativeLayout
+    android:orientation="vertical"
+    android:padding="3dp">
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="?attr/bahamut_dialogTitleBackground"
-        android:layout_margin="3.0dp">
-        <TextView
-            android:id="@+id/dialog_insert_expressions_title"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            style="@style/TextViewLarge"
-            android:gravity="center_vertical"
-            android:textColor="?attr/bahamut_dialogTitleTextColor"
-            android:background="?attr/bahamut_dialogTitleBackground"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp">
-        </TextView>
-        <Button
-            android:id="@+id/dialog_insert_expressions_setting"
-            style="@style/ToolbarItem"
-            android:layout_width="60dp"
-            android:layout_height="40dp"
-            android:text="@string/setting"
-            android:textSize="18sp"
-            android:layout_alignParentEnd="true" />
-    </RelativeLayout>
-    <View style="@style/HorizontalDivider" />
-    <ScrollView
-        android:id="@+id/dialog_insert_expressions_scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="?attr/bahamut_pageBackground"
-        android:layout_marginStart="3dp"
-        android:layout_marginEnd="3dp"
-        android:layout_marginBottom="3dp">
-        <LinearLayout
-            android:id="@+id/dialog_insert_expressions_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <RelativeLayout
+            android:id="@+id/dialog_header"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:background="?attr/bahamut_dialogTitleBackground">
+
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:id="@+id/dialog_insert_expressions_title"
+                style="@style/TextViewLarge"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:gravity="center_vertical"
+                android:paddingStart="6dp"
+                android:paddingEnd="66dp"
+                android:background="?attr/bahamut_dialogTitleBackground"
+                android:textColor="?attr/bahamut_dialogTitleTextColor" />
+
+            <Button
+                android:id="@+id/dialog_insert_expressions_setting"
+                style="@style/ToolbarItem"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:text="@string/setting"
+                android:textSize="18sp" />
+        </RelativeLayout>
+
+        <View style="@style/HorizontalDivider" />
+
+        <!-- Middle Content -->
+        <ScrollView
+            android:id="@+id/dialog_insert_expressions_scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="?attr/bahamut_pageBackground">
+
+            <LinearLayout
+                android:id="@+id/dialog_insert_expressions_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <!-- Footer Toolbar -->
+        <LinearLayout
+            android:id="@+id/dialog_toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/cancel"
+                style="@style/DialogToolbarItem"
+                android:text="@string/cancel" />
         </LinearLayout>
-    </ScrollView>
+    </LinearLayout>
 </LinearLayout>

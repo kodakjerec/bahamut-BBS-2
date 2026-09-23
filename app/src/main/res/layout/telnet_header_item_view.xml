@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
@@ -45,7 +46,8 @@
         <ImageButton
             android:gravity="center"
             android:id="@+id/menu_button"
-            android:tint="?attr/bahamut_defaultTextColor"
+            android:tint="@color/board_item_normal"
+            app:tint="@color/board_item_normal"
             android:background="?attr/bahamut_titleBarMenuIconBackground"
             android:visibility="gone"
             android:layout_width="60dp"
