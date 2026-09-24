@@ -53,7 +53,7 @@
                         android:layout_weight="2"
                         android:id="@+id/dialog_query_hero_mp"
                         style="@style/ToolbarItem.Hero"
-                        android:textColor="@color/ext_toolbar_background_color_focused"
+                        android:textColor="@color/board_page_item_view_author"
                         android:text="@string/zero_word" />
                 </LinearLayout>
                 <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">

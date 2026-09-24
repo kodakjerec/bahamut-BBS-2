@@ -1,6 +1,5 @@
 package com.kota.Bahamut.pages.theme
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
@@ -11,77 +10,20 @@ import com.kota.Bahamut.service.UserSettings
 
 object ThemeStore {
     private lateinit var perf: SharedPreferences
-    private const val PERF_NAME:String = "themeStore"
-    private var themeStore:ArrayList<Theme> = ArrayList()
+    private const val PERF_NAME: String = "themeStore"
+    private const val PER_SELECT_THEME_INDEX: String = "select_theme_index"
 
-    // 變數
-    private const val PER_SELECT_THEME_INDEX:String = "select_theme_index" // 選擇外觀
-
-    /** 初始化並載入儲存的外觀資料 */
-    fun upgrade(activity: Activity) {
+    /** 初始化 ThemeStore */
+    fun upgrade(context: Context) {
         if (!::perf.isInitialized) {
-            perf = activity.getSharedPreferences(PERF_NAME, 0)
-            load()
+            perf = context.getSharedPreferences(PERF_NAME, Context.MODE_PRIVATE)
         }
-    }
-
-    /** 取得目前所有的外觀清單 */
-    fun getThemeStore(): ArrayList<Theme> {
-        return themeStore
-    }
-
-    /** 新增一個外觀到清單中 */
-    private fun addTheme(theme: Theme) {
-        themeStore.add(theme)
-    }
-
-    /** 更新目前所有的外觀清單 */
-    fun refreshThemeStore() {
-        themeStore = ArrayList()
-        // 預設
-        addTheme(getDefaultTheme(0))
-        // 粉紅
-        addTheme(getDefaultTheme(1))
-        // EInk (排第三)
-        addTheme(getDefaultTheme(3))
-    }
-
-    /** 載入外觀資料，初始化預設外觀 */
-    fun load() {
-        refreshThemeStore()
     }
 
     /** 取得目前使用者選取的外觀索引 */
     fun getSelectIndex(): Int {
         if (!::perf.isInitialized) return 0
         return perf.getInt(PER_SELECT_THEME_INDEX, 0)
-    }
-
-    /** 判斷目前系統是否處於深色模式 */
-    fun isSystemDarkMode(context: Context): Boolean {
-        val mode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        return mode == Configuration.UI_MODE_NIGHT_YES
-    }
-
-    /** 
-     * 取得目前應該套用的外觀物件。
-     * 若開啟「跟隨系統深色模式」且系統處於深色模式，則依使用者選取的風格返回對應深色主題。
-     */
-    fun getSelectTheme(): Theme {
-        val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
-        val themeIndex = getSelectIndex()
-        if (isDark) {
-            return when (themeIndex) {
-                1 -> getDefaultTheme(4) // 粉紅深色
-                2 -> getDefaultTheme(5) // EInk 深色
-                else -> getDefaultTheme(2) // 預設深色
-            }
-        }
-        val themes = getThemeStore()
-        if (themeIndex >= 0 && themeIndex < themes.size) {
-            return themes[themeIndex]
-        }
-        return themes[0]
     }
 
     /** 設定使用者選取的外觀索引並儲存 */
@@ -91,139 +33,29 @@ object ThemeStore {
         }
     }
 
+    /** 判斷目前系統是否處於深色模式 */
+    fun isSystemDarkMode(context: Context): Boolean {
+        val mode = context.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return mode == Configuration.UI_MODE_NIGHT_YES
+    }
+
     /** 取得目前應該套用的原生主題資源 ID (用於 Activity.setTheme) */
     fun getThemeResId(): Int {
         val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
-        val index = getSelectIndex()
-        return when(index) {
+        return when (getSelectIndex()) {
             1 -> if (isDark) R.style.MyTheme_Pink_Dark else R.style.MyTheme_Pink
             2 -> if (isDark) R.style.MyTheme_eInk_Dark else R.style.MyTheme_eInk
             else -> if (isDark) R.style.MyTheme_Dark else R.style.MyTheme
         }
     }
 
-    /** 取得目前應該套用的對話框 Activity 原生主題資源 ID (用於 DialogShortenImage 等) */
+    /** 取得目前應該套用的對話框 Activity 原生主題資源 ID */
     fun getDialogThemeResId(): Int {
         val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
-        val index = getSelectIndex()
-        return when(index) {
+        return when (getSelectIndex()) {
             1 -> if (isDark) R.style.Dialog_NoTitleBar_Pink_Dark else R.style.Dialog_NoTitleBar_Pink
             2 -> if (isDark) R.style.Dialog_NoTitleBar_eInk_Dark else R.style.Dialog_NoTitleBar_eInk
             else -> if (isDark) R.style.Dialog_NoTitleBar_Dark else R.style.Dialog_NoTitleBar
-        }
-    }
-
-    /** 取得特定索引的初始預設外觀資料 */
-    fun getDefaultTheme(selectedIndex: Int): Theme {
-        when(selectedIndex) {
-            1 -> {
-                val themePink = Theme()
-                themePink.name = "粉紅"
-                themePink.textColorDisabled = "#FF808080"
-                themePink.backgroundColor = "#FFFE00FE"
-                themePink.backgroundColorPressed = "#FFE400E4"
-                themePink.backgroundColorDisabled = "#FF650065"
-
-                themePink.backgroundColorDanger = "#FF800000"
-                themePink.backgroundColorDangerPressed = "#FFFF0000"
-                return themePink
-            }
-            2 -> { // 深色模式 (保留作為系統跟隨用)
-                val themeDarkMode = Theme()
-                themeDarkMode.name = "深色"
-
-                // 全域基礎色彩 (通用按鈕與文字)
-                themeDarkMode.textColor = "#FFE0E0E0"             // 主要文字 (柔和灰白，非刺眼純白)
-                themeDarkMode.textColorPressed = "#FFFFFFFF"      // 按壓時文字 (白色微亮)
-                themeDarkMode.textColorDisabled = "#FF507050"     // 停用時文字 (暗綠灰)
-                themeDarkMode.backgroundColor = "#FF002020"       // 通用背景 (暗墨綠，比白天 #003030 更深)
-                themeDarkMode.backgroundColorPressed = "#FF004848"// 按壓時背景 (深青綠，非刺眼亮綠)
-                themeDarkMode.backgroundColorDisabled = "#FF001414"// 停用時背景 (極深墨綠)
-                themeDarkMode.contentAuthorColor = "#FFC0C0C0"
-
-                themeDarkMode.backgroundColorDanger = "#FF4A1A1A"
-                themeDarkMode.backgroundColorDangerPressed = "#FF8B3A3A"
-                themeDarkMode.textColorDanger = "#FFE0E0E0"
-
-                // 引用文章配色 (深色模式調暗，降低亮度)
-                themeDarkMode.articleAuthorColor1 = "#FF60A060"
-                themeDarkMode.articleContentColor1 = "#FF18A018"
-                return themeDarkMode
-            }
-            3 -> { // EInk (真實電子紙專用高對比版)
-                val themeEInk = Theme()
-                themeEInk.name = "EInk"
-
-                // 全域基礎色彩
-                themeEInk.textColor = "#FF000000"
-                themeEInk.textColorPressed = "#FFFFFFFF"
-                themeEInk.textColorDisabled = "#FF777777"
-                themeEInk.backgroundColor = "#FFFFFFFF"
-                themeEInk.backgroundColorPressed = "#FF000000"
-                themeEInk.backgroundColorDisabled = "#FFFFFFFF"
-                themeEInk.contentAuthorColor = "#FF000000"
-
-                themeEInk.articleAuthorColor0 = "#FF000000"
-                themeEInk.articleContentColor0 = "#FF000000"
-                themeEInk.articleAuthorColor1 = "#FF444444"
-                themeEInk.articleContentColor1 = "#FF444444"
-                themeEInk.articlePushAuthorColor = "#FF000000"
-                themeEInk.articlePushContentColor = "#FF000000"
-
-                themeEInk.backgroundColorDanger = "#FF000000"
-                themeEInk.backgroundColorDangerPressed = "#FF444444"
-                themeEInk.textColorDanger = "#FFFFFFFF"
-                return themeEInk
-            }
-            4 -> { // 粉紅深色模式 (保留作為系統跟隨用)
-                val themePinkDark = Theme()
-                themePinkDark.name = "粉紅深色"
-
-                // 全域基礎色彩 (通用按鈕與文字)
-                themePinkDark.textColor = "#FFE0E0E0"
-                themePinkDark.textColorPressed = "#FFFFFFFF"
-                themePinkDark.textColorDisabled = "#FF805068"
-                themePinkDark.backgroundColor = "#FF701850"
-                themePinkDark.backgroundColorPressed = "#FF902068"
-                themePinkDark.backgroundColorDisabled = "#FF300A24"
-
-                themePinkDark.backgroundColorDanger = "#FF800000"
-                themePinkDark.backgroundColorDangerPressed = "#FFFF0000"
-                themePinkDark.textColorDanger = "#FFE0E0E0"
-
-                // 引用文章配色 (深色模式調暗，降低亮度)
-                themePinkDark.articleAuthorColor1 = "#FF60A060"
-                themePinkDark.articleContentColor1 = "#FF18A018"
-                return themePinkDark
-            }
-            5 -> { // EInk 深色模式 (保留作為系統跟隨用，黑白對調)
-                val themeEInkDark = Theme()
-                themeEInkDark.name = "EInk深色"
-
-                // 全域基礎色彩 (黑白對調)
-                themeEInkDark.textColor = "#FFFFFFFF"
-                themeEInkDark.textColorPressed = "#FF000000"
-                themeEInkDark.textColorDisabled = "#FF777777"
-                themeEInkDark.backgroundColor = "#FF000000"
-                themeEInkDark.backgroundColorPressed = "#FFFFFFFF"
-                themeEInkDark.backgroundColorDisabled = "#FF000000"
-                themeEInkDark.contentAuthorColor = "#FFFFFFFF"
-
-                themeEInkDark.articleAuthorColor0 = "#FFFFFFFF"
-                themeEInkDark.articleContentColor0 = "#FFFFFFFF"
-                themeEInkDark.articleAuthorColor1 = "#FF444444"
-                themeEInkDark.articleContentColor1 = "#FF444444"
-                themeEInkDark.articlePushAuthorColor = "#FFFFFFFF"
-                themeEInkDark.articlePushContentColor = "#FFFFFFFF"
-
-                themeEInkDark.backgroundColorDanger = "#FFFFFFFF"
-                themeEInkDark.backgroundColorDangerPressed = "#FF444444"
-                themeEInkDark.textColorDanger = "#FF000000"
-                return themeEInkDark
-            }
-            else -> {
-                return Theme()
-            }
         }
     }
 }

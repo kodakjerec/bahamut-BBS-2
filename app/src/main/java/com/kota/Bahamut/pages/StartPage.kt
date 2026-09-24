@@ -1,7 +1,6 @@
 package com.kota.Bahamut.pages
 
 import android.Manifest
-import android.view.ViewGroup
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -9,7 +8,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import androidx.core.content.pm.PackageInfoCompat
@@ -17,7 +15,6 @@ import androidx.core.net.toUri
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getConnectIpAddress
 import com.kota.Bahamut.service.NotificationSettings.getConnectMethod

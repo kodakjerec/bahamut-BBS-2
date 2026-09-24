@@ -1,10 +1,8 @@
 package com.kota.Bahamut.pages
 
-import android.view.ViewGroup
 import android.app.Activity
 import android.view.View
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingFlowParams
@@ -15,7 +13,6 @@ import com.android.billingclient.api.QueryProductDetailsResult
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.MyBillingClient
 import com.kota.Bahamut.service.MyBillingClient.checkPurchaseHistoryCloud

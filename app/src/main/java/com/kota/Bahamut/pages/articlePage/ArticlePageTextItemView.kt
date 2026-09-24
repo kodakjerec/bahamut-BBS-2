@@ -430,21 +430,19 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setQuote(quote: Int) {
         myQuote = quote
-        val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
-        val rgbToInt = com.kota.Bahamut.service.CommonFunctions::rgbToInt
         
         // 之前的引用文章
         if (myQuote > 0) {
             val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor1)
             val contentColor = getThemeColor(R.attr.bahamut_articleContentColor1)
-            authorLabel?.setTextColor(if (authorColor != -1) authorColor else rgbToInt(theme.articleAuthorColor1))
-            contentLabel?.setTextColor(if (contentColor != -1) contentColor else rgbToInt(theme.articleContentColor1))
+            if (authorColor != -1) authorLabel?.setTextColor(authorColor)
+            if (contentColor != -1) contentLabel?.setTextColor(contentColor)
         } else {
             // 使用者回文
             val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor0)
             val contentColor = getThemeColor(R.attr.bahamut_articleContentColor0)
-            authorLabel?.setTextColor(if (authorColor != -1) authorColor else rgbToInt(theme.articleAuthorColor0))
-            contentLabel?.setTextColor(if (contentColor != -1) contentColor else rgbToInt(theme.articleContentColor0))
+            if (authorColor != -1) authorLabel?.setTextColor(authorColor)
+            if (contentColor != -1) contentLabel?.setTextColor(contentColor)
         }
     }
 

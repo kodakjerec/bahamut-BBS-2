@@ -6,7 +6,6 @@ import android.content.DialogInterface
 import android.content.res.Configuration
 import android.os.PowerManager
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -18,7 +17,6 @@ import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogHeroStep
 import com.kota.Bahamut.pages.messages.MessageDatabase
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.HeroStep

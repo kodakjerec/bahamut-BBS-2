@@ -8,7 +8,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BoardExtendBookmarkItemView : LinearLayout {
     private var authorLabel: TextView? = null

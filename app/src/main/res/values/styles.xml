@@ -140,7 +140,7 @@
     <style name="MyTheme.eInk" parent="MyTheme">
         <item name="bahamut_pageBackground">@color/board_item_normal</item>
         <item name="bahamut_defaultTextColor">@color/page_background</item>
-        <item name="bahamut_buttonTextColor">@color/eink_button_text_normal</item>
+        <item name="bahamut_buttonTextColor">@color/white</item>
         <item name="bahamut_buttonDangerTextColor">@color/board_item_normal</item>
         <item name="bahamut_toolbarItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_buttonDangerBackground">@drawable/eink_button_danger_background</item>
@@ -203,10 +203,10 @@
         <item name="bahamut_dialogBorderColor">@color/page_background</item>
         <item name="bahamut_dialogSelectArticleFocusedColor">@color/gray_white</item>
         <item name="bahamut_dialogSelectArticleDividerColor">@color/page_background</item>
-        <item name="bahamut_dialogSelectArticleTextColor">@color/eink_button_text_normal</item>
+        <item name="bahamut_dialogSelectArticleTextColor">@color/white</item>
         <item name="bahamut_dialogSelectArticleItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_listDialogItemBackground">@drawable/eink_toolbar_item_background</item>
-        <item name="bahamut_listDialogItemTextColor">@color/eink_button_text_normal</item>
+        <item name="bahamut_listDialogItemTextColor">@color/white</item>
 
         <!-- 縮圖 (Thumbnail) 電子紙配色 - 白底黑字 -->
         <item name="bahamut_thumbnailBackground">@drawable/eink_dialog_block_background</item>

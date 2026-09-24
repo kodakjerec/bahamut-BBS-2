@@ -27,7 +27,6 @@ import com.kota.Bahamut.dialogs.DialogQueryHero
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.model.ToolBarFloating
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.EditFromLinkedStep
 import com.kota.Bahamut.service.NotificationSettings.getShowTopBottomButton

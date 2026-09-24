@@ -1,12 +1,10 @@
 package com.kota.Bahamut.pages.blockListPage
 
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BlockListViewHolder(view: View, listener: BlockListClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {

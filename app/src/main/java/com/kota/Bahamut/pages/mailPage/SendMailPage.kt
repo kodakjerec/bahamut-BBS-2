@@ -5,10 +5,8 @@ import android.view.View
 import android.view.View.OnFocusChangeListener
 import android.widget.Button
 import android.widget.EditText
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
-import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.ArticleTempStore
 import com.kota.Bahamut.dialogs.DialogInsertExpression
@@ -18,7 +16,6 @@ import com.kota.Bahamut.dialogs.DialogInsertSymbolListener
 import com.kota.Bahamut.dialogs.DialogPaintColor
 import com.kota.Bahamut.dialogs.DialogPaintColorListener
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
 import com.kota.asFramework.dialog.ASAlertDialog

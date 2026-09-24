@@ -6,7 +6,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.dataModels.Bookmark
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 
 class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {

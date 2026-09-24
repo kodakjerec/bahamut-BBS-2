@@ -20,10 +20,8 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandFSendMail
-import com.kota.Bahamut.pages.articlePage.ArticlePageEditRecordItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageHeaderItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
-import com.kota.Bahamut.pages.articlePage.ArticlePagePushItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
@@ -31,7 +29,6 @@ import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.mailPage.SendMailPage
 import com.kota.Bahamut.pages.mailPage.SendMailPageListener
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.dialog.ASAlertDialog

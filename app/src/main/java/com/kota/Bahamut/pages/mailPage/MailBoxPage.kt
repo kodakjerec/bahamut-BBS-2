@@ -6,7 +6,6 @@ import android.view.View.OnLongClickListener
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.ListAdapter
 import android.widget.ListView
 import com.kota.Bahamut.BahamutPage
@@ -24,7 +23,6 @@ import com.kota.Bahamut.listPage.TelnetListPageItem
 import com.kota.Bahamut.pages.model.MailBoxPageBlock
 import com.kota.Bahamut.pages.model.MailBoxPageHandler
 import com.kota.Bahamut.pages.model.MailBoxPageItem
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.ui.ASToast.showShortToast

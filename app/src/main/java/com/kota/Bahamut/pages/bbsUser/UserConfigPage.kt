@@ -9,7 +9,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast

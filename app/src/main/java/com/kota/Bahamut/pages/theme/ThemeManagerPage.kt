@@ -1,5 +1,6 @@
 package com.kota.Bahamut.pages.theme
 
+import android.view.View
 import android.widget.Button
 import android.widget.LinearLayout
 import com.kota.Bahamut.BahamutPage
@@ -12,9 +13,8 @@ import com.kota.asFramework.dialog.ASAlertDialogListener
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 
-class ThemeManagerPage: TelnetPage() {
-    private lateinit var mainLayout:LinearLayout
-    private lateinit var buttonIds:List<Button>
+class ThemeManagerPage : TelnetPage() {
+    private lateinit var mainLayout: LinearLayout
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_THEME_MANAGER_PAGE
@@ -31,20 +31,21 @@ class ThemeManagerPage: TelnetPage() {
     override fun onPageDidLoad() {
         mainLayout = findViewById(R.id.content_view) as LinearLayout
 
-        // 產生外觀列的按鈕
-        val themes = ThemeStore.getThemeStore()
-        buttonIds = listOf(
+        val themeNames = listOf("預設", "粉紅", "EInk")
+        val buttonIds = listOf<Button>(
             mainLayout.findViewById(R.id.Theme_Manager_Page_Button_0),
             mainLayout.findViewById(R.id.Theme_Manager_Page_Button_1),
-            mainLayout.findViewById(R.id.Theme_Manager_Page_Button_2),
-            mainLayout.findViewById(R.id.Theme_Manager_Page_Button_3),
-            mainLayout.findViewById(R.id.Theme_Manager_Page_Button_4)
+            mainLayout.findViewById(R.id.Theme_Manager_Page_Button_2)
         )
 
-        themes.forEachIndexed { index, theme ->
+        // 隱藏預留但未使用的按鈕 3 與 4
+        mainLayout.findViewById<View>(R.id.Theme_Manager_Page_Button_3)?.visibility = View.GONE
+        mainLayout.findViewById<View>(R.id.Theme_Manager_Page_Button_4)?.visibility = View.GONE
+
+        themeNames.forEachIndexed { index, name ->
             if (index < buttonIds.size) {
                 val button: Button = buttonIds[index]
-                button.text = theme.name
+                button.text = name
                 button.setOnClickListener { _ ->
                     if (index == ThemeStore.getSelectIndex()) {
                         return@setOnClickListener
@@ -62,7 +63,7 @@ class ThemeManagerPage: TelnetPage() {
                             ) {
                                 if (paramInt == 1) {
                                     ThemeStore.setSelectIndex(index)
-                                    // 更換主題時使用系統 Toast，因為 recreate() 會銷毀當前 Activity 的所有自定義 Window
+                                    // 更換主題時使用系統 Toast
                                     android.widget.Toast.makeText(
                                         context,
                                         getContextString(R.string.theme_manager_page_msg01),

@@ -23,20 +23,14 @@
     <color name="list_page_item_arrow_color">@color/white</color>
 
     <!-- BBS 內容顯示色彩 -->
-    <color name="mail_box_page_item_view_status">#FFF0F080</color>
-    <color name="mail_box_page_item_view_mark">#FFFF7F27</color>
     <color name="mail_box_page_item_view_reply">#FF00FFFF</color>
-    <color name="mail_box_page_item_view_date">#FF80C080</color>
-    <color name="mail_box_page_item_view_author">#FFB0B0F0</color>
-    <color name="mail_box_page_item_view_number">#FFC08080</color>
 
-    <color name="board_page_item_view_gy">#FF00C0C0</color>
     <color name="board_ex_page_item_view_author_title">#FFB0FFFF</color>
     <color name="board_ex_page_item_view_author">#FF909090</color>
     <color name="article_page_header_board">#FFC0FFFF</color>
     <color name="article_page_text_item_author1">#FF80FF80</color>
     <color name="article_page_text_item_content1">#FF20FF20</color>
-    <color name="article_page_text_item_author0">#FFFFFFFF</color>
+    <color name="article_page_text_item_author0">@color/white</color>
     <color name="article_page_text_item_content0">#FFC0C0C0</color>
 
     <color name="board_item_follow_first">#FF00FF00</color>
@@ -102,7 +96,7 @@
     <color name="board_page_item_view_mark">#FFFF7F27</color>
     <color name="board_page_item_view_date">#FF80C080</color>
     <color name="board_page_item_view_author">#FFB0B0F0</color>
-    <color name="board_page_item_view_gy_title">#FF00C0C0</color>
+    <color name="board_page_item_view_gy">#FF00C0C0</color>
     <color name="class_page_item_view_name">#FFF0F080</color>
     <color name="class_page_item_view_manager">#FFB0B0F0</color>
 
@@ -111,8 +105,6 @@
     <!-- 其他補充顏色 -->
     <color name="dialog_select_article_background_color_normal">#FF303030</color>
     <color name="dialog_select_article_background_color_focused">#FF606060</color>
-    <color name="ext_toolbar_background_color_focused">#FF224CB1</color>
-    <color name="item_background_color">@color/page_background</color>
 
     <!-- 輸入框配色 -->
     <color name="input_box_background">#FFE0E0E0</color>

@@ -10,10 +10,8 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
 import android.widget.CompoundButton
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.Spinner
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
 import com.google.android.material.slider.Slider

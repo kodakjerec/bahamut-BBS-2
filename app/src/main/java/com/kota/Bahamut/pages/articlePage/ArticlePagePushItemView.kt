@@ -34,19 +34,9 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
 
     @SuppressLint("SetTextI18n")
     fun setContent(item: TelnetArticlePush) {
-        val theme = com.kota.Bahamut.pages.theme.ThemeStore.getSelectTheme()
-        val rgbToInt = com.kota.Bahamut.service.CommonFunctions::rgbToInt
-        
         txtAuthor.text = item.author
-        txtAuthor.setTextColor(rgbToInt(theme.articlePushAuthorColor))
-        
         txtContent.text = item.content
-        txtContent.setTextColor(rgbToInt(theme.articlePushContentColor))
-        
-        txtDatetime.text = item.date+" "+item.time
-        txtDatetime.setTextColor(rgbToInt(theme.articlePushAuthorColor))
-        
-        txtFloor.setTextColor(rgbToInt(theme.articlePushAuthorColor))
+        txtDatetime.text = item.date + " " + item.time
 
         // 預覽圖
         stringThumbnail()
@@ -73,7 +63,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
     /** 加上預覽圖  */
     @SuppressLint("ResourceAsColor")
     private fun stringThumbnail() {
-        if (txtContent.parent ==null)
+        if (txtContent.parent == null)
             return
         val mainLayout = txtContent.parent as LinearLayout
         var originalIndex = mainLayout.indexOfChild(txtContent)

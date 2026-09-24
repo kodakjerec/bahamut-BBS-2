@@ -4,14 +4,12 @@ import android.view.View.GONE
 import android.view.View.OnClickListener
 import android.view.View.VISIBLE
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.widget.doOnTextChanged
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.PostEditText
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.thread.ASCoroutine

@@ -3,7 +3,6 @@ package com.kota.Bahamut.pages.essencePage
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
@@ -16,7 +15,6 @@ import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.model.BoardEssencePageItem
 import com.kota.Bahamut.pages.model.BoardEssencePageItemView
 import com.kota.Bahamut.pages.model.BoardPageBlock
-import com.kota.Bahamut.pages.theme.ThemeFunctions
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.ui.ASListView

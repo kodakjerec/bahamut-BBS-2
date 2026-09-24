@@ -46,13 +46,13 @@
         <ImageButton
             android:gravity="center"
             android:id="@+id/menu_button"
-            app:tint="@color/board_item_normal"
             android:background="?attr/bahamut_titleBarMenuIconBackground"
             android:visibility="gone"
             android:layout_width="60dp"
             android:layout_height="match_parent"
             android:src="@drawable/menu_icon"
-            android:contentDescription="@string/zero_word"/>
+            android:contentDescription="@string/zero_word"
+            android:tint="?attr/bahamut_defaultTextColor" />
     </LinearLayout>
     <View style="@style/HorizontalDivider"/>
 </LinearLayout>
