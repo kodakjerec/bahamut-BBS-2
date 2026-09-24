@@ -13,12 +13,12 @@
     <attr name="bahamut_dividerColor" format="reference|color" />
     <attr name="bahamut_defaultTextColor" format="reference|color" />
     <attr name="bahamut_itemBackground" format="reference|color" />
-    <attr name="bahamut_chapterBackground" format="reference|color" />
     <attr name="bahamut_chapterTextColor" format="reference|color" />
     <attr name="bahamut_checkboxTint" format="reference|color" />
     <attr name="bahamut_sliderActiveColor" format="reference|color" />
     <attr name="bahamut_sliderInactiveColor" format="reference|color" />
     <attr name="bahamut_sliderThumbColor" format="reference|color" />
+    <attr name="bahamut_mainStatusTextColor" format="reference|color" />
 
     <!-- 選擇文章對話框相關 -->
     <attr name="bahamut_dialogSelectArticleFocusedColor" format="reference|color" />

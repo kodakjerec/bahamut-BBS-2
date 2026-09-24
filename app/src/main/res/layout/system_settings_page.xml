@@ -13,6 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/bahamut_pageBackground">
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_bbs"/>
@@ -32,6 +34,8 @@
                 <View style="@style/ItemViewDividerVertical"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/theme"/>
@@ -49,6 +53,8 @@
                     android:text="@string/follow_system_dark_mode" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_followSystemDarkMode" style="@style/SystemSettingsCheckbox" />
             </RelativeLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_blocklist"/>
@@ -72,6 +78,8 @@
                 <View style="@style/ItemViewDividerVertical"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_board_article"/>
@@ -134,6 +142,8 @@
                         android:layout_weight="1"/>
                     <com.google.android.material.slider.Slider
                         android:id="@+id/system_setting_page_toolbar_idle"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:value="2.0"
                         android:valueFrom="0.0"
                         android:valueTo="4.0"
@@ -155,6 +165,8 @@
                         android:layout_weight="1"/>
                     <com.google.android.material.slider.Slider
                         android:id="@+id/system_setting_page_toolbar_alpha"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
                         android:value="20"
                         android:valueFrom="0"
                         android:valueTo="100"
@@ -193,6 +205,8 @@
                 <View style="@style/ItemViewDividerVertical"/>
                 <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_link"/>
@@ -214,6 +228,8 @@
                     android:text="@string/system_setting_page_chapter_link_show_only_wifi" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_enableLinkShowOnlyWifi" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_link_show_only_wifi"/>
             </RelativeLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_preference"/>
@@ -256,6 +272,8 @@
                     android:text="@string/switch_connect_recovery" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_AutoConnectionRecover" style="@style/SystemSettingsCheckbox"/>
             </RelativeLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -270,6 +288,7 @@
                         android:text="@string/cloud_save_setting_switch" style="@style/SystemSettingsCheckboxText"/>
                     <CheckBox android:id="@+id/SystemSettings_cloudSaveEnable" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_cloud_save_hint" />
                 </RelativeLayout>
+                <View style="@style/HorizontalDivider"/>
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:id="@+id/SystemSettings_cloudSaveLastTime"
                     style="@style/TextViewLarge"
@@ -278,6 +297,8 @@
                     android:gravity="center"
                     android:text="@string/zero_word"/>
             </LinearLayout>
+
+            <View style="@style/HorizontalDivider"/>
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_donation"/>

@@ -26,12 +26,12 @@
         <item name="bahamut_dividerColor">@color/divider_color</item>
         <item name="bahamut_defaultTextColor">@color/board_item_normal</item>
         <item name="bahamut_itemBackground">@color/transparent</item>
-        <item name="bahamut_chapterBackground">@color/chapter_background</item>
         <item name="bahamut_chapterTextColor">@color/gray_white</item>
         <item name="bahamut_checkboxTint">@color/button_checkbox</item>
         <item name="bahamut_sliderActiveColor">#FF99CC00</item>
         <item name="bahamut_sliderInactiveColor">#3399CC00</item>
         <item name="bahamut_sliderThumbColor">#FF99CC00</item>
+        <item name="bahamut_mainStatusTextColor">@color/red</item>
 
         <!-- board title bar -->
         <item name="bahamut_titleBarMenuIconBackground">@color/title_bar_menu_icon_background</item>
@@ -116,6 +116,7 @@
         <item name="bahamut_dialogTitleTextColor">@color/gray_white</item>
         <item name="bahamut_listDialogItemBackground">@drawable/dark_list_dialog_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/gray_white</item>
+        <item name="bahamut_mainStatusTextColor">#FF6F0000</item>
     </style>
 
     <!-- 粉紅主題 -->
@@ -215,6 +216,12 @@
         <item name="bahamut_thumbnailTitleColor">@color/black</item>
         <item name="bahamut_thumbnailDescriptionColor">@color/black</item>
         <item name="bahamut_thumbnailUrlColor">@color/halfWhite</item>
+
+        <!-- 滑桿 (Slider) 電子紙配色 -->
+        <item name="bahamut_sliderActiveColor">@color/black</item>
+        <item name="bahamut_sliderInactiveColor">@color/halfWhite</item>
+        <item name="bahamut_sliderThumbColor">@color/black</item>
+        <item name="bahamut_mainStatusTextColor">@color/black</item>
     </style>
 
     <!-- eInk 主題 (深色模式 - 黑白對調，高對比亮灰/純白配色) -->
@@ -298,6 +305,12 @@
         <item name="bahamut_thumbnailTitleColor">@color/white</item>
         <item name="bahamut_thumbnailDescriptionColor">@color/white</item>
         <item name="bahamut_thumbnailUrlColor">@color/gray_white</item>
+
+        <!-- 滑桿 (Slider) 電子紙深色配色 -->
+        <item name="bahamut_sliderActiveColor">@color/white</item>
+        <item name="bahamut_sliderInactiveColor">@color/gray_white</item>
+        <item name="bahamut_sliderThumbColor">@color/white</item>
+        <item name="bahamut_mainStatusTextColor">@color/white</item>
     </style>
 
     <style name="toolbar" parent="BaseTouchPart">
@@ -508,6 +521,7 @@
         <item name="bahamut_itemBackground">@color/transparent</item>
         <item name="bahamut_listDialogItemBackground">@drawable/list_dialog_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/white</item>
+        <item name="bahamut_mainStatusTextColor">@color/red</item>
     </style>
 
     <style name="Dialog.NoTitleBar.Pink" parent="Dialog.NoTitleBar">
@@ -526,6 +540,7 @@
         <item name="bahamut_dialogTitleTextColor">@color/gray_white</item>
         <item name="bahamut_listDialogItemBackground">@drawable/dark_list_dialog_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/gray_white</item>
+        <item name="bahamut_mainStatusTextColor">#FF6F0000</item>
     </style>
 
     <style name="Dialog.NoTitleBar.Pink.Dark" parent="Dialog.NoTitleBar.Dark">
@@ -551,6 +566,7 @@
         <item name="bahamut_dialogBlockBackground">@drawable/eink_dialog_block_background</item>
         <item name="bahamut_listDialogItemBackground">@drawable/eink_toolbar_item_background</item>
         <item name="bahamut_listDialogItemTextColor">@color/eink_button_text_normal</item>
+        <item name="bahamut_mainStatusTextColor">@color/black</item>
     </style>
 
     <!-- 對話框 eInk 主題 (深色模式 - 黑白對調) -->
@@ -574,6 +590,7 @@
         <item name="bahamut_tabUnselectedBackground">@drawable/eink_dark_tab_unselected_background</item>
         <item name="bahamut_tabSelectedTextColor">@color/page_background</item>
         <item name="bahamut_tabUnselectedTextColor">@color/white</item>
+        <item name="bahamut_mainStatusTextColor">@color/white</item>
     </style>
 
     <style name="TextViewUltraLarge" parent="TextViewNormal">
@@ -681,7 +698,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textColor">?attr/bahamut_chapterTextColor</item>
-        <item name="android:background">?attr/bahamut_chapterBackground</item>
+        <item name="android:background">?attr/bahamut_pageBackground</item>
         <item name="android:paddingStart">5dp</item>
     </style>
 
@@ -694,13 +711,16 @@
         <item name="android:textSize">19sp</item>
     </style>
 
-    <style name="SystemSettingsSlider" parent="SpinnerStyle">
-        <item name="android:textColor">?attr/bahamut_defaultTextColor</item>
+    <style name="SystemSettingsSlider" parent="Widget.MaterialComponents.Slider">
+        <item name="trackColorActive">?attr/bahamut_sliderActiveColor</item>
+        <item name="trackColorInactive">?attr/bahamut_sliderInactiveColor</item>
+        <item name="thumbColor">?attr/bahamut_sliderThumbColor</item>
+        <item name="haloColor">?attr/bahamut_sliderInactiveColor</item>
         <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_alignParentEnd">true</item>
-        <item name="android:textSize">19sp</item>
     </style>
 
     <style name="SystemSettingsDirectoryText" parent="TextViewLarge">

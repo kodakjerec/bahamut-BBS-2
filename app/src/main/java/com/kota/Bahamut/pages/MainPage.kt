@@ -185,6 +185,12 @@ class MainPage : TelnetPage() {
             mainLayout?.findViewById<Button>(R.id.Main_SystemSettingsButton)?.setTextColor(buttonTextColor)
         }
 
+        val statusTextColor = CommonFunctions.getThemeColorStateList(R.attr.bahamut_mainStatusTextColor)
+        if (statusTextColor != null) {
+            mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)?.setTextColor(statusTextColor)
+            mainLayout?.findViewById<TextView>(R.id.Main_BBCall)?.setTextColor(statusTextColor)
+        }
+
         val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_toolbarItemBackground)
         if (bgRes != 0) {
             mainLayout?.findViewById<Button>(R.id.Main_LogoutButton)?.setBackgroundResource(bgRes)
