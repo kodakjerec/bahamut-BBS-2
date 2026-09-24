@@ -59,6 +59,8 @@
                 android:orientation="vertical" />
         </ScrollView>
 
+        <View style="@style/HorizontalDivider" />
+
         <!-- Footer Toolbar -->
         <LinearLayout
             android:id="@+id/dialog_toolbar"

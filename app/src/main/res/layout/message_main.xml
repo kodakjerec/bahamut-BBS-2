@@ -48,7 +48,7 @@
             android:layout_height="wrap_content">
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/Message_Main_Search"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:layout_alignParentStart="true"
                 android:layout_alignParentTop="true"
                 android:autofillHints=""

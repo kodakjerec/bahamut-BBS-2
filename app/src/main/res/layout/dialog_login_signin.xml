@@ -30,7 +30,7 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
         
-        <View style="@style/BlockDividerHorizontal"/>
+        <View style="@style/HorizontalDivider"/>
         
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button 

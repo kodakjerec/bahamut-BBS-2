@@ -109,7 +109,7 @@
                         style="@style/SpinnerStyle" />
                 </LinearLayout>
 
-                <View style="@style/BlockDividerHorizontal" />
+                <View style="@style/HorizontalDivider" />
 
                 <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
 

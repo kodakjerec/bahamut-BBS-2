@@ -48,7 +48,7 @@
 
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/dialog_web_login_username"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="username"
@@ -69,7 +69,7 @@
 
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/dialog_web_login_password"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="password"
@@ -101,7 +101,7 @@
             </LinearLayout>
         </LinearLayout>
 
-        <View style="@style/BlockDividerHorizontal" />
+        <View style="@style/HorizontalDivider" />
 
         <LinearLayout
             android:id="@+id/toolbar"

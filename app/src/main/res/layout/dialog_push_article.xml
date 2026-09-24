@@ -11,12 +11,12 @@
                 android:text="@string/zero_word"
                 android:hint="@string/main_push_article_msg01"
                 android:maxLength="48"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:textSize="20sp"
                 android:lines="3"
                 android:autofillHints="" />
         </LinearLayout>
-        <View style="@style/BlockDividerHorizontal"/>
+        <View style="@style/HorizontalDivider"/>
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button android:id="@+id/Dialog_push_article_cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
             <View style="@style/ToolbarDivider"/>

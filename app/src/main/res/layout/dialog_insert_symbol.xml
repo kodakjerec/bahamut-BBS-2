@@ -35,6 +35,8 @@
             android:gravity="center"
             android:numColumns="4"/>
 
+        <View style="@style/HorizontalDivider" />
+
         <!-- Footer Toolbar -->
         <LinearLayout
             android:id="@+id/dialog_toolbar"

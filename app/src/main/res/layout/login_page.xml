@@ -88,7 +88,7 @@
 
                 <com.kota.Bahamut.pages.model.PostEditText
                     android:id="@+id/Login_UsernameEdit"
-                    style="@style/EditTextSingleLine"
+                    style="@style/PostEditTextStyle"
                     android:autofillHints="username"
                     android:digits="@string/account_digits"
                     android:hint="@string/Username_hint"
@@ -115,7 +115,7 @@
 
                 <com.kota.Bahamut.pages.model.PostEditText
                     android:id="@+id/Login_passwordEdit"
-                    style="@style/EditTextSingleLine"
+                    style="@style/PostEditTextStyle"
                     android:maxLength="8"
                     android:hint="@string/password_hint"
                     android:labelFor="@id/Login_passwordLabel"

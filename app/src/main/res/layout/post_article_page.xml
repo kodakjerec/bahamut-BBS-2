@@ -103,6 +103,8 @@
                 android:layout_weight="1"
                 android:text="@string/post_toolbar_show" />
 
+            <View style="@style/ToolbarDivider" />
+
             <TextView
                 android:id="@+id/ArticlePostDialog_Reference"
                 style="@style/ToolbarItem"
@@ -110,6 +112,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/post_article_page_format" />
+
+            <View style="@style/ToolbarDivider" />
 
             <TextView
                 android:id="@+id/ArticlePostDialog_Cancel"
@@ -119,6 +123,8 @@
                 android:layout_weight="1"
                 android:text="@string/symbol" />
 
+            <View style="@style/ToolbarDivider" />
+
             <TextView
                 android:id="@+id/ArticlePostDialog_Symbol"
                 style="@style/ToolbarItem"
@@ -126,6 +132,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/face" />
+
+            <View style="@style/ToolbarDivider" />
 
             <TextView
                 android:id="@+id/ArticlePostDialog_Post"
@@ -136,13 +144,19 @@
                 android:text="@string/post" />
         </LinearLayout>
 
-        <!-- Row 0: 延伸按鈕（貼在 Row 1 上方，展開時向上增長顯現） -->
+        <!-- 水平分隔線 (位在 Row 1 與 Row 0 之間) -->
+        <View
+            android:id="@+id/toolbar_row_divider"
+            style="@style/HorizontalDivider"
+            android:layout_above="@id/toolbar_row_primary" />
+
+        <!-- Row 0: 延伸按鈕（貼在 分隔線 上方） -->
         <LinearLayout
             android:id="@+id/toolbar_row_extended"
             style="@style/toolbar"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_above="@id/toolbar_row_primary"
+            android:layout_above="@id/toolbar_row_divider"
             android:orientation="horizontal">
 
             <TextView
@@ -153,6 +167,8 @@
                 android:layout_weight="1"
                 android:text="@string/post_article_page_paint_color" />
 
+            <View style="@style/ToolbarDivider" />
+
             <TextView
                 android:id="@+id/ArticlePostDialog_File"
                 style="@style/ToolbarItem"
@@ -160,6 +176,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/file" />
+
+            <View style="@style/ToolbarDivider" />
 
             <LinearLayout
                 android:id="@+id/ArticlePostDialog_ShortenUrl"
@@ -186,6 +204,8 @@
                     android:textSize="18sp" />
             </LinearLayout>
 
+            <View style="@style/ToolbarDivider" />
+
             <TextView
                 android:id="@+id/ArticlePostDialog_ShortenImage"
                 style="@style/ToolbarItem"
@@ -193,6 +213,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="@string/dialog_shorten_img_title" />
+
+            <View style="@style/ToolbarDivider" />
 
             <LinearLayout
                 android:id="@+id/ArticlePostDialog_EditButtons"

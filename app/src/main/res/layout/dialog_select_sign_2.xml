@@ -68,7 +68,7 @@
                     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
                         <Button android:id="@+id/Bahamut_Dialog_Select_Button_0_p" android:layout_width="0dp" android:text="@string/number_0" android:layout_weight="1" style="@style/SelectArticleItemP"/>
                     </LinearLayout>
-                    <View style="@style/DialogSelectArticleHorizontalDivider"/>
+                    <View style="@style/HorizontalDivider"/>
                 </LinearLayout>
                 <LinearLayout style="@style/toolbar">
                     <Button android:id="@+id/Bahamut_Dialog_Select_Sign_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem"/>

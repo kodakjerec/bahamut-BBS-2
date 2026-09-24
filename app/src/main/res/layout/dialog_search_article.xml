@@ -63,10 +63,10 @@
 
                         <com.kota.Bahamut.pages.model.PostEditText
                             android:id="@+id/Bahamut_Dialog_Search_keyword"
-                            style="@style/EditTextSingleLine"
+                            style="@style/PostEditTextStyle"
                             android:autofillHints=""
                             android:hint="@string/keyword_hint"
-                            android:inputType="text" />
+                            android:inputType="textMultiLine" />
                     </LinearLayout>
 
                     <View
@@ -94,10 +94,10 @@
 
                         <com.kota.Bahamut.pages.model.PostEditText
                             android:id="@+id/Bahamut_Dialog_Search_Author"
-                            style="@style/EditTextSingleLine"
+                            style="@style/PostEditTextStyle"
                             android:autofillHints=""
                             android:hint="@string/author_hint"
-                            android:inputType="text" />
+                            android:inputType="textMultiLine" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -167,7 +167,7 @@
 
                     <com.kota.Bahamut.pages.model.PostEditText
                         android:id="@+id/gy_number_field"
-                        style="@style/EditTextSingleLine"
+                        style="@style/PostEditTextStyle"
                         android:layout_width="80dp"
                         android:autofillHints=""
                         android:hint="@string/GY_hint"
@@ -176,6 +176,8 @@
                 </LinearLayout>
             </LinearLayout>
         </ScrollView>
+
+        <View style="@style/HorizontalDivider"/>
 
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
 

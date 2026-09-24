@@ -43,7 +43,7 @@
     </LinearLayout>
     <com.kota.Bahamut.pages.model.PostEditText
         android:id="@+id/Message_Sub_EditField"
-        style="@style/EditTextSingleLine"
+        style="@style/PostEditTextStyle"
         android:layout_above="@+id/toolbar_container"
         android:gravity="top|start|center_vertical|center_horizontal|center"
         android:hint="@string/input_content_here"

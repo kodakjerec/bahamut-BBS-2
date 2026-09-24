@@ -13,21 +13,21 @@
                 android:text="@string/zero_word"
                 android:hint="@string/number_1"
                 android:maxLength="48"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:autofillHints="" />
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/Dialog_hero_step_content2"
                 android:text="@string/zero_word"
                 android:hint="@string/number_2"
                 android:maxLength="48"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:autofillHints="" />
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/Dialog_hero_step_content3"
                 android:text="@string/zero_word"
                 android:hint="@string/number_3"
                 android:maxLength="48"
-                style="@style/EditTextSingleLine"
+                style="@style/PostEditTextStyle"
                 android:autofillHints="" />
         </LinearLayout>
         <View style="@style/HorizontalDivider"/>

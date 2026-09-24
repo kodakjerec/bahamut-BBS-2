@@ -38,7 +38,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
-                    android:layout_above="@+id/toolbar"
+                    android:layout_above="@+id/dialog_middle_toolbar_top_divider"
                     android:orientation="horizontal">
                     <com.kota.telnetUI.textView.TelnetTextViewNormal
                         android:id="@+id/dialog_shorten_image_hint"
@@ -58,12 +58,16 @@
                         android:layout_height="match_parent"
                         android:visibility="gone"/>
                 </LinearLayout>
+                <View
+                    android:id="@+id/dialog_middle_toolbar_top_divider"
+                    style="@style/HorizontalDivider"
+                    android:layout_above="@+id/toolbar" />
                 <LinearLayout
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:orientation="horizontal"
-                    android:layout_alignParentBottom="true">
+                    android:layout_above="@+id/dialog_middle_toolbar_bottom_divider">
                     <LinearLayout
                         android:id="@+id/dialog_shorten_image_middle_toolbar"
                         android:layout_width="match_parent"
@@ -92,6 +96,10 @@
                             android:text="@string/dialog_shorten_img_title" />
                     </LinearLayout>
                 </LinearLayout>
+                <View
+                    android:id="@+id/dialog_middle_toolbar_bottom_divider"
+                    style="@style/HorizontalDivider"
+                    android:layout_alignParentBottom="true" />
             </RelativeLayout>
         </LinearLayout>
         <com.kota.telnetUI.textView.TelnetTextViewSmall
@@ -101,7 +109,11 @@
             android:layout_height="40dp"
             android:gravity="center"
             android:text="@string/dialog_paint_color_sample_ch"
-            android:layout_above="@+id/dialog_toolbar"/>
+            android:layout_above="@+id/dialog_toolbar_divider"/>
+        <View
+            android:id="@+id/dialog_toolbar_divider"
+            style="@style/HorizontalDivider"
+            android:layout_above="@+id/dialog_toolbar" />
         <LinearLayout style="@style/toolbar" android:id="@+id/dialog_toolbar" android:layout_alignParentBottom="true" >
         <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
         <View style="@style/ToolbarDivider"/>
