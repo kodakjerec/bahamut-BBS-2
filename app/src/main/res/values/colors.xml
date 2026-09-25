@@ -7,7 +7,6 @@
     <color name="white">#FFFFFFFF</color>
     <color name="gray_white">#FFC0C0C0</color>
     <color name="transparent">#00000000</color>
-    <color name="yellow">#FFF0F080</color>
     <color name="red">#FF800000</color>
     <color name="halfWhite">#FF808080</color>
 
@@ -17,7 +16,6 @@
     <color name="title_bar_background">#FF000060</color>
     <color name="title_bar_menu_icon_background">#FF101090</color>
     <color name="dialog_title_background">@color/dark_gray_20</color>
-    <color name="chapter_background">@color/dark_gray_20</color>
     <color name="divider_color">#FF404040</color>
     <color name="ripple_material">#1f000000</color>
     <color name="dialog_border_color">@color/halfWhite</color>
@@ -69,9 +67,6 @@
     <color name="dialog_toolbar_background_color_focused">#FFFF7F27</color>
     <color name="dialog_toolbar_background_color_disabled">#FF200000</color>
 
-    <!-- 其他介面顏色 -->
-    <color name="list_page_item_content_background">@color/page_background</color>
-
     <!-- 基礎介面背景顏色 (供 Drawable 使用) -->
     <color name="dialog_item_background_normal">#FF400000</color>
     <color name="dialog_item_background_pressed">#FFFFC90E</color>
@@ -102,8 +97,6 @@
     <color name="class_page_item_view_name">#FFF0F080</color>
     <color name="class_page_item_view_manager">#FFB0B0F0</color>
 
-    <color name="time_line_background_color">#FF224CB1</color>
-
     <!-- 其他補充顏色 -->
     <color name="dialog_select_article_background_color_normal">#FF303030</color>
     <color name="dialog_select_article_background_color_focused">#FF606060</color>
@@ -116,26 +109,20 @@
     <color name="pink_button_background_normal">#FFFE00FE</color>
     <color name="pink_button_background_pressed">#FFE400E4</color>
     <color name="pink_button_background_disabled">#FF650065</color>
-    <color name="pink_header_background">#FFFFC0CB</color>
-    <color name="pink_header_text">#FFC71585</color>
 
     <!-- 深色主題配色 -->
     <color name="dark_button_background_normal">@color/toolbar_background_color_normal</color>
     <color name="dark_button_background_pressed">@color/toolbar_background_color_pressed</color>
     <color name="dark_button_background_focused">@color/toolbar_background_color_focused</color>
     <color name="dark_button_background_disabled">@color/toolbar_background_color_disabled</color>
-    <color name="dark_button_text">@color/gray_white</color>
 
     <!-- 電子紙主題配色 (E-Ink) -->
     <color name="eink_button_background_normal">#FFFFFFFF</color>
     <color name="eink_button_background_pressed">#FF000000</color>
     <color name="eink_button_text_normal">#FF000000</color>
-    <color name="eink_button_text_pressed">#FFFFFFFF</color>
     <color name="eink_button_danger_background_normal">#FF000000</color>
     <color name="eink_button_danger_background_pressed">#FF444444</color>
     <!-- 電子紙深色主題配色 (E-Ink Dark) -->
     <color name="eink_dark_button_background_normal">@color/black</color>
     <color name="eink_dark_button_background_pressed">#FF404040</color>
-    <color name="eink_dark_button_text_normal">@color/white</color>
-    <color name="eink_dark_button_text_pressed">@color/white</color>
 </resources>

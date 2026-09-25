@@ -13,9 +13,4 @@
         <item>簽名檔8</item>
         <item>簽名檔9</item>
     </array>
-    <array name="sign_selection_list">
-        <item>版上</item>
-        <item>作者信箱</item>
-        <item>兩者皆是</item>
-    </array>
 </resources>

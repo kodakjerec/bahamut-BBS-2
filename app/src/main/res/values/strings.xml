@@ -129,7 +129,6 @@
     <string name="switch_on_block_list">開啟黑名單功能</string>
     <string name="switch_on_block_list_for_title">套用至標題</string>
     <string name="symbol">符號</string>
-    <string name="title">標題</string>
     <string name="title_">標題：</string>
     <string name="_warning">警告</string>
     <string name="un_input">未輸入</string>
@@ -332,7 +331,6 @@
     <string name="dialog_reference_error_1">沒有引用他人文章</string>
     <string name="theme">外觀</string>
     <string name="theme_manager_page">外觀管理</string>
-    <string name="theme_manager_palette">調色盤</string>
     <string name="follow_system_dark_mode">跟隨系統深色模式</string>
     <string name="theme_manager_page_guide">請點選上方按鈕切換佈景主題\n變更將立即生效並儲存。</string>
     <string name="theme_manager_page_chapter_update">套用新設定</string>

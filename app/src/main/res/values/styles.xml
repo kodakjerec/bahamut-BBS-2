@@ -126,6 +126,7 @@
         <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
         <item name="bahamut_tabSelectedTextColor">@color/board_item_normal</item>
+        <item name="bahamut_dividerColor">#FF202020</item>
     </style>
 
     <!-- 粉紅主題 (深色模式) -->
@@ -325,6 +326,12 @@
         <item name="android:layout_height">match_parent</item>
     </style>
 
+    <style name="ToolbarDivider.Horizontal">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:minHeight">1px</item>
+    </style>
+
     <style name="ToolbarItem" parent="BaseTouchPart">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">?attr/bahamut_buttonTextColor</item>
@@ -378,16 +385,6 @@
         <item name="android:layout_height">6dp</item>
     </style>
 
-    <style name="Button">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/bahamut_buttonTextColor</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@android:drawable/list_selector_background</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:layout_weight">1</item>
-    </style>
-
     <style name="DialogSelectArticleHorizontalDivider">
         <item name="android:background">?attr/bahamut_dialogSelectArticleDividerColor</item>
         <item name="android:layout_width">match_parent</item>
@@ -409,16 +406,6 @@
         <item name="android:layout_weight">1</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-    </style>
-
-    <style name="Dialog_NoTitle_FullScreen">
-        <item name="android:windowBackground">?attr/bahamut_pageBackground</item>
-        <item name="android:windowFrame">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowIsTranslucent">false</item>
-        <item name="android:windowContentOverlay">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">false</item>
     </style>
 
     <style name="PostEditTextStyle" parent="TextViewUltraLarge">
@@ -444,7 +431,7 @@
     </style>
 
     <style name="HorizontalDivider">
-        <item name="android:background">?attr/bahamut_toolbarDivider</item>
+        <item name="android:background">?attr/bahamut_dividerColor</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">1dp</item>
         <item name="android:minHeight">1px</item>
@@ -488,18 +475,6 @@
         <item name="android:textColor">?attr/bahamut_buttonTextColor</item>
     </style>
 
-    <style name="MainItemBackground">
-        <item name="android:background">?attr/bahamut_itemBackground</item>
-    </style>
-
-    <style name="MenuItem">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/bahamut_buttonTextColor</item>
-        <item name="android:background">@android:drawable/list_selector_background</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-    </style>
-
     <style name="Dialog.NoTitleBar" parent="Theme.AppCompat.DayNight.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -530,6 +505,7 @@
         <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
         <item name="bahamut_tabSelectedTextColor">@color/white</item>
+        <item name="bahamut_dividerColor">#FF202020</item>
     </style>
 
     <style name="Dialog.NoTitleBar.Dark" parent="Dialog.NoTitleBar">
@@ -621,23 +597,6 @@
         <item name="android:paddingBottom">6dp</item>
         <item name="android:minHeight">48dp</item>
         <item name="android:minWidth">48dp</item>
-    </style>
-
-    <style name="VerticalDivider">
-        <item name="android:background">?attr/bahamut_dividerColor</item>
-        <item name="android:layout_width">1dp</item>
-        <item name="android:layout_height">match_parent</item>
-        <item name="android:minWidth">1px</item>
-    </style>
-
-    <style name="SelectArticleItemL" parent="BaseTouchPart">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">?attr/bahamut_dialogSelectArticleTextColor</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">?attr/bahamut_dialogSelectArticleItemBackground</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:minWidth">70dp</item>
     </style>
 
     <style name="SelectArticleItemP" parent="BaseTouchPart">
@@ -742,13 +701,6 @@
 
     <style name="ToolbarItem.RightMenu">
         <item name="android:layout_width">0dp</item>
-    </style>
-
-    <style name="DialogQueryHeroText" parent="TextViewNormal">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:gravity">center</item>
     </style>
 
     <style name="StartIcon">

@@ -102,122 +102,60 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             row.reloadSpace()
             val ssRawString = SpannableStringBuilder(row.rawString)
             if (ssRawString.isNotEmpty()) {
-                var startIndex = 0
+                // 前景顏色替換
                 val textColor: ByteArray = row.getTextColorArray()
-                var endIndex = 0
-                var paintTextColor: Byte = TelnetAnsi.DEFAULT_TEXT_COLOR
-                var startCatching = false
-                // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
-                var needReplaceTextColor = false
-                for (i in textColor.indices) {
-                    if (textColor[i] != paintTextColor) {
-                        if ((i + 1) <= ssRawString.length) {
-                            needReplaceTextColor = true
+                var textStartIndex = -1
+                var currentTextColor: Byte = TelnetAnsi.DEFAULT_TEXT_COLOR
+
+                for (i in 0..<ssRawString.length) {
+                    val charColor = if (i < textColor.size) textColor[i] else TelnetAnsi.DEFAULT_TEXT_COLOR
+                    if (charColor != currentTextColor) {
+                        if (currentTextColor != TelnetAnsi.DEFAULT_TEXT_COLOR && textStartIndex != -1) {
+                            val colorSpan = ForegroundColorSpan(getTextColor(currentTextColor))
+                            ssRawString.setSpan(
+                                colorSpan, textStartIndex, i,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
-                        break
+                        currentTextColor = charColor
+                        textStartIndex = i
                     }
                 }
-                // 開始替換
-                if (needReplaceTextColor) {
-                    for (i in 0..<ssRawString.length) {
-                        // 開始擷取
-                        if (textColor[i] != paintTextColor) {
-                            if (!startCatching) {
-                                startCatching = true
-                                startIndex = i
-                                endIndex = i
-                                paintTextColor = textColor[i]
-                            } else {
-                                startCatching = false
-                                endIndex = i - 1
-                            }
-                        }
-                        // 停止擷取
-                        if (i == (ssRawString.length - 1)) {
-                            if (startCatching) {
-                                startCatching = false
-                                endIndex = i
-                                paintTextColor = textColor[i]
-                            }
-                        }
-                        // 塗顏色
-                        if (!startCatching) {
-                            if (paintTextColor != TelnetAnsi.DEFAULT_TEXT_COLOR) {
-                                val colorSpan = ForegroundColorSpan(
-                                    getTextColor(paintTextColor)
-                                )
-                                ssRawString.setSpan(
-                                    colorSpan, startIndex, endIndex + 1,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                                )
-                            }
+                if (currentTextColor != TelnetAnsi.DEFAULT_TEXT_COLOR && textStartIndex != -1) {
+                    val colorSpan = ForegroundColorSpan(getTextColor(currentTextColor))
+                    ssRawString.setSpan(
+                        colorSpan, textStartIndex, ssRawString.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                }
 
-                            startIndex = i
-                            paintTextColor = textColor[i]
+                // 背景顏色替換
+                val backgroundColor: ByteArray = row.getBackgroundColor()
+                var backStartIndex = -1
+                var currentBackColor: Byte = TelnetAnsi.DEFAULT_BACKGROUND_COLOR
 
-                            if (textColor[i] != TelnetAnsi.DEFAULT_TEXT_COLOR) startCatching =
-                                true
+                for (i in 0..<ssRawString.length) {
+                    val charColor = if (i < backgroundColor.size) backgroundColor[i] else TelnetAnsi.DEFAULT_BACKGROUND_COLOR
+                    if (charColor != currentBackColor) {
+                        if (currentBackColor != TelnetAnsi.DEFAULT_BACKGROUND_COLOR && backStartIndex != -1) {
+                            val colorSpan = BackgroundColorSpan(getBackgroundColor(currentBackColor))
+                            ssRawString.setSpan(
+                                colorSpan, backStartIndex, i,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
                         }
+                        currentBackColor = charColor
+                        backStartIndex = i
                     }
                 }
-                val backgroundColor = row.getBackgroundColor()
-                startIndex = 0
-                endIndex = 0
-                startCatching = false
-                var paintBackColor: Byte = TelnetAnsi.DEFAULT_BACKGROUND_COLOR
-                // 檢查整串字元內有沒有包含預設顏色, 預設不用替換
-                var needReplaceBackColor = false
-                for (i in backgroundColor.indices) {
-                    if (backgroundColor[i] != paintBackColor) {
-                        if ((i + 1) <= ssRawString.length) {
-                            needReplaceBackColor = true
-                        }
-                        break
-                    }
+                if (currentBackColor != TelnetAnsi.DEFAULT_BACKGROUND_COLOR && backStartIndex != -1) {
+                    val colorSpan = BackgroundColorSpan(getBackgroundColor(currentBackColor))
+                    ssRawString.setSpan(
+                        colorSpan, backStartIndex, ssRawString.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
                 }
-                // 開始替換
-                if (needReplaceBackColor) {
-                    for (i in 0..<ssRawString.length) {
-                        // 開始擷取
-                        if (backgroundColor[i] != paintBackColor) {
-                            if (!startCatching) {
-                                startCatching = true
-                                startIndex = i
-                                endIndex = i
-                                paintBackColor = backgroundColor[i]
-                            } else {
-                                startCatching = false
-                                endIndex = i - 1
-                            }
-                        }
-                        // 停止擷取
-                        if (i == (ssRawString.length - 1)) {
-                            if (startCatching) {
-                                startCatching = false
-                                endIndex = i
-                                paintBackColor = backgroundColor[i]
-                            }
-                        }
-                        // 塗顏色
-                        if (!startCatching) {
-                            if (paintBackColor != TelnetAnsi.DEFAULT_BACKGROUND_COLOR) {
-                                val colorSpan = BackgroundColorSpan(
-                                    getBackgroundColor(paintBackColor)
-                                )
-                                ssRawString.setSpan(
-                                    colorSpan, startIndex, endIndex + 1,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                                )
-                            }
 
-                            startIndex = i
-                            paintBackColor = backgroundColor[i]
-
-                            if (backgroundColor[i] != TelnetAnsi.DEFAULT_BACKGROUND_COLOR) startCatching =
-                                true
-                        }
-                    }
-                }
                 // Apply profanity mask after all other color formatting
                 applyBlocklistMask(ssRawString)
             }
