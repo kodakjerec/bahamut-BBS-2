@@ -11,7 +11,7 @@
     <color name="halfWhite">#FF808080</color>
 
     <!-- 功能性顏色 (保留給程式碼引用) -->
-    <color name="text_color_link">#FF1F5EFF</color>
+    <color name="text_color_link">#FF4EADC2</color>
     <color name="page_background">@color/black</color>
     <color name="title_bar_background">#FF000060</color>
     <color name="title_bar_menu_icon_background">#FF101090</color>

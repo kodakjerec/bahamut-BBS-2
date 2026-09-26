@@ -17,6 +17,8 @@ class BahamutCommandDeleteArticle(var articleIndex: Int) : TelnetCommand() {
 
     override fun executeFinished(telnetListPage: TelnetListPage, telnetListPageBlock: TelnetListPageBlock?) {
         isDone = true
+        telnetListPage.cleanAllItem()
+        telnetListPage.loadLastBlock()
     }
 
     override fun toString(): String {

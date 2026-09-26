@@ -129,7 +129,6 @@
         <item name="bahamut_tabSelectedBackground">@drawable/pink_toolbar_item_background</item>
         <item name="bahamut_tabUnselectedBackground">@drawable/pink_tab_unselected_background</item>
         <item name="bahamut_tabSelectedTextColor">@color/board_item_normal</item>
-        <item name="bahamut_dividerColor">#FF202020</item>
     </style>
 
     <!-- 粉紅主題 (深色模式) -->

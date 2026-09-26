@@ -60,7 +60,7 @@
                 </LinearLayout>
                 <View
                     android:id="@+id/dialog_middle_toolbar_top_divider"
-                    style="@style/HorizontalDivider"
+                    style="@style/ToolbarDivider.Horizontal"
                     android:layout_above="@+id/toolbar" />
                 <LinearLayout
                     android:id="@+id/toolbar"

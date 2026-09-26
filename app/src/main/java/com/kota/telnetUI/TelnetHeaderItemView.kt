@@ -62,10 +62,10 @@ open class TelnetHeaderItemView : LinearLayout {
     }
 
     open fun updateThemeColors() {
-        val titleColor = getThemeColor(R.attr.bahamut_titleBarTitleColor)
-        val detail1Color = getThemeColor(R.attr.bahamut_titleBarDetailColor)
-        val detail2Color = getThemeColor(R.attr.bahamut_titleBarDetail2Color)
-        val headerBg = getThemeColor(R.attr.bahamut_titleBarBackground)
+        val titleColor = getThemeColor(context, R.attr.bahamut_titleBarTitleColor)
+        val detail1Color = getThemeColor(context, R.attr.bahamut_titleBarDetailColor)
+        val detail2Color = getThemeColor(context, R.attr.bahamut_titleBarDetail2Color)
+        val headerBg = getThemeColor(context, R.attr.bahamut_titleBarBackground)
 
         if (myTitle?.text?.contains("系統精靈送信來了") != true) {
             myTitle?.setTextColor(titleColor)

@@ -311,8 +311,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             this.selectedIndex = telnetListPageBlock.selectedItemNumber
             this.currentBlock = ItemUtils.getBlock(this.selectedIndex)
         }
-        if (telnetListPageBlock.maximumItemNumber > this.itemSize) {
-            this.itemSize = telnetListPageBlock.maximumItemNumber
+        if (telnetListPageBlock.maximumItemNumber > 0) {
+            if (this.itemSize == 0 || telnetListPageBlock.maximumItemNumber > this.itemSize || blockList.size <= 1) {
+                this.itemSize = telnetListPageBlock.maximumItemNumber
+            }
         }
     }
 
@@ -646,6 +648,10 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
                     removeBlock(key)
             }
             blockList.clear()
+        }
+        synchronized(countLock) {
+            this.itemSize = 0
+            this.listCount = 0
         }
     }
 

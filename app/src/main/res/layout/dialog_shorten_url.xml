@@ -34,7 +34,7 @@
         </RelativeLayout>
         <View
             android:id="@+id/dialog_header_divider"
-            style="@style/HorizontalDivider"
+            style="@style/ToolbarDivider.Horizontal"
             android:layout_below="@id/dialog_header" />
         <LinearLayout
                 android:id="@+id/dialog_shorten_url_middle_linear_layout"
@@ -77,7 +77,7 @@
                             android:layout_alignParentTop="true"
                             android:text="@string/dialog_shorten_url_non_id" />
                     </RelativeLayout>
-                    <View style="@style/HorizontalDivider"/>
+                    <View style="@style/ToolbarDivider.Horizontal"/>
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="60dp"

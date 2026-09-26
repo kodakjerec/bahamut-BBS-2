@@ -46,18 +46,19 @@ class BillingPage : TelnetPage() {
         button1.setOnClickListener { view: View? ->
             checkPurchaseHistoryQuery(forceCheck = true)
             checkPurchaseHistoryCloud { qty: Int? ->
-                val totalMoney = (qty!! * 90).toString()
-                val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
-                textView?.text = totalMoney
+                ASCoroutine.ensureMainThread {
+                    val totalMoney = ((qty ?: 0) * 90).toString()
+                    val textView = findViewById(R.id.BillingPage_already_billing_value) as TextView?
+                    textView?.text = totalMoney
+                }
             }
             showShortToast(getContextString(R.string.billing_page_result_success))
         }
         button1.performClick()
 
-        // 新增：處理底端工具列的返回按鈕
+        // 處理底端工具列的返回按鈕
         findViewById(R.id.BillingPage_BackButton)?.setOnClickListener {
             onBackPressed()
-            PageContainer.instance!!.cleanBillingPage()
         }
     }
 
@@ -124,9 +125,13 @@ class BillingPage : TelnetPage() {
             }
         }
 
+    override fun onBackPressed(): Boolean {
+        PageContainer.instance!!.cleanBillingPage()
+        return super.onBackPressed()
+    }
+
     override fun onReceivedGestureRight(): Boolean {
         onBackPressed()
-        PageContainer.instance!!.cleanBillingPage()
         showShortToast("返回")
         return true
     }

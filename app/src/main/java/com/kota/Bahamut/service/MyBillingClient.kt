@@ -380,16 +380,22 @@ object MyBillingClient {
                         val buyQty = jsonObject.optString("qty", "0").toInt()
                         UserSettings.propertiesVIP = buyQty > 0
                         Log.d(TAG, "checkPurchaseHistoryCloud: 帳號 $username 購買數量=$buyQty, VIP=${UserSettings.propertiesVIP}")
-                        callback(buyQty)
+                        ASCoroutine.ensureMainThread {
+                            callback(buyQty)
+                        }
                     } else {
                         // 網路或伺服器異常時，不主動修改使用者 VIP 權限
                         Log.w(TAG, "checkPurchaseHistoryCloud HTTP error: ${response.code}")
-                        callback(0)
+                        ASCoroutine.ensureMainThread {
+                            callback(0)
+                        }
                     }
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "checkPurchaseHistoryCloud exception: ${e.message}")
-                callback(0)
+                ASCoroutine.ensureMainThread {
+                    callback(0)
+                }
             }
         }
     }

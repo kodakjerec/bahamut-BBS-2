@@ -1,6 +1,7 @@
 package com.kota.Bahamut.service
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.util.Log
@@ -51,13 +52,13 @@ object CommonFunctions {
 
     /**
      * 取得主題屬性顏色
+     * @param context 指定上下文 (如帶主題的 ContextThemeWrapper)
      * @param attrItem R.attr.XX
      * @return 顏色內容(int)
      */
     @JvmStatic
-    fun getThemeColor(attrItem: Int): Int {
+    fun getThemeColor(context: Context, attrItem: Int): Int {
         val typedValue = TypedValue()
-        val context = TempSettings.myContext ?: return 0
         context.theme?.resolveAttribute(attrItem, typedValue, true)
         if (typedValue.resourceId != 0) {
             try {
@@ -69,15 +70,21 @@ object CommonFunctions {
         return typedValue.data
     }
 
+    @JvmStatic
+    fun getThemeColor(attrItem: Int): Int {
+        val context = TempSettings.myContext ?: return 0
+        return getThemeColor(context, attrItem)
+    }
+
     /**
      * 取得主題屬性 ColorStateList
+     * @param context 指定上下文
      * @param attrItem R.attr.XX
      * @return ColorStateList?
      */
     @JvmStatic
-    fun getThemeColorStateList(attrItem: Int): ColorStateList? {
+    fun getThemeColorStateList(context: Context, attrItem: Int): ColorStateList? {
         val typedValue = TypedValue()
-        val context = TempSettings.myContext ?: return null
         context.theme?.resolveAttribute(attrItem, typedValue, true)
         if (typedValue.resourceId != 0) {
             return ContextCompat.getColorStateList(context, typedValue.resourceId)
@@ -85,16 +92,29 @@ object CommonFunctions {
         return ColorStateList.valueOf(typedValue.data)
     }
 
+    @JvmStatic
+    fun getThemeColorStateList(attrItem: Int): ColorStateList? {
+        val context = TempSettings.myContext ?: return null
+        return getThemeColorStateList(context, attrItem)
+    }
+
     /**
      * 取得主題屬性資源 ID
+     * @param context 指定上下文
      * @param attrItem R.attr.XX
      * @return 資源ID(int)
      */
     @JvmStatic
-    fun getThemeResourceId(attrItem: Int): Int {
+    fun getThemeResourceId(context: Context, attrItem: Int): Int {
         val typedValue = TypedValue()
-        TempSettings.myContext?.theme?.resolveAttribute(attrItem, typedValue, true)
+        context.theme?.resolveAttribute(attrItem, typedValue, true)
         return typedValue.resourceId
+    }
+
+    @JvmStatic
+    fun getThemeResourceId(attrItem: Int): Int {
+        val context = TempSettings.myContext ?: return 0
+        return getThemeResourceId(context, attrItem)
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)

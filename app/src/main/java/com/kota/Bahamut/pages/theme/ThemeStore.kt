@@ -39,14 +39,19 @@ object ThemeStore {
         return mode == Configuration.UI_MODE_NIGHT_YES
     }
 
-    /** 取得目前應該套用的原生主題資源 ID (用於 Activity.setTheme) */
-    fun getThemeResId(): Int {
+    /** 取得指定索引應該套用的原生主題資源 ID */
+    fun getThemeResIdForIndex(index: Int): Int {
         val isDark = UserSettings.propertiesFollowSystemDarkMode && TempSettings.myContext != null && isSystemDarkMode(TempSettings.myContext!!)
-        return when (getSelectIndex()) {
+        return when (index) {
             1 -> if (isDark) R.style.MyTheme_Pink_Dark else R.style.MyTheme_Pink
             2 -> if (isDark) R.style.MyTheme_eInk_Dark else R.style.MyTheme_eInk
             else -> if (isDark) R.style.MyTheme_Dark else R.style.MyTheme
         }
+    }
+
+    /** 取得目前應該套用的原生主題資源 ID (用於 Activity.setTheme) */
+    fun getThemeResId(): Int {
+        return getThemeResIdForIndex(getSelectIndex())
     }
 
     /** 取得目前應該套用的對話框 Activity 原生主題資源 ID */

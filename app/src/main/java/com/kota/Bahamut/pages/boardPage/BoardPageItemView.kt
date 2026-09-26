@@ -53,19 +53,19 @@ class BoardPageItemView : LinearLayout {
 
     /** 動態更新看板項目文字與背景色彩以符合當前主題與深淺色模式 */
     fun updateThemeColors() {
-        statusLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemStatusColor))
-        numberLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNumberColor))
-        dateLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemDateColor))
-        gyTitleLabel?.setTextColor(getThemeColor(R.attr.bahamut_articleContentColor0))
-        gyLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemGyColor))
-        markLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemMarkColor))
-        authorLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemAuthorColor))
-        contentView?.findViewById<View>(R.id.BoardPage_ItemView_backgroundView)?.setBackgroundColor(getThemeColor(R.attr.bahamut_pageBackground))
+        statusLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemStatusColor))
+        numberLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemNumberColor))
+        dateLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemDateColor))
+        gyTitleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_articleContentColor0))
+        gyLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemGyColor))
+        markLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemMarkColor))
+        authorLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemAuthorColor))
+        contentView?.findViewById<View>(R.id.BoardPage_ItemView_backgroundView)?.setBackgroundColor(getThemeColor(context, R.attr.bahamut_pageBackground))
 
         val arrowView = findViewById<TextView>(R.id.ListItem_ArrowView)
         if (arrowView != null) {
-            arrowView.setTextColor(getThemeColor(R.attr.bahamut_arrowColor))
-            arrowView.setBackgroundColor(getThemeColor(R.attr.bahamut_arrowBackground))
+            arrowView.setTextColor(getThemeColor(context, R.attr.bahamut_arrowColor))
+            arrowView.setBackgroundColor(getThemeColor(context, R.attr.bahamut_arrowBackground))
         }
     }
 
@@ -182,22 +182,22 @@ class BoardPageItemView : LinearLayout {
         if (TempSettings.isBoardFollowTitle((titleLabel?.text as String?)!!)) { // 關注的討論串
             if (statusLabel?.text == "◆") { // 首篇文章
                 if (isRead) {
-                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowFirstReadColor))
+                    titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemFollowFirstReadColor))
                 } else {
-                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowFirstColor))
+                    titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemFollowFirstColor))
                 }
             } else { // 回應文章
                 if (isRead) {
-                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowOtherReadColor))
+                    titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemFollowOtherReadColor))
                 } else {
-                    titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemFollowOtherColor))
+                    titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemFollowOtherColor))
                 }
             }
         } else { // 其他文章
             if (isRead) {
-                titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalReadColor))
+                titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemNormalReadColor))
             } else {
-                titleLabel?.setTextColor(getThemeColor(R.attr.bahamut_boardItemNormalColor))
+                titleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemNormalColor))
             }
         }
     }

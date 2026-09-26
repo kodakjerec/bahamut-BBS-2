@@ -4,6 +4,7 @@
         android:id="@+id/ArticleTextItemView_contentView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/bahamut_pageBackground"
         style="@style/TouchBlock">
         <com.kota.telnetUI.textView.TelnetTextViewNormal
             android:id="@+id/ArticleTextItemView_Title"

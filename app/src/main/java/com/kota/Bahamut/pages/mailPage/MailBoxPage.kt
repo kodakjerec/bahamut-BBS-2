@@ -162,8 +162,6 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
                     val mailBoxPageItem = getItem(itemIndex - 1) as MailBoxPageItem?
                     mailBoxPageItem?.isDeleted = true
 
-                    myListView.removeViewInLayout(view)
-
                     // telnet
                     val command: TelnetCommand = BahamutCommandDeleteArticle(itemIndex)
                     this@MailBoxPage.pushCommand(command)

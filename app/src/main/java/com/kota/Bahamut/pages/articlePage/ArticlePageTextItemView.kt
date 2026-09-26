@@ -56,10 +56,11 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             .inflate(R.layout.article_page_text_item_view, this)
         authorLabel = findViewById(R.id.ArticleTextItemView_Title)
         contentLabel = findViewById(R.id.ArticleTextItemView_content)
-        contentLabel?.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
+        contentLabel?.setLinkTextColor(getThemeColor(context, R.attr.bahamut_linkColor))
         dividerView = findViewById(R.id.ArticleTextItemView_DividerView)
         contentView = findViewById(R.id.ArticleTextItemView_contentView)
         setBackgroundResource(R.color.transparent)
+        updateThemeColors()
     }
 
     fun setAuthor(author: String?, nickname: String?) {
@@ -78,6 +79,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     /** 設定內容  */
     fun setContent(content: String, rows: Vector<TelnetRow>) {
+        updateThemeColors()
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
             if (myQuote > 0) {
@@ -188,7 +190,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         val mainLayout = contentView as LinearLayout
 
         var originalIndex = mainLayout.indexOfChild(contentLabel)
-        val originalColor = contentLabel?.currentTextColor ?: getThemeColor(R.attr.bahamut_defaultTextColor)
+        val originalColor = contentLabel?.currentTextColor ?: getThemeColor(context, R.attr.bahamut_defaultTextColor)
 
         if (originalIndex > 0) {
             // 使用預覽圖
@@ -246,7 +248,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                             textView.setFocusable(true)
                             textView.isLongClickable = true
                             textView.setTextColor(originalColor)
-                            textView.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
+                            textView.setLinkTextColor(getThemeColor(context, R.attr.bahamut_linkColor))
 
                             addMenuItemSearch(textView)
                             stringNewUrlSpan(textView)
@@ -366,22 +368,26 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         target.customSelectionActionModeCallback = selfMenu
     }
 
-    fun setQuote(quote: Int) {
-        myQuote = quote
-        
-        // 之前的引用文章
+    /** 動態更新文章項目背景與文字顏色以符合當前主題 */
+    fun updateThemeColors() {
+        contentView?.setBackgroundColor(getThemeColor(context, R.attr.bahamut_pageBackground))
+        contentLabel?.setLinkTextColor(getThemeColor(context, R.attr.bahamut_linkColor))
         if (myQuote > 0) {
-            val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor1)
-            val contentColor = getThemeColor(R.attr.bahamut_articleContentColor1)
+            val authorColor = getThemeColor(context, R.attr.bahamut_articleAuthorColor1)
+            val contentColor = getThemeColor(context, R.attr.bahamut_articleContentColor1)
             if (authorColor != -1) authorLabel?.setTextColor(authorColor)
             if (contentColor != -1) contentLabel?.setTextColor(contentColor)
         } else {
-            // 使用者回文
-            val authorColor = getThemeColor(R.attr.bahamut_articleAuthorColor0)
-            val contentColor = getThemeColor(R.attr.bahamut_articleContentColor0)
+            val authorColor = getThemeColor(context, R.attr.bahamut_articleAuthorColor0)
+            val contentColor = getThemeColor(context, R.attr.bahamut_articleContentColor0)
             if (authorColor != -1) authorLabel?.setTextColor(authorColor)
             if (contentColor != -1) contentLabel?.setTextColor(contentColor)
         }
+    }
+
+    fun setQuote(quote: Int) {
+        myQuote = quote
+        updateThemeColors()
     }
 
     override val type: Int
@@ -406,7 +412,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
     private fun applyBlocklistMask(spannable: SpannableStringBuilder) {
         // Using R.color.black as the mask color. Ensure this color is defined in your colors.xml.
         val blocklist = UserSettings.blockList
-        val maskedColor = getThemeColor(R.attr.bahamut_dividerColor)
+        val maskedColor = getThemeColor(context, R.attr.bahamut_dividerColor)
 
         for (blockName in blocklist) {
             var index = spannable.indexOf(blockName, ignoreCase = true)
