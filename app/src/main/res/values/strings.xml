@@ -335,6 +335,11 @@
     <string name="theme_manager_page_guide">請點選上方按鈕切換佈景主題</string>
     <string name="theme_manager_page_chapter_update">套用新設定</string>
     <string name="apply">套用</string>
+    <string name="done">完成</string>
+    <string name="post_toolbar_edit_title">編輯按鈕順序</string>
+    <string name="post_toolbar_edit_hint">點擊 ▲ / ▼ 按鈕即可調整工具列位置</string>
+    <string name="post_toolbar_row_1">Row 1</string>
+    <string name="post_toolbar_row_2">Row 2</string>
     <string name="theme_manager_page_msg01">外觀套用新設定完畢</string>
     <string name="user_info">個人資料</string>
     <string name="user_info_nick_name">暱稱</string>

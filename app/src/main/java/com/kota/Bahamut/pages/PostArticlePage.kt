@@ -7,6 +7,8 @@ import android.text.Selection
 import android.util.TypedValue
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.ViewGroup
+import com.kota.Bahamut.service.UserSettings
 import android.view.animation.DecelerateInterpolator
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
@@ -201,6 +203,8 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .setOnClickListener(postToolbarShowOnClickListener)
         mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Reference)!!
             .setOnClickListener(referenceClickListener)
+
+        applyToolbarOrder()
     }
 
     override fun clear() {
@@ -305,7 +309,45 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             val intent = Intent(TempSettings.myActivity, DialogShortenImage::class.java)
             startActivity(intent)
         } else if (view.id == R.id.ArticlePostDialog_EditButtons) {
-            showShortToast(getContextString(R.string.error_under_develop))
+            val dialog = com.kota.Bahamut.dialogs.DialogPostToolbarEdit(this)
+            dialog.show()
+        }
+    }
+
+    /** 依據使用者設定動態套用發文工具列按鈕順序 */
+    fun applyToolbarOrder() {
+        val rowPrimary = mainLayout?.findViewById<LinearLayout>(R.id.toolbar_row_primary) ?: return
+        val rowExtended = mainLayout?.findViewById<LinearLayout>(R.id.toolbar_row_extended) ?: return
+
+        val buttonMap = mapOf(
+            "REFERENCE" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Reference),
+            "SYMBOL" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Cancel),
+            "FACE" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Symbol),
+            "COLOR" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_Color),
+            "FILE" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_File),
+            "SHORTEN_URL" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenUrl),
+            "SHORTEN_IMAGE" to mainLayout?.findViewById<View>(R.id.ArticlePostDialog_ShortenImage)
+        )
+
+        val keys = UserSettings.propertiesPostToolbarOrder.split(",")
+
+        // 從原本的 parent 中移除這 7 個 View
+        buttonMap.values.forEach { view ->
+            (view?.parent as? ViewGroup)?.removeView(view)
+        }
+
+        // 按順序加入回對應的列插槽 (Row 1 Index 2, 4, 6 及 Row 0 Index 0, 2, 4, 6)
+        keys.forEachIndexed { slotIndex, key ->
+            val view = buttonMap[key] ?: return@forEachIndexed
+            when (slotIndex) {
+                0 -> rowPrimary.addView(view, 2)
+                1 -> rowPrimary.addView(view, 4)
+                2 -> rowPrimary.addView(view, 6)
+                3 -> rowExtended.addView(view, 0)
+                4 -> rowExtended.addView(view, 2)
+                5 -> rowExtended.addView(view, 3) // rowExtended currently has 4 slots
+                6 -> rowExtended.addView(view, 6)
+            }
         }
     }
 

@@ -119,6 +119,8 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_WEB_PASSWORD: String = "WebPassword" // Web 登入密碼 (不雲端同步)
         const val PROPERTIES_WEB_DEBUG_VIEW: String = "WebDebugView" // 顯示 Web 登入除錯視窗 (不雲端同步)
         const val PROPERTIES_FOLLOW_SYSTEM_DARK_MODE: String = "FollowSystemDarkMode" // 跟隨系統深色模式
+        const val PROPERTIES_POST_TOOLBAR_ORDER: String = "PostToolbarOrder" // 發文工具列按鈕順序
+        const val POST_TOOLBAR_ORDER_DEFAULT: String = "REFERENCE,SYMBOL,FACE,COLOR,FILE,SHORTEN_URL,SHORTEN_IMAGE"
 
         // 執行階段比較不重要的設定
         const val FLOATING_LOCATION_X: String = "floatingLocationX" // 浮動工具列位置 X
@@ -640,6 +642,19 @@ class UserSettings(var myContext: Context) {
                     NON_VIP_SHORTEN_TIMES_LIMIT,
                     times
                 ).commit()
+            }
+
+        @JvmStatic
+        var propertiesPostToolbarOrder: String
+            get() {
+                var order = mySharedPref?.getString(PROPERTIES_POST_TOOLBAR_ORDER, POST_TOOLBAR_ORDER_DEFAULT)
+                if (order.isNullOrBlank()) {
+                    order = POST_TOOLBAR_ORDER_DEFAULT
+                }
+                return order
+            }
+            set(order) {
+                myEditor!!.putString(PROPERTIES_POST_TOOLBAR_ORDER, order).commit()
             }
 
         fun setPropertiesShortUrlNonId(enable: Boolean) {

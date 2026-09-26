@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?attr/bahamut_dialogBorderColor"
+    android:padding="3dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:id="@+id/dialog_post_toolbar_edit_content_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/bahamut_pageBackground"
+        android:orientation="vertical"
+        android:padding="1dp">
+
+        <com.kota.telnetUI.textView.TelnetTextViewLarge
+            style="@style/TextViewLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/bahamut_dialogTitleBackground"
+            android:padding="6dp"
+            android:text="@string/post_toolbar_edit_title"
+            android:textColor="?attr/bahamut_dialogTitleTextColor" />
+
+        <View style="@style/HorizontalDivider" />
+
+        <com.kota.telnetUI.textView.TelnetTextViewSmall
+            style="@style/TextViewSmall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="8dp"
+            android:text="@string/post_toolbar_edit_hint"
+            android:textColor="?attr/bahamut_defaultTextColor" />
+
+        <View style="@style/HorizontalDivider" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:id="@+id/PostToolbarEdit_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/bahamut_itemBackground"
+                android:orientation="vertical" />
+        </ScrollView>
+
+        <View style="@style/ToolbarDivider.Horizontal" />
+
+        <LinearLayout
+            android:id="@+id/toolbar"
+            style="@style/toolbar">
+
+            <Button
+                android:id="@+id/PostToolbarEdit_Done"
+                style="@style/DialogToolbarItem"
+                android:layout_width="match_parent"
+                android:text="@string/done" />
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>
