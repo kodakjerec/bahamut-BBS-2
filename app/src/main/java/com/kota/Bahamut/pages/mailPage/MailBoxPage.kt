@@ -75,7 +75,9 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
     override fun onPageRefresh() {
         super.onPageRefresh()
         val myListCount = getItemSize()
-        headerItemView.setData("我的信箱", "您有 $myListCount 封信在信箱內", "")
+        val hasNotification = com.kota.Bahamut.BahamutStateHandler.bahamutStateHandler?.hasSystemNotification == true
+        val title = if (hasNotification) "系統精靈送信來了" else "我的信箱"
+        headerItemView.setData(title, "您有 $myListCount 封信在信箱內", "")
     }
 
     override fun onBackPressed(): Boolean {

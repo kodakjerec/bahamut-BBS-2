@@ -681,13 +681,14 @@ open class BoardMainPage : TelnetListPage(),
 
     /** 更新headerView  */
     fun refreshHeaderView() {
-        var boardTitle1 = boardTitle
+        val hasNotification = BahamutStateHandler.bahamutStateHandler?.hasSystemNotification == true
+        var boardTitle1 = if (hasNotification) "系統精靈送信來了" else boardTitle
         boardTitle1 = boardTitle1.ifEmpty { getContextString(R.string.loading) }
         var boardManager1 = boardManager
         boardManager1 = boardManager1.ifEmpty { getContextString(R.string.loading) }
         val boardName = listName
-        val headerView = mainLayout.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
-        headerView.setData(boardTitle1, boardName, boardManager1)
+        val headerView = mainLayout?.findViewById<BoardHeaderView>(R.id.BoardPage_HeaderView)
+        headerView?.setData(boardTitle1, boardName, boardManager1)
     }
 
     override fun getListIdFromListName(aName: String?): String? {

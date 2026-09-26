@@ -101,6 +101,9 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         this.myArticleNumber = aArticleNumber
     }
 
+    var hasSystemNotification: Boolean = false
+        private set
+
     /**
      * 載入當前 Telnet 畫面狀態
      *
@@ -130,6 +133,41 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
         }
         this.firstHeader = getHeader(this.rowString00)
         this.lastHeader = getHeader(this.rowStringFinal)
+
+        // 偵測 Telnet 畫面是否有系統通知 (如：系統精靈送信來了)
+        val newNotification = checkSystemNotification()
+        if (newNotification != hasSystemNotification) {
+            hasSystemNotification = newNotification
+            notifyHeaderRedraw()
+        } else if (hasSystemNotification) {
+            notifyHeaderRedraw()
+        }
+    }
+
+    /** 檢查當前 Telnet 畫面是否包含系統通知 (系統精靈) */
+    private fun checkSystemNotification(): Boolean {
+        for (row in telnetRows) {
+            val content = row.toContentString()
+            if (content.contains("系統精靈送信來了") || content.contains("系統精靈")) {
+                return true
+            }
+        }
+        if (this.rowString00.contains("系統精靈") || this.rowString01.contains("系統精靈") || this.rowStringFinal.contains("系統精靈")) {
+            return true
+        }
+        return false
+    }
+
+    /** 立即通知當前最上層頁面更新 HeaderView */
+    fun notifyHeaderRedraw() {
+        ASCoroutine.ensureMainThread {
+            val topPage = com.kota.asFramework.pageController.ASNavigationController.currentController?.topController as? TelnetPage
+            if (topPage is BoardMainPage) {
+                topPage.refreshHeaderView()
+            } else if (topPage != null) {
+                topPage.onPageRefresh()
+            }
+        }
     }
 
     /**

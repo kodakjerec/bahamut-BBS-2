@@ -172,24 +172,21 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             val rawX = event.rawX
             val rawY = event.rawY
 
-            // 當觸控點在 ToolBarFloating 範圍以外時，自動將工具列移動到對應的 Y 軸，X 軸保持不變
+            // 當觸控點在 ToolBarFloating 範圍以外時，移動到點擊對應的 Y 軸；若點擊在中線左側，貼合左緣，右側則貼合右緣
             if (!isTouchInsideToolbar(rawX, rawY)) {
-                moveToY(rawY)
+                moveToXAndY(rawX, rawY)
             }
         }
     }
 
-    private fun moveToY(rawY: Float) {
+    private fun moveToXAndY(rawX: Float, rawY: Float) {
         val location = IntArray(2)
         rootView?.getLocationOnScreen(location)
         val pointY = rawY - scale * 60 - location[1].toFloat()
+        val pointX = rawX - location[0].toFloat()
 
-        // 取得當前 X 軸左邊距 leftMargin
-        val params = mainLayout?.layoutParams as? LayoutParams
-        val currentLeftMargin = params?.leftMargin?.toFloat() ?: 0f
-
-        // 更新 Layout，帶入當前的 X 軸位置保持靠左或靠右不變
-        updateLayout(currentLeftMargin, pointY, dragging = false)
+        // 更新 Layout，帶入點擊之 X 與 Y 座標，非拖曳狀態下會依據點擊 X 位置靠左或靠右吸附
+        updateLayout(pointX, pointY, dragging = false)
     }
 
     private fun getBarWidth(): Float {
@@ -235,9 +232,8 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             // 拖曳中：即時跟隨手指，並限制在螢幕可視寬度內
             finalX = finalX.coerceIn(0f, maxRightX)
         } else {
-            // 拖曳結束放開或初始化：判斷使用者觸控/中心點位置，遵循靠左 (X=0) 或靠右 (X=maxRightX) 原則
-            val touchCenterX = targetX + barWidth / 2f
-            finalX = if (touchCenterX <= screenWidth / 2f) {
+            // 拖曳結束放開、初始化或外面點擊：判斷觸控/點擊位置相對於螢幕中線 (screenWidth / 2f)
+            finalX = if (targetX <= screenWidth / 2f) {
                 0f
             } else {
                 maxRightX

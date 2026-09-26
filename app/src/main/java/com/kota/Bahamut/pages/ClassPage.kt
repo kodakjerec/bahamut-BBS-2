@@ -79,7 +79,8 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     override fun onPageRefresh() {
         super.onPageRefresh()
         updateToolbarColors()
-        var title = this.title
+        val hasNotification = com.kota.Bahamut.BahamutStateHandler.bahamutStateHandler?.hasSystemNotification == true
+        var title = if (hasNotification) "系統精靈送信來了" else this.title
         if (title == null || title.isEmpty()) {
             title = getContextString(R.string.loading)
         }
