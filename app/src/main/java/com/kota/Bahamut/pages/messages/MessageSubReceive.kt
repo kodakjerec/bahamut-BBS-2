@@ -12,6 +12,7 @@ import android.widget.TextView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.articlePage.MyUrlSpan
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -123,6 +124,7 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
                         textView.isLongClickable = true
                         textView.background = txtMessageBackgroundColor
                         textView.maxWidth = txtMessageMaxWidth
+                        textView.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
                         stringNewUrlSpan(textView)
                     } else if (view.javaClass == ThumbnailItemView::class.java) {
                         val thumbnail = view as ThumbnailItemView
@@ -131,6 +133,7 @@ class MessageSubReceive(context: Context): RelativeLayout(context) {
                 }
             }
         } else {
+            txtMessage.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
             stringNewUrlSpan(txtMessage)
         }
     }

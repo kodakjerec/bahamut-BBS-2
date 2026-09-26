@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.SearchManager
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.SpannableStringBuilder
@@ -24,7 +23,6 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
-import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
@@ -58,6 +56,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
             .inflate(R.layout.article_page_text_item_view, this)
         authorLabel = findViewById(R.id.ArticleTextItemView_Title)
         contentLabel = findViewById(R.id.ArticleTextItemView_content)
+        contentLabel?.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
         dividerView = findViewById(R.id.ArticleTextItemView_DividerView)
         contentView = findViewById(R.id.ArticleTextItemView_contentView)
         setBackgroundResource(R.color.transparent)
@@ -247,6 +246,7 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
                             textView.setFocusable(true)
                             textView.isLongClickable = true
                             textView.setTextColor(originalColor)
+                            textView.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
 
                             addMenuItemSearch(textView)
                             stringNewUrlSpan(textView)

@@ -3,11 +3,8 @@ package com.kota.Bahamut.pages
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
-import android.content.res.Configuration
 import android.os.PowerManager
 import android.view.View
-import android.widget.Button
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -17,7 +14,6 @@ import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogHeroStep
 import com.kota.Bahamut.pages.messages.MessageDatabase
-import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.HeroStep
 import com.kota.Bahamut.service.NotificationSettings.getAlarmIgnoreBatteryOptimizations
@@ -147,9 +143,6 @@ class MainPage : TelnetPage() {
         // 檢查不斷線掛網
         checkBatteryLife()
 
-        // 更新主題顏色
-        updateThemeColors()
-
         // 自動登入洽特
         if (TempSettings.isUnderAutoToChat) {
             object : ASCoroutine() {
@@ -163,43 +156,7 @@ class MainPage : TelnetPage() {
     }
 
     override fun onPageRefresh() {
-        updateThemeColors()
         setFrameToTelnetView()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        updateThemeColors()
-    }
-
-    /** 動態更新主畫面項目文字與工具列顏色 */
-    fun updateThemeColors() {
-        val buttonTextColor = CommonFunctions.getThemeColorStateList(R.attr.bahamut_buttonTextColor)
-        if (buttonTextColor != null) {
-            mainLayout?.findViewById<TextView>(R.id.Main_HeroStepButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<TextView>(R.id.Main_BoardsButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<TextView>(R.id.Main_ClassButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<TextView>(R.id.Main_FavoriteButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<Button>(R.id.Main_LogoutButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<Button>(R.id.Main_MailButton)?.setTextColor(buttonTextColor)
-            mainLayout?.findViewById<Button>(R.id.Main_SystemSettingsButton)?.setTextColor(buttonTextColor)
-        }
-
-        val statusTextColor = CommonFunctions.getThemeColorStateList(R.attr.bahamut_mainStatusTextColor)
-        if (statusTextColor != null) {
-            mainLayout?.findViewById<TextView>(R.id.Main_OnlinePeople)?.setTextColor(statusTextColor)
-            mainLayout?.findViewById<TextView>(R.id.Main_BBCall)?.setTextColor(statusTextColor)
-        }
-
-        val bgRes = CommonFunctions.getThemeResourceId(R.attr.bahamut_toolbarItemBackground)
-        if (bgRes != 0) {
-            mainLayout?.findViewById<Button>(R.id.Main_LogoutButton)?.setBackgroundResource(bgRes)
-            mainLayout?.findViewById<Button>(R.id.Main_MailButton)?.setBackgroundResource(bgRes)
-            mainLayout?.findViewById<Button>(R.id.Main_SystemSettingsButton)?.setBackgroundResource(bgRes)
-        }
-
-        val pageBg = CommonFunctions.getThemeColor(R.attr.bahamut_pageBackground)
-        (mainLayout?.getChildAt(0) as? FrameLayout)?.setBackgroundColor(pageBg)
     }
 
     private fun setFrameToTelnetView() {

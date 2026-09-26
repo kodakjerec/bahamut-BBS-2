@@ -13,6 +13,7 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.articlePage.MyUrlSpan
 import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
+import com.kota.Bahamut.service.CommonFunctions.getThemeColor
 import com.kota.Bahamut.service.UserSettings
 import com.kota.asFramework.thread.ASCoroutine
 import java.text.SimpleDateFormat
@@ -108,7 +109,7 @@ class MessageSubSend(context: Context): RelativeLayout(context) {
                     var urlSpanEnd = originalString.getSpanEnd(urlSpan)
                     val partA = originalString.subSequence(previousIndex, urlSpanEnd)
                     textView1.text = partA
-                    textView1.setLinkTextColor(getContextColor(R.color.text_color_link))
+                    textView1.setLinkTextColor(getThemeColor(R.attr.bahamut_linkColor))
 
                     // check error
                     if (urlSpanEnd + 1 <= originalString.length) urlSpanEnd += 1

@@ -67,7 +67,7 @@
                     android:id="@+id/LoginWebSignInSettings"
                     android:layout_alignParentTop="true"
                     android:layout_marginStart="8dp"
-                    android:textColor="@color/text_color_link"
+                    android:textColor="?attr/bahamut_linkColor"
                     android:text="@string/login_web_settings_btn" />
             </RelativeLayout>
 

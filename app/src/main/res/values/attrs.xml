@@ -19,6 +19,7 @@
     <attr name="bahamut_sliderInactiveColor" format="reference|color" />
     <attr name="bahamut_sliderThumbColor" format="reference|color" />
     <attr name="bahamut_mainStatusTextColor" format="reference|color" />
+    <attr name="bahamut_linkColor" format="reference|color" />
 
     <!-- 選擇文章對話框相關 -->
     <attr name="bahamut_dialogSelectArticleFocusedColor" format="reference|color" />
