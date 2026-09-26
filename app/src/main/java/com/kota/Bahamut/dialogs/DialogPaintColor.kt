@@ -19,7 +19,7 @@ import com.kota.asFramework.dialog.ASDialog
 import com.kota.telnet.reference.TelnetAnsiCode.getBackgroundColor
 import com.kota.telnet.reference.TelnetAnsiCode.getTextColor
 
-class DialogPaintColor : ASDialog(), View.OnClickListener {
+class DialogPaintColor(theme: Int = com.kota.Bahamut.pages.theme.ThemeStore.getDialogThemeResId()) : ASDialog(theme), View.OnClickListener {
     var mainLayout: LinearLayout
     var isRecovery: Boolean = true
     var isHighlight: Boolean = false
@@ -121,26 +121,22 @@ class DialogPaintColor : ASDialog(), View.OnClickListener {
             }
 
         // 前景
-        val adapterFrontColor = ArrayAdapter(
-            context,
-            R.layout.simple_spinner_item,
-            context.resources.getStringArray(R.array.dialog_paint_color_items)
-        )
-        adapterFrontColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         frontColorSpinner =
             mainLayout.findViewById<Spinner>(R.id.post_article_page_paint_color_front_spinner)
+        val adapterFrontColor = com.kota.Bahamut.service.CommonFunctions.createSpinnerAdapter(
+            context,
+            context.resources.getStringArray(R.array.dialog_paint_color_items)
+        ) { frontColorSpinner.selectedItemPosition }
         frontColorSpinner.adapter = adapterFrontColor
         frontColorSpinner.onItemSelectedListener = frontColorListener
 
         // 背景
-        val adapterBackColor = ArrayAdapter(
-            context,
-            R.layout.simple_spinner_item,
-            context.resources.getStringArray(R.array.dialog_paint_color_items)
-        )
-        adapterBackColor.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         backColorSpinner =
             mainLayout.findViewById<Spinner>(R.id.post_article_page_paint_color_back_spinner)
+        val adapterBackColor = com.kota.Bahamut.service.CommonFunctions.createSpinnerAdapter(
+            context,
+            context.resources.getStringArray(R.array.dialog_paint_color_items)
+        ) { backColorSpinner.selectedItemPosition }
         backColorSpinner.adapter = adapterBackColor
         backColorSpinner.onItemSelectedListener = backColorListener
 

@@ -2,9 +2,10 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:background="?attr/bahamut_dialogBorderColor"
     android:padding="3dp"
-    android:layout_width="260dp"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content">
     <LinearLayout
+        android:id="@+id/dialog_post_article_content_view"
         android:orientation="vertical"
         android:background="?attr/bahamut_pageBackground"
         android:padding="1dp"
@@ -106,7 +107,8 @@
 
                     <Spinner
                         android:id="@+id/sign_spinner"
-                        style="@style/SpinnerStyle" />
+                        style="@style/SpinnerStyle"
+                        android:popupBackground="?attr/bahamut_pageBackground" />
                 </LinearLayout>
 
                 <View style="@style/ToolbarDivider.Horizontal" />

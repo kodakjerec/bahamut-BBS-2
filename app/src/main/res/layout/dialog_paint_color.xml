@@ -1,28 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
     android:background="?attr/bahamut_dialogBorderColor"
-    android:id="@+id/dialog_paint_color_content_view"
-    android:orientation="vertical"
-    android:padding="3dp">
+    android:padding="3dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:id="@+id/dialog_paint_color_content_view"
         android:orientation="vertical"
-        android:background="?attr/bahamut_pageBackground">
+        android:background="?attr/bahamut_pageBackground"
+        android:padding="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
         <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:textColor="?attr/bahamut_dialogTitleTextColor" android:background="?attr/bahamut_dialogTitleBackground" android:padding="6dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="@string/post_article_page_paint_color" style="@style/TextViewLarge"/>
+            android:textColor="?attr/bahamut_dialogTitleTextColor"
+            android:background="?attr/bahamut_dialogTitleBackground"
+            android:padding="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/post_article_page_paint_color"
+            style="@style/TextViewLarge"/>
         <View style="@style/HorizontalDivider" />
-        <ScrollView android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1">
-            <LinearLayout android:orientation="vertical" android:background="?attr/bahamut_itemBackground" android:layout_width="match_parent" android:layout_height="wrap_content">
-                <RelativeLayout android:id="@+id/dialog_paint_color_check_recovery_item" style="@style/SystemSettingsItem">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:orientation="vertical"
+                android:background="?attr/bahamut_itemBackground"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:id="@+id/dialog_paint_color_check_recovery_item"
+                    style="@style/SystemSettingsItem">
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
-                        android:text="@string/post_article_page_paint_color_recovery" style="@style/SystemSettingsCheckboxText"/>
+                        android:text="@string/post_article_page_paint_color_recovery"
+                        style="@style/SystemSettingsCheckboxText"/>
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
-                        android:text="@string/post_article_page_paint_color_recovery2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
-                    <CheckBox android:id="@+id/dialog_paint_color_check_recovery" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/post_article_page_paint_color_recovery" android:checked="true" />
+                        android:text="@string/post_article_page_paint_color_recovery2"
+                        style="@style/SystemSettingsCheckboxText"
+                        android:paddingStart="60dp"
+                        android:textColor="@color/halfWhite"/>
+                    <CheckBox
+                        android:id="@+id/dialog_paint_color_check_recovery"
+                        style="@style/SystemSettingsCheckbox"
+                        android:contentDescription="@string/post_article_page_paint_color_recovery"
+                        android:checked="true" />
                 </RelativeLayout>
                 <RelativeLayout style="@style/SystemSettingsItem">
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
@@ -34,9 +56,14 @@
                         android:paddingStart="60dp"
                         android:textColor="@color/halfWhite"
                         tools:ignore="RtlSymmetry" />
-                    <Spinner android:id="@+id/post_article_page_paint_color_front_spinner"
-                        style="@style/SystemSettingsCheckbox"
-                        android:layout_width="90dp" />
+                    <Spinner
+                        android:id="@+id/post_article_page_paint_color_front_spinner"
+                        style="@style/SpinnerStyle"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:popupBackground="?attr/bahamut_pageBackground" />
                 </RelativeLayout>
                 <RelativeLayout style="@style/SystemSettingsItem">
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
@@ -50,17 +77,30 @@
                         tools:ignore="RtlSymmetry"/>
                     <Spinner
                         android:id="@+id/post_article_page_paint_color_back_spinner"
+                        style="@style/SpinnerStyle"
+                        android:layout_width="120dp"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentEnd="true"
+                        android:popupBackground="?attr/bahamut_pageBackground" />
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/dialog_paint_color_check_highlight_item"
+                    style="@style/SystemSettingsItem">
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_highlight"
+                        style="@style/SystemSettingsCheckboxText"/>
+                    <com.kota.telnetUI.textView.TelnetTextViewLarge
+                        android:text="@string/post_article_page_paint_color_highlight2"
+                        style="@style/SystemSettingsCheckboxText"
+                        android:paddingStart="60dp"
+                        android:textColor="@color/halfWhite"/>
+                    <CheckBox
+                        android:id="@+id/dialog_paint_color_check_highlight"
                         style="@style/SystemSettingsCheckbox"
-                        android:layout_width="90dp"/>
+                        android:contentDescription="@string/post_article_page_paint_color_highlight" />
                 </RelativeLayout>
-                <RelativeLayout android:id="@+id/dialog_paint_color_check_highlight_item" style="@style/SystemSettingsItem">
-                    <com.kota.telnetUI.textView.TelnetTextViewLarge
-                        android:text="@string/post_article_page_paint_color_highlight" style="@style/SystemSettingsCheckboxText"/>
-                    <com.kota.telnetUI.textView.TelnetTextViewLarge
-                        android:text="@string/post_article_page_paint_color_highlight2" style="@style/SystemSettingsCheckboxText" android:paddingStart="60dp" android:textColor="@color/halfWhite"/>
-                    <CheckBox android:id="@+id/dialog_paint_color_check_highlight" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/post_article_page_paint_color_highlight" />
-                </RelativeLayout>
-                <View style="@style/BlockDividerHorizontal"/>
+                <View style="@style/HorizontalDivider"/>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -83,13 +123,14 @@
                         android:gravity="center"
                         android:text="@string/dialog_paint_color_sample_ch" />
                 </LinearLayout>
+
+                <View style="@style/ToolbarDivider.Horizontal"/>
+                <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
+                    <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
+                    <View style="@style/ToolbarDivider"/>
+                    <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
-        <View style="@style/ToolbarDivider.Horizontal"/>
-        <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
-            <Button android:id="@+id/cancel" android:text="@string/cancel" style="@style/DialogToolbarItem"/>
-            <View style="@style/ToolbarDivider"/>
-            <Button android:id="@+id/send" android:text="@string/send" style="@style/DialogToolbarItem"/>
-        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</FrameLayout>

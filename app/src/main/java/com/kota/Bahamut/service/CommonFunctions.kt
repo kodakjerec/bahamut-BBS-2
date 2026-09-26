@@ -6,7 +6,12 @@ import android.content.pm.ActivityInfo
 import android.content.res.ColorStateList
 import android.util.Log
 import android.util.TypedValue
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.kota.Bahamut.R
 import com.kota.telnet.reference.TelnetDef
 import com.kota.textEncoder.B2UEncoder
 import com.kota.textEncoder.U2BEncoder
@@ -115,6 +120,39 @@ object CommonFunctions {
     fun getThemeResourceId(attrItem: Int): Int {
         val context = TempSettings.myContext ?: return 0
         return getThemeResourceId(context, attrItem)
+    }
+
+    /** 建立下拉選單 Adapter，設定項目高度 (48dp) 與被選取項目的主題高亮色彩 */
+    @JvmStatic
+    fun createSpinnerAdapter(
+        context: Context,
+        items: Array<out Any?>,
+        getSelectedPosition: () -> Int
+    ): ArrayAdapter<Any?> {
+        val adapter = object : ArrayAdapter<Any?>(context, R.layout.simple_spinner_item, items) {
+            override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getView(position, convertView, parent)
+                if (view is TextView) {
+                    view.setTextColor(getThemeColor(parent.context, R.attr.bahamut_defaultTextColor))
+                }
+                return view
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                if (view is TextView) {
+                    val isSelected = (position == getSelectedPosition())
+                    if (isSelected) {
+                        view.setTextColor(getThemeColor(parent.context, R.attr.bahamut_spinnerSelectedTextColor))
+                    } else {
+                        view.setTextColor(getThemeColor(parent.context, R.attr.bahamut_defaultTextColor))
+                    }
+                }
+                return view
+            }
+        }
+        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item)
+        return adapter
     }
 
     /** 輸入 R.string.XX 回傳 文字內容(string)

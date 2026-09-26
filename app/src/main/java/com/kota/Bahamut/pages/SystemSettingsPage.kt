@@ -6,6 +6,7 @@ import android.content.Intent
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
@@ -432,14 +433,11 @@ class SystemSettingsPage : TelnetPage() {
             .setOnClickListener { view: View? -> articleMoveEnableBox.isChecked = !articleMoveEnableBox.isChecked }
 
         // 螢幕方向
-        val adapterScreenOrientation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-            myContext!!,
-            R.layout.simple_spinner_item,
-            resource?.getStringArray(R.array.system_setting_page_screen_orientation_items) ?: arrayOf()
-        )
-        adapterScreenOrientation.setDropDownViewResource(R.layout.simple_spinner_item)
         val spinnerScreenOrientation =
             mainLayout?.findViewById<Spinner>(R.id.SystemSettings_screen_orientation_spinner)!!
+        val adapterScreenOrientation = createSpinnerAdapter(
+            resource?.getStringArray(R.array.system_setting_page_screen_orientation_items) ?: arrayOf()
+        ) { spinnerScreenOrientation.selectedItemPosition }
         spinnerScreenOrientation.adapter = adapterScreenOrientation
         spinnerScreenOrientation.setSelection(propertiesScreenOrientation)
         spinnerScreenOrientation.onItemSelectedListener = screenOrientationListener
@@ -496,27 +494,21 @@ class SystemSettingsPage : TelnetPage() {
                 .setOnClickListener { view: View? -> autoToChatEnableBox.isChecked = !autoToChatEnableBox.isChecked }
 
             // 工具列位置
-            val adapterToolbarLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_toolbar_location_items) ?: arrayOf()
-            )
-            adapterToolbarLocation.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerToolbarLocation =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_location_spinner)!!
+            val adapterToolbarLocation = createSpinnerAdapter(
+                resource?.getStringArray(R.array.system_setting_page_toolbar_location_items) ?: arrayOf()
+            ) { spinnerToolbarLocation.selectedItemPosition }
             spinnerToolbarLocation.adapter = adapterToolbarLocation
             spinnerToolbarLocation.setSelection(propertiesToolbarLocation)
             spinnerToolbarLocation.onItemSelectedListener = toolbarLocationListener
 
             // 工具列順序
-            val adapterToolbarOrder: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_toolbar_order_items) ?: arrayOf()
-            )
-            adapterToolbarOrder.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerToolbarOrder =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_toolbar_order_spinner)!!
+            val adapterToolbarOrder = createSpinnerAdapter(
+                resource?.getStringArray(R.array.system_setting_page_toolbar_order_items) ?: arrayOf()
+            ) { spinnerToolbarOrder.selectedItemPosition }
             spinnerToolbarOrder.adapter = adapterToolbarOrder
             spinnerToolbarOrder.setSelection(propertiesToolbarOrder)
             spinnerToolbarOrder.onItemSelectedListener = toolbarOrderListener
@@ -556,14 +548,11 @@ class SystemSettingsPage : TelnetPage() {
                 textSmallAlpha.text = value.toInt().toString() + "%"
             }
             // 側滑選單位置
-            val adapterDrawerLocation: ArrayAdapter<Any> = ArrayAdapter<Any>(
-                myContext!!,
-                R.layout.simple_spinner_item,
-                resource?.getStringArray(R.array.system_setting_page_drawer_location_items) ?: arrayOf()
-            )
-            adapterDrawerLocation.setDropDownViewResource(R.layout.simple_spinner_item)
             val spinnerDrawerLocation =
                 mainLayout?.findViewById<Spinner>(R.id.SystemSettings_drawer_location_spinner)!!
+            val adapterDrawerLocation = createSpinnerAdapter(
+                resource?.getStringArray(R.array.system_setting_page_drawer_location_items) ?: arrayOf()
+            ) { spinnerDrawerLocation.selectedItemPosition }
             spinnerDrawerLocation.adapter = adapterDrawerLocation
             spinnerDrawerLocation.setSelection(propertiesDrawerLocation)
             spinnerDrawerLocation.onItemSelectedListener = drawerLocationListener
@@ -650,6 +639,11 @@ class SystemSettingsPage : TelnetPage() {
 
     val name: String
         get() = "TelnetSystemSettingsDialog"
+
+    /** 建立下拉選單 Adapter，設定項目高度 (48dp) 與被選取項目的主題高亮色彩 */
+    private fun createSpinnerAdapter(items: Array<out Any?>, getSelectedPosition: () -> Int): ArrayAdapter<Any?> {
+        return com.kota.Bahamut.service.CommonFunctions.createSpinnerAdapter(myContext!!, items, getSelectedPosition)
+    }
 
     override fun onBackPressed(): Boolean {
         notifyDataUpdated()

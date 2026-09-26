@@ -16,9 +16,11 @@
 
         <Spinner
             android:id="@+id/Post_headerSelector"
-            android:layout_width="65dp"
+            style="@style/SpinnerStyle"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:background="@null"
+            android:popupBackground="?attr/bahamut_pageBackground"
             android:textSize="19sp" />
 
         <FrameLayout

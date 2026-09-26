@@ -9,7 +9,7 @@ import com.kota.Bahamut.R
 import com.kota.asFramework.dialog.ASDialog
 import com.kota.telnet.TelnetArticle
 
-class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
+class DialogPostArticle(aTarget: Int, theme: Int = com.kota.Bahamut.pages.theme.ThemeStore.getDialogThemeResId()) : ASDialog(theme), View.OnClickListener {
     var cancelButton: Button
     var dialogPostArticleListener: DialogPostArticleListener? = null
     var postTargetRadioGroup: RadioGroup
@@ -36,17 +36,16 @@ class DialogPostArticle(aTarget: Int) : ASDialog(), View.OnClickListener {
             replyTargetView.visibility = View.VISIBLE
         }
         this.signSpinner = findViewById<Spinner>(R.id.sign_spinner)
-        val adapter = ArrayAdapter.createFromResource(
+        val adapter = com.kota.Bahamut.service.CommonFunctions.createSpinnerAdapter(
             context,
-            R.array.reply_target_list,
-            R.layout.simple_spinner_item
-        )
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            context.resources.getStringArray(R.array.reply_target_list)
+        ) { this.signSpinner.selectedItemPosition }
         this.signSpinner.adapter = adapter
         this.sendButton.tag = "ToolbarItem.Danger"
         this.cancelButton.tag = "ToolbarItem.Danger"
         this.sendButton.setOnClickListener(this)
         this.cancelButton.setOnClickListener(this)
+        setDialogWidth(findViewById(R.id.dialog_post_article_content_view))
     }
 
     override fun onClick(view: View?) {

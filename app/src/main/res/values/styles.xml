@@ -16,6 +16,7 @@
 
         <!-- 自定義主題色彩屬性 -->
         <item name="bahamut_linkColor">@color/text_color_link</item>
+        <item name="bahamut_spinnerSelectedTextColor">@color/board_page_item_view_status</item>
         <item name="bahamut_titleBarBackground">@color/title_bar_background</item>
         <item name="bahamut_toolbarDivider">@color/page_background</item>
         <item name="bahamut_buttonTextColor">@color/button_text_color</item>
@@ -142,6 +143,7 @@
 
     <!-- eInk 主題 (白底黑字) -->
     <style name="MyTheme.eInk" parent="MyTheme">
+        <item name="bahamut_spinnerSelectedTextColor">@color/black</item>
         <item name="bahamut_linkColor">@color/black</item>
         <item name="bahamut_pageBackground">@color/white</item>
         <item name="bahamut_defaultTextColor">@color/black</item>
@@ -230,6 +232,7 @@
 
     <!-- eInk 主題 (深色模式 - 黑白對調，高對比亮灰/純白配色) -->
     <style name="MyTheme.eInk.Dark" parent="MyTheme.eInk">
+        <item name="bahamut_spinnerSelectedTextColor">@color/white</item>
         <item name="bahamut_linkColor">@color/white</item>
         <item name="bahamut_toolbarDivider">@color/white</item>
         <item name="bahamut_pageBackground">@color/black</item>
@@ -478,6 +481,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:textColorLink">?attr/bahamut_linkColor</item>
         <item name="bahamut_linkColor">@color/text_color_link</item>
+        <item name="bahamut_spinnerSelectedTextColor">@color/board_page_item_view_status</item>
         <item name="bahamut_defaultTextColor">@color/white</item>
         <item name="bahamut_buttonTextColor">@color/button_text_color</item>
         <item name="bahamut_buttonDangerTextColor">@color/white</item>
@@ -529,6 +533,7 @@
     </style>
 
     <style name="Dialog.NoTitleBar.eInk" parent="Dialog.NoTitleBar">
+        <item name="bahamut_spinnerSelectedTextColor">@color/black</item>
         <item name="bahamut_linkColor">@color/black</item>
         <item name="bahamut_pageBackground">@color/white</item>
         <item name="bahamut_defaultTextColor">@color/page_background</item>
@@ -549,6 +554,7 @@
 
     <!-- 對話框 eInk 主題 (深色模式 - 黑白對調) -->
     <style name="Dialog.NoTitleBar.eInk.Dark" parent="Dialog.NoTitleBar.Dark">
+        <item name="bahamut_spinnerSelectedTextColor">@color/white</item>
         <item name="bahamut_linkColor">@color/white</item>
         <item name="bahamut_toolbarDivider">@color/white</item>
         <item name="bahamut_pageBackground">@color/page_background</item>

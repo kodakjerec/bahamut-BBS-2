@@ -187,9 +187,10 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
             .setOnClickListener(this)
 
         headerSelector = mainLayout?.findViewById(R.id.Post_headerSelector)
-        val adapter: ArrayAdapter<Any> =
-            ArrayAdapter<Any>(context!!, R.layout.simple_spinner_item, headers)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        val adapter = com.kota.Bahamut.service.CommonFunctions.createSpinnerAdapter(
+            context!!,
+            headers
+        ) { headerSelector?.selectedItemPosition ?: 0 }
         headerSelected = 0
         headerSelector?.adapter = adapter
         headerSelector?.onItemSelectedListener = this
