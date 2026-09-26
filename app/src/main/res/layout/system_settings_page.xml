@@ -23,7 +23,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/user_info" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>
@@ -31,7 +31,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/user_config" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
 
@@ -44,7 +44,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/theme_manager_page" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>
@@ -75,7 +75,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/block_list_setting" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
 
@@ -194,7 +194,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/article_header_setting" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
             <View style="@style/HorizontalDivider"/>
@@ -202,7 +202,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/article_expression_setting" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view"/>
             </LinearLayout>
 
@@ -307,7 +307,7 @@
                 android:clickable="true"
                 style="@style/SystemSettingsItem">
                 <TextView android:text="@string/system_setting_page_goBillingPage" style="@style/SystemSettingsDirectoryText"/>
-                <View style="@style/ItemViewDividerVertical"/>
+                <View style="@style/VerticalDivider"/>
                 <include layout="@layout/right_arrow_item_view" />
             </LinearLayout>
         </LinearLayout>
@@ -320,7 +320,7 @@
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <View style="@style/HorizontalDivider" />
+        <View style="@style/ToolbarDivider.Horizontal" />
 
         <LinearLayout
             android:id="@+id/toolbar"

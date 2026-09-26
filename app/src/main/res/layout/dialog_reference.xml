@@ -195,7 +195,7 @@
                 </LinearLayout>
         </ScrollView>
 
-        <View style="@style/HorizontalDivider"/>
+        <View style="@style/ToolbarDivider.Horizontal"/>
 
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
 

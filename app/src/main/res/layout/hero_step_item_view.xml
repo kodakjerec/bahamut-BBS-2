@@ -45,5 +45,5 @@
             android:text="@string/main_page_hero_step_content"/>
     </LinearLayout>
     <View android:id="@+id/HeroStep_ItemView_DividerBottom"
-        style="@style/ItemViewDividerHorizontal"/>
+        style="@style/HorizontalDivider"/>
 </LinearLayout>

@@ -91,7 +91,7 @@
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <View style="@style/HorizontalDivider"/>
+        <View style="@style/ToolbarDivider.Horizontal"/>
 
         <LinearLayout android:id="@+id/toolbar" android:layout_width="match_parent" android:layout_height="wrap_content">
             <Button android:textColor="?attr/bahamut_tabSelectedTextColor" android:id="@+id/Message_Main_Button_Chat" android:background="?attr/bahamut_tabSelectedBackground" android:text="@string/message_main_tab_chat" style="@style/ToolbarItem"/>

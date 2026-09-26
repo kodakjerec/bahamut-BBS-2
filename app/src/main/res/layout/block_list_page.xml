@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/bahamut_pageBackground"
     android:id="@+id/content_view">
-    <View style="@style/ItemViewDividerHorizontal"/>
+    <View style="@style/HorizontalDivider"/>
     <LinearLayout
         android:gravity="center_vertical"
         android:orientation="horizontal"
@@ -44,7 +44,7 @@
             android:padding="6dp"
             android:text="@string/add"/>
     </LinearLayout>
-    <View style="@style/ItemViewDividerHorizontal"/>
+    <View style="@style/HorizontalDivider"/>
     <View android:background="?attr/bahamut_dividerColor" android:layout_width="match_parent" android:layout_height="5dp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/BlockList_list"
@@ -54,7 +54,7 @@
         android:dividerHeight="0dp"
         android:layout_weight="1"/>
 
-    <View style="@style/HorizontalDivider"/>
+    <View style="@style/ToolbarDivider.Horizontal"/>
     <LinearLayout
         android:id="@+id/toolbar"
         style="@style/toolbar">

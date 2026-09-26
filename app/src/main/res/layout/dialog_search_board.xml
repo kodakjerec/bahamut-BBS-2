@@ -16,7 +16,7 @@
                 android:inputType="textMultiLine"
                 android:hint="@string/board_name"/>
         </LinearLayout>
-        <View style="@style/HorizontalDivider"/>
+        <View style="@style/ToolbarDivider.Horizontal"/>
         <LinearLayout android:id="@+id/toolbar" style="@style/toolbar">
             <Button android:id="@+id/Bahamut_Dialog_Search_board_Cancel_Button" android:text="@string/cancel" style="@style/DialogToolbarItem" />
             <View style="@style/ToolbarDivider"/>

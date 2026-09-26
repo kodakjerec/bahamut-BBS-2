@@ -7,7 +7,7 @@
 
     <View
         android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerTop"
-        style="@style/ItemViewDividerHorizontal"
+        style="@style/HorizontalDivider"
         android:visibility="gone" />
 
     <LinearLayout
@@ -65,7 +65,7 @@
 
         <View
             android:id="@+id/BoardExtendOptionalPage_historyItemView_SplitView"
-            style="@style/ItemViewDividerVertical"
+            style="@style/VerticalDivider"
             android:visibility="gone" />
 
         <include
@@ -76,5 +76,5 @@
 
     <View
         android:id="@+id/BoardExtendOptionalPage_historyItemView_DividerBottom"
-        style="@style/ItemViewDividerHorizontal" />
+        style="@style/HorizontalDivider" />
 </LinearLayout>

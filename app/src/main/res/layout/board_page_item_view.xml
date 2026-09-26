@@ -33,5 +33,5 @@
             layout="@layout/right_arrow_item_view"
             android:id="@+id/ListItem_ArrowView" />
     </LinearLayout>
-    <View android:id="@+id/BoardPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+    <View android:id="@+id/BoardPage_ItemView_DividerBottom" style="@style/HorizontalDivider"/>
 </LinearLayout>

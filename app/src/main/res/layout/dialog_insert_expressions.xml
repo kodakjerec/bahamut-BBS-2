@@ -59,7 +59,7 @@
                 android:orientation="vertical" />
         </ScrollView>
 
-        <View style="@style/HorizontalDivider" />
+        <View style="@style/ToolbarDivider.Horizontal" />
 
         <!-- Footer Toolbar -->
         <LinearLayout

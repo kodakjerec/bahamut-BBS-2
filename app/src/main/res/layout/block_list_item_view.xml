@@ -21,5 +21,5 @@
             android:padding="6dp"
             android:text="@string/delete"/>
     </LinearLayout>
-    <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+    <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/HorizontalDivider"/>
 </LinearLayout>

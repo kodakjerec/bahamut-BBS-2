@@ -147,7 +147,7 @@
         <!-- 水平分隔線 (位在 Row 1 與 Row 0 之間) -->
         <View
             android:id="@+id/toolbar_row_divider"
-            style="@style/HorizontalDivider"
+            style="@style/ToolbarDivider.Horizontal"
             android:layout_above="@id/toolbar_row_primary" />
 
         <!-- Row 0: 延伸按鈕（貼在 分隔線 上方） -->

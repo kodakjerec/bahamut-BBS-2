@@ -16,5 +16,5 @@
             android:singleLine="true"
             android:textColor="?attr/bahamut_articleContentColor1"/>
     </LinearLayout>
-    <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+    <View android:id="@+id/BlockListPage_ItemView_DividerBottom" style="@style/HorizontalDivider"/>
 </LinearLayout>

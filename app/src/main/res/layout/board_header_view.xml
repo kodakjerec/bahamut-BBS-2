@@ -73,5 +73,5 @@
             android:contentDescription="@string/zero_word"
             android:tint="?attr/bahamut_defaultTextColor" />
     </LinearLayout>
-    <View style="@style/HorizontalDivider"/>
+    <View style="@style/ToolbarDivider.Horizontal"/>
 </LinearLayout>

@@ -7,7 +7,7 @@
 
     <View
         android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_DividerTop"
-        style="@style/ItemViewDividerHorizontal"
+        style="@style/HorizontalDivider"
         android:visibility="gone" />
 
     <LinearLayout
@@ -125,5 +125,5 @@
 
     <View
         android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_DividerBottom"
-        style="@style/ItemViewDividerHorizontal" />
+        style="@style/HorizontalDivider" />
 </LinearLayout>

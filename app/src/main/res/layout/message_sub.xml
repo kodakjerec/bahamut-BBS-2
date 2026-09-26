@@ -60,7 +60,7 @@
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <View style="@style/HorizontalDivider" />
+        <View style="@style/ToolbarDivider.Horizontal" />
 
         <LinearLayout
             android:id="@+id/toolbar"

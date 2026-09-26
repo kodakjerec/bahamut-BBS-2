@@ -13,7 +13,7 @@
                     android:textColor="?attr/bahamut_classItemManagerColor" android:gravity="right" android:id="@+id/ClassPage_ItemView_classManager" android:paddingLeft="12dp" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="true" android:layout_weight="1" style="@style/TextViewSmall"/>
             </LinearLayout>
         </LinearLayout>
-        <View style="@style/ItemViewDividerVertical"/>
+        <View style="@style/VerticalDivider"/>
         <include
             layout="@layout/right_arrow_item_view"
             android:id="@+id/ListItem_ArrowView" />
@@ -22,5 +22,5 @@
             <Button android:textSize="28sp" android:id="@+id/BoardPage_ItemView_MoveDown" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/arrow_down" style="@style/TouchBlock"/>
         </LinearLayout>
     </LinearLayout>
-    <View android:id="@+id/ClassPage_ItemView_DividerBottom" style="@style/ItemViewDividerHorizontal"/>
+    <View android:id="@+id/ClassPage_ItemView_DividerBottom" style="@style/HorizontalDivider"/>
 </LinearLayout>

@@ -38,7 +38,7 @@
                         <View style="@style/DialogSelectArticleVerticalDivider"/>
                         <Button android:id="@+id/Bahamut_Dialog_Select_Button_backSpace_p" android:layout_width="match_parent" android:text="@string/del" android:layout_weight="2" style="@style/SelectArticleItemP"/>
                     </LinearLayout>
-                    <View style="@style/HorizontalDivider"/>
+                    <View style="@style/ToolbarDivider.Horizontal"/>
                 </LinearLayout>
                 <LinearLayout
                     android:id="@+id/toolbar"

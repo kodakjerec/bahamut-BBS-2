@@ -67,7 +67,7 @@
                         android:text="@string/billing_page_button_90" />
                 </LinearLayout>
 
-                <View style="@style/HorizontalDivider" />
+                <View style="@style/ToolbarDivider.Horizontal" />
 
                 <LinearLayout
                     style="@style/toolbar"
@@ -120,7 +120,7 @@
         android:orientation="vertical"
         android:layout_alignParentBottom="true">
 
-        <View style="@style/HorizontalDivider" />
+        <View style="@style/ToolbarDivider.Horizontal" />
 
         <LinearLayout
             android:id="@+id/toolbar"

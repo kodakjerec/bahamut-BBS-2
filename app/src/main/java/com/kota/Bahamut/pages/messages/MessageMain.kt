@@ -6,6 +6,7 @@ import android.view.View.GONE
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
+import android.widget.AbsListView
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.CompoundButton
@@ -43,6 +44,8 @@ class MessageMain:TelnetPage() {
     private lateinit var btnSettings: Button
     private var isPostDelayedSuccess = false // 同步用 postDelay
     private var isUnderList = false // 是否正在查詢名單
+    private var isUserListLoading = false
+    private var lastUserListRequestTime = 0L
 
     override val pageLayout: Int
         get() = R.layout.message_main
@@ -60,6 +63,7 @@ class MessageMain:TelnetPage() {
     private val handleSearchWatcher = TextView.OnEditorActionListener { textView, actionId, _ ->
         if (actionId == EditorInfo.IME_ACTION_SEARCH) {
             if (isUnderList) {
+                clearUserList()
                 TelnetClient.myInstance!!.sendDataToServer(
                     TelnetOutputBuilder.create()
                         .pushString("/") // 請輸入勇者代號：
@@ -97,6 +101,7 @@ class MessageMain:TelnetPage() {
         } else {
             btnSettings.visibility = INVISIBLE
             toolbarList.visibility = VISIBLE
+            clearUserList()
             // 送出查詢指令
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.CTRL_U)
         }
@@ -121,6 +126,9 @@ class MessageMain:TelnetPage() {
     }
     /** 最前頁 */
     private val firstPageClickListener = View.OnLongClickListener { _ ->// 送出查詢指令
+        if (isUnderList) {
+            clearUserList()
+        }
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.HOME)
         return@OnLongClickListener true
     }
@@ -204,6 +212,22 @@ class MessageMain:TelnetPage() {
         txtEsc.setOnClickListener{ _-> onBackPressed() }
 
         listView = mainLayout.findViewById(R.id.Message_Main_Scroll)
+        listView.setOnScrollListener(object : AbsListView.OnScrollListener {
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
+
+            override fun onScroll(
+                view: AbsListView?,
+                firstVisibleItem: Int,
+                visibleItemCount: Int,
+                totalItemCount: Int
+            ) {
+                if (isUnderList && totalItemCount > 0) {
+                    if (firstVisibleItem + visibleItemCount >= totalItemCount - 2) {
+                        requestNextUserListPage()
+                    }
+                }
+            }
+        })
         toolbarList = mainLayout.findViewById(R.id.toolbar_List)
 
         // 重置
@@ -291,9 +315,32 @@ class MessageMain:TelnetPage() {
         }
     }
 
-    /** 顯示線上名單 */
+    /** 清空線上名單 */
+    fun clearUserList() {
+        ASCoroutine.ensureMainThread {
+            val adapter = listView.adapter
+            if (adapter is MessageMainListAdapter) {
+                adapter.clear()
+            } else {
+                listView.adapter = null
+            }
+        }
+    }
+
+    /** 滾動觸發加載下一頁名單 */
+    private fun requestNextUserListPage() {
+        val now = System.currentTimeMillis()
+        if (isUnderList && !isUserListLoading && (now - lastUserListRequestTime > 1200L)) {
+            isUserListLoading = true
+            lastUserListRequestTime = now
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
+        }
+    }
+
+    /** 顯示線上名單 (追加模式，比照 BoardMainPage) */
     fun loadUserList(fromRows:Vector<TelnetRow>) {
         isUnderList = true
+        isUserListLoading = false
         val userList:MutableList<MessageMainListItemStructure> = ArrayList()
 
         // 创建一个新的列表，并复制传入的 rows 的内容
@@ -301,22 +348,31 @@ class MessageMain:TelnetPage() {
 
         for (i in 3 until rows.size step 1) {
             val row = rows[i]
-            val item = MessageMainListItemStructure()
             val bytes = row.data
-            item.index =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5))
-            item.senderName =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19))
-            item.nickname =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37))
-            item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56))
-            item.status =
-                B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70))
-            userList.add(item)
+            val senderNameStr = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(8, 19)).trim()
+            if (senderNameStr.isNotEmpty()) {
+                val item = MessageMainListItemStructure()
+                item.index =
+                    B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(1, 5)).trim()
+                item.senderName = senderNameStr
+                item.nickname =
+                    B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(21, 37)).trim()
+                item.ip = B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(39, 56)).trim()
+                item.status =
+                    B2UEncoder.instance!!.encodeToString(bytes.copyOfRange(58, 70)).trim()
+                userList.add(item)
+            }
         }
 
-        val myAdapter = MessageMainListAdapter(userList)
-        listView.adapter = myAdapter
+        ASCoroutine.ensureMainThread {
+            val currentAdapter = listView.adapter
+            if (currentAdapter is MessageMainListAdapter) {
+                currentAdapter.addItems(userList)
+            } else {
+                val myAdapter = MessageMainListAdapter(userList)
+                listView.adapter = myAdapter
+            }
+        }
     }
 
     override fun onReceivedGestureRight(): Boolean {
