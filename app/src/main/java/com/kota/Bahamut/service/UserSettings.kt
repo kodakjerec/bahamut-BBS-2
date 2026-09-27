@@ -37,8 +37,8 @@ class UserSettings(var myContext: Context) {
                     val toolbarLocation = prep.getProperty(PROPERTIES_TOOLBAR_LOCATION, 0)
                     val toolbarOrder = prep.getProperty(PROPERTIES_TOOLBAR_ORDER, 0)
                     val drawerLocation = prep.getProperty(PROPERTIES_DRAWER_LOCATION, 0)
-                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 0.0f)
-                    val toolbarAlpha = prep.getProperty(PROPERTIES_TOOLBAR_ALPHA, 0.0f)
+                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 2.0f).let { if (it <= 0f) 2.0f else it }
+                    val toolbarAlpha = prep.getProperty(PROPERTIES_TOOLBAR_ALPHA, 20.0f).let { if (it <= 0f) 20.0f else it }
                     val articleHeaders = prep.getProperty(PROPERTIES_ARTICLE_HEADS, "")
                     val shortUrlNonId = prep.getProperty(PROPERTIES_SHORT_URL_NON_ID, false)
                     val floatingLocationX = prep.getProperty(FLOATING_LOCATION_X, 0.0f)

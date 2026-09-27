@@ -213,7 +213,11 @@ class MessageMain:TelnetPage() {
 
         listView = mainLayout.findViewById(R.id.Message_Main_Scroll)
         listView.setOnScrollListener(object : AbsListView.OnScrollListener {
-            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {}
+            override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
+                if (isUnderList && scrollState != AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                    checkAndRequestMoreUserListIfNeeded()
+                }
+            }
 
             override fun onScroll(
                 view: AbsListView?,
@@ -222,7 +226,7 @@ class MessageMain:TelnetPage() {
                 totalItemCount: Int
             ) {
                 if (isUnderList && totalItemCount > 0) {
-                    if (firstVisibleItem + visibleItemCount >= totalItemCount - 2) {
+                    if (firstVisibleItem + visibleItemCount >= totalItemCount - 3) {
                         requestNextUserListPage()
                     }
                 }
@@ -327,10 +331,20 @@ class MessageMain:TelnetPage() {
         }
     }
 
+    /** 檢查並在接近底部時自動請求下一頁名單 */
+    private fun checkAndRequestMoreUserListIfNeeded() {
+        if (!isUnderList) return
+        val totalCount = listView.count
+        val lastVisiblePosition = listView.lastVisiblePosition
+        if (totalCount > 0 && lastVisiblePosition >= totalCount - 3) {
+            requestNextUserListPage()
+        }
+    }
+
     /** 滾動觸發加載下一頁名單 */
     private fun requestNextUserListPage() {
         val now = System.currentTimeMillis()
-        if (isUnderList && !isUserListLoading && (now - lastUserListRequestTime > 1200L)) {
+        if (isUnderList && !isUserListLoading && (now - lastUserListRequestTime > 600L)) {
             isUserListLoading = true
             lastUserListRequestTime = now
             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN)
@@ -372,6 +386,7 @@ class MessageMain:TelnetPage() {
                 val myAdapter = MessageMainListAdapter(userList)
                 listView.adapter = myAdapter
             }
+            checkAndRequestMoreUserListIfNeeded()
         }
     }
 

@@ -165,8 +165,17 @@ open class ASNavigationController : Activity() {
     }
 
     // android.app.Activity, android.view.KeyEvent.Callback
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event != null) {
+            event.startTracking()
+            return true
+        }
+        return super.onKeyDown(keyCode, event)
+    }
+
+    // android.app.Activity, android.view.KeyEvent.Callback
     override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == 4) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             return onBackLongPressed()
         }
         return super.onKeyLongPress(keyCode, event)

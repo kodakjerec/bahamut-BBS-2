@@ -531,21 +531,23 @@ class SystemSettingsPage : TelnetPage() {
                 mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_idle_text)!!
             val sliderIdle =
                 mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_idle)!!
-            sliderIdle.value = toolbarIdle
+            sliderIdle.value = toolbarIdle.coerceIn(sliderIdle.valueFrom, sliderIdle.valueTo)
             textSmallIdle.text = sliderIdle.value.toString() + "s"
             sliderIdle.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
                 toolbarIdle = value
                 textSmallIdle.text = value.toString() + "s"
+                com.kota.Bahamut.pages.model.ToolBarFloating.activeInstance?.updateSettings()
             }
             val textSmallAlpha =
                 mainLayout?.findViewById<TelnetTextViewSmall>(R.id.system_setting_page_toolbar_alpha_text)!!
             val sliderAlpha =
                 mainLayout?.findViewById<Slider>(R.id.system_setting_page_toolbar_alpha)!!
-            sliderAlpha.value = toolbarAlpha
+            sliderAlpha.value = toolbarAlpha.coerceIn(sliderAlpha.valueFrom, sliderAlpha.valueTo)
             textSmallAlpha.text = sliderAlpha.value.toInt().toString() + "%"
             sliderAlpha.addOnChangeListener { slider: Slider?, value: Float, fromUser: Boolean ->
                 toolbarAlpha = value
                 textSmallAlpha.text = value.toInt().toString() + "%"
+                com.kota.Bahamut.pages.model.ToolBarFloating.activeInstance?.updateSettings()
             }
             // 側滑選單位置
             val spinnerDrawerLocation =

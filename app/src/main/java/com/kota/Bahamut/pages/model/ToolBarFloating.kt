@@ -34,7 +34,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     @SuppressLint("ClickableViewAccessibility")
     private fun init(context: Context?) {
         idleTime = toolbarIdle
-        alphaPercentage = toolbarAlpha / 100
+        alphaPercentage = toolbarAlpha / 100f
         inflate(context, R.layout.toolbar_floating, this)
         scale = getContext().resources.displayMetrics.density
 
@@ -108,10 +108,14 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
+        activeInstance = this
         attachWindowTouchListener()
     }
 
     override fun onDetachedFromWindow() {
+        if (activeInstance == this) {
+            activeInstance = null
+        }
         detachWindowTouchListener()
         super.onDetachedFromWindow()
     }
@@ -168,13 +172,15 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     private fun handleOutsideTouch(event: MotionEvent) {
         if (visibility != View.VISIBLE || mainLayout?.visibility != View.VISIBLE) return
 
-        if (event.action == MotionEvent.ACTION_DOWN) {
-            val rawX = event.rawX
-            val rawY = event.rawY
+        when (event.action) {
+            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
+                val rawX = event.rawX
+                val rawY = event.rawY
 
-            // 當觸控點在 ToolBarFloating 範圍以外時，移動到點擊對應的 Y 軸；若點擊在中線左側，貼合左緣，右側則貼合右緣
-            if (!isTouchInsideToolbar(rawX, rawY)) {
-                moveToXAndY(rawX, rawY)
+                // 當觸控/滑動點在 ToolBarFloating 範圍以外時，移動到對應 Y 軸；若點擊在中線左側，貼合左緣，右側則貼合右緣
+                if (!isTouchInsideToolbar(rawX, rawY)) {
+                    moveToXAndY(rawX, rawY)
+                }
             }
         }
     }
@@ -301,6 +307,21 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
         val screenHeight = context.resources.displayMetrics.heightPixels.toFloat()
         updateLayout(screenWidth, screenHeight / 2f, false)
+    }
+
+    /** 重新讀取並套用最新的閒置隱藏時間與不透明度設定 */
+    fun updateSettings() {
+        idleTime = toolbarIdle
+        alphaPercentage = toolbarAlpha / 100f
+        if (TempSettings.isFloatingInvisible) {
+            mainLayout?.alpha = alphaPercentage
+        }
+        startInvisible()
+    }
+
+    companion object {
+        var activeInstance: ToolBarFloating? = null
+            private set
     }
 
     val startInvisible: ASCoroutine? = object : ASCoroutine() {
