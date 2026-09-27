@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/SystemSettingsCheckbox"
-                    android:textSize="24dp"
+                    android:textSize="24sp"
                     android:text="@string/start_connect_ip1" />
 
                 <RadioButton
@@ -86,7 +86,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     style="@style/SystemSettingsCheckbox"
-                    android:textSize="24dp"
+                    android:textSize="24sp"
                     android:text="@string/start_connect_ip2" />
             </RadioGroup>
 
@@ -108,7 +108,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/start_connect_method1"
-                    android:textSize="24dp" />
+                    android:textSize="24sp" />
 
                 <RadioButton
                     android:id="@+id/radioButtonConnectMethod2"
@@ -116,7 +116,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/start_connect_method2"
-                    android:textSize="24dp" />
+                    android:textSize="24sp" />
 
             </RadioGroup>
 
@@ -179,7 +179,6 @@
             <Button
                 android:id="@+id/Start_instructions"
                 style="@style/ToolbarItem"
-                android:autofillHints=""
                 android:text="@string/start_page_instructions" />
 
             <View style="@style/ToolbarDivider" />

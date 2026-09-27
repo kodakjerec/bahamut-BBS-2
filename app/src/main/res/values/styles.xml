@@ -11,8 +11,6 @@
         <item name="android:windowContentOverlay">@null</item>
         <item name="android:textColorHint">@color/halfWhite</item>
         <item name="android:textColorLink">?attr/bahamut_linkColor</item>
-        <item name="android:enforceStatusBarContrast">false</item>
-        <item name="android:enforceNavigationBarContrast">false</item>
 
         <!-- 自定義主題色彩屬性 -->
         <item name="bahamut_linkColor">@color/text_color_link</item>
@@ -348,10 +346,10 @@
         <item name="android:singleLine">true</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_weight">1</item>
-        <item name="autoSizeTextType">uniform</item>
-        <item name="autoSizeMinTextSize">2sp</item>
-        <item name="autoSizeMaxTextSize">24sp</item>
-        <item name="autoSizeStepGranularity">2sp</item>
+        <item name="android:autoSizeTextType">uniform</item>
+        <item name="android:autoSizeMinTextSize">2sp</item>
+        <item name="android:autoSizeMaxTextSize">24sp</item>
+        <item name="android:autoSizeStepGranularity">2sp</item>
     </style>
 
     <style name="ToolbarItem.Grid">
