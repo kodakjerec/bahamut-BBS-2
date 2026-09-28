@@ -48,9 +48,6 @@ theme 模組與 Android 原生樣式系統結合，提供應用程式的主題�
 ### 3️⃣ `ThemeManagerPage.kt` - 主題管理頁面
 提供使用者切換預設、粉紅、電子紙等主題外觀的設定頁面。
 
-### 4️⃣ `ThemeFunctions.kt` - 工具函式
-提供主題色彩計算、按鈕狀態顏色產生等工具方法。
-
 ---
 
 ## 🎨 主題體系與樣式階層 (`styles.xml`)
@@ -160,6 +157,21 @@ graph TD
 | `bahamut_articleAuthorColor1` | 引用文章作者標頭顏色 | 閱讀頁中「xxx 說:」引言作者標頭（深色調暗為 `#60A060`） |
 | `bahamut_articleContentColor1` | 引用文章內容文字顏色 | 閱讀頁中引言內文（深色調暗為 `#18A018`） |
 | `bahamut_checkboxTint` | 核取方塊與單選鈕顏色 | 對話框內單選/多選圓點（E-Ink 純黑/純白） |
+
+---
+
+## 🛠️ 工具列色彩與浮動工具列機制
+
+### 1. 工具列背景色彩收斂 (`toolbar_background_color_*`)
+專案將工具列與按鈕背景色統一定義為 `toolbar_background_color_*` 標籤系列，解決舊有 duplicate 命名混淆問題：
+- **`toolbar_background_color_normal`**: 日間 `#FF003030`（深墨綠）、夜間 `#FF002020`（暗墨綠）
+- **`toolbar_background_color_pressed`**: `#FFB5E61D` (亮黃綠)
+- **`toolbar_background_color_focused`**: `#FF22B14C` (亮綠)
+- **`toolbar_background_color_disabled`**: `#FF001A1A`
+
+### 2. 浮動工具列 (`ToolBarFloating`)
+- **閒置自動隱藏 (Idle Time)**: 預設閒置 **1.0 秒**（`1000ms`）後調低不透明度，手勢觸控或移動即刻恢復不透明。
+- **全域觸控監聽 (`GlobalWindowCallback`)**: 使用單一 `GlobalWindowCallback` 掛載於 Activity Window，避免頁面切換 (`BoardMain` $\leftrightarrow$ `Article` / `BoardLink` / `BoardSearch`) 導致的 Window Callback 鏈鏈條斷裂或手勢跟隨失效問題。
 
 ---
 

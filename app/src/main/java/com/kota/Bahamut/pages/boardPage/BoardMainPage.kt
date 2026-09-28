@@ -60,7 +60,6 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContainsFuzzy
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
@@ -942,7 +941,6 @@ open class BoardMainPage : TelnetListPage(),
     /** 啟用/停用 黑名單  */
     fun onChangeBlockStateButtonClicked() {
         propertiesBlockListEnable = !this.isItemBlockEnable
-        notifyDataUpdated()
         this.isItemBlockEnable = propertiesBlockListEnable
         if (mainDrawerLayout != null) {
             val blockEnableCheckbox =

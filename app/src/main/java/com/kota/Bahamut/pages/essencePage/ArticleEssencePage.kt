@@ -506,7 +506,6 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                         newList.add(aBlockName)
                     }
                     UserSettings.blockList = newList
-                    UserSettings.notifyDataUpdated()
                     if (UserSettings.propertiesBlockListEnable) {
                         if (aBlockName == telnetArticle?.author) {
                             onBackPressed()

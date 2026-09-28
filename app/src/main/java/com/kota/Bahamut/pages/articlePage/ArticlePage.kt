@@ -35,7 +35,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.blockList
 import com.kota.Bahamut.service.UserSettings.Companion.exchangeArticleViewMode
 import com.kota.Bahamut.service.UserSettings.Companion.isBlockListContains
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleViewMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
@@ -738,7 +737,6 @@ class ArticlePage : TelnetPage() {
     /** 切換 text <-> telnet  */
     fun changeViewMode() {
         exchangeArticleViewMode()
-        notifyDataUpdated()
         reloadViewMode()
     }
 
@@ -901,7 +899,6 @@ class ArticlePage : TelnetPage() {
                     }
 
                     blockList = newList
-                    notifyDataUpdated()
 
                     if (propertiesBlockListEnable) {
                         if (aBlockName == telnetArticle!!.author) {

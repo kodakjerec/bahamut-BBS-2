@@ -14,7 +14,6 @@ import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.NotificationSettings.getShowBlockList
 import com.kota.Bahamut.service.NotificationSettings.setShowBlockList
 import com.kota.Bahamut.service.UserSettings
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetBlockList
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -50,7 +49,6 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
                 }
                 UserSettings.blockList = newList
 
-                notifyDataUpdated()
                 this@BlockListPage.reload()
             } else {
                 showErrorDialog(getContextString(R.string.please_input_id), this@BlockListPage)
@@ -185,10 +183,6 @@ class BlockListPage : TelnetPage(), BlockListClickListener {
             showLongToast(getContextString(R.string.notification_block_list))
             setShowBlockList(true)
         }
-    }
-
-    override fun onPageWillDisappear() {
-        notifyDataUpdated()
     }
 
     override fun onPageDidDisappear() {

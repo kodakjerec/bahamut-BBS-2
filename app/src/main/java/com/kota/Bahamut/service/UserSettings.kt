@@ -3,7 +3,6 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
-import com.kota.Bahamut.service.NotificationSettings.getCloudSave
 import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.telnet.PropertiesOperator
 import java.io.File
@@ -37,7 +36,7 @@ class UserSettings(var myContext: Context) {
                     val toolbarLocation = prep.getProperty(PROPERTIES_TOOLBAR_LOCATION, 0)
                     val toolbarOrder = prep.getProperty(PROPERTIES_TOOLBAR_ORDER, 0)
                     val drawerLocation = prep.getProperty(PROPERTIES_DRAWER_LOCATION, 0)
-                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 2.0f).let { if (it <= 0f) 2.0f else it }
+                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 1.0f).let { if (it <= 0f) 1.0f else it }
                     val toolbarAlpha = prep.getProperty(PROPERTIES_TOOLBAR_ALPHA, 20.0f).let { if (it <= 0f) 20.0f else it }
                     val articleHeaders = prep.getProperty(PROPERTIES_ARTICLE_HEADS, "")
                     val shortUrlNonId = prep.getProperty(PROPERTIES_SHORT_URL_NON_ID, false)
@@ -82,6 +81,9 @@ class UserSettings(var myContext: Context) {
     }
 
     init {
+        mySharedPref = myContext.getSharedPreferences(PERF_NAME, Context.MODE_PRIVATE)
+        myEditor = mySharedPref!!.edit()
+        mySharedPref!!.registerOnSharedPreferenceChangeListener(prefChangeListener)
         upgrade()
     }
 
@@ -135,6 +137,24 @@ class UserSettings(var myContext: Context) {
             "不加 ▼,[問題],[情報],[心得],[討論],[攻略],[秘技],[閒聊],[程設],[職場],[推廣],[手機],[平板],[新番],[電影],[新聞],[其它]"
         const val EXPRESSIONS_DEFAULT: String =
             "( >_0)b,( ;-w-)a,( -3-)y-~,ˋ(°▽ ° )ノˋ( ° ▽° )ノ,#/-_-)/~╨──╨,(||￣▽￣)a,o( -_-)=0))-3-)/,(#‵′)o,O(‵皿′)o,( T_T),(o_O ),_ψ(._. ),v(￣︶￣)y,ㄟ(￣▽￣ㄟ)...,(っ´▽`)っ,m(_ _)m,ˋ(°ω ° )ノ,◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣,( O口O)!?, ☆━━━(ﾟ∀ﾟ)━━━, *[1;33m洽特*[m"
+
+        // 雲端同步豁免的本地 Key（不觸發 markDirty）
+        private val IGNORED_KEYS = setOf(
+            PROPERTIES_WEB_USERNAME,
+            PROPERTIES_WEB_PASSWORD,
+            PROPERTIES_WEB_DEBUG_VIEW,
+            FLOATING_LOCATION_X,
+            FLOATING_LOCATION_Y,
+            NON_VIP_SHORTEN_TIMES_LIMIT,
+            "upgrade"
+        )
+
+        // 自動監控 SharedPreferences 變更的事件監聽器
+        private val prefChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key != null && key !in IGNORED_KEYS) {
+                notifyDataUpdated()
+            }
+        }
 
         // 通知更新
         @JvmStatic
@@ -553,23 +573,25 @@ class UserSettings(var myContext: Context) {
         @JvmStatic
         var toolbarIdle: Float
             get() {
-                try {
-                    return mySharedPref!!.getFloat(
+                val value = try {
+                    mySharedPref!!.getFloat(
                         PROPERTIES_TOOLBAR_IDLE,
-                        2.0f
+                        1.0f
                     )
                 } catch (_: ClassCastException) {
-                    val value: Int = mySharedPref!!.getInt(
+                    val intVal: Int = mySharedPref!!.getInt(
                         PROPERTIES_TOOLBAR_IDLE,
-                        2
+                        1
                     )
-                    return value.toFloat()
+                    intVal.toFloat()
                 }
+                return if (value <= 0f) 1.0f else value
             }
             set(idle) {
+                val validIdle = if (idle <= 0f) 1.0f else idle
                 myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_IDLE,
-                    idle
+                    validIdle
                 ).commit()
             }
         @JvmStatic

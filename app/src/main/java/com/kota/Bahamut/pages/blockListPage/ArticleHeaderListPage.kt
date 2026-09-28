@@ -14,7 +14,6 @@ import com.kota.Bahamut.service.NotificationSettings.getShowHeader
 import com.kota.Bahamut.service.NotificationSettings.setShowHeader
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.articleHeaders
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetArticleHeaders
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -51,7 +50,6 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
                 }
                 UserSettings.setArticleHeaders(newList)
 
-                notifyDataUpdated()
                 this@ArticleHeaderListPage.reload()
             } else {
                 showErrorDialog(
@@ -190,10 +188,6 @@ class ArticleHeaderListPage : TelnetPage(), BlockListClickListener {
             showLongToast(getContextString(R.string.notification_header))
             setShowHeader(true)
         }
-    }
-
-    override fun onPageWillDisappear() {
-        notifyDataUpdated()
     }
 
     override fun onPageDidDisappear() {

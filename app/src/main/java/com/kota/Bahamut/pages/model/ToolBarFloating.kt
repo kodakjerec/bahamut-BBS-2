@@ -29,11 +29,9 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     private var idleTime = 0f // 閒置多久
     private var alphaPercentage = 0f // 閒置不透明度
 
-    private var originalWindowCallback: Window.Callback? = null
-
     @SuppressLint("ClickableViewAccessibility")
     private fun init(context: Context?) {
-        idleTime = toolbarIdle
+        idleTime = if (toolbarIdle <= 0f) 1.0f else toolbarIdle
         alphaPercentage = toolbarAlpha / 100f
         inflate(context, R.layout.toolbar_floating, this)
         scale = getContext().resources.displayMetrics.density
@@ -109,14 +107,13 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         activeInstance = this
-        attachWindowTouchListener()
+        findActivity()?.let { attachGlobalWindowCallback(it) }
     }
 
     override fun onDetachedFromWindow() {
         if (activeInstance == this) {
             activeInstance = null
         }
-        detachWindowTouchListener()
         super.onDetachedFromWindow()
     }
 
@@ -131,33 +128,6 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         return null
     }
 
-    private fun attachWindowTouchListener() {
-        val activity = findActivity() ?: return
-        val window = activity.window ?: return
-        if (originalWindowCallback != null) return
-
-        val currentCallback = window.callback ?: return
-        originalWindowCallback = currentCallback
-
-        window.callback = object : Window.Callback by currentCallback {
-            override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
-                if (event != null) {
-                    handleOutsideTouch(event)
-                }
-                return currentCallback.dispatchTouchEvent(event)
-            }
-        }
-    }
-
-    private fun detachWindowTouchListener() {
-        val activity = findActivity() ?: return
-        val window = activity.window ?: return
-        if (originalWindowCallback != null) {
-            window.callback = originalWindowCallback
-            originalWindowCallback = null
-        }
-    }
-
     private fun isTouchInsideToolbar(rawX: Float, rawY: Float): Boolean {
         val targetView = mainLayout ?: this
         val location = IntArray(2)
@@ -169,8 +139,8 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         return rawX >= left && rawX <= right && rawY >= top && rawY <= bottom
     }
 
-    private fun handleOutsideTouch(event: MotionEvent) {
-        if (visibility != View.VISIBLE || mainLayout?.visibility != View.VISIBLE) return
+    fun handleOutsideTouch(event: MotionEvent) {
+        if (!isShown || mainLayout?.visibility != View.VISIBLE) return
 
         when (event.action) {
             MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
@@ -299,6 +269,9 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     // 指定 layout 顯示
     override fun setVisibility(visibility: Int) {
         mainLayout?.visibility = visibility
+        if (visibility == View.VISIBLE) {
+            activeInstance = this
+        }
     }
 
     // 旋轉或變彈出視窗時, 將工具列回到右方預設位置
@@ -311,7 +284,8 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
 
     /** 重新讀取並套用最新的閒置隱藏時間與不透明度設定 */
     fun updateSettings() {
-        idleTime = toolbarIdle
+        activeInstance = this
+        idleTime = if (toolbarIdle <= 0f) 1.0f else toolbarIdle
         alphaPercentage = toolbarAlpha / 100f
         if (TempSettings.isFloatingInvisible) {
             mainLayout?.alpha = alphaPercentage
@@ -322,6 +296,28 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     companion object {
         var activeInstance: ToolBarFloating? = null
             private set
+
+        fun attachGlobalWindowCallback(activity: Activity) {
+            val window = activity.window ?: return
+            val currentCallback = window.callback ?: return
+            if (currentCallback is GlobalWindowCallback) return
+
+            window.callback = GlobalWindowCallback(currentCallback)
+        }
+    }
+
+    private class GlobalWindowCallback(
+        private val delegate: Window.Callback
+    ) : Window.Callback by delegate {
+        override fun dispatchTouchEvent(event: MotionEvent?): Boolean {
+            if (event != null) {
+                val active = activeInstance
+                if (active != null && active.isShown) {
+                    active.handleOutsideTouch(event)
+                }
+            }
+            return delegate.dispatchTouchEvent(event)
+        }
     }
 
     val startInvisible: ASCoroutine? = object : ASCoroutine() {
@@ -332,7 +328,8 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
 
     private fun startInvisible() {
         startInvisible?.cancel()
-        startInvisible?.postDelayed(idleTime.toLong() * 1000L)
+        val delayMillis = (idleTime * 1000f).toLong().coerceAtLeast(1000L)
+        startInvisible?.postDelayed(delayMillis)
         TempSettings.isFloatingInvisible = true
     }
 

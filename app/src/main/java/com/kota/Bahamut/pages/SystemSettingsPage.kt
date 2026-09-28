@@ -39,7 +39,6 @@ import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAutoToChat
@@ -89,7 +88,6 @@ class SystemSettingsPage : TelnetPage() {
                         ) {
                             if (paramInt == 1) {
                                 propertiesFollowSystemDarkMode = isChecked
-                                notifyDataUpdated()
                                 val nightMode = if (isChecked) {
                                     AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                                 } else {
@@ -648,7 +646,6 @@ class SystemSettingsPage : TelnetPage() {
     }
 
     override fun onBackPressed(): Boolean {
-        notifyDataUpdated()
         return super.onBackPressed()
     }
 

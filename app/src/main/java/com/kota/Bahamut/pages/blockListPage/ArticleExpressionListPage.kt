@@ -14,7 +14,6 @@ import com.kota.Bahamut.service.NotificationSettings.getShowExpression
 import com.kota.Bahamut.service.NotificationSettings.setShowExpression
 import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.articleExpressions
-import com.kota.Bahamut.service.UserSettings.Companion.notifyDataUpdated
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesVIP
 import com.kota.Bahamut.service.UserSettings.Companion.resetArticleExpressions
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -51,7 +50,6 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
                 }
                 UserSettings.setArticleExpressions(newList)
 
-                notifyDataUpdated()
                 this@ArticleExpressionListPage.reload()
             } else {
                 showErrorDialog(
@@ -186,10 +184,6 @@ class ArticleExpressionListPage : TelnetPage(), BlockListClickListener {
             showLongToast(getContextString(R.string.notification_expression))
             setShowExpression(true)
         }
-    }
-
-    override fun onPageWillDisappear() {
-        notifyDataUpdated()
     }
 
     override fun onPageDidDisappear() {
