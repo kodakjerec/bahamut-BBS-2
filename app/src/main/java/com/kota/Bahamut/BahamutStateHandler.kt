@@ -689,19 +689,18 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     }
 
     /**
-     * 處理從串接頁編輯文章的狀態
+     * 處理從同主題串接頁 (BoardLinkPage / BoardSearchPage) 編輯文章時的定位狀態機。
      *
-     * 當使用者從 LinkPage/SearchPage 觸發編輯時，
-     * 此函式根據當前狀態執行對應的操作。
-     *
-     * @return true 如果正在處理編輯流程，false 表示沒有進行中的編輯任務
+     * 由於在串接頁面中文章序號與主看板真正的版面文章編號 (boardNumber) 不同，
+     * 此狀態機引導 Telnet 終端發送 "t" 鍵獲取 boardNumber、按 Left 鍵離開串接頁返回主看板，
+     * 並處理區塊邊界、頁面第一筆、首頁與末頁等邊界例外，最終精準定位並加載目標文章內文。
      */
     fun handleEditFromLinkedState() {
         val state = TempSettings.editFromLinkedState ?: return
 
-        var isBoardMain: Boolean = false
+        var isBoardMain = false
 
-        // 偵測到 BoardMainPage 已到最後
+        // 偵測到是否已回到主看板畫面 (BoardMainPage)
         if (this.rowString00.startsWith("【板主：") && this.rowString00.contains("看板《")) {
             isBoardMain = true
         }
@@ -709,7 +708,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
 
         when (state.step) {
             EditFromLinkedStep.MOVE_UP_FOR_BOUNDARY -> {
-                // 偵測到 LinkPage/SearchPage，送出 "t"
+                // 1. 在串接頁送出 "t" 鍵以查詢游標所在行的版面文章編號
                 if (currentPage == BahamutPage.BAHAMUT_BOARD_LINK ||
                     currentPage == BahamutPage.BAHAMUT_BOARD_SEARCH) {
                     state.step = EditFromLinkedStep.SENT_T
@@ -719,33 +718,34 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
 
             EditFromLinkedStep.SENT_T -> {
-                // 解析 cursor-row 取得 boardNumber
+                // 2. 解析當前游標行的版面文章編號，並按 Left 鍵離開串接頁返回主看板
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
                 state.boardNumber = boardNum
 
-                // 離開串接頁(回看板)
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
                 create().pushKey(TelnetKeyboard.LEFT_ARROW).sendToServer()
             }
 
             EditFromLinkedStep.LEAVING_LINKED_PAGE -> {
-                // 偵測到 BoardMainPage
+                // 3. 已回到主看板畫面，依據例外狀態決定定位策略
                 if (isBoardMain) {
                     state.step = EditFromLinkedStep.ON_BOARD_PAGE
 
                     ASCoroutine.ensureMainThread {
-
                         if (state.isBlockBoundary || (state.isFirstInPage && !state.isFirst)) {
+                            // 例外 1: 區塊邊界 (20 的倍數) 或頁面首筆，跳至編號後搜尋下一篇同標題文章 ("]")
                             state.step = EditFromLinkedStep.SEARCH_NEXT
                             TelnetClient.myInstance!!.sendStringToServer(state.boardNumber.toString())
                         } else if (state.isFirst) {
+                            // 例外 2: 第一篇文章，跳至首篇 ("=")
                             state.step = EditFromLinkedStep.GOTO_LAST
                             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.EQUAL)
                         } else if (state.isLast) {
+                            // 例外 3: 最後一篇文章，跳至末篇 ("END") 後搜尋上一篇同標題文章 ("[" )
                             state.step = EditFromLinkedStep.SEARCH_PREV
                             TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.END)
                         } else {
-                            // 正常: 選擇文章並進入
+                            // 正常流程: 直接跳至版面文章編號並進入讀取
                             state.step = EditFromLinkedStep.READING_ARTICLE
                             showShortToast("編輯文章定位至：${state.boardNumber}")
                             boardPage.loadItemAtIndex(state.boardNumber - 1)
@@ -755,12 +755,13 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
 
             EditFromLinkedStep.SEARCH_PREV -> {
+                // 搜尋上一篇同標題文章 ("[" )
                 state.step = EditFromLinkedStep.GOTO_LAST
                 this.myCursorRow = this.telnetCursor!!.row
                 val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
                 state.boardNumber = boardNum
-                // 例外: boardMain最後一篇 = 串接最後一篇, 開啟文章
-                if ( boardPage.getItemSize() == boardNum ) {
+
+                if (boardPage.getItemSize() == boardNum) {
                     state.step = EditFromLinkedStep.READING_ARTICLE
                     showShortToast("編輯文章定位至：${state.boardNumber}")
                     boardPage.loadItemAtIndex(state.boardNumber)
@@ -770,15 +771,16 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
 
             EditFromLinkedStep.SEARCH_NEXT -> {
+                // 搜尋下一篇同標題文章 ("]")
                 state.step = EditFromLinkedStep.GOTO_LAST
                 create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
-                // 如果之前是第一篇文章, 要多補一次"]"
-                if (state.isFirstInPage)
+                if (state.isFirstInPage) {
                     create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
+                }
             }
 
             EditFromLinkedStep.GOTO_LAST -> {
-                // 偵測到 BoardMainPage 已到最後
+                // 已定位至目標行，取得最終版面文章編號並加載內文
                 if (isBoardMain) {
                     ASCoroutine.ensureMainThread {
                         state.step = EditFromLinkedStep.READING_ARTICLE
@@ -791,21 +793,22 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
 
             else -> {
-                // 其他步驟由 ArticlePage 處理
+                // 其他步驟 (如 VERIFYING / DONE) 由 ArticlePage 處理
             }
         }
     }
 
     /**
-     * 從 row4 解析版面文章編號
+     * 從指定游標行解析版面文章編號 (boardNumber)
      *
-     * 格式: "  1234  作者  日期  標題"
+     * 格式範例: "  1234  作者名  日期  文章標題"
      *
-     * @return 解析出的編號，解析失敗回傳 0
+     * @param row 指定的 Telnet 畫面列索引
+     * @return 解析成功傳回文章編號，失敗傳回 0
      */
     private fun parseBoardNumberFromCursorRow(row: Int): Int {
-        val row4 = getRowString(row).trim()
-        val match = Regex("^\\s*(\\d+)").find(row4)
+        val rowStr = getRowString(row).trim()
+        val match = Regex("^\\s*(\\d+)").find(rowStr)
         return match?.groupValues?.get(1)?.toIntOrNull() ?: 0
     }
 

@@ -1,7 +1,6 @@
 package com.kota.Bahamut
 
 import com.kota.Bahamut.pages.BillingPage
-import com.kota.Bahamut.pages.classPage.ClassPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.StartPage
@@ -11,6 +10,7 @@ import com.kota.Bahamut.pages.bbsUser.UserInfoPage
 import com.kota.Bahamut.pages.boardPage.BoardLinkPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.boardPage.BoardSearchPage
+import com.kota.Bahamut.pages.classPage.ClassPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
 import com.kota.Bahamut.pages.login.LoginPage
@@ -21,6 +21,14 @@ import com.kota.Bahamut.pages.messages.MessageSub
 import com.kota.Bahamut.pages.theme.ThemeManagerPage
 import java.util.Stack
 
+/**
+ * [PageContainer] - 全域頁面物件容器與快取中心 (單例模式)。
+ *
+ * 職責：
+ * 1. 集中建立、維護與快取全域共用頁面實例 (如 [MainPage], [BoardMainPage], [ArticlePage], [LoginPage] 等)。
+ * 2. 透過 [classPageStack] 管理多層級看板分類/目錄頁面堆疊。
+ * 3. 透過 [cleanStartPage] 等清理函式釋放記憶體與狀態。
+ */
 class PageContainer private constructor() {
     private var startPageInstance: StartPage? = null
     private var loginPageInstance: LoginPage? = null
@@ -41,6 +49,7 @@ class PageContainer private constructor() {
     var myMessageMain: MessageMain? = null
     var myMessageSub: MessageSub? = null
 
+    /** 取得起始頁面實例 */
     val startPage: StartPage
         get() {
             if (this.startPageInstance == null) {
@@ -49,6 +58,7 @@ class PageContainer private constructor() {
             return this.startPageInstance!!
         }
 
+    /** 清理並重置所有快取頁面實例 */
     fun cleanStartPage() {
         cleanLoginPage()
         cleanMainPage()
@@ -69,6 +79,7 @@ class PageContainer private constructor() {
         cleanMessageSub()
     }
 
+    /** 取得登入頁面實例 */
     val loginPage: LoginPage
         get() {
             if (this.loginPageInstance == null) {
@@ -85,6 +96,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得主功能表頁面實例 */
     val mainPage: MainPage
         get() {
             if (this.mainPageInstance == null) {
@@ -100,6 +112,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 推入新的分類/目錄看板頁面至堆疊 */
     fun pushClassPage(aClassName: String, aClassTitle: String) {
         val classPage1 = ClassPage()
         classPage1.listName = aClassName
@@ -107,20 +120,20 @@ class PageContainer private constructor() {
         this.classPageStack.push(classPage1)
     }
 
+    /** 彈出最上層分類看板頁面 */
     fun popClassPage() {
         if (this.classPageStack.isNotEmpty()) {
             this.classPageStack.pop()
         }
     }
 
+    /** 取得當前分類看板堆疊深度 */
     val classPageStackSize: Int
         get() = this.classPageStack.size
 
+    /** 取得當前最上層分類看板頁面實例 */
     val classPage: ClassPage
         get() {
-            if (this.classPageStack.isNotEmpty()) {
-                return this.classPageStack.lastElement()
-            }
             return this.classPageStack.lastElement()
         }
 
@@ -131,6 +144,7 @@ class PageContainer private constructor() {
         this.classPageStack.clear()
     }
 
+    /** 取得主看板文章列表頁面實例 */
     val boardPage: BoardMainPage
         get() {
             if (this.boardMainPageInstance == null) {
@@ -146,6 +160,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得同主題串接頁面實例 */
     val boardLinkedTitlePage: BoardLinkPage
         get() {
             if (this.boardTitleLinkPageInstance == null) {
@@ -161,6 +176,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得看板搜尋頁面實例 */
     val boardSearchPage: BoardSearchPage
         get() {
             if (this.boardSearchPageInstance == null) {
@@ -176,11 +192,9 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得精華區看板頁面實例 */
     val boardEssencePage: BoardEssencePage
         get() {
-            if (this.boardEssencePageStack.isNotEmpty()) {
-                return this.boardEssencePageStack.lastElement()
-            }
             return this.boardEssencePageStack.lastElement()
         }
 
@@ -219,6 +233,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得信箱頁面實例 */
     val mailBoxPage: MailBoxPage
         get() {
             if (this.mailBoxPageInstance == null) {
@@ -234,6 +249,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得文章內文閱讀頁面實例 */
     val articlePage: ArticlePage
         get() {
             if (this.articlePageInstance == null) {
@@ -249,6 +265,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得贊助/內購頁面實例 */
     val billingPage: BillingPage
         get() {
             if (this.billingPageInstance == null) {
@@ -264,6 +281,7 @@ class PageContainer private constructor() {
         }
     }
 
+    /** 取得發文頁面實例 */
     val postArticlePage: PostArticlePage
         get() {
             if (this.postArticlePageInstance == null) {

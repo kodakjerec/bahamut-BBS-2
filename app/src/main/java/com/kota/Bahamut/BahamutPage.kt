@@ -1,7 +1,13 @@
 package com.kota.Bahamut
 
+/**
+ * 巴哈姆特 BBS 頁面類型常數介面 ([BahamutPage])。
+ *
+ * 定義所有頁面的頁面識別碼 (pageType)，供狀態處理器 ([BahamutStateHandler]) 與導航控制器識別當前畫面。
+ */
 interface BahamutPage {
     companion object {
+        const val START: Int = 0
         const val BAHAMUT_LOGIN: Int = 1
         const val BAHAMUT_SYSTEM_ANNOUNCEMENT: Int = 2
         const val BAHAMUT_INSTRUCTIONS: Int = 3
@@ -28,7 +34,6 @@ interface BahamutPage {
         const val BAHAMUT_MESSAGE_MAIN_PAGE: Int = 24
         const val BAHAMUT_MESSAGE_SUB_PAGE: Int = 25
         const val MANUAL: Int = 26
-        const val START: Int = 0
         const val UNKNOWN: Int = -1
     }
 }
