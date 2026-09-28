@@ -8,12 +8,18 @@ import android.view.MotionEvent
 import android.widget.FrameLayout
 import kotlin.math.abs
 
+/**
+ * [ASGestureView] - 手勢偵測 FrameLayout 容器。
+ *
+ * 職責：
+ * 1. 攔截並分析上、下、左、右滑動手勢 ([onFling])。
+ * 2. 透過 [ASGestureViewDelegate] 代理介面將滑動事件發送至頁面控制器（如向右滑動返回上頁）。
+ */
 class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
     GestureDetector.OnGestureListener {
+
     private var gestureViewDelegate: ASGestureViewDelegate? = null
-
     private var eventLocked = false
-
     private val gestureDetector: GestureDetector = GestureDetector(paramContext, this)
 
     init {
@@ -34,7 +40,6 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
         paramFloat1: Float,
         paramFloat2: Float
     ): Boolean {
-        var paramMotionEvent1: MotionEvent
         var bool1 = false
         if (this.gestureViewDelegate != null) {
             val f2 = abs(paramFloat1)
@@ -47,20 +52,22 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
                 }
             } else {
                 if (f1 > filter) {
-                    if (f1 > range * f2) bool1 = (if (paramFloat2 > 0.0f) {
-                        this.gestureViewDelegate!!.onASGestureReceivedGestureDown()
-                    } else {
-                        this.gestureViewDelegate!!.onASGestureReceivedGestureUp()
-                    }) == true
+                    if (f1 > range * f2) {
+                        bool1 = if (paramFloat2 > 0.0f) {
+                            this.gestureViewDelegate!!.onASGestureReceivedGestureDown()
+                        } else {
+                            this.gestureViewDelegate!!.onASGestureReceivedGestureUp()
+                        }
+                    }
                 }
             }
         }
         this.eventLocked = bool1
         if (bool1 && this.gestureViewDelegate != null) {
-            paramMotionEvent1 = MotionEvent.obtain(paramMotionEvent2)
-            paramMotionEvent1.action = 3
-            this.gestureViewDelegate?.onASGestureDisPathTouchEvent(paramMotionEvent1)
-            paramMotionEvent1.recycle()
+            val cancelEvent = MotionEvent.obtain(paramMotionEvent2)
+            cancelEvent.action = MotionEvent.ACTION_CANCEL
+            this.gestureViewDelegate?.onASGestureDisPathTouchEvent(cancelEvent)
+            cancelEvent.recycle()
         }
         return bool1
     }
@@ -85,10 +92,12 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
         this.gestureDetector.onTouchEvent(paramMotionEvent)
-        if (!this.eventLocked && this.gestureViewDelegate != null) this.gestureViewDelegate?.onASGestureDisPathTouchEvent(
-            paramMotionEvent
-        )
-        if (paramMotionEvent.action == 1) this.eventLocked = false
+        if (!this.eventLocked && this.gestureViewDelegate != null) {
+            this.gestureViewDelegate?.onASGestureDisPathTouchEvent(paramMotionEvent)
+        }
+        if (paramMotionEvent.action == MotionEvent.ACTION_UP) {
+            this.eventLocked = false
+        }
         return true
     }
 
@@ -98,12 +107,6 @@ class ASGestureView(paramContext: Context?) : FrameLayout(paramContext!!),
 
     companion object {
         var filter: Int = 550
-
         var range: Float = 2.4f
     }
-} /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\PageController\ASGestureView.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */
-
-
+}

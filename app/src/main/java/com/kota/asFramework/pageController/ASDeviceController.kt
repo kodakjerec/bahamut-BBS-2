@@ -6,15 +6,27 @@ import android.net.wifi.WifiManager
 import android.net.wifi.WifiManager.WifiLock
 import android.os.Build
 
+/**
+ * [ASDeviceController] - 裝置狀態與網路鎖定控制器。
+ *
+ * 職責：
+ * 1. 於背景掛網或保持 Telnet 保持連線時鎖定 Wi-Fi ([lockWifi])，防止休眠斷線。
+ * 2. 檢測並回傳當前網路連線狀態與連線類型。
+ *
+ * @property context 應用程式上下文 Context
+ */
 class ASDeviceController(val context: Context) {
-    // 檢查是否正在使用鎖定
+
+    /** 檢查是否正在使用 Wi-Fi 鎖定 */
     var isWifiLocked: Boolean = false
 
+    /** Wi-Fi 鎖定物件 */
     val mWifiLock: WifiLock
+
+    /** 當前網路傳輸類型 */
     var transportType: Int = -1
 
     init {
-        // create wifi-lock
         mWifiLock = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             // API 29+ 使用 WIFI_MODE_FULL_LOW_LATENCY
             (context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
@@ -22,7 +34,7 @@ class ASDeviceController(val context: Context) {
                 WIFI_LOCK_KEY
             )
         } else {
-            // API 28 及以下使用 WIFI_MODE_FULL_HIGH_PERF (已棄用但仍可用於舊版本)
+            // API 28 及以下使用 WIFI_MODE_FULL_HIGH_PERF
             @Suppress("DEPRECATION")
             (context.getSystemService(Context.WIFI_SERVICE) as WifiManager).createWifiLock(
                 WifiManager.WIFI_MODE_FULL_HIGH_PERF,
@@ -32,8 +44,12 @@ class ASDeviceController(val context: Context) {
         mWifiLock.setReferenceCounted(false)
     }
 
+    /**
+     * 檢查當前網路連線狀況
+     *
+     * @return 傳播介面類型代碼 (-1 代表無網路)
+     */
     val isNetworkAvailable: Int
-        // 檢查網路狀況
         get() {
             val connectivityManager =
                 context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -42,7 +58,6 @@ class ASDeviceController(val context: Context) {
                 connectivityManager.getNetworkCapabilities(activeNetwork)
             transportType = -1
             if (capabilities != null) {
-                // any type of internet
                 for (i in 0..9) {
                     if (capabilities.hasTransport(i)) {
                         transportType = i
@@ -53,8 +68,10 @@ class ASDeviceController(val context: Context) {
             return transportType
         }
 
+    /**
+     * 獲取 Wi-Fi 鎖定，防止網路休眠斷線
+     */
     fun lockWifi() {
-        println("Lock Wifi")
         if (!this.isWifiLocked) {
             this.isWifiLocked = true
             if (!mWifiLock.isHeld) {
@@ -63,9 +80,11 @@ class ASDeviceController(val context: Context) {
         }
     }
 
+    /**
+     * 釋放 Wi-Fi 鎖定
+     */
     fun unlockWifi() {
         if (this.isWifiLocked) {
-            println("Unlock Wifi")
             try {
                 if (mWifiLock.isHeld) mWifiLock.release()
             } catch (exception: Exception) {
@@ -75,13 +94,14 @@ class ASDeviceController(val context: Context) {
         }
     }
 
-    // 添加清理方法，避免 memory leak
+    /**
+     * 清理資源，釋放鎖定以避免 Memory Leak
+     */
     fun cleanup() {
         unlockWifi()
     }
 
     companion object {
-
         const val WIFI_LOCK_KEY: String = "myapp:wifiLockKey"
     }
 }

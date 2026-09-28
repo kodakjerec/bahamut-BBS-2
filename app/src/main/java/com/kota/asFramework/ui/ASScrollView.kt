@@ -11,15 +11,19 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.view.isNotEmpty
 
+/**
+ * [ASScrollView] - 支援雙指縮放 (Pinch-to-zoom) 與拖曳捲動的自訂 LinearLayout 容器。
+ *
+ * 職責：
+ * 1. 結合 [GestureDetector] 實現雙向捲動處理 ([onScroll])。
+ * 2. 結合 [ScaleGestureDetector] 實現雙指手勢縮放控制。
+ */
 class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGestureListener {
+
     private var contentSizeHeight = 0
-
     private var contentSizeWidth = 0
-
     private var contentView: View? = null
-
     private var scaleDetector: ScaleGestureDetector? = null
-
     private var scrollDetector: GestureDetector? = null
 
     constructor(paramContext: Context) : super(paramContext) {
@@ -100,22 +104,28 @@ class ASScrollView : LinearLayout, GestureDetector.OnGestureListener, OnScaleGes
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(paramMotionEvent: MotionEvent): Boolean {
-        return if (paramMotionEvent.pointerCount == 2) this.scaleDetector!!.onTouchEvent(
-            paramMotionEvent
-        ) else this.scrollDetector!!.onTouchEvent(paramMotionEvent)
+        return if (paramMotionEvent.pointerCount == 2) {
+            this.scaleDetector!!.onTouchEvent(paramMotionEvent)
+        } else {
+            this.scrollDetector!!.onTouchEvent(paramMotionEvent)
+        }
     }
 
+    /**
+     * 重新載入內部 Child View 為內容檢視元件
+     */
     fun reload() {
         if (isNotEmpty()) this.contentView = getChildAt(0)
     }
 
+    /**
+     * 設定內容視圖尺寸邊界
+     *
+     * @param paramInt1 寬度 (px)
+     * @param paramInt2 高度 (px)
+     */
     fun setContentSize(paramInt1: Int, paramInt2: Int) {
         this.contentSizeWidth = paramInt1
         this.contentSizeHeight = paramInt2
     }
-} /* Location:              C:\Users\kodak\Downloads\反編譯\dex-tools-v2.4\classes-dex2jar.jar!\com\kumi\ASFramework\UI\ASScrollView.class
- * Java compiler version: 6 (50.0)
- * JD-Core Version:       1.1.3
- */
-
-
+}

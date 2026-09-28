@@ -17,13 +17,21 @@ import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.pageController.ASPageView
 import com.kota.asFramework.thread.ASCoroutine
 
+/**
+ * [ASSnackBar] - 自訂頂部即時通知 SnackBar 工具。
+ *
+ * 職責：
+ * 1. 於畫面頂部呈現富文字 (SpannableString) 通知，如水球訊息、熱訊或系統提醒。
+ * 2. 支援標題文字粗體 (largeMessage) 與普通內文 (normalMessage) 自訂色彩與字型大小。
+ */
 object ASSnackBar {
     private var previousSnackBar: Snackbar? = null
 
     /**
-     * 產生 snackBar
-     * @param largeMessage 想要粗體的訊息
-     * @param normalMessage 訊息
+     * 產生並顯示頂部提示 SnackBar
+     *
+     * @param largeMessage 想要粗體/大字體強化的訊息前綴 (如發送者名稱)
+     * @param normalMessage 一般訊息內文
      */
     @JvmStatic
     fun show(largeMessage: String, normalMessage: String?) {
@@ -44,14 +52,14 @@ object ASSnackBar {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                // 傳送者:添加大字體 (20sp)
+                // 傳送者: 添加大字體 (24sp)
                 spannableString.setSpan(
                     AbsoluteSizeSpan(24, true),
                     boldStart,
                     boldEnd,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-                // 傳送者:黃色
+                // 傳送者: 黃色文字
                 spannableString.setSpan(
                     ForegroundColorSpan(Color.YELLOW),
                     boldStart,
@@ -59,14 +67,14 @@ object ASSnackBar {
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
 
-                // 其他訊息:普通字體
+                // 其他訊息: 普通字體 (20sp)
                 spannableString.setSpan(
                     AbsoluteSizeSpan(20, true),
                     boldEnd,
                     totalMessage.length,
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-                // 其他訊息:白色
+                // 其他訊息: 白色文字
                 spannableString.setSpan(
                     ForegroundColorSpan(Color.WHITE),
                     boldEnd,

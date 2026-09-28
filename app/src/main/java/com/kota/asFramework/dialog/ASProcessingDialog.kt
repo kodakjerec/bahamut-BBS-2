@@ -7,6 +7,13 @@ import com.kota.Bahamut.R
 import com.kota.asFramework.pageController.ASNavigationController
 import com.kota.asFramework.thread.ASCoroutine
 
+/**
+ * [ASProcessingDialog] - 系統「載入中/處理中」的全域浮動對話框。
+ *
+ * 職責：
+ * 1. 於背景處理網路通訊、BBS 載入或長耗時作業時呈送載入動畫與說明文字。
+ * 2. 採用單例 (Singleton) 管理模式，確保全域同時僅存在一個處理中對話框。
+ */
 class ASProcessingDialog : ASDialog() {
     private var messageLabel: TextView? = null
 
@@ -17,19 +24,19 @@ class ASProcessingDialog : ASDialog() {
         buildContentView()
     }
 
+    /**
+     * 建立對話框視圖內容
+     */
     fun buildContentView() {
-        // frame_view
         val frameView = findViewById<LinearLayout>(R.id.as_processing_dialog_frame_view)
         messageLabel = frameView.findViewById(R.id.as_processing_dialog_text)
         messageLabel?.setText(R.string.zero_word)
     }
 
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
     override fun show() {
         super.show()
     }
 
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog, android.content.DialogInterface
     override fun dismiss() {
         super.dismiss()
     }
@@ -37,6 +44,7 @@ class ASProcessingDialog : ASDialog() {
     companion object {
         @SuppressLint("StaticFieldLeak")
         private var aSProcessingDialog: ASProcessingDialog? = null
+
         private fun constructInstance() {
             aSProcessingDialog = ASProcessingDialog()
         }
@@ -45,10 +53,13 @@ class ASProcessingDialog : ASDialog() {
             aSProcessingDialog = null
         }
 
+        /**
+         * 顯示處理中對話框
+         *
+         * @param aMessage 顯示說明文字 (如 "載入中")
+         */
         @JvmStatic
-        fun showProcessingDialog(
-            aMessage: String?
-        ) {
+        fun showProcessingDialog(aMessage: String?) {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
                     ASCoroutine.ensureMainThread {
@@ -64,6 +75,9 @@ class ASProcessingDialog : ASDialog() {
             }
         }
 
+        /**
+         * 關閉並銷毀處理中對話框
+         */
         @JvmStatic
         fun dismissProcessingDialog() {
             ASCoroutine.ensureMainThread {
@@ -76,6 +90,11 @@ class ASProcessingDialog : ASDialog() {
             }
         }
 
+        /**
+         * 更新處理中對話框之文字訊息
+         *
+         * @param message 最新說明文字
+         */
         @JvmStatic
         fun setMessage(message: String?) {
             ASCoroutine.ensureMainThread {
