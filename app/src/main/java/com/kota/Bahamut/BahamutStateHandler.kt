@@ -326,7 +326,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 }
                 return false
             }
-            TelnetClient.myInstance!!.sendStringToServer("")
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SPACE)
             return false
         } else if (this.rowStringFinal.contains("要新增資料嗎？(Y/N) [N]")) {
             showShortToast("此看板無文章")

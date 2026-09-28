@@ -102,6 +102,10 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
     val itemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.SimpleCallback(
         ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
     ) {
+        override fun isLongPressDragEnabled(): Boolean {
+            return listName == "Favorite"
+        }
+
         override fun onMove(
             recyclerView: RecyclerView,
             viewHolder: RecyclerView.ViewHolder,
@@ -336,7 +340,7 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
      * 格式：`$fromIndex\nM$toIndex\n`
      */
     private fun sendBbsMoveOrderCommand(fromIndex: Int, toIndex: Int) {
-        create().pushString("$fromIndex\nM$toIndex\n").sendToServer()
+        TelnetClient.myInstance!!.sendStringToServer("$fromIndex\nM$toIndex")
     }
 
     /**
@@ -348,12 +352,12 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
             showProcessingDialog(getContextString(R.string.loading))
             PageContainer.instance!!.pushClassPage(item.name, item.title)
             navigationController.pushViewController(PageContainer.instance!!.classPage)
-            TelnetClient.myInstance!!.sendStringToServer("${position + 1}")
+            TelnetClient.myInstance!!.sendStringToServer("${position + 1}\n")
         } else {
             if (TempSettings.lastVisitBoard != item.name) {
                 TempSettings.lastVisitArticleNumber = 0
             }
-            TelnetClient.myInstance!!.sendStringToServer("${position + 1}")
+            TelnetClient.myInstance!!.sendStringToServer("${position + 1}\n")
         }
     }
 
@@ -370,36 +374,24 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
             .setListener { _, index ->
                 if (index == 1) {
                     val itemIndex = position + 1
-                    create().pushString("$itemIndex\nd").sendToServer()
-                    this.loadLastBlock()
+                    // 向 BBS 送出刪除指令 (跳到該項 + 按 d)
+                    TelnetClient.myInstance!!.sendStringToServer("$itemIndex")
+                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_D)
+
+                    // 本地同步刪除項目並更新 RecyclerView
+                    if (position in 0 until boardItems.size) {
+                        boardItems.removeAt(position)
+                        for (i in position until boardItems.size) {
+                            boardItems[i].itemNumber = i + 1
+                        }
+                        adapter?.notifyItemRemoved(position)
+                        adapter?.notifyItemRangeChanged(position, boardItems.size - position)
+                        updateEmptyViewVisibility()
+                    }
                 }
             }
             .scheduleDismissOnPageDisappear(this)
             .show()
-    }
-
-    /**
-     * 檢查是否已存在載入最後區塊命令
-     */
-    fun containsLoadLastBlock(): Boolean {
-        return isCommandLoadingLastBlock
-    }
-
-    /**
-     * 載入/刷新最後區塊資料 (對齊原本 TelnetListPage 的更新列表方式)
-     *
-     * @param isRecordTime 是否記錄載入時間
-     */
-    fun loadLastBlock(isRecordTime: Boolean = true) {
-        if (!containsLoadLastBlock()) {
-            isCommandLoadingLastBlock = true
-            isForceRefresh = true
-            hasMoreOnBbs = true
-            create()
-                .pushKey(TelnetKeyboard.HOME)
-                .pushKey(TelnetKeyboard.END)
-                .sendToServer()
-        }
     }
 
     /**
@@ -425,7 +417,8 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
             .addButton("確定")
             .setListener { _, index ->
                 if (index == 1) {
-                    create().pushString("$itemIndex\na").sendToServer()
+                    TelnetClient.myInstance!!.sendStringToServer("$itemIndex")
+                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_A)
                 }
             }
             .scheduleDismissOnPageDisappear(this)

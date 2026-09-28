@@ -46,7 +46,9 @@ object TelnetKeyboard {
     const val RIGHT_BRACKET: Int = 93 // ]
     const val EQUAL: Int = 61         // =
     const val KEY_S: Int = 115
+    const val SMALL_A: Int = 97       // 加入我的最愛
     const val SMALL_C: Int = 99       // 切換編號/總數
+    const val SMALL_D: Int = 100      // 移出我的最愛 / 刪除
     const val SMALL_T: Int = 116      // 串接模式切換編號
     const val SHIFT_M: Int = 77
     const val BACK_ONE_CHAR: Int = 83
