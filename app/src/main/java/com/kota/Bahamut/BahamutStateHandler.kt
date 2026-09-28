@@ -4,7 +4,6 @@ import android.util.Log
 import com.kota.Bahamut.command.BahamutCommandLoadArticleEnd
 import com.kota.Bahamut.command.BahamutCommandLoadArticleEndForSearch
 import com.kota.Bahamut.command.BahamutCommandLoadMoreArticle
-import com.kota.Bahamut.pages.ClassPage
 import com.kota.Bahamut.pages.MainPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.articlePage.ArticlePage
@@ -14,6 +13,7 @@ import com.kota.Bahamut.pages.boardPage.BoardLinkPage
 import com.kota.Bahamut.pages.boardPage.BoardMainPage
 import com.kota.Bahamut.pages.boardPage.BoardPageAction
 import com.kota.Bahamut.pages.boardPage.BoardSearchPage
+import com.kota.Bahamut.pages.classPage.ClassPage
 import com.kota.Bahamut.pages.essencePage.ArticleEssencePage
 import com.kota.Bahamut.pages.essencePage.BoardEssencePage
 import com.kota.Bahamut.pages.login.LoginPage

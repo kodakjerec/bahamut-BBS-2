@@ -16,6 +16,7 @@ import android.widget.LinearLayout
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.drawerlayout.widget.DrawerLayout.DrawerListener
@@ -44,17 +45,16 @@ import com.kota.Bahamut.listPage.ListStateStore.Companion.instance
 import com.kota.Bahamut.listPage.TelnetListPage
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
-import com.kota.Bahamut.pages.ClassPage
 import com.kota.Bahamut.pages.PostArticlePage
 import com.kota.Bahamut.pages.PostArticlePageListener
 import com.kota.Bahamut.pages.blockListPage.BlockListPage
 import com.kota.Bahamut.pages.bookmarkPage.BoardExtendOptionalPageListener
 import com.kota.Bahamut.pages.bookmarkPage.BookmarkManagePage
+import com.kota.Bahamut.pages.classPage.ClassPage
 import com.kota.Bahamut.pages.model.BoardPageBlock
 import com.kota.Bahamut.pages.model.BoardPageHandler
 import com.kota.Bahamut.pages.model.BoardPageItem
 import com.kota.Bahamut.pages.model.ToolBarFloating
-import androidx.core.content.ContextCompat
 import com.kota.Bahamut.service.CommonFunctions
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.Bahamut.service.TempSettings
