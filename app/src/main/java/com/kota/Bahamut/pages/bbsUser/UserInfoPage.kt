@@ -38,7 +38,7 @@ class UserInfoPage: TelnetPage() {
 
     override fun onBackPressed(): Boolean {
         // 返回
-        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW, 1)
         return super.onBackPressed()
     }
 

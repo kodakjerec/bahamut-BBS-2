@@ -3,12 +3,9 @@ package com.kota.asFramework.pageController
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.kota.asFramework.model.ASSize
-
 class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
     var backgroundView: ASPageView?
         private set
-    val contentSize: ASSize?
     var contentView: ASPageView?
         private set
     private var gestureView: ASGestureView?
@@ -18,7 +15,6 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
         this.backgroundView = null
         this.contentView = null
         this.gestureView = null
-        this.contentSize = ASSize(0, 0)
         this.pageController = null
         initial(context)
     }
@@ -27,7 +23,6 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
         this.backgroundView = null
         this.contentView = null
         this.gestureView = null
-        this.contentSize = ASSize(0, 0)
         this.pageController = null
         initial(context)
     }
@@ -40,7 +35,6 @@ class ASNavigationControllerView : ASPageView, ASGestureViewDelegate {
         this.backgroundView = null
         this.contentView = null
         this.gestureView = null
-        this.contentSize = ASSize(0, 0)
         this.pageController = null
         initial(context)
     }

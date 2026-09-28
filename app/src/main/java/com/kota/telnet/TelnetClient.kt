@@ -1,12 +1,10 @@
 package com.kota.telnet
 
 import android.util.Log
-import com.kota.asFramework.thread.ASCoroutine
 import com.kota.telnet.model.TelnetModel
 import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.textEncoder.U2BEncoder
-import java.io.UnsupportedEncodingException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -47,84 +45,34 @@ class TelnetClient(aStateHandler: TelnetStateHandler) : TelnetConnectorListener 
         }
     }
 
-    fun sendStringToServer(str: String?) {
-        if (ASCoroutine.isMainThread) {
-            sendStringToServerInBackground(str, 0)
-        } else {
-            sendStringToServer(str, 0)
-        }
-    }
-
-    private fun sendStringToServer(str: String?, channel: Int) {
-        var data: ByteArray? = null
-        var encodeSuccess = false
-        try {
-            val data2: ByteArray = (str + "\n").toByteArray(charset(TelnetDef.CHARSET))
-            data = U2BEncoder.instance!!.encodeToBytes(data2, 0)
-            encodeSuccess = true
-        } catch (e: UnsupportedEncodingException) {
-            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
-        }
-        if (encodeSuccess) {
-            sendDataToServer(data, channel)
-        }
-    }
-
+    /** 傳送原始 ByteArray 至伺服器（背景線程安全發送） */
     @JvmOverloads
-    fun sendStringToServerInBackground(str: String?, channel: Int = 0) {
-        var data: ByteArray? = null
-        var encodeSuccess = false
-        try {
-            val data2: ByteArray = (str + "\n").toByteArray(charset(TelnetDef.CHARSET))
-            data = U2BEncoder.instance!!.encodeToBytes(data2, 0)
-            encodeSuccess = true
-        } catch (e: UnsupportedEncodingException) {
-            Log.e(javaClass.simpleName, (if (e.message != null) e.message else "")!!)
-        }
-        if (encodeSuccess) {
-            sendDataToServerInBackground(data, channel)
-        }
-    }
-
-    fun sendKeyboardInputToServer(key: Int) {
-        if (ASCoroutine.isMainThread) {
-            sendKeyboardInputToServerInBackground(key, 0)
-        } else {
-            sendKeyboardInputToServer(key, 0)
-        }
-    }
-
-    private fun sendKeyboardInputToServer(key: Int, channel: Int) {
-        sendDataToServer(TelnetKeyboard.getKeyData(key), channel)
-    }
-
-    @JvmOverloads
-    fun sendKeyboardInputToServerInBackground(key: Int, channel: Int = 0) {
-        sendDataToServerInBackground(TelnetKeyboard.getKeyData(key), channel)
-    }
-
-    fun sendDataToServer(data: ByteArray?) {
-        if (ASCoroutine.isMainThread) {
-            sendDataToServerInBackground(data, 0)
-        } else {
-            sendDataToServer(data, 0)
-        }
-    }
-
-    fun sendDataToServer(data: ByteArray?, channel: Int) {
-        if (data != null && telnetConnector!!.isConnecting) {
-            telnetConnector!!.writeData(data, channel)
-            telnetConnector!!.sendData(channel)
-        }
-    }
-
-    fun sendDataToServerInBackground(data: ByteArray?, channel: Int) {
-        if (data != null && telnetConnector!!.isConnecting) {
+    fun sendDataToServer(data: ByteArray?, channel: Int = 0) {
+        if (data != null && telnetConnector?.isConnecting == true) {
             executorService.submit {
-                this@TelnetClient.telnetConnector!!.writeData(data, channel)
-                this@TelnetClient.telnetConnector!!.sendData(channel)
+                telnetConnector?.writeData(data, channel)
+                telnetConnector?.sendData(channel)
             }
         }
+    }
+
+    /** 傳送字串至伺服器（自動加上 \n 與 Big5 編碼） */
+    @JvmOverloads
+    fun sendStringToServer(str: String?, channel: Int = 0) {
+        if (str == null) return
+        try {
+            val raw = (str + "\n").toByteArray(charset(TelnetDef.CHARSET))
+            val encoded = U2BEncoder.instance!!.encodeToBytes(raw, 0)
+            sendDataToServer(encoded, channel)
+        } catch (e: Exception) {
+            Log.e(javaClass.simpleName, e.message ?: "sendStringToServer error")
+        }
+    }
+
+    /** 傳送鍵盤按鍵 (TelnetKeyboard) 至伺服器 */
+    @JvmOverloads
+    fun sendKeyboardInputToServer(key: Int, channel: Int = 0) {
+        sendDataToServer(TelnetKeyboard.getKeyData(key), channel)
     }
 
     fun setListener(aListener: TelnetClientListener?) {

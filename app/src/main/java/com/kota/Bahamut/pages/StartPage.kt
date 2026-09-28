@@ -185,10 +185,7 @@ class StartPage : TelnetPage() {
         TempSettings.transportType = transportType
         when {
             transportType > -1 -> {
-                ASProcessingDialog.showProcessingDialog("連線中") {
-                    TelnetClient.myInstance!!.close()
-                    false
-                }
+                ASProcessingDialog.showProcessingDialog("連線中")
                 val connectIpAddress = getConnectIpAddress()
                 ASCoroutine.runInNewCoroutine {
                     TelnetClient.myInstance!!.connect(connectIpAddress, 23)

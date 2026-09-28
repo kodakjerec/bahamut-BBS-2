@@ -84,7 +84,7 @@ class MailBoxPage : TelnetListPage(), ListAdapter, DialogSearchArticleListener,
         clear()
         navigationController.popViewController()
         create().pushKey(TelnetKeyboard.LEFT_ARROW).pushKey(TelnetKeyboard.LEFT_ARROW)
-            .sendToServerInBackground(1)
+            .sendToServer(1)
         return true
     }
 

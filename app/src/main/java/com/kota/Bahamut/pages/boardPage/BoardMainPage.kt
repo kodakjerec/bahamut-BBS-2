@@ -747,7 +747,7 @@ open class BoardMainPage : TelnetListPage(),
         }
         clear()
         navigationController.popViewController()
-        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW, 1)
         PageContainer.instance!!.cleanBoardPage()
         return true
     }

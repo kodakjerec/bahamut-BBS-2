@@ -47,16 +47,6 @@
         <activity android:name=".dialogs.DialogShortenImage"
             android:theme="@style/Dialog.NoTitleBar"
             android:configChanges="orientation|screenSize" />
-        <receiver
-            android:name="com.kota.asFramework.network.ASNetworkStateChangeReceiver"
-            android:exported="true"
-            android:label="NetworkConnection">
-            <intent-filter>
-                <action
-                    android:name="android.net.conn.CONNECTIVITY_CHANGE"
-                    tools:ignore="BatteryLife" />
-            </intent-filter>
-        </receiver>
 
         <service
             android:name=".service.BahaBBSBackgroundService"

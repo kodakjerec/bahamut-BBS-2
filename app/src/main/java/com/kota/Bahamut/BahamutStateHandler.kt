@@ -91,6 +91,11 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
     val articleHandler: ArticleHandler = ArticleHandler()
     /** 是否正在讀取文章中 */
     var duringReadingArticle: Boolean = false
+    /** 使用者原本進入看板列表時，是否為總數模式 */
+    var isUserOriginalCountMode: Boolean = false
+
+    /** 標記 App 目前是否正處於「離開看板列表、送出 c 還原為總數」的過渡階段 */
+    var isRestoringToCountMode: Boolean = false
 
     /**
      * 設定文章編號
@@ -441,6 +446,10 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
      */
     fun handleMainPage() {
         this.nowStep = STEP_WORKING
+
+        // 徹底回到主選單時，確保狀態重置
+        isUserOriginalCountMode = false
+        isRestoringToCountMode = false
 
         if (currentPage < BahamutPage.BAHAMUT_MAIN) {
             PageContainer.instance!!.loginPage.onLoginSuccess()
@@ -929,8 +938,19 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 if (this.rowString01.contains("請輸入看板名稱")) {
                     handleSearchBoard()
                 } else if (this.rowString02.contains("總數")) {
-                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_C)
+                    if (isRestoringToCountMode) {
+                        // [防死循環核心] 此畫面是 App 離開看板列表送出 'c' 還原所產生的過渡畫面
+                        // 重置所有狀態，靜默略過，絕不再送 'c'
+                        isRestoringToCountMode = false
+                        isUserOriginalCountMode = false
+                    } else if (!isUserOriginalCountMode) {
+                        // 初次進入看板列表，使用者原本為「總數」模式
+                        isUserOriginalCountMode = true
+                        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_C)
+                    }
+                    // 若已送出切換但畫面尚未刷新的延遲幀，走此處靜默略過
                 } else {
+                    // 已是「編號」模式，正常解析
                     handleClassPage()
                 }
             } else if (this.rowString00.contains("【主題串列】")) {

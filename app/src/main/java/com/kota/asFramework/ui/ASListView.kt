@@ -17,7 +17,6 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
     private var isScrolledToTop: Boolean
     @JvmField
     var extendOptionalDelegate: ASListViewExtentOptionalDelegate?
-    var overscrollDelegate: ASListViewOverscrollDelegate?
 
     constructor(context: Context?, attrs: AttributeSet?, defStyle: Int) : super(
         context,
@@ -28,7 +27,6 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
         this.isScrolledToTop = false
         this.isScrolledToBottom = false
         this.extendOptionalDelegate = null
-        this.overscrollDelegate = null
         init()
     }
 
@@ -37,7 +35,6 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
         this.isScrolledToTop = false
         this.isScrolledToBottom = false
         this.extendOptionalDelegate = null
-        this.overscrollDelegate = null
         init()
     }
 
@@ -46,7 +43,6 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
         this.isScrolledToTop = false
         this.isScrolledToBottom = false
         this.extendOptionalDelegate = null
-        this.overscrollDelegate = null
         init()
     }
 
@@ -101,23 +97,6 @@ class ASListView : ListView, GestureDetector.OnGestureListener {
                     }
                 }
             }
-        }
-        if (this.overscrollDelegate != null && distanceY > ASGestureView.filter && distanceY > ASGestureView.range * distanceX && isNotEmpty()) {
-            synchronized(this) {
-                if (velocityY < 0.0f) {
-                    if (this.isScrolledToBottom) {
-                        this.overscrollDelegate?.onASListViewDelectedOverscrollTop(this)
-                        this.isScrolledToTop = false
-                        this.isScrolledToBottom = false
-                    }
-                }
-                if (velocityY > 0.0f && this.isScrolledToTop) {
-                    this.overscrollDelegate?.onASListViewDelectedOverscrollBottom(this)
-                }
-                this.isScrolledToTop = false
-                this.isScrolledToBottom = false
-            }
-            return true
         }
         return true
     }

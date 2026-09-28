@@ -260,7 +260,7 @@ open class ASNavigationController : Activity() {
         if (aRemovePage != null) {
             aRemovePage.notifyPageWillDisappear()
             if (animated) {
-                removePageView(aRemovePage, ASAnimation.fadeOutToRightAnimation)
+                removePageView(aRemovePage, ASPageAnimation.fadeOutTtRightAnimation!!)
             } else {
                 removePageView(aRemovePage)
             }
@@ -741,14 +741,6 @@ open class ASNavigationController : Activity() {
 
                 // 計算總的底部間距（系統欄 + 軟鍵盤）
                 val bottomPadding = max(systemBars.bottom, imeInsets.bottom)
-
-
-                // 更新 ASWindowStateHandler 中的狀態
-                ASWindowStateHandler.updateWindowInsets(
-                    systemBars.top, bottomPadding,
-                    systemBars.left, systemBars.right
-                )
-
 
                 // 設定內容區域的 padding 以避免與系統欄和軟鍵盤重疊
                 v?.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomPadding)

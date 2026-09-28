@@ -1,7 +1,6 @@
 package com.kota.telnet
 
 import android.util.Log
-import com.kota.asFramework.thread.ASCoroutine
 import com.kota.dataPool.MutableByteBuffer
 import com.kota.telnet.reference.TelnetDef
 import com.kota.telnet.reference.TelnetKeyboard.getKeyData
@@ -11,20 +10,8 @@ class TelnetOutputBuilder {
     private val byteBuffers: MutableByteBuffer = MutableByteBuffer.createMutableByteBuffer()
 
     @JvmOverloads
-    fun sendToServerInBackground(channel: Int = 0) {
-        TelnetClient.myInstance!!.sendDataToServerInBackground(build(), channel)
-    }
-
-    fun sendToServer() {
-        if (ASCoroutine.isMainThread) {
-            sendToServerInBackground(0)
-        } else {
-            sendToServer(0)
-        }
-    }
-
-    private fun sendToServer(channel: Int) {
-        TelnetClient.Companion.myInstance!!.sendDataToServer(build(), channel)
+    fun sendToServer(channel: Int = 0) {
+        TelnetClient.myInstance?.sendDataToServer(build(), channel)
     }
 
     fun build(): ByteArray? {

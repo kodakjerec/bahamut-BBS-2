@@ -1,14 +1,14 @@
 package com.kota.Bahamut.pages.model
 
-import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.TelnetClient
 import com.kota.telnet.TelnetUtils
 import com.kota.telnet.logic.ClassMode
+import com.kota.telnet.model.TelnetRow
 
 class ClassPageHandler private constructor() {
     fun load(): ClassPageBlock {
         val classPackage: ClassPageBlock = ClassPageBlock.Companion.create()
-        // TODO: 原本設計是 編號/總數 共用, 但是總數目前無法逐步新增
+
         if (TelnetClient.model.getRowString(2).trim().startsWith("編號")) {
             classPackage.mode = ClassMode.INDEX
         } else {

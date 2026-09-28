@@ -21,8 +21,6 @@ abstract class ASViewController {
     var isPageDisappeared: Boolean = true
         private set
     private var isRequestRefresh = false
-    private var operationListeners: Vector<ASViewControllerOperationListener?>? = null
-    private var appearListeners: Vector<ASViewControllerAppearListener?>? = null
     private var disappearListeners: Vector<ASViewControllerDisappearListener?>? = null
 
     abstract val pageLayout: Int
@@ -74,44 +72,20 @@ abstract class ASViewController {
     }
 
     fun notifyPageDidRemoveFromNavigationController() {
-        if (this.operationListeners != null) {
-            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners!!)
-            for (listener in listeners) {
-                listener?.onASViewControllerWillRemoveFromNavigationController(this)
-            }
-        }
         onPageDidRemoveFromNavigationController()
     }
 
     fun notifyPageDidAddToNavigationController() {
-        if (this.operationListeners != null) {
-            val listeners = Vector<ASViewControllerOperationListener?>(this.operationListeners!!)
-            for (listener in listeners) {
-                listener?.onASViewControllerWillAddToNavigationController(this)
-            }
-        }
         onPageDidAddToNavigationController()
     }
 
     fun notifyPageWillAppear() {
         this.isPageDisappeared = false
-        if (this.appearListeners != null) {
-            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners!!)
-            for (listener in listeners) {
-                listener?.onASViewControllerWillAppear(this)
-            }
-        }
         onPageWillAppear()
     }
 
     fun notifyPageDidAppear() {
         this.isPageAppeared = true
-        if (this.appearListeners != null) {
-            val listeners = Vector<ASViewControllerAppearListener?>(this.appearListeners!!)
-            for (listener in listeners) {
-                listener?.onASViewControllerDidAppear(this)
-            }
-        }
         onPageDidAppear()
         if (this.isRequestRefresh) {
             onPageRefresh()
@@ -255,32 +229,6 @@ abstract class ASViewController {
 
     override fun toString(): String {
         return "ASViewController[Type:" + this.pageType + "]"
-    }
-
-    fun registerPageOperationListener(aListener: ASViewControllerOperationListener) {
-        if (this.operationListeners == null) {
-            this.operationListeners = Vector<ASViewControllerOperationListener?>()
-        }
-        this.operationListeners?.add(aListener)
-    }
-
-    fun unregisterPageOperationListener(aListener: ASViewControllerOperationListener) {
-        if (this.operationListeners != null) {
-            this.operationListeners?.remove(aListener)
-        }
-    }
-
-    fun registerAppearListener(aListener: ASViewControllerAppearListener) {
-        if (this.appearListeners == null) {
-            this.appearListeners = Vector<ASViewControllerAppearListener?>()
-        }
-        this.appearListeners?.add(aListener)
-    }
-
-    fun unregisterAppearListener(aListener: ASViewControllerAppearListener) {
-        if (this.appearListeners != null) {
-            this.appearListeners?.remove(aListener)
-        }
     }
 
     fun registerDisappearListener(aListener: ASViewControllerDisappearListener?) {

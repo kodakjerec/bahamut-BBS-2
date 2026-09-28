@@ -9,7 +9,6 @@ import com.kota.asFramework.thread.ASCoroutine
 
 class ASProcessingDialog : ASDialog() {
     private var messageLabel: TextView? = null
-    private var onBackDelegate: ASProcessingDialogOnBackDelegate? = null
 
     init {
         requestWindowFeature(1)
@@ -35,21 +34,6 @@ class ASProcessingDialog : ASDialog() {
         super.dismiss()
     }
 
-    fun setOnBackDelegate(onBackDelegate: ASProcessingDialogOnBackDelegate?) {
-        this.onBackDelegate = onBackDelegate
-    }
-
-    // com.kota.asFramework.dialog.ASDialog, android.app.Dialog
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        if (this.onBackDelegate == null || !this.onBackDelegate!!.onASProcessingDialogOnBackDetected(
-                this
-            )
-        ) {
-            super.onBackPressed()
-        }
-    }
-
     companion object {
         @SuppressLint("StaticFieldLeak")
         private var aSProcessingDialog: ASProcessingDialog? = null
@@ -62,10 +46,8 @@ class ASProcessingDialog : ASDialog() {
         }
 
         @JvmStatic
-        @JvmOverloads
         fun showProcessingDialog(
-            aMessage: String?,
-            onBackDelegate: ASProcessingDialogOnBackDelegate? = null
+            aMessage: String?
         ) {
             ASNavigationController.currentController?.isInBackground?.let {
                 if (!it) {
@@ -74,7 +56,6 @@ class ASProcessingDialog : ASDialog() {
                             constructInstance()
                         }
                         setMessage(aMessage)
-                        aSProcessingDialog!!.setOnBackDelegate(onBackDelegate)
                         if (!aSProcessingDialog!!.isShowing) {
                             aSProcessingDialog?.show()
                         }

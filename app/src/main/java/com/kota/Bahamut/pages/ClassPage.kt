@@ -9,6 +9,7 @@ import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
+import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dialogs.DialogSearchBoard
@@ -69,7 +70,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             object: ASCoroutine() {
                 override suspend fun run() {
                     // 延遲1秒，確保看板列表載入完成
-                    TelnetClient.myInstance!!.sendStringToServerInBackground("sChat")
+                    TelnetClient.myInstance!!.sendStringToServer("sChat")
                 }
             }.postDelayed(500L)
         }
@@ -138,11 +139,28 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     }
 
     override fun onBackPressed(): Boolean {
+        // 檢查是否為最後一層 ClassPage（即即將退回主選單 MainPage）
+        val isExitingClassSystem = PageContainer.instance!!.classPageStackSize <= 1
+        if (isExitingClassSystem) {
+            restoreCountModeIfNeeded()
+        }
+
         clear()
         PageContainer.instance!!.popClassPage()
         navigationController.popViewController()
-        TelnetClient.myInstance!!.sendKeyboardInputToServerInBackground(TelnetKeyboard.LEFT_ARROW, 1)
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW, 1)
         return true
+    }
+
+    /**
+     * 若使用者原本為「總數」模式，在徹底離開看板系統前還原
+     */
+    private fun restoreCountModeIfNeeded() {
+        val stateHandler = BahamutStateHandler.bahamutStateHandler ?: return
+        if (stateHandler.isUserOriginalCountMode && !stateHandler.isRestoringToCountMode) {
+            stateHandler.isRestoringToCountMode = true
+            TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_C)
+        }
     }
 
     override fun onSearchButtonClicked(): Boolean {
@@ -159,7 +177,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     override fun onSearchButtonClickedWithKeyword(str: String) {
         SearchBoardHandler.instance.clear()
         showProcessingDialog("搜尋中")
-        create().pushString("s$str ").sendToServerInBackground()
+        create().pushString("s$str ").sendToServer()
     }
 
     fun setClassTitle(aTitle: String?) {
@@ -188,7 +206,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index1: Int ->
                     if (index1 == 1) {
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex\nd")
+                        TelnetClient.myInstance!!.sendStringToServer("$itemIndex\nd")
                         this@ClassPage.loadLastBlock()
                     }
                 }.scheduleDismissOnPageDisappear(this).show()
@@ -201,7 +219,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 .addButton("確定")
                 .setListener { aDialog: ASAlertDialog?, index12: Int ->
                     if (index12 == 1) {
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("$itemIndex2\na")
+                        TelnetClient.myInstance!!.sendStringToServer("$itemIndex2\na")
                     }
                 }.show()
             return true
@@ -232,7 +250,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     if (TempSettings.lastVisitBoard != board) {
                         TempSettings.lastVisitArticleNumber = 0
                     }
-                    TelnetClient.myInstance!!.sendStringToServerInBackground("s$board")
+                    TelnetClient.myInstance!!.sendStringToServer("s$board")
 
                     SearchBoardHandler.instance.clear()
                 }
@@ -255,13 +273,13 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                     create().pushKey(TelnetKeyboard.LEFT_ARROW).pushString("B\n")
                         .pushKey(TelnetKeyboard.HOME).pushString("/$boardName\na ")
                         .pushKey(TelnetKeyboard.LEFT_ARROW).pushString("F\ns$boardName\n")
-                        .sendToServerInBackground()
+                        .sendToServer()
                     return@setListener
                 }
                 if (TempSettings.lastVisitBoard != boardName) {
                     TempSettings.lastVisitArticleNumber = 0
                 }
-                TelnetClient.myInstance!!.sendStringToServerInBackground("s$boardName")
+                TelnetClient.myInstance!!.sendStringToServer("s$boardName")
                 SearchBoardHandler.instance.clear()
             }.scheduleDismissOnPageDisappear(this).show()
     }
@@ -288,7 +306,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             if (TempSettings.lastVisitBoard != item.name) {
                 TempSettings.lastVisitArticleNumber = 0
             }
-            TelnetClient.myInstance!!.sendStringToServerInBackground((index+1).toString() + "\n")
+            TelnetClient.myInstance!!.sendStringToServer((index+1).toString() + "\n")
         }
     }
 

@@ -113,6 +113,9 @@ class PageContainer private constructor() {
         }
     }
 
+    val classPageStackSize: Int
+        get() = this.classPageStack.size
+
     val classPage: ClassPage
         get() {
             if (this.classPageStack.isNotEmpty()) {

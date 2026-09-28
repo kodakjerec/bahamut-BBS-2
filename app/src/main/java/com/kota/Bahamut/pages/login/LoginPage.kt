@@ -241,7 +241,7 @@ class LoginPage : TelnetPage() {
     fun login() {
         ASProcessingDialog.showProcessingDialog("登入中")
         ASCoroutine.runInNewCoroutine {
-            TelnetClient.myInstance!!.sendStringToServerInBackground(username)
+            TelnetClient.myInstance!!.sendStringToServer(username)
         }
     }
 
@@ -256,20 +256,12 @@ class LoginPage : TelnetPage() {
                     .setMessage("您想刪除其他重複的登入嗎？").addButton("否").addButton("是")
                     .setListener { aDialog: ASAlertDialog?, index: Int ->
                         if (index == 0) {
-                            TelnetClient.myInstance!!.sendStringToServerInBackground("n")
+                            TelnetClient.myInstance!!.sendStringToServer("n")
                         } else {
-                            TelnetClient.myInstance!!.sendStringToServerInBackground("y")
+                            TelnetClient.myInstance!!.sendStringToServer("y")
                         }
                         dialogRemoveLoginUser = null
                         ASProcessingDialog.showProcessingDialog("登入中")
-                    }.setOnBackDelegate { aDialog: ASDialog? ->
-                        TelnetClient.myInstance!!.sendStringToServerInBackground("n")
-                        if (dialogRemoveLoginUser != null) {
-                            dialogRemoveLoginUser!!.dismiss()
-                            dialogRemoveLoginUser = null
-                        }
-                        ASProcessingDialog.showProcessingDialog("登入中")
-                        true
                     } as ASAlertDialog?
             }
             dialogRemoveLoginUser!!.show()
