@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <Spinner
@@ -25,7 +26,8 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical">
 
             <com.kota.telnetUI.textView.TelnetTextViewNormal
                 android:id="@+id/ArticlePostDialog_TitleFieldBackground"
@@ -33,20 +35,19 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:ellipsize="end"
-                android:gravity="center_vertical"
-                android:singleLine="true"/>
+                android:gravity="center_vertical"/>
 
             <com.kota.Bahamut.pages.model.PostEditText
                 android:id="@+id/ArticlePostDialog_TitleField"
                 style="@style/TextViewNormal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minHeight="50dp"
                 android:autofillHints=""
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:hint="@string/input_title_here"
-                android:inputType="textMultiLine"
-                android:singleLine="true"
                 android:background="@color/transparent"/>
         </FrameLayout>
     </LinearLayout>
