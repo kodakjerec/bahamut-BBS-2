@@ -13,10 +13,28 @@
         android:orientation="vertical"
         android:padding="1dp"
         style="@style/toolbar">
-        <Button android:id="@+id/ToolbarFloating_setting" android:text="@string/post" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider.Horizontal"/>
-        <Button android:id="@+id/ToolbarFloating_1" android:text="@string/prev_page" style="@style/ToolbarItem"/>
-        <View style="@style/ToolbarDivider.Horizontal"/>
-        <Button android:id="@+id/ToolbarFloating_2" android:text="@string/last_page" style="@style/ToolbarItem"/>
+        <Button
+            android:id="@+id/ToolbarFloating_setting"
+            style="@style/ToolbarItem"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/post" />
+        <View style="@style/ToolbarDivider.Horizontal" />
+        <Button
+            android:id="@+id/ToolbarFloating_1"
+            style="@style/ToolbarItem"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/prev_page" />
+        <View style="@style/ToolbarDivider.Horizontal" />
+        <Button
+            android:id="@+id/ToolbarFloating_2"
+            style="@style/ToolbarItem"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:text="@string/last_page" />
     </LinearLayout>
 </LinearLayout>

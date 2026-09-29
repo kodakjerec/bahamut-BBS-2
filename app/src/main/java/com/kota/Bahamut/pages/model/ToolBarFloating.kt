@@ -5,10 +5,12 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.res.Configuration
+import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.Window
+import android.view.WindowInsets
 import android.widget.Button
 import android.widget.LinearLayout
 import com.kota.Bahamut.R
@@ -19,16 +21,33 @@ import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import com.kota.asFramework.thread.ASCoroutine
 
+/**
+ * 浮動工具列元件 (`ToolBarFloating`)
+ *
+ * 提供懸浮於頁面側邊的快速導覽與操作按鈕（例如：發表、上一頁、下一頁）。
+ * 支援全域觸控跟隨、靠左/靠右自動吸附、邊界保護（避免被系統底欄遮擋）以及底部防抖動鎖定功能。
+ */
 class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+    /** 主要 Layout 容器 */
     private var mainLayout: LinearLayout? = null
+    /** 最上方按鈕（例如：發表） */
     private var btnSetting: Button? = null
+    /** 中間按鈕（例如：上一頁 / 上一篇） */
     private var btn1: Button? = null
+    /** 最下方按鈕（例如：下一頁 / 下一篇） */
     private var btn2: Button? = null
-    private var scale = 0f // 畫面精度
+    /** 螢幕密度 (density) */
+    private var scale = 0f
 
-    private var idleTime = 0f // 閒置多久
-    private var alphaPercentage = 0f // 閒置不透明度
+    /** 閒置自動半透明/隱藏時間 (秒) */
+    private var idleTime = 0f
+    /** 閒置時的不透明度比例 (0.0 ~ 1.0) */
+    private var alphaPercentage = 0f
 
+    /** 底部遲滯 (Hysteresis) 鎖定狀態：防止在頁面底部滾動時工具列微幅震動 */
+    private var isLockedAtBottom = false
+
+    /** 初始化元件，載入佈局、設定監聽器與復原上次紀錄的懸浮位置 */
     @SuppressLint("ClickableViewAccessibility")
     private fun init(context: Context?) {
         idleTime = if (toolbarIdle <= 0f) 1.0f else toolbarIdle
@@ -37,14 +56,15 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         scale = getContext().resources.displayMetrics.density
 
         mainLayout = findViewById(R.id.ToolbarFloating)
-        // 取得上次紀錄
+
+        // 嘗試讀取上次儲存的浮動位置
         val list = floatingLocation
         if (list.isNotEmpty() && list[0]!! >= 0.0f) {
             val pointX: Float = list[0]!!
             val pointY: Float = list[1]!!
             updateLayout(pointX, pointY, false)
         } else {
-            // 畫面預設值：靠右吸附、高度居中
+            // 預設位置：靠右邊界吸附，高度位於畫面中央
             val screenWidth = getContext().resources.displayMetrics.widthPixels.toFloat()
             val screenHeight = getContext().resources.displayMetrics.heightPixels.toFloat()
             updateLayout(screenWidth, screenHeight / 2f, false)
@@ -55,12 +75,17 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         btn2 = mainLayout?.findViewById(R.id.ToolbarFloating_2)
         btnSetting?.setOnTouchListener(onTouchListener)
 
-        // 啟用定時隱藏
-        if (TempSettings.isFloatingInvisible) mainLayout?.alpha = alphaPercentage
-        else startInvisible()
+        // 若啟用閒置隱藏，自動設定透明度與計時器
+        if (TempSettings.isFloatingInvisible) {
+            mainLayout?.alpha = alphaPercentage
+        } else {
+            startInvisible()
+        }
     }
 
-    // 移動 toolbar 手勢監聽
+    /**
+     * 直接拖曳浮動工具列的手勢監聽器
+     */
     @SuppressLint("ClickableViewAccessibility")
     private val onTouchListener = OnTouchListener { view: View?, event: MotionEvent? ->
         if (event == null) return@OnTouchListener false
@@ -69,33 +94,41 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         var pointX = event.rawX
         var pointY = event.rawY
 
-        // 微調手指中心點
-        pointX -= scale * 30
-        pointY -= scale * 60
+        // 手指中心點微調：
+        // pointX 扣除工具列寬度的一半 (80dp / 2 = 40dp)
+        // pointY 扣除「上一頁」與「下一頁」中間的分隔線位置 (120dp)
+        pointX -= scale * 40f
+        pointY -= scale * 120f
 
-        // 彈出視窗與父容器位置扣除
+        // 扣除容器在螢幕上的視窗偏移量 (Status bar 等 offset)
         val location = IntArray(2)
-        rootView?.getLocationOnScreen(location)
+        getLocationOnScreen(location)
         pointX -= location[0].toFloat()
         pointY -= location[1].toFloat()
 
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> // 手指按下
+            MotionEvent.ACTION_DOWN -> {
+                // 手指按下時取消透明度並重置閒置計時
                 cancelInvisible()
+            }
 
             MotionEvent.ACTION_UP -> {
-                if (duration < 200) { // 點擊
+                if (duration < 200) {
+                    // 短按 (點擊事件)：執行按鈕點擊
                     if (view is Button) {
                         view.performClick()
                     }
-                } else { // 手指放開，將位置靠左或靠右吸附
+                } else {
+                    // 長按或拖曳結束放開：將工具列靠左或靠右邊界吸附
                     updateLayout(pointX, pointY, false)
                 }
                 startInvisible()
             }
 
-            MotionEvent.ACTION_MOVE -> // 拖曳中即時更新位置
+            MotionEvent.ACTION_MOVE -> {
+                // 拖曳中：即時更新工具列位置
                 updateLayout(pointX, pointY, true)
+            }
         }
         true
     }
@@ -117,6 +150,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         super.onDetachedFromWindow()
     }
 
+    /** 尋找當前 View 所屬的 Activity */
     private fun findActivity(): Activity? {
         var ctx = context
         while (ctx is ContextWrapper) {
@@ -128,6 +162,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         return null
     }
 
+    /** 判斷全域觸控座標 (rawX, rawY) 是否落於浮動工具列本體的邊界內 */
     private fun isTouchInsideToolbar(rawX: Float, rawY: Float): Boolean {
         val targetView = mainLayout ?: this
         val location = IntArray(2)
@@ -136,9 +171,12 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         val top = location[1].toFloat()
         val right = left + getBarWidth()
         val bottom = top + getBarHeight()
-        return rawX >= left && rawX <= right && rawY >= top && rawY <= bottom
+        return rawX in left..right && rawY in top..bottom
     }
 
+    /**
+     * 處理工具列外部的全域滑動事件 (當使用者在頁面其他區域滑動時，工具列跟隨 Y 軸滑動)
+     */
     fun handleOutsideTouch(event: MotionEvent) {
         if (!isShown || mainLayout?.visibility != View.VISIBLE) return
 
@@ -147,7 +185,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
                 val rawX = event.rawX
                 val rawY = event.rawY
 
-                // 當觸控/滑動點在 ToolBarFloating 範圍以外時，移動到對應 Y 軸；若點擊在中線左側，貼合左緣，右側則貼合右緣
+                // 當觸控/滑動點在 ToolBarFloating 範圍外時，更新工具列 Y 軸位置
                 if (!isTouchInsideToolbar(rawX, rawY)) {
                     moveToXAndY(rawX, rawY)
                 }
@@ -155,16 +193,18 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         }
     }
 
+    /** 根據全域觸控座標移動工具列 Y 軸，並依 X 軸點擊位置自動靠左或靠右吸附 */
     private fun moveToXAndY(rawX: Float, rawY: Float) {
         val location = IntArray(2)
-        rootView?.getLocationOnScreen(location)
-        val pointY = rawY - scale * 60 - location[1].toFloat()
+        getLocationOnScreen(location)
+        // Y 軸對齊於「上一頁」與「下一頁」之間的分隔線 (120dp)
+        val pointY = rawY - scale * 120f - location[1].toFloat()
         val pointX = rawX - location[0].toFloat()
 
-        // 更新 Layout，帶入點擊之 X 與 Y 座標，非拖曳狀態下會依據點擊 X 位置靠左或靠右吸附
         updateLayout(pointX, pointY, dragging = false)
     }
 
+    /** 取得工具列當前寬度（若 Layout 尚未測量則提供備用估算值 80dp） */
     private fun getBarWidth(): Float {
         val width = mainLayout?.width ?: 0
         if (width > 0) return width.toFloat()
@@ -174,9 +214,12 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
         )
-        return (mainLayout?.measuredWidth ?: 0).toFloat()
+        val measured = mainLayout?.measuredWidth ?: 0
+        if (measured > 0) return measured.toFloat()
+        return scale * 80f
     }
 
+    /** 取得工具列當前高度（若 Layout 尚未測量則提供備用估算值 180dp） */
     private fun getBarHeight(): Float {
         val height = mainLayout?.height ?: 0
         if (height > 0) return height.toFloat()
@@ -186,37 +229,108 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
         )
-        return (mainLayout?.measuredHeight ?: 0).toFloat()
+        val measured = mainLayout?.measuredHeight ?: 0
+        if (measured > 0) return measured.toFloat()
+        return scale * 180f
     }
 
-    // 更新 toolbar 位置
+    /** 取得頁面容器寬度 (使用 parent 或 rootView 的寬度，非 ToolBarFloating 本身) */
+    private fun getContainerWidth(): Float {
+        val parentW = (parent as? View)?.width?.toFloat() ?: 0f
+        if (parentW > 0f) return parentW
+        val rootW = rootView?.width?.toFloat() ?: 0f
+        if (rootW > 0f) return rootW
+        return context.resources.displayMetrics.widthPixels.toFloat()
+    }
+
+    /** 取得頁面容器高度 (使用 parent 或 rootView 的高度，非 ToolBarFloating 本身) */
+    private fun getContainerHeight(): Float {
+        val parentH = (parent as? View)?.height?.toFloat() ?: 0f
+        if (parentH > 0f) return parentH
+        val rootH = rootView?.height?.toFloat() ?: 0f
+        if (rootH > 0f) return rootH
+        return context.resources.displayMetrics.heightPixels.toFloat()
+    }
+
+    /** 取得系統底欄 (Gesture / Navigation Bar) 的 Safe Inset 高度 */
+    private fun getBottomInset(): Float {
+        var inset = 0f
+        val root = rootView ?: return inset
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val insets = root.rootWindowInsets?.getInsets(WindowInsets.Type.systemBars())
+            if (insets != null) {
+                inset = insets.bottom.toFloat()
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            val windowInsets = root.rootWindowInsets
+            if (windowInsets != null) {
+                @Suppress("DEPRECATION")
+                inset = windowInsets.systemWindowInsetBottom.toFloat()
+            }
+        }
+        return inset
+    }
+
+    /**
+     * 更新工具列 Layout 位置
+     *
+     * @param targetX 目標 X 座標
+     * @param targetY 目標 Y 座標
+     * @param dragging 是否為使用者正在直接拖曳中
+     */
     private fun updateLayout(targetX: Float, targetY: Float, dragging: Boolean) {
         val barWidth = getBarWidth()
         val barHeight = getBarHeight()
 
-        val displayMetrics = context.resources.displayMetrics
-        val screenWidth = displayMetrics.widthPixels.toFloat()
-        val screenHeight = displayMetrics.heightPixels.toFloat()
+        val containerWidth = getContainerWidth()
+        val containerHeight = getContainerHeight()
+        val bottomInset = getBottomInset()
 
         var finalX = targetX
-        var finalY = targetY
+        val rawTargetY = targetY
 
-        val maxRightX = (screenWidth - barWidth).coerceAtLeast(0f)
-        val maxBottomY = (screenHeight - barHeight).coerceAtLeast(0f)
+        val maxRightX = (containerWidth - barWidth).coerceAtLeast(0f)
+        val usableHeight = (containerHeight - bottomInset).coerceAtLeast(barHeight)
+        val maxBottomY = (usableHeight - barHeight).coerceAtLeast(0f)
 
+        // X 軸位置計算：
         if (dragging) {
-            // 拖曳中：即時跟隨手指，並限制在螢幕可視寬度內
+            // 拖曳中：即時跟隨手指，限制於螢幕可視寬度內
             finalX = finalX.coerceIn(0f, maxRightX)
         } else {
-            // 拖曳結束放開、初始化或外面點擊：判斷觸控/點擊位置相對於螢幕中線 (screenWidth / 2f)
-            finalX = if (targetX <= screenWidth / 2f) {
+            // 靜止/吸附：判斷目標位置位於左半邊或右半邊，自動貼合左邊界或右邊界
+            finalX = if (targetX <= containerWidth / 2f) {
                 0f
             } else {
                 maxRightX
             }
         }
 
-        // Y 軸維持使用者的 Touch Y，並限制在螢幕可視高度內
+        // Y 軸位置與底部防抖動 (Hysteresis) 處理：
+        // 當頁面滑到最底部時，鎖定在 maxBottomY；避免在邊界滾動時工具列跳動
+        val unlockThreshold = scale * 36f // 36dp 反向向上滑動解鎖閾值
+
+        var finalY: Float
+        if (isLockedAtBottom) {
+            // 若已處於底部鎖定狀態，必須向上滑動超過 unlockThreshold 才會解鎖
+            if (rawTargetY < maxBottomY - unlockThreshold) {
+                isLockedAtBottom = false
+                finalY = rawTargetY
+            } else {
+                finalY = maxBottomY
+            }
+        } else {
+            // 未鎖定時：若目標位置達到或超過 maxBottomY，進入底部鎖定
+            if (rawTargetY >= maxBottomY) {
+                isLockedAtBottom = true
+                finalY = maxBottomY
+            } else {
+                finalY = rawTargetY
+            }
+        }
+
+        // 確保 Y 軸嚴格限制在 [0, maxBottomY] 之間，確保 100% 不會超出可視畫面
         finalY = finalY.coerceIn(0f, maxBottomY)
 
         val params = mainLayout?.layoutParams as? LayoutParams ?: LayoutParams(
@@ -227,46 +341,51 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         params.topMargin = finalY.toInt()
         mainLayout?.layoutParams = params
 
-        // 儲存最新浮動位置
+        // 儲存最新的懸浮位置紀錄
         setFloatingLocation(finalX, finalY)
     }
 
-    // 指定按鈕動作和文字 btnSetting
+    /** 設定第一個按鈕 (Setting) 的點擊事件 */
     fun setOnClickListenerSetting(listener: OnClickListener?) {
         btnSetting?.setOnClickListener(listener)
     }
 
+    /** 設定第一個按鈕 (Setting) 的顯示文字 */
     fun setTextSetting(text: String?) {
         btnSetting?.text = text
     }
 
-    // 指定按鈕動作和文字 btn1
+    /** 設定第二個按鈕 (btn1) 的點擊事件 */
     fun setOnClickListener1(listener: OnClickListener?) {
         btn1?.setOnClickListener(listener)
     }
 
+    /** 設定第二個按鈕 (btn1) 的長按事件 */
     fun setOnLongClickListener1(listener: OnLongClickListener?) {
         btn1?.setOnLongClickListener(listener)
     }
 
+    /** 設定第二個按鈕 (btn1) 的顯示文字 */
     fun setText1(text: String?) {
         btn1?.text = text
     }
 
-    // 指定按鈕動作和文字 btn2
+    /** 設定第三個按鈕 (btn2) 的點擊事件 */
     fun setOnClickListener2(listener: OnClickListener?) {
         btn2?.setOnClickListener(listener)
     }
 
+    /** 設定第三個按鈕 (btn2) 的長按事件 */
     fun setOnLongClickListener2(listener: OnLongClickListener?) {
         btn2?.setOnLongClickListener(listener)
     }
 
+    /** 設定第三個按鈕 (btn2) 的顯示文字 */
     fun setText2(text: String?) {
         btn2?.text = text
     }
 
-    // 指定 layout 顯示
+    /** 設定控制元件顯示狀態 */
     override fun setVisibility(visibility: Int) {
         mainLayout?.visibility = visibility
         if (visibility == View.VISIBLE) {
@@ -274,7 +393,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         }
     }
 
-    // 旋轉或變彈出視窗時, 將工具列回到右方預設位置
+    /** 當裝置旋轉或版面配置改變時，重置工具列至畫面右側預設位置 */
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
         val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
@@ -294,9 +413,11 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
     }
 
     companion object {
+        /** 當前活躍的 ToolBarFloating 實例 */
         var activeInstance: ToolBarFloating? = null
             private set
 
+        /** 附加全域 Window Callback 以監聽頁面手勢 */
         fun attachGlobalWindowCallback(activity: Activity) {
             val window = activity.window ?: return
             val currentCallback = window.callback ?: return
@@ -306,6 +427,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         }
     }
 
+    /** 全域 Window 觸控監聽 Proxy */
     private class GlobalWindowCallback(
         private val delegate: Window.Callback
     ) : Window.Callback by delegate {
@@ -320,12 +442,14 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         }
     }
 
+    /** 閒置漸變透明 Coroutine 工作 */
     val startInvisible: ASCoroutine? = object : ASCoroutine() {
         override suspend fun run() {
             mainLayout?.alpha = alphaPercentage
         }
     }
 
+    /** 開始閒置隱藏倒數 */
     private fun startInvisible() {
         startInvisible?.cancel()
         val delayMillis = (idleTime * 1000f).toLong().coerceAtLeast(1000L)
@@ -333,6 +457,7 @@ class ToolBarFloating(context: Context?, attrs: AttributeSet?) : LinearLayout(co
         TempSettings.isFloatingInvisible = true
     }
 
+    /** 取消閒置隱藏並恢復完全不透明 */
     private fun cancelInvisible() {
         startInvisible?.cancel()
         mainLayout?.alpha = 1f
