@@ -500,16 +500,28 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             }
         }
         if (this.rowStringFinal.contains("[訪客]")) {
-            // 紀錄線上人數
-            var startIndex = rowStringFinal.indexOf("[訪客]") + 4
-            var endIndex = rowStringFinal.indexOf(" 人")
-            page.setOnlinePeople(
-                this.rowStringFinal.substring(startIndex, endIndex).trim())
+            // 紀錄線上人數 (解析 "[訪客] XXX 人")
+            val visitorMatch = Regex("""\[訪客]\s*([^人]+)\s*人""").find(this.rowStringFinal)
+            if (visitorMatch != null) {
+                page.setOnlinePeople(visitorMatch.groupValues[1].trim())
+            } else {
+                val startIndex = rowStringFinal.indexOf("[訪客]") + 4
+                val endIndex = rowStringFinal.indexOf("人", startIndex)
+                if (startIndex in 4..rowStringFinal.length && endIndex > startIndex) {
+                    page.setOnlinePeople(rowStringFinal.substring(startIndex, endIndex).trim())
+                }
+            }
 
-            // 紀錄呼叫器
-            startIndex = rowStringFinal.indexOf("[呼叫器]") + 5
-            endIndex = rowStringFinal.length
-            page.setBBCall(this.rowStringFinal.substring(startIndex, endIndex).trim())
+            // 紀錄呼叫器 (解析 "[呼叫器] 開/關")
+            val bbCallMatch = Regex("""\[呼叫器]\s*(\S+)""").find(this.rowStringFinal)
+            if (bbCallMatch != null) {
+                page.setBBCall(bbCallMatch.groupValues[1].trim())
+            } else if (rowStringFinal.contains("[呼叫器]")) {
+                val startIndex = rowStringFinal.indexOf("[呼叫器]") + 5
+                if (startIndex in 5..rowStringFinal.length) {
+                    page.setBBCall(rowStringFinal.substring(startIndex).trim())
+                }
+            }
         }
     }
 
