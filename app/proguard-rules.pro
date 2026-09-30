@@ -1,21 +1,18 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# 保留行號與原始檔名，利於崩潰日誌 (Crash StackTrace) 追蹤除錯
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# Gson 序列化保護規則
+-keepattributes Signature
+-keepattributes *Annotation*
+-dontwarn com.google.gson.**
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# 保留使用 @SerializedName 標註的欄位
+-keepclassmembers class * {
+    @com.google.gson.annotations.SerializedName <fields>;
+}
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# 保留專案中 JSON/Gson 序列化與資料模型
+-keep class com.kota.Bahamut.pages.model.** { *; }
+-keep class com.kota.Bahamut.service.** { *; }
+-keep class com.kota.telnet.model.** { *; }

@@ -108,6 +108,7 @@
                 style="@style/ToolbarItem"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
+                android:autoSizeTextType="none"
                 android:text="@string/edit_short"
                 android:textSize="14sp" />
 
@@ -118,6 +119,7 @@
                 style="@style/ToolbarItem.Danger"
                 android:layout_width="60dp"
                 android:layout_height="match_parent"
+                android:autoSizeTextType="none"
                 android:text="@string/delete_short"
                 android:textSize="14sp" />
         </LinearLayout>
