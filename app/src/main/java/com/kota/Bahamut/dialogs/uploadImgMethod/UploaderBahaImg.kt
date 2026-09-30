@@ -12,12 +12,17 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import android.view.Surface
 import com.google.gson.Gson
-import okhttp3.*
-import java.io.IOException
+import okhttp3.Call
+import okhttp3.Callback
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import java.io.ByteArrayOutputStream
 import java.io.File
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.IOException
 
 data class bahaImgResponse(
     val url: String
@@ -59,30 +64,43 @@ class UploaderBahaImg {
     private fun getFileSizeLimit(mediaType: String): Int = fileSizeLimits[mediaType] ?: Int.MAX_VALUE
 
     /**
-     * 壓縮圖片
+     * 壓縮圖片 (使用 BitmapFactory.Options.inSampleSize 進行降取樣，防止 OOM 記憶體溢出)
      * @param context Context
      * @param imageUri 圖片 Uri
      * @return 壓縮後的位元組陣列
      */
     private fun compressImage(context: Context, imageUri: Uri): ByteArray? {
         return try {
-            val inputStream = context.contentResolver.openInputStream(imageUri)
-            val bitmap = BitmapFactory.decodeStream(inputStream)
-            inputStream?.close()
-
-            if (bitmap == null) return null
-
-            // 計算縮放比例以符合 2K 解析度 (2560×1440)
             val maxWidth = 2560
             val maxHeight = 1440
-            var width = bitmap.width
-            var height = bitmap.height
 
+            // 1. 第一次解碼：僅讀取圖片長寬資訊 (不載入像素至記憶體)
+            val options = BitmapFactory.Options().apply {
+                inJustDecodeBounds = true
+            }
+            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream, null, options)
+            }
+
+            if (options.outWidth <= 0 || options.outHeight <= 0) return null
+
+            // 2. 計算 inSampleSize (降取樣比例)
+            options.inSampleSize = calculateInSampleSize(options, maxWidth, maxHeight)
+            options.inJustDecodeBounds = false
+
+            // 3. 第二次解碼：使用 inSampleSize 以降取樣後的解析度載入 Bitmap
+            val bitmap = context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream, null, options)
+            } ?: return null
+
+            // 4. 計算精確縮放比例以符合 2K 解析度 (2560×1440)
+            val width = bitmap.width
+            val height = bitmap.height
             val scaleWidth = width.toFloat() / maxWidth
             val scaleHeight = height.toFloat() / maxHeight
             val scale = maxOf(scaleWidth, scaleHeight)
 
-            // 如果圖片超過 2K，進行縮放
+            // 如果圖片尺寸仍超過 2K，進行精確縮放
             val scaledBitmap = if (scale > 1) {
                 val newWidth = (width / scale).toInt()
                 val newHeight = (height / scale).toInt()
@@ -102,8 +120,32 @@ class UploaderBahaImg {
 
             compressedBytes
         } catch (e: Exception) {
+            e.printStackTrace()
             null
         }
+    }
+
+    /**
+     * 計算 BitmapFactory.Options 的 inSampleSize 降取樣數值
+     */
+    private fun calculateInSampleSize(
+        options: BitmapFactory.Options,
+        reqWidth: Int,
+        reqHeight: Int
+    ): Int {
+        val height = options.outHeight
+        val width = options.outWidth
+        var inSampleSize = 1
+
+        if (height > reqHeight || width > reqWidth) {
+            val halfHeight = height / 2
+            val halfWidth = width / 2
+
+            while (halfHeight / inSampleSize >= reqHeight && halfWidth / inSampleSize >= reqWidth) {
+                inSampleSize *= 2
+            }
+        }
+        return inSampleSize
     }
 
     /**
