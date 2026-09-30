@@ -7,7 +7,6 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.size
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CommonFunctions.getContextColor
 import com.kota.Bahamut.service.CommonFunctions.getThemeColor
@@ -41,24 +40,26 @@ open class TelnetHeaderItemView : LinearLayout {
         detail2 = findViewById(R.id.detail_2)
         mMenuButton = findViewById(R.id.menu_button)
 
-        // 側邊選單
-        val location = UserSettings.propertiesDrawerLocation
-        if (location == 1) {
-            val headerItemView = findViewById<LinearLayout>(R.id.header_item_view)
-            // 備份現在的view
-            val alViews = ArrayList<View?>()
-            for (i in headerItemView.size - 1 downTo 0) {
-                val view = headerItemView.getChildAt(i)
-                alViews.add(view)
-            }
-            // 刪除所有child-view
-            headerItemView.removeAllViews()
-            // 回填
-            for (j in alViews.indices) {
-                headerItemView.addView(alViews[j])
-            }
-        }
+        updateMenuButtonPosition()
         updateThemeColors()
+    }
+
+    /** 依據 UserSettings.propertiesDrawerLocation 動態調整漢堡圖示位置 (0: 右側, 1: 左側) */
+    open fun updateMenuButtonPosition() {
+        val headerItemView = findViewById<LinearLayout>(R.id.header_item_view) ?: return
+        val menuButton = mMenuButton ?: findViewById(R.id.menu_button) ?: return
+
+        val isLeft = UserSettings.propertiesDrawerLocation == 1
+        val currentMenuIndex = headerItemView.indexOfChild(menuButton)
+        if (currentMenuIndex == -1) return
+
+        if (isLeft && currentMenuIndex != 0) {
+            headerItemView.removeView(menuButton)
+            headerItemView.addView(menuButton, 0)
+        } else if (!isLeft && currentMenuIndex == 0) {
+            headerItemView.removeView(menuButton)
+            headerItemView.addView(menuButton)
+        }
     }
 
     open fun updateThemeColors() {
@@ -82,6 +83,7 @@ open class TelnetHeaderItemView : LinearLayout {
     }
 
     open fun setMenuButtonClickListener(aListener: OnClickListener?) {
+        updateMenuButtonPosition()
         if (aListener == null) {
             mMenuDivider?.visibility = GONE
             mMenuButton?.visibility = GONE
@@ -94,6 +96,7 @@ open class TelnetHeaderItemView : LinearLayout {
     }
 
     open fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
+        updateMenuButtonPosition()
         updateThemeColors()
         setTitle(aTitle)
         setDetail1(aDetail1)
