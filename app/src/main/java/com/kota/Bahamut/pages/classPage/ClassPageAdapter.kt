@@ -23,6 +23,9 @@ class ClassPageAdapter(
     /** 是否為「我的最愛」模式 */
     var isFavoriteMode: Boolean = false
 
+    /** 是否為「刪除管理」模式 (顯示刪除按鈕) */
+    var isDeleteManageMode: Boolean = false
+
     /** 項目與刪除按鈕點擊監聽器 */
     private var listener: ClassPageClickListener? = null
 
@@ -42,7 +45,7 @@ class ClassPageAdapter(
 
     override fun onBindViewHolder(holder: ClassPageViewHolder, position: Int) {
         val item = getItem(position)
-        holder.setItem(item, isFavoriteMode)
+        holder.setItem(item, isFavoriteMode, isDeleteManageMode)
     }
 
     override fun getItemCount(): Int = items.size

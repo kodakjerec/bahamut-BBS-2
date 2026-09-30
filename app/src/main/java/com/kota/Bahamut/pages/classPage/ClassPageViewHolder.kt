@@ -41,8 +41,9 @@ class ClassPageViewHolder(
      *
      * @param item [ClassPageItem] 看板資料物件
      * @param isFavoriteMode 是否為「我的最愛」模式
+     * @param isDeleteManageMode 是否為「刪除管理」模式（顯示刪除按鈕）
      */
-    fun setItem(item: ClassPageItem?, isFavoriteMode: Boolean) {
+    fun setItem(item: ClassPageItem?, isFavoriteMode: Boolean, isDeleteManageMode: Boolean = false) {
         if (item != null) {
             classTitle.text = item.title
             className.text = item.name
@@ -53,7 +54,7 @@ class ClassPageViewHolder(
             classManager.text = ""
         }
 
-        if (isFavoriteMode) {
+        if (isFavoriteMode && isDeleteManageMode) {
             deleteButton.visibility = View.VISIBLE
             arrowView.visibility = View.GONE
         } else {

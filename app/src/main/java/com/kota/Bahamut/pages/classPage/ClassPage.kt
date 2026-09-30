@@ -222,6 +222,7 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
             displayTitle = getContextString(R.string.loading)
         }
 
+        val isFavorite = (listName == "Favorite")
         val headerView = mainLayout.findViewById<TelnetHeaderItemView>(R.id.ClassPage_headerView)
         if (headerView != null) {
             if (TempSettings.lastVisitBoard.isNotEmpty()) {
@@ -239,11 +240,19 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
                 }
             }
             val detail = "看板列表"
-            val headerDetail2 = if (listName == "Favorite") "長按可移動位置" else ""
+            val headerDetail2 = if (isFavorite) "長按可移動位置" else ""
             headerView.setData(displayTitle, detail, headerDetail2)
+
+            if (isFavorite) {
+                headerView.setMenuButtonClickListener {
+                    showFavoriteMenu()
+                }
+            } else {
+                headerView.setMenuButtonClickListener(null)
+            }
         }
 
-        adapter?.isFavoriteMode = (listName == "Favorite")
+        adapter?.isFavoriteMode = isFavorite
         adapter?.notifyDataSetChanged()
         updateEmptyViewVisibility()
     }
@@ -630,10 +639,58 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
     }
 
     /**
+     * 處理選單按鈕事件 (例如實體選單鍵或標題列選單)
+     */
+    override fun onMenuButtonClicked(): Boolean {
+        if (listName == "Favorite") {
+            showFavoriteMenu()
+            return true
+        }
+        return super.onMenuButtonClicked()
+    }
+
+    /**
+     * 顯示「我的最愛」漢堡選單 (含「刪除管理」選項)
+     */
+    private fun showFavoriteMenu() {
+        ASListDialog.createDialog()
+            .addItem("刪除管理")
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ) {
+                    if (index == 0) {
+                        toggleDeleteManageMode()
+                    }
+                }
+
+                override fun onListDialogItemLongClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ): Boolean = false
+            })
+            .scheduleDismissOnPageDisappear(this)
+            .show()
+    }
+
+    /**
+     * 切換「刪除管理」模式 (點擊一次顯示刪除按鈕，再點一次隱藏)
+     */
+    private fun toggleDeleteManageMode() {
+        val currentMode = adapter?.isDeleteManageMode ?: false
+        adapter?.isDeleteManageMode = !currentMode
+        adapter?.notifyDataSetChanged()
+    }
+
+    /**
      * 完全離開 ClassPage 時清理頁面狀態與暫存資料
      */
     override fun clear() {
         boardItems.clear()
+        adapter?.isDeleteManageMode = false
         adapter?.notifyDataSetChanged()
         listName = ""
         isLoadingMore = false
