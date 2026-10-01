@@ -18,6 +18,8 @@ abstract class TelnetListPage2 : TelnetListPage() {
     var recyclerView: RecyclerView? = null
         private set
 
+    var emptyView: android.view.View? = null
+
     /** 內部使用的 RecyclerView Adapter */
     val recyclerViewAdapter: RecyclerView.Adapter<TelnetViewHolder> by lazy {
         TelnetListAdapter2()
@@ -94,11 +96,40 @@ abstract class TelnetListPage2 : TelnetListPage() {
         }
 
     /**
+     * 當 Telnet 頁面收到刷新通知時呼叫，同步更新 RecyclerView
+     */
+    override fun onPageRefresh() {
+        super.onPageRefresh()
+        if (recyclerView != null) {
+            safeNotifyDataSetChanged()
+        }
+    }
+
+    /**
+     * 清除列表項目時同步刷新 RecyclerView
+     */
+    override fun clear() {
+        super.clear()
+        if (recyclerView != null) {
+            safeNotifyDataSetChanged()
+        }
+    }
+
+    /**
      * 安全地在主執行緒刷新列表
      */
     override fun safeNotifyDataSetChanged() {
         ASCoroutine.ensureMainThread {
             recyclerViewAdapter.notifyDataSetChanged()
+            if (emptyView != null) {
+                if (isEmpty()) {
+                    emptyView?.visibility = android.view.View.VISIBLE
+                    recyclerView?.visibility = android.view.View.GONE
+                } else {
+                    emptyView?.visibility = android.view.View.GONE
+                    recyclerView?.visibility = android.view.View.VISIBLE
+                }
+            }
             super.safeNotifyDataSetChanged()
         }
     }

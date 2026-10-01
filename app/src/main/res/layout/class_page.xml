@@ -28,14 +28,12 @@
             android:textColor="?attr/bahamut_defaultTextColor"
             android:visibility="invisible" />
 
-        <com.kota.asFramework.ui.ASListView
-            android:id="@+id/ClassPage_listView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ClassPage_recyclerView"
             style="@style/List"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="-1dp"
-            android:divider="@null"
-            android:dividerHeight="0dp" />
+            android:layout_marginBottom="-1dp" />
     </FrameLayout>
 
     <TextView

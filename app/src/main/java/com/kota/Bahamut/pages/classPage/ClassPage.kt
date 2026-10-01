@@ -3,8 +3,6 @@ package com.kota.Bahamut.pages.classPage
 import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AbsListView
-import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.kota.Bahamut.BahamutPage
@@ -14,7 +12,8 @@ import com.kota.Bahamut.R
 import com.kota.Bahamut.command.BahamutCommandDeleteFavoriteBoard
 import com.kota.Bahamut.dialogs.DialogSearchBoard
 import com.kota.Bahamut.dialogs.DialogSearchBoardListener
-import com.kota.Bahamut.listPage.TelnetListPage
+import androidx.recyclerview.widget.RecyclerView
+import com.kota.Bahamut.listPage.TelnetListPage2
 import com.kota.Bahamut.listPage.TelnetListPageBlock
 import com.kota.Bahamut.listPage.TelnetListPageItem
 import com.kota.Bahamut.pages.model.ClassPageBlock
@@ -39,7 +38,7 @@ import com.kota.telnet.logic.SearchBoardHandler
 import com.kota.telnet.reference.TelnetKeyboard
 import com.kota.telnetUI.TelnetHeaderItemView
 
-class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
+class ClassPage : TelnetListPage2(), View.OnClickListener, DialogSearchBoardListener {
     lateinit var mainLayout: RelativeLayout
     private var title: String? = ""
     var isDeleteManageMode: Boolean = false
@@ -55,9 +54,9 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
         mainLayout = findViewById(R.id.content_view) as RelativeLayout
 
-        val listView1: ListView = mainLayout.findViewById(R.id.ClassPage_listView)
-        listView1.emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
-        bindListView(listView1)
+        val recyclerView: RecyclerView = mainLayout.findViewById(R.id.ClassPage_recyclerView)
+        emptyView = mainLayout.findViewById(R.id.ClassPage_listEmptyView)
+        bindRecyclerView(recyclerView)
         mainLayout.findViewById<View>(R.id.ClassPage_SearchButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_FirstPageButton).setOnClickListener(this)
         mainLayout.findViewById<View>(R.id.ClassPage_LastestPageButton).setOnClickListener(this)
@@ -120,8 +119,6 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         onPageRefresh()
-        val listView1: ListView? = mainLayout.findViewById(R.id.ClassPage_listView)
-        listView1?.invalidateViews()
         safeNotifyDataSetChanged()
     }
 
@@ -345,8 +342,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
      */
     private fun toggleDeleteManageMode() {
         isDeleteManageMode = !isDeleteManageMode
-        val listView1: ListView? = mainLayout.findViewById(R.id.ClassPage_listView)
-        listView1?.invalidateViews()
+        safeNotifyDataSetChanged()
     }
 
     private fun onDeleteFavoriteBoardClicked(index: Int) {
@@ -388,7 +384,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         }
         if (itemView == null) {
             itemView = ClassPageItemView(context)
-            itemView.layoutParams = AbsListView.LayoutParams(-1, -2)
+            itemView.layoutParams = ViewGroup.LayoutParams(-1, -2)
         }
         val isFavorite = (listName == "Favorite")
         val pageItemView = itemView as ClassPageItemView
