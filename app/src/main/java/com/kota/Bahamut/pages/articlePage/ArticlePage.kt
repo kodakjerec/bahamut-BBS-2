@@ -909,8 +909,16 @@ class ArticlePage : TelnetPage() {
         boardMainPage = aBoardMainPage
     }
 
+    override fun clear() {
+        ThumbnailItemView.clearManualLoadedUrls()
+        telnetArticle?.clear()
+        telnetArticle = null
+        super.clear()
+    }
+
     /** 給其他網頁顯示文章使用  */
     fun setArticle(aArticle: TelnetArticle): Boolean {
+        ThumbnailItemView.clearManualLoadedUrls()
         var isSuccess = true
         telnetArticle = aArticle
 

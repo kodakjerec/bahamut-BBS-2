@@ -18,6 +18,7 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
@@ -216,6 +217,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     override fun clear() {
+        ThumbnailItemView.clearManualLoadedUrls()
         telnetArticle = null
     }
 

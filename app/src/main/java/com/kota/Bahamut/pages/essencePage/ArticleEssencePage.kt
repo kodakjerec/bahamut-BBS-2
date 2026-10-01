@@ -253,6 +253,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     override fun clear() {
+        ThumbnailItemView.clearManualLoadedUrls()
         telnetArticle = null
     }
 
