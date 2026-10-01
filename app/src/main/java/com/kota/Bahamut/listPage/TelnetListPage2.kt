@@ -311,19 +311,21 @@ abstract class TelnetListPage2 : TelnetListPage() {
                 }
             }
 
+            val targetView = childView ?: holder.container
+
             // 點擊事件監聽轉發
-            holder.container.setOnClickListener {
+            targetView.setOnClickListener {
                 val currentPos = holder.bindingAdapterPosition
                 if (currentPos != RecyclerView.NO_POSITION) {
-                    onItemClick(null, childView ?: holder.container, currentPos, getItemId(currentPos))
+                    onItemClick(null, targetView, currentPos, getItemId(currentPos))
                 }
             }
 
             // 長按事件監聽轉發
-            holder.container.setOnLongClickListener {
+            targetView.setOnLongClickListener {
                 val currentPos = holder.bindingAdapterPosition
                 if (currentPos != RecyclerView.NO_POSITION) {
-                    onListViewItemLongClicked(childView ?: holder.container, currentPos)
+                    onListViewItemLongClicked(targetView, currentPos)
                 } else {
                     false
                 }
