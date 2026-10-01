@@ -117,35 +117,28 @@ class ArticlePage : TelnetPage() {
 
         // android.widget.Adapter
         override fun getView(itemIndex: Int, itemViewFrom: View?, parentView: ViewGroup?): View {
-            var type = getItemViewType(itemIndex)
+            val type = getItemViewType(itemIndex)
             val item = getItem(itemIndex)
-            // 2-標題 0-本文 1-簽名檔 3-發文時間 4-推文
             var itemViewOrigin = itemViewFrom
 
-            if (itemViewOrigin == null) {
-                when (type) {
-                    ArticlePageItemType.Companion.SIGN -> itemViewOrigin =
-                        ArticlePageTelnetItemView(context)
+            val isMatch = when (type) {
+                ArticlePageItemType.Companion.HEADER -> itemViewOrigin is ArticlePageHeaderItemView
+                ArticlePageItemType.Companion.SIGN -> itemViewOrigin is ArticlePageTelnetItemView
+                ArticlePageItemType.Companion.POST_TIME -> itemViewOrigin is ArticlePageTimeTimeView
+                ArticlePageItemType.Companion.PUSH -> itemViewOrigin is ArticlePagePushItemView
+                ArticlePageItemType.Companion.EDIT_RECORD -> itemViewOrigin is ArticlePageEditRecordItemView
+                else -> itemViewOrigin is ArticlePageTextItemView
+            }
 
-                    ArticlePageItemType.Companion.HEADER -> itemViewOrigin =
-                        ArticlePageHeaderItemView(context)
-
-                    ArticlePageItemType.Companion.POST_TIME -> itemViewOrigin =
-                        ArticlePageTimeTimeView(context)
-
-                    ArticlePageItemType.Companion.PUSH -> itemViewOrigin =
-                        ArticlePagePushItemView(context!!)
-
-                    ArticlePageItemType.Companion.EDIT_RECORD -> itemViewOrigin =
-                        ArticlePageEditRecordItemView(context!!)
-
-                    else -> {
-                        type = ArticlePageItemType.Companion.CONTENT
-                        itemViewOrigin = ArticlePageTextItemView(context)
-                    }
+            if (!isMatch) {
+                itemViewOrigin = when (type) {
+                    ArticlePageItemType.Companion.HEADER -> ArticlePageHeaderItemView(context)
+                    ArticlePageItemType.Companion.SIGN -> ArticlePageTelnetItemView(context)
+                    ArticlePageItemType.Companion.POST_TIME -> ArticlePageTimeTimeView(context)
+                    ArticlePageItemType.Companion.PUSH -> ArticlePagePushItemView(context!!)
+                    ArticlePageItemType.Companion.EDIT_RECORD -> ArticlePageEditRecordItemView(context!!)
+                    else -> ArticlePageTextItemView(context)
                 }
-            } else if (type == ArticlePageItemType.Companion.CONTENT) {
-                itemViewOrigin = ArticlePageTextItemView(context)
             }
 
             if (itemViewOrigin is ArticlePageTextItemView) {
@@ -198,7 +191,7 @@ class ArticlePage : TelnetPage() {
                 }
             }
 
-            return itemViewOrigin
+            return itemViewOrigin!!
         }
 
         /** 一共有多少种不同的视图类型  */

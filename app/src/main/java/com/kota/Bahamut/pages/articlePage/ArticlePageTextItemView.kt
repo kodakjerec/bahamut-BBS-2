@@ -76,8 +76,27 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         }
     }
 
+    /** 重置動態增減的 child views，確保 View 回收 (Recycling) 後畫面正確 */
+    private fun resetViews() {
+        val mainLayout = contentView as? LinearLayout ?: return
+        mainLayout.removeAllViews()
+        if (authorLabel?.parent != null) {
+            (authorLabel?.parent as ViewGroup).removeView(authorLabel)
+        }
+        if (authorLabel != null) {
+            mainLayout.addView(authorLabel)
+        }
+        if (contentLabel?.parent != null) {
+            (contentLabel?.parent as ViewGroup).removeView(contentLabel)
+        }
+        if (contentLabel != null) {
+            mainLayout.addView(contentLabel)
+        }
+    }
+
     /** 設定內容  */
     fun setContent(content: String, rows: Vector<TelnetRow>) {
+        resetViews()
         updateThemeColors()
         if (contentLabel != null) {
             // 讓內文對應顏色, 限定使用者自己發文
