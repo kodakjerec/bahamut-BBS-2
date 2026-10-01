@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.kota.Bahamut.R
@@ -17,9 +16,8 @@ class ClassPageItemView : LinearLayout {
     private lateinit var boardNameLabel: TextView
     private lateinit var boardTitleLabel: TextView
     private lateinit var dividerBottom: View
-    private lateinit var deleteButton: Button
+    private lateinit var dragHandle: View
     private lateinit var arrowView: View
-    private var onDeleteClickListener: OnClickListener? = null
 
     constructor(context: Context?) : super(context) {
         init()
@@ -38,16 +36,12 @@ class ClassPageItemView : LinearLayout {
         this.boardNameLabel = findViewById(R.id.ClassPage_ItemView_className)
         this.boardManagerLabel = findViewById(R.id.ClassPage_ItemView_classManager)
         this.dividerBottom = findViewById(R.id.ClassPage_ItemView_DividerBottom)
-        this.deleteButton = findViewById(R.id.ClassPage_ItemView_DeleteButton)
+        this.dragHandle = findViewById(R.id.ClassPage_ItemView_DragHandle)
         this.arrowView = findViewById(R.id.ListItem_ArrowView)
-
-        this.deleteButton.setOnClickListener { v ->
-            onDeleteClickListener?.onClick(v)
-        }
     }
 
-    fun setOnDeleteClickListener(listener: OnClickListener?) {
-        this.onDeleteClickListener = listener
+    fun setOnDragHandleTouchListener(listener: OnTouchListener?) {
+        this.dragHandle.setOnTouchListener(listener)
     }
 
     fun setDividerBottomVisible(visible: Boolean) {
@@ -81,7 +75,7 @@ class ClassPageItemView : LinearLayout {
         )
     }
 
-    fun setItem(aItem: ClassPageItem?, isFavoriteMode: Boolean = false, isDeleteManageMode: Boolean = false) {
+    fun setItem(aItem: ClassPageItem?, isFavoriteMode: Boolean = false, isReorderMode: Boolean = false) {
         if (aItem != null) {
             setBoardTitleText(aItem.title)
             setBoardNameText(aItem.name)
@@ -91,11 +85,11 @@ class ClassPageItemView : LinearLayout {
             return
         }
 
-        if (isFavoriteMode && isDeleteManageMode) {
-            deleteButton.visibility = VISIBLE
+        if (isFavoriteMode && isReorderMode) {
+            dragHandle.visibility = VISIBLE
             arrowView.visibility = GONE
         } else {
-            deleteButton.visibility = GONE
+            dragHandle.visibility = GONE
             arrowView.visibility = VISIBLE
         }
     }

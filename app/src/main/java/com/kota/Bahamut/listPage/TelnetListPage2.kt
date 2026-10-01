@@ -1,10 +1,13 @@
 package com.kota.Bahamut.listPage
 
+import android.annotation.SuppressLint
 import android.view.ViewGroup
 import android.widget.AbsListView
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.kota.Bahamut.R
 import com.kota.asFramework.thread.ASCoroutine
 
 /**
@@ -20,9 +23,86 @@ abstract class TelnetListPage2 : TelnetListPage() {
 
     var emptyView: android.view.View? = null
 
+    var itemTouchHelper: ItemTouchHelper? = null
+        private set
+
     /** 內部使用的 RecyclerView Adapter */
     val recyclerViewAdapter: RecyclerView.Adapter<TelnetViewHolder> by lazy {
         TelnetListAdapter2()
+    }
+
+    /** 預設 ItemTouchHelper Callback，封裝拖曳處理邏輯 */
+    private val defaultItemTouchHelperCallback = object : ItemTouchHelper.SimpleCallback(
+        ItemTouchHelper.UP or ItemTouchHelper.DOWN, 0
+    ) {
+        var startPos: Int = -1
+        var targetPos: Int = -1
+
+        override fun isLongPressDragEnabled(): Boolean = false
+        override fun isItemViewSwipeEnabled(): Boolean = false
+
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
+            val from = viewHolder.bindingAdapterPosition
+            val to = target.bindingAdapterPosition
+            if (from != RecyclerView.NO_POSITION && to != RecyclerView.NO_POSITION) {
+                if (startPos == -1) startPos = from
+                targetPos = to
+                return onItemMove(from, to)
+            }
+            return false
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                viewHolder?.itemView?.alpha = 0.7f
+            } else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
+                viewHolder?.itemView?.alpha = 1.0f
+                if (startPos != -1 && targetPos != -1 && startPos != targetPos) {
+                    onItemDrop(startPos, targetPos)
+                }
+                startPos = -1
+                targetPos = -1
+            }
+        }
+    }
+
+    /**
+     * 當 Item 正在拖曳移動時呼叫 (畫面或資料交換)
+     *
+     * @param fromPosition 原始位置 (0-based)
+     * @param toPosition 目標位置 (0-based)
+     * @return 是否允許移動
+     */
+    open fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
+        recyclerViewAdapter.notifyItemMoved(fromPosition, toPosition)
+        return true
+    }
+
+    /**
+     * 當 Item 拖曳放開 (完成拖曳) 時呼叫
+     *
+     * @param fromPosition 起始位置 (0-based)
+     * @param toPosition 最終放置位置 (0-based)
+     */
+    open fun onItemDrop(fromPosition: Int, toPosition: Int) {
+        // 預設留空，由子類別 (如 ClassPage) 覆寫處理 (如發送 Telnet 移動指令)
+    }
+
+    /**
+     * 設定自訂 ItemTouchHelper 供拖曳排序使用
+     */
+    fun setupItemTouchHelper(callback: ItemTouchHelper.Callback) {
+        itemTouchHelper = ItemTouchHelper(callback)
+        if (recyclerView != null) {
+            itemTouchHelper?.attachToRecyclerView(recyclerView)
+        }
     }
 
     /**
@@ -34,6 +114,11 @@ abstract class TelnetListPage2 : TelnetListPage() {
             recyclerView?.layoutManager = LinearLayoutManager(recyclerView?.context)
         }
         recyclerView?.adapter = recyclerViewAdapter
+
+        if (itemTouchHelper == null) {
+            itemTouchHelper = ItemTouchHelper(defaultItemTouchHelperCallback)
+        }
+        itemTouchHelper?.attachToRecyclerView(recyclerView)
     }
 
     /**
@@ -194,6 +279,7 @@ abstract class TelnetListPage2 : TelnetListPage() {
             return TelnetViewHolder(container)
         }
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun onBindViewHolder(holder: TelnetViewHolder, position: Int) {
             val adapterPos = holder.bindingAdapterPosition
             if (adapterPos == RecyclerView.NO_POSITION) return
@@ -214,6 +300,14 @@ abstract class TelnetListPage2 : TelnetListPage() {
                     (childView.parent as? ViewGroup)?.removeView(childView)
                     holder.container.removeAllViews()
                     holder.container.addView(childView)
+                }
+
+                val dragHandle = childView.findViewById<android.view.View>(R.id.ClassPage_ItemView_DragHandle)
+                dragHandle?.setOnTouchListener { _, event ->
+                    if (event.actionMasked == android.view.MotionEvent.ACTION_DOWN) {
+                        itemTouchHelper?.startDrag(holder)
+                    }
+                    false
                 }
             }
 
