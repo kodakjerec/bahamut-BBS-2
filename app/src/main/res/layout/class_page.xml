@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/content_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="?attr/bahamut_pageBackground"
-    android:orientation="vertical">
+    android:id="@+id/content_view">
 
     <com.kota.telnetUI.TelnetHeaderItemView
         android:id="@+id/ClassPage_headerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true" />
-
+        android:layout_alignParentTop="true"/>
     <FrameLayout
         android:id="@+id/ClassPage_listViewBlock"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/toolbar_container"
-        android:layout_below="@id/ClassPage_headerView">
+        android:layout_below="@id/ClassPage_headerView"
+        android:layout_above="@id/toolbar_container">
 
         <com.kota.telnetUI.textView.TelnetTextViewUltraLarge
             android:id="@+id/ClassPage_listEmptyView"
@@ -29,11 +28,14 @@
             android:textColor="?attr/bahamut_defaultTextColor"
             android:visibility="invisible" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/ClassPage_recyclerView"
+        <com.kota.asFramework.ui.ASListView
+            android:id="@+id/ClassPage_listView"
+            style="@style/List"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbars="vertical" />
+            android:layout_marginBottom="-1dp"
+            android:divider="@null"
+            android:dividerHeight="0dp" />
     </FrameLayout>
 
     <TextView
@@ -42,19 +44,19 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/toolbar_container"
         android:layout_alignParentEnd="true"
-        android:height="60dp"
         android:minWidth="60dp"
+        android:height="60dp"
+        android:textSize="20sp"
         android:gravity="center_vertical"
         android:textColor="?attr/bahamut_articleContentColor0"
-        android:textSize="20sp"
         android:visibility="gone" />
 
     <LinearLayout
         android:id="@+id/toolbar_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true">
 
         <View style="@style/ToolbarDivider.Horizontal" />
 

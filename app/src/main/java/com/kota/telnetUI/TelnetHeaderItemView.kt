@@ -41,7 +41,6 @@ open class TelnetHeaderItemView : LinearLayout {
         mMenuButton = findViewById(R.id.menu_button)
 
         updateMenuButtonPosition()
-        updateThemeColors()
     }
 
     /** 依據 UserSettings.propertiesDrawerLocation 動態調整漢堡圖示位置 (0: 右側, 1: 左側) */
@@ -62,26 +61,6 @@ open class TelnetHeaderItemView : LinearLayout {
         }
     }
 
-    open fun updateThemeColors() {
-        val titleColor = getThemeColor(context, R.attr.bahamut_titleBarTitleColor)
-        val detail1Color = getThemeColor(context, R.attr.bahamut_titleBarDetailColor)
-        val detail2Color = getThemeColor(context, R.attr.bahamut_titleBarDetail2Color)
-        val headerBg = getThemeColor(context, R.attr.bahamut_titleBarBackground)
-
-        if (myTitle?.text?.contains("系統精靈送信來了") != true) {
-            myTitle?.setTextColor(titleColor)
-        }
-        detail1?.setTextColor(detail1Color)
-        detail2?.setTextColor(detail2Color)
-
-        findViewById<View>(R.id.header_item_view)?.setBackgroundColor(headerBg)
-        findViewById<View>(R.id.title)?.parent?.let { parentView ->
-            if (parentView is View) {
-                parentView.setBackgroundColor(headerBg)
-            }
-        }
-    }
-
     open fun setMenuButtonClickListener(aListener: OnClickListener?) {
         updateMenuButtonPosition()
         if (aListener == null) {
@@ -97,7 +76,6 @@ open class TelnetHeaderItemView : LinearLayout {
 
     open fun setData(aTitle: String?, aDetail1: String?, aDetail2: String?) {
         updateMenuButtonPosition()
-        updateThemeColors()
         setTitle(aTitle)
         setDetail1(aDetail1)
         setDetail2(aDetail2)
