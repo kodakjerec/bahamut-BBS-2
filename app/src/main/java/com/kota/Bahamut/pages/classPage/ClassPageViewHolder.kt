@@ -6,6 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.model.ClassPageItem
+import com.kota.Bahamut.service.CommonFunctions.getContextString
 
 /**
  * 看板列表單元格 (Item) 的 ViewHolder 快取。
@@ -45,11 +46,11 @@ class ClassPageViewHolder(
      */
     fun setItem(item: ClassPageItem?, isFavoriteMode: Boolean, isDeleteManageMode: Boolean = false) {
         if (item != null) {
-            classTitle.text = item.title
+            classTitle.text = if (item.title.isEmpty() && item.name.isEmpty()) getContextString(R.string.loading) else item.title
             className.text = item.name
             classManager.text = item.manager
         } else {
-            classTitle.text = ""
+            classTitle.text = getContextString(R.string.loading)
             className.text = ""
             classManager.text = ""
         }

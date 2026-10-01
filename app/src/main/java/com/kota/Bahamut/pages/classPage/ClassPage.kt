@@ -73,14 +73,27 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
     /** 是否正在載入下一頁區塊 */
     private var isLoadingMore = false
 
+    /** 是否正在預載下一頁或上一頁 */
+    private var isPreloadingNext = false
+    private var isPreloadingPrevious = false
+
     /** 是否強制重新刷洗全頁資料 */
     private var isForceRefresh = false
+
+    /** 頁面資料載入完成後的目標滾動位置 (0: 頂端, -1: 底端) */
+    private var targetScrollPosition: Int? = null
 
     /** 是否正在載入最後區塊資料 */
     private var isCommandLoadingLastBlock = false
 
     /** BBS 伺服器是否還有更多看板項目 */
     private var hasMoreOnBbs = true
+
+    /** 是否已初始化取得 maxCount */
+    private var isInitialed = false
+
+    /** 看板清單最大項目總數 */
+    private var maxCount = 0
 
     /** 離開頁面時暫存的滾動位置與偏移量 */
     private var savedPosition: Int = -1
@@ -168,16 +181,48 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
         adapter?.setOnItemClickListener(this)
         recyclerView.adapter = adapter
 
-        // 加入滾動監聽器：接近底部時自動向 BBS 請求下一頁
+        // 整合單一滾動與邊界拖曳監聽器 (提前觸發 PAGE_DOWN / PAGE_UP 載入)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING || newState == RecyclerView.SCROLL_STATE_SETTLING) {
+                    val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                    val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+                    val totalItemCount = layoutManager.itemCount
+
+                    if (!isLoadingMore && !isPreloadingNext && !isPreloadingPrevious) {
+                        // 在頂端 5 項內拖曳且還有舊項目 ➔ 提前觸發 PAGE_UP
+                        val hasPreviousOnBbs = boardItems.isNotEmpty() && boardItems.first().itemNumber > 1
+                        if (firstVisibleItem <= 5 && !recyclerView.canScrollVertically(-1) && hasPreviousOnBbs) {
+                            loadPreviousPageFromBbs()
+                        }
+                        // 在底端 5 項內拖曳且還有新項目 ➔ 提前觸發 PAGE_DOWN
+                        else if (lastVisibleItem >= totalItemCount - 5 && !recyclerView.canScrollVertically(1) && hasMoreOnBbs) {
+                            loadNextPageFromBbs()
+                        }
+                    }
+                }
+            }
+
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
                 val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
                 val totalItemCount = layoutManager.itemCount
+                if (totalItemCount == 0 || isLoadingMore) return
+
+                val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
                 val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
-                if (dy > 0 && lastVisibleItem >= totalItemCount - 3 && !isLoadingMore && hasMoreOnBbs) {
+                // 向下滑動：距底部剩 8 項時提前預載下一頁 (PAGE_DOWN)
+                if (dy > 0 && lastVisibleItem >= totalItemCount - 8 && hasMoreOnBbs && !isPreloadingNext) {
                     loadNextPageFromBbs()
+                }
+
+                // 向上滑動：距頂部剩 8 項時提前預載上一頁 (PAGE_UP)
+                val hasPreviousOnBbs = boardItems.isNotEmpty() && boardItems.first().itemNumber > 1
+                if (dy < 0 && firstVisibleItem <= 8 && hasPreviousOnBbs && !isPreloadingPrevious) {
+                    loadPreviousPageFromBbs()
                 }
             }
         })
@@ -206,8 +251,78 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
      * 向 BBS 伺服器發送 PageDown 鍵，請求加載下一頁項目
      */
     private fun loadNextPageFromBbs() {
+        if (isLoadingMore || isPreloadingNext) return
         isLoadingMore = true
+        isPreloadingNext = true
+
+        ASCoroutine.ensureMainThread {
+            // 預先插入 20 個「讀取中...」佔位 Item
+            if (boardItems.isNotEmpty()) {
+                val lastItemNumber = boardItems.last().itemNumber
+                val placeholders = mutableListOf<ClassPageItem>()
+                val startNum = lastItemNumber + 1
+                val endNum = lastItemNumber + 20
+                for (num in startNum..endNum) {
+                    if (boardItems.none { it.itemNumber == num }) {
+                        val placeholder = ClassPageItem.create()
+                        placeholder.itemNumber = num
+                        placeholder.title = getContextString(R.string.loading)
+                        placeholders.add(placeholder)
+                    }
+                }
+                if (placeholders.isNotEmpty()) {
+                    val oldSize = boardItems.size
+                    boardItems.addAll(placeholders)
+                    boardItems.sortBy { it.itemNumber }
+                    adapter?.notifyItemRangeInserted(oldSize, placeholders.size)
+                }
+            }
+        }
+
         TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_DOWN, 1)
+    }
+
+    /**
+     * 向 BBS 伺服器發送 PageUp 鍵，請求加載上一頁項目
+     */
+    private fun loadPreviousPageFromBbs() {
+        if (isLoadingMore || isPreloadingPrevious) return
+        if (boardItems.isNotEmpty() && boardItems.first().itemNumber <= 1) return
+        isLoadingMore = true
+        isPreloadingPrevious = true
+
+        ASCoroutine.ensureMainThread {
+            // 預先插入 20 個「讀取中...」佔位 Item
+            if (boardItems.isNotEmpty() && boardItems.first().itemNumber > 1) {
+                val firstItemNumber = boardItems.first().itemNumber
+                val placeholders = mutableListOf<ClassPageItem>()
+                val startNum = (firstItemNumber - 20).coerceAtLeast(1)
+                val endNum = firstItemNumber - 1
+                for (num in startNum..endNum) {
+                    if (boardItems.none { it.itemNumber == num }) {
+                        val placeholder = ClassPageItem.create()
+                        placeholder.itemNumber = num
+                        placeholder.title = getContextString(R.string.loading)
+                        placeholders.add(placeholder)
+                    }
+                }
+                if (placeholders.isNotEmpty()) {
+                    val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+                    val oldFirstPos = layoutManager?.findFirstVisibleItemPosition() ?: 0
+                    val firstView = layoutManager?.findViewByPosition(oldFirstPos)
+                    val topOffset = firstView?.top ?: 0
+
+                    boardItems.addAll(0, placeholders)
+                    boardItems.sortBy { it.itemNumber }
+
+                    val addedCount = placeholders.size
+                    adapter?.notifyItemRangeInserted(0, addedCount)
+                    layoutManager?.scrollToPositionWithOffset(oldFirstPos + addedCount, topOffset)
+                }
+            }
+        }
+
+        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.PAGE_UP, 1)
     }
 
     /**
@@ -263,6 +378,12 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
      * @return 處理成功傳回 true，若封包無有效資料則傳回 false
      */
     override fun onPagePreload(): Boolean {
+        if (!isInitialed) {
+            isInitialed = true
+            // 首次進入頁面時發送 END 取得清單總數 (maxCount)，並發送 HOME 歸位至第 1 頁
+            create().pushKey(TelnetKeyboard.END).pushKey(TelnetKeyboard.HOME).sendToServer()
+        }
+
         // 若已載入過清單資料，且非主動加載更多或強制刷新，則直接傳回 true，不重複讀取/更新列表
         if (boardItems.isNotEmpty() && !isLoadingMore && !isForceRefresh) {
             ASCoroutine.ensureMainThread {
@@ -272,6 +393,10 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
         }
 
         val block: ClassPageBlock = ClassPageHandler.instance.load()
+        if (block.maximumItemNumber > maxCount) {
+            maxCount = block.maximumItemNumber
+        }
+
         val newItems = mutableListOf<ClassPageItem>()
         var i = 0
         while (i < 20) {
@@ -287,46 +412,75 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
             return false
         }
 
-        // 若當前區塊不足 20 項，表示已無更多 BBS 項目
-        if (newItems.size < 20) {
+        // 依據 maxCount 精準判斷是否有更多 BBS 項目
+        if (maxCount > 0 && boardItems.isNotEmpty() && boardItems.last().itemNumber >= maxCount) {
             hasMoreOnBbs = false
-        }
-
-        val minNumber = block.minimumItemNumber
-        val isInitialLoad = boardItems.isEmpty() || isForceRefresh
-
-        if (isInitialLoad) {
-            boardItems.clear()
-            boardItems.addAll(newItems)
+        } else if (newItems.size < 20) {
+            hasMoreOnBbs = false
         } else {
-            for (item in newItems) {
-                val pos = item.itemNumber - 1
-                if (pos in 0 until boardItems.size) {
-                    boardItems[pos] = item
-                } else if (pos == boardItems.size) {
-                    boardItems.add(item)
-                } else if (pos > boardItems.size) {
-                    while (boardItems.size < pos) {
-                        val dummy = ClassPageItem.create()
-                        dummy.itemNumber = boardItems.size + 1
-                        boardItems.add(dummy)
-                    }
-                    boardItems.add(item)
-                }
-            }
+            hasMoreOnBbs = true
         }
 
-        isLoadingMore = false
-        isForceRefresh = false
-        isCommandLoadingLastBlock = false
+        val selectedItemNumber = block.selectedItemNumber
 
+        // 所有資料集合修改與 UI 通知全部切換至主執行緒同步進行，防止多執行緒競態與 RecyclerView 閃退
         ASCoroutine.ensureMainThread {
-            dismissProcessingDialog()
+            val isInitialLoad = boardItems.isEmpty() || isForceRefresh
+
             if (isInitialLoad) {
+                boardItems.clear()
+                boardItems.addAll(newItems)
+                boardItems.sortBy { it.itemNumber }
                 adapter?.notifyDataSetChanged()
             } else {
-                val startPos = (minNumber - 1).coerceAtLeast(0)
-                adapter?.notifyItemRangeChanged(startPos, newItems.size)
+                val maxLoadedNumber = newItems.maxOf { it.itemNumber }
+                var minChangedPos = Int.MAX_VALUE
+                var maxChangedPos = Int.MIN_VALUE
+
+                for (item in newItems) {
+                    val indexInBoard = boardItems.indexOfFirst { it.itemNumber == item.itemNumber }
+                    if (indexInBoard != -1) {
+                        boardItems[indexInBoard] = item
+                        if (indexInBoard < minChangedPos) minChangedPos = indexInBoard
+                        if (indexInBoard > maxChangedPos) maxChangedPos = indexInBoard
+                    } else {
+                        boardItems.add(item)
+                    }
+                }
+                // 若傳回項目不足 20 頁，清理多餘的末尾「讀取中...」佔位符
+                if (newItems.size < 20) {
+                    boardItems.removeAll { it.title == getContextString(R.string.loading) && it.itemNumber > maxLoadedNumber }
+                }
+                boardItems.sortBy { it.itemNumber }
+
+                if (minChangedPos != Int.MAX_VALUE) {
+                    val changedCount = maxChangedPos - minChangedPos + 1
+                    adapter?.notifyItemRangeChanged(minChangedPos, changedCount)
+                } else {
+                    adapter?.notifyDataSetChanged()
+                }
+            }
+
+            isPreloadingNext = false
+            isPreloadingPrevious = false
+            isLoadingMore = false
+            isForceRefresh = false
+            isCommandLoadingLastBlock = false
+
+            dismissProcessingDialog()
+
+            if (selectedItemNumber > 0) {
+                val selectedPos = boardItems.indexOfFirst { it.itemNumber == selectedItemNumber }
+                if (selectedPos != -1) {
+                    recyclerView.scrollToPosition(selectedPos)
+                }
+            } else if (isInitialLoad) {
+                if (targetScrollPosition == 0) {
+                    recyclerView.scrollToPosition(0)
+                } else if (targetScrollPosition == -1 && boardItems.isNotEmpty()) {
+                    recyclerView.scrollToPosition(boardItems.size - 1)
+                }
+                targetScrollPosition = null
             }
             updateEmptyViewVisibility()
         }
@@ -448,17 +602,36 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
      * 移動至清單第一頁/最頂端
      */
     fun moveToFirstPosition() {
-        if (boardItems.isNotEmpty()) {
-            recyclerView.scrollToPosition(0)
+        showProcessingDialog(getContextString(R.string.loading))
+        ASCoroutine.ensureMainThread {
+            if (this::recyclerView.isInitialized) {
+                recyclerView.stopScroll()
+            }
+            boardItems.clear()
+            adapter?.notifyDataSetChanged()
         }
+        isForceRefresh = true
+        hasMoreOnBbs = true
+        targetScrollPosition = 0
+        create().pushKey(TelnetKeyboard.HOME).sendToServer()
     }
 
     /**
      * 移動至清單最後一頁/最末端
      */
     fun moveToLastPosition() {
+        showProcessingDialog(getContextString(R.string.loading))
+        ASCoroutine.ensureMainThread {
+            if (this::recyclerView.isInitialized) {
+                recyclerView.stopScroll()
+            }
+            boardItems.clear()
+            adapter?.notifyDataSetChanged()
+        }
+        isForceRefresh = true
         isLoadingMore = true
-        TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.END, 1)
+        targetScrollPosition = -1
+        create().pushKey(TelnetKeyboard.HOME).pushKey(TelnetKeyboard.END).sendToServer()
     }
 
     /**
@@ -685,6 +858,12 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
         adapter?.notifyDataSetChanged()
     }
 
+    override fun onPageDidRemoveFromNavigationController() {
+        isInitialed = false
+        maxCount = 0
+        super.onPageDidRemoveFromNavigationController()
+    }
+
     /**
      * 完全離開 ClassPage 時清理頁面狀態與暫存資料
      */
@@ -694,6 +873,12 @@ class ClassPage : TelnetPage(), View.OnClickListener, ClassPageClickListener, Di
         adapter?.notifyDataSetChanged()
         listName = ""
         isLoadingMore = false
+        isPreloadingNext = false
+        isPreloadingPrevious = false
+        isForceRefresh = false
+        isInitialed = false
+        maxCount = 0
+        targetScrollPosition = null
         hasMoreOnBbs = true
         savedPosition = -1
         savedOffset = 0
