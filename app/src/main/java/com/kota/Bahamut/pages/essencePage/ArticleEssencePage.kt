@@ -81,20 +81,20 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
             val item = getItem(itemIndex)
             var itemViewOrigin: View? = itemView
 
-            // 2-標題 0-本文 1-簽名檔 3-發文時間
-            if (itemViewOrigin == null) {
+            val isMatch = when (type) {
+                ArticlePageItemType.HEADER -> itemViewOrigin is ArticlePageHeaderItemView
+                ArticlePageItemType.SIGN -> itemViewOrigin is ArticlePageTelnetItemView
+                ArticlePageItemType.POST_TIME -> itemViewOrigin is ArticlePageTimeTimeView
+                else -> itemViewOrigin is ArticlePageTextItemView
+            }
+
+            if (!isMatch) {
                 itemViewOrigin = when (type) {
-                    ArticlePageItemType.HEADER ->
-                        ArticlePageHeaderItemView(context)
-                    ArticlePageItemType.SIGN ->
-                        ArticlePageTelnetItemView(context)
-                    ArticlePageItemType.POST_TIME ->
-                        ArticlePageTimeTimeView(context)
-                    else ->
-                        ArticlePageTextItemView(context)
+                    ArticlePageItemType.HEADER -> ArticlePageHeaderItemView(context)
+                    ArticlePageItemType.SIGN -> ArticlePageTelnetItemView(context)
+                    ArticlePageItemType.POST_TIME -> ArticlePageTimeTimeView(context)
+                    else -> ArticlePageTextItemView(context)
                 }
-            } else if (type == ArticlePageItemType.CONTENT) {
-                itemViewOrigin = ArticlePageTextItemView(context)
             }
 
             when (getItemViewType(itemIndex)) {
@@ -147,7 +147,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
                     itemView4.setIP(telnetArticle?.fromIP!!)
                 }
             }
-            return itemViewOrigin
+            return itemViewOrigin!!
         }
 
 
@@ -253,6 +253,7 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
     }
 
     override fun clear() {
+        ThumbnailItemView.clearManualLoadedUrls()
         telnetArticle = null
     }
 

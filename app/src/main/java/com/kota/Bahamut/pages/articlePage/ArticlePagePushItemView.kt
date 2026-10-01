@@ -7,6 +7,7 @@ import android.text.Spanned
 import android.text.style.URLSpan
 import android.text.util.Linkify
 import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -20,6 +21,7 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
     private var txtContent: TextView
     private var txtDatetime: TextView
     private var txtFloor: TextView
+    private var contentContainer: LinearLayout
 
     init {
         (getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater).inflate(
@@ -30,10 +32,20 @@ class ArticlePagePushItemView(context: Context) : ConstraintLayout(context), Tel
         txtContent = findViewById(R.id.ArticlePushItemView_Content)
         txtDatetime = findViewById(R.id.ArticlePushItemView_Datetime)
         txtFloor = findViewById(R.id.ArticlePushItemView_Floor)
+        contentContainer = txtContent.parent as LinearLayout
+    }
+
+    private fun resetViews() {
+        contentContainer.removeAllViews()
+        if (txtContent.parent != null) {
+            (txtContent.parent as ViewGroup).removeView(txtContent)
+        }
+        contentContainer.addView(txtContent)
     }
 
     @SuppressLint("SetTextI18n")
     fun setContent(item: TelnetArticlePush) {
+        resetViews()
         txtAuthor.text = item.author
         txtContent.text = item.content
         txtDatetime.text = item.date + " " + item.time

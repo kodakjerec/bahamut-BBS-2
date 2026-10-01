@@ -47,6 +47,12 @@ import kotlin.math.min
 
 class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     companion object {
+        val manualLoadedUrls: MutableSet<String> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+
+        fun clearManualLoadedUrls() {
+            manualLoadedUrls.clear()
+        }
+
         private val sharedClient: OkHttpClient by lazy {
             OkHttpClient.Builder()
                 .followRedirects(true)
@@ -308,11 +314,20 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         }
     }
 
+    fun markManualLoaded() {
+        if (myUrl.isNotEmpty()) manualLoadedUrls.add(myUrl)
+        if (myImageUrl.isNotEmpty()) manualLoadedUrls.add(myImageUrl)
+    }
+
     /** 判斷是圖片或連結, 改變顯示狀態  */
     fun picoUrlChangeStatus(isPic: Boolean) {
         loadThumbnailImg = linkShowThumbnail // 讀取預覽圖設定
         loadOnlyWifi = linkShowOnlyWifi // 只在wifi下預覽設定
         val transportType = TempSettings.transportType
+
+        val isManualLoaded = (myUrl.isNotEmpty() && manualLoadedUrls.contains(myUrl)) ||
+                (myImageUrl.isNotEmpty() && manualLoadedUrls.contains(myImageUrl))
+        val shouldLoadImage = (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) || isManualLoaded
 
         ASCoroutine.ensureMainThread {
             retryButton.visibility = GONE
@@ -321,7 +336,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                 // 圖片
                 layoutPic.visibility = VISIBLE
-                if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                if (shouldLoadImage) {
                     prepareLoadImage()
                 } else if (myImageUrl == "") {
                     imageViewButton.visibility = GONE
@@ -334,7 +349,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                 // 圖片
                 layoutPic.visibility = VISIBLE
-                if (loadThumbnailImg && (!loadOnlyWifi || transportType == 1)) {
+                if (shouldLoadImage) {
                     prepareLoadImage()
                 } else if (myImageUrl == "") {
                     imageViewButton.visibility = GONE
@@ -349,6 +364,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
     /** 純圖片  */
     fun prepareLoadImage() {
+        markManualLoaded()
         if (imgLoaded) return
 
         loadImage()
@@ -545,6 +561,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         retryButton.setOnClickListener {
             retryButton.visibility = GONE
             imgLoaded = false
+            markManualLoaded()
             if (myImageUrl.isNotEmpty()) {
                 prepareLoadImage()
             } else {

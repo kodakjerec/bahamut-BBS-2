@@ -2,7 +2,7 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="false" android:drawable="@color/page_background"/>
     <item android:state_pressed="true" android:drawable="@color/list_dialog_item_background_pressed"/>
-    <item android:state_focused="true" android:drawable="@color/list_dialog_item_background_pressed"/>
+    <item android:state_focused="true" android:drawable="@color/list_dialog_item_background_focused"/>
     <item android:drawable="@color/page_background"/>
 </selector>
 

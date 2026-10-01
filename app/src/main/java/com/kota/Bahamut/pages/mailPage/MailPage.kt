@@ -18,6 +18,7 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
@@ -141,15 +142,20 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
         val item = getItem(itemIndex)
         var itemViewOrigin = itemViewFrom
 
-        if (itemViewOrigin == null) {
+        val isMatch = when (type) {
+            ArticlePageItemType.SIGN -> itemViewOrigin is ArticlePageTelnetItemView
+            ArticlePageItemType.HEADER -> itemViewOrigin is ArticlePageHeaderItemView
+            ArticlePageItemType.POST_TIME -> itemViewOrigin is ArticlePageTimeTimeView
+            else -> itemViewOrigin is ArticlePageTextItemView
+        }
+
+        if (!isMatch) {
             itemViewOrigin = when (type) {
                 ArticlePageItemType.SIGN -> ArticlePageTelnetItemView(context)
                 ArticlePageItemType.HEADER -> ArticlePageHeaderItemView(context)
                 ArticlePageItemType.POST_TIME -> ArticlePageTimeTimeView(context)
                 else -> ArticlePageTextItemView(context)
             }
-        } else if (type == ArticlePageItemType.CONTENT) {
-            itemViewOrigin = ArticlePageTextItemView(context)
         }
 
         if (itemViewOrigin is ArticlePageTextItemView && item!==null) {
@@ -179,7 +185,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
             itemViewOrigin.setIP(telnetArticle?.fromIP!!)
         }
 
-        return itemViewOrigin
+        return itemViewOrigin!!
     }
 
     override fun getViewTypeCount(): Int {
@@ -211,6 +217,7 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
     }
 
     override fun clear() {
+        ThumbnailItemView.clearManualLoadedUrls()
         telnetArticle = null
     }
 
