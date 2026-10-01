@@ -14,13 +14,11 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     private val markLevel: TextView = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Mark)
     private val titleLevel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Title)
     private val btnEdit: Button? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Edit)
-    private val btnDelete: Button? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_Delete)
     private val buttonBlock: View? = view.findViewById(R.id.BoardExtendOptionalPage_bookmarkItemView_ButtonBlock)
 
     init {
         view.setOnClickListener(this)
         btnEdit?.setOnClickListener(this)
-        btnDelete?.setOnClickListener(this)
         buttonBlock?.visibility = View.VISIBLE
     }
 
@@ -68,7 +66,6 @@ class BookmarkViewHolder(view: View, private val mListener: BookmarkClickListene
     override fun onClick(view: View?) {
         when(view?.id) {
             R.id.BoardExtendOptionalPage_bookmarkItemView_Edit -> mListener?.onEditClick(view, bindingAdapterPosition)
-            R.id.BoardExtendOptionalPage_bookmarkItemView_Delete -> mListener?.onDeleteClick(view, bindingAdapterPosition)
             else -> mListener?.onItemClick(view, bindingAdapterPosition)
         }
     }

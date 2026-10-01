@@ -26,6 +26,7 @@
     <string name="article_expression_setting">表情符號設定</string>
     <string name="bookmark">書籤</string>
     <string name="bookmark_manager">書籤管理</string>
+    <string name="drag_reorder">拖曳排序</string>
     <string name="cancel">取消</string>
     <string name="sure">確定</string>
     <string name="on">啟用</string>
@@ -337,7 +338,7 @@
     <string name="apply">套用</string>
     <string name="done">完成</string>
     <string name="post_toolbar_edit_title">編輯按鈕順序</string>
-    <string name="post_toolbar_edit_hint">點擊 ▲ / ▼ 按鈕即可調整工具列位置</string>
+    <string name="post_toolbar_edit_hint">拖曳把手即可調整工具列位置</string>
     <string name="post_toolbar_row_1">Row 1</string>
     <string name="post_toolbar_row_2">Row 2</string>
     <string name="theme_manager_page_msg01">外觀套用新設定完畢</string>

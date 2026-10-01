@@ -111,18 +111,18 @@
                 android:autoSizeTextType="none"
                 android:text="@string/edit_short"
                 android:textSize="14sp" />
-
-            <View style="@style/ToolbarDivider" />
-
-            <Button
-                android:id="@+id/BoardExtendOptionalPage_bookmarkItemView_Delete"
-                style="@style/ToolbarItem.Danger"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:autoSizeTextType="none"
-                android:text="@string/delete_short"
-                android:textSize="14sp" />
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/ClassPage_ItemView_DragHandle"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/drag_reorder"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_drag_handle"
+            android:visibility="gone" />
     </LinearLayout>
 
     <View

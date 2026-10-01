@@ -45,25 +45,6 @@
         </LinearLayout>
 
         <!-- 操作按鈕 -->
-        <LinearLayout
-            android:id="@+id/BoardExtendOptionalPage_historyItemView_ButtonBlock"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <View style="@style/ToolbarDivider" />
-
-            <Button
-                android:id="@+id/BoardExtendOptionalPage_historyItemView_Delete"
-                style="@style/ToolbarItem.Danger"
-                android:layout_width="60dp"
-                android:layout_height="match_parent"
-                android:autoSizeTextType="none"
-                android:text="@string/delete_short"
-                android:textSize="14sp" />
-        </LinearLayout>
-
         <View
             android:id="@+id/BoardExtendOptionalPage_historyItemView_SplitView"
             style="@style/VerticalDivider"
@@ -72,6 +53,17 @@
         <include
             android:id="@+id/ListItem_ArrowView"
             layout="@layout/right_arrow_item_view"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/ClassPage_ItemView_DragHandle"
+            android:layout_width="48dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/drag_reorder"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_drag_handle"
             android:visibility="gone" />
     </LinearLayout>
 
