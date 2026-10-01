@@ -123,10 +123,14 @@ class ThemeManagerPage : TelnetPage() {
         // 建立對應試閱主題的 Context
         val themeResId = ThemeStore.getThemeResIdForIndex(index)
         val themedContext = ContextThemeWrapper(context, themeResId)
+        val listDialogItemBgRes = com.kota.Bahamut.service.CommonFunctions.getThemeResourceId(themedContext, R.attr.bahamut_listDialogItemBackground)
 
         // 1. TelnetHeaderItemView 範例
         val headerView = TelnetHeaderItemView(themedContext)
         headerView.setData("【看板標題】Chat (洽特)", "看板: Chat (洽特)", "線上: 1234 人")
+        (headerView.findViewById<View>(R.id.header_item_view) ?: headerView).setBackgroundResource(listDialogItemBgRes)
+        headerView.isClickable = true
+        headerView.setOnClickListener { }
         previewContainer.addView(headerView)
 
         // 分隔線
@@ -151,6 +155,9 @@ class ThemeManagerPage : TelnetPage() {
             isRead = false
         }
         boardItemView.setItem(sampleBoardItem)
+        (boardItemView.findViewById<View>(R.id.BoardPage_ItemView_backgroundView) ?: boardItemView).setBackgroundResource(listDialogItemBgRes)
+        boardItemView.isClickable = true
+        boardItemView.setOnClickListener { }
         previewContainer.addView(boardItemView)
 
         // 分隔線
@@ -180,6 +187,7 @@ class ThemeManagerPage : TelnetPage() {
         }
         sampleRows.add(row1)
         articleItemView.setContent(sampleText, sampleRows)
+        (articleItemView.findViewById<View>(R.id.ArticleTextItemView_contentView) ?: articleItemView).setBackgroundResource(listDialogItemBgRes)
         previewContainer.addView(articleItemView)
 
         // 分隔線
@@ -202,15 +210,27 @@ class ThemeManagerPage : TelnetPage() {
             }
         }
 
+        val normalBtnBg = com.kota.Bahamut.service.CommonFunctions.getThemeResourceId(themedContext, R.attr.bahamut_toolbarItemBackground)
+        val normalBtnTextColorSL = com.kota.Bahamut.service.CommonFunctions.getThemeColorStateList(themedContext, R.attr.bahamut_buttonTextColor)
         val normalBtn = Button(themedContext, null, 0, R.style.ToolbarItem).apply {
             text = "一般按鈕"
+            if (normalBtnBg != 0) setBackgroundResource(normalBtnBg)
+            if (normalBtnTextColorSL != null) setTextColor(normalBtnTextColorSL)
+            isClickable = true
+            setOnClickListener { }
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
                 setMargins(4, 0, 4, 0)
             }
         }
 
+        val dangerBtnBg = com.kota.Bahamut.service.CommonFunctions.getThemeResourceId(themedContext, R.attr.bahamut_buttonDangerBackground)
+        val dangerBtnTextColorSL = com.kota.Bahamut.service.CommonFunctions.getThemeColorStateList(themedContext, R.attr.bahamut_buttonDangerTextColor)
         val dangerBtn = Button(themedContext, null, 0, R.style.ToolbarItem_Danger).apply {
             text = "危險按鈕"
+            if (dangerBtnBg != 0) setBackgroundResource(dangerBtnBg)
+            if (dangerBtnTextColorSL != null) setTextColor(dangerBtnTextColorSL)
+            isClickable = true
+            setOnClickListener { }
             layoutParams = LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, 1f).apply {
                 setMargins(4, 0, 4, 0)
             }
