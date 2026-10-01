@@ -283,6 +283,10 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     PageContainer.instance!!.boardPage.cancelRunner()
                 }
                 showShortToast(continueMessage)
+                // 成功移出我的最愛, 還需要更新畫面
+                if (continueMessage.contains("成功移出我的最愛")) {
+                    return true
+                }
             }
             if (this.rowStringFinal.contains("★ 引言太多")) {
                 // 放棄此次編輯內容

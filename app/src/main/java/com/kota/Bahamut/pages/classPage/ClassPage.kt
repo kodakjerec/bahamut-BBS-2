@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AbsListView
-import android.widget.Button
 import android.widget.ListView
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -12,6 +11,7 @@ import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.BahamutStateHandler
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
+import com.kota.Bahamut.command.BahamutCommandDeleteFavoriteBoard
 import com.kota.Bahamut.dialogs.DialogSearchBoard
 import com.kota.Bahamut.dialogs.DialogSearchBoardListener
 import com.kota.Bahamut.listPage.TelnetListPage
@@ -42,6 +42,7 @@ import com.kota.telnetUI.TelnetHeaderItemView
 class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListener {
     lateinit var mainLayout: RelativeLayout
     private var title: String? = ""
+    var isDeleteManageMode: Boolean = false
 
     override val pageType: Int
         get() = BahamutPage.BAHAMUT_CLASS
@@ -83,6 +84,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             title = getContextString(R.string.loading)
         }
 
+        val isFavorite = (listName == "Favorite")
         val headerView =
             mainLayout.findViewById<TelnetHeaderItemView>(R.id.ClassPage_headerView)
         if (headerView != null) {
@@ -102,7 +104,16 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
                 }
             }
             val detail = "看板列表"
-            headerView.setData(title, detail, "")
+            val headerDetail2 = if (isFavorite) "點漢堡選單刪除" else ""
+            headerView.setData(title, detail, headerDetail2)
+
+            if (isFavorite) {
+                headerView.setMenuButtonClickListener {
+                    showFavoriteMenu()
+                }
+            } else {
+                headerView.setMenuButtonClickListener(null)
+            }
         }
     }
 
@@ -177,15 +188,7 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
 
     override fun onListViewItemLongClicked(itemView: View?, index: Int): Boolean {
         if (listName == "Favorite") {
-            val itemIndex = index + 1
-            ASAlertDialog.createDialog().setMessage("確定要將此看板移出我的最愛?").addButton("取消")
-                .addButton("確定")
-                .setListener { aDialog: ASAlertDialog?, index1: Int ->
-                    if (index1 == 1) {
-                        TelnetClient.myInstance!!.sendStringToServer("$itemIndex\nd")
-                        this@ClassPage.loadLastBlock()
-                    }
-                }.scheduleDismissOnPageDisappear(this).show()
+            onDeleteFavoriteBoardClicked(index)
             return true
         } else if ((getItem(index) as ClassPageItem).isDirectory) {
             return false
@@ -271,7 +274,17 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
         return "$aName[Class]"
     }
 
+    override fun isItemCanLoadAtIndex(index: Int): Boolean {
+        val classPageItem = getItem(index) as ClassPageItem?
+        if (classPageItem == null || classPageItem.isDeleted) {
+            showShortToast("此看板已被刪除")
+            return false
+        }
+        return true
+    }
+
     override fun loadItemAtIndex(index: Int) {
+        if (!isItemCanLoadAtIndex(index)) return
         val item = getItem(index) as ClassPageItem
 
         if (item.isDirectory) {
@@ -284,6 +297,84 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             }
             TelnetClient.myInstance!!.sendStringToServer((index+1).toString() + "\n")
         }
+    }
+
+    override fun clear() {
+        super.clear()
+        isDeleteManageMode = false
+    }
+
+    override fun onMenuButtonClicked(): Boolean {
+        if (listName == "Favorite") {
+            showFavoriteMenu()
+            return true
+        }
+        return super.onMenuButtonClicked()
+    }
+
+    /**
+     * 顯示「我的最愛」選單
+     */
+    private fun showFavoriteMenu() {
+        val menuText = "刪除管理"
+        ASListDialog.createDialog()
+            .addItem(menuText)
+            .setListener(object : ASListDialogItemClickListener {
+                override fun onListDialogItemClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ) {
+                    if (index == 0) {
+                        toggleDeleteManageMode()
+                    }
+                }
+
+                override fun onListDialogItemLongClicked(
+                    paramASListDialog: ASListDialog?,
+                    index: Int,
+                    title: String?
+                ): Boolean = false
+            })
+            .scheduleDismissOnPageDisappear(this)
+            .show()
+    }
+
+    /**
+     * 切換刪除管理模式（顯示/隱藏刪除按鈕）
+     */
+    private fun toggleDeleteManageMode() {
+        isDeleteManageMode = !isDeleteManageMode
+        val listView1: ListView? = mainLayout.findViewById(R.id.ClassPage_listView)
+        listView1?.invalidateViews()
+    }
+
+    private fun onDeleteFavoriteBoardClicked(index: Int) {
+        val item = getItem(index) as ClassPageItem?
+        val itemIndex = index + 1
+        val boardTitle = item?.title?.trim() ?: ""
+        val message = if (boardTitle.isNotEmpty()) {
+            "確定要將「$boardTitle」移出我的最愛？"
+        } else {
+            "確定要將此看板移出我的最愛？"
+        }
+        ASAlertDialog.createDialog()
+            .setMessage(message)
+            .addButton("取消")
+            .addButton("確定")
+            .setListener { _, buttonIndex ->
+                if (buttonIndex == 1) {
+                    // 1. 標記本地資料 (資料層，防護二次點擊)
+                    item?.isDeleted = true
+                    item?.clear()
+
+                    // 2. 推入 Telnet 刪除指令，完成後由 TelnetListPage 自動 cleanAllItem() 並 loadLastBlock() 重新讀取最新清單
+                    val command = BahamutCommandDeleteFavoriteBoard(itemIndex)
+                    pushCommand(command)
+                }
+            }
+            .scheduleDismissOnPageDisappear(this)
+            .show()
     }
 
     /** 填入看板  */
@@ -299,7 +390,12 @@ class ClassPage : TelnetListPage(), View.OnClickListener, DialogSearchBoardListe
             itemView = ClassPageItemView(context)
             itemView.layoutParams = AbsListView.LayoutParams(-1, -2)
         }
-        (itemView as ClassPageItemView).setItem(item)
+        val isFavorite = (listName == "Favorite")
+        val pageItemView = itemView as ClassPageItemView
+        pageItemView.setItem(item, isFavorite, isDeleteManageMode)
+        pageItemView.setOnDeleteClickListener {
+            onDeleteFavoriteBoardClicked(i)
+        }
         return itemView
     }
 
