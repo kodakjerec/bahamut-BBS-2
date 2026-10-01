@@ -11,8 +11,8 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 36 // 更新到36以支援Android 16的edge-to-edge
-        versionCode 62
-        versionName "3.3"
+        versionCode 64
+        versionName "3.4"
     }
 
     buildTypes {
@@ -70,8 +70,4 @@ dependencies {
     implementation "com.squareup.okhttp3:okhttp:5.1.0"
     implementation 'com.google.android.material:material:1.13.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.2.1'
-
-    // 調色盤
-    implementation 'com.github.skydoves:colorpickerview:2.3.0'
-    implementation 'androidx.compose.ui:ui-text:1.10.5'
 }
