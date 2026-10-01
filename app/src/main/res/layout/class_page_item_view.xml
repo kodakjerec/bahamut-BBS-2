@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
-        <LinearLayout android:orientation="vertical" android:id="@+id/ClassPage_ItemView_backgroundView" android:background="?attr/bahamut_pageBackground" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
+        <LinearLayout android:orientation="vertical" android:id="@+id/ClassPage_ItemView_backgroundView" android:background="?attr/bahamut_listDialogItemBackground" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" style="@style/TouchBlock">
             <LinearLayout android:orientation="horizontal" android:layout_width="match_parent" android:layout_height="wrap_content">
                 <com.kota.telnetUI.textView.TelnetTextViewNormal
                     android:textColor="?attr/bahamut_defaultTextColor" android:ellipsize="end" android:id="@+id/ClassPage_ItemView_classTitle" android:layout_width="0dp" android:layout_height="wrap_content" android:singleLine="false" android:layout_weight="1" style="@style/TextViewNormal"/>
