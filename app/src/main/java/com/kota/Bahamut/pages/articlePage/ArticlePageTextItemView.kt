@@ -60,7 +60,6 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
         dividerView = findViewById(R.id.ArticleTextItemView_DividerView)
         contentView = findViewById(R.id.ArticleTextItemView_contentView)
         setBackgroundResource(R.color.transparent)
-        updateThemeColors()
     }
 
     fun setAuthor(author: String?, nickname: String?) {
@@ -370,8 +369,6 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     /** 動態更新文章項目背景與文字顏色以符合當前主題 */
     fun updateThemeColors() {
-        contentView?.setBackgroundColor(getThemeColor(context, R.attr.bahamut_pageBackground))
-        contentLabel?.setLinkTextColor(getThemeColor(context, R.attr.bahamut_linkColor))
         if (myQuote > 0) {
             val authorColor = getThemeColor(context, R.attr.bahamut_articleAuthorColor1)
             val contentColor = getThemeColor(context, R.attr.bahamut_articleContentColor1)
@@ -387,7 +384,6 @@ class ArticlePageTextItemView : LinearLayout, TelnetArticleItemView {
 
     fun setQuote(quote: Int) {
         myQuote = quote
-        updateThemeColors()
     }
 
     override val type: Int

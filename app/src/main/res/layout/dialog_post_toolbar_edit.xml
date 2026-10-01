@@ -35,17 +35,11 @@
 
         <View style="@style/HorizontalDivider" />
 
-        <ScrollView
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/PostToolbarEdit_recyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:id="@+id/PostToolbarEdit_list"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="?attr/bahamut_itemBackground"
-                android:orientation="vertical" />
-        </ScrollView>
+            android:layout_height="wrap_content"
+            android:background="?attr/bahamut_itemBackground" />
 
         <View style="@style/ToolbarDivider.Horizontal" />
 

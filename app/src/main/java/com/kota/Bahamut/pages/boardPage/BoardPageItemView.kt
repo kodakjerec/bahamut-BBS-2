@@ -45,28 +45,9 @@ class BoardPageItemView : LinearLayout {
             setGYNumber(aItem.gy)
             setReply(aItem.isReply)
             setRead(aItem.isDeleted || aItem.isRead)
-            updateThemeColors()
             return
         }
         clear()
-    }
-
-    /** 動態更新看板項目文字與背景色彩以符合當前主題與深淺色模式 */
-    fun updateThemeColors() {
-        statusLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemStatusColor))
-        numberLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemNumberColor))
-        dateLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemDateColor))
-        gyTitleLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_articleContentColor0))
-        gyLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemGyColor))
-        markLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemMarkColor))
-        authorLabel?.setTextColor(getThemeColor(context, R.attr.bahamut_boardItemAuthorColor))
-        contentView?.findViewById<View>(R.id.BoardPage_ItemView_backgroundView)?.setBackgroundColor(getThemeColor(context, R.attr.bahamut_pageBackground))
-
-        val arrowView = findViewById<TextView>(R.id.ListItem_ArrowView)
-        if (arrowView != null) {
-            arrowView.setTextColor(getThemeColor(context, R.attr.bahamut_arrowColor))
-            arrowView.setBackgroundColor(getThemeColor(context, R.attr.bahamut_arrowBackground))
-        }
     }
 
     private fun init() {
@@ -84,7 +65,6 @@ class BoardPageItemView : LinearLayout {
         markLabel = contentView?.findViewById(R.id.BoardPage_ItemView_mark)
         authorLabel = contentView?.findViewById(R.id.BoardPage_ItemView_Author)
         dividerBottom = contentView?.findViewById(R.id.BoardPage_ItemView_DividerBottom)
-        updateThemeColors()
     }
 
     fun setDividerBottomVisible(visible: Boolean) {

@@ -96,6 +96,20 @@ class BookmarkList(private val myBoard: String) {
         historyBookmarks.removeAt(index)
     }
 
+    fun clearHistory() {
+        historyBookmarks.clear()
+    }
+
+    fun setBookmarks(aList: List<Bookmark>) {
+        bookmarks.clear()
+        bookmarks.addAll(aList)
+    }
+
+    fun setHistoryBookmarks(aList: List<Bookmark>) {
+        historyBookmarks.clear()
+        historyBookmarks.addAll(aList)
+    }
+
     fun loadHistoryList(aList: MutableList<Bookmark>) {
         aList.clear()
         aList.addAll(historyBookmarks)

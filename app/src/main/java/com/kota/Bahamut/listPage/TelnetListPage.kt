@@ -120,7 +120,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
     /** android.widget.Adapter
      * 安全的在主執行緒中更新列表
      */
-    fun safeNotifyDataSetChanged() {
+    open fun safeNotifyDataSetChanged() {
         ASCoroutine.ensureMainThread {
             mDataSetObservable.notifyChanged()
 
@@ -193,7 +193,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         listName = ""
     }
 
-    fun setListViewSelection(selection: Int) {
+    open fun setListViewSelection(selection: Int) {
         ASCoroutine.ensureMainThread {
             if (this@TelnetListPage.listView != null) {
                 if (selection == -1) {
@@ -205,7 +205,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    fun setListViewSelectionFromTop(selection: Int, top: Int) {
+    open fun setListViewSelectionFromTop(selection: Int, top: Int) {
         if (listView != null) {
             if (selection == -1) {
                 listView?.setSelection(count - 1)
@@ -318,7 +318,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    val firstVisibleBlockIndex: Int
+    open val firstVisibleBlockIndex: Int
         get() {
             if (listView == null) {
                 return -1
@@ -326,7 +326,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
             return getBlockIndex(listView?.firstVisiblePosition!!)
         }
 
-    val lastVisibleBlockIndex: Int
+    open val lastVisibleBlockIndex: Int
         get() {
             if (listView == null) {
                 return -1
@@ -619,7 +619,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         loadItemAtIndex(index)
     }
 
-    protected fun saveListState() {
+    protected open fun saveListState() {
         if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
             state.position = listView?.firstVisiblePosition!!
@@ -630,7 +630,7 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
         }
     }
 
-    protected fun loadListState() {
+    protected open fun loadListState() {
         if (listView != null) {
             val state: ListState = ListStateStore.instance.getState(this.listId)
             setListViewSelectionFromTop(state.position, state.top)

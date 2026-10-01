@@ -10,13 +10,9 @@ import com.kota.Bahamut.R
 class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener?) :
     RecyclerView.ViewHolder(view), View.OnClickListener {
     private val titleLabel: TextView? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Title)
-    private val btnDelete: Button? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_Delete)
-    private val buttonBlock: View? = view.findViewById(R.id.BoardExtendOptionalPage_historyItemView_ButtonBlock)
 
     init {
         view.setOnClickListener(this)
-        btnDelete?.setOnClickListener(this)
-        buttonBlock?.visibility = View.VISIBLE
     }
 
     fun setBookmark(bookmark: Bookmark?) {
@@ -39,9 +35,6 @@ class HistoryViewHolder(view: View, private val mListener: BookmarkClickListener
     }
 
     override fun onClick(view: View?) {
-        when(view?.id) {
-            R.id.BoardExtendOptionalPage_historyItemView_Delete -> mListener?.onDeleteClick(view, bindingAdapterPosition)
-            else -> mListener?.onItemClick(view, bindingAdapterPosition)
-        }
+        mListener?.onItemClick(view, bindingAdapterPosition)
     }
 }

@@ -96,8 +96,9 @@
                             android:id="@+id/Bahamut_Dialog_Search_Author"
                             style="@style/PostEditTextStyle"
                             android:autofillHints=""
-                            android:hint="@string/author_hint"
-                            android:inputType="textMultiLine" />
+                            android:maxLines="1"
+                            android:singleLine="true"
+                            android:hint="@string/author_hint" />
                     </LinearLayout>
                 </LinearLayout>
 
