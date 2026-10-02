@@ -12,6 +12,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.Window
 import android.widget.Button
 import android.widget.FrameLayout
@@ -32,7 +33,7 @@ import kotlin.math.hypot
  * 預設狀態 (收合)：
  * - 顯示 60dp x 60dp 圓形浮動按鈕 FAB (內部為精確居中的圓點)
  * - 錨點位置 (靠左下 or 靠右下) 記錄於 UserSetting (floatingLocation)
- * - 拖曳圓點可移動位置，放開後自動貼合左下或右下
+ * - 按住圓點可任意拖動，放開手指時依據是否超過中線，自動吸附至左下角或右下角
  * - 透明度沿用 UserSetting (預設 40%)
  *
  * 展開狀態：
@@ -43,8 +44,7 @@ import kotlin.math.hypot
  * 收合條件：
  * 1. 再次點擊圓形按鈕
  * 2. 點擊工具列外區域
- * 3. 開始捲動內容 (MotionEvent outside while expanded)
- * 4. 閒置逾時 (預設 3 秒，沿用 UserSetting)
+ * 3. 閒置逾時 (預設 3 秒，沿用 UserSetting)
  */
 class ToolBarFloating @JvmOverloads constructor(
     context: Context,
@@ -113,8 +113,8 @@ class ToolBarFloating @JvmOverloads constructor(
 
         updateSettings()
 
-        // 初始為收合狀態 (使用 INVISIBLE 保留寬度避免被 RelativeLayout 裁切)
-        cardActionsContainer?.visibility = View.INVISIBLE
+        // 初始為收合狀態 (actionsCard 為 GONE，避免佔位及遮擋點擊)
+        cardActionsContainer?.visibility = View.GONE
         cardActionsContainer?.alpha = 0f
         cardFab?.alpha = collapsedAlpha
 
@@ -130,19 +130,19 @@ class ToolBarFloating @JvmOverloads constructor(
             }
         }
 
-        // FAB 手勢觸控 (支援拖曳移動貼合左/右下)
+        // FAB 手勢觸控 (支援任意拖曳移動與中線判斷貼合左/右下)
         cardFab?.setOnTouchListener(fabTouchListener)
-        findViewById<View>(R.id.ToolbarFloating_fab_icon)?.setOnTouchListener(fabTouchListener)
     }
 
     /** FAB 手勢觸控監聽器 */
     @SuppressLint("ClickableViewAccessibility")
     private val fabTouchListener = OnTouchListener { v, event ->
         val density = resources.displayMetrics.density
-        val dragSlop = 5f * density
+        val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
 
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
+                animate().cancel()
                 isDragging = false
                 touchDownRawX = event.rawX
                 touchDownRawY = event.rawY
@@ -162,7 +162,7 @@ class ToolBarFloating @JvmOverloads constructor(
                 val dy = event.rawY - touchDownRawY
                 val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
 
-                if (!isDragging && dist > dragSlop) {
+                if (!isDragging && dist > touchSlop) {
                     isDragging = true
                     if (isExpanded) {
                         collapse()
@@ -170,6 +170,7 @@ class ToolBarFloating @JvmOverloads constructor(
                 }
 
                 if (isDragging) {
+                    // 按住按鈕時可以任意拖動 (即時跟隨手指 X, Y)
                     translationX = initialTranslationX + dx
                     translationY = initialTranslationY + dy
                 }
@@ -180,27 +181,53 @@ class ToolBarFloating @JvmOverloads constructor(
                 if (isDragging) {
                     isDragging = false
 
-                    val fabLoc = IntArray(2)
-                    cardFab?.getLocationOnScreen(fabLoc)
-                    val fabCenterX = fabLoc[0] + (cardFab?.width ?: 0) / 2f
+                    // 取得螢幕寬度與中線
                     val screenWidth = resources.displayMetrics.widthPixels.toFloat()
-                    val newIsLeft = fabCenterX < screenWidth / 2f
+                    val screenCenterX = screenWidth / 2f
 
+                    // 取得放開時 FAB 在螢幕上的中心點 X
+                    val fabLoc = IntArray(2)
+                    v.getLocationOnScreen(fabLoc)
+                    val fabCenterX = fabLoc[0] + v.width / 2f
+
+                    // 當拖動超過中線，判斷屬於左下角還是右下角
+                    val targetIsLeft = fabCenterX < screenCenterX
+
+                    val marginPx = 16f * density
+                    val fabWidth = v.width.toFloat()
+
+                    val parentView = parent as? View
+                    val containerWidth = (if (parentView != null && parentView.width > 0) parentView.width else screenWidth.toInt()).toFloat()
+
+                    // 計算動畫吸附至左下角或右下角的目標 translationX
+                    val targetTranslationX = if (targetIsLeft == isAnchoredLeft) {
+                        0f
+                    } else {
+                        if (isAnchoredLeft) {
+                            // 當前靠左錨點，目標靠右下角：向右平移至 (containerWidth - marginPx - fabWidth)
+                            (containerWidth - marginPx - fabWidth) - marginPx
+                        } else {
+                            // 當前靠右錨點，目標靠左下角：向左平移至 marginPx (負值)
+                            marginPx - (containerWidth - marginPx - fabWidth)
+                        }
+                    }
+
+                    // 放開手指時平滑吸附至左下角或右下角 (Y 軸平滑回彈至 0f)
                     animate()
-                        .translationX(0f)
+                        .translationX(targetTranslationX)
                         .translationY(0f)
-                        .setDuration(150L)
+                        .setDuration(200L)
                         .withEndAction {
-                            applyAnchorSide(newIsLeft)
+                            if (targetIsLeft != isAnchoredLeft) {
+                                applyAnchorSide(targetIsLeft)
+                            }
+                            translationX = 0f
+                            translationY = 0f
                         }
                         .start()
                 } else {
-                    // 短按點擊：直接切換展開/收合
-                    if (isExpanded) {
-                        collapse()
-                    } else {
-                        expand()
-                    }
+                    // 點擊事件：切換展開/收合
+                    v.performClick()
                 }
                 true
             }
@@ -208,7 +235,11 @@ class ToolBarFloating @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL -> {
                 if (isDragging) {
                     isDragging = false
-                    animate().translationX(0f).translationY(0f).setDuration(150L).start()
+                    animate()
+                        .translationX(0f)
+                        .translationY(0f)
+                        .setDuration(200L)
+                        .start()
                 }
                 true
             }
@@ -247,13 +278,17 @@ class ToolBarFloating @JvmOverloads constructor(
             fab.layoutParams = fabParams
             root.addView(fab)
             actionsParams.marginStart = gapPx
+            actionsParams.leftMargin = gapPx
             actionsParams.marginEnd = 0
+            actionsParams.rightMargin = 0
             actionsCard.layoutParams = actionsParams
             root.addView(actionsCard)
         } else {
             // 靠右下： ActionsCard (左) + FAB (右)
             actionsParams.marginEnd = gapPx
+            actionsParams.rightMargin = gapPx
             actionsParams.marginStart = 0
+            actionsParams.leftMargin = 0
             actionsCard.layoutParams = actionsParams
             root.addView(actionsCard)
 
@@ -291,12 +326,21 @@ class ToolBarFloating @JvmOverloads constructor(
         if (p is RelativeLayout.LayoutParams) {
             p.removeRule(RelativeLayout.ALIGN_PARENT_START)
             p.removeRule(RelativeLayout.ALIGN_PARENT_END)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+
             if (isAnchoredLeft) {
                 p.addRule(RelativeLayout.ALIGN_PARENT_START)
+                p.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+                p.leftMargin = marginPx
+                p.rightMargin = 0
                 p.marginStart = marginPx
                 p.marginEnd = 0
             } else {
                 p.addRule(RelativeLayout.ALIGN_PARENT_END)
+                p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+                p.rightMargin = marginPx
+                p.leftMargin = 0
                 p.marginEnd = marginPx
                 p.marginStart = 0
             }
@@ -306,14 +350,28 @@ class ToolBarFloating @JvmOverloads constructor(
         } else if (p is LayoutParams) {
             p.gravity = gravityVal
             if (isAnchoredLeft) {
+                p.leftMargin = marginPx
+                p.rightMargin = 0
                 p.marginStart = marginPx
                 p.marginEnd = 0
             } else {
+                p.rightMargin = marginPx
+                p.leftMargin = 0
                 p.marginEnd = marginPx
                 p.marginStart = 0
             }
             p.bottomMargin = marginBottomPx
             layoutParams = p
+        }
+
+        // 同步更新內部 LinearLayout 的 layout_gravity
+        val root = findViewById<LinearLayout>(R.id.ToolbarFloating)
+        if (root != null) {
+            val rootLp = root.layoutParams as? LayoutParams
+            if (rootLp != null) {
+                rootLp.gravity = gravityVal
+                root.layoutParams = rootLp
+            }
         }
 
         requestLayout()
@@ -355,6 +413,7 @@ class ToolBarFloating @JvmOverloads constructor(
 
         val container = cardActionsContainer ?: return
         container.animate().cancel()
+        container.alpha = 0f
         container.visibility = View.VISIBLE
 
         container.animate()
@@ -386,7 +445,7 @@ class ToolBarFloating @JvmOverloads constructor(
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         if (!isExpanded) {
-                            container.visibility = View.INVISIBLE
+                            container.visibility = View.GONE
                         }
                     }
                 })
@@ -405,6 +464,7 @@ class ToolBarFloating @JvmOverloads constructor(
         if (visibility == View.VISIBLE) {
             activeInstance = this
             updateSettings()
+            enforcePositioning()
         } else {
             collapse()
         }
@@ -423,25 +483,34 @@ class ToolBarFloating @JvmOverloads constructor(
 
     /** 判斷觸控座標 (rawX, rawY) 是否在 Floating Toolbar 範圍內 */
     private fun isTouchInsideToolbar(rawX: Float, rawY: Float): Boolean {
-        val targetView = if (isExpanded) this else (cardFab ?: this)
-        val location = IntArray(2)
-        targetView.getLocationOnScreen(location)
-        val left = location[0].toFloat()
-        val top = location[1].toFloat()
-        val right = left + targetView.width.toFloat()
-        val bottom = top + targetView.height.toFloat()
-        return rawX in left..right && rawY in top..bottom
+        val fab = cardFab
+        val actions = cardActionsContainer
+
+        val fabHit = if (fab != null && fab.visibility == View.VISIBLE) isViewHit(fab, rawX, rawY) else false
+        val actionsHit = if (isExpanded && actions != null && actions.visibility == View.VISIBLE) isViewHit(actions, rawX, rawY) else false
+
+        return fabHit || actionsHit
     }
 
-    /** 處理外部點擊/滾動事件：若展開狀態且點擊 outside，聯動收合 */
+    private fun isViewHit(v: View, rawX: Float, rawY: Float): Boolean {
+        val loc = IntArray(2)
+        v.getLocationOnScreen(loc)
+        val left = loc[0].toFloat()
+        val top = loc[1].toFloat()
+        val right = left + v.width.toFloat()
+        val bottom = top + v.height.toFloat()
+        val buffer = 6f * resources.displayMetrics.density
+        return rawX >= (left - buffer) && rawX <= (right + buffer) &&
+               rawY >= (top - buffer) && rawY <= (bottom + buffer)
+    }
+
+    /** 處理外部點擊事件：若展開狀態且點擊 outside，聯動收合 */
     fun handleOutsideTouch(event: MotionEvent) {
         if (!isExpanded || !isShown || isDragging) return
 
-        when (event.action) {
-            MotionEvent.ACTION_DOWN, MotionEvent.ACTION_MOVE -> {
-                if (!isTouchInsideToolbar(event.rawX, event.rawY)) {
-                    collapse()
-                }
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            if (!isTouchInsideToolbar(event.rawX, event.rawY)) {
+                collapse()
             }
         }
     }

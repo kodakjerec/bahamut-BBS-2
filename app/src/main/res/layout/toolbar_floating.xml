@@ -96,6 +96,8 @@
             android:layout_width="22dp"
             android:layout_height="22dp"
             android:layout_gravity="center"
+            android:clickable="false"
+            android:focusable="false"
             android:background="@drawable/shape_circle_dot" />
     </com.google.android.material.card.MaterialCardView>
 
