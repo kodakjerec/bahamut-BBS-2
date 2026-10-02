@@ -11,19 +11,17 @@ android {
         applicationId "com.kota.Bahamut"
         minSdk 26
         targetSdk 36 // 更新到36以支援Android 16的edge-to-edge
-        versionCode 63
-        versionName "3.3"
+        versionCode 64
+        versionName "3.4"
     }
 
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-
         }
         release {
-            minifyEnabled true        // 開啟 R8 程式碼縮減、混淆與最佳化
-            shrinkResources true      // 開啟無用資源縮減
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
