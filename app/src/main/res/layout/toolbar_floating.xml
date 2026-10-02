@@ -1,40 +1,102 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/ToolbarFloating"
-    android:layout_width="80dp"
-    android:layout_height="180dp"
-    android:layout_marginEnd="0dp"
-    android:orientation="vertical"
-    android:background="?attr/bahamut_dividerColor">
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:padding="1dp"
-        style="@style/toolbar">
-        <Button
-            android:id="@+id/ToolbarFloating_setting"
-            style="@style/ToolbarItem"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/post" />
-        <View style="@style/ToolbarDivider.Horizontal" />
-        <Button
-            android:id="@+id/ToolbarFloating_1"
-            style="@style/ToolbarItem"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/prev_page" />
-        <View style="@style/ToolbarDivider.Horizontal" />
-        <Button
-            android:id="@+id/ToolbarFloating_2"
-            style="@style/ToolbarItem"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:text="@string/last_page" />
-    </LinearLayout>
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="end|bottom"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:clipToPadding="false"
+    android:clipChildren="false">
+
+    <!-- 展開狀態：矩形外框動作按鈕區 (無圓角, 沿用 app toolbar 風格) -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/ToolbarFloating_actions_card"
+        android:layout_width="wrap_content"
+        android:layout_height="52dp"
+        android:visibility="gone"
+        app:cardCornerRadius="0dp"
+        app:cardElevation="6dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="?attr/bahamut_toolbarDivider"
+        app:cardBackgroundColor="?attr/bahamut_titleBarBackground">
+
+        <LinearLayout
+            android:id="@+id/ToolbarFloating_actions"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Button
+                android:id="@+id/ToolbarFloating_setting"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:ellipsize="none"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:text="@string/post" />
+
+            <View
+                android:id="@+id/toolbar_divider_0"
+                style="@style/ToolbarDivider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/ToolbarFloating_1"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="80dp"
+                android:ellipsize="none"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:text="@string/prev_page" />
+
+            <View
+                android:id="@+id/toolbar_divider_1"
+                style="@style/ToolbarDivider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent" />
+
+            <Button
+                android:id="@+id/ToolbarFloating_2"
+                style="@style/ToolbarItem"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="0"
+                android:minWidth="80dp"
+                android:ellipsize="none"
+                android:singleLine="true"
+                android:textSize="14sp"
+                android:text="@string/last_page" />
+
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- 預設收合狀態：圓形浮動按鈕 FAB (60dp x 60dp)，內部為精確居中的 22dp 圓點 -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/ToolbarFloating_fab"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:cardCornerRadius="30dp"
+        app:cardElevation="6dp"
+        app:strokeWidth="0dp"
+        app:cardBackgroundColor="?attr/bahamut_titleBarBackground">
+
+        <View
+            android:id="@+id/ToolbarFloating_fab_icon"
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:layout_gravity="center"
+            android:background="@drawable/shape_circle_dot" />
+    </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>

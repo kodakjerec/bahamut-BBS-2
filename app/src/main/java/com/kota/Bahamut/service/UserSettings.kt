@@ -36,8 +36,8 @@ class UserSettings(var myContext: Context) {
                     val toolbarLocation = prep.getProperty(PROPERTIES_TOOLBAR_LOCATION, 0)
                     val toolbarOrder = prep.getProperty(PROPERTIES_TOOLBAR_ORDER, 0)
                     val drawerLocation = prep.getProperty(PROPERTIES_DRAWER_LOCATION, 0)
-                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 1.0f).let { if (it <= 0f) 1.0f else it }
-                    val toolbarAlpha = prep.getProperty(PROPERTIES_TOOLBAR_ALPHA, 20.0f).let { if (it <= 0f) 20.0f else it }
+                    val toolbarIdle = prep.getProperty(PROPERTIES_TOOLBAR_IDLE, 3.0f).let { if (it <= 0f) 3.0f else it }
+                    val toolbarAlpha = prep.getProperty(PROPERTIES_TOOLBAR_ALPHA, 40.0f).let { if (it <= 0f) 40.0f else it }
                     val articleHeaders = prep.getProperty(PROPERTIES_ARTICLE_HEADS, "")
                     val shortUrlNonId = prep.getProperty(PROPERTIES_SHORT_URL_NON_ID, false)
                     val floatingLocationX = prep.getProperty(FLOATING_LOCATION_X, 0.0f)
@@ -576,19 +576,19 @@ class UserSettings(var myContext: Context) {
                 val value = try {
                     mySharedPref!!.getFloat(
                         PROPERTIES_TOOLBAR_IDLE,
-                        1.0f
+                        3.0f
                     )
                 } catch (_: ClassCastException) {
                     val intVal: Int = mySharedPref!!.getInt(
                         PROPERTIES_TOOLBAR_IDLE,
-                        1
+                        3
                     )
                     intVal.toFloat()
                 }
-                return if (value <= 0f) 1.0f else value
+                return if (value <= 0f) 3.0f else value
             }
             set(idle) {
-                val validIdle = if (idle <= 0f) 1.0f else idle
+                val validIdle = if (idle <= 0f) 3.0f else idle
                 myEditor!!.putFloat(
                     PROPERTIES_TOOLBAR_IDLE,
                     validIdle
@@ -600,12 +600,12 @@ class UserSettings(var myContext: Context) {
                 try {
                     return mySharedPref!!.getFloat(
                         PROPERTIES_TOOLBAR_ALPHA,
-                        20.0f
+                        40.0f
                     )
                 } catch (_: ClassCastException) {
                     val value: Int = mySharedPref!!.getInt(
                         PROPERTIES_TOOLBAR_ALPHA,
-                        20
+                        40
                     )
                     return value.toFloat()
                 }

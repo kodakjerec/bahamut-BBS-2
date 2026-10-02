@@ -137,16 +137,16 @@
                         android:layout_weight="3"/>
                     <com.kota.telnetUI.textView.TelnetTextViewSmall
                         android:id="@+id/system_setting_page_toolbar_idle_text"
-                        android:text="1.0s"
+                        android:text="3.0s"
                         style="@style/SystemSettingsSpinnerText"
                         android:layout_weight="1"/>
                     <com.google.android.material.slider.Slider
                         android:id="@+id/system_setting_page_toolbar_idle"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:value="1.0"
-                        android:valueFrom="0.0"
-                        android:valueTo="4.0"
+                        android:value="3.0"
+                        android:valueFrom="1.0"
+                        android:valueTo="5.0"
                         android:stepSize="0.5"
                         style="@style/SystemSettingsSlider"
                         android:layout_weight="3"/>
@@ -167,7 +167,7 @@
                         android:id="@+id/system_setting_page_toolbar_alpha"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:value="20"
+                        android:value="40"
                         android:valueFrom="0"
                         android:valueTo="100"
                         android:stepSize="10"
