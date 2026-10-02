@@ -345,7 +345,7 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
                 2 -> rowPrimary.addView(view, 6)
                 3 -> rowExtended.addView(view, 0)
                 4 -> rowExtended.addView(view, 2)
-                5 -> rowExtended.addView(view, 3) // rowExtended currently has 4 slots
+                5 -> rowExtended.addView(view, 4)
                 6 -> rowExtended.addView(view, 6)
             }
         }
