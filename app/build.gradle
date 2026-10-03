@@ -21,7 +21,8 @@ android {
             versionNameSuffix "-debug"
         }
         release {
-            minifyEnabled false
+            minifyEnabled true       // 開啟 R8 程式碼縮減、混淆與最佳化
+            shrinkResources true     // 開啟未使用的資源縮減
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
