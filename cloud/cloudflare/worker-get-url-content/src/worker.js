@@ -1,14 +1,34 @@
-const cheerio = require('cheerio')
+const cheerio = require('cheerio');
+
+// ===== 辅助函数：URL 正规化 =====
+function normalizeUrl(imgUrl, pageUrl) {
+	if (!imgUrl) return "";
+	try {
+		if (imgUrl.startsWith("//")) {
+			return "https:" + imgUrl;
+		}
+		return new URL(imgUrl, pageUrl).href;
+	} catch (e) {
+		return imgUrl;
+	}
+}
 
 export default {
 	async fetch(request, env, ctx) {
 		let url = "";
-		const getFormData = await request.formData();
-
+		let getFormData;
 		try {
+			getFormData = await request.formData();
 			url = getFormData.get("url");
+			if (!url) throw new Error("No url");
 		} catch {
-			return Response.json({ "error": "No url " });
+			return Response.json({
+				title: "",
+				desc: "",
+				imageUrl: "",
+				contentType: "",
+				isMedia: false
+			});
 		}
 
 		// 如果前端有傳來 title, desc, imageUrl 就直接存到資料庫，不用再爬一次
@@ -21,9 +41,8 @@ export default {
 		const { DATABASE } = env;
 
 		try {
-			// 已經有 title 或 desc 就直接存到資料庫，不用再爬一次
-			if (titleFromFront || descFromFront) {
-				// 修改儲存邏輯，使用 UPSERT 語法
+			// 已經有 title 或 desc 或 imageUrl 就直接存到資料庫，不用再爬一次
+			if (titleFromFront || descFromFront || imageUrlFromFront) {
 				await DATABASE.prepare(`
 					INSERT INTO urls VALUES (?, ?, ?, ?, ?)
 					ON CONFLICT(url) DO UPDATE SET 
@@ -37,7 +56,8 @@ export default {
 					title: titleFromFront,
 					desc: descFromFront,
 					imageUrl: imageUrlFromFront,
-					contentType: contentTypeFromFront
+					contentType: contentTypeFromFront,
+					isMedia: contentTypeFromFront.startsWith("image/") || contentTypeFromFront.startsWith("video/") || contentTypeFromFront.startsWith("audio/")
 				});
 			}
 
@@ -45,11 +65,16 @@ export default {
 			const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
 			const { results } = await stmt.all();
 			if (results && results.length > 0) {
+				let cachedContentType = results[0].contentType || "";
+				let cachedImageUrl = results[0].imageUrl || "";
+				cachedImageUrl = normalizeUrl(cachedImageUrl, url);
+
 				return Response.json({
-					title: results[0].title,
-					desc: results[0].desc,
-					imageUrl: results[0].imageUrl,
-					contentType: results[0].contentType
+					title: results[0].title || "",
+					desc: results[0].desc || "",
+					imageUrl: cachedImageUrl,
+					contentType: cachedContentType,
+					isMedia: cachedContentType.startsWith("image/") || cachedContentType.startsWith("video/") || cachedContentType.startsWith("audio/")
 				});
 			}
 
@@ -66,7 +91,7 @@ export default {
 				"Accept-Charset": "utf-8",
 			};
 
-			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtu", "kodakjerec"];
+			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtube", "youtu", "kodakjerec"];
 			for (let i = 0; i < siteKeywords.length; i++) {
 				const keyword = siteKeywords[i];
 				if (urlStructure.hostname.indexOf(keyword) > -1) {
@@ -74,29 +99,71 @@ export default {
 						title,
 						desc,
 						imageUrl,
-						contentType
+						contentType,
+						isMedia: false
 					});
 				}
 			}
 
 			// twitter 轉址
-			const twitterKeywords = ["x.com", "twitter"];
-			twitterKeywords.forEach((keyword) => {
-				if (urlStructure.hostname.indexOf(keyword) > -1) {
-					url = url.replace(urlStructure.hostname, "api.vxtwitter.com");
-					isTwitter = true;
-				}
-			});
+			function isTwitterHost(hostname) {
+				return (
+					hostname === 'twitter.com' ||
+					hostname.endsWith('.twitter.com') ||
+					hostname === 'x.com' ||
+					hostname.endsWith('.x.com')
+				);
+			}
+
+			if (isTwitterHost(urlStructure.hostname)) {
+				url = url.replace(urlStructure.hostname, "api.vxtwitter.com");
+				isTwitter = true;
+			}
+			
 			// ptt 加變數
 			if (urlStructure.hostname.indexOf("ptt") > -1) {
 				headers.cookie = "over18=1";
 			}
+
+			// ===== 新增 HEAD Request 判斷是否為 Media =====
+			if (!isTwitter) {
+				let headContentType = "";
+				try {
+					const headResp = await fetch(url, {
+						method: 'HEAD',
+						headers,
+						redirect: 'follow'
+					});
+					headContentType = headResp.headers.get('content-type') || '';
+				} catch (e) {
+					// Ignore HEAD failure
+				}
+
+				let isDirectMedia = headContentType.startsWith('image/') || 
+									headContentType.startsWith('video/') || 
+									headContentType.startsWith('audio/');
+				
+				if (isDirectMedia) {
+					return Response.json({
+						title: '',
+						desc: '',
+						imageUrl: url,
+						contentType: headContentType,
+						isMedia: true
+					});
+				}
+			}
+
+			// ===== 發送 GET 請求並限制下載範圍 (256KB) =====
 			let responseFrom = await fetch(url, {
 				method: "GET",
-				headers,
+				headers: isTwitter ? headers : {
+					...headers,
+					"Range": "bytes=0-262144"
+				},
 				redirect: "follow"
 			});
-			contentType = responseFrom.headers.get("content-type");
+			contentType = responseFrom.headers.get("content-type") || "";
 			// 指定 charset
 			if (contentType.indexOf("charset=") > -1)
 				charset = contentType.substring(contentType.indexOf("charset=") + 8).trim().replaceAll("'", "").replaceAll('"', "").toLowerCase();
@@ -107,6 +174,9 @@ export default {
 				url = responseFrom.headers.get("target");
 				urlStructure = new URL(url);
 			}
+
+			let isMedia = contentType.startsWith("image/") || contentType.startsWith("video/") || contentType.startsWith("audio/");
+
 			if (isTwitter) {
 				const html = await responseFrom.json();
 				title = html.user_name + " @" + html.user_screen_name;
@@ -114,13 +184,19 @@ export default {
 				if (html.mediaURLs && html.mediaURLs.length > 0)
 					imageUrl = html.mediaURLs[0];
 			} else {
-				if (contentType.indexOf("text") > -1) {
+				if (contentType.indexOf("text/html") > -1 || contentType.indexOf("application/xhtml+xml") > -1) {
 					// 将HTML文本解码并解析
 					let decoder = new TextDecoder(charset);
 					const html = await responseFrom.arrayBuffer();
 					const htmlBuffer = decoder.decode(html);
 					const soup = cheerio.load(htmlBuffer);
 					const originHtml = soup.html();
+
+					// og:type Media Detection
+					const ogType = soup('meta[property="og:type"]').attr('content')?.toLowerCase() || '';
+					if (ogType.startsWith('video') || ogType.startsWith('audio')) {
+						isMedia = true;
+					}
 					
 					// 记录HTML大小和基本信息
 					const parseMetrics = {
@@ -132,14 +208,35 @@ export default {
 						titleTags: soup("title").length
 					};
 					
+					// Parse JSON-LD
+					const jsonLd = parseJsonLd(soup);
+
 					// ===== 提取标题 =====
-					title = extractPageTitle(soup);
+					title = extractPageTitle(soup, jsonLd);
 					
 					// ===== 提取描述 =====
-					desc = extractPageDescription(soup);
+					desc = extractPageDescription(soup, jsonLd);
 					
 					// ===== 提取图片 =====
-					imageUrl = extractPageImage(soup, originHtml, urlStructure);
+					imageUrl = extractPageImage(soup, originHtml, urlStructure, jsonLd);
+
+					// Bilibili 特殊處理
+					if (urlStructure.hostname.indexOf("bilibili") > -1) {
+						const start = htmlBuffer.indexOf('window.__INITIAL_STATE__=');
+						if (start > -1) {
+							const end = htmlBuffer.indexOf(';(function()', start);
+							if (end > start) {
+								try {
+									const jsonText = htmlBuffer.substring(start + 'window.__INITIAL_STATE__='.length, end);
+									const state = JSON.parse(jsonText);
+									if (state?.video?.viewInfo) {
+										if (!desc) desc = state.video.viewInfo.desc || "";
+										if (!imageUrl) imageUrl = normalizeUrl(state.video.viewInfo.pic, urlStructure.href);
+									}
+								} catch(e) {}
+							}
+						}
+					}
 					
 					// 🎯 发送到 Analytics Engine
 					const parseQuality = {
@@ -171,17 +268,29 @@ export default {
 						})
 					);
 
-					// ✅ 保存 htmlBuffer 到数据库
-					await DATABASE.prepare(`
-						INSERT INTO urls_html VALUES (?, ?, ?)
-						ON CONFLICT(url) DO UPDATE SET 
-						htmlContent = excluded.htmlContent,
-						createdAt = excluded.createdAt
-					`).bind(url, htmlBuffer, new Date().toISOString()).run();
-				} else {
-					// 非HTML文件：使用路径作为标题，用URL作为图片
-					title = urlStructure.pathname;
+					// ✅ 只在解析失敗時保存 htmlBuffer 到数据库 (Limit to 500KB)
+					if (!title && !desc && !imageUrl && htmlBuffer.length < 512000) {
+						await DATABASE.prepare(`
+							INSERT INTO urls_html VALUES (?, ?, ?)
+							ON CONFLICT(url) DO UPDATE SET 
+							htmlContent = excluded.htmlContent,
+							createdAt = excluded.createdAt
+						`).bind(url, htmlBuffer, new Date().toISOString()).run();
+					}
+				} else if (isMedia) {
+					// 媒體檔案備案處理：使用路徑作為標題，用URL作為圖片 (防呆處理，如果 HEAD 請求失敗)
+					title = urlStructure.pathname.split('/').pop() || urlStructure.pathname;
 					imageUrl = url;
+					
+					ctx.waitUntil(
+						env.ANALYTICS.writeDataPoint({
+							indexes: ["getUrl"],
+							blobs: ["non_html", contentType],
+							doubles: [0]
+						})
+					);
+				} else {
+					title = urlStructure.pathname.split('/').pop() || urlStructure.pathname;
 					
 					ctx.waitUntil(
 						env.ANALYTICS.writeDataPoint({
@@ -193,61 +302,81 @@ export default {
 				}
 			}
 			
+			// ===== 辅助函数：解析 JSON-LD =====
+			function parseJsonLd(soup) {
+				let result = null;
+				soup('script[type="application/ld+json"]').each((i, el) => {
+					try {
+						const data = JSON.parse(soup(el).html());
+						
+						const supportedTypes = [
+							'Article', 'NewsArticle', 'BlogPosting', 'WebPage',
+							'VideoObject', 'ImageObject', 'WebSite', 'ProfilePage', 'CollectionPage'
+						];
+
+						const processData = (item) => {
+							const type = item["@type"];
+							if (supportedTypes.includes(type)) {
+								if (!result) result = {};
+								if (item.headline && !result.headline) result.headline = item.headline;
+								if (item.description && !result.description) result.description = item.description;
+								
+								let img = item.image;
+								if (Array.isArray(img) && img.length > 0) img = img[0];
+								if (img && typeof img === 'object') {
+									img = img.url || img.contentUrl || "";
+								}
+								if (img && typeof img === 'string' && !result.image) result.image = img;
+							}
+						};
+						
+						if (data['@graph'] && Array.isArray(data['@graph'])) {
+							data['@graph'].forEach(processData);
+						} else if (Array.isArray(data)) {
+							data.forEach(processData);
+						} else {
+							processData(data);
+						}
+					} catch(e) {}
+				});
+				return result;
+			}
+
 			// ===== 辅助函数：提取页面标题 =====
-			function extractPageTitle(soup) {
-				// 优先使用 <title> 标签
-				if (soup("title").length > 0)
-					return soup("title").text();
-				
-				// 其次使用 Open Graph 标签
-				if (soup('meta[property="og:title"]').length > 0)
-					return soup('meta[property="og:title"]').attr("content");
-				
+			function extractPageTitle(soup, jsonLd) {
+				if (soup("title").length > 0) return soup("title").text();
+				if (soup('meta[property="og:title"]').length > 0) return soup('meta[property="og:title"]').attr("content");
+				if (soup('meta[name="twitter:title"]').length > 0) return soup('meta[name="twitter:title"]').attr("content");
+				if (jsonLd && jsonLd.headline) return jsonLd.headline;
 				return "";
 			}
 			
 			// ===== 辅助函数：提取页面描述 =====
-			function extractPageDescription(soup) {
-				// 优先使用标准 meta description
-				if (soup('meta[name="description"]').length > 0)
-					return soup('meta[name="description"]').attr("content");
-				
-				// 其次使用 Open Graph description
-				if (soup('meta[property="og:description"]').length > 0)
-					return soup('meta[property="og:description"]').attr("content");
-				
+			function extractPageDescription(soup, jsonLd) {
+				if (soup('meta[name="description"]').length > 0) return soup('meta[name="description"]').attr("content");
+				if (soup('meta[property="og:description"]').length > 0) return soup('meta[property="og:description"]').attr("content");
+				if (soup('meta[name="twitter:description"]').length > 0) return soup('meta[name="twitter:description"]').attr("content");
+				if (jsonLd && jsonLd.description) return jsonLd.description;
 				return "";
 			}
 			
 			// ===== 辅助函数：提取页面图片 =====
-			function extractPageImage(soup, htmlContent, urlObj) {
+			function extractPageImage(soup, htmlContent, urlObj, jsonLd) {
 				const hostname = urlObj.hostname;
+				let img = "";
 				
-				// 各网站的特殊处理规则
 				const siteImageExtractors = {
-					// PTT 论坛：从富文本区域提取
 					"ptt": () => {
 						if (soup("div.richcontent").length > 0) {
 							return soup("div.richcontent>img").attr("src") || "";
 						}
 						return "";
 					},
-					
-					// iHerb：从 og:images 元标签提取
-					"iherb": () => {
-						return soup('meta[property="og:images"]').attr("content") || "";
-					},
-					
-					// 亚马逊：从特定ID的图片提取
-					"amazon": () => {
-						return soup("#landingImage").attr("src") || "";
-					},
-					
-					// Meee：从HTML内容中查找特殊字符串
+					"iherb": () => soup('meta[property="og:images"]').attr("content") || "",
+					"amazon": () => soup("#landingImage").attr("src") || "",
 					"meee": () => {
 						const findString = urlObj.pathname.replace("/", "") + ".";
 						const findIndex = htmlContent.indexOf(findString);
-						
 						if (findIndex > -1) {
 							const imageName = "/" + htmlContent.substring(findIndex, findIndex + findString.length + 3);
 							return urlObj.href.replace(urlObj.pathname, imageName);
@@ -256,21 +385,28 @@ export default {
 					}
 				};
 				
-				// 查找匹配的网站规则
 				for (const [siteKeyword, extractor] of Object.entries(siteImageExtractors)) {
 					if (hostname.indexOf(siteKeyword) > -1) {
-						const result = extractor();
-						if (result) return result;
-						break;
+						img = extractor();
+						if (img) break;
 					}
 				}
 				
-				// 若以上规则都无结果，使用通用的 Open Graph 图片标签
-				return soup('meta[property="og:image"]').attr("content") || "";
+				if (!img) {
+					img = soup('meta[property="og:image"]').attr("content") ||
+						  soup('meta[property="og:image:url"]').attr("content") ||
+						  soup('meta[name="twitter:image"]').attr("content") ||
+						  soup('meta[property="og:images"]').attr("content") ||
+						  soup("#landingImage").attr("src") ||
+						  (jsonLd && jsonLd.image ? jsonLd.image : "") ||
+						  soup('link[rel*="icon"]').first().attr("href") || "";
+				}
+				
+				return normalizeUrl(img, urlObj.href);
 			}
 
-			// 修改儲存邏輯，使用 UPSERT 語法
-			await DATABASE.prepare(`
+			if (title || desc || imageUrl) {
+				await DATABASE.prepare(`
 					INSERT INTO urls VALUES (?, ?, ?, ?, ?)
 					ON CONFLICT(url) DO UPDATE SET 
 					title = excluded.title,
@@ -278,16 +414,24 @@ export default {
 					imageUrl = excluded.imageUrl,
 					contentType = excluded.contentType
 				`).bind(url, title, desc, imageUrl, contentType).run();
+			}
 
 			return Response.json({
-				title,
-				desc,
-				imageUrl,
-				contentType
+				title: title || "",
+				desc: desc || "",
+				imageUrl: imageUrl || "",
+				contentType: contentType || "",
+				isMedia
 			});
 		} catch (e) {
 			console.log(e);
-			return Response.json({ "error": "發生錯誤\n" + e.toString() });
+			return Response.json({
+				title: "",
+				desc: "",
+				imageUrl: "",
+				contentType: "",
+				isMedia: false
+			});
 		}
 	}
 };

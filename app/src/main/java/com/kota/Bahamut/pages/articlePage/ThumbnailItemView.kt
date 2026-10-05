@@ -25,6 +25,8 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonArray
+import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.kota.Bahamut.R
 import com.kota.Bahamut.dataModels.UrlDatabase
@@ -236,13 +238,11 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                             isPic = true
 
                                         // 文字標題處理
-                                        myTitle = document.title()
-                                        if (myTitle.isEmpty())
-                                            myTitle = document.select("meta[property=og:title]")
-                                                .attr("content")
+                                        myTitle = document.select("meta[property=og:title]")
+                                            .attr("content")
                                         if (myTitle.isEmpty())
                                             myTitle = document.select("meta[name=twitter:title]")
-                                            .attr("content")
+                                                .attr("content")
 
                                         // 文字描述處理
                                         myDescription = document.select("meta[name=description]")
@@ -255,6 +255,10 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                             myDescription =
                                                 document.select("meta[name=twitter:description]")
                                                     .attr("content")
+
+                                        val jsonLd = parseJsonLd(document)
+                                        if (myTitle.isEmpty()) myTitle = jsonLd.title
+                                        if (myDescription.isEmpty()) myDescription = jsonLd.description
 
                                         myImageUrl =
                                             document.select("meta[property=og:image]")
@@ -275,6 +279,8 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                                 document.select("meta[property=og:images]")
                                                     .attr("content")
 
+                                        if (myImageUrl.isEmpty()) myImageUrl = jsonLd.imageUrl
+
                                         if (myImageUrl.isEmpty())
                                             myImageUrl =
                                                 document.select("#landingImage")
@@ -285,6 +291,8 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                             myImageUrl =
                                                 document.select("link[rel~=.*icon.*]")
                                                     .attr("abs:href")
+
+                                        if (myTitle.isEmpty()) myTitle = document.title()
 
                                         if (myImageUrl.startsWith("//")) {
                                             myImageUrl = "https:$myImageUrl"
@@ -340,6 +348,92 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     setFail()
                 }
             }
+        }
+    }
+
+    private data class JsonLdMetadata(
+        val title: String = "",
+        val description: String = "",
+        val imageUrl: String = ""
+    )
+
+    private fun parseJsonLd(document: Document): JsonLdMetadata {
+        val candidates = mutableListOf<JsonObject>()
+        val gson = GsonBuilder().create()
+
+        fun collectNodes(element: JsonElement) {
+            when {
+                element.isJsonArray -> element.asJsonArray.forEach(::collectNodes)
+                element.isJsonObject -> {
+                    val objectValue = element.asJsonObject
+                    candidates.add(objectValue)
+                    objectValue.get("@graph")?.let(::collectNodes)
+                    objectValue.get("@included")?.let(::collectNodes)
+                }
+            }
+        }
+
+        document.select("script[type=application/ld+json]").forEach { script ->
+            try {
+                val json = script.data().ifBlank { script.html() }
+                gson.fromJson(json, JsonElement::class.java)?.let(::collectNodes)
+            } catch (e: Exception) {
+                Log.d("loadUrl", "Unable to parse JSON-LD: ${e.message}")
+            }
+        }
+
+        fun JsonObject.schemaPriority(): Int {
+            val type = get("@type") ?: return 0
+            val typeNames = if (type.isJsonArray) {
+                type.asJsonArray.mapNotNull { it.takeJsonLdString() }
+            } else {
+                listOfNotNull(type.takeJsonLdString())
+            }
+            return if (typeNames.any {
+                    it.substringAfterLast('/').substringAfterLast('#').lowercase() in setOf(
+                        "article", "newsarticle", "blogposting", "webpage", "product",
+                        "videoobject", "recipe", "event", "book", "softwareapplication",
+                        "course", "jobposting"
+                    )
+                }) 1 else 0
+        }
+
+        val orderedCandidates = candidates.sortedByDescending { it.schemaPriority() }
+        val title = orderedCandidates.firstNotNullOfOrNull { candidate ->
+            candidate.get("headline").takeJsonLdString()
+                ?: candidate.get("name").takeJsonLdString()
+        }.orEmpty()
+        val description = orderedCandidates.firstNotNullOfOrNull { candidate ->
+            candidate.get("description").takeJsonLdString()
+        }.orEmpty()
+        val imageUrl = orderedCandidates.firstNotNullOfOrNull { candidate ->
+            candidate.get("image").takeJsonLdString()
+                ?: candidate.get("thumbnailUrl").takeJsonLdString()
+        }?.let { resolveJsonLdUrl(it, document.baseUri()) }.orEmpty()
+
+        return JsonLdMetadata(title, description, imageUrl)
+    }
+
+    private fun JsonElement?.takeJsonLdString(): String? {
+        if (this == null || isJsonNull) return null
+        return when {
+            isJsonPrimitive -> asString.trim().takeIf { it.isNotEmpty() }
+            isJsonArray -> asJsonArray.firstNotNullOfOrNull { it.takeJsonLdString() }
+            isJsonObject -> {
+                val objectValue = asJsonObject
+                objectValue.get("url").takeJsonLdString()
+                    ?: objectValue.get("contentUrl").takeJsonLdString()
+                    ?: objectValue.get("@id").takeJsonLdString()
+            }
+            else -> null
+        }
+    }
+
+    private fun resolveJsonLdUrl(url: String, baseUri: String): String {
+        return try {
+            java.net.URI(baseUri).resolve(url).toString()
+        } catch (_: Exception) {
+            url
         }
     }
 
