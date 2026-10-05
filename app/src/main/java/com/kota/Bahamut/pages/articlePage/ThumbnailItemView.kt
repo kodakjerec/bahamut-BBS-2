@@ -59,6 +59,20 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 .followSslRedirects(true)
                 .build()
         }
+
+        private var cachedUserAgent: String? = null
+
+        fun getRealUserAgent(context: Context): String {
+            if (cachedUserAgent == null) {
+                try {
+                    // 取得裝置真實 WebView 的 User-Agent
+                    cachedUserAgent = android.webkit.WebSettings.getDefaultUserAgent(context)
+                } catch (e: Exception) {
+                    cachedUserAgent = System.getProperty("http.agent") ?: "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
+                }
+            }
+            return cachedUserAgent!!
+        }
     }
     var mainLayout: LinearLayout? = null
     var viewWidth: Int
@@ -92,12 +106,15 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     /** 判斷URL內容  */
     fun loadUrl(url: String) {
         myUrl = url
+        ASCoroutine.ensureMainThread {
+            urlView.text = url
+        }
 
-        try {
-            UrlDatabase(context).use { urlDatabase ->
-                val findUrl: Vector<String> = urlDatabase.getUrl(myUrl)
-                urlView.text = myUrl
-
+        ASCoroutine.runInNewCoroutine {
+            try {
+                val findUrl: Vector<String> = UrlDatabase(context).use { urlDatabase ->
+                    urlDatabase.getUrl(url)
+                }
                 if (findUrl.isNotEmpty()) {
                     // 已經有URL資料
                     myTitle = findUrl[1]
@@ -117,8 +134,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                         .build()
 
                     // 尋找URL資料
-                    ASCoroutine.runInNewCoroutine {
-                        try {
+                    try {
                             var contentType = ""
                             try {
                                 // 嘗試使用共用的 sharedClient 向 Cloudflare Worker 取得網址資料
@@ -128,7 +144,11 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                     val jsonObject = JSONObject(data.string())
                                     contentType = jsonObject.optString("contentType", "")
 
-                                    if (contentType.contains("image") || contentType.contains("video") || contentType.contains("audio")) {
+                                    if (
+                                        contentType.startsWith("image/")
+                                        || contentType.startsWith("video/")
+                                        || contentType.startsWith("audio/")
+                                    ) {
                                         isPic = true
                                     }
                                     myTitle = jsonObject.optString("title", "")
@@ -141,10 +161,14 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
                             // 遠端詢問 cloudflare 失敗（沒資料或發生 exception），改由本地直接連線獲取內容
                             if (myTitle.isEmpty() || myDescription.isEmpty()) {
-                                var userAgent: String = System.getProperty("http.agent") ?: ""
-                                if (myUrl.contains("youtu") || myUrl.contains("amazon"))
-                                    userAgent = "Mozilla/5.0 (Windows NT 10.0 Win64 x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
-
+                                var userAgent: String = getRealUserAgent(myContext)
+                                if (myUrl.contains("youtu") || myUrl.contains("amazon")) {
+                                    // 針對特定網站如果需要強制電腦版，可以將真實 UA 中的 Mobile 移除，或是維持直接給一個電腦版 UA
+                                    userAgent = userAgent.replace("Mobile ", "")
+                                    if (!userAgent.contains("Windows") && !userAgent.contains("Macintosh")) {
+                                        userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36 Edg/125.0.0.0"
+                                    }
+                                }
 
                                 // cookie
                                 // Create a new Map to store cookies
@@ -157,60 +181,114 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                     val headResp = Jsoup.connect(myUrl)
                                         .method(Connection.Method.HEAD)
                                         .header("User-Agent", userAgent)
+                                        .header("Accept", "*/*")
+                                        .header("Accept-Encoding", "gzip, deflate, br")
                                         .cookies(cookies)
                                         .timeout(5000)
                                         .ignoreContentType(true)
                                         .execute()
+                                    
                                     contentType = headResp.contentType() ?: ""
                                 } catch (_: Exception) {}
 
-                                if (contentType.contains("image/") || contentType.contains("video/")) {
+                                if (contentType.startsWith("image/")
+                                    || contentType.startsWith("video/")
+                                    || contentType.startsWith("audio/")
+                                ) {
                                     isPic = true
                                 } else {
                                     // 2. 如果是網頁（或 HEAD 失敗），才執行限制大小的 GET
                                     val getResp: Connection.Response = Jsoup
                                         .connect(myUrl)
                                         .header("User-Agent", userAgent)
-                                        .header("Range", "bytes=0-102400") // 請求前 100KB
+                                        .header("Accept", "*/*")
+                                        .header("Accept-Encoding", "gzip, deflate, br")
+                                        .header("Range", "bytes=0-262144") // 請求前 256KB
                                         .cookies(cookies)
                                         .timeout(10000)
                                         .ignoreContentType(true)
-                                        .maxBodySize(100 * 1024) // 限制只下載前 100KB
+                                        .maxBodySize(256 * 1024) // 限制只下載前 256KB
                                         .execute()
 
                                     contentType = getResp.contentType() ?: ""
 
-                                    if (contentType.contains("image/") || contentType.contains("video/")) {
+                                    val lowerUrl = myUrl.lowercase()
+
+                                    if (
+                                        lowerUrl.endsWith(".jpg") ||
+                                        lowerUrl.endsWith(".jpeg") ||
+                                        lowerUrl.endsWith(".png") ||
+                                        lowerUrl.endsWith(".gif") ||
+                                        lowerUrl.endsWith(".webp") ||
+                                        lowerUrl.endsWith(".bmp") ||
+                                        lowerUrl.endsWith(".avif")
+                                    ) {
                                         isPic = true
                                     }
 
-                                    if (contentType.contains("text/html")) {
+                                    if (contentType.contains("text/html") || contentType.contains("xhtml")) {
                                         // 文字處理
                                         val document: Document = getResp.parse()
 
+                                        val ogType = document.select("meta[property=og:type]").attr("content").lowercase()
+
+                                        if (ogType.startsWith("video"))
+                                            isPic = true
+
+                                        // 文字標題處理
                                         myTitle = document.title()
                                         if (myTitle.isEmpty())
                                             myTitle = document.select("meta[property=og:title]")
                                                 .attr("content")
+                                        if (myTitle.isEmpty())
+                                            myTitle = document.select("meta[name=twitter:title]")
+                                            .attr("content")
 
+                                        // 文字描述處理
                                         myDescription = document.select("meta[name=description]")
                                             .attr("content")
                                         if (myDescription.isEmpty())
                                             myDescription =
                                                 document.select("meta[property=og:description]")
                                                     .attr("content")
+                                        if (myDescription.isEmpty())
+                                            myDescription =
+                                                document.select("meta[name=twitter:description]")
+                                                    .attr("content")
 
-                                        myImageUrl = document.select("meta[property=og:image]")
-                                            .attr("content")
-                                        if (myImageUrl.isEmpty())
-                                            myImageUrl = document.select("meta[property=og:image]")
+                                        myImageUrl =
+                                            document.select("meta[property=og:image]")
                                                 .attr("content")
-                                        if (myImageUrl.isEmpty())
-                                            myImageUrl = document.select("meta[property=og:images]")
-                                                .attr("content")
+
                                         if (myImageUrl.isEmpty())
                                             myImageUrl =
-                                                document.select("#landingImage").attr("src")
+                                                document.select("meta[property=og:image:url]")
+                                                    .attr("content")
+
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl =
+                                                document.select("meta[name=twitter:image]")
+                                                    .attr("content")
+
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl =
+                                                document.select("meta[property=og:images]")
+                                                    .attr("content")
+
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl =
+                                                document.select("#landingImage")
+                                                    .attr("src")
+
+                                        // 最少有縮圖
+                                        if (myImageUrl.isEmpty())
+                                            myImageUrl =
+                                                document.select("link[rel~=.*icon.*]")
+                                                    .attr("abs:href")
+
+                                        if (myImageUrl.startsWith("//")) {
+                                            myImageUrl = "https:$myImageUrl"
+                                        }
 
 
                                         // 2. 針對 B 站數據進行 Gson 深度解析
@@ -228,7 +306,9 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                             // 圖片處理
                             picoUrlChangeStatus(isPic)
 
-                            urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
+                            UrlDatabase(context).use { urlDatabase ->
+                                urlDatabase.addUrl(myUrl, myTitle, myDescription, myImageUrl, isPic)
+                            }
 
                             // 上傳至cloudflare, 方便之後擷取
                             try {
@@ -244,21 +324,21 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                     .url(apiUrl)
                                     .post(uploadBody)
                                     .build()
-                                sharedClient.newCall(uploadRequest).execute()
+                                sharedClient.newCall(uploadRequest).execute().use { }
                             } catch (_: Exception) {}
 
-                        } catch (e: Exception) {
-                            Log.e("loadUrl", e.message.toString())
-                            ASCoroutine.ensureMainThread {
-                                setFail()
-                            }
+                    } catch (e: Exception) {
+                        Log.e("loadUrl", e.message.toString())
+                        ASCoroutine.ensureMainThread {
+                            setFail()
                         }
                     }
                 }
-            }
-        } catch (_: Exception) {
-            ASCoroutine.ensureMainThread {
-                setFail()
+            } catch (e: Exception) {
+                Log.e("loadUrl", e.message.toString())
+                ASCoroutine.ensureMainThread {
+                    setFail()
+                }
             }
         }
     }
