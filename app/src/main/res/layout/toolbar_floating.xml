@@ -37,7 +37,7 @@
                 android:layout_weight="0"
                 android:ellipsize="none"
                 android:singleLine="true"
-                android:textSize="14sp"
+                android:paddingHorizontal="16dp"
                 android:text="@string/post" />
 
             <View
@@ -55,7 +55,7 @@
                 android:minWidth="80dp"
                 android:ellipsize="none"
                 android:singleLine="true"
-                android:textSize="14sp"
+                android:paddingHorizontal="16dp"
                 android:text="@string/prev_page" />
 
             <View
@@ -73,13 +73,13 @@
                 android:minWidth="80dp"
                 android:ellipsize="none"
                 android:singleLine="true"
-                android:textSize="14sp"
+                android:paddingHorizontal="16dp"
                 android:text="@string/last_page" />
 
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <!-- 預設收合狀態：圓形浮動按鈕 FAB (60dp x 60dp)，內部為精確居中的 22dp 圓點 -->
+    <!-- 預設收合狀態：圓形浮動按鈕 FAB (60dp x 60dp)，內部為精確居中的 30dp 圓點 -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/ToolbarFloating_fab"
         android:layout_width="60dp"
@@ -93,8 +93,8 @@
 
         <View
             android:id="@+id/ToolbarFloating_fab_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_gravity="center"
             android:clickable="false"
             android:focusable="false"
