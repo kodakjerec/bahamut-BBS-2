@@ -26,6 +26,8 @@ import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import java.lang.ref.WeakReference
 import kotlin.math.hypot
+import androidx.core.view.isVisible
+import com.kota.asFramework.ui.ASToast
 
 /**
  * 浮動工具列元件 (`ToolBarFloating`)
@@ -87,6 +89,22 @@ class ToolBarFloating @JvmOverloads constructor(
         }
     }
 
+    /** 長按提示 Runnable */
+    private val longPressHintRunnable = Runnable {
+        if (!isDragging) {
+            cardFab?.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            ASToast.showLongToast(
+                "短滑: 上下頁 長滑: 最前最後頁 左右拖曳: 換邊"
+            )
+        }
+    }
+
+    /** FAB 手勢觸控監聽器 */
+    @SuppressLint("ClickableViewAccessibility")
+    private val fabTouchListener = OnTouchListener { v, event ->
+        handleFabTouch(v, event)
+    }
+
     init {
         init(context)
     }
@@ -114,7 +132,7 @@ class ToolBarFloating @JvmOverloads constructor(
         updateSettings()
 
         // 初始為收合狀態 (actionsCard 為 GONE，避免佔位及遮擋點擊)
-        cardActionsContainer?.visibility = View.GONE
+        cardActionsContainer?.visibility = GONE
         cardActionsContainer?.alpha = 0f
         cardFab?.alpha = collapsedAlpha
 
@@ -134,9 +152,8 @@ class ToolBarFloating @JvmOverloads constructor(
         cardFab?.setOnTouchListener(fabTouchListener)
     }
 
-    /** FAB 手勢觸控監聽器 */
-    @SuppressLint("ClickableViewAccessibility")
-    private val fabTouchListener = OnTouchListener { v, event ->
+    /** FAB 手勢觸控處理：支援按住任意拖動，放開時依中線判斷貼合左下或右下 */
+    private fun handleFabTouch(v: View, event: MotionEvent): Boolean {
         val density = resources.displayMetrics.density
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
 
@@ -151,35 +168,65 @@ class ToolBarFloating @JvmOverloads constructor(
 
                 v.parent?.requestDisallowInterceptTouchEvent(true)
                 parent?.requestDisallowInterceptTouchEvent(true)
-                true
+                
+                mainHandler.removeCallbacks(longPressHintRunnable)
+                mainHandler.postDelayed(longPressHintRunnable, ViewConfiguration.getLongPressTimeout().toLong())
+                
+                return true
             }
 
             MotionEvent.ACTION_MOVE -> {
-                v.parent?.requestDisallowInterceptTouchEvent(true)
-                parent?.requestDisallowInterceptTouchEvent(true)
-
                 val dx = event.rawX - touchDownRawX
                 val dy = event.rawY - touchDownRawY
                 val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
 
                 if (!isDragging && dist > touchSlop) {
                     isDragging = true
+                    mainHandler.removeCallbacks(longPressHintRunnable)
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    parent?.requestDisallowInterceptTouchEvent(true)
                     if (isExpanded) {
                         collapse()
                     }
                 }
 
                 if (isDragging) {
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    parent?.requestDisallowInterceptTouchEvent(true)
+
                     // 按住按鈕時可以任意拖動 (即時跟隨手指 X, Y)
+                    val parentView = parent as? View
+                    val parentHeight = (if (parentView != null && parentView.height > 0) parentView.height else resources.displayMetrics.heightPixels).toFloat()
+                    val fabSize = 60f * density
+                    val maxDown = 80f * density
+                    val maxUp = -(parentHeight - 80f * density - fabSize)
+
                     translationX = initialTranslationX + dx
-                    translationY = initialTranslationY + dy
+                    translationY = (initialTranslationY + dy).coerceIn(maxUp, maxDown)
                 }
-                true
+                return true
             }
 
             MotionEvent.ACTION_UP -> {
+                mainHandler.removeCallbacks(longPressHintRunnable)
                 if (isDragging) {
                     isDragging = false
+
+                    val dx = event.rawX - touchDownRawX
+                    val dy = event.rawY - touchDownRawY
+                    val swipeThreshold = 40f * density
+                    val deepSwipeThreshold = 120f * density
+                    
+                    // 判斷是否為明顯的上下滑動
+                    if (kotlin.math.abs(dy) > kotlin.math.abs(dx) && kotlin.math.abs(dy) > swipeThreshold) {
+                        if (dy < 0) {
+                            // 往上滑：觸發第二顆按鈕功能 (btn1)
+                            if (kotlin.math.abs(dy) > deepSwipeThreshold) btn1?.performLongClick() else btn1?.performClick()
+                        } else {
+                            // 往下滑：觸發第三顆按鈕功能 (btn2)
+                            if (kotlin.math.abs(dy) > deepSwipeThreshold) btn2?.performLongClick() else btn2?.performClick()
+                        }
+                    }
 
                     // 取得螢幕寬度與中線
                     val screenWidth = resources.displayMetrics.widthPixels.toFloat()
@@ -229,10 +276,11 @@ class ToolBarFloating @JvmOverloads constructor(
                     // 點擊事件：切換展開/收合
                     v.performClick()
                 }
-                true
+                return true
             }
 
             MotionEvent.ACTION_CANCEL -> {
+                mainHandler.removeCallbacks(longPressHintRunnable)
                 if (isDragging) {
                     isDragging = false
                     animate()
@@ -241,10 +289,10 @@ class ToolBarFloating @JvmOverloads constructor(
                         .setDuration(200L)
                         .start()
                 }
-                true
+                return true
             }
 
-            else -> false
+            else -> return false
         }
     }
 
@@ -270,7 +318,7 @@ class ToolBarFloating @JvmOverloads constructor(
 
         val actionsParams = LinearLayout.LayoutParams(
             LayoutParams.WRAP_CONTENT,
-            (52 * density).toInt()
+            (60 * density).toInt()
         )
 
         if (isLeft) {
@@ -296,7 +344,15 @@ class ToolBarFloating @JvmOverloads constructor(
             root.addView(fab)
         }
 
+        fab.setOnTouchListener(fabTouchListener)
         enforcePositioning()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (isDragging) {
+            parent?.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onAttachedToWindow() {
@@ -414,7 +470,7 @@ class ToolBarFloating @JvmOverloads constructor(
         val container = cardActionsContainer ?: return
         container.animate().cancel()
         container.alpha = 0f
-        container.visibility = View.VISIBLE
+        container.visibility = VISIBLE
 
         container.animate()
             .alpha(1.0f)
@@ -445,7 +501,7 @@ class ToolBarFloating @JvmOverloads constructor(
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
                         if (!isExpanded) {
-                            container.visibility = View.GONE
+                            container.visibility = GONE
                         }
                     }
                 })
@@ -461,7 +517,7 @@ class ToolBarFloating @JvmOverloads constructor(
     /** 控制整個浮動工具列的顯示狀態 */
     override fun setVisibility(visibility: Int) {
         super.setVisibility(visibility)
-        if (visibility == View.VISIBLE) {
+        if (visibility == VISIBLE) {
             activeInstance = this
             updateSettings()
             enforcePositioning()
@@ -486,8 +542,8 @@ class ToolBarFloating @JvmOverloads constructor(
         val fab = cardFab
         val actions = cardActionsContainer
 
-        val fabHit = if (fab != null && fab.visibility == View.VISIBLE) isViewHit(fab, rawX, rawY) else false
-        val actionsHit = if (isExpanded && actions != null && actions.visibility == View.VISIBLE) isViewHit(actions, rawX, rawY) else false
+        val fabHit = if (fab != null && fab.isVisible) isViewHit(fab, rawX, rawY) else false
+        val actionsHit = if (isExpanded && actions != null && actions.isVisible) isViewHit(actions, rawX, rawY) else false
 
         return fabHit || actionsHit
     }

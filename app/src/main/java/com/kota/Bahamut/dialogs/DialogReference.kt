@@ -91,35 +91,39 @@ class DialogReference : ASDialog(), View.OnClickListener {
             val checkBoxAuthor0:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0)
             val checkBoxAuthor1:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1)
 
-            myAuthors[0].enabled = checkBoxAuthor0.isChecked
-            if (checkBoxAuthor0.isChecked) {
-                val author = myAuthors[0]
-                // 去除空白行
-                val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
-                author.removeBlank = checkboxRemoveBlank.isChecked
-                // 保留行數
-                val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
-                rbs.forEachIndexed { index, rbsView ->
-                    if (rbsView is RadioButton) {
-                        if (rbsView.isChecked) {
-                            author.reservedType = index
+            if (myAuthors.size >= 1) {
+                myAuthors[0].enabled = checkBoxAuthor0.isChecked
+                if (checkBoxAuthor0.isChecked) {
+                    val author = myAuthors[0]
+                    // 去除空白行
+                    val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author0_removeBlank_checkbox)
+                    author.removeBlank = checkboxRemoveBlank.isChecked
+                    // 保留行數
+                    val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author0_reservedType)
+                    rbs.forEachIndexed { index, rbsView ->
+                        if (rbsView is RadioButton) {
+                            if (rbsView.isChecked) {
+                                author.reservedType = index
+                            }
                         }
                     }
                 }
             }
 
-            myAuthors[1].enabled = checkBoxAuthor1.isChecked
-            if (checkBoxAuthor1.isChecked) {
-                val author = myAuthors[1]
-                // 去除空白行
-                val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
-                author.removeBlank = checkboxRemoveBlank.isChecked
-                // 保留行數
-                val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
-                rbs.forEachIndexed { index, rbsView ->
-                    if (rbsView is RadioButton) {
-                        if (rbsView.isChecked) {
-                            author.reservedType = index
+            if (myAuthors.size >= 2) {
+                myAuthors[1].enabled = checkBoxAuthor1.isChecked
+                if (checkBoxAuthor1.isChecked) {
+                    val author = myAuthors[1]
+                    // 去除空白行
+                    val checkboxRemoveBlank:CheckBox = mainLayout.findViewById(R.id.Dialog_reference_author1_removeBlank_checkbox)
+                    author.removeBlank = checkboxRemoveBlank.isChecked
+                    // 保留行數
+                    val rbs: RadioGroup = mainLayout.findViewById(R.id.Dialog_reference_author1_reservedType)
+                    rbs.forEachIndexed { index, rbsView ->
+                        if (rbsView is RadioButton) {
+                            if (rbsView.isChecked) {
+                                author.reservedType = index
+                            }
                         }
                     }
                 }
@@ -147,7 +151,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
         checkBoxAuthor1Layout.visibility = View.GONE
 
         // 前一
-        if (myAuthors[0].enabled) {
+        if (myAuthors.size >= 1) {
             val author:ReferenceAuthor = myAuthors[0]
             checkBoxAuthor0.visibility = View.VISIBLE
             checkBoxAuthor0Layout.visibility = View.VISIBLE
@@ -169,7 +173,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
         }
 
         // 前二
-        if (myAuthors[1].enabled) {
+        if (myAuthors.size >= 2) {
             val author:ReferenceAuthor = myAuthors[1]
             checkBoxAuthor1.visibility = View.VISIBLE
             checkBoxAuthor1Layout.visibility = View.VISIBLE

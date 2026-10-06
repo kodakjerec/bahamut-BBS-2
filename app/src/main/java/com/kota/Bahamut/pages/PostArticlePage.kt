@@ -837,8 +837,8 @@ class PostArticlePage : TelnetPage(), View.OnClickListener, AdapterView.OnItemSe
 
 
         // 開始篩選
-        val author0 = authors[0]
-        val author1 = authors[1]
+        val author0 = if (authors.isNotEmpty()) authors[0] else ReferenceAuthor()
+        val author1 = if (authors.size > 1) authors[1] else ReferenceAuthor()
         var author0InsertRows = 0
         var author1InsertRows = 0
 
