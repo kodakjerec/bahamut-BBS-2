@@ -974,15 +974,7 @@ open class BoardMainPage : TelnetListPage(),
     // com.kota.Bahamut.BookmarkPage.BoardExtendOptionalPageListener
     override fun onBoardExtendOptionalPageDidSelectBookmark(bookmark: Bookmark?) {
         if (bookmark != null) {
-            this.lastListAction = BoardPageAction.Companion.SEARCH
-            pushCommand(
-                BahamutCommandSearchArticle(
-                    bookmark.keyword,
-                    bookmark.author,
-                    bookmark.mark,
-                    bookmark.gy
-                )
-            )
+            searchArticle(bookmark.keyword, bookmark.author, bookmark.mark, bookmark.gy)
         }
     }
 
