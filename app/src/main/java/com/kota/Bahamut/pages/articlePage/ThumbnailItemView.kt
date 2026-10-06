@@ -2,10 +2,10 @@ package com.kota.Bahamut.pages.articlePage
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,7 +25,6 @@ import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.request.transition.Transition
 import com.github.chrisbanes.photoview.PhotoView
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.kota.Bahamut.R
@@ -69,11 +68,11 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
 
         fun getRealUserAgent(context: Context): String {
             if (cachedUserAgent == null) {
-                try {
+                cachedUserAgent = try {
                     // 取得裝置真實 WebView 的 User-Agent
-                    cachedUserAgent = android.webkit.WebSettings.getDefaultUserAgent(context)
-                } catch (e: Exception) {
-                    cachedUserAgent = System.getProperty("http.agent")
+                    android.webkit.WebSettings.getDefaultUserAgent(context)
+                } catch (_: Exception) {
+                    System.getProperty("http.agent")
                         ?: "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Mobile Safari/537.36"
                 }
             }
@@ -82,8 +81,19 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     }
 
     var mainLayout: LinearLayout? = null
-    var viewWidth: Int
-    var viewHeight: Int
+    val viewWidth: Int
+        get() {
+            if (this.width > 0) return this.width
+            val metrics = Resources.getSystem().displayMetrics
+            return min(metrics.widthPixels, metrics.heightPixels)
+        }
+
+    val viewHeight: Int
+        get() {
+            if (this.rootView != null && this.rootView.height > 0) return this.rootView.height
+            val metrics = Resources.getSystem().displayMetrics
+            return kotlin.math.max(metrics.widthPixels, metrics.heightPixels)
+        }
 
     // 預設圖層
     lateinit var layoutDefault: LinearLayout
@@ -465,6 +475,36 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         if (myImageUrl.isEmpty()) myImageUrl = document.select("link[rel=apple-touch-icon-precomposed]").attr("href")
         if (myImageUrl.isEmpty()) myImageUrl = document.select("#landingImage").attr("src")
 
+        // 尋找第一個<a href>標籤內是圖片 (或者網頁中的第一張圖片)
+        if (myImageUrl.isEmpty()) {
+            // 情況 1: 尋找 <a href="...jpg"> 指向圖片的連結
+            val aTags = document.select("a[href]")
+            for (a in aTags) {
+                val href = a.attr("href").lowercase()
+                if (href.endsWith(".jpg") || href.endsWith(".jpeg") || href.endsWith(".png") ||
+                    href.endsWith(".gif") || href.endsWith(".webp") || href.endsWith(".bmp") ||
+                    href.endsWith(".avif")) {
+                    myImageUrl = a.attr("href")
+                    break
+                }
+            }
+        }
+
+        if (myImageUrl.isEmpty()) {
+            // 情況 2: 尋找 <a> 標籤裡面包著的 <img>，例如 <a href="..."><img src="..."></a>
+            val imgInA = document.select("a[href] img[src]").first()
+            if (imgInA != null) {
+                myImageUrl = imgInA.attr("src")
+            }
+        }
+
+        if (myImageUrl.isEmpty()) {
+            // 情況 3: 尋找網頁中第一張普通的 <img>
+            val img = document.select("img[src]").first()
+            if (img != null) {
+                myImageUrl = img.attr("src")
+            }
+        }
         // 最終備用：網站 favicon
         if (myImageUrl.isEmpty()) {
             myImageUrl = document.select("link[rel~=.*icon.*]").attr("href")
@@ -476,7 +516,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 myImageUrl = "https:$myImageUrl"
             } else if (myImageUrl.startsWith("/")) {
                 try {
-                    val uri = android.net.Uri.parse(myUrl)
+                    val uri = myUrl.toUri()
                     myImageUrl = "${uri.scheme}://${uri.host}$myImageUrl"
                 } catch (e: Exception) {
                     e.printStackTrace()
@@ -495,12 +535,9 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
      * @return 如果是多媒體檔案則回傳 true，否則回傳 false
      */
     private fun checkIsMedia(contentType: String): Boolean {
-        if (contentType.startsWith("image/") || 
-            contentType.startsWith("video/") || 
-            contentType.startsWith("audio/")) {
-            return true
-        }
-        return false
+        return contentType.startsWith("image/") ||
+                contentType.startsWith("video/") ||
+                contentType.startsWith("audio/")
     }
 
     fun markManualLoaded() {
@@ -740,14 +777,12 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                 .build()
             val response: Response = sharedClient.newCall(request).execute()
             val data = response.body
-            if (data != null) {
-                val jsonObject = JSONObject(data.string())
-                myTitle = jsonObject.optString("title", "")
-                myDescription = jsonObject.optString("author_name", "")
-                myImageUrl = jsonObject.optString("thumbnail_url", "")
-                isPic = false // 顯示為內容網址 (包含圖片與文字)
-                return true
-            }
+            val jsonObject = JSONObject(data.string())
+            myTitle = jsonObject.optString("title", "")
+            myDescription = jsonObject.optString("author_name", "")
+            myImageUrl = jsonObject.optString("thumbnail_url", "")
+            isPic = false // 顯示為內容網址 (包含圖片與文字)
+            return true
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -757,7 +792,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     /** 針對 Twitter / X 網址進行 api.vxtwitter.com 解析 */
     private fun parseTwitter(url: String): Boolean {
         try {
-            val uri = android.net.Uri.parse(url)
+            val uri = url.toUri()
             val hostname = uri.host ?: return false
             val isTwitterHost = hostname == "twitter.com" || hostname.endsWith(".twitter.com") ||
                     hostname == "x.com" || hostname.endsWith(".x.com")
@@ -771,20 +806,18 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                     .build()
                 val response: Response = sharedClient.newCall(request).execute()
                 val data = response.body
-                if (data != null) {
-                    val jsonObject = JSONObject(data.string())
-                    val userName = jsonObject.optString("user_name", "")
-                    val screenName = jsonObject.optString("user_screen_name", "")
-                    myTitle = "$userName @$screenName"
-                    myDescription = jsonObject.optString("text", "")
+                val jsonObject = JSONObject(data.string())
+                val userName = jsonObject.optString("user_name", "")
+                val screenName = jsonObject.optString("user_screen_name", "")
+                myTitle = "$userName @$screenName"
+                myDescription = jsonObject.optString("text", "")
 
-                    val mediaURLs = jsonObject.optJSONArray("mediaURLs")
-                    if (mediaURLs != null && mediaURLs.length() > 0) {
-                        myImageUrl = mediaURLs.optString(0, "")
-                    }
-                    isPic = false // 顯示為連結預覽
-                    return true
+                val mediaURLs = jsonObject.optJSONArray("mediaURLs")
+                if (mediaURLs != null && mediaURLs.length() > 0) {
+                    myImageUrl = mediaURLs.optString(0, "")
                 }
+                isPic = false // 顯示為連結預覽
+                return true
             }
         } catch (e: Exception) {
             e.printStackTrace()
@@ -793,10 +826,6 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     }
 
     init {
-        val metrics = DisplayMetrics()
-        myContext.resources.displayMetrics.also { metrics.setTo(it) }
-        viewWidth = metrics.widthPixels
-        viewHeight = metrics.heightPixels
         init()
     }
 
@@ -817,7 +846,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         photoViewPic.mediumScale = 3.0f
 
         imageViewButton = mainLayout!!.findViewById(R.id.thumbnail_image_button)
-        imageViewButton.setOnClickListener { view: View? -> prepareLoadImage() }
+        imageViewButton.setOnClickListener { _: View? -> prepareLoadImage() }
 
         retryButton = mainLayout!!.findViewById(R.id.thumbnail_retry_button)
         retryButton.setOnClickListener {
