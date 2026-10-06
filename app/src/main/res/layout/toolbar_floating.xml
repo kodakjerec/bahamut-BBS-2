@@ -14,7 +14,7 @@
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/ToolbarFloating_actions_card"
         android:layout_width="wrap_content"
-        android:layout_height="52dp"
+        android:layout_height="60dp"
         android:visibility="gone"
         app:cardCornerRadius="0dp"
         app:cardElevation="6dp"

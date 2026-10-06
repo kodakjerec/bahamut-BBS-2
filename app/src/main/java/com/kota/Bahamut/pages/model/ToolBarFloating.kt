@@ -87,6 +87,12 @@ class ToolBarFloating @JvmOverloads constructor(
         }
     }
 
+    /** FAB 手勢觸控監聽器 */
+    @SuppressLint("ClickableViewAccessibility")
+    private val fabTouchListener = OnTouchListener { v, event ->
+        handleFabTouch(v, event)
+    }
+
     init {
         init(context)
     }
@@ -134,9 +140,8 @@ class ToolBarFloating @JvmOverloads constructor(
         cardFab?.setOnTouchListener(fabTouchListener)
     }
 
-    /** FAB 手勢觸控監聽器 */
-    @SuppressLint("ClickableViewAccessibility")
-    private val fabTouchListener = OnTouchListener { v, event ->
+    /** FAB 手勢觸控處理：支援按住任意拖動，放開時依中線判斷貼合左下或右下 */
+    private fun handleFabTouch(v: View, event: MotionEvent): Boolean {
         val density = resources.displayMetrics.density
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
 
@@ -151,30 +156,38 @@ class ToolBarFloating @JvmOverloads constructor(
 
                 v.parent?.requestDisallowInterceptTouchEvent(true)
                 parent?.requestDisallowInterceptTouchEvent(true)
-                true
+                return true
             }
 
             MotionEvent.ACTION_MOVE -> {
-                v.parent?.requestDisallowInterceptTouchEvent(true)
-                parent?.requestDisallowInterceptTouchEvent(true)
-
                 val dx = event.rawX - touchDownRawX
                 val dy = event.rawY - touchDownRawY
                 val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
 
                 if (!isDragging && dist > touchSlop) {
                     isDragging = true
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    parent?.requestDisallowInterceptTouchEvent(true)
                     if (isExpanded) {
                         collapse()
                     }
                 }
 
                 if (isDragging) {
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    parent?.requestDisallowInterceptTouchEvent(true)
+
                     // 按住按鈕時可以任意拖動 (即時跟隨手指 X, Y)
+                    val parentView = parent as? View
+                    val parentHeight = (if (parentView != null && parentView.height > 0) parentView.height else resources.displayMetrics.heightPixels).toFloat()
+                    val fabSize = 60f * density
+                    val maxDown = 80f * density
+                    val maxUp = -(parentHeight - 80f * density - fabSize)
+
                     translationX = initialTranslationX + dx
-                    translationY = initialTranslationY + dy
+                    translationY = (initialTranslationY + dy).coerceIn(maxUp, maxDown)
                 }
-                true
+                return true
             }
 
             MotionEvent.ACTION_UP -> {
@@ -229,7 +242,7 @@ class ToolBarFloating @JvmOverloads constructor(
                     // 點擊事件：切換展開/收合
                     v.performClick()
                 }
-                true
+                return true
             }
 
             MotionEvent.ACTION_CANCEL -> {
@@ -241,10 +254,10 @@ class ToolBarFloating @JvmOverloads constructor(
                         .setDuration(200L)
                         .start()
                 }
-                true
+                return true
             }
 
-            else -> false
+            else -> return false
         }
     }
 
@@ -296,7 +309,15 @@ class ToolBarFloating @JvmOverloads constructor(
             root.addView(fab)
         }
 
+        fab.setOnTouchListener(fabTouchListener)
         enforcePositioning()
+    }
+
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        if (isDragging) {
+            parent?.requestDisallowInterceptTouchEvent(true)
+        }
+        return super.dispatchTouchEvent(ev)
     }
 
     override fun onAttachedToWindow() {
