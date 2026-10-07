@@ -47,7 +47,7 @@ import java.util.Vector
 import kotlin.math.min
 
 class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
-    private val isDebug = true // 開啟除錯模式，跳過 urlBase 和 cloudflare
+    private val isDebug = false // 開啟除錯模式，跳過 urlBase 和 cloudflare
 
     companion object {
         val manualLoadedUrls: MutableSet<String> =
@@ -283,7 +283,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                         try {
                             val uploadBody: RequestBody = MultipartBody.Builder()
                                 .setType(MultipartBody.FORM)
-                                .addFormDataPart("url", myUrl)
+                                .addFormDataPart("url", url)
                                 .addFormDataPart("title", myTitle)
                                 .addFormDataPart("description", myDescription)
                                 .addFormDataPart("imageUrl", myImageUrl)
