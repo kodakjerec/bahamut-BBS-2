@@ -61,45 +61,54 @@ class ToolBarFloating @JvmOverloads constructor(
     private var btn1: Button? = null
     private var btn2: Button? = null
 
-    /** 是否靠左邊下方 */
+    /** 是否靠左 (僅決定選單展開方向) */
     private var isAnchoredLeft: Boolean = false
 
-    /** 是否為展開狀態 */
     var isExpanded: Boolean = false
         private set
 
-    /** 閒置自動收合時間 (毫秒) */
     private var autoHideDelayMs: Long = 3000L
-
-    /** 收合狀態時的不透明度 (0.0 ~ 1.0) */
     private var collapsedAlpha: Float = 0.4f
 
-    /** 拖曳狀態變數 */
     private var isDragging = false
+    private var isSwiping = false
+    private var isPositioningMode = false
+    private var swipeDirection = 0
+    private var swipeActionExecuted = false
+
     private var touchDownRawX = 0f
     private var touchDownRawY = 0f
     private var initialTranslationX = 0f
     private var initialTranslationY = 0f
 
-    /** 閒置倒數 Handler */
     private val mainHandler = Handler(Looper.getMainLooper())
     private val autoHideRunnable = Runnable {
-        if (isExpanded) {
-            collapse()
-        }
+        if (isExpanded) collapse()
     }
 
-    /** 長按提示 Runnable */
-    private val longPressHintRunnable = Runnable {
-        if (!isDragging) {
+    private val longPressCenterRunnable = Runnable {
+        if (!isDragging && !isSwiping) {
+            isPositioningMode = true
             cardFab?.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
-            ASToast.showLongToast(
-                "短滑: 上下頁 長滑: 最前最後頁 左右拖曳: 換邊"
-            )
+            com.kota.asFramework.ui.ASToast.showLongToast("鬆開手指定位")
         }
     }
 
-    /** FAB 手勢觸控監聽器 */
+    private val swipeHoldRunnable = Runnable {
+        if (isSwiping && !swipeActionExecuted) {
+            swipeActionExecuted = true
+            cardFab?.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            if (swipeDirection == -1) actionSwipeUpHold()
+            else if (swipeDirection == 1) actionSwipeDownHold()
+        }
+    }
+
+    // --- 行為定義區 (未來可擴充) ---
+    private fun actionSwipeUp() { btn1?.performClick() }
+    private fun actionSwipeDown() { btn2?.performClick() }
+    private fun actionSwipeUpHold() { btn1?.performLongClick() }
+    private fun actionSwipeDownHold() { btn2?.performLongClick() }
+
     @SuppressLint("ClickableViewAccessibility")
     private val fabTouchListener = OnTouchListener { v, event ->
         handleFabTouch(v, event)
@@ -112,47 +121,27 @@ class ToolBarFloating @JvmOverloads constructor(
     @SuppressLint("ClickableViewAccessibility")
     private fun init(context: Context) {
         inflate(context, R.layout.toolbar_floating, this)
-
         cardActionsContainer = findViewById(R.id.ToolbarFloating_actions_card)
         cardFab = findViewById(R.id.ToolbarFloating_fab)
-
         btnSetting = findViewById(R.id.ToolbarFloating_setting)
         btn1 = findViewById(R.id.ToolbarFloating_1)
         btn2 = findViewById(R.id.ToolbarFloating_2)
 
-        // 讀取 UserSettings 記錄的懸浮位置判斷靠左或靠右
-        val loc = floatingLocation
-        val screenWidth = context.resources.displayMetrics.widthPixels.toFloat()
-        isAnchoredLeft = if (loc.isNotEmpty() && loc[0]!! >= 0f) {
-            loc[0]!! < screenWidth / 2f
-        } else {
-            false // 預設靠右邊下方
-        }
-
         updateSettings()
 
-        // 初始為收合狀態 (actionsCard 為 GONE，避免佔位及遮擋點擊)
-        cardActionsContainer?.visibility = GONE
+        cardActionsContainer?.visibility = View.GONE
         cardActionsContainer?.alpha = 0f
         cardFab?.alpha = collapsedAlpha
 
-        // 套用錨點邊界配置與 View 順序
-        applyAnchorSide(isAnchoredLeft)
+        // 初始套用位置
+        post { applyPercentagePosition(animateFromCurrent = false) }
 
-        // FAB 點擊事件 (切換展開/收合)
         cardFab?.setOnClickListener {
-            if (isExpanded) {
-                collapse()
-            } else {
-                expand()
-            }
+            if (isExpanded) collapse() else expand()
         }
-
-        // FAB 手勢觸控 (支援任意拖曳移動與中線判斷貼合左/右下)
         cardFab?.setOnTouchListener(fabTouchListener)
     }
 
-    /** FAB 手勢觸控處理：支援按住任意拖動，放開時依中線判斷貼合左下或右下 */
     private fun handleFabTouch(v: View, event: MotionEvent): Boolean {
         val density = resources.displayMetrics.density
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
@@ -161,6 +150,9 @@ class ToolBarFloating @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 animate().cancel()
                 isDragging = false
+                isSwiping = false
+                isPositioningMode = false
+                swipeActionExecuted = false
                 touchDownRawX = event.rawX
                 touchDownRawY = event.rawY
                 initialTranslationX = translationX
@@ -168,10 +160,10 @@ class ToolBarFloating @JvmOverloads constructor(
 
                 v.parent?.requestDisallowInterceptTouchEvent(true)
                 parent?.requestDisallowInterceptTouchEvent(true)
-                
-                mainHandler.removeCallbacks(longPressHintRunnable)
-                mainHandler.postDelayed(longPressHintRunnable, ViewConfiguration.getLongPressTimeout().toLong())
-                
+
+                mainHandler.removeCallbacks(longPressCenterRunnable)
+                mainHandler.removeCallbacks(swipeHoldRunnable)
+                mainHandler.postDelayed(longPressCenterRunnable, 1000L)
                 return true
             }
 
@@ -180,130 +172,171 @@ class ToolBarFloating @JvmOverloads constructor(
                 val dy = event.rawY - touchDownRawY
                 val dist = hypot(dx.toDouble(), dy.toDouble()).toFloat()
 
-                if (!isDragging && dist > touchSlop) {
-                    isDragging = true
-                    mainHandler.removeCallbacks(longPressHintRunnable)
-                    v.parent?.requestDisallowInterceptTouchEvent(true)
-                    parent?.requestDisallowInterceptTouchEvent(true)
-                    if (isExpanded) {
-                        collapse()
-                    }
-                }
-
-                if (isDragging) {
-                    v.parent?.requestDisallowInterceptTouchEvent(true)
-                    parent?.requestDisallowInterceptTouchEvent(true)
-
-                    // 按住按鈕時可以任意拖動 (即時跟隨手指 X, Y)
-                    val parentView = parent as? View
-                    val parentHeight = (if (parentView != null && parentView.height > 0) parentView.height else resources.displayMetrics.heightPixels).toFloat()
-                    val fabSize = 60f * density
-                    val maxDown = 80f * density
-                    val maxUp = -(parentHeight - 80f * density - fabSize)
-
-                    translationX = initialTranslationX + dx
-                    translationY = (initialTranslationY + dy).coerceIn(maxUp, maxDown)
-                }
-                return true
-            }
-
-            MotionEvent.ACTION_UP -> {
-                mainHandler.removeCallbacks(longPressHintRunnable)
-                if (isDragging) {
-                    isDragging = false
-
-                    val dx = event.rawX - touchDownRawX
-                    val dy = event.rawY - touchDownRawY
-                    val swipeThreshold = 40f * density
-                    val deepSwipeThreshold = 120f * density
-                    
-                    // 判斷是否為明顯的上下滑動
-                    if (kotlin.math.abs(dy) > kotlin.math.abs(dx) && kotlin.math.abs(dy) > swipeThreshold) {
-                        if (dy < 0) {
-                            // 往上滑：觸發第二顆按鈕功能 (btn1)
-                            if (kotlin.math.abs(dy) > deepSwipeThreshold) btn1?.performLongClick() else btn1?.performClick()
-                        } else {
-                            // 往下滑：觸發第三顆按鈕功能 (btn2)
-                            if (kotlin.math.abs(dy) > deepSwipeThreshold) btn2?.performLongClick() else btn2?.performClick()
-                        }
-                    }
-
-                    // 取得螢幕寬度與中線
-                    val screenWidth = resources.displayMetrics.widthPixels.toFloat()
-                    val screenCenterX = screenWidth / 2f
-
-                    // 取得放開時 FAB 在螢幕上的中心點 X
-                    val fabLoc = IntArray(2)
-                    v.getLocationOnScreen(fabLoc)
-                    val fabCenterX = fabLoc[0] + v.width / 2f
-
-                    // 當拖動超過中線，判斷屬於左下角還是右下角
-                    val targetIsLeft = fabCenterX < screenCenterX
-
-                    val marginPx = 16f * density
-                    val fabWidth = v.width.toFloat()
-
-                    val parentView = parent as? View
-                    val containerWidth = (if (parentView != null && parentView.width > 0) parentView.width else screenWidth.toInt()).toFloat()
-
-                    // 計算動畫吸附至左下角或右下角的目標 translationX
-                    val targetTranslationX = if (targetIsLeft == isAnchoredLeft) {
-                        0f
+                if (!isDragging && !isSwiping && dist > touchSlop) {
+                    mainHandler.removeCallbacks(longPressCenterRunnable)
+                    if (isPositioningMode) {
+                        isDragging = true
                     } else {
-                        if (isAnchoredLeft) {
-                            // 當前靠左錨點，目標靠右下角：向右平移至 (containerWidth - marginPx - fabWidth)
-                            (containerWidth - marginPx - fabWidth) - marginPx
-                        } else {
-                            // 當前靠右錨點，目標靠左下角：向左平移至 marginPx (負值)
-                            marginPx - (containerWidth - marginPx - fabWidth)
-                        }
+                        isSwiping = true
+                        swipeDirection = if (dy < 0) -1 else 1
+                        mainHandler.postDelayed(swipeHoldRunnable, 1000L)
                     }
+                }
 
-                    // 放開手指時平滑吸附至左下角或右下角 (Y 軸平滑回彈至 0f)
-                    animate()
-                        .translationX(targetTranslationX)
-                        .translationY(0f)
-                        .setDuration(200L)
-                        .withEndAction {
-                            if (targetIsLeft != isAnchoredLeft) {
-                                applyAnchorSide(targetIsLeft)
-                            }
-                            translationX = 0f
-                            translationY = 0f
-                        }
-                        .start()
-                } else {
-                    // 點擊事件：切換展開/收合
-                    v.performClick()
+                if (isDragging || isSwiping) {
+                    v.parent?.requestDisallowInterceptTouchEvent(true)
+                    parent?.requestDisallowInterceptTouchEvent(true)
+                    if (isExpanded) collapse()
+                    translationX = initialTranslationX + dx
+                    translationY = initialTranslationY + dy
                 }
                 return true
             }
 
-            MotionEvent.ACTION_CANCEL -> {
-                mainHandler.removeCallbacks(longPressHintRunnable)
-                if (isDragging) {
-                    isDragging = false
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                mainHandler.removeCallbacks(longPressCenterRunnable)
+                mainHandler.removeCallbacks(swipeHoldRunnable)
+
+                val dx = event.rawX - touchDownRawX
+                val dy = event.rawY - touchDownRawY
+
+                if (isPositioningMode && event.actionMasked == MotionEvent.ACTION_UP) {
+                    savePositionAsPercentage()
+                    applyPercentagePosition(animateFromCurrent = true)
+                } else if (isSwiping && event.actionMasked == MotionEvent.ACTION_UP) {
+                    if (!swipeActionExecuted) {
+                        if (kotlin.math.abs(dy) > kotlin.math.abs(dx)) {
+                            if (swipeDirection == -1) actionSwipeUp()
+                            else actionSwipeDown()
+                        }
+                    }
+                    applyPercentagePosition(animateFromCurrent = true)
+                } else if (isDragging || isSwiping) {
+                    applyPercentagePosition(animateFromCurrent = true)
+                } else {
+                    if (event.actionMasked == MotionEvent.ACTION_UP) {
+                        v.performClick()
+                    }
+                }
+
+                isDragging = false
+                isSwiping = false
+                isPositioningMode = false
+                return true
+            }
+            else -> return false
+        }
+    }
+
+    private fun savePositionAsPercentage() {
+        val parentView = parent as? View ?: return
+        val pw = parentView.width.toFloat()
+        val ph = parentView.height.toFloat()
+        if (pw == 0f || ph == 0f) return
+
+        val fabLoc = IntArray(2)
+        cardFab?.getLocationOnScreen(fabLoc)
+        val fabCenterX = fabLoc[0] + (cardFab?.width ?: 0) / 2f
+        val fabCenterY = fabLoc[1] + (cardFab?.height ?: 0) / 2f
+
+        val parentLoc = IntArray(2)
+        parentView.getLocationOnScreen(parentLoc)
+        val relX = fabCenterX - parentLoc[0]
+        val relY = fabCenterY - parentLoc[1]
+
+        var pctX = relX / pw
+        var pctY = relY / ph
+
+        pctX = pctX.coerceIn(0.1f, 0.9f)
+        pctY = pctY.coerceIn(0.1f, 0.9f)
+
+        setFloatingLocation(pctX, pctY)
+    }
+
+    private fun applyPercentagePosition(animateFromCurrent: Boolean = false) {
+        val parentView = parent as? View ?: return
+        val pw = parentView.width.toFloat()
+        val ph = parentView.height.toFloat()
+        if (pw == 0f || ph == 0f) return
+
+        val density = resources.displayMetrics.density
+        val fabHalf = 30f * density
+
+        val loc = floatingLocation
+        var pctX = if (loc.isNotEmpty() && loc[0]!! >= 0f) loc[0]!! else 0.9f
+        var pctY = if (loc.isNotEmpty() && loc[1]!! >= 0f) loc[1]!! else 0.9f
+
+        // Migrate legacy pixel positions to 90%
+        if (pctX > 1.0f) pctX = 0.9f
+        if (pctY > 1.0f) pctY = 0.9f
+
+        pctX = pctX.coerceIn(0.1f, 0.9f)
+        pctY = pctY.coerceIn(0.1f, 0.9f)
+
+        val newIsLeft = pctX < 0.5f
+        if (newIsLeft != isAnchoredLeft) {
+            applyAnchorSide(newIsLeft)
+        }
+
+        val p = layoutParams
+        if (p is RelativeLayout.LayoutParams) {
+            p.removeRule(RelativeLayout.ALIGN_PARENT_START)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_END)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_LEFT)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_TOP)
+            p.removeRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
+
+            p.addRule(RelativeLayout.ALIGN_PARENT_TOP)
+            p.topMargin = (ph * pctY - fabHalf).toInt()
+
+            if (newIsLeft) {
+                p.addRule(RelativeLayout.ALIGN_PARENT_START)
+                p.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
+                p.leftMargin = (pw * pctX - fabHalf).toInt()
+                p.rightMargin = 0
+                p.marginStart = p.leftMargin
+                p.marginEnd = 0
+            } else {
+                p.addRule(RelativeLayout.ALIGN_PARENT_END)
+                p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
+                p.rightMargin = (pw - pw * pctX - fabHalf).toInt()
+                p.leftMargin = 0
+                p.marginEnd = p.rightMargin
+                p.marginStart = 0
+            }
+
+            if (animateFromCurrent) {
+                val locBefore = IntArray(2)
+                getLocationOnScreen(locBefore)
+
+                layoutParams = p
+
+                post {
+                    val locAfter = IntArray(2)
+                    getLocationOnScreen(locAfter)
+                    val dx = locBefore[0] - locAfter[0]
+                    val dy = locBefore[1] - locAfter[1]
+
+                    translationX += dx
+                    translationY += dy
+
                     animate()
                         .translationX(0f)
                         .translationY(0f)
                         .setDuration(200L)
                         .start()
                 }
-                return true
+            } else {
+                layoutParams = p
+                translationX = 0f
+                translationY = 0f
             }
-
-            else -> return false
         }
     }
 
-    /** 切換靠左下或靠右下位置配置 */
     private fun applyAnchorSide(isLeft: Boolean) {
         isAnchoredLeft = isLeft
-
-        val screenWidth = resources.displayMetrics.widthPixels.toFloat()
-        val savedX = if (isLeft) 0f else screenWidth
-        setFloatingLocation(savedX, 0f)
-
         val root = findViewById<LinearLayout>(R.id.ToolbarFloating) ?: return
         val actionsCard = cardActionsContainer ?: return
         val fab = cardFab ?: return
@@ -322,7 +355,6 @@ class ToolBarFloating @JvmOverloads constructor(
         )
 
         if (isLeft) {
-            // 靠左下： FAB (左) + ActionsCard (右)
             fab.layoutParams = fabParams
             root.addView(fab)
             actionsParams.marginStart = gapPx
@@ -332,24 +364,21 @@ class ToolBarFloating @JvmOverloads constructor(
             actionsCard.layoutParams = actionsParams
             root.addView(actionsCard)
         } else {
-            // 靠右下： ActionsCard (左) + FAB (右)
             actionsParams.marginEnd = gapPx
             actionsParams.rightMargin = gapPx
             actionsParams.marginStart = 0
             actionsParams.leftMargin = 0
             actionsCard.layoutParams = actionsParams
             root.addView(actionsCard)
-
             fab.layoutParams = fabParams
             root.addView(fab)
         }
 
         fab.setOnTouchListener(fabTouchListener)
-        enforcePositioning()
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
-        if (isDragging) {
+        if (isDragging || isSwiping) {
             parent?.requestDisallowInterceptTouchEvent(true)
         }
         return super.dispatchTouchEvent(ev)
@@ -358,7 +387,7 @@ class ToolBarFloating @JvmOverloads constructor(
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         activeInstance = this
-        enforcePositioning()
+        post { applyPercentagePosition(animateFromCurrent = false) }
         findActivity()?.let { attachGlobalWindowCallback(it) }
     }
 
@@ -370,71 +399,6 @@ class ToolBarFloating @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
-    /** 確保元件位於靠左/靠右邊界下方，間距 16dp, 80dp */
-    private fun enforcePositioning() {
-        val density = resources.displayMetrics.density
-        val marginPx = (16 * density).toInt()
-        val marginBottomPx = (80 * density).toInt()
-
-        val p = layoutParams
-        val gravityVal = if (isAnchoredLeft) (Gravity.START or Gravity.BOTTOM) else (Gravity.END or Gravity.BOTTOM)
-
-        if (p is RelativeLayout.LayoutParams) {
-            p.removeRule(RelativeLayout.ALIGN_PARENT_START)
-            p.removeRule(RelativeLayout.ALIGN_PARENT_END)
-            p.removeRule(RelativeLayout.ALIGN_PARENT_LEFT)
-            p.removeRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-
-            if (isAnchoredLeft) {
-                p.addRule(RelativeLayout.ALIGN_PARENT_START)
-                p.addRule(RelativeLayout.ALIGN_PARENT_LEFT)
-                p.leftMargin = marginPx
-                p.rightMargin = 0
-                p.marginStart = marginPx
-                p.marginEnd = 0
-            } else {
-                p.addRule(RelativeLayout.ALIGN_PARENT_END)
-                p.addRule(RelativeLayout.ALIGN_PARENT_RIGHT)
-                p.rightMargin = marginPx
-                p.leftMargin = 0
-                p.marginEnd = marginPx
-                p.marginStart = 0
-            }
-            p.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM)
-            p.bottomMargin = marginBottomPx
-            layoutParams = p
-        } else if (p is LayoutParams) {
-            p.gravity = gravityVal
-            if (isAnchoredLeft) {
-                p.leftMargin = marginPx
-                p.rightMargin = 0
-                p.marginStart = marginPx
-                p.marginEnd = 0
-            } else {
-                p.rightMargin = marginPx
-                p.leftMargin = 0
-                p.marginEnd = marginPx
-                p.marginStart = 0
-            }
-            p.bottomMargin = marginBottomPx
-            layoutParams = p
-        }
-
-        // 同步更新內部 LinearLayout 的 layout_gravity
-        val root = findViewById<LinearLayout>(R.id.ToolbarFloating)
-        if (root != null) {
-            val rootLp = root.layoutParams as? LayoutParams
-            if (rootLp != null) {
-                rootLp.gravity = gravityVal
-                root.layoutParams = rootLp
-            }
-        }
-
-        requestLayout()
-        invalidate()
-    }
-
-    /** 尋找當前 View 所屬的 Activity */
     private fun findActivity(): Activity? {
         var ctx = context
         while (ctx is ContextWrapper) {
