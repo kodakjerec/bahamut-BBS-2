@@ -346,7 +346,7 @@ open class BookmarkManagePage(
 
     override fun onItemClick(view: View?, position: Int) {
         val bookmark = bookmarks.getOrNull(position) ?: return
-        navigationController.popViewController()
+        navigationController.popViewController(false)
         boardExtendOptionalPageListener?.onBoardExtendOptionalPageDidSelectBookmark(bookmark)
     }
 

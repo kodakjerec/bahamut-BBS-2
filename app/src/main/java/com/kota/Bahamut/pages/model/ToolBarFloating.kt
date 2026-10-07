@@ -9,7 +9,6 @@ import android.content.ContextWrapper
 import android.os.Handler
 import android.os.Looper
 import android.util.AttributeSet
-import android.view.Gravity
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -18,6 +17,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
+import androidx.core.view.isVisible
 import com.google.android.material.card.MaterialCardView
 import com.kota.Bahamut.R
 import com.kota.Bahamut.service.UserSettings.Companion.floatingLocation
@@ -26,8 +26,6 @@ import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
 import java.lang.ref.WeakReference
 import kotlin.math.hypot
-import androidx.core.view.isVisible
-import com.kota.asFramework.ui.ASToast
 
 /**
  * 浮動工具列元件 (`ToolBarFloating`)
@@ -42,7 +40,7 @@ import com.kota.asFramework.ui.ASToast
  * - 下滑：下一頁/下一篇 (觸發 btn2 點擊)
  * - 上滑按住超過1秒：最前頁 (觸發 btn1 長按)
  * - 下滑按住超過1秒：最後頁 (觸發 btn2 長按)
- * - 長按圓點1秒：進入「自訂位置模式」(震動一次並顯示提示)，此時可拖動，鬆開手指儲存百分比座標，強制內縮至少10%邊緣。
+ * - 長按圓點0.5秒：進入「自訂位置模式」(震動一次並顯示提示)，此時可拖動，鬆開手指儲存百分比座標，強制內縮至少10%邊緣。
  *
  * 展開狀態：
  * - 點擊圓形按鈕後水平展開，顯示詳細選單按鈕
@@ -88,7 +86,7 @@ class ToolBarFloating @JvmOverloads constructor(
     private var isDragging = false
     /** 判斷目前是否處於「滑動」狀態 (尚未達到長按條件時的上下位移) */
     private var isSwiping = false
-    /** 判斷目前是否進入「自訂位置模式」(長按 FAB 1秒後觸發)，此模式下可拖曳儲存座標 */
+    /** 判斷目前是否進入「自訂位置模式」(長按 FAB 0.5秒後觸發)，此模式下可拖曳儲存座標 */
     private var isPositioningMode = false
     /** 記錄滑動方向：-1 表示上滑，1 表示下滑 */
     private var swipeDirection = 0
@@ -111,7 +109,7 @@ class ToolBarFloating @JvmOverloads constructor(
         if (isExpanded) collapse()
     }
 
-    /** 判斷「長按圓點中心」的排程任務。若觸控未移動超過 1 秒，即進入 isPositioningMode 並產生震動與 Toast 提示 */
+    /** 判斷「長按圓點中心」的排程任務。若觸控未移動超過 0.5 秒，即進入 isPositioningMode 並產生震動與 Toast 提示 */
     private val longPressCenterRunnable = Runnable {
         if (!isDragging && !isSwiping) {
             isPositioningMode = true
@@ -161,7 +159,7 @@ class ToolBarFloating @JvmOverloads constructor(
 
         updateSettings()
 
-        cardActionsContainer?.visibility = View.GONE
+        cardActionsContainer?.visibility = GONE
         cardActionsContainer?.alpha = 0f
         cardFab?.alpha = collapsedAlpha
 
@@ -176,7 +174,6 @@ class ToolBarFloating @JvmOverloads constructor(
 
     /** 處理浮動按鈕的觸控事件，包含點擊、拖曳定位、滑動換頁及長按等手勢判斷 */
     private fun handleFabTouch(v: View, event: MotionEvent): Boolean {
-        val density = resources.displayMetrics.density
         val touchSlop = ViewConfiguration.get(context).scaledTouchSlop.toFloat()
 
         when (event.actionMasked) {
@@ -197,10 +194,10 @@ class ToolBarFloating @JvmOverloads constructor(
                 v.parent?.requestDisallowInterceptTouchEvent(true)
                 parent?.requestDisallowInterceptTouchEvent(true)
 
-                // 取消先前的計時器，並重新設定 1 秒的長按計時器 (用於觸發自訂位置模式)
+                // 取消先前的計時器，並重新設定 0.5 秒的長按計時器 (用於觸發自訂位置模式)
                 mainHandler.removeCallbacks(longPressCenterRunnable)
                 mainHandler.removeCallbacks(swipeHoldRunnable)
-                mainHandler.postDelayed(longPressCenterRunnable, 1000L)
+                mainHandler.postDelayed(longPressCenterRunnable, 500L)
                 return true
             }
 
@@ -396,6 +393,7 @@ class ToolBarFloating @JvmOverloads constructor(
     }
 
     /** 調整展開選單的方向：若按鈕位於畫面左側則選單向右展開，若位於右側則向左展開 */
+    @SuppressLint("ClickableViewAccessibility")
     private fun applyAnchorSide(isLeft: Boolean) {
         isAnchoredLeft = isLeft
         val root = findViewById<LinearLayout>(R.id.ToolbarFloating) ?: return
@@ -567,7 +565,7 @@ class ToolBarFloating @JvmOverloads constructor(
     }
 
     /** 判斷觸控座標 (rawX, rawY) 是否在 Floating Toolbar 範圍內 */
-    private fun isTouchInsideToolbar(rawX: Float, rawY: Float): Boolean {
+    fun isTouchInsideToolbar(rawX: Float, rawY: Float): Boolean {
         val fab = cardFab
         val actions = cardActionsContainer
 
