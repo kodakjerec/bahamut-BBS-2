@@ -92,7 +92,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
     }
 
     /** 儲存書籤  */
-    fun store() {
+    fun store(triggerDebounce: Boolean = true) {
         val obj: JSONObject = exportToJSON()
         println("save bookmark store to file")
         this.context?.getSharedPreferences("bookmark", 0)?.edit(commit = true) {
@@ -103,7 +103,7 @@ class BookmarkStore(val context: Context?, var filePath: String?) {
         }
 
         // 標記雲端異動
-        SyncManager.markDirty()
+        SyncManager.markDirty(triggerDebounce)
     }
 
     private fun load(): BookmarkStore {

@@ -34,11 +34,13 @@ object SyncManager {
      * 標記資料已變更 (Dirty)
      * 當書籤、偏好設定等被修改時呼叫此方法。
      */
-    fun markDirty() {
+    fun markDirty(triggerDebounce: Boolean = true) {
         if (!getCloudSave()) return
         setCloudDirty(true)
-        Log.d(TAG, "markDirty: 資料已標記為有變更 (isDirty = true)")
-        scheduleDebounceUpload()
+        Log.d(TAG, "markDirty: 資料已標記為有變更 (isDirty = true), triggerDebounce = $triggerDebounce")
+        if (triggerDebounce) {
+            scheduleDebounceUpload()
+        }
     }
 
     /**

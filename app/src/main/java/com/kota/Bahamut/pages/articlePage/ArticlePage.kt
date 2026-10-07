@@ -929,7 +929,7 @@ class ArticlePage : TelnetPage() {
             if (store != null) {
                 val bookmarkList = store.getBookmarkList(boardName)
                 bookmarkList.addHistoryBookmark(telnetArticle!!.title)
-                store.store()
+                store.store(triggerDebounce = false)
             }
 
             // 關係到 telnetView

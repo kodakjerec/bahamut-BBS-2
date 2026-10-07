@@ -218,6 +218,25 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                                 if (checkIsMedia(contentType)) {
                                     isPic = true
                                 } else {
+                                    // 如果是 threads.net or threads.com, 替換網址
+                                    try {
+                                        val uri = myUrl.toUri()
+                                        val host = uri.host
+                                        if (host != null && (host == "threads.net" || host.endsWith(".threads.net") || host == "threads.com" || host.endsWith(".threads.com"))) {
+                                            myUrl = myUrl.replaceFirst(host, "fixthreads.seria.moe")
+                                        }
+                                    } catch (_: Exception) {}
+
+                                    // 如果是 facebook.com 或 m.facebook.com, 替換網址
+                                    try {
+                                        val uri = myUrl.toUri()
+                                        val host = uri.host
+                                        if (host != null && (host == "facebook.com" || host.endsWith(".facebook.com") || host == "m.facebook.com" || host.endsWith(".m.facebook.com"))) {
+                                            myUrl = myUrl.replaceFirst(host, "facebed.com")
+                                            userAgent = "PostmanRuntime/2.10.1"
+                                        }
+                                    } catch (_: Exception) {}
+
                                     // 2. 如果是網頁（或 HEAD 失敗），才執行限制大小的 GET
                                     val getResp: Connection.Response = Jsoup
                                         .connect(myUrl)
@@ -441,11 +460,6 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
      * @param document Jsoup 解析出來的 HTML 文件模型
      */
     private fun parseHtmlMetadata(document: Document) {
-        val ogType = document.select("meta[property=og:type]").attr("content").lowercase()
-        if (ogType.startsWith("video")) {
-            isPic = true
-        }
-
         // 文字標題處理 (優先順序：OG > Twitter > name=title > <title> > JSON-LD)
         myTitle = document.select("meta[property=og:title]").attr("content")
         if (myTitle.isEmpty()) myTitle = document.select("meta[name=twitter:title]").attr("content")
