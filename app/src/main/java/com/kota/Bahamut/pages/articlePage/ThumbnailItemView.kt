@@ -589,13 +589,17 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         }
     }
 
-    /** 純圖片  */
+    /** 純圖片 / 或被點擊顯示圖片的 HTML 內容  */
     fun prepareLoadImage() {
         markManualLoaded()
         if (imgLoaded) return
 
         loadImage()
-        urlView.text = myImageUrl
+        if (isPic) {
+            urlView.text = myImageUrl
+        } else {
+            urlView.text = myUrl
+        }
     }
 
     /** 內容網址  */
@@ -624,7 +628,13 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
         retryButton.visibility = VISIBLE
 
         // 內容
-        layoutNormal.visibility = GONE
+        if (isPic) {
+            layoutNormal.visibility = GONE
+            urlView.text = myImageUrl
+        } else {
+            layoutNormal.visibility = VISIBLE
+            urlView.text = myUrl
+        }
     }
 
     /** 讀取圖片  */

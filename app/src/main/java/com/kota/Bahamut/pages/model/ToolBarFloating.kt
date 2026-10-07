@@ -314,8 +314,8 @@ class ToolBarFloating @JvmOverloads constructor(
         val fabHalf = 30f * density
 
         val loc = floatingLocation
-        var pctX = if (loc.isNotEmpty() && loc[0]!! >= 0f) loc[0]!! else 0.9f
-        var pctY = if (loc.isNotEmpty() && loc[1]!! >= 0f) loc[1]!! else 0.9f
+        var pctX = if (loc.isNotEmpty() && loc[0]!! > 0f) loc[0]!! else 0.9f
+        var pctY = if (loc.isNotEmpty() && loc[1]!! > 0f) loc[1]!! else 0.9f
 
         // 相容舊版以像素 (Pixel) 儲存的座標值：若讀取到的值大於 1，強制修正為 0.9 (90%)
         // Migrate legacy pixel positions to 90%
@@ -344,6 +344,8 @@ class ToolBarFloating @JvmOverloads constructor(
 
             p.addRule(RelativeLayout.ALIGN_PARENT_TOP)
             p.topMargin = (ph * pctY - fabHalf).toInt()
+            p.bottomMargin = 0
+            p.height = RelativeLayout.LayoutParams.WRAP_CONTENT
 
             if (newIsLeft) {
                 p.addRule(RelativeLayout.ALIGN_PARENT_START)
@@ -444,10 +446,19 @@ class ToolBarFloating @JvmOverloads constructor(
         return super.dispatchTouchEvent(ev)
     }
 
+    /** 監聽父視圖的大小變化 (例如旋轉螢幕、首次排版)，藉此重新套用百分比座標 */
+    private val parentLayoutListener = OnLayoutChangeListener { _, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom ->
+        if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
+            applyPercentagePosition(animateFromCurrent = false)
+        }
+    }
+
     /** 當元件附加到視窗時觸發，將自身註冊為 activeInstance 並開始監聽全域觸控事件 */
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         activeInstance = this
+        val parentView = parent as? View
+        parentView?.addOnLayoutChangeListener(parentLayoutListener)
         post { applyPercentagePosition(animateFromCurrent = false) }
         findActivity()?.let { attachGlobalWindowCallback(it) }
     }
@@ -455,6 +466,8 @@ class ToolBarFloating @JvmOverloads constructor(
     /** 當元件從視窗移除時觸發，清除閒置隱藏計時器與實體參照，避免記憶體洩漏 (Memory Leak) */
     override fun onDetachedFromWindow() {
         cancelAutoHideTimer()
+        val parentView = parent as? View
+        parentView?.removeOnLayoutChangeListener(parentLayoutListener)
         if (activeInstance == this) {
             activeInstance = null
         }
