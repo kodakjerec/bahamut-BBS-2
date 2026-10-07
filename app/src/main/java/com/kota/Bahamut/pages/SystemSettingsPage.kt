@@ -287,12 +287,16 @@ class SystemSettingsPage : TelnetPage() {
                         View.GONE
                     mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
                         View.GONE
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_toolbar_floating_help)?.visibility =
+                        View.GONE
                 } else {
                     mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
                         View.GONE
                     mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
                         View.VISIBLE
                     mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
+                        View.VISIBLE
+                    mainLayout?.findViewById<View>(R.id.SystemSettings_toolbar_floating_help)?.visibility =
                         View.VISIBLE
                 }
                 propertiesToolbarLocation = i
@@ -510,6 +514,13 @@ class SystemSettingsPage : TelnetPage() {
             spinnerToolbarOrder.adapter = adapterToolbarOrder
             spinnerToolbarOrder.setSelection(propertiesToolbarOrder)
             spinnerToolbarOrder.onItemSelectedListener = toolbarOrderListener
+            mainLayout?.findViewById<View>(R.id.SystemSettings_toolbar_floating_help)?.setOnClickListener {
+                val dialog = ASAlertDialog("TOOLBAR_FLOATING_HELP")
+                dialog.setTitle("操作說明")
+                    .setMessage("上滑：上一頁/上一篇\n下滑：下一頁/下一篇\n上滑按住超過1秒：最前頁\n下滑按住超過1秒：最後頁\n長按圓點1秒：震動一次並顯示「鬆開手指定位」，此時移動到想要的位置後鬆開手指即可記錄。")
+                    .addButton("確定")
+                    .show()
+            }
             if (propertiesToolbarLocation <= 2) { // 底部工具列
                 mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
                     View.VISIBLE
@@ -517,12 +528,16 @@ class SystemSettingsPage : TelnetPage() {
                     View.GONE
                 mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
                     View.GONE
+                mainLayout?.findViewById<View>(R.id.SystemSettings_toolbar_floating_help)?.visibility =
+                    View.GONE
             } else { // 浮動
                 mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_1)!!.visibility =
                     View.GONE
                 mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_2)!!.visibility =
                     View.VISIBLE
                 mainLayout?.findViewById<View>(R.id.SystemSettings_item_toolbar_order_item_3)!!.visibility =
+                    View.VISIBLE
+                mainLayout?.findViewById<View>(R.id.SystemSettings_toolbar_floating_help)?.visibility =
                     View.VISIBLE
             }
             val textSmallIdle =

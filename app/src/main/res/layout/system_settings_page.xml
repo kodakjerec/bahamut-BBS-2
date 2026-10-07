@@ -83,13 +83,14 @@
             <com.kota.telnetUI.textView.TelnetTextViewLarge
                 style="@style/SystemSettingsChapter"
                 android:text="@string/system_setting_page_chapter_board_article"/>
-            <View style="@style/HorizontalDivider"/>
             <RelativeLayout android:id="@+id/SystemSettings_item_enableBoardMove" style="@style/SystemSettingsItem">
+                <View style="@style/HorizontalDivider"/>
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_enable_board_move" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_enableBoardMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_board_move_hint"/>
             </RelativeLayout>
             <RelativeLayout android:id="@+id/SystemSettings_item_enableArticleMove" style="@style/SystemSettingsItem">
+                <View style="@style/HorizontalDivider"/>
                 <com.kota.telnetUI.textView.TelnetTextViewLarge
                     android:text="@string/system_setting_page_enable_article_move" style="@style/SystemSettingsCheckboxText"/>
                 <CheckBox android:id="@+id/SystemSettings_enableArticleMove" style="@style/SystemSettingsCheckbox" android:contentDescription="@string/system_setting_page_checkbox_article_move_hint"/>
@@ -109,6 +110,15 @@
                     <com.kota.telnetUI.textView.TelnetTextViewLarge
                         android:text="@string/system_setting_page_toolbar_location"
                         style="@style/SystemSettingsSpinnerText"/>
+                    <TextView
+                        android:id="@+id/SystemSettings_toolbar_floating_help"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="？"
+                        android:background="?android:attr/selectableItemBackgroundBorderless"
+                        android:visibility="gone"
+                        style="@style/SystemSettingsSpinnerText"
+                        android:clickable="true" />
                     <Spinner
                         android:id="@+id/SystemSettings_toolbar_location_spinner"
                         style="@style/SystemSettingsSpinnerItem"/>
