@@ -340,6 +340,10 @@ open class BookmarkManagePage(
      * @param view 點擊的 View
      * @param position 項目位置
      */
+    override fun onItemClick(parentView: android.widget.AdapterView<*>?, itemView: View?, index: Int, id: Long) {
+        onItemClick(itemView, index)
+    }
+
     override fun onItemClick(view: View?, position: Int) {
         val bookmark = bookmarks.getOrNull(position) ?: return
         navigationController.popViewController()
