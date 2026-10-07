@@ -139,12 +139,17 @@ class UserSettings(var myContext: Context) {
             "( >_0)b,( ;-w-)a,( -3-)y-~,ˋ(°▽ ° )ノˋ( ° ▽° )ノ,#/-_-)/~╨──╨,(||￣▽￣)a,o( -_-)=0))-3-)/,(#‵′)o,O(‵皿′)o,( T_T),(o_O ),_ψ(._. ),v(￣︶￣)y,ㄟ(￣▽￣ㄟ)...,(っ´▽`)っ,m(_ _)m,ˋ(°ω ° )ノ,◢▆▅▄▃崩╰(〒皿〒)╯潰▃▄▅▇◣,( O口O)!?, ☆━━━(ﾟ∀ﾟ)━━━, *[1;33m洽特*[m"
 
         // 雲端同步豁免的本地 Key（不觸發 markDirty）
-        private val IGNORED_KEYS = setOf(
+        val IGNORED_KEYS = setOf(
+            PROPERTIES_USERNAME,
+            PROPERTIES_PASSWORD,
+            PROPERTIES_SAVE_LOGON_USER,
+            PROPERTIES_WEB_SIGN_IN,
             PROPERTIES_WEB_USERNAME,
             PROPERTIES_WEB_PASSWORD,
             PROPERTIES_WEB_DEBUG_VIEW,
             FLOATING_LOCATION_X,
             FLOATING_LOCATION_Y,
+            PROPERTIES_VIP,
             NON_VIP_SHORTEN_TIMES_LIMIT,
             "upgrade"
         )
