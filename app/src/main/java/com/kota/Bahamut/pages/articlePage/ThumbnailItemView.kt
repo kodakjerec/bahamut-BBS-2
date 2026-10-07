@@ -121,17 +121,17 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
     var myImageUrl: String = ""
 
     /** 判斷URL內容  */
-    fun loadUrl(url: String) {
-        myUrl = url
+    fun loadUrl(fromUrl: String) {
+        myUrl = fromUrl
         ASCoroutine.ensureMainThread {
-            urlView.text = url
+            urlView.text = fromUrl
         }
 
         ASCoroutine.runInNewCoroutine {
             try {
                  val findUrl: Vector<String> = if (!isDebug) {
                      UrlDatabase(context).use { urlDatabase ->
-                         urlDatabase.getUrl(url)
+                         urlDatabase.getUrl(fromUrl)
                      }
                  } else {
                      Vector()
@@ -283,7 +283,7 @@ class ThumbnailItemView(var myContext: Context) : LinearLayout(myContext) {
                         try {
                             val uploadBody: RequestBody = MultipartBody.Builder()
                                 .setType(MultipartBody.FORM)
-                                .addFormDataPart("url", url)
+                                .addFormDataPart("url", fromUrl)
                                 .addFormDataPart("title", myTitle)
                                 .addFormDataPart("description", myDescription)
                                 .addFormDataPart("imageUrl", myImageUrl)
