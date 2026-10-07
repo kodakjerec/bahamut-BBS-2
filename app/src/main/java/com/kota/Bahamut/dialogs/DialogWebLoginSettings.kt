@@ -48,7 +48,7 @@ class DialogWebLoginSettings(private val onSaved: (() -> Unit)? = null) : ASDial
         btnCancel.setOnClickListener(this)
         btnSave.setOnClickListener(this)
 
-        setDialogWidth(mainLayout)
+        setDialogWidth()
     }
 
     override fun onClick(v: View) {

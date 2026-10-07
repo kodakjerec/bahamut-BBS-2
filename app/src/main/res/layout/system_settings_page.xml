@@ -114,7 +114,7 @@
                         android:id="@+id/SystemSettings_toolbar_floating_help"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="？"
+                        android:text="[？]"
                         android:background="?android:attr/selectableItemBackgroundBorderless"
                         android:visibility="gone"
                         style="@style/SystemSettingsSpinnerText"

@@ -47,7 +47,7 @@ class DialogSearchArticle : ASDialog(), View.OnClickListener {
         searchButton.setOnClickListener(this)
         cancelButton.setOnClickListener(this)
 
-        setDialogWidth(mainLayout)
+        setDialogWidth()
     }
 
     override fun onClick(view: View) {

@@ -45,7 +45,7 @@ class DialogPostArticle(aTarget: Int, theme: Int = com.kota.Bahamut.pages.theme.
         this.cancelButton.tag = "ToolbarItem.Danger"
         this.sendButton.setOnClickListener(this)
         this.cancelButton.setOnClickListener(this)
-        setDialogWidth(findViewById(R.id.dialog_post_article_content_view))
+        setDialogWidth()
     }
 
     override fun onClick(view: View?) {

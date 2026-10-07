@@ -114,7 +114,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
     }
 
     /** 變更對話框寬度 (依據螢幕比例適應) */
-    fun setDialogWidth(targetView: View) {
+    fun setDialogWidth() {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val screenHeight = context.resources.displayMetrics.heightPixels
 
@@ -124,13 +124,11 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
             (screenWidth * 0.8).toInt()
         }
 
-        val oldLayoutParams = targetView.layoutParams
-        oldLayoutParams.width = dialogWidth
-        targetView.layoutParams = oldLayoutParams
+        window?.setLayout(dialogWidth, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 
     /** 變更對話框寬度與高度 (依據螢幕方向適應) */
-    fun setDialogWidthHeight(targetView: View) {
+    fun setDialogWidthHeight() {
         val screenWidth = context.resources.displayMetrics.widthPixels
         val screenHeight = context.resources.displayMetrics.heightPixels
 
@@ -145,10 +143,7 @@ open class ASDialog : Dialog, ASViewControllerDisappearListener {
             dialogHeight = (screenHeight * 0.7).toInt()
         }
 
-        val oldLayoutParams: ViewGroup.LayoutParams = targetView.layoutParams
-        oldLayoutParams.width = dialogWidth
-        oldLayoutParams.height = dialogHeight
-        targetView.layoutParams = oldLayoutParams
+        window?.setLayout(dialogWidth, dialogHeight)
     }
 
     companion object {

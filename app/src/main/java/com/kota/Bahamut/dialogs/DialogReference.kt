@@ -36,7 +36,7 @@ class DialogReference : ASDialog(), View.OnClickListener {
         sendButton.setOnClickListener(this)
         cancelButton.setOnClickListener(this)
 
-        setDialogWidth(mainLayout)
+        setDialogWidth()
 
         readOldSettings()
     }

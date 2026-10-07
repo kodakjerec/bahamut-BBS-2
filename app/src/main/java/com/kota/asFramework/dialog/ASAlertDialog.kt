@@ -248,7 +248,6 @@ class ASAlertDialog : ASDialog, View.OnClickListener {
         requestWindowFeature(1)
         setContentView(buildContentView())
         window?.setBackgroundDrawable(null)
-        setSize(currentDialogSize)
     }
 
     /**

@@ -25,7 +25,7 @@ class LoginWebDebugView(private val context: Context) : ASDialog() {
         btnClose.setOnClickListener { dismiss() }
 
         // 設定 WebView 屬性
-        setDialogWidthHeight(mainLayout)
+        setDialogWidthHeight()
     }
 
     var onDismissCallback: (() -> Unit)? = null

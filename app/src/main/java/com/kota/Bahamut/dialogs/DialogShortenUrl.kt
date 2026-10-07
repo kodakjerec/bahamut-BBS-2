@@ -234,7 +234,7 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
                 }
             }
         }
-        setDialogWidth(mainLayout)
+        setDialogWidth()
     }
 
     override fun onClick(view: View) {

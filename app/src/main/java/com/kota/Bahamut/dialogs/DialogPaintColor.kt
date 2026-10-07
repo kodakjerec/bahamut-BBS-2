@@ -160,7 +160,7 @@ class DialogPaintColor(theme: Int = com.kota.Bahamut.pages.theme.ThemeStore.getD
         cancelButton.tag = "ToolbarItem.Danger"
         cancelButton.setOnClickListener(this)
 
-        setDialogWidth(mainLayout)
+        setDialogWidth()
     }
 
     fun generateOutputParam() {

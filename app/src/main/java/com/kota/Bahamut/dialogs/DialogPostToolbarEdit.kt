@@ -111,7 +111,7 @@ class DialogPostToolbarEdit(
         itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(recyclerView)
 
-        setDialogWidth(mainLayout)
+        setDialogWidth()
     }
 
     private fun saveAndApply() {

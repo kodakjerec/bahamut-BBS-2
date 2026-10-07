@@ -36,7 +36,7 @@ class DialogInsertSymbol : ASDialog(), OnItemClickListener, ListAdapter {
             dismiss()
         }
         val mainLayout = findViewById<View>(R.id.dialog_insert_symbol_main_layout)
-        setDialogWidthHeight(mainLayout)
+        setDialogWidthHeight()
     }
 
     override fun onItemClick(adapterView: AdapterView<*>?, arg1: View?, index: Int, id: Long) {

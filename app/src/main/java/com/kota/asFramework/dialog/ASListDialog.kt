@@ -261,24 +261,6 @@ class ASListDialog : ASDialog() {
         return result
     }
 
-    fun setDialogWidth(width: Float): ASListDialog {
-        this.dialogWidth = width
-        val dialogWidth = ((TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            this.dialogWidth,
-            context.resources.displayMetrics
-        ).toInt()) / 2) * 2
-        this.scrollView?.layoutParams = LinearLayout.LayoutParams(
-            dialogWidth,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        this.contentView?.layoutParams = FrameLayout.LayoutParams(
-            dialogWidth,
-            ViewGroup.LayoutParams.WRAP_CONTENT
-        )
-        return this
-    }
-
     override fun show() {
         super.show()
     }

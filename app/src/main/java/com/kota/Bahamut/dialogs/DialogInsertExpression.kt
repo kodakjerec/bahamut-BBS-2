@@ -52,7 +52,7 @@ class DialogInsertExpression : ASDialog() {
             dismiss()
         }
         val mainLayout = findViewById<View>(R.id.dialog_insert_expressions_main_layout)
-        setDialogWidthHeight(mainLayout)
+        setDialogWidthHeight()
     }
 
     fun setListener(aListener: DialogInsertExpressionListener?): DialogInsertExpression {
