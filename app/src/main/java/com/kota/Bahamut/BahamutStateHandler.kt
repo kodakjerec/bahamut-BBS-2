@@ -773,17 +773,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             EditFromLinkedStep.SEARCH_PREV -> {
                 // 搜尋上一篇同標題文章 ("[" )
                 state.step = EditFromLinkedStep.GOTO_LAST
-                this.myCursorRow = this.telnetCursor!!.row
-                val boardNum = parseBoardNumberFromCursorRow(this.myCursorRow)
-                state.boardNumber = boardNum
-
-                if (boardPage.getItemSize() == boardNum) {
-                    state.step = EditFromLinkedStep.READING_ARTICLE
-                    showShortToast("編輯文章定位至：${state.boardNumber}")
-                    boardPage.loadItemAtIndex(state.boardNumber)
-                } else {
-                    create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
-                }
+                create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
             }
 
             EditFromLinkedStep.SEARCH_NEXT -> {

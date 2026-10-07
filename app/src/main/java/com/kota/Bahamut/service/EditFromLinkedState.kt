@@ -10,9 +10,11 @@ import com.kota.telnet.TelnetArticle
  *
  * @property targetArticle 目標文章 (包含特徵：title, author, dateTime)
  */
-data class EditFromLinkedState(
-    var targetArticle: TelnetArticle,
+class EditFromLinkedState(
+    rawArticle: TelnetArticle,
 ) {
+    /** 獨立複製一份目標文章副本，避免原串接頁面清空 TelnetArticle 時連帶清空此處的特徵 */
+    val targetArticle: TelnetArticle = rawArticle.clone()
     /** 從 BBS "t" 鍵查詢解析所得之真正的版面文章編號 */
     var boardNumber: Int = 0
 
@@ -46,13 +48,28 @@ data class EditFromLinkedState(
      * @return 若標題、作者與日期皆吻合則傳回 true
      */
     fun matchesTarget(article: TelnetArticle): Boolean {
-        if (article.title != targetArticle.title) return false
-        if (article.author != targetArticle.author) return false
-        // dateTime 可能存在格式微異，檢查是否互相包含
+        // 1. 比對作者 (不區分大小寫)
+        if (!article.author.equals(targetArticle.author, ignoreCase = true)) return false
+
+        // 2. 比對標題 (自動移除 "Re: " 前綴與前後空白後比對)
+        val targetCleanTitle = cleanTitle(targetArticle.title)
+        val articleCleanTitle = cleanTitle(article.title)
+        if (targetCleanTitle != articleCleanTitle) return false
+
+        // 3. dateTime 可能存在格式微異，檢查是否互相包含
         if (targetArticle.dateTime.isNotEmpty() && !article.dateTime.contains(targetArticle.dateTime)) {
             return false
         }
         return true
+    }
+
+    /** 輔助方法：清理標題字串 (去除 "Re: " 前綴與前後空白) */
+    private fun cleanTitle(title: String): String {
+        var t = title.trim()
+        if (t.startsWith("Re: ", ignoreCase = true)) {
+            t = t.substring(4).trim()
+        }
+        return t
     }
 }
 

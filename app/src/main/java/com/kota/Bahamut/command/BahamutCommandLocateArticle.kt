@@ -20,9 +20,12 @@ import com.kota.telnet.reference.TelnetKeyboard
  * @property isFirstInPage 當前文章是否位於串接頁該頁面的第一筆 (用於處理 20 的倍數或頁面第一筆之例外判定)
  */
 class BahamutCommandLocateArticle(
-    private val targetArticle: TelnetArticle? = null,
+    targetArticle: TelnetArticle? = null,
     private val isFirstInPage: Boolean = false
 ) : TelnetCommand() {
+
+    /** 傳入時立即複製獨立副本，避免排隊等待執行期間原 TelnetArticle 被 ArticlePage.clear() 清空 */
+    private val targetArticle: TelnetArticle? = targetArticle?.clone()
 
     init {
         this.action = BahamutCommandDef.LOCATE_ARTICLE
