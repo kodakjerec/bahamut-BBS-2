@@ -6,6 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * [ASCoroutine] - 協程與線程調度工具抽象類別。
@@ -16,25 +17,10 @@ import kotlinx.coroutines.launch
  * 3. 靜態提供 [ensureMainThread] 確保區塊代碼在 UI 主執行緒中安全執行。
  */
 abstract class ASCoroutine {
-
     private var job: Job? = null
 
     /** 子類別實作的非同步執行區塊 */
     abstract suspend fun run()
-
-    /** 在主執行緒內執行 */
-    fun runInMainThread() {
-        CoroutineScope(Dispatchers.Main).launch {
-            run()
-        }
-    }
-
-    /** 在背景執行緒 (IO) 執行 */
-    fun runInBackground() {
-        CoroutineScope(Dispatchers.IO).launch {
-            run()
-        }
-    }
 
     /**
      * 延遲指定毫秒後在主執行緒執行
@@ -44,7 +30,7 @@ abstract class ASCoroutine {
     fun postDelayed(delayMillis: Long) {
         cancel()
         job = CoroutineScope(Dispatchers.Main).launch {
-            delay(delayMillis)
+            delay(delayMillis.milliseconds)
             run()
         }
     }

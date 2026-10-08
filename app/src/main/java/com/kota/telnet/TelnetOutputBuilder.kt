@@ -11,7 +11,7 @@ class TelnetOutputBuilder {
 
     @JvmOverloads
     fun sendToServer(channel: Int = 0) {
-        TelnetClient.myInstance?.sendDataToServer(build(), channel)
+        TelnetClient.myInstance!!.sendDataToServer(build(), channel)
     }
 
     fun build(): ByteArray? {

@@ -15,12 +15,12 @@ function normalizeUrl(imgUrl, pageUrl) {
 
 export default {
 	async fetch(request, env, ctx) {
-		let url = "";
+		let fromUrl = "";
 		let getFormData;
 		try {
 			getFormData = await request.formData();
-			url = getFormData.get("url");
-			if (!url) throw new Error("No url");
+			fromUrl = getFormData.get("url");
+			if (!fromUrl) throw new Error("No url");
 		} catch {
 			return Response.json({
 				title: "",
@@ -50,7 +50,7 @@ export default {
 					desc = excluded.desc,
 					imageUrl = excluded.imageUrl,
 					contentType = excluded.contentType
-				`).bind(url, titleFromFront, descFromFront, imageUrlFromFront, contentTypeFromFront).run();
+				`).bind(fromUrl, titleFromFront, descFromFront, imageUrlFromFront, contentTypeFromFront).run();
 
 				return Response.json({
 					title: titleFromFront,
@@ -62,12 +62,12 @@ export default {
 			}
 
 			// 檢查是否有相同 URL 的資料
-			const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(url);
+			const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(fromUrl);
 			const { results } = await stmt.all();
 			if (results && results.length > 0) {
 				let cachedContentType = results[0].contentType || "";
 				let cachedImageUrl = results[0].imageUrl || "";
-				cachedImageUrl = normalizeUrl(cachedImageUrl, url);
+				cachedImageUrl = normalizeUrl(cachedImageUrl, fromUrl);
 
 				return Response.json({
 					title: results[0].title || "",
@@ -78,8 +78,10 @@ export default {
 				});
 			}
 
-			let urlStructure = new URL(url);
+			let myUrl = fromUrl;
+			let urlStructure = new URL(myUrl);
 			let isTwitter = false;
+			let isYoutube = false;
 			let title = "";
 			let desc = "";
 			let imageUrl = "";
@@ -91,7 +93,7 @@ export default {
 				"Accept-Charset": "utf-8",
 			};
 
-			const siteKeywords = ["facebook", "instagram", "amazon", "threads", "youtube", "youtu", "kodakjerec"];
+			const siteKeywords = ["instagram", "amazon", "kodakjerec"];
 			for (let i = 0; i < siteKeywords.length; i++) {
 				const keyword = siteKeywords[i];
 				if (urlStructure.hostname.indexOf(keyword) > -1) {
@@ -105,6 +107,12 @@ export default {
 				}
 			}
 
+			// youtube 轉址 oembed
+			if (urlStructure.hostname.includes("youtube.com") || urlStructure.hostname.includes("youtu.be")) {
+				myUrl = `https://www.youtube.com/oembed?url=${myUrl}`;
+				isYoutube = true;
+			}
+
 			// twitter 轉址
 			function isTwitterHost(hostname) {
 				return (
@@ -116,8 +124,24 @@ export default {
 			}
 
 			if (isTwitterHost(urlStructure.hostname)) {
-				url = url.replace(urlStructure.hostname, "api.vxtwitter.com");
+				myUrl = myUrl.replace(urlStructure.hostname, "api.vxtwitter.com");
 				isTwitter = true;
+				headers["User-Agent"] = "PostmanRuntime/2.10.1";
+			}
+
+			// threads 轉址
+			if (urlStructure.hostname === "threads.net" || urlStructure.hostname.endsWith(".threads.net") || 
+				urlStructure.hostname === "threads.com" || urlStructure.hostname.endsWith(".threads.com")) {
+				myUrl = myUrl.replace(urlStructure.hostname, "fixthreads.seria.moe");
+				urlStructure = new URL(myUrl);
+			}
+
+			// facebook 轉址
+			if (urlStructure.hostname === "facebook.com" || urlStructure.hostname.endsWith(".facebook.com") || 
+				urlStructure.hostname === "m.facebook.com" || urlStructure.hostname.endsWith(".m.facebook.com")) {
+				myUrl = myUrl.replace(urlStructure.hostname, "facebed.com");
+				urlStructure = new URL(myUrl);
+				headers["User-Agent"] = "PostmanRuntime/2.10.1";
 			}
 			
 			// ptt 加變數
@@ -126,10 +150,10 @@ export default {
 			}
 
 			// ===== 新增 HEAD Request 判斷是否為 Media =====
-			if (!isTwitter) {
+			if (!isTwitter && !isYoutube) {
 				let headContentType = "";
 				try {
-					const headResp = await fetch(url, {
+					const headResp = await fetch(myUrl, {
 						method: 'HEAD',
 						headers,
 						redirect: 'follow'
@@ -147,7 +171,7 @@ export default {
 					return Response.json({
 						title: '',
 						desc: '',
-						imageUrl: url,
+						imageUrl: myUrl,
 						contentType: headContentType,
 						isMedia: true
 					});
@@ -155,9 +179,9 @@ export default {
 			}
 
 			// ===== 發送 GET 請求並限制下載範圍 (256KB) =====
-			let responseFrom = await fetch(url, {
+			let responseFrom = await fetch(myUrl, {
 				method: "GET",
-				headers: isTwitter ? headers : {
+				headers: (isTwitter || isYoutube) ? headers : {
 					...headers,
 					"Range": "bytes=0-262144"
 				},
@@ -171,8 +195,8 @@ export default {
 			if (charset === "windows-31j")
 				charset = "shift_jis";
 			if (responseFrom.headers.get("target")) {
-				url = responseFrom.headers.get("target");
-				urlStructure = new URL(url);
+				myUrl = responseFrom.headers.get("target");
+				urlStructure = new URL(myUrl);
 			}
 
 			let isMedia = contentType.startsWith("image/") || contentType.startsWith("video/") || contentType.startsWith("audio/");
@@ -183,6 +207,15 @@ export default {
 				desc = html.text;
 				if (html.mediaURLs && html.mediaURLs.length > 0)
 					imageUrl = html.mediaURLs[0];
+			} else if (isYoutube) {
+				try {
+					const json = await responseFrom.json();
+					title = json.title || "";
+					desc = json.author_name || "";
+					imageUrl = json.thumbnail_url || "";
+				} catch (e) {
+					// JSON 解析失敗時
+				}
 			} else {
 				if (contentType.indexOf("text/html") > -1 || contentType.indexOf("application/xhtml+xml") > -1) {
 					// 将HTML文本解码并解析
@@ -191,12 +224,6 @@ export default {
 					const htmlBuffer = decoder.decode(html);
 					const soup = cheerio.load(htmlBuffer);
 					const originHtml = soup.html();
-
-					// og:type Media Detection
-					const ogType = soup('meta[property="og:type"]').attr('content')?.toLowerCase() || '';
-					if (ogType.startsWith('video') || ogType.startsWith('audio')) {
-						isMedia = true;
-					}
 					
 					// 记录HTML大小和基本信息
 					const parseMetrics = {
@@ -275,12 +302,12 @@ export default {
 							ON CONFLICT(url) DO UPDATE SET 
 							htmlContent = excluded.htmlContent,
 							createdAt = excluded.createdAt
-						`).bind(url, htmlBuffer, new Date().toISOString()).run();
+						`).bind(fromUrl, htmlBuffer, new Date().toISOString()).run();
 					}
 				} else if (isMedia) {
 					// 媒體檔案備案處理：使用路徑作為標題，用URL作為圖片 (防呆處理，如果 HEAD 請求失敗)
 					title = urlStructure.pathname.split('/').pop() || urlStructure.pathname;
-					imageUrl = url;
+					imageUrl = myUrl;
 					
 					ctx.waitUntil(
 						env.ANALYTICS.writeDataPoint({
@@ -413,7 +440,7 @@ export default {
 					desc = excluded.desc,
 					imageUrl = excluded.imageUrl,
 					contentType = excluded.contentType
-				`).bind(url, title, desc, imageUrl, contentType).run();
+				`).bind(fromUrl, title, desc, imageUrl, contentType).run();
 			}
 
 			return Response.json({

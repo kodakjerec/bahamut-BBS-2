@@ -729,7 +729,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                     currentPage == BahamutPage.BAHAMUT_BOARD_SEARCH) {
                     state.step = EditFromLinkedStep.SENT_T
                     this.myCursorRow = this.telnetCursor!!.row
-                    create().pushKey(TelnetKeyboard.SMALL_T).sendToServer()
+                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.SMALL_T)
                 }
             }
 
@@ -739,7 +739,7 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
                 state.boardNumber = boardNum
 
                 state.step = EditFromLinkedStep.LEAVING_LINKED_PAGE
-                create().pushKey(TelnetKeyboard.LEFT_ARROW).sendToServer()
+                TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_ARROW)
             }
 
             EditFromLinkedStep.LEAVING_LINKED_PAGE -> {
@@ -773,28 +773,38 @@ class BahamutStateHandler internal constructor() : TelnetStateHandler() {
             EditFromLinkedStep.SEARCH_PREV -> {
                 // 搜尋上一篇同標題文章 ("[" )
                 state.step = EditFromLinkedStep.GOTO_LAST
-                create().pushKey(TelnetKeyboard.LEFT_BRACKET).sendToServer()
+                TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.LEFT_BRACKET)
             }
 
             EditFromLinkedStep.SEARCH_NEXT -> {
                 // 搜尋下一篇同標題文章 ("]")
                 state.step = EditFromLinkedStep.GOTO_LAST
-                create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
+                TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.RIGHT_BRACKET)
                 if (state.isFirstInPage) {
-                    create().pushKey(TelnetKeyboard.RIGHT_BRACKET).sendToServer()
+                    TelnetClient.myInstance!!.sendKeyboardInputToServer(TelnetKeyboard.RIGHT_BRACKET)
                 }
             }
 
             EditFromLinkedStep.GOTO_LAST -> {
                 // 已定位至目標行，取得最終版面文章編號並加載內文
+                // 延緩0.1秒, 等待畫面更新
                 if (isBoardMain) {
-                    ASCoroutine.ensureMainThread {
-                        state.step = EditFromLinkedStep.READING_ARTICLE
-                        val boardNum = parseBoardNumberFromCursorRow(this.telnetCursor!!.row)
-                        state.boardNumber = boardNum
-                        showShortToast("編輯文章定位至：$boardNum")
-                        boardPage.loadItemAtIndex(state.boardNumber - 1)
-                    }
+                    object : ASCoroutine() {
+                        override suspend fun run() {
+                            ensureMainThread {
+                                state.step = EditFromLinkedStep.READING_ARTICLE
+                                val boardNum =
+                                    parseBoardNumberFromCursorRow(this@BahamutStateHandler.telnetCursor!!.row)
+                                if (boardNum > 0) {
+                                    state.boardNumber = boardNum
+                                    showShortToast("編輯文章定位至：$boardNum")
+                                    boardPage.loadItemAtIndex(state.boardNumber - 1)
+                                } else {
+                                    showShortToast("定位文章失敗，請重試")
+                                }
+                            }
+                        }
+                    }.postDelayed(100L)
                 }
             }
 
