@@ -144,15 +144,25 @@ export default {
 
   // 排程(每天刪圖片)
   async scheduled(event, env, ctx) {
-    const sevenDaysAgo = Date.now() - 7*24*60*60*1000;
-    const list = await env.IMAGES.list({ prefix: "uploads/"});
+    const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    let truncated = true;
+    let cursor = undefined;
 
-    for (const obj of list.objects) {
-      const uploadedAt = Number(obj.customMetadata?.uploadedAt);
-      
-      if (uploadedAt < sevenDaysAgo) {
-        await env.IMAGES.delete(obj.key);
+    while (truncated) {
+      const list = await env.IMAGES.list({
+        prefix: "uploads/",
+        cursor: cursor
+      });
+
+      for (const obj of list.objects) {
+        // 直接使用 R2 物件內建的 uploaded (Date 物件) 屬性來判斷
+        if (obj.uploaded < sevenDaysAgo) {
+          await env.IMAGES.delete(obj.key);
+        }
       }
+
+      truncated = list.truncated;
+      cursor = list.cursor;
     }
   }
 };
