@@ -2,6 +2,8 @@ package com.kota.telnet
 
 import android.text.SpannableString
 import com.kota.Bahamut.service.UserSettings
+import com.kota.telnet.TelnetArticle.Companion.NEW
+import com.kota.telnet.TelnetArticle.Companion.REPLY
 import com.kota.telnet.model.TelnetFrame
 import com.kota.telnet.model.TelnetRow
 import com.kota.telnet.reference.TelnetAnsiCode.getBackAsciiCode
@@ -250,6 +252,22 @@ class TelnetArticle {
         infos.clear()
         editRecords.clear()
         this.frame = null
+    }
+
+    /**
+     * 複製此文章的基礎特徵屬性（做為獨立副本，避免原頁面清空物件時影響備份與比對）
+     */
+    fun clone(): TelnetArticle {
+        val copy = TelnetArticle()
+        copy.title = this.title
+        copy.author = this.author
+        copy.boardName = this.boardName
+        copy.dateTime = this.dateTime
+        copy.nickName = this.nickName
+        copy.fromIP = this.fromIP
+        copy.articleNumber = this.articleNumber
+        copy.articleType = this.articleType
+        return copy
     }
     
     // ==================== 內容產生方法 ====================
