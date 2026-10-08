@@ -219,7 +219,7 @@ class ToolBarFloating @JvmOverloads constructor(
                         // 並根據 Y 軸的變化量決定是上滑 (-1) 還是下滑 (1)，並啟動滑動長按計時器
                         isSwiping = true
                         swipeDirection = if (dy < 0) -1 else 1
-                        mainHandler.postDelayed(swipeHoldRunnable, 1000L)
+                        mainHandler.postDelayed(swipeHoldRunnable, 500L)
                     }
                 }
 
