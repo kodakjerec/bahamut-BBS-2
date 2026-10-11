@@ -1,12 +1,12 @@
 package com.kota.Bahamut.pages
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.CheckBox
@@ -15,20 +15,16 @@ import android.widget.RelativeLayout
 import android.widget.Spinner
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import com.google.android.material.slider.Slider
-import com.kota.asFramework.dialog.ASAlertDialog
-import com.kota.asFramework.dialog.ASAlertDialogListener
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
-import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
-import com.kota.asFramework.pageController.ASNavigationController
-import com.kota.asFramework.ui.ASToast.showLongToast
-import com.kota.asFramework.ui.ASToast.showShortToast
+import com.kota.Bahamut.BahamutController.Companion.applyHighRefreshRate
+import com.kota.Bahamut.BahamutController.Companion.isHighRefreshRateSupported
 import com.kota.Bahamut.BahamutPage
 import com.kota.Bahamut.PageContainer
+import com.kota.Bahamut.R
 import com.kota.Bahamut.pages.blockListPage.ArticleExpressionListPage
 import com.kota.Bahamut.pages.blockListPage.ArticleHeaderListPage
 import com.kota.Bahamut.pages.blockListPage.BlockListPage
-import com.kota.Bahamut.R
 import com.kota.Bahamut.service.CloudBackup
 import com.kota.Bahamut.service.CommonFunctions.changeScreenOrientation
 import com.kota.Bahamut.service.CommonFunctions.getContextString
@@ -36,18 +32,20 @@ import com.kota.Bahamut.service.NotificationSettings.getCloudSave
 import com.kota.Bahamut.service.NotificationSettings.getCloudSaveLastTime
 import com.kota.Bahamut.service.NotificationSettings.setCloudSave
 import com.kota.Bahamut.service.TempSettings
+import com.kota.Bahamut.service.TempSettings.myContext
 import com.kota.Bahamut.service.UserSettings.Companion.linkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowOnlyWifi
 import com.kota.Bahamut.service.UserSettings.Companion.linkShowThumbnail
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesArticleMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAutoToChat
-import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBlockListForTitle
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesBoardMoveEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesDrawerLocation
+import com.kota.Bahamut.service.UserSettings.Companion.propertiesFollowSystemDarkMode
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesGestureOnBoardEnable
+import com.kota.Bahamut.service.UserSettings.Companion.propertiesHighRefreshRate
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesScreenOrientation
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesToolbarLocation
@@ -58,12 +56,17 @@ import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesBoardMoveDis
 import com.kota.Bahamut.service.UserSettings.Companion.setPropertiesLinkAutoShow
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarAlpha
 import com.kota.Bahamut.service.UserSettings.Companion.toolbarIdle
+import com.kota.asFramework.dialog.ASAlertDialog
+import com.kota.asFramework.dialog.ASAlertDialogListener
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
+import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.pageController.ASNavigationController
+import com.kota.asFramework.thread.ASCoroutine
+import com.kota.asFramework.ui.ASToast.showLongToast
+import com.kota.asFramework.ui.ASToast.showShortToast
 import com.kota.telnet.TelnetClient
 import com.kota.telnetUI.TelnetPage
 import com.kota.telnetUI.textView.TelnetTextViewSmall
-import androidx.core.net.toUri
-import com.kota.Bahamut.service.TempSettings.myContext
-import com.kota.asFramework.thread.ASCoroutine
 
 class SystemSettingsPage : TelnetPage() {
     var mainLayout: RelativeLayout? = null
@@ -637,6 +640,37 @@ class SystemSettingsPage : TelnetPage() {
         box.setOnCheckedChangeListener(followSystemDarkModeListener)
         mainLayout?.findViewById<View>(R.id.SystemSettings_item_followSystemDarkMode)!!
             .setOnClickListener { view: View? -> box.isChecked = !box.isChecked }
+
+        // 高幀率模式
+        val highRefreshRateBox = mainLayout?.findViewById<CheckBox>(R.id.SystemSettings_highRefreshRate)
+        val highRefreshRateItem = mainLayout?.findViewById<View>(R.id.SystemSettings_item_highRefreshRate)
+        val highRefreshRateLabel = mainLayout?.findViewById<TextView>(R.id.SystemSettings_highRefreshRate_label)
+        val isSupported = isHighRefreshRateSupported(context)
+
+        if (highRefreshRateBox != null) {
+            if (isSupported) {
+                highRefreshRateBox.isEnabled = true
+                highRefreshRateItem?.isEnabled = true
+                highRefreshRateLabel?.isEnabled = true
+                highRefreshRateBox.isChecked = propertiesHighRefreshRate
+                highRefreshRateBox.setOnCheckedChangeListener { _, isChecked ->
+                    propertiesHighRefreshRate = isChecked
+                    val act = (context as? Activity) ?: (navigationController as? Activity)
+                    if (act != null) {
+                        applyHighRefreshRate(act)
+                    }
+                }
+                highRefreshRateItem?.setOnClickListener {
+                    highRefreshRateBox.isChecked = !highRefreshRateBox.isChecked
+                }
+            } else {
+                highRefreshRateBox.isChecked = false
+                highRefreshRateBox.isEnabled = false
+                highRefreshRateItem?.isEnabled = false
+                highRefreshRateLabel?.isEnabled = false
+                highRefreshRateItem?.setOnClickListener(null)
+            }
+        }
 
         // bbs-user-info-page
         mainLayout?.findViewById<View>(R.id.SystemSettings_goBBSUserInfo)!!

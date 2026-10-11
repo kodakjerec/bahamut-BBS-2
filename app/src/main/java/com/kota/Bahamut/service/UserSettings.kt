@@ -121,6 +121,7 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_WEB_PASSWORD: String = "WebPassword" // Web 登入密碼 (不雲端同步)
         const val PROPERTIES_WEB_DEBUG_VIEW: String = "WebDebugView" // 顯示 Web 登入除錯視窗 (不雲端同步)
         const val PROPERTIES_FOLLOW_SYSTEM_DARK_MODE: String = "FollowSystemDarkMode" // 跟隨系統深色模式
+        const val PROPERTIES_HIGH_REFRESH_RATE: String = "HighRefreshRate" // 高幀率模式
         const val PROPERTIES_POST_TOOLBAR_ORDER: String = "PostToolbarOrder" // 發文工具列按鈕順序
         const val POST_TOOLBAR_ORDER_DEFAULT: String = "REFERENCE,SYMBOL,FACE,COLOR,FILE,SHORTEN_URL,SHORTEN_IMAGE"
 
@@ -755,6 +756,19 @@ class UserSettings(var myContext: Context) {
             set(enable) {
                 myEditor?.putBoolean(
                     PROPERTIES_FOLLOW_SYSTEM_DARK_MODE,
+                    enable
+                )?.commit()
+            }
+
+        @JvmStatic
+        var propertiesHighRefreshRate: Boolean
+            get() = mySharedPref?.getBoolean(
+                PROPERTIES_HIGH_REFRESH_RATE,
+                false
+            ) ?: false
+            set(enable) {
+                myEditor?.putBoolean(
+                    PROPERTIES_HIGH_REFRESH_RATE,
                     enable
                 )?.commit()
             }

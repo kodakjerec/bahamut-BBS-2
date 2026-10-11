@@ -334,6 +334,7 @@
     <string name="theme">外觀</string>
     <string name="theme_manager_page">外觀管理</string>
     <string name="follow_system_dark_mode">跟隨系統深色模式</string>
+    <string name="high_refresh_rate">高幀率模式</string>
     <string name="theme_manager_page_guide">請點選上方按鈕切換佈景主題</string>
     <string name="theme_manager_page_chapter_update">套用新設定</string>
     <string name="apply">套用</string>

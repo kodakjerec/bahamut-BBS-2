@@ -1,6 +1,10 @@
 package com.kota.Bahamut
 
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.dataModels.ArticleTempStore
@@ -24,6 +28,7 @@ import com.kota.Bahamut.service.SyncManager
 import com.kota.Bahamut.service.TempSettings
 import com.kota.Bahamut.service.TempSettings.getMessageSmall
 import com.kota.Bahamut.service.TempSettings.setMessageSmall
+import com.kota.Bahamut.service.UserSettings
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesAnimationEnable
 import com.kota.Bahamut.service.UserSettings.Companion.propertiesKeepWifi
 import com.kota.asFramework.dialog.ASAlertDialog
@@ -55,6 +60,11 @@ import java.util.Vector
  * 3. 管理全域系統初始化 (編碼器、書籤、暫存檔、金流 BillingClient、前景服務等)。
  */
 class BahamutController : ASNavigationController(), TelnetClientListener {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        applyHighRefreshRate(this, immediate = true)
+    }
 
     override fun onControllerWillLoad() {
         requestWindowFeature(1)
@@ -115,7 +125,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onControllerDidLoad() {
         // 未連線時，顯示起始頁面 (StartPage)
         if (TelnetClient.myInstance?.telnetConnector?.isConnecting != true) {
-            val startPage: StartPage? = PageContainer.instance!!.startPage
+            val startPage: StartPage = PageContainer.instance!!.startPage
             pushViewController(startPage, false)
         }
     }
@@ -142,7 +152,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
         super.onDestroy()
     }
 
-    override val controllerName: String?
+    override val controllerName: String
         get() = R.string.app_name.toString()
 
     /**
@@ -230,7 +240,7 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
                 newControllers.add(telnetPage)
             }
         }
-        val startPage: StartPage? = PageContainer.instance!!.startPage
+        val startPage: StartPage = PageContainer.instance!!.startPage
         if (!newControllers.contains(startPage)) {
             newControllers.insertElementAt(startPage, 0)
         }
@@ -255,5 +265,138 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
     override fun onTrimMemory(level: Int) {
         super.onTrimMemory(level)
         Glide.get(this).trimMemory(level)
+    }
+
+    companion object {
+        private var targetActivityRef: java.lang.ref.WeakReference<Activity>? = null
+
+        private val highRefreshRateCoroutine = object : ASCoroutine() {
+            override suspend fun run() {
+                val act = targetActivityRef?.get() ?: return
+                performApplyHighRefreshRate(act)
+            }
+        }
+
+        fun isHighRefreshRateSupported(context: Context?): Boolean {
+            if (context == null) return false
+            val display = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                context.display
+            } else {
+                @Suppress("DEPRECATION")
+                (context.getSystemService(WINDOW_SERVICE) as? android.view.WindowManager)?.defaultDisplay
+            } ?: return false
+
+            val supportedModes = display.supportedModes ?: return false
+            return supportedModes.any { it.refreshRate > 60.5f }
+        }
+
+        @JvmStatic
+        @JvmOverloads
+        fun applyHighRefreshRate(activity: Activity, immediate: Boolean = false) {
+            targetActivityRef = java.lang.ref.WeakReference(activity)
+            if (immediate) {
+                highRefreshRateCoroutine.cancel()
+                ASCoroutine.ensureMainThread {
+                    performApplyHighRefreshRate(activity)
+                }
+            } else {
+                highRefreshRateCoroutine.postDelayed(300L)
+            }
+        }
+
+        @android.annotation.SuppressLint("NewApi", "DEPRECATION")
+        private fun performApplyHighRefreshRate(activity: Activity) {
+            val window = activity.window ?: return
+
+            val currentDisplay = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                activity.display
+            } else {
+                activity.windowManager.defaultDisplay
+            } ?: window.decorView.display ?: return
+
+            val currentMode = currentDisplay.mode ?: return
+            val supportedModes = currentDisplay.supportedModes ?: return
+
+            val targetMode: android.view.Display.Mode?
+
+            if (UserSettings.propertiesHighRefreshRate) {
+                // 【開啟高幀率】
+                // 策略 1：優先在「當前解析度」下尋找最高刷新率的 Mode
+                var highMode = supportedModes
+                    .filter { it.physicalWidth == currentMode.physicalWidth && it.physicalHeight == currentMode.physicalHeight }
+                    .maxByOrNull { it.refreshRate }
+
+                // 策略 2：若當前解析度無更高刷新率，選取刷新率最高中解析度最大的 Mode（避免選到小解析度 720p 等）
+                if (highMode == null || highMode.refreshRate <= currentMode.refreshRate) {
+                    highMode = supportedModes.maxWithOrNull(
+                        compareBy<android.view.Display.Mode> { it.refreshRate }
+                            .thenBy { it.physicalWidth * it.physicalHeight }
+                    )
+                }
+                targetMode = highMode
+            } else {
+                // 【關閉高幀率 - 明確指定 60Hz Mode 避免卡在 40Hz 等動態降頻模式】
+                // 階層 1：優先在當前解析度下找接近 60Hz (58Hz~62Hz) 的 Mode
+                var normMode = supportedModes
+                    .filter {
+                        it.physicalWidth == currentMode.physicalWidth &&
+                                it.physicalHeight == currentMode.physicalHeight &&
+                                it.refreshRate in 58.0f..62.0f
+                    }
+                    .minByOrNull { kotlin.math.abs(it.refreshRate - 60.0f) }
+
+                // 階層 2：找任意解析度下最接近 60Hz 且解析度最大的 Mode
+                if (normMode == null) {
+                    normMode = supportedModes
+                        .filter { it.refreshRate in 58.0f..62.0f }
+                        .maxWithOrNull(
+                            compareBy<android.view.Display.Mode> { -kotlin.math.abs(it.refreshRate - 60.0f) }
+                                .thenBy { it.physicalWidth * it.physicalHeight }
+                        )
+                }
+
+                // 階層 3：若無標準 60Hz，優先在當前解析度尋找 <= 62Hz 中最高的 Mode (例如 50Hz, 48Hz)
+                if (normMode == null) {
+                    normMode = supportedModes
+                        .filter {
+                            it.physicalWidth == currentMode.physicalWidth &&
+                                    it.physicalHeight == currentMode.physicalHeight &&
+                                    it.refreshRate <= 62.0f
+                        }
+                        .maxByOrNull { it.refreshRate }
+                }
+
+                // 階層 4：若仍無，全域尋找 <= 62Hz 的最大模式，若連 <= 62Hz 都沒有，則挑選全域最低刷新率模式
+                if (normMode == null) {
+                    normMode = supportedModes
+                        .filter { it.refreshRate <= 62.0f }
+                        .maxWithOrNull(
+                            compareBy<android.view.Display.Mode> { it.refreshRate }
+                                .thenBy { it.physicalWidth * it.physicalHeight }
+                        )
+                        ?: supportedModes.minWithOrNull(
+                            compareBy<android.view.Display.Mode> { it.refreshRate }
+                                .thenByDescending { it.physicalWidth * it.physicalHeight }
+                        )
+                }
+
+                targetMode = normMode
+            }
+
+            if (targetMode != null) {
+                if (targetMode.modeId != currentMode.modeId) {
+                    val lp = window.attributes
+                    lp.preferredDisplayModeId = targetMode.modeId
+                    window.attributes = lp
+                }
+            } else if (!UserSettings.propertiesHighRefreshRate) {
+                // 若找不到標準 60Hz Mode，備用重置為 0
+                val lp = window.attributes
+                if (lp.preferredDisplayModeId != 0) {
+                    lp.preferredDisplayModeId = 0
+                    window.attributes = lp
+                }
+            }
+        }
     }
 }
