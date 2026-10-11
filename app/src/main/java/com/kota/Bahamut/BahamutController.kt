@@ -384,18 +384,39 @@ class BahamutController : ASNavigationController(), TelnetClientListener {
             }
 
             if (targetMode != null) {
-                if (targetMode.modeId != currentMode.modeId) {
-                    val lp = window.attributes
-                    lp.preferredDisplayModeId = targetMode.modeId
-                    window.attributes = lp
+                val lp = window.attributes
+                lp.preferredDisplayModeId = targetMode.modeId
+                lp.preferredRefreshRate = targetMode.refreshRate
+
+                // 針對 Android 12 (API 31+) 廠商專屬 DisplayManager 補充 preferredMinFrameRate / preferredMaxFrameRate
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    try {
+                        lp.javaClass.getField("preferredMinFrameRate").setFloat(lp, targetMode.refreshRate)
+                        lp.javaClass.getField("preferredMaxFrameRate").setFloat(lp, targetMode.refreshRate)
+                    } catch (_: Throwable) {}
+                }
+
+                window.attributes = lp
+
+                // 針對 Android 11 (API 30+) 設定 Root SurfaceFrameRate
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    try {
+                        val rootSc = window.decorView.rootSurfaceControl
+                        if (rootSc != null) {
+                            val method = rootSc.javaClass.getMethod(
+                                "setFrameRate",
+                                Float::class.javaPrimitiveType,
+                                Int::class.javaPrimitiveType
+                            )
+                            method.invoke(rootSc, targetMode.refreshRate, 0)
+                        }
+                    } catch (_: Throwable) {}
                 }
             } else if (!UserSettings.propertiesHighRefreshRate) {
-                // 若找不到標準 60Hz Mode，備用重置為 0
                 val lp = window.attributes
-                if (lp.preferredDisplayModeId != 0) {
-                    lp.preferredDisplayModeId = 0
-                    window.attributes = lp
-                }
+                lp.preferredDisplayModeId = 0
+                lp.preferredRefreshRate = 0f
+                window.attributes = lp
             }
         }
     }
