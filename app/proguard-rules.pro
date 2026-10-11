@@ -7,12 +7,21 @@
 -keepattributes *Annotation*
 -dontwarn com.google.gson.**
 
+# 保留使用 @Keep 標註的類別與成員
+-keep @androidx.annotation.Keep class * { *; }
+-keepclassmembers class * {
+    @androidx.annotation.Keep <fields>;
+    @androidx.annotation.Keep <methods>;
+}
+
 # 保留使用 @SerializedName 標註的欄位
 -keepclassmembers class * {
     @com.google.gson.annotations.SerializedName <fields>;
 }
 
 # 保留專案中 JSON/Gson 序列化與資料模型
+-keep class com.kota.Bahamut.dialogs.uploadImgMethod.** { *; }
+-keep class com.kota.Bahamut.dataModels.** { *; }
 -keep class com.kota.Bahamut.pages.model.** { *; }
 -keep class com.kota.Bahamut.service.** { *; }
 -keep class com.kota.telnet.model.** { *; }

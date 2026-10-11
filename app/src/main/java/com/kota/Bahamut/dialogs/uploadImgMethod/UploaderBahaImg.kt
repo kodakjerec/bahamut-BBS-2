@@ -11,7 +11,10 @@ import android.media.MediaMuxer
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.view.Surface
+import androidx.annotation.Keep
+import androidx.core.graphics.scale
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -24,8 +27,10 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.IOException
 
-data class bahaImgResponse(
-    val url: String
+@Keep
+data class BahaImgResponse(
+    @SerializedName("url")
+    val url: String = ""
 )
 
 class UploaderBahaImg {
@@ -104,7 +109,7 @@ class UploaderBahaImg {
             val scaledBitmap = if (scale > 1) {
                 val newWidth = (width / scale).toInt()
                 val newHeight = (height / scale).toInt()
-                Bitmap.createScaledBitmap(bitmap, newWidth, newHeight, true)
+                bitmap.scale(newWidth, newHeight)
             } else {
                 bitmap
             }
@@ -246,8 +251,6 @@ class UploaderBahaImg {
             }
 
             val inputMime = videoFormat.getString(MediaFormat.KEY_MIME) ?: "video/avc"
-            val inputWidth = videoFormat.getInteger(MediaFormat.KEY_WIDTH)
-            val inputHeight = videoFormat.getInteger(MediaFormat.KEY_HEIGHT)
             val outputWidth = getScaledWidth(videoFormat)
             val outputHeight = getScaledHeight(videoFormat)
             
@@ -491,12 +494,8 @@ class UploaderBahaImg {
             }
 
             // 3. 原始檔案超過限制，進行壓縮
-            val compressedBytes = compressMedia(context, uri, mediaType)
-            
-            if (compressedBytes == null) {
-                // 壓縮失敗
-                return Pair(null, false)
-            }
+            val compressedBytes = compressMedia(context, uri, mediaType) ?: // 壓縮失敗
+            return Pair(null, false)
 
             // 4. 檢查壓縮後的大小
             if (compressedBytes.size <= sizeLimit) {
@@ -506,7 +505,7 @@ class UploaderBahaImg {
 
             // 5. 壓縮後仍超過限制
             return Pair(null, false)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             Pair(null, false)
         }
     }
@@ -518,15 +517,13 @@ class UploaderBahaImg {
         var result: String? = null
         if (uri.scheme == "content") {
             val cursor = context.contentResolver.query(uri, null, null, null, null)
-            try {
+            cursor.use { cursor ->
                 if (cursor != null && cursor.moveToFirst()) {
                     val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     if (index != -1) {
                         result = cursor.getString(index)
                     }
                 }
-            } finally {
-                cursor?.close()
             }
         }
         if (result == null) {
@@ -558,7 +555,7 @@ class UploaderBahaImg {
             }
 
             // 3. 先檢查原始大小，決定是否需要壓縮
-            val (mediaBytes, wasCompressed) = getMediaBytesWithCompressionCheck(context, imageUri, mediaType)
+            val (mediaBytes, _) = getMediaBytesWithCompressionCheck(context, imageUri, mediaType)
             if (mediaBytes == null) {
                 val sizeLimit = getFileSizeLimit(mediaType)
                 val limitMB = sizeLimit / (1024 * 1024)
@@ -589,11 +586,11 @@ class UploaderBahaImg {
                 }
 
                 override fun onResponse(call: Call, response: Response) {
-                    val responseBody = response.body?.string()
+                    val responseBody = response.body.string()
 
-                    if (response.isSuccessful && responseBody != null) {
+                    if (response.isSuccessful) {
                         try {
-                            val result = gson.fromJson(responseBody, bahaImgResponse::class.java)
+                            val result = gson.fromJson(responseBody, BahaImgResponse::class.java)
                             if (result.url.isNotEmpty()) {
                                 // 成功：回傳 bahaImg 託管後的直接圖片網址
                                 callback.onSuccess(result.url)

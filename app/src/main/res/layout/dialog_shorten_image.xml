@@ -9,19 +9,32 @@
         android:layout_height="match_parent"
         android:background="?attr/bahamut_pageBackground"
         android:layout_margin="3dp">
-        <com.kota.telnetUI.textView.TelnetTextViewLarge
-            android:id="@+id/dialog_title"
-            style="@style/TextViewLarge"
+        <RelativeLayout
+            android:id="@+id/dialog_header"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:background="?attr/bahamut_dialogTitleBackground"
-            android:text="@string/dialog_shorten_img_title"
-            android:textColor="?attr/bahamut_dialogTitleTextColor"
-            android:layout_alignParentTop="true" />
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true">
+            <com.kota.telnetUI.textView.TelnetTextViewLarge
+                android:id="@+id/dialog_title"
+                style="@style/TextViewLarge"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="?attr/bahamut_dialogTitleBackground"
+                android:text="@string/dialog_shorten_img_title"
+                android:textColor="?attr/bahamut_dialogTitleTextColor" />
+            <Button
+                android:id="@+id/dialog_shorten_image_host"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:text="@string/dialog_shorten_image_host"
+                android:textColor="?attr/bahamut_dialogTitleTextColor"
+                android:background="?attr/bahamut_dialogItemBackground"
+                android:layout_alignParentEnd="true"/>
+        </RelativeLayout>
         <View
             android:id="@+id/dialog_title_divider"
             style="@style/HorizontalDivider"
-            android:layout_below="@id/dialog_title" />
+            android:layout_below="@id/dialog_header" />
         <LinearLayout
             android:id="@+id/dialog_shorten_url_middle_linear_layout"
             android:layout_width="match_parent"

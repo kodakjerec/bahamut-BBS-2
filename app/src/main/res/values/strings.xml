@@ -295,6 +295,7 @@
     <string name="dialog_shorten_image_album">相簿</string>
     <string name="dialog_shorten_image_camera_shot">拍照</string>
     <string name="dialog_shorten_image_camera_video">錄影</string>
+    <string name="dialog_shorten_image_host">圖床</string>
     <string name="dialog_shorten_image_hint">1. 選擇從\"相簿\"選取圖片或影片，或者\"拍照\"\"錄影\"取得圖片或影片\n2. 按鈕\"縮圖\"產生catbox短網址\n3. 按鈕\"送出\"貼到文章內</string>
     <string name="dialog_shorten_image_error02">圖片轉檔有問題，無法上傳</string>
     <string name="dialog_shorten_image_error03">上傳失敗</string>

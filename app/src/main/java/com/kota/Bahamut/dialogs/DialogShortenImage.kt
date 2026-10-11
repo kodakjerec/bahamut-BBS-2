@@ -31,6 +31,7 @@ import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import com.bumptech.glide.Glide
 import com.kota.Bahamut.PageContainer
 import com.kota.Bahamut.R
@@ -98,6 +99,15 @@ class DialogShortenImage : AppCompatActivity(), OnClickListener {
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_album).setOnClickListener(selectImageListener)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_shot).setOnClickListener(selectCameraListener)
         mainLayout.findViewById<Button>(R.id.dialog_shorten_image_camera_video).setOnClickListener(selectVideoListener)
+        mainLayout.findViewById<Button>(R.id.dialog_shorten_image_host)?.setOnClickListener {
+            val intent = Intent(Intent.ACTION_VIEW, "https://imgbr.kodakjerec.workers.dev/".toUri())
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            try {
+                startActivity(intent)
+            } catch (e: Exception) {
+                Log.e(javaClass.simpleName, e.message.toString())
+            }
+        }
         transferButton = mainLayout.findViewById(R.id.dialog_shorten_image_transfer)
         transferButton?.setOnClickListener(transferListener)
         sendButton = mainLayout.findViewById(R.id.send)
