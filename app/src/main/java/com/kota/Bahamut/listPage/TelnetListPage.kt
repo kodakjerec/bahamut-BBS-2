@@ -454,22 +454,20 @@ abstract class TelnetListPage : TelnetPage(), ListAdapter, OnItemClickListener,
 
     /** 檢查指定的文章編號是否正在載入中，通常用於在 UI 上顯示載入狀態 */
     fun isLoadingBlock(itemIndex: Int): Boolean {
-        var result: Boolean
-        result = false
-        if (executingCommand != null && executingCommand?.action == 0) {
-            val loadBlockCommand = executingCommand as BahamutCommandLoadBlock
-            result = loadBlockCommand.containsArticle(itemIndex)
+        var result = false
+        val currentCommand = executingCommand
+        if (currentCommand != null && currentCommand.action == 0) {
+            val loadBlockCommand = currentCommand as? BahamutCommandLoadBlock
+            if (loadBlockCommand != null) {
+                result = loadBlockCommand.containsArticle(itemIndex)
+            }
         }
         if (!result) {
-            val it = loadCommandStack.iterator()
-            while (true) {
-                if (!it.hasNext()) {
-                    break
-                }
-                val command = it.next()
+            val commands = loadCommandStack.toTypedArray()
+            for (command in commands) {
                 if (command != null && command.action == 0) {
-                    val loadBlockCommand2 = command as BahamutCommandLoadBlock
-                    if (loadBlockCommand2.containsArticle(itemIndex)) {
+                    val loadBlockCommand2 = command as? BahamutCommandLoadBlock
+                    if (loadBlockCommand2 != null && loadBlockCommand2.containsArticle(itemIndex)) {
                         result = true
                         break
                     }

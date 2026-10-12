@@ -35,6 +35,7 @@ import com.kota.asFramework.dialog.ASAlertDialog
 import com.kota.asFramework.dialog.ASListDialog
 import com.kota.asFramework.dialog.ASListDialogItemClickListener
 import com.kota.asFramework.dialog.ASProcessingDialog
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast
@@ -254,7 +255,9 @@ class ArticleEssencePage() : TelnetPage(), View.OnClickListener, SendMailPageLis
 
     override fun clear() {
         ThumbnailItemView.clearManualLoadedUrls()
+        telnetArticle?.clear()
         telnetArticle = null
+        ASCoroutine.ensureMainThread { listAdapter.notifyDataSetChanged() }
     }
 
     override fun onClick(aView: View) {

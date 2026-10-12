@@ -910,9 +910,12 @@ class ArticlePage : TelnetPage() {
     }
 
     override fun clear() {
-        ThumbnailItemView.clearManualLoadedUrls()
-        telnetArticle?.clear()
-        telnetArticle = null
+        ASCoroutine.ensureMainThread {
+            ThumbnailItemView.clearManualLoadedUrls()
+            telnetArticle?.clear()
+            telnetArticle = null
+            listAdapter.notifyDataSetChanged()
+        }
         super.clear()
     }
 

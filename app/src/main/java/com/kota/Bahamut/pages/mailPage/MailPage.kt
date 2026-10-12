@@ -18,11 +18,12 @@ import com.kota.Bahamut.pages.articlePage.ArticlePageItemType
 import com.kota.Bahamut.pages.articlePage.ArticlePageTelnetItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTextItemView
 import com.kota.Bahamut.pages.articlePage.ArticlePageTimeTimeView
-import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.pages.articlePage.ArticleViewMode
+import com.kota.Bahamut.pages.articlePage.ThumbnailItemView
 import com.kota.Bahamut.service.CommonFunctions.getContextString
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.dismissProcessingDialog
 import com.kota.asFramework.dialog.ASProcessingDialog.Companion.showProcessingDialog
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASListView
 import com.kota.asFramework.ui.ASScrollView
 import com.kota.asFramework.ui.ASToast.showShortToast
@@ -218,7 +219,9 @@ class MailPage : TelnetPage(), ListAdapter, View.OnClickListener, SendMailPageLi
 
     override fun clear() {
         ThumbnailItemView.clearManualLoadedUrls()
+        telnetArticle?.clear()
         telnetArticle = null
+        ASCoroutine.ensureMainThread { mDataSetObservable.notifyChanged() }
     }
 
     override fun onClick(aView: View) {
