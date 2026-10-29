@@ -182,7 +182,7 @@ export default {
 
         // 讀取圖片或影片
         const filename = url.pathname.slice(1);
-        if (!filename) return new Response("Not found", { status: 404 });
+        if (!filename) return Response.redirect("https://imgbr.kodakjerec.workers.dev/", 302);
 
         const objects = await env.IMAGES.list({
             prefix: "uploads"
