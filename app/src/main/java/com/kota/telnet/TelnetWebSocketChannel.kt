@@ -66,6 +66,17 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
 
             override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
                 isConnected = false
+                try {
+                    webSocket.close(1000, null)
+                } catch (_: Exception) {
+                }
+                synchronized(readLock) {
+                    (readLock as Object).notifyAll()
+                }
+            }
+
+            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+                isConnected = false
                 synchronized(readLock) {
                     (readLock as Object).notifyAll()
                 }
@@ -165,9 +176,15 @@ class TelnetWebSocketChannel(serverUrl: String) : TelnetSocketChannel {
 
     @Throws(IOException::class)
     override fun finishConnect(): Boolean {
+        isConnected = false
+        synchronized(readLock) {
+            (readLock as Object).notifyAll()
+        }
         if (webSocket != null) {
-            webSocket.close(1000, "Normal closure")
-            isConnected = false
+            try {
+                webSocket.close(1000, "Normal closure")
+            } catch (_: Exception) {
+            }
         }
 
         // 2. 停止等待中的非同步任務 (Dispatchers)

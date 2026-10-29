@@ -212,12 +212,22 @@ class TelnetConnector : TelnetChannelListener {
     }
 
     fun close() {
+        val shouldNotifyClosed: Boolean
+        synchronized(this) {
+            if (!this.isConnecting && this.socketChannel == null) {
+                return
+            }
+            this.isConnecting = false
+            shouldNotifyClosed = true
+        }
         // 關閉連線時釋放鎖定
         if (this.deviceController != null) {
             this.deviceController?.unlockWifi()
         }
         clear()
-        this.connectorListener.onTelnetConnectorClosed(this)
+        if (shouldNotifyClosed) {
+            this.connectorListener.onTelnetConnectorClosed(this)
+        }
     }
 
     private fun getChannel(channel: Int): TelnetChannel? {
