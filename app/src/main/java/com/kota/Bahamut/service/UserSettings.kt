@@ -124,7 +124,14 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_SHORT_URL_RESTORE: String = "ShortUrlRestore" // 短網址,開啟還原網址
         const val PROPERTIES_RESTORE_URLS_VERSION: String = "RestoreUrlsVersion" // 還原網址主機清單版本號
         const val PROPERTIES_RESTORE_URLS_LIST: String = "RestoreUrlsList" // 還原網址主機清單 (以逗號分隔)
+        const val PROPERTIES_CLEAR_URL_RULES: String = "ClearUrlRulesJson" // 自訂去識別化極簡版 JSON 規則
         const val RESTORE_URLS_DEFAULT: String = "facebook.com,fb.watch,fb.me,tw.shp.ee" // 預設還原網址主機清單
+        /**
+         * 預設的台灣網站與補充去識別化極簡版 JSON 規則：
+         * - Key 為網域（例如 "shopee.tw"）
+         * - Value 為欲移除的 Query 參數陣列；若填入 ["*"] 代表將 ? 後方的所有參數與字元全部移除
+         */
+        const val CLEAR_URL_RULES_DEFAULT: String = """{"shopee.tw":["*"],"facebook.com":["rdid","share_url"]}"""
         const val PROPERTIES_WEB_SIGN_IN: String = "WebSignIn" // 開啟網頁登入
         const val PROPERTIES_WEB_USERNAME: String = "WebUsername" // Web 登入帳號 (不雲端同步)
         const val PROPERTIES_WEB_PASSWORD: String = "WebPassword" // Web 登入密碼 (不雲端同步)
@@ -163,6 +170,7 @@ class UserSettings(var myContext: Context) {
             NON_VIP_SHORTEN_TIMES_LIMIT,
             PROPERTIES_RESTORE_URLS_VERSION,
             PROPERTIES_RESTORE_URLS_LIST,
+            PROPERTIES_CLEAR_URL_RULES,
             "upgrade"
         )
 
@@ -761,11 +769,29 @@ class UserSettings(var myContext: Context) {
             }
 
         /**
-         * 於登入成功後在背景協程執行，向 Cloudflare 檢查並更新「還原網址」主機清單：
+         * 取得或設定本機儲存的「自訂去識別化極簡版 JSON 規則」字串：
+         * 格式範例：`{"shopee.tw":["*"],"facebook.com":["rdid","share_url"]}`
+         */
+        @JvmStatic
+        var clearUrlRulesJson: String
+            get() = mySharedPref?.getString(
+                PROPERTIES_CLEAR_URL_RULES,
+                CLEAR_URL_RULES_DEFAULT
+            )?.ifBlank { CLEAR_URL_RULES_DEFAULT } ?: CLEAR_URL_RULES_DEFAULT
+            set(jsonStr) {
+                myEditor?.putString(
+                    PROPERTIES_CLEAR_URL_RULES,
+                    jsonStr
+                )?.commit()
+            }
+
+        /**
+         * 於登入成功後在背景協程執行，向 Cloudflare 檢查並更新「還原網址」主機清單與自訂「去識別化規則」：
          * 1. 先請求 `/version` 取得雲端最新 `version` 編號。
          * 2. 比對雲端版本號與本機 SharedPreferences 儲存的 `restoreUrlsVersion`：
          *    僅在雲端版本號大於本機版本號（或本機尚未寫入過清單）時，才進一步請求 `/config`。
-         * 3. 從 `/config` 下載 JSON，解析 `urls` 陣列與 `version` 後替換本機 SharedPreferences 中的清單與版本號。
+         * 3. 從 `/config` 下載 JSON，解析 `urls` 陣列、`clearRules` 物件（若有提供）與 `version` 後，
+         *    替換本機 SharedPreferences 中的清單、去識別化規則與版本號。
          */
         @JvmStatic
         fun syncRestoreUrlsConfig() {
@@ -796,7 +822,7 @@ class UserSettings(var myContext: Context) {
                         return@runInNewCoroutine
                     }
 
-                    // 步驟 3：有新版本，下載完整 config JSON 並替換本機端 urls 與 version
+                    // 步驟 3：有新版本，下載完整 config JSON 並替換本機端 urls、clearRules 與 version
                     val configRequest = Request.Builder()
                         .url(configUrl)
                         .get()
@@ -807,21 +833,29 @@ class UserSettings(var myContext: Context) {
                         val bodyStr = response.body.string()
                         val jsonObject = JSONObject(bodyStr)
                         val newVersion = jsonObject.optInt("version", remoteVersion)
-                        val urlsArray = jsonObject.optJSONArray("urls") ?: return@use
+                        val urlsArray = jsonObject.optJSONArray("urls")
+                        val clearRulesObj = jsonObject.optJSONObject("clearRules")
 
-                        val newUrls = mutableListOf<String>()
-                        for (i in 0 until urlsArray.length()) {
-                            val domain = urlsArray.optString(i, "").trim().lowercase()
-                            if (domain.isNotEmpty()) {
-                                newUrls.add(domain)
+                        if (urlsArray != null) {
+                            val newUrls = mutableListOf<String>()
+                            for (i in 0 until urlsArray.length()) {
+                                val domain = urlsArray.optString(i, "").trim().lowercase()
+                                if (domain.isNotEmpty()) {
+                                    newUrls.add(domain)
+                                }
+                            }
+                            if (newUrls.isNotEmpty()) {
+                                restoreUrlsList = newUrls
                             }
                         }
 
-                        if (newUrls.isNotEmpty()) {
-                            restoreUrlsList = newUrls
-                            restoreUrlsVersion = newVersion
-                            Log.d("UserSettings", "Restore URLs updated to version $newVersion: $newUrls")
+                        // 若雲端 JSON 有提供 clearRules 欄位，一併更新至本機 SharedPreferences
+                        if (clearRulesObj != null && clearRulesObj.length() > 0) {
+                            clearUrlRulesJson = clearRulesObj.toString()
                         }
+
+                        restoreUrlsVersion = newVersion
+                        Log.d("UserSettings", "Restore URLs config updated to version $newVersion")
                     }
                 } catch (e: Exception) {
                     Log.e("UserSettings", "syncRestoreUrlsConfig failed: ${e.message}")

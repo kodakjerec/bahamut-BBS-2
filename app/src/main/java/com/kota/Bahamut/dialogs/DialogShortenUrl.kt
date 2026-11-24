@@ -30,6 +30,7 @@ import fe.clearurlskt.ClearUrlSettings
 import fe.clearurlskt.ClearUrls
 import fe.clearurlskt.Resource
 import fe.clearurlskt.config.loader.BundledClearURLConfigLoader
+import fe.clearurlskt.config.provider.ProviderV1
 import fe.std.result.isSuccess
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -60,14 +61,110 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     private var mOrientationEventListener: OrientationEventListener
 
     /**
+     * 將極簡版 JSON 去識別化規則（`UserSettings.clearUrlRulesJson`）自動轉換為 `clearurlkt` 的 `List<ProviderV1>`。
+     *
+     * 極簡版 JSON 格式範例：
+     * ```json
+     * {
+     *   "shopee.tw": ["*"],
+     *   "momoshop.com.tw": ["*"],
+     *   "facebook.com": ["rdid", "share_url"],
+     *   "pchome.com.tw": ["utm_.*", "from"]
+     * }
+     * ```
+     *
+     * 轉換與計算過程說明：
+     * 1. 讀取 JSON 物件的每個 Key（即目標網域，例如 `"shopee.tw"`），將網域中的 `.` 轉義為 `\.`，
+     *    並自動組裝成可匹配主網域與所有子網域的正則表達式：`^https?://(?:[a-z0-9-]+\.)*?shopee\.tw`。
+     * 2. 解析對應的字串陣列 Value：
+     *    - 若陣列中包含 `"*"` 或 `".*"`：代表要將 `?` 後方所有參數全部移除，
+     *      因此自動設定 `rules = listOf(Regex(".*"))` 與 `rawRules = listOf(Regex("""\?.*"""))`。
+     *    - 若為一般參數名稱或正則（如 `"rdid"`、`"utm_.*"`）：自動加上首尾錨點 `^...$` 轉為不分大小寫的 `Regex`，
+     *      僅精準移除指定的追蹤參數，保留該網址的其他必要參數。
+     *
+     * @param jsonStr 極簡版去識別化規則的 JSON 字串
+     * @return 轉換後的 `ProviderV1` 規則清單
+     */
+    private fun parseSimpleClearRulesToProviders(jsonStr: String): List<ProviderV1> {
+        val providers = mutableListOf<ProviderV1>()
+        try {
+            val jsonObject = JSONObject(jsonStr)
+            val keys = jsonObject.keys()
+            var index = 0
+            while (keys.hasNext()) {
+                val domain = keys.next().trim().lowercase()
+                if (domain.isEmpty()) continue
+                val rulesArray = jsonObject.optJSONArray(domain) ?: continue
+
+                // 將網域中的 "." 轉義為 "\."，組裝成匹配 http/https 及任意子網域的 urlPattern
+                val escapedDomain = domain.replace(".", "\\.")
+                val urlRegex = Regex("""^https?://(?:[a-z0-9-]+\.)*?$escapedDomain""", RegexOption.IGNORE_CASE)
+
+                var removeAllQuery = false
+                val ruleRegexList = mutableListOf<Regex>()
+
+                for (i in 0 until rulesArray.length()) {
+                    val ruleStr = rulesArray.optString(i, "").trim()
+                    if (ruleStr.isEmpty()) continue
+                    if (ruleStr == "*" || ruleStr == ".*") {
+                        removeAllQuery = true
+                        break
+                    } else {
+                        // 自動補上 ^ 與 $ 錨點以精準匹配參數名稱
+                        val pattern = if (ruleStr.startsWith("^") || ruleStr.endsWith("$")) {
+                            ruleStr
+                        } else {
+                            "^$ruleStr$"
+                        }
+                        ruleRegexList.add(Regex(pattern, RegexOption.IGNORE_CASE))
+                    }
+                }
+
+                if (removeAllQuery) {
+                    providers.add(
+                        ProviderV1(
+                            sortPosition = index++,
+                            key = "custom_${domain.replace(".", "_")}",
+                            url = urlRegex,
+                            completeProvider = false,
+                            rules = listOf(Regex(".*")),
+                            rawRules = listOf(Regex("""\?.*""")),
+                            referralMarketing = emptyList(),
+                            exceptions = emptyList(),
+                            redirections = emptyList()
+                        )
+                    )
+                } else if (ruleRegexList.isNotEmpty()) {
+                    providers.add(
+                        ProviderV1(
+                            sortPosition = index++,
+                            key = "custom_${domain.replace(".", "_")}",
+                            url = urlRegex,
+                            completeProvider = false,
+                            rules = ruleRegexList,
+                            rawRules = emptyList(),
+                            referralMarketing = emptyList(),
+                            exceptions = emptyList(),
+                            redirections = emptyList()
+                        )
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(javaClass.simpleName, "parseSimpleClearRulesToProviders failed: ${e.message}")
+        }
+        return providers
+    }
+
+    /**
      * 去識別化規則引擎 (ClearURLs)：
-     * 延遲載入套件內建的 clearurls.json 規則集，若載入成功則取出所有網站的規則清單，
-     * 失敗則退回空清單，避免初始化例外。
+     * 延遲載入套件內建的 clearurls.json 規則集，並合併由極簡版 JSON (`UserSettings.clearUrlRulesJson`) 轉換而成的自訂規則。
      */
     private val clearUrls by lazy {
         val result = BundledClearURLConfigLoader(Resource::class.java).load()
-        val providers = if (result.isSuccess()) result.value.orEmpty() else emptyList()
-        ClearUrls(providers)
+        val bundledProviders = if (result.isSuccess()) result.value.orEmpty() else emptyList()
+        val customProviders = parseSimpleClearRulesToProviders(UserSettings.clearUrlRulesJson)
+        ClearUrls(bundledProviders + customProviders)
     }
 
     /**
@@ -361,38 +458,14 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
     /**
      * 清除網址中的追蹤與識別參數（去識別化）：
-     * 1. 先透過 ClearURLs 規則庫移除各平台常見的追蹤參數（如 utm_*、mibextid、__cft__ 等）。
-     * 2. 針對在「還原網址」主機清單內且轉址後額外附加 `rdid` 與 `share_url` 參數的網址（ClearURLs 舊規則未涵蓋），
-     *    拆解 Uri 的 Query 參數逐一過濾並重新組裝，同時保留 `story_fbid`、`id`、`fbid` 等必要貼文參數。
+     * 透過 ClearURLs 規則引擎（包含套件內建規則與 `customClearUrlProviders` 自訂台灣網站規則）移除追蹤參數。
      *
      * @param url 待清理的網址字串
      * @return 移除追蹤參數後的乾淨網址
      */
     private fun cleanUrlParams(url: String): String {
-        // 步驟 1：使用 ClearURLs 規則進行初步清理
         val (cleanedUrl, _) = clearUrls.clearUrl(url, ClearUrlSettings(skipUnchanged = true))
-        return try {
-            val uri = cleanedUrl.toUri()
-            // 步驟 2：若屬於還原網址主機清單網域且含有 rdid 或 share_url 追蹤參數，重建 Query 部分並剔除這兩個參數
-            if (isMatchedRestoreHost(cleanedUrl) &&
-                (uri.getQueryParameter("rdid") != null || uri.getQueryParameter("share_url") != null)
-            ) {
-                val builder = uri.buildUpon().clearQuery()
-                for (name in uri.queryParameterNames) {
-                    if (name != "rdid" && name != "share_url") {
-                        // 同名參數可能有多個值，逐一加回 Builder
-                        for (value in uri.getQueryParameters(name)) {
-                            builder.appendQueryParameter(name, value)
-                        }
-                    }
-                }
-                builder.build().toString()
-            } else {
-                cleanedUrl
-            }
-        } catch (_: Exception) {
-            cleanedUrl
-        }
+        return cleanedUrl
     }
 
     /**
