@@ -13,7 +13,16 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://www.jitpack.io' }
+        maven {
+            url 'https://www.jitpack.io'
+            content {
+                excludeGroupByRegex "com\\.gitlab\\.grrfe.*"
+            }
+        }
+        maven { url 'https://gitlab.com/api/v4/projects/47594051/packages/maven' }
+        maven { url 'https://gitlab.com/api/v4/projects/23062172/packages/maven' }
+        maven { url 'https://gitlab.com/api/v4/projects/72253145/packages/maven' }
+        maven { url 'https://gitlab.com/api/v4/projects/69501388/packages/maven' }
     }
 }
 rootProject.name = "bahamut-BBS-2"

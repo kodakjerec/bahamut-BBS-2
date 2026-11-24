@@ -335,6 +335,9 @@ class LoginPage : TelnetPage() {
         // 雲端同步
         SyncManager.performLoginSync()
 
+        // 背景檢查並更新「還原網址」主機清單設定
+        UserSettings.syncRestoreUrlsConfig()
+
         // 調用 Web 登入與自動簽到
         if (checkWebSignIn || UserSettings.propertiesWebSignIn) {
             WebAutoSignInManager.onLoginSuccess(context)

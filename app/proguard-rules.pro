@@ -25,3 +25,5 @@
 -keep class com.kota.Bahamut.pages.model.** { *; }
 -keep class com.kota.Bahamut.service.** { *; }
 -keep class com.kota.telnet.model.** { *; }
+-keep class fe.clearurlskt.** { *; }
+-keepdirectories fe/clearurlskt

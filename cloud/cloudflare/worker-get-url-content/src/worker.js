@@ -1,5 +1,3 @@
-const cheerio = require('cheerio');
-
 // ===== 辅助函数：URL 正规化 =====
 function normalizeUrl(imgUrl, pageUrl) {
 	if (!imgUrl) return "";
@@ -11,6 +9,75 @@ function normalizeUrl(imgUrl, pageUrl) {
 	} catch (e) {
 		return imgUrl;
 	}
+}
+
+// ===== 辅助函数：依据图片网址副档名取得 Content-Type =====
+function getImageContentType(url) {
+	if (!url) return "";
+	const ext = url.split('.').pop()?.split(/[?#]/)[0]?.toLowerCase();
+	switch (ext) {
+		case "jpg":
+		case "jpeg":
+			return "image/jpeg";
+		case "png":
+			return "image/png";
+		case "gif":
+			return "image/gif";
+		case "webp":
+			return "image/webp";
+		case "svg":
+			return "image/svg+xml";
+		case "avif":
+			return "image/avif";
+		case "bmp":
+			return "image/bmp";
+		case "mp4":
+			return "video/mp4";
+		default:
+			return "image/jpeg";
+	}
+}
+
+// ===== 辅助函数：解析 JSON-LD =====
+function parseJsonLdFromHtml(html) {
+	let result = null;
+	const regex = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+	let match;
+	const supportedTypes = [
+		'Article', 'NewsArticle', 'BlogPosting', 'WebPage',
+		'VideoObject', 'ImageObject', 'WebSite', 'ProfilePage', 'CollectionPage'
+	];
+
+	const processData = (item) => {
+		if (!item || typeof item !== 'object') return;
+		const type = item["@type"];
+		if (supportedTypes.includes(type)) {
+			if (!result) result = {};
+			if (item.headline && !result.headline) result.headline = item.headline;
+			if (item.description && !result.description) result.description = item.description;
+
+			let img = item.image;
+			if (Array.isArray(img) && img.length > 0) img = img[0];
+			if (img && typeof img === 'object') {
+				img = img.url || img.contentUrl || "";
+			}
+			if (img && typeof img === 'string' && !result.image) result.image = img;
+		}
+	};
+
+	while ((match = regex.exec(html)) !== null) {
+		try {
+			const data = JSON.parse(match[1]);
+			if (data['@graph'] && Array.isArray(data['@graph'])) {
+				data['@graph'].forEach(processData);
+			} else if (Array.isArray(data)) {
+				data.forEach(processData);
+			} else {
+				processData(data);
+			}
+		} catch (e) {}
+	}
+	return result;
 }
 
 export default {
@@ -36,6 +103,7 @@ export default {
 		const descFromFront = getFormData.get("description") || "";
 		const imageUrlFromFront = getFormData.get("imageUrl") || "";
 		const contentTypeFromFront = getFormData.get("contentType") || "";
+		const forceRefresh = getFormData.get("refresh") === "true" || getFormData.get("noCache") === "true";
 
 		// 連接 D1 資料庫
 		const { DATABASE } = env;
@@ -61,27 +129,42 @@ export default {
 				});
 			}
 
-			// 檢查是否有相同 URL 的資料
-			const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(fromUrl);
-			const { results } = await stmt.all();
-			if (results && results.length > 0) {
-				let cachedContentType = results[0].contentType || "";
-				let cachedImageUrl = results[0].imageUrl || "";
-				cachedImageUrl = normalizeUrl(cachedImageUrl, fromUrl);
+			// 檢查是否有相同 URL 的資料 (除非指定 forceRefresh)
+			if (!forceRefresh) {
+				const stmt = DATABASE.prepare('SELECT * FROM urls WHERE url = ?').bind(fromUrl);
+				const { results } = await stmt.all();
+				if (results && results.length > 0) {
+					let cachedContentType = results[0].contentType || "";
+					let cachedImageUrl = results[0].imageUrl || "";
+					cachedImageUrl = normalizeUrl(cachedImageUrl, fromUrl);
 
-				return Response.json({
-					title: results[0].title || "",
-					desc: results[0].desc || "",
-					imageUrl: cachedImageUrl,
-					contentType: cachedContentType,
-					isMedia: cachedContentType.startsWith("image/") || cachedContentType.startsWith("video/") || cachedContentType.startsWith("audio/")
-				});
+					// 如果是 meee 圖床，驗證快取的 imageUrl 是否為有效直連網址 (必須包含 i.meee.com.tw)
+					const isMeeeUrl = fromUrl.includes("meee.com.tw") || fromUrl.includes("meee");
+					if (isMeeeUrl) {
+						if (!cachedImageUrl || !cachedImageUrl.includes("i.meee.com.tw")) {
+							cachedImageUrl = ""; // 快取為無效/錯誤網址，強制重新爬取
+						} else {
+							cachedContentType = getImageContentType(cachedImageUrl);
+						}
+					}
+
+					if (!isMeeeUrl || cachedImageUrl) {
+						return Response.json({
+							title: results[0].title || "",
+							desc: isMeeeUrl ? "" : (results[0].desc || ""),
+							imageUrl: cachedImageUrl,
+							contentType: cachedContentType,
+							isMedia: cachedContentType.startsWith("image/") || cachedContentType.startsWith("video/") || cachedContentType.startsWith("audio/")
+						});
+					}
+				}
 			}
 
 			let myUrl = fromUrl;
 			let urlStructure = new URL(myUrl);
 			let isTwitter = false;
 			let isYoutube = false;
+			let isMeee = urlStructure.hostname.includes("meee");
 			let title = "";
 			let desc = "";
 			let imageUrl = "";
@@ -149,7 +232,7 @@ export default {
 				headers.cookie = "over18=1";
 			}
 
-			// ===== 新增 HEAD Request 判斷是否為 Media =====
+			// ===== HEAD Request 判斷是否為 Media =====
 			if (!isTwitter && !isYoutube) {
 				let headContentType = "";
 				try {
@@ -178,10 +261,10 @@ export default {
 				}
 			}
 
-			// ===== 發送 GET 請求並限制下載範圍 (256KB) =====
+			// ===== 發送 GET 請求並限制下載範圍 (256KB，meee 頁面包含龐大 CSS 故不限制) =====
 			let responseFrom = await fetch(myUrl, {
 				method: "GET",
-				headers: (isTwitter || isYoutube) ? headers : {
+				headers: (isTwitter || isYoutube || isMeee) ? headers : {
 					...headers,
 					"Range": "bytes=0-262144"
 				},
@@ -218,34 +301,174 @@ export default {
 				}
 			} else {
 				if (contentType.indexOf("text/html") > -1 || contentType.indexOf("application/xhtml+xml") > -1) {
-					// 将HTML文本解码并解析
+					// 将HTML文本解码
 					let decoder = new TextDecoder(charset);
 					const html = await responseFrom.arrayBuffer();
 					const htmlBuffer = decoder.decode(html);
-					const soup = cheerio.load(htmlBuffer);
-					const originHtml = soup.html();
-					
+
+					// 使用 Cloudflare 原生 HTMLRewriter 解析 HTML（0 外部依賴）
+					let pageTitle = "";
+					let metaMap = {};
+					let metaCount = 0;
+					let titleCount = 0;
+					let hasBody = false;
+					let iconUrl = "";
+					let amazonImage = "";
+					let pttImage = "";
+					let currentTitle = "";
+
+					const rewriter = new HTMLRewriter()
+						.on("title", {
+							element() {
+								titleCount++;
+								currentTitle = "";
+							},
+							text(chunk) {
+								currentTitle += chunk.text;
+								if (chunk.lastInTextNode && !pageTitle) {
+									pageTitle = currentTitle.trim();
+								}
+							}
+						})
+						.on("meta", {
+							element(el) {
+								metaCount++;
+								const name = el.getAttribute("name")?.toLowerCase();
+								const property = el.getAttribute("property")?.toLowerCase();
+								const content = el.getAttribute("content");
+								if (content) {
+									if (property && !metaMap[property]) metaMap[property] = content;
+									if (name && !metaMap[name]) metaMap[name] = content;
+								}
+							}
+						})
+						.on("link", {
+							element(el) {
+								const rel = el.getAttribute("rel")?.toLowerCase() || "";
+								const href = el.getAttribute("href");
+								if (href && rel.includes("icon") && !iconUrl) {
+									iconUrl = href;
+								}
+							}
+						})
+						.on("#landingImage", {
+							element(el) {
+								const src = el.getAttribute("src");
+								if (src && !amazonImage) amazonImage = src;
+							}
+						})
+						.on("div.richcontent img", {
+							element(el) {
+								const src = el.getAttribute("src");
+								if (src && !pttImage) pttImage = src;
+							}
+						})
+						.on("body", {
+							element() {
+								hasBody = true;
+							}
+						});
+
+					await rewriter.transform(new Response(htmlBuffer)).text();
+
+					// 计算 Head 大小
+					const headMatch = htmlBuffer.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+					const headSize = headMatch ? headMatch[1].length : 0;
+
 					// 记录HTML大小和基本信息
 					const parseMetrics = {
 						htmlSize: htmlBuffer.length,
 						charset: charset,
-						hasBody: soup("body").length > 0,
-						headSize: soup("head").html()?.length || 0,
-						metaTags: soup("meta").length,
-						titleTags: soup("title").length
+						hasBody: hasBody,
+						headSize: headSize,
+						metaTags: metaCount,
+						titleTags: titleCount
 					};
-					
+
 					// Parse JSON-LD
-					const jsonLd = parseJsonLd(soup);
+					const jsonLd = parseJsonLdFromHtml(htmlBuffer);
 
 					// ===== 提取标题 =====
-					title = extractPageTitle(soup, jsonLd);
-					
+					title = pageTitle || 
+							metaMap["og:title"] || 
+							metaMap["twitter:title"] || 
+							(jsonLd && jsonLd.headline ? jsonLd.headline : "");
+
 					// ===== 提取描述 =====
-					desc = extractPageDescription(soup, jsonLd);
-					
+					desc = (
+						metaMap["description"] || 
+						metaMap["og:description"] || 
+						metaMap["twitter:description"] || 
+						(jsonLd && jsonLd.description ? jsonLd.description : "")
+					);
+
 					// ===== 提取图片 =====
-					imageUrl = extractPageImage(soup, originHtml, urlStructure, jsonLd);
+					const hostname = urlStructure.hostname;
+					const siteImageExtractors = {
+						"ptt": () => pttImage,
+						"iherb": () => metaMap["og:images"] || "",
+						"amazon": () => amazonImage || "",
+						"meee": () => {
+							// 1. 優先從 __NUXT_DATA__ 精準擷取上傳的圖片檔名（避免網址搜尋誤判）
+							const nuxtMatch = htmlBuffer.match(/<script[^>]*id="__NUXT_DATA__"[^>]*>([\s\S]*?)<\/script>/i);
+							if (nuxtMatch) {
+								const fileMatch = nuxtMatch[1].match(/["']([a-zA-Z0-9_-]+\.(?:png|jpe?g|gif|webp|svg|avif|bmp|mp4))["']/i);
+								if (fileMatch) {
+									return `https://i.meee.com.tw/${fileMatch[1]}`;
+								}
+							}
+
+							// 2. 備案：從網址 ID 搜尋帶有副檔名的檔案名稱
+							let id = "";
+							try {
+								id = decodeURIComponent(urlStructure.pathname.replace(/^\/+|\/+$/g, '').split('/')[0]);
+							} catch (e) {
+								id = urlStructure.pathname.replace(/^\/+|\/+$/g, '').split('/')[0];
+							}
+
+							if (id) {
+								const idMatch = htmlBuffer.match(new RegExp(`(?:["'\\\\/]|\\b)(${id}\\.[a-zA-Z0-9]+)(?:["'\\\\/\\s,;]|\\b)`, 'i'));
+								if (idMatch) {
+									return `https://i.meee.com.tw/${idMatch[1]}`;
+								}
+
+								const looseMatch = htmlBuffer.match(new RegExp(`${id}\\.[a-zA-Z0-9]+`, 'i'));
+								if (looseMatch) {
+									return `https://i.meee.com.tw/${looseMatch[0]}`;
+								}
+							}
+
+							return "";
+						}
+					};
+
+					for (const [siteKeyword, extractor] of Object.entries(siteImageExtractors)) {
+						if (hostname.indexOf(siteKeyword) > -1) {
+							imageUrl = extractor();
+							if (imageUrl) break;
+						}
+					}
+
+					if (!imageUrl) {
+						imageUrl = metaMap["og:image"] ||
+								   metaMap["og:image:url"] ||
+								   metaMap["twitter:image"] ||
+								   metaMap["og:images"] ||
+								   amazonImage ||
+								   (jsonLd && jsonLd.image ? jsonLd.image : "") ||
+								   iconUrl || "";
+					}
+
+					imageUrl = normalizeUrl(imageUrl, urlStructure.href);
+
+					if (isMeee) {
+						if (imageUrl && imageUrl.includes("i.meee.com.tw")) {
+							contentType = getImageContentType(imageUrl);
+							isMedia = true;
+						} else {
+							imageUrl = "";
+						}
+					}
 
 					// Bilibili 特殊處理
 					if (urlStructure.hostname.indexOf("bilibili") > -1) {
@@ -277,7 +500,7 @@ export default {
 					};
 					
 					ctx.waitUntil(
-						env.ANALYTICS.writeDataPoint({
+						env.ANALYTICS?.writeDataPoint?.({
 							indexes: ["getUrl"],
 							blobs: [
 								"parse_result",  // 事件类型
@@ -310,7 +533,7 @@ export default {
 					imageUrl = myUrl;
 					
 					ctx.waitUntil(
-						env.ANALYTICS.writeDataPoint({
+						env.ANALYTICS?.writeDataPoint?.({
 							indexes: ["getUrl"],
 							blobs: ["non_html", contentType],
 							doubles: [0]
@@ -320,116 +543,13 @@ export default {
 					title = urlStructure.pathname.split('/').pop() || urlStructure.pathname;
 					
 					ctx.waitUntil(
-						env.ANALYTICS.writeDataPoint({
+						env.ANALYTICS?.writeDataPoint?.({
 							indexes: ["getUrl"],
 							blobs: ["non_html", contentType],
 							doubles: [0]
 						})
 					);
 				}
-			}
-			
-			// ===== 辅助函数：解析 JSON-LD =====
-			function parseJsonLd(soup) {
-				let result = null;
-				soup('script[type="application/ld+json"]').each((i, el) => {
-					try {
-						const data = JSON.parse(soup(el).html());
-						
-						const supportedTypes = [
-							'Article', 'NewsArticle', 'BlogPosting', 'WebPage',
-							'VideoObject', 'ImageObject', 'WebSite', 'ProfilePage', 'CollectionPage'
-						];
-
-						const processData = (item) => {
-							const type = item["@type"];
-							if (supportedTypes.includes(type)) {
-								if (!result) result = {};
-								if (item.headline && !result.headline) result.headline = item.headline;
-								if (item.description && !result.description) result.description = item.description;
-								
-								let img = item.image;
-								if (Array.isArray(img) && img.length > 0) img = img[0];
-								if (img && typeof img === 'object') {
-									img = img.url || img.contentUrl || "";
-								}
-								if (img && typeof img === 'string' && !result.image) result.image = img;
-							}
-						};
-						
-						if (data['@graph'] && Array.isArray(data['@graph'])) {
-							data['@graph'].forEach(processData);
-						} else if (Array.isArray(data)) {
-							data.forEach(processData);
-						} else {
-							processData(data);
-						}
-					} catch(e) {}
-				});
-				return result;
-			}
-
-			// ===== 辅助函数：提取页面标题 =====
-			function extractPageTitle(soup, jsonLd) {
-				if (soup("title").length > 0) return soup("title").text();
-				if (soup('meta[property="og:title"]').length > 0) return soup('meta[property="og:title"]').attr("content");
-				if (soup('meta[name="twitter:title"]').length > 0) return soup('meta[name="twitter:title"]').attr("content");
-				if (jsonLd && jsonLd.headline) return jsonLd.headline;
-				return "";
-			}
-			
-			// ===== 辅助函数：提取页面描述 =====
-			function extractPageDescription(soup, jsonLd) {
-				if (soup('meta[name="description"]').length > 0) return soup('meta[name="description"]').attr("content");
-				if (soup('meta[property="og:description"]').length > 0) return soup('meta[property="og:description"]').attr("content");
-				if (soup('meta[name="twitter:description"]').length > 0) return soup('meta[name="twitter:description"]').attr("content");
-				if (jsonLd && jsonLd.description) return jsonLd.description;
-				return "";
-			}
-			
-			// ===== 辅助函数：提取页面图片 =====
-			function extractPageImage(soup, htmlContent, urlObj, jsonLd) {
-				const hostname = urlObj.hostname;
-				let img = "";
-				
-				const siteImageExtractors = {
-					"ptt": () => {
-						if (soup("div.richcontent").length > 0) {
-							return soup("div.richcontent>img").attr("src") || "";
-						}
-						return "";
-					},
-					"iherb": () => soup('meta[property="og:images"]').attr("content") || "",
-					"amazon": () => soup("#landingImage").attr("src") || "",
-					"meee": () => {
-						const findString = urlObj.pathname.replace("/", "") + ".";
-						const findIndex = htmlContent.indexOf(findString);
-						if (findIndex > -1) {
-							const imageName = "/" + htmlContent.substring(findIndex, findIndex + findString.length + 3);
-							return urlObj.href.replace(urlObj.pathname, imageName);
-						}
-						return "";
-					}
-				};
-				
-				for (const [siteKeyword, extractor] of Object.entries(siteImageExtractors)) {
-					if (hostname.indexOf(siteKeyword) > -1) {
-						img = extractor();
-						if (img) break;
-					}
-				}
-				
-				if (!img) {
-					img = soup('meta[property="og:image"]').attr("content") ||
-						  soup('meta[property="og:image:url"]').attr("content") ||
-						  soup('meta[name="twitter:image"]').attr("content") ||
-						  soup('meta[property="og:images"]').attr("content") ||
-						  soup("#landingImage").attr("src") ||
-						  (jsonLd && jsonLd.image ? jsonLd.image : "") ||
-						  soup('link[rel*="icon"]').first().attr("href") || "";
-				}
-				
-				return normalizeUrl(img, urlObj.href);
 			}
 
 			if (title || desc || imageUrl) {
