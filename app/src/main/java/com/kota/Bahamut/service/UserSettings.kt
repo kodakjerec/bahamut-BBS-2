@@ -3,8 +3,13 @@ package com.kota.Bahamut.service
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
+import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast.showLongToast
 import com.kota.telnet.PropertiesOperator
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
 import java.io.File
 
 class UserSettings(var myContext: Context) {
@@ -116,6 +121,10 @@ class UserSettings(var myContext: Context) {
         const val PROPERTIES_ARTICLE_HEADS: String = "ArticleHeaders" // 文章標題清單
         const val PROPERTIES_ARTICLE_EXPRESSIONS: String = "ArticleExpressions" // 表情符號清單
         const val PROPERTIES_SHORT_URL_NON_ID: String = "ShortUrlNonId" // 短網址,開啟去識別化
+        const val PROPERTIES_SHORT_URL_RESTORE: String = "ShortUrlRestore" // 短網址,開啟還原網址
+        const val PROPERTIES_RESTORE_URLS_VERSION: String = "RestoreUrlsVersion" // 還原網址主機清單版本號
+        const val PROPERTIES_RESTORE_URLS_LIST: String = "RestoreUrlsList" // 還原網址主機清單 (以逗號分隔)
+        const val RESTORE_URLS_DEFAULT: String = "facebook.com,fb.watch,fb.me,tw.shp.ee" // 預設還原網址主機清單
         const val PROPERTIES_WEB_SIGN_IN: String = "WebSignIn" // 開啟網頁登入
         const val PROPERTIES_WEB_USERNAME: String = "WebUsername" // Web 登入帳號 (不雲端同步)
         const val PROPERTIES_WEB_PASSWORD: String = "WebPassword" // Web 登入密碼 (不雲端同步)
@@ -152,6 +161,8 @@ class UserSettings(var myContext: Context) {
             FLOATING_LOCATION_Y,
             PROPERTIES_VIP,
             NON_VIP_SHORTEN_TIMES_LIMIT,
+            PROPERTIES_RESTORE_URLS_VERSION,
+            PROPERTIES_RESTORE_URLS_LIST,
             "upgrade"
         )
 
@@ -685,15 +696,138 @@ class UserSettings(var myContext: Context) {
                 myEditor!!.putString(PROPERTIES_POST_TOOLBAR_ORDER, order).commit()
             }
 
+        /** 設定是否啟用短網址「去識別化」（移除網址追蹤參數） */
         fun setPropertiesShortUrlNonId(enable: Boolean) {
             myEditor!!.putBoolean(PROPERTIES_SHORT_URL_NON_ID, enable).commit()
         }
 
+        /** 取得是否啟用短網址「去識別化」（預設為 true） */
         val shortUrlNonId: Boolean
             get() = mySharedPref!!.getBoolean(
                 PROPERTIES_SHORT_URL_NON_ID,
                 true
             )
+
+        /** 設定是否啟用短網址「還原網址」（展開短網址與 Facebook share 轉址） */
+        fun setPropertiesShortUrlRestore(enable: Boolean) {
+            myEditor!!.putBoolean(PROPERTIES_SHORT_URL_RESTORE, enable).commit()
+        }
+
+        /** 取得是否啟用短網址「還原網址」（預設為 true） */
+        val shortUrlRestore: Boolean
+            get() = mySharedPref!!.getBoolean(
+                PROPERTIES_SHORT_URL_RESTORE,
+                true
+            )
+
+        /** 取得或設定本機目前已同步的「還原網址」主機清單版本號（預設為 0） */
+        @JvmStatic
+        var restoreUrlsVersion: Int
+            get() = mySharedPref?.getInt(
+                PROPERTIES_RESTORE_URLS_VERSION,
+                0
+            ) ?: 0
+            set(version) {
+                myEditor?.putInt(
+                    PROPERTIES_RESTORE_URLS_VERSION,
+                    version
+                )?.commit()
+            }
+
+        /**
+         * 取得或設定本機儲存的「還原網址」主機清單：
+         * - 讀取時將 SharedPreferences 中以逗號分隔的字串拆解為清單（若無資料則回傳預設清單 `RESTORE_URLS_DEFAULT`）。
+         * - 寫入時將字串清單以逗號合併後存入 SharedPreferences。
+         */
+        @JvmStatic
+        var restoreUrlsList: List<String>
+            get() {
+                val raw = mySharedPref?.getString(
+                    PROPERTIES_RESTORE_URLS_LIST,
+                    RESTORE_URLS_DEFAULT
+                ) ?: RESTORE_URLS_DEFAULT
+                return raw.split(",")
+                    .map { it.trim().lowercase() }
+                    .filter { it.isNotEmpty() }
+            }
+            set(urls) {
+                val joined = urls.map { it.trim().lowercase() }
+                    .filter { it.isNotEmpty() }
+                    .joinToString(",")
+                myEditor?.putString(
+                    PROPERTIES_RESTORE_URLS_LIST,
+                    joined
+                )?.commit()
+            }
+
+        /**
+         * 於登入成功後在背景協程執行，向 Cloudflare 檢查並更新「還原網址」主機清單：
+         * 1. 先請求 `/version` 取得雲端最新 `version` 編號。
+         * 2. 比對雲端版本號與本機 SharedPreferences 儲存的 `restoreUrlsVersion`：
+         *    僅在雲端版本號大於本機版本號（或本機尚未寫入過清單）時，才進一步請求 `/config`。
+         * 3. 從 `/config` 下載 JSON，解析 `urls` 陣列與 `version` 後替換本機 SharedPreferences 中的清單與版本號。
+         */
+        @JvmStatic
+        fun syncRestoreUrlsConfig() {
+            ASCoroutine.runInNewCoroutine {
+                try {
+                    val client = OkHttpClient()
+                    val versionUrl = "https://restore-urls.kodakjerec.workers.dev/version"
+                    val configUrl = "https://restore-urls.kodakjerec.workers.dev/config"
+
+                    // 步驟 1：查詢雲端版本號
+                    val versionRequest = Request.Builder()
+                        .url(versionUrl)
+                        .get()
+                        .build()
+
+                    val remoteVersion = client.newCall(versionRequest).execute().use { response ->
+                        if (!response.isSuccessful) return@use -1
+                        val bodyStr = response.body.string()
+                        JSONObject(bodyStr).optInt("version", -1)
+                    }
+
+                    if (remoteVersion <= 0) return@runInNewCoroutine
+
+                    // 步驟 2：比對本機版本號，若無更新且本機已有清單則略過下載
+                    val localVersion = restoreUrlsVersion
+                    val hasLocalConfig = !mySharedPref?.getString(PROPERTIES_RESTORE_URLS_LIST, null).isNullOrEmpty()
+                    if (remoteVersion <= localVersion && hasLocalConfig) {
+                        return@runInNewCoroutine
+                    }
+
+                    // 步驟 3：有新版本，下載完整 config JSON 並替換本機端 urls 與 version
+                    val configRequest = Request.Builder()
+                        .url(configUrl)
+                        .get()
+                        .build()
+
+                    client.newCall(configRequest).execute().use { response ->
+                        if (!response.isSuccessful) return@use
+                        val bodyStr = response.body.string()
+                        val jsonObject = JSONObject(bodyStr)
+                        val newVersion = jsonObject.optInt("version", remoteVersion)
+                        val urlsArray = jsonObject.optJSONArray("urls") ?: return@use
+
+                        val newUrls = mutableListOf<String>()
+                        for (i in 0 until urlsArray.length()) {
+                            val domain = urlsArray.optString(i, "").trim().lowercase()
+                            if (domain.isNotEmpty()) {
+                                newUrls.add(domain)
+                            }
+                        }
+
+                        if (newUrls.isNotEmpty()) {
+                            restoreUrlsList = newUrls
+                            restoreUrlsVersion = newVersion
+                            Log.d("UserSettings", "Restore URLs updated to version $newVersion: $newUrls")
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("UserSettings", "syncRestoreUrlsConfig failed: ${e.message}")
+                }
+            }
+        }
 
         @JvmStatic
         var propertiesWebSignIn: Boolean

@@ -394,8 +394,8 @@ export default {
 							metaMap["twitter:title"] || 
 							(jsonLd && jsonLd.headline ? jsonLd.headline : "");
 
-					// ===== 提取描述 (meee 站點為通用廣告文案，置空) =====
-					desc = isMeee ? "" : (
+					// ===== 提取描述 =====
+					desc = (
 						metaMap["description"] || 
 						metaMap["og:description"] || 
 						metaMap["twitter:description"] || 
