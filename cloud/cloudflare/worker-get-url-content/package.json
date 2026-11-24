@@ -10,7 +10,5 @@
   "devDependencies": {
     "wrangler": "^3.0.0"
   },
-  "dependencies": {
-    "cheerio": "^1.0.0-rc.12"
-  }
+  "dependencies": {}
 }
