@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Paint
 import android.os.PowerManager
 import android.provider.Settings
 import android.view.View
@@ -652,6 +653,11 @@ class SystemSettingsPage : TelnetPage() {
                 highRefreshRateBox.isEnabled = true
                 highRefreshRateItem?.isEnabled = true
                 highRefreshRateLabel?.isEnabled = true
+                highRefreshRateItem?.alpha = 1.0f
+                if (highRefreshRateLabel != null) {
+                    highRefreshRateLabel.paintFlags = highRefreshRateLabel.paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                    highRefreshRateLabel.text = getContextString(R.string.high_refresh_rate)
+                }
                 highRefreshRateBox.isChecked = propertiesHighRefreshRate
                 highRefreshRateBox.setOnCheckedChangeListener { _, isChecked ->
                     propertiesHighRefreshRate = isChecked
@@ -668,6 +674,11 @@ class SystemSettingsPage : TelnetPage() {
                 highRefreshRateBox.isEnabled = false
                 highRefreshRateItem?.isEnabled = false
                 highRefreshRateLabel?.isEnabled = false
+                highRefreshRateItem?.alpha = 0.4f
+                if (highRefreshRateLabel != null) {
+                    highRefreshRateLabel.paintFlags = highRefreshRateLabel.paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                    highRefreshRateLabel.text = "${getContextString(R.string.high_refresh_rate)} (不支援)"
+                }
                 highRefreshRateItem?.setOnClickListener(null)
             }
         }
