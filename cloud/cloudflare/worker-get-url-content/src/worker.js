@@ -1,14 +1,53 @@
+// ===== 辅助函数：解码 HTML Entities =====
+function decodeHtmlEntities(str) {
+	if (!str || typeof str !== "string") return "";
+	return str
+		.replace(/&#x([0-9a-fA-F]+);/gi, (_, hex) => {
+			try {
+				return String.fromCodePoint(parseInt(hex, 16));
+			} catch {
+				return _;
+			}
+		})
+		.replace(/&#(\d+);/g, (_, dec) => {
+			try {
+				return String.fromCodePoint(parseInt(dec, 10));
+			} catch {
+				return _;
+			}
+		})
+		.replace(/&quot;/gi, '"')
+		.replace(/&apos;/gi, "'")
+		.replace(/&lt;/gi, '<')
+		.replace(/&gt;/gi, '>')
+		.replace(/&nbsp;/gi, ' ')
+		.replace(/&amp;/gi, '&');
+}
+
 // ===== 辅助函数：URL 正规化 =====
 function normalizeUrl(imgUrl, pageUrl) {
 	if (!imgUrl) return "";
+	imgUrl = decodeHtmlEntities(imgUrl);
+	let resultUrl = imgUrl;
 	try {
 		if (imgUrl.startsWith("//")) {
-			return "https:" + imgUrl;
+			resultUrl = "https:" + imgUrl;
+		} else {
+			resultUrl = new URL(imgUrl, pageUrl).href;
 		}
-		return new URL(imgUrl, pageUrl).href;
 	} catch (e) {
-		return imgUrl;
+		resultUrl = imgUrl;
 	}
+
+	// 限定 facebook.com：拿掉 imageUrl 中 ? 後面的字串
+	try {
+		const pageHost = pageUrl ? new URL(pageUrl).hostname.toLowerCase() : "";
+		if (pageHost === "facebook.com" || pageHost.endsWith(".facebook.com") || pageHost === "facebed.com" || pageHost.endsWith(".facebed.com")) {
+			resultUrl = resultUrl.split("?")[0];
+		}
+	} catch (e) {}
+
+	return resultUrl;
 }
 
 // ===== 辅助函数：依据图片网址副档名取得 Content-Type =====
@@ -150,8 +189,8 @@ export default {
 
 					if (!isMeeeUrl || cachedImageUrl) {
 						return Response.json({
-							title: results[0].title || "",
-							desc: isMeeeUrl ? "" : (results[0].desc || ""),
+							title: decodeHtmlEntities(results[0].title || ""),
+							desc: isMeeeUrl ? "" : decodeHtmlEntities(results[0].desc || ""),
 							imageUrl: cachedImageUrl,
 							contentType: cachedContentType,
 							isMedia: cachedContentType.startsWith("image/") || cachedContentType.startsWith("video/") || cachedContentType.startsWith("audio/")
@@ -389,13 +428,15 @@ export default {
 					const jsonLd = parseJsonLdFromHtml(htmlBuffer);
 
 					// ===== 提取标题 =====
-					title = pageTitle || 
-							metaMap["og:title"] || 
-							metaMap["twitter:title"] || 
-							(jsonLd && jsonLd.headline ? jsonLd.headline : "");
+					title = decodeHtmlEntities(
+						pageTitle || 
+						metaMap["og:title"] || 
+						metaMap["twitter:title"] || 
+						(jsonLd && jsonLd.headline ? jsonLd.headline : "")
+					);
 
 					// ===== 提取描述 =====
-					desc = (
+					desc = decodeHtmlEntities(
 						metaMap["description"] || 
 						metaMap["og:description"] || 
 						metaMap["twitter:description"] || 
