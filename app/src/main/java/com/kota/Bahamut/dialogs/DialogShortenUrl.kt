@@ -25,6 +25,11 @@ import com.kota.asFramework.dialog.ASDialog
 import com.kota.asFramework.dialog.ASProcessingDialog
 import com.kota.asFramework.thread.ASCoroutine
 import com.kota.asFramework.ui.ASToast
+import fe.clearurlskt.ClearUrlSettings
+import fe.clearurlskt.ClearUrls
+import fe.clearurlskt.Resource
+import fe.clearurlskt.config.loader.BundledClearURLConfigLoader
+import fe.std.result.isSuccess
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -267,6 +272,12 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
     }
 
     /** 去識別化 */
+    private val clearUrls by lazy {
+        val result = BundledClearURLConfigLoader(Resource::class.java).load()
+        val providers = if (result.isSuccess()) result.value.orEmpty() else emptyList()
+        ClearUrls(providers)
+    }
+
     private fun urlRemoveId() {
         val filterString = if (UserSettings.shortUrlNonId) {
             var returnString = editText.text.toString()
@@ -276,37 +287,9 @@ class DialogShortenUrl : ASDialog(), OnClickListener,DialogShortenUrlItemViewLis
 
             val urls: Array<URLSpan> = textView.urls
             if (urls.isNotEmpty()) {
-                // 針對網址處理
-
                 val firstUrl = urls[0].url
-                val splits = firstUrl.split("?")
-                if (splits.size>=2) {
-                    // 有參數
-
-                    // 先指定給前面位址
-                    returnString = splits[0]
-
-                    // 特定網址參數例外處理
-                    // www.facebook.com , 只保留 fbid=1234
-                    // www.youtube.com , 只保留 v=1234
-                    if (splits[0].indexOf("www.youtube.com")>0 || splits[0].indexOf("www.facebook.com")>0) {
-                        val reserveKeys = arrayOf("v","fbid")
-                        val params = splits[1].split("&")
-                        if (params.isNotEmpty()) {
-                            for (param in params) {
-                                val paramPair = param.split("=")
-                                if (reserveKeys.contains(paramPair[0])) {
-                                    returnString+= "?$param"
-                                }
-                            }
-                        } else {
-                            returnString += splits[1]
-                        }
-                    }
-                } else {
-                    // 沒有參數
-                    returnString = firstUrl
-                }
+                val (cleanedUrl, _) = clearUrls.clearUrl(firstUrl, ClearUrlSettings(skipUnchanged = true))
+                returnString = cleanedUrl
             }
 
             returnString
