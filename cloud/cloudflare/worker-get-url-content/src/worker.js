@@ -39,14 +39,6 @@ function normalizeUrl(imgUrl, pageUrl) {
 		resultUrl = imgUrl;
 	}
 
-	// 限定 facebook.com：拿掉 imageUrl 中 ? 後面的字串
-	try {
-		const pageHost = pageUrl ? new URL(pageUrl).hostname.toLowerCase() : "";
-		if (pageHost === "facebook.com" || pageHost.endsWith(".facebook.com") || pageHost === "facebed.com" || pageHost.endsWith(".facebed.com")) {
-			resultUrl = resultUrl.split("?")[0];
-		}
-	} catch (e) {}
-
 	return resultUrl;
 }
 
